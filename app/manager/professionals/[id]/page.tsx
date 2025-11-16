@@ -6,6 +6,7 @@ import { Users, Calendar, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { notFound } from "next/navigation";
 import { formatTimeAgo } from "@/lib/utils/date";
+import Link from "next/link";
 
 export default async function ProfessionalDetailPage({
   params,
@@ -33,8 +34,9 @@ export default async function ProfessionalDetailPage({
           <p className="text-slate-600">{professional.email}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">Edit Profile</Button>
-          <Button>Manage Permissions</Button>
+          <Link href={`/manager/professionals/${professional.id}/edit`}>
+            <Button variant="outline">Edit Profile</Button>
+          </Link>
         </div>
       </div>
 
@@ -113,15 +115,17 @@ export default async function ProfessionalDetailPage({
 
         <Card>
           <CardHeader>
-            <CardTitle>Permissions</CardTitle>
+            <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-slate-600 mb-4">
-              Manage granular permissions for this professional
+          <CardContent className="space-y-2">
+            <Link href={`/manager/professionals/${professional.id}/edit`} className="block">
+              <Button variant="outline" className="w-full">
+                Edit Profile
+              </Button>
+            </Link>
+            <p className="text-xs text-slate-500 text-center pt-2">
+              Permission management available in future updates
             </p>
-            <Button variant="outline" className="w-full">
-              Configure Permissions
-            </Button>
           </CardContent>
         </Card>
       </div>
