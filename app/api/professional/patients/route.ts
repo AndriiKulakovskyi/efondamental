@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireProfessional, getUserContext } from "@/lib/rbac/middleware";
 import { createPatient } from "@/lib/services/patient.service";
 import { getPathologyByType } from "@/lib/services/center.service";
+import { invitePatient } from "@/lib/services/user-provisioning.service";
 import { PathologyType } from "@/lib/types/enums";
 import { logPatientCreation } from "@/lib/services/audit.service";
 
@@ -78,7 +79,39 @@ export async function POST(request: NextRequest) {
       { firstName, lastName, medicalRecordNumber }
     );
 
-    return NextResponse.json({ patient }, { status: 201 });
+    // Send patient invitation if email is provided
+    let invitationResult = null;
+    if (email) {
+      try {
+        invitationResult = await invitePatient({
+          patientId: patient.id,
+          email,
+          firstName,
+          lastName,
+          centerId: context.profile.center_id,
+          invitedBy: context.user.id,
+        });
+
+        if (!invitationResult.success) {
+          console.warn('Failed to send patient invitation:', invitationResult.error);
+          // Don't fail patient creation, just log the warning
+        }
+      } catch (inviteError) {
+        console.error('Error sending patient invitation:', inviteError);
+        // Patient creation succeeds even if invitation fails
+      }
+    }
+
+    return NextResponse.json({ 
+      patient,
+      invitation: invitationResult?.success ? {
+        sent: true,
+        invitationId: invitationResult.invitationId,
+      } : {
+        sent: false,
+        reason: !email ? 'No email provided' : invitationResult?.error || 'Failed to send',
+      }
+    }, { status: 201 });
   } catch (error) {
     console.error("Failed to create patient:", error);
     

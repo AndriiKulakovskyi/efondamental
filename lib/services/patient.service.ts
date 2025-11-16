@@ -74,9 +74,77 @@ export async function activatePatient(patientId: string): Promise<void> {
   await updatePatient(patientId, { active: true });
 }
 
-export async function deletePatient(patientId: string): Promise<void> {
-  // Soft delete by deactivating the patient
-  await deactivatePatient(patientId);
+export async function deletePatient(
+  patientId: string,
+  deletedBy: string
+): Promise<void> {
+  const supabase = await createClient();
+
+  // Get patient info before deletion
+  const patient = await getPatientById(patientId);
+  if (!patient) {
+    throw new Error('Patient not found');
+  }
+
+  // 1. Cancel any pending invitations
+  await supabase
+    .from('user_invitations')
+    .update({ status: 'expired' })
+    .eq('patient_id', patientId)
+    .eq('status', 'pending');
+
+  // 2. Deactivate linked user account if exists
+  if (patient.user_id) {
+    await supabase
+      .from('user_profiles')
+      .update({ active: false })
+      .eq('id', patient.user_id);
+  }
+
+  // 3. Soft delete the patient with metadata
+  await supabase
+    .from('patients')
+    .update({
+      active: false,
+      deleted_at: new Date().toISOString(),
+      deleted_by: deletedBy,
+    })
+    .eq('id', patientId);
+}
+
+export async function restorePatient(
+  patientId: string
+): Promise<void> {
+  const supabase = await createClient();
+
+  // Get patient info
+  const { data: patient } = await supabase
+    .from('patients')
+    .select('user_id')
+    .eq('id', patientId)
+    .single();
+
+  if (!patient) {
+    throw new Error('Patient not found');
+  }
+
+  // 1. Reactivate the patient
+  await supabase
+    .from('patients')
+    .update({
+      active: true,
+      deleted_at: null,
+      deleted_by: null,
+    })
+    .eq('id', patientId);
+
+  // 2. Reactivate linked user account if exists
+  if (patient.user_id) {
+    await supabase
+      .from('user_profiles')
+      .update({ active: true })
+      .eq('id', patient.user_id);
+  }
 }
 
 // ============================================================================
@@ -355,3 +423,52 @@ export async function getPatientsRequiringFollowup(
   return patientsRequiringFollowup;
 }
 
+// ============================================================================
+// PATIENT INVITATION STATUS
+// ============================================================================
+
+export interface PatientInvitationStatus {
+  hasUserAccount: boolean;
+  userId: string | null;
+  pendingInvitation: {
+    id: string;
+    sentAt: string;
+    expiresAt: string;
+    email: string;
+  } | null;
+}
+
+export async function getPatientInvitationStatus(
+  patientId: string
+): Promise<PatientInvitationStatus> {
+  const supabase = await createClient();
+
+  // Check if patient has a linked user account
+  const { data: patient } = await supabase
+    .from('patients')
+    .select('user_id')
+    .eq('id', patientId)
+    .single();
+
+  const hasUserAccount = !!(patient?.user_id);
+  const userId = patient?.user_id || null;
+
+  // Check for pending invitation
+  const { data: invitation } = await supabase
+    .from('user_invitations')
+    .select('id, created_at, expires_at, email')
+    .eq('patient_id', patientId)
+    .eq('status', 'pending')
+    .single();
+
+  return {
+    hasUserAccount,
+    userId,
+    pendingInvitation: invitation ? {
+      id: invitation.id,
+      sentAt: invitation.created_at,
+      expiresAt: invitation.expires_at,
+      email: invitation.email,
+    } : null,
+  };
+}

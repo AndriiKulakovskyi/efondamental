@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, use } from "next/navigation";
+import { useEffect, useState, use } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,10 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  acceptInvitation,
-  getInvitation,
-} from "@/lib/services/user-provisioning.service";
+// Removed server-side imports - now using API routes instead
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { ROLE_NAMES } from "@/lib/types/enums";
 
@@ -39,7 +36,14 @@ export default function InvitationPage({
   useEffect(() => {
     async function loadInvitation() {
       try {
-        const data = await getInvitation(resolvedParams.token);
+        const response = await fetch(`/api/invitations/${resolvedParams.token}`);
+        
+        if (!response.ok) {
+          setError("This invitation is invalid or has expired.");
+          return;
+        }
+
+        const { invitation: data } = await response.json();
         
         if (!data || data.status !== "pending") {
           setError("This invitation is invalid or has expired.");
@@ -79,18 +83,29 @@ export default function InvitationPage({
     setIsSubmitting(true);
 
     try {
-      const result = await acceptInvitation({
-        token: resolvedParams.token,
-        password,
-        username: username || undefined,
+      const response = await fetch('/api/invitations/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: resolvedParams.token,
+          password,
+          username: username || undefined,
+        }),
       });
 
-      if (!result.success) {
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
         setError(result.error || "Failed to accept invitation");
         return;
       }
 
-      router.push("/auth/login?message=Account created successfully");
+      // Redirect based on role
+      if (invitation.role === 'patient') {
+        router.push("/auth/login?message=Account created successfully. Please login to access your patient portal.");
+      } else {
+        router.push("/auth/login?message=Account created successfully");
+      }
     } catch (err) {
       setError("An unexpected error occurred");
     } finally {
@@ -124,14 +139,26 @@ export default function InvitationPage({
     );
   }
 
+  const isPatientInvitation = invitation.role === 'patient';
+
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl">Accept Invitation</CardTitle>
+          <CardTitle className="text-2xl">
+            {isPatientInvitation ? "Welcome to Your Patient Portal" : "Accept Invitation"}
+          </CardTitle>
           <CardDescription>
-            You&apos;ve been invited to join eFondaMental as a{" "}
-            <strong>{ROLE_NAMES[invitation.role]}</strong>
+            {isPatientInvitation ? (
+              <span>
+                Create your account to access your appointments, questionnaires, and communicate with your healthcare team.
+              </span>
+            ) : (
+              <span>
+                You&apos;ve been invited to join eFondaMental as a{" "}
+                <strong>{ROLE_NAMES[invitation.role]}</strong>
+              </span>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>

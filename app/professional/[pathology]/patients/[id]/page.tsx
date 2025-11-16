@@ -1,4 +1,4 @@
-import { getPatientById, getPatientStats, getPatientRiskLevel } from "@/lib/services/patient.service";
+import { getPatientById, getPatientStats, getPatientRiskLevel, getPatientInvitationStatus } from "@/lib/services/patient.service";
 import { getVisitsByPatient } from "@/lib/services/visit.service";
 import { 
   getEvaluationsByPatient, 
@@ -21,6 +21,8 @@ import { VISIT_TYPE_NAMES, PATHOLOGY_NAMES, PathologyType } from "@/lib/types/en
 import { AnalyticsCharts } from "./components/analytics-charts";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { DeletePatientDialog } from "./components/delete-patient-dialog";
+import { InvitationStatus } from "./components/invitation-status";
+import { EditPatientEmail } from "./components/edit-patient-email";
 
 export default async function PatientDetailPage({
   params,
@@ -48,7 +50,7 @@ export default async function PatientDetailPage({
   twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
   const fromDate = twelveMonthsAgo.toISOString();
 
-  const [stats, visits, riskLevel, evaluations, moodTrend, riskHistory, adherenceTrend] = await Promise.all([
+  const [stats, visits, riskLevel, evaluations, moodTrend, riskHistory, adherenceTrend, invitationStatus] = await Promise.all([
     getPatientStats(id),
     getVisitsByPatient(id),
     getPatientRiskLevel(id),
@@ -56,6 +58,7 @@ export default async function PatientDetailPage({
     getMoodTrend(id, fromDate),
     getRiskHistory(id, fromDate),
     getMedicationAdherenceTrend(id, fromDate),
+    getPatientInvitationStatus(id),
   ]);
 
   const risk = formatRiskLevel(riskLevel);
@@ -80,6 +83,12 @@ export default async function PatientDetailPage({
           </p>
         </div>
         <div className="flex gap-2">
+          <EditPatientEmail
+            patientId={id}
+            currentEmail={patient.email}
+            patientFirstName={patient.first_name}
+            patientLastName={patient.last_name}
+          />
           <Link href={`/professional/${pathology}/patients/${id}/visits/new`}>
             <Button>Schedule Visit</Button>
           </Link>
@@ -139,6 +148,13 @@ export default async function PatientDetailPage({
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
+          <InvitationStatus
+            patientId={id}
+            patientEmail={patient.email}
+            hasUserAccount={invitationStatus.hasUserAccount}
+            pendingInvitation={invitationStatus.pendingInvitation}
+          />
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>

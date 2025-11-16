@@ -2,6 +2,7 @@
 // Top-down user creation: Admin -> Manager -> Professional -> Patient
 
 import { createClient } from '../supabase/server';
+import { createAdminClient } from '../supabase/admin';
 import { UserRole, InvitationStatus } from '../types/enums';
 import {
   UserInvitationInsert,
@@ -111,6 +112,8 @@ export async function createUserInvitation(
       email: request.email,
       role: request.role,
       center_id: request.centerId,
+      first_name: request.firstName,
+      last_name: request.lastName,
       token,
       status: InvitationStatus.PENDING,
       invited_by: request.invitedBy,
@@ -174,6 +177,8 @@ export async function acceptInvitation(
   const supabase = await createClient();
 
   try {
+    console.log('[ACCEPT INVITATION SERVICE] Validating invitation...');
+    
     // Validate invitation
     const { data: invitation } = await supabase
       .from('user_invitations')
@@ -181,6 +186,8 @@ export async function acceptInvitation(
       .eq('token', request.token)
       .eq('status', InvitationStatus.PENDING)
       .single();
+
+    console.log('[ACCEPT INVITATION SERVICE] Invitation found:', invitation ? 'YES' : 'NO');
 
     if (!invitation) {
       return {
@@ -202,19 +209,38 @@ export async function acceptInvitation(
       };
     }
 
-    // Create auth user (using admin client)
+    // Create auth user (using admin client with service role key)
+    console.log('[ACCEPT INVITATION SERVICE] Creating admin client...');
+    const adminClient = createAdminClient();
+    
+    console.log('[ACCEPT INVITATION SERVICE] Creating auth user for:', invitation.email);
     const { data: authUser, error: authError } =
-      await supabase.auth.admin.createUser({
+      await adminClient.auth.admin.createUser({
         email: invitation.email,
         password: request.password,
         email_confirm: true,
       });
 
     if (authError || !authUser.user) {
+      console.error('[ACCEPT INVITATION SERVICE] Failed to create auth user:', authError);
       return {
         success: false,
         error: authError?.message || 'Failed to create user account',
       };
+    }
+
+    console.log('[ACCEPT INVITATION SERVICE] Auth user created successfully. ID:', authUser.user.id);
+
+    // Get patient data if this is a patient invitation
+    let patientData = null;
+    if (invitation.role === UserRole.PATIENT && invitation.patient_id) {
+      const { data } = await supabase
+        .from('patients')
+        .select('first_name, last_name')
+        .eq('id', invitation.patient_id)
+        .single();
+      
+      patientData = data;
     }
 
     // Create user profile
@@ -224,38 +250,77 @@ export async function acceptInvitation(
       center_id: invitation.center_id,
       email: invitation.email,
       username: request.username || null,
-      first_name: null,
-      last_name: null,
+      first_name: patientData?.first_name || null,
+      last_name: patientData?.last_name || null,
       active: true,
-      metadata: {},
+      metadata: invitation.patient_id ? { patient_id: invitation.patient_id } : {},
       created_by: invitation.invited_by,
     };
 
-    const { error: profileError } = await supabase
+    console.log('[ACCEPT INVITATION SERVICE] Inserting user profile:', {
+      id: profile.id,
+      role: profile.role,
+      email: profile.email,
+      center_id: profile.center_id,
+    });
+
+    // Use admin client to bypass RLS policies during user creation
+    const { data: insertedProfile, error: profileError } = await adminClient
       .from('user_profiles')
-      .insert(profile);
+      .insert(profile)
+      .select()
+      .single();
 
     if (profileError) {
+      console.error('[ACCEPT INVITATION SERVICE] ❌ Failed to insert user profile:', profileError);
+      console.error('[ACCEPT INVITATION SERVICE] Error code:', profileError.code);
+      console.error('[ACCEPT INVITATION SERVICE] Error message:', profileError.message);
+      console.error('[ACCEPT INVITATION SERVICE] Error details:', profileError.details);
+      
       // Rollback: delete auth user
-      await supabase.auth.admin.deleteUser(authUser.user.id);
+      console.log('[ACCEPT INVITATION SERVICE] Rolling back - deleting auth user...');
+      await adminClient.auth.admin.deleteUser(authUser.user.id);
 
       return {
         success: false,
-        error: 'Failed to create user profile',
+        error: `Failed to create user profile: ${profileError.message}`,
       };
     }
+
+    console.log('[ACCEPT INVITATION SERVICE] ✅ User profile created successfully');
 
     // Grant default permissions for role
     await grantDefaultPermissions(authUser.user.id, invitation.role);
 
+    // If this is a patient invitation, link the patient record to the user account
+    if (invitation.role === UserRole.PATIENT && invitation.patient_id) {
+      console.log('[ACCEPT INVITATION SERVICE] Linking patient to user account...');
+      
+      const { error: linkError } = await adminClient
+        .from('patients')
+        .update({ user_id: authUser.user.id })
+        .eq('id', invitation.patient_id);
+
+      if (linkError) {
+        console.error('[ACCEPT INVITATION SERVICE] Failed to link patient to user account:', linkError);
+        // Don't fail the entire process, just log the error
+      } else {
+        console.log('[ACCEPT INVITATION SERVICE] ✅ Patient linked to user account');
+      }
+    }
+
     // Update invitation status
-    await supabase
+    console.log('[ACCEPT INVITATION SERVICE] Updating invitation status to accepted...');
+    
+    await adminClient
       .from('user_invitations')
       .update({
         status: InvitationStatus.ACCEPTED,
         accepted_by: authUser.user.id,
       })
       .eq('id', invitation.id);
+    
+    console.log('[ACCEPT INVITATION SERVICE] ✅ Invitation marked as accepted');
 
     return {
       success: true,
@@ -265,6 +330,110 @@ export async function acceptInvitation(
     return {
       success: false,
       error: 'An unexpected error occurred',
+    };
+  }
+}
+
+// ============================================================================
+// PATIENT INVITATION
+// ============================================================================
+
+export interface InvitePatientRequest {
+  patientId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  centerId: string;
+  invitedBy: string;
+}
+
+export async function invitePatient(
+  request: InvitePatientRequest
+): Promise<InvitationResult> {
+  const supabase = await createClient();
+
+  try {
+    // Check if email already has an active user account
+    const { data: existingProfile } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('email', request.email)
+      .single();
+
+    if (existingProfile) {
+      return {
+        success: false,
+        error: 'A user account with this email already exists',
+      };
+    }
+
+    // Check for pending invitation for this email
+    const { data: pendingInvitation } = await supabase
+      .from('user_invitations')
+      .select('id')
+      .eq('email', request.email)
+      .eq('status', InvitationStatus.PENDING)
+      .single();
+
+    if (pendingInvitation) {
+      return {
+        success: false,
+        error: 'A pending invitation already exists for this email',
+      };
+    }
+
+    // Generate secure token
+    const token = crypto.randomBytes(32).toString('hex');
+
+    // Set expiration (7 days from now)
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    // Create invitation
+    const invitation: UserInvitationInsert = {
+      email: request.email,
+      role: UserRole.PATIENT,
+      center_id: request.centerId,
+      patient_id: request.patientId,
+      first_name: request.firstName,
+      last_name: request.lastName,
+      token,
+      status: InvitationStatus.PENDING,
+      invited_by: request.invitedBy,
+      expires_at: expiresAt.toISOString(),
+    };
+
+    const { data, error } = await supabase
+      .from('user_invitations')
+      .insert(invitation)
+      .select()
+      .single();
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    // Send invitation email via Supabase
+    await sendPatientInvitationEmail({
+      email: request.email,
+      firstName: request.firstName,
+      lastName: request.lastName,
+      token,
+    });
+
+    return {
+      success: true,
+      invitationId: data.id,
+      token,
+    };
+  } catch (error) {
+    console.error('Failed to invite patient:', error);
+    return {
+      success: false,
+      error: 'An unexpected error occurred while sending invitation',
     };
   }
 }
@@ -345,9 +514,10 @@ export async function createPatientUser(
     const temporaryPassword =
       request.temporaryPassword || generateTemporaryPassword();
 
-    // Create auth user
+    // Create auth user (using admin client with service role key)
+    const adminClient = createAdminClient();
     const { data: authUser, error: authError } =
-      await supabase.auth.admin.createUser({
+      await adminClient.auth.admin.createUser({
         email: request.email,
         password: temporaryPassword,
         email_confirm: true,
@@ -379,7 +549,7 @@ export async function createPatientUser(
 
     if (profileError) {
       // Rollback: delete auth user
-      await supabase.auth.admin.deleteUser(authUser.user.id);
+      await adminClient.auth.admin.deleteUser(authUser.user.id);
 
       return {
         success: false,
@@ -459,15 +629,72 @@ interface InvitationEmailData {
 async function sendInvitationEmail(
   data: InvitationEmailData
 ): Promise<void> {
-  // TODO: Implement email sending
-  // For now, just log the invitation URL
   const invitationUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/invite/${data.token}`;
+  
+  // For staff invitations, we could use a different email template
+  // For now, just log that email should be sent
   console.log(`
-    Invitation email would be sent to: ${data.email}
+    Staff invitation created (email sending TBD):
+    To: ${data.email}
     Name: ${data.firstName} ${data.lastName}
     Role: ${data.role}
     Invitation URL: ${invitationUrl}
   `);
+  
+  // TODO: Implement staff invitation email template if needed
+}
+
+interface PatientInvitationEmailData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  token: string;
+}
+
+async function sendPatientInvitationEmail(
+  data: PatientInvitationEmailData
+): Promise<void> {
+  const invitationUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/invite/${data.token}`;
+  
+  try {
+    // Import email service
+    const { sendPatientInvitation } = await import('./email.service');
+    
+    // Send email using Resend
+    const sent = await sendPatientInvitation({
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      invitationUrl,
+    });
+
+    if (!sent) {
+      console.warn(`
+        ⚠️  Email not sent - RESEND_API_KEY not configured
+        
+        To enable email sending:
+        1. Sign up at https://resend.com (free tier: 3,000 emails/month)
+        2. Get your API key from the dashboard
+        3. Add to .env.local:
+           RESEND_API_KEY=re_your_key_here
+           NEXT_PUBLIC_SITE_URL=http://localhost:3000
+        4. Restart dev server: npm run dev
+        
+        For now, patient can access this invitation URL:
+        ${invitationUrl}
+      `);
+    } else {
+      console.log(`
+        ✅ Patient invitation email sent successfully!
+        To: ${data.email}
+        Name: ${data.firstName} ${data.lastName}
+        Invitation URL: ${invitationUrl}
+      `);
+    }
+  } catch (error) {
+    console.error('Error sending patient invitation email:', error);
+    // Don't throw - allow invitation to be created even if email fails
+  }
 }
 
 interface WelcomeEmailData {
@@ -586,14 +813,25 @@ export async function resendInvitation(
     };
   }
 
-  // Resend email
-  await sendInvitationEmail({
-    email: invitation.email,
-    firstName: '',
-    lastName: '',
-    token,
-    role: invitation.role,
-  });
+  // Resend email based on role
+  if (invitation.role === UserRole.PATIENT) {
+    // For patients, use the Resend-based email function
+    await sendPatientInvitationEmail({
+      email: invitation.email,
+      firstName: invitation.first_name || '',
+      lastName: invitation.last_name || '',
+      token,
+    });
+  } else {
+    // For staff, use the standard invitation email
+    await sendInvitationEmail({
+      email: invitation.email,
+      firstName: invitation.first_name || '',
+      lastName: invitation.last_name || '',
+      token,
+      role: invitation.role,
+    });
+  }
 
   return {
     success: true,
