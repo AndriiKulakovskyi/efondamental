@@ -14,11 +14,14 @@ export interface EvaluationSummary {
   evaluator_id: string;
   evaluator_name: string;
   visit_type: string | null;
-  mood_score: number | null;
+  diagnosis: string | null;
+  clinical_notes: string | null;
   risk_assessment: {
     suicide_risk?: 'none' | 'low' | 'moderate' | 'high';
     relapse_risk?: 'none' | 'low' | 'moderate' | 'high';
   } | null;
+  treatment_plan: string | null;
+  mood_score: number | null;
   medication_adherence: number | null;
   notes: string | null;
 }
@@ -30,11 +33,7 @@ export async function getEvaluationsByPatient(
 
   const { data, error } = await supabase
     .from('evaluations')
-    .select(`
-      *,
-      evaluator:user_profiles!evaluations_evaluator_id_fkey(first_name, last_name),
-      visit:visits(visit_type)
-    `)
+    .select('*')
     .eq('patient_id', patientId)
     .order('evaluation_date', { ascending: false });
 
@@ -42,21 +41,66 @@ export async function getEvaluationsByPatient(
     throw new Error(`Failed to fetch evaluations: ${error.message}`);
   }
 
-  return (data || []).map((eval: any) => ({
-    id: eval.id,
-    patient_id: eval.patient_id,
-    visit_id: eval.visit_id,
-    evaluation_date: eval.evaluation_date,
-    evaluator_id: eval.evaluator_id,
-    evaluator_name: eval.evaluator
-      ? `${eval.evaluator.first_name} ${eval.evaluator.last_name}`
-      : 'Unknown',
-    visit_type: eval.visit?.visit_type || null,
-    mood_score: eval.mood_score,
-    risk_assessment: eval.risk_assessment,
-    medication_adherence: eval.medication_adherence,
-    notes: eval.notes,
-  }));
+  // Fetch evaluator and visit info separately for each evaluation
+  const evaluationsWithDetails = await Promise.all(
+    (data || []).map(async (evaluation: any) => {
+      // Get evaluator info
+      let evaluatorName = 'Unknown';
+      if (evaluation.evaluator_id) {
+        const { data: evaluator } = await supabase
+          .from('user_profiles')
+          .select('first_name, last_name')
+          .eq('id', evaluation.evaluator_id)
+          .single();
+        
+        if (evaluator) {
+          evaluatorName = `${evaluator.first_name} ${evaluator.last_name}`;
+        }
+      }
+
+      // Get visit type
+      let visitType = null;
+      if (evaluation.visit_id) {
+        const { data: visit } = await supabase
+          .from('visits')
+          .select('visit_type')
+          .eq('id', evaluation.visit_id)
+          .single();
+        
+        if (visit) {
+          visitType = visit.visit_type;
+        }
+      }
+
+      // Extract mood_score and medication_adherence from metadata
+      const moodScore = evaluation.metadata && typeof evaluation.metadata === 'object' && 'mood_score' in evaluation.metadata
+        ? (evaluation.metadata as any).mood_score
+        : null;
+      
+      const medicationAdherence = evaluation.metadata && typeof evaluation.metadata === 'object' && 'medication_adherence' in evaluation.metadata
+        ? (evaluation.metadata as any).medication_adherence
+        : null;
+
+      return {
+        id: evaluation.id,
+        patient_id: evaluation.patient_id,
+        visit_id: evaluation.visit_id,
+        evaluation_date: evaluation.evaluation_date,
+        evaluator_id: evaluation.evaluator_id,
+        evaluator_name: evaluatorName,
+        visit_type: visitType,
+        diagnosis: evaluation.diagnosis,
+        clinical_notes: evaluation.clinical_notes,
+        risk_assessment: evaluation.risk_assessment,
+        treatment_plan: evaluation.treatment_plan,
+        mood_score: moodScore,
+        medication_adherence: medicationAdherence,
+        notes: evaluation.clinical_notes, // Use clinical_notes as notes
+      };
+    })
+  );
+
+  return evaluationsWithDetails;
 }
 
 export async function getEvaluationById(evaluationId: string) {
@@ -64,11 +108,7 @@ export async function getEvaluationById(evaluationId: string) {
 
   const { data, error } = await supabase
     .from('evaluations')
-    .select(`
-      *,
-      evaluator:user_profiles!evaluations_evaluator_id_fkey(first_name, last_name),
-      visit:visits(visit_type, template_name:visit_templates(name))
-    `)
+    .select('*')
     .eq('id', evaluationId)
     .single();
 
@@ -77,7 +117,43 @@ export async function getEvaluationById(evaluationId: string) {
     throw new Error(`Failed to fetch evaluation: ${error.message}`);
   }
 
-  return data;
+  if (!data) return null;
+
+  // Fetch related data separately
+  let evaluatorName = 'Unknown';
+  if (data.evaluator_id) {
+    const { data: evaluator } = await supabase
+      .from('user_profiles')
+      .select('first_name, last_name')
+      .eq('id', data.evaluator_id)
+      .single();
+    
+    if (evaluator) {
+      evaluatorName = `${evaluator.first_name} ${evaluator.last_name}`;
+    }
+  }
+
+  let visitType = null;
+  let templateName = null;
+  if (data.visit_id) {
+    const { data: visit } = await supabase
+      .from('visits')
+      .select('visit_type, visit_template:visit_templates(name)')
+      .eq('id', data.visit_id)
+      .single();
+    
+    if (visit) {
+      visitType = visit.visit_type;
+      templateName = (visit.visit_template as any)?.name;
+    }
+  }
+
+  return {
+    ...data,
+    evaluator_name: evaluatorName,
+    visit_type: visitType,
+    template_name: templateName,
+  };
 }
 
 // ============================================================================
@@ -99,9 +175,8 @@ export async function getMoodTrend(
 
   let query = supabase
     .from('evaluations')
-    .select('evaluation_date, mood_score, evaluator_id')
+    .select('evaluation_date, metadata')
     .eq('patient_id', patientId)
-    .not('mood_score', 'is', null)
     .order('evaluation_date', { ascending: true });
 
   if (fromDate) {
@@ -118,11 +193,14 @@ export async function getMoodTrend(
     throw new Error(`Failed to fetch mood trend: ${error.message}`);
   }
 
-  return (data || []).map((item) => ({
-    date: item.evaluation_date,
-    mood_score: item.mood_score!,
-    source: 'clinical' as const,
-  }));
+  // Extract mood_score from metadata if available
+  return (data || [])
+    .filter((item) => item.metadata && typeof item.metadata === 'object' && 'mood_score' in item.metadata)
+    .map((item) => ({
+      date: item.evaluation_date,
+      mood_score: (item.metadata as any).mood_score,
+      source: 'clinical' as const,
+    }));
 }
 
 export interface RiskHistoryData {
@@ -182,9 +260,8 @@ export async function getMedicationAdherenceTrend(
 
   let query = supabase
     .from('evaluations')
-    .select('evaluation_date, medication_adherence')
+    .select('evaluation_date, metadata')
     .eq('patient_id', patientId)
-    .not('medication_adherence', 'is', null)
     .order('evaluation_date', { ascending: true });
 
   if (fromDate) {
@@ -201,10 +278,13 @@ export async function getMedicationAdherenceTrend(
     throw new Error(`Failed to fetch adherence trend: ${error.message}`);
   }
 
-  return (data || []).map((item) => ({
-    date: item.evaluation_date,
-    adherence: item.medication_adherence!,
-  }));
+  // Extract medication_adherence from metadata if available
+  return (data || [])
+    .filter((item) => item.metadata && typeof item.metadata === 'object' && 'medication_adherence' in item.metadata)
+    .map((item) => ({
+      date: item.evaluation_date,
+      adherence: (item.metadata as any).medication_adherence,
+    }));
 }
 
 // ============================================================================
@@ -233,22 +313,26 @@ export async function getPatientEvaluationStats(
   // Get latest evaluation
   const { data: latestEval } = await supabase
     .from('evaluations')
-    .select('mood_score, risk_assessment, medication_adherence')
+    .select('metadata, risk_assessment')
     .eq('patient_id', patientId)
     .order('evaluation_date', { ascending: false })
     .limit(1)
     .single();
 
-  // Get average mood score
-  const { data: moodData } = await supabase
+  // Get all evaluations with metadata
+  const { data: allEvals } = await supabase
     .from('evaluations')
-    .select('mood_score')
-    .eq('patient_id', patientId)
-    .not('mood_score', 'is', null);
+    .select('metadata')
+    .eq('patient_id', patientId);
+
+  // Extract mood scores from metadata
+  const moodScores = (allEvals || [])
+    .filter((item) => item.metadata && typeof item.metadata === 'object' && 'mood_score' in item.metadata)
+    .map((item) => (item.metadata as any).mood_score);
 
   const averageMoodScore =
-    moodData && moodData.length > 0
-      ? moodData.reduce((sum, item) => sum + (item.mood_score || 0), 0) / moodData.length
+    moodScores.length > 0
+      ? moodScores.reduce((sum: number, score: number) => sum + score, 0) / moodScores.length
       : null;
 
   // Determine current risk level
@@ -261,21 +345,24 @@ export async function getPatientEvaluationStats(
     else if (risks.includes('low')) currentRiskLevel = 'low';
   }
 
-  // Get adherence rate (average)
-  const { data: adherenceData } = await supabase
-    .from('evaluations')
-    .select('medication_adherence')
-    .eq('patient_id', patientId)
-    .not('medication_adherence', 'is', null);
+  // Extract adherence from metadata
+  const adherenceScores = (allEvals || [])
+    .filter((item) => item.metadata && typeof item.metadata === 'object' && 'medication_adherence' in item.metadata)
+    .map((item) => (item.metadata as any).medication_adherence);
 
   const adherenceRate =
-    adherenceData && adherenceData.length > 0
-      ? adherenceData.reduce((sum, item) => sum + (item.medication_adherence || 0), 0) / adherenceData.length
+    adherenceScores.length > 0
+      ? adherenceScores.reduce((sum: number, score: number) => sum + score, 0) / adherenceScores.length
+      : null;
+
+  const latestMoodScore = 
+    latestEval?.metadata && typeof latestEval.metadata === 'object' && 'mood_score' in latestEval.metadata
+      ? (latestEval.metadata as any).mood_score
       : null;
 
   return {
     totalEvaluations: totalEvaluations || 0,
-    latestMoodScore: latestEval?.mood_score || null,
+    latestMoodScore,
     averageMoodScore,
     currentRiskLevel,
     adherenceRate,

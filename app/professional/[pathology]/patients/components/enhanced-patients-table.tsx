@@ -1,44 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { PatientFull } from "@/lib/types/database.types";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { calculateAge, formatShortDate } from "@/lib/utils/date";
-import { Calendar, Eye, AlertTriangle, Download } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-const getRiskBadge = (riskLevel?: string) => {
-  if (!riskLevel || riskLevel === 'none') {
-    return (
-      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
-        None
-      </span>
-    );
-  }
-
-  const colors = {
-    high: 'bg-red-100 text-red-800 border-red-200',
-    moderate: 'bg-amber-100 text-amber-800 border-amber-200',
-    low: 'bg-blue-100 text-blue-800 border-blue-200',
-  };
-
-  const color = colors[riskLevel as keyof typeof colors] || colors.low;
-
-  return (
-    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${color}`}>
-      <AlertTriangle className="h-3 w-3 mr-1" />
-      {riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)}
-    </span>
-  );
-};
+import { calculateAge } from "@/lib/utils/date";
+import { Calendar, Eye, Download } from "lucide-react";
 
 const createColumns = (pathology: string): ColumnDef<PatientFull>[] => [
   {
@@ -69,27 +38,6 @@ const createColumns = (pathology: string): ColumnDef<PatientFull>[] => [
     accessorKey: "gender",
     header: "Gender",
     cell: ({ row }) => row.original.gender || "Not specified",
-  },
-  {
-    id: "risk_level",
-    header: "Risk Level",
-    cell: ({ row }) => getRiskBadge(row.original.risk_level),
-  },
-  {
-    id: "last_visit",
-    header: "Last Visit",
-    cell: ({ row }) => {
-      const lastVisit = row.original.last_visit_date;
-      return lastVisit ? formatShortDate(lastVisit) : "Never";
-    },
-  },
-  {
-    id: "next_visit",
-    header: "Next Visit",
-    cell: ({ row }) => {
-      const nextVisit = row.original.next_visit_date;
-      return nextVisit ? formatShortDate(nextVisit) : "Not scheduled";
-    },
   },
   {
     accessorKey: "active",

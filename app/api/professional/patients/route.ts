@@ -81,8 +81,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ patient }, { status: 201 });
   } catch (error) {
     console.error("Failed to create patient:", error);
+    
+    // Handle specific database errors
+    const errorMessage = error instanceof Error ? error.message : "Failed to create patient";
+    
+    if (errorMessage.includes("duplicate key") && errorMessage.includes("medical_record_number")) {
+      return NextResponse.json(
+        { error: "A patient with this Medical Record Number already exists" },
+        { status: 409 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: "Failed to create patient" },
+      { error: errorMessage },
       { status: 500 }
     );
   }
