@@ -74,6 +74,11 @@ export async function activatePatient(patientId: string): Promise<void> {
   await updatePatient(patientId, { active: true });
 }
 
+export async function deletePatient(patientId: string): Promise<void> {
+  // Soft delete by deactivating the patient
+  await deactivatePatient(patientId);
+}
+
 // ============================================================================
 // PATIENT QUERIES
 // ============================================================================

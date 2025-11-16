@@ -29,78 +29,98 @@ export interface EvaluationSummary {
 export async function getEvaluationsByPatient(
   patientId: string
 ): Promise<EvaluationSummary[]> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from('evaluations')
-    .select('*')
-    .eq('patient_id', patientId)
-    .order('evaluation_date', { ascending: false });
+    const { data, error } = await supabase
+      .from('evaluations')
+      .select('*')
+      .eq('patient_id', patientId)
+      .order('evaluation_date', { ascending: false });
 
-  if (error) {
-    throw new Error(`Failed to fetch evaluations: ${error.message}`);
+    if (error) {
+      console.error('Error fetching evaluations:', error);
+      throw new Error(`Failed to fetch evaluations: ${error.message}`);
+    }
+
+    // If no evaluations, return empty array
+    if (!data || data.length === 0) {
+      return [];
+    }
+
+    // Fetch evaluator and visit info separately for each evaluation
+    const evaluationsWithDetails = await Promise.all(
+      data.map(async (evaluation: any) => {
+        // Get evaluator info
+        let evaluatorName = 'Unknown';
+        if (evaluation.evaluator_id) {
+          try {
+            const { data: evaluator } = await supabase
+              .from('user_profiles')
+              .select('first_name, last_name')
+              .eq('id', evaluation.evaluator_id)
+              .single();
+            
+            if (evaluator) {
+              evaluatorName = `${evaluator.first_name} ${evaluator.last_name}`;
+            }
+          } catch (err) {
+            console.error('Error fetching evaluator:', err);
+          }
+        }
+
+        // Get visit type
+        let visitType = null;
+        if (evaluation.visit_id) {
+          try {
+            const { data: visit } = await supabase
+              .from('visits')
+              .select('visit_type')
+              .eq('id', evaluation.visit_id)
+              .single();
+            
+            if (visit) {
+              visitType = visit.visit_type;
+            }
+          } catch (err) {
+            console.error('Error fetching visit:', err);
+          }
+        }
+
+        // Extract mood_score and medication_adherence from metadata
+        const moodScore = evaluation.metadata && typeof evaluation.metadata === 'object' && 'mood_score' in evaluation.metadata
+          ? (evaluation.metadata as any).mood_score
+          : null;
+        
+        const medicationAdherence = evaluation.metadata && typeof evaluation.metadata === 'object' && 'medication_adherence' in evaluation.metadata
+          ? (evaluation.metadata as any).medication_adherence
+          : null;
+
+        return {
+          id: evaluation.id,
+          patient_id: evaluation.patient_id,
+          visit_id: evaluation.visit_id,
+          evaluation_date: evaluation.evaluation_date,
+          evaluator_id: evaluation.evaluator_id,
+          evaluator_name: evaluatorName,
+          visit_type: visitType,
+          diagnosis: evaluation.diagnosis,
+          clinical_notes: evaluation.clinical_notes,
+          risk_assessment: evaluation.risk_assessment,
+          treatment_plan: evaluation.treatment_plan,
+          mood_score: moodScore,
+          medication_adherence: medicationAdherence,
+          notes: evaluation.clinical_notes, // Use clinical_notes as notes
+        };
+      })
+    );
+
+    return evaluationsWithDetails;
+  } catch (error) {
+    console.error('Failed to fetch evaluations:', error);
+    // Return empty array instead of throwing to prevent page crash
+    return [];
   }
-
-  // Fetch evaluator and visit info separately for each evaluation
-  const evaluationsWithDetails = await Promise.all(
-    (data || []).map(async (evaluation: any) => {
-      // Get evaluator info
-      let evaluatorName = 'Unknown';
-      if (evaluation.evaluator_id) {
-        const { data: evaluator } = await supabase
-          .from('user_profiles')
-          .select('first_name, last_name')
-          .eq('id', evaluation.evaluator_id)
-          .single();
-        
-        if (evaluator) {
-          evaluatorName = `${evaluator.first_name} ${evaluator.last_name}`;
-        }
-      }
-
-      // Get visit type
-      let visitType = null;
-      if (evaluation.visit_id) {
-        const { data: visit } = await supabase
-          .from('visits')
-          .select('visit_type')
-          .eq('id', evaluation.visit_id)
-          .single();
-        
-        if (visit) {
-          visitType = visit.visit_type;
-        }
-      }
-
-      // Extract mood_score and medication_adherence from metadata
-      const moodScore = evaluation.metadata && typeof evaluation.metadata === 'object' && 'mood_score' in evaluation.metadata
-        ? (evaluation.metadata as any).mood_score
-        : null;
-      
-      const medicationAdherence = evaluation.metadata && typeof evaluation.metadata === 'object' && 'medication_adherence' in evaluation.metadata
-        ? (evaluation.metadata as any).medication_adherence
-        : null;
-
-      return {
-        id: evaluation.id,
-        patient_id: evaluation.patient_id,
-        visit_id: evaluation.visit_id,
-        evaluation_date: evaluation.evaluation_date,
-        evaluator_id: evaluation.evaluator_id,
-        evaluator_name: evaluatorName,
-        visit_type: visitType,
-        diagnosis: evaluation.diagnosis,
-        clinical_notes: evaluation.clinical_notes,
-        risk_assessment: evaluation.risk_assessment,
-        treatment_plan: evaluation.treatment_plan,
-        mood_score: moodScore,
-        medication_adherence: medicationAdherence,
-        notes: evaluation.clinical_notes, // Use clinical_notes as notes
-      };
-    })
-  );
-
-  return evaluationsWithDetails;
 }
 
 export async function getEvaluationById(evaluationId: string) {
@@ -171,36 +191,42 @@ export async function getMoodTrend(
   fromDate?: string,
   toDate?: string
 ): Promise<MoodTrendData[]> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  let query = supabase
-    .from('evaluations')
-    .select('evaluation_date, metadata')
-    .eq('patient_id', patientId)
-    .order('evaluation_date', { ascending: true });
+    let query = supabase
+      .from('evaluations')
+      .select('evaluation_date, metadata')
+      .eq('patient_id', patientId)
+      .order('evaluation_date', { ascending: true });
 
-  if (fromDate) {
-    query = query.gte('evaluation_date', fromDate);
+    if (fromDate) {
+      query = query.gte('evaluation_date', fromDate);
+    }
+
+    if (toDate) {
+      query = query.lte('evaluation_date', toDate);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching mood trend:', error);
+      return [];
+    }
+
+    // Extract mood_score from metadata if available
+    return (data || [])
+      .filter((item) => item.metadata && typeof item.metadata === 'object' && 'mood_score' in item.metadata)
+      .map((item) => ({
+        date: item.evaluation_date,
+        mood_score: (item.metadata as any).mood_score,
+        source: 'clinical' as const,
+      }));
+  } catch (error) {
+    console.error('Failed to fetch mood trend:', error);
+    return [];
   }
-
-  if (toDate) {
-    query = query.lte('evaluation_date', toDate);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    throw new Error(`Failed to fetch mood trend: ${error.message}`);
-  }
-
-  // Extract mood_score from metadata if available
-  return (data || [])
-    .filter((item) => item.metadata && typeof item.metadata === 'object' && 'mood_score' in item.metadata)
-    .map((item) => ({
-      date: item.evaluation_date,
-      mood_score: (item.metadata as any).mood_score,
-      source: 'clinical' as const,
-    }));
 }
 
 export interface RiskHistoryData {
@@ -214,36 +240,42 @@ export async function getRiskHistory(
   fromDate?: string,
   toDate?: string
 ): Promise<RiskHistoryData[]> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  let query = supabase
-    .from('evaluations')
-    .select('evaluation_date, risk_assessment')
-    .eq('patient_id', patientId)
-    .not('risk_assessment', 'is', null)
-    .order('evaluation_date', { ascending: true });
+    let query = supabase
+      .from('evaluations')
+      .select('evaluation_date, risk_assessment')
+      .eq('patient_id', patientId)
+      .not('risk_assessment', 'is', null)
+      .order('evaluation_date', { ascending: true });
 
-  if (fromDate) {
-    query = query.gte('evaluation_date', fromDate);
+    if (fromDate) {
+      query = query.gte('evaluation_date', fromDate);
+    }
+
+    if (toDate) {
+      query = query.lte('evaluation_date', toDate);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching risk history:', error);
+      return [];
+    }
+
+    return (data || [])
+      .filter((item) => item.risk_assessment)
+      .map((item) => ({
+        date: item.evaluation_date,
+        suicide_risk: item.risk_assessment.suicide_risk || 'none',
+        relapse_risk: item.risk_assessment.relapse_risk || 'none',
+      }));
+  } catch (error) {
+    console.error('Failed to fetch risk history:', error);
+    return [];
   }
-
-  if (toDate) {
-    query = query.lte('evaluation_date', toDate);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    throw new Error(`Failed to fetch risk history: ${error.message}`);
-  }
-
-  return (data || [])
-    .filter((item) => item.risk_assessment)
-    .map((item) => ({
-      date: item.evaluation_date,
-      suicide_risk: item.risk_assessment.suicide_risk || 'none',
-      relapse_risk: item.risk_assessment.relapse_risk || 'none',
-    }));
 }
 
 export interface AdherenceTrendData {
@@ -256,35 +288,41 @@ export async function getMedicationAdherenceTrend(
   fromDate?: string,
   toDate?: string
 ): Promise<AdherenceTrendData[]> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  let query = supabase
-    .from('evaluations')
-    .select('evaluation_date, metadata')
-    .eq('patient_id', patientId)
-    .order('evaluation_date', { ascending: true });
+    let query = supabase
+      .from('evaluations')
+      .select('evaluation_date, metadata')
+      .eq('patient_id', patientId)
+      .order('evaluation_date', { ascending: true });
 
-  if (fromDate) {
-    query = query.gte('evaluation_date', fromDate);
+    if (fromDate) {
+      query = query.gte('evaluation_date', fromDate);
+    }
+
+    if (toDate) {
+      query = query.lte('evaluation_date', toDate);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching adherence trend:', error);
+      return [];
+    }
+
+    // Extract medication_adherence from metadata if available
+    return (data || [])
+      .filter((item) => item.metadata && typeof item.metadata === 'object' && 'medication_adherence' in item.metadata)
+      .map((item) => ({
+        date: item.evaluation_date,
+        adherence: (item.metadata as any).medication_adherence,
+      }));
+  } catch (error) {
+    console.error('Failed to fetch adherence trend:', error);
+    return [];
   }
-
-  if (toDate) {
-    query = query.lte('evaluation_date', toDate);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    throw new Error(`Failed to fetch adherence trend: ${error.message}`);
-  }
-
-  // Extract medication_adherence from metadata if available
-  return (data || [])
-    .filter((item) => item.metadata && typeof item.metadata === 'object' && 'medication_adherence' in item.metadata)
-    .map((item) => ({
-      date: item.evaluation_date,
-      adherence: (item.metadata as any).medication_adherence,
-    }));
 }
 
 // ============================================================================

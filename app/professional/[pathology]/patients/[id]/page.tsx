@@ -20,6 +20,7 @@ import { recordPatientAccess } from "@/lib/services/patient.service";
 import { VISIT_TYPE_NAMES, PATHOLOGY_NAMES, PathologyType } from "@/lib/types/enums";
 import { AnalyticsCharts } from "./components/analytics-charts";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { DeletePatientDialog } from "./components/delete-patient-dialog";
 
 export default async function PatientDetailPage({
   params,
@@ -78,9 +79,17 @@ export default async function PatientDetailPage({
             MRN: <span className="font-mono">{patient.medical_record_number}</span>
           </p>
         </div>
-        <Link href={`/professional/${pathology}/patients/${id}/visits/new`}>
-          <Button>Schedule Visit</Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href={`/professional/${pathology}/patients/${id}/visits/new`}>
+            <Button>Schedule Visit</Button>
+          </Link>
+          <DeletePatientDialog
+            patientId={id}
+            patientFirstName={patient.first_name}
+            patientLastName={patient.last_name}
+            pathology={pathology}
+          />
+        </div>
       </div>
 
       {riskLevel !== 'none' && (
