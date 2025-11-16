@@ -197,7 +197,7 @@ export async function getRecentlyAccessedPatients(
 
   const { data, error } = await supabase
     .from('recent_accesses')
-    .select('patient:patients(*, v_patients_full(*))')
+    .select('accessed_at, patient_id')
     .eq('user_id', userId)
     .order('accessed_at', { ascending: false })
     .limit(limit);
@@ -206,7 +206,35 @@ export async function getRecentlyAccessedPatients(
     throw new Error(`Failed to fetch recent patients: ${error.message}`);
   }
 
-  return data?.map((ra: any) => ra.patient).filter(Boolean) || [];
+  if (!data || data.length === 0) {
+    return [];
+  }
+
+  // Fetch full patient details for each accessed patient
+  const patientIds = data.map((ra) => ra.patient_id);
+  const { data: patients, error: patientsError } = await supabase
+    .from('v_patients_full')
+    .select('*')
+    .in('id', patientIds);
+
+  if (patientsError) {
+    throw new Error(`Failed to fetch patient details: ${patientsError.message}`);
+  }
+
+  // Map patients with their accessed_at timestamps
+  const patientsWithAccess = patients?.map((patient) => {
+    const access = data.find((ra) => ra.patient_id === patient.id);
+    return {
+      ...patient,
+      accessed_at: access?.accessed_at,
+    };
+  }) || [];
+
+  // Sort by accessed_at to maintain order
+  return patientsWithAccess.sort((a, b) => {
+    if (!a.accessed_at || !b.accessed_at) return 0;
+    return new Date(b.accessed_at).getTime() - new Date(a.accessed_at).getTime();
+  });
 }
 
 export async function recordPatientAccess(
