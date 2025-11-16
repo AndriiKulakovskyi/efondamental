@@ -16,7 +16,7 @@ import { Questionnaire, Question } from "@/lib/types/database.types";
 import {
   evaluateConditionalLogic,
   validateQuestionnaireResponse,
-} from "@/lib/services/questionnaire.service";
+} from "@/lib/utils/questionnaire-logic";
 import { Loader2 } from "lucide-react";
 
 interface QuestionnaireRendererProps {
