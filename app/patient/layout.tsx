@@ -2,6 +2,7 @@ import { requirePatient, getUserContext } from "@/lib/rbac/middleware";
 import { Calendar, FileText, MessageSquare, Home } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { UserProfileDropdown } from "@/components/user-profile-dropdown";
 
 export default async function PatientLayout({
   children,
@@ -23,12 +24,12 @@ export default async function PatientLayout({
               <h1 className="text-2xl font-bold text-slate-900">eFondaMental</h1>
               <p className="text-sm text-slate-600">Patient Portal</p>
             </div>
-            <div className="text-right">
-              <p className="text-sm font-medium text-slate-900">
-                {profile.first_name} {profile.last_name}
-              </p>
-              <p className="text-xs text-slate-500">Patient</p>
-            </div>
+            <UserProfileDropdown
+              firstName={profile.first_name || ""}
+              lastName={profile.last_name || ""}
+              email={profile.email}
+              role={profile.role}
+            />
           </div>
         </div>
       </header>

@@ -1,14 +1,18 @@
-import { getUserContext } from "@/lib/rbac/middleware";
-import { getDefaultRedirectForRole } from "@/lib/rbac/roles";
+import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
 export default async function HomePage() {
-  const context = await getUserContext();
+  const supabase = await createClient();
+  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (context) {
-    const redirectPath = getDefaultRedirectForRole(context.profile.role);
-    redirect(redirectPath);
+  if (user) {
+    // User is logged in, redirect to protected page which will route to dashboard
+    redirect("/protected");
   }
 
+  // No user, go to login
   redirect("/auth/login");
 }

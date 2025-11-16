@@ -48,9 +48,8 @@ export function LoginForm({
         return;
       }
 
-      // Redirect to appropriate dashboard based on role
-      router.push("/protected");
-      router.refresh();
+      // Redirect to protected page which will route to proper dashboard
+      window.location.href = "/protected";
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -62,9 +61,9 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardTitle className="text-2xl">eFondaMental Login</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Clinical management platform for psychiatric disorder follow-up
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -3,6 +3,7 @@ import { PATHOLOGY_NAMES, PathologyType } from "@/lib/types/enums";
 import { Users, Calendar, BarChart3, Home } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { UserProfileDropdown } from "@/components/user-profile-dropdown";
 
 export default async function PathologyLayout({
   children,
@@ -36,12 +37,12 @@ export default async function PathologyLayout({
               >
                 <Home className="h-5 w-5" />
               </Link>
-              <div className="text-right">
-                <p className="text-sm font-medium text-slate-900">
-                  {context.profile.first_name} {context.profile.last_name}
-                </p>
-                <p className="text-xs text-slate-500">{context.centerName}</p>
-              </div>
+              <UserProfileDropdown
+                firstName={context.profile.first_name || ""}
+                lastName={context.profile.last_name || ""}
+                email={context.profile.email}
+                role={context.profile.role}
+              />
             </div>
           </div>
         </div>

@@ -2,49 +2,9 @@ import { StatCard } from "@/components/ui/stat-card";
 import { getGlobalStatistics } from "@/lib/services/analytics.service";
 import { getAllCenters } from "@/lib/services/center.service";
 import { Building2, Users, UserCheck, Calendar } from "lucide-react";
-import { DataTable } from "@/components/ui/data-table";
-import { ColumnDef } from "@tanstack/react-table";
-import { Center } from "@/lib/types/database.types";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-
-const centerColumns: ColumnDef<Center>[] = [
-  {
-    accessorKey: "name",
-    header: "Center Name",
-    cell: ({ row }) => (
-      <Link
-        href={`/admin/centers/${row.original.id}`}
-        className="font-medium text-blue-600 hover:underline"
-      >
-        {row.original.name}
-      </Link>
-    ),
-  },
-  {
-    accessorKey: "code",
-    header: "Code",
-  },
-  {
-    accessorKey: "city",
-    header: "City",
-  },
-  {
-    accessorKey: "active",
-    header: "Status",
-    cell: ({ row }) => (
-      <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          row.original.active
-            ? "bg-green-100 text-green-800"
-            : "bg-slate-100 text-slate-800"
-        }`}
-      >
-        {row.original.active ? "Active" : "Inactive"}
-      </span>
-    ),
-  },
-];
+import { CentersTable } from "./components/centers-table";
 
 export default async function AdminDashboard() {
   const stats = await getGlobalStatistics();
@@ -93,7 +53,7 @@ export default async function AdminDashboard() {
             <Button>Create Center</Button>
           </Link>
         </div>
-        <DataTable columns={centerColumns} data={centers} />
+        <CentersTable centers={centers} />
       </div>
     </div>
   );

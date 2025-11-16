@@ -2,6 +2,7 @@ import { requireManager, getUserContext } from "@/lib/rbac/middleware";
 import { Users, UserCheck, Calendar, Settings } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { UserProfileDropdown } from "@/components/user-profile-dropdown";
 
 export default async function ManagerLayout({
   children,
@@ -26,12 +27,12 @@ export default async function ManagerLayout({
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-sm font-medium text-slate-900">
-                  {context.profile.first_name} {context.profile.last_name}
-                </p>
-                <p className="text-xs text-slate-500 capitalize">{context.profile.role.replace('_', ' ')}</p>
-              </div>
+              <UserProfileDropdown
+                firstName={context.profile.first_name || ""}
+                lastName={context.profile.last_name || ""}
+                email={context.profile.email}
+                role={context.profile.role}
+              />
             </div>
           </div>
         </div>

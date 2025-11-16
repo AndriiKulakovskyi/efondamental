@@ -1,17 +1,36 @@
-import { requireAdmin } from "@/lib/rbac/middleware";
+import { createClient } from "@/lib/supabase/server";
 import { Building2, Settings, Users, BarChart3, Shield } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { UserProfileDropdown } from "@/components/user-profile-dropdown";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const profile = await requireAdmin();
+  const supabase = await createClient();
+  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  const { data: profile } = await supabase
+    .from("user_profiles")
+    .select("*")
+    .eq("id", user.id)
+    .single();
 
   if (!profile) {
-    redirect("/auth/login");
+    redirect("/auth/error?message=User profile not found");
+  }
+
+  if (profile.role !== "administrator") {
+    redirect("/auth/error?message=Access denied - Admin only");
   }
 
   return (
@@ -24,12 +43,12 @@ export default async function AdminLayout({
               <p className="text-sm text-slate-600">Administrator Dashboard</p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-sm font-medium text-slate-900">
-                  {profile.first_name} {profile.last_name}
-                </p>
-                <p className="text-xs text-slate-500">Administrator</p>
-              </div>
+              <UserProfileDropdown
+                firstName={profile.first_name || ""}
+                lastName={profile.last_name || ""}
+                email={profile.email}
+                role={profile.role}
+              />
             </div>
           </div>
         </div>
