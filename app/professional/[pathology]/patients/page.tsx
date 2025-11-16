@@ -5,7 +5,7 @@ import { PathologyType } from "@/lib/types/enums";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
-import { PatientsTable } from "./components/patients-table";
+import { PatientsTableWithSearch } from "./components/patients-table-with-search";
 
 export default async function PatientsListPage({
   params,
@@ -38,9 +38,10 @@ export default async function PatientsListPage({
         </Link>
       </div>
 
-      <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <PatientsTable patients={patients} pathology={pathology} />
-      </div>
+      <PatientsTableWithSearch 
+        patients={patients} 
+        pathology={pathology} 
+      />
     </div>
   );
 }

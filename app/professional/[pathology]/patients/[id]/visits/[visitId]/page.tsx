@@ -7,6 +7,7 @@ import { formatDateTime } from "@/lib/utils/date";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Circle, FileText } from "lucide-react";
+import VisitActions from "./components/visit-actions";
 
 export default async function VisitDetailPage({
   params,
@@ -80,15 +81,29 @@ export default async function VisitDetailPage({
             {visit.patient_first_name} {visit.patient_last_name} •{" "}
             {visit.scheduled_date && formatDateTime(visit.scheduled_date)}
           </p>
+          <div className="mt-2">
+            <span
+              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                visit.status === 'completed'
+                  ? 'bg-green-100 text-green-800'
+                  : visit.status === 'in_progress'
+                  ? 'bg-blue-100 text-blue-800'
+                  : visit.status === 'scheduled'
+                  ? 'bg-slate-100 text-slate-800'
+                  : 'bg-red-100 text-red-800'
+              }`}
+            >
+              {visit.status === 'in_progress' ? 'In Progress' : visit.status.charAt(0).toUpperCase() + visit.status.slice(1)}
+            </span>
+          </div>
         </div>
-        <div className="flex gap-2">
-          {visit.status === "scheduled" && (
-            <Button>Start Visit</Button>
-          )}
-          {visit.status === "in_progress" && (
-            <Button>Complete Visit</Button>
-          )}
-        </div>
+        <VisitActions 
+          visitId={visitId}
+          patientId={patientId}
+          pathology={pathology}
+          status={visit.status}
+          completionStatus={completionStatus}
+        />
       </div>
 
       <div className="bg-white rounded-lg border border-slate-200 p-6">

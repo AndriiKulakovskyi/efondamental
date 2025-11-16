@@ -183,9 +183,10 @@ export async function getUpcomingVisitsByCenter(
 ): Promise<VisitFull[]> {
   const supabase = await createClient();
 
+  // Query visits and join with patients to filter by center
   let query = supabase
     .from('visits')
-    .select('*, patient:patients!inner(*), v_visits_full(*)')
+    .select('*, patient:patients!inner(center_id, first_name, last_name, medical_record_number), visit_template:visit_templates(name, pathology:pathologies(name))')
     .eq('patient.center_id', centerId)
     .eq('status', VisitStatus.SCHEDULED)
     .gte('scheduled_date', new Date().toISOString())
@@ -201,7 +202,15 @@ export async function getUpcomingVisitsByCenter(
     throw new Error(`Failed to fetch upcoming visits: ${error.message}`);
   }
 
-  return data?.map((v: any) => ({ ...v, ...v.v_visits_full })) || [];
+  // Map to VisitFull format
+  return (data || []).map((v: any) => ({
+    ...v,
+    patient_first_name: v.patient?.first_name,
+    patient_last_name: v.patient?.last_name,
+    medical_record_number: v.patient?.medical_record_number,
+    template_name: v.visit_template?.name,
+    pathology_name: v.visit_template?.pathology?.name,
+  })) as VisitFull[];
 }
 
 // ============================================================================

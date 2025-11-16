@@ -1,9 +1,8 @@
 import { getUserContext } from "@/lib/rbac/middleware";
 import { PATHOLOGY_NAMES, PathologyType } from "@/lib/types/enums";
-import { Users, Calendar, BarChart3, Home } from "lucide-react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { UserProfileDropdown } from "@/components/user-profile-dropdown";
+import PathologyNav from "./components/pathology-nav";
 
 export default async function PathologyLayout({
   children,
@@ -31,12 +30,6 @@ export default async function PathologyLayout({
               <p className="text-sm text-slate-600">{pathologyName}</p>
             </div>
             <div className="flex items-center gap-4">
-              <Link
-                href="/professional"
-                className="text-sm text-slate-600 hover:text-slate-900"
-              >
-                <Home className="h-5 w-5" />
-              </Link>
               <UserProfileDropdown
                 firstName={context.profile.first_name || ""}
                 lastName={context.profile.last_name || ""}
@@ -50,32 +43,7 @@ export default async function PathologyLayout({
 
       <div className="container mx-auto px-4 py-6">
         <div className="flex gap-6">
-          <aside className="w-64 flex-shrink-0">
-            <nav className="space-y-1">
-              <Link
-                href={`/professional/${pathology}`}
-                className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
-              >
-                <Calendar className="h-5 w-5" />
-                Dashboard
-              </Link>
-              <Link
-                href={`/professional/${pathology}/patients`}
-                className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
-              >
-                <Users className="h-5 w-5" />
-                Patients
-              </Link>
-              <Link
-                href={`/professional/${pathology}/statistics`}
-                className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
-              >
-                <BarChart3 className="h-5 w-5" />
-                Statistics
-              </Link>
-            </nav>
-          </aside>
-
+          <PathologyNav pathology={pathology} />
           <main className="flex-1">{children}</main>
         </div>
       </div>

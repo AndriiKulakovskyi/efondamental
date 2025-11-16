@@ -9,6 +9,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { formatShortDate } from "@/lib/utils/date";
 import { redirect } from "next/navigation";
+import { NotificationsPanel } from "./components/notifications-panel";
 
 export default async function PathologyDashboard({
   params,
@@ -30,6 +31,19 @@ export default async function PathologyDashboard({
     getUpcomingVisitsByCenter(context.profile.center_id, 5),
     getPatientsRequiringFollowup(context.profile.center_id, pathologyType),
   ]);
+
+  // Generate notifications from patients requiring followup
+  const notifications = patientsRequiringFollowup.slice(0, 5).map((patient) => ({
+    id: patient.id,
+    type: "high_risk" as const,
+    title: "Patient Requires Follow-up",
+    message: "This patient has been flagged for follow-up attention",
+    patientId: patient.id,
+    patientName: `${patient.first_name} ${patient.last_name}`,
+    link: `/professional/${pathology}/patients/${patient.id}`,
+    priority: "high" as const,
+    timestamp: new Date().toISOString(),
+  }));
 
   return (
     <div className="space-y-6">
@@ -60,6 +74,10 @@ export default async function PathologyDashboard({
           icon={AlertTriangle}
         />
       </div>
+
+      {notifications.length > 0 && (
+        <NotificationsPanel notifications={notifications} pathology={pathology} />
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg border border-slate-200 p-6">

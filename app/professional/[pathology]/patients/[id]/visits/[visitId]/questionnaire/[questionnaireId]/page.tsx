@@ -30,7 +30,7 @@ export default function QuestionnaireCompletionPage() {
 
         // Check for existing response
         const rResponse = await fetch(
-          `/api/questionnaire-responses?visitId=${visitId}&questionnaireId=${questionnaireId}`
+          `/api/professional/questionnaire-responses?visitId=${visitId}&questionnaireId=${questionnaireId}`
         );
         if (rResponse.ok) {
           const rData = await rResponse.json();
@@ -50,7 +50,7 @@ export default function QuestionnaireCompletionPage() {
 
   const handleSave = async (responses: Record<string, any>) => {
     try {
-      const response = await fetch("/api/questionnaire-responses", {
+      const response = await fetch("/api/professional/questionnaire-responses", {
         method: existingResponse ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -76,7 +76,7 @@ export default function QuestionnaireCompletionPage() {
 
   const handleSubmit = async (responses: Record<string, any>) => {
     try {
-      const response = await fetch("/api/questionnaire-responses", {
+      const response = await fetch("/api/professional/questionnaire-responses", {
         method: existingResponse ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

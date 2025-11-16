@@ -1,16 +1,25 @@
 import { getPatientById, getPatientStats, getPatientRiskLevel } from "@/lib/services/patient.service";
 import { getVisitsByPatient } from "@/lib/services/visit.service";
+import { 
+  getEvaluationsByPatient, 
+  getMoodTrend, 
+  getRiskHistory, 
+  getMedicationAdherenceTrend 
+} from "@/lib/services/evaluation.service";
 import { getUserContext } from "@/lib/rbac/middleware";
 import { StatCard } from "@/components/ui/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, FileText, AlertTriangle } from "lucide-react";
+import { Calendar, FileText, AlertTriangle, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { calculateAge, formatShortDate } from "@/lib/utils/date";
+import { calculateAge, formatShortDate, formatDateTime } from "@/lib/utils/date";
 import { formatRiskLevel } from "@/lib/utils/formatting";
 import { recordPatientAccess } from "@/lib/services/patient.service";
+import { VISIT_TYPE_NAMES, PATHOLOGY_NAMES, PathologyType } from "@/lib/types/enums";
+import { AnalyticsCharts } from "./components/analytics-charts";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 
 export default async function PatientDetailPage({
   params,
@@ -33,16 +42,33 @@ export default async function PatientDetailPage({
   // Record access for "recently viewed" feature
   await recordPatientAccess(context.user.id, id);
 
-  const [stats, visits, riskLevel] = await Promise.all([
+  // Calculate date for last 12 months
+  const twelveMonthsAgo = new Date();
+  twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+  const fromDate = twelveMonthsAgo.toISOString();
+
+  const [stats, visits, riskLevel, evaluations, moodTrend, riskHistory, adherenceTrend] = await Promise.all([
     getPatientStats(id),
     getVisitsByPatient(id),
     getPatientRiskLevel(id),
+    getEvaluationsByPatient(id),
+    getMoodTrend(id, fromDate),
+    getRiskHistory(id, fromDate),
+    getMedicationAdherenceTrend(id, fromDate),
   ]);
 
   const risk = formatRiskLevel(riskLevel);
 
   return (
     <div className="space-y-6">
+      <Breadcrumb
+        items={[
+          { label: "Dashboard", href: `/professional/${pathology}` },
+          { label: "Patients", href: `/professional/${pathology}/patients` },
+          { label: `${patient.first_name} ${patient.last_name}` },
+        ]}
+      />
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold text-slate-900">
@@ -240,16 +266,103 @@ export default async function PatientDetailPage({
           )}
         </TabsContent>
 
-        <TabsContent value="evaluations">
-          <div className="text-center py-12 bg-white rounded-lg border border-slate-200">
-            <p className="text-slate-600">Evaluations view coming soon</p>
+        <TabsContent value="evaluations" className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold">Clinical Evaluations</h3>
+            <div className="text-sm text-slate-600">
+              {evaluations.length} evaluation{evaluations.length !== 1 ? 's' : ''} recorded
+            </div>
           </div>
+
+          {evaluations.length > 0 ? (
+            <div className="space-y-3">
+              {evaluations.map((evaluation) => (
+                <Card key={evaluation.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h4 className="font-semibold text-slate-900">
+                            {evaluation.visit_type && VISIT_TYPE_NAMES[evaluation.visit_type]}
+                            {!evaluation.visit_type && "Clinical Evaluation"}
+                          </h4>
+                          {evaluation.risk_assessment && (
+                            <div className="flex gap-2">
+                              {evaluation.risk_assessment.suicide_risk && evaluation.risk_assessment.suicide_risk !== 'none' && (
+                                <span className={`text-xs px-2 py-1 rounded-full ${
+                                  evaluation.risk_assessment.suicide_risk === 'high'
+                                    ? 'bg-red-100 text-red-800'
+                                    : evaluation.risk_assessment.suicide_risk === 'moderate'
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : 'bg-blue-100 text-blue-800'
+                                }`}>
+                                  Suicide Risk: {evaluation.risk_assessment.suicide_risk}
+                                </span>
+                              )}
+                              {evaluation.risk_assessment.relapse_risk && evaluation.risk_assessment.relapse_risk !== 'none' && (
+                                <span className={`text-xs px-2 py-1 rounded-full ${
+                                  evaluation.risk_assessment.relapse_risk === 'high'
+                                    ? 'bg-red-100 text-red-800'
+                                    : evaluation.risk_assessment.relapse_risk === 'moderate'
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : 'bg-blue-100 text-blue-800'
+                                }`}>
+                                  Relapse Risk: {evaluation.risk_assessment.relapse_risk}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-sm text-slate-600 mb-2">
+                          Evaluated by {evaluation.evaluator_name} on{" "}
+                          {formatDateTime(evaluation.evaluation_date)}
+                        </p>
+                        <div className="grid grid-cols-3 gap-4 mt-3">
+                          {evaluation.mood_score !== null && (
+                            <div>
+                              <dt className="text-xs font-medium text-slate-500">Mood Score</dt>
+                              <dd className="text-sm font-semibold text-slate-900">
+                                {evaluation.mood_score}/10
+                              </dd>
+                            </div>
+                          )}
+                          {evaluation.medication_adherence !== null && (
+                            <div>
+                              <dt className="text-xs font-medium text-slate-500">Adherence</dt>
+                              <dd className="text-sm font-semibold text-slate-900">
+                                {evaluation.medication_adherence}%
+                              </dd>
+                            </div>
+                          )}
+                        </div>
+                        {evaluation.notes && (
+                          <div className="mt-3 p-3 bg-slate-50 rounded-lg">
+                            <p className="text-sm text-slate-700">{evaluation.notes}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-white rounded-lg border border-slate-200">
+              <TrendingUp className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-600">No clinical evaluations recorded yet</p>
+              <p className="text-sm text-slate-500 mt-2">
+                Evaluations will appear here after visits are completed
+              </p>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="analytics">
-          <div className="text-center py-12 bg-white rounded-lg border border-slate-200">
-            <p className="text-slate-600">Analytics view coming soon</p>
-          </div>
+          <AnalyticsCharts
+            moodTrend={moodTrend}
+            riskHistory={riskHistory}
+            adherenceTrend={adherenceTrend}
+          />
         </TabsContent>
       </Tabs>
     </div>
