@@ -1,13 +1,14 @@
 import { getVisitById, getVisitModules, getVisitCompletionStatus } from "@/lib/services/visit.service";
-import { getQuestionnaireById } from "@/lib/services/questionnaire.service";
 import { getUserContext } from "@/lib/rbac/middleware";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { formatDateTime } from "@/lib/utils/date";
 import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
-import { CheckCircle, Circle, FileText } from "lucide-react";
+import { Calendar, User } from "lucide-react";
 import VisitActions from "./components/visit-actions";
+import { ExpandableModuleCard } from "./components/expandable-module-card";
+import { VisitQuickStats } from "./components/visit-quick-stats";
+import { CircularProgress } from "./components/circular-progress";
+import { cn } from "@/lib/utils";
 
 export default async function VisitDetailPage({
   params,
@@ -72,124 +73,112 @@ export default async function VisitDetailPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold text-slate-900">
-            {visit.template_name}
-          </h2>
-          <p className="text-slate-600">
-            {visit.patient_first_name} {visit.patient_last_name} •{" "}
-            {visit.scheduled_date && formatDateTime(visit.scheduled_date)}
-          </p>
-          <div className="mt-2">
-            <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                visit.status === 'completed'
-                  ? 'bg-green-100 text-green-800'
-                  : visit.status === 'in_progress'
-                  ? 'bg-blue-100 text-blue-800'
-                  : visit.status === 'scheduled'
-                  ? 'bg-slate-100 text-slate-800'
-                  : 'bg-red-100 text-red-800'
-              }`}
-            >
-              {visit.status === 'in_progress' ? 'In Progress' : visit.status.charAt(0).toUpperCase() + visit.status.slice(1)}
-            </span>
-          </div>
-        </div>
-        <VisitActions 
-          visitId={visitId}
-          patientId={patientId}
-          pathology={pathology}
-          status={visit.status}
-          completionStatus={completionStatus}
-        />
-      </div>
+      {/* Enhanced Header with Progress Visualization */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div className="flex items-start justify-between gap-6">
+          <div className="flex items-start gap-6 flex-1">
+            {/* Circular Progress */}
+            <CircularProgress percentage={completionStatus.completionPercentage} />
+            
+            {/* Visit Info */}
+            <div className="flex-1">
+              <h2 className="text-3xl font-bold text-slate-900 mb-2">
+                {visit.template_name}
+              </h2>
+              <div className="flex items-center gap-4 text-sm text-slate-600 mb-3">
+                <span className="flex items-center gap-1">
+                  <User className="h-4 w-4" />
+                  {visit.patient_first_name} {visit.patient_last_name}
+                </span>
+                <span className="text-slate-400">•</span>
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  {visit.scheduled_date && formatDateTime(visit.scheduled_date)}
+                </span>
+              </div>
+              
+              {/* Status Badge */}
+              <div>
+                <span
+                  className={cn(
+                    "inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium border",
+                    visit.status === 'completed'
+                      ? 'bg-green-100 text-green-800 border-green-200'
+                      : visit.status === 'in_progress'
+                      ? 'bg-blue-100 text-blue-800 border-blue-200'
+                      : visit.status === 'scheduled'
+                      ? 'bg-slate-100 text-slate-800 border-slate-200'
+                      : 'bg-red-100 text-red-800 border-red-200'
+                  )}
+                >
+                  {visit.status === 'in_progress' ? 'In Progress' : visit.status.charAt(0).toUpperCase() + visit.status.slice(1)}
+                </span>
+              </div>
 
-      <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-slate-900">Progress</h3>
-          <span className="text-sm text-slate-600">
-            {completionStatus.completedQuestionnaires}/{completionStatus.totalQuestionnaires} questionnaires completed
-          </span>
-        </div>
-        <div className="w-full bg-slate-200 rounded-full h-2">
-          <div
-            className="bg-green-600 h-2 rounded-full transition-all"
-            style={{ width: `${completionStatus.completionPercentage}%` }}
+              {/* Progress Summary */}
+              <div className="mt-4 flex items-center gap-2 text-sm">
+                <div className="flex-1">
+                  <div className="flex justify-between text-xs text-slate-600 mb-1">
+                    <span>Overall Progress</span>
+                    <span>{completionStatus.completedQuestionnaires}/{completionStatus.totalQuestionnaires} forms</span>
+                  </div>
+                  <div className="w-full bg-slate-200 rounded-full h-2.5">
+                    <div
+                      className={cn(
+                        "h-2.5 rounded-full transition-all duration-500",
+                        completionStatus.completionPercentage === 100 ? "bg-green-600" : "bg-blue-600"
+                      )}
+                      style={{ width: `${completionStatus.completionPercentage}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <VisitActions 
+            visitId={visitId}
+            patientId={patientId}
+            pathology={pathology}
+            status={visit.status}
+            completionStatus={completionStatus}
           />
         </div>
       </div>
 
+      {/* Quick Stats */}
+      <VisitQuickStats
+        totalModules={modules.length}
+        totalQuestionnaires={completionStatus.totalQuestionnaires}
+        completedQuestionnaires={completionStatus.completedQuestionnaires}
+        completionPercentage={completionStatus.completionPercentage}
+      />
+
+      {/* Clinical Modules */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-slate-900">Clinical Modules</h3>
+        <h3 className="text-xl font-semibold text-slate-900">Clinical Modules</h3>
 
         {modulesWithQuestionnaires.map((module, index) => (
-          <Card key={module.id}>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">
-                    {index + 1}. {module.name}
-                  </CardTitle>
-                  {module.description && (
-                    <p className="text-sm text-slate-500 mt-1">{module.description}</p>
-                  )}
-                </div>
-                <div className="text-sm text-slate-600">
-                  {module.questionnaires.filter((q: any) => q.completed).length}/{module.questionnaires.length} completed
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {module.questionnaires.map((questionnaire: any) => (
-                  <div
-                    key={questionnaire.id}
-                    className="flex items-center justify-between p-3 border border-slate-200 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      {questionnaire.completed ? (
-                        <CheckCircle className="h-5 w-5 text-green-600" />
-                      ) : (
-                        <Circle className="h-5 w-5 text-slate-300" />
-                      )}
-                      <div>
-                        <p className="font-medium text-slate-900">{questionnaire.title}</p>
-                        <p className="text-xs text-slate-500 capitalize">
-                          For: {questionnaire.target_role?.replace(/_/g, " ")}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {questionnaire.completed ? (
-                        <span className="text-xs text-green-600">Completed</span>
-                      ) : (
-                        <Link
-                          href={`/professional/${pathology}/patients/${patientId}/visits/${visitId}/questionnaire/${questionnaire.id}`}
-                        >
-                          <Button size="sm" variant="outline">
-                            <FileText className="h-4 w-4 mr-1" />
-                            Fill
-                          </Button>
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <ExpandableModuleCard
+            key={module.id}
+            module={module}
+            index={index}
+            pathology={pathology}
+            patientId={patientId}
+            visitId={visitId}
+          />
         ))}
       </div>
 
+      {/* Visit Notes */}
       {visit.notes && (
-        <Card>
+        <Card className="hover:shadow-md transition-shadow duration-200">
           <CardHeader>
-            <CardTitle>Notes</CardTitle>
+            <CardTitle>Visit Notes</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-slate-700 whitespace-pre-wrap">{visit.notes}</p>
+            <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{visit.notes}</p>
           </CardContent>
         </Card>
       )}
