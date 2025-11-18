@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
       visit_template_id: visitTemplateId,
       visit_type: visitType as VisitType,
       scheduled_date: scheduledDate,
+      completed_date: null,
       status: VisitStatus.SCHEDULED,
       notes: notes || null,
       conducted_by: null,

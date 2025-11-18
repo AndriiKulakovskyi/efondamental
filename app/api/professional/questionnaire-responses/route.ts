@@ -7,7 +7,7 @@ import {
   getResponseByVisitAndQuestionnaire,
 } from "@/lib/services/questionnaire.service";
 import { logAuditEvent } from "@/lib/services/audit.service";
-import { AuditAction } from "@/lib/types/enums";
+import { AuditAction, QuestionnaireResponseStatus } from "@/lib/types/enums";
 
 export async function GET(request: NextRequest) {
   try {
@@ -77,25 +77,25 @@ export async function POST(request: NextRequest) {
       completed_by: completed ? context.user.id : null,
       started_at: new Date().toISOString(),
       completed_at: completed ? new Date().toISOString() : null,
-      status: completed ? "completed" : "in_progress",
+      status: completed ? QuestionnaireResponseStatus.COMPLETED : QuestionnaireResponseStatus.IN_PROGRESS,
       metadata: {},
     });
 
     // Log audit event
     if (context.profile.center_id) {
-      await logAuditEvent(
-        context.user.id,
-        AuditAction.CREATE,
-        "questionnaire_response",
-        response.id,
-        context.profile.center_id,
-        { 
+      await logAuditEvent({
+        userId: context.user.id,
+        action: AuditAction.CREATE,
+        entityType: "questionnaire_response",
+        entityId: response.id,
+        centerId: context.profile.center_id,
+        changes: { 
           visitId, 
           questionnaireId, 
           patientId,
           completed 
         }
-      );
+      });
     }
 
     return NextResponse.json({ response }, { status: 201 });
@@ -136,14 +136,14 @@ export async function PUT(request: NextRequest) {
 
       // Log audit event
       if (context.profile.center_id) {
-        await logAuditEvent(
-          context.user.id,
-          AuditAction.UPDATE,
-          "questionnaire_response",
-          responseId,
-          context.profile.center_id,
-          { completed }
-        );
+        await logAuditEvent({
+          userId: context.user.id,
+          action: AuditAction.UPDATE,
+          entityType: "questionnaire_response",
+          entityId: responseId,
+          centerId: context.profile.center_id,
+          changes: { completed }
+        });
       }
 
       return NextResponse.json({ response }, { status: 200 });
@@ -172,19 +172,19 @@ export async function PUT(request: NextRequest) {
         completed_by: completed ? context.user.id : null,
         started_at: new Date().toISOString(),
         completed_at: completed ? new Date().toISOString() : null,
-        status: completed ? "completed" : "in_progress",
+        status: completed ? QuestionnaireResponseStatus.COMPLETED : QuestionnaireResponseStatus.IN_PROGRESS,
         metadata: {},
       });
 
       if (context.profile.center_id) {
-        await logAuditEvent(
-          context.user.id,
-          AuditAction.CREATE,
-          "questionnaire_response",
-          response.id,
-          context.profile.center_id,
-          { visitId, questionnaireId, patientId, completed }
-        );
+        await logAuditEvent({
+          userId: context.user.id,
+          action: AuditAction.CREATE,
+          entityType: "questionnaire_response",
+          entityId: response.id,
+          centerId: context.profile.center_id,
+          changes: { visitId, questionnaireId, patientId, completed }
+        });
       }
 
       return NextResponse.json({ response }, { status: 201 });
@@ -204,14 +204,14 @@ export async function PUT(request: NextRequest) {
     const response = await updateResponse(existingResponse.id, updates);
 
     if (context.profile.center_id) {
-      await logAuditEvent(
-        context.user.id,
-        AuditAction.UPDATE,
-        "questionnaire_response",
-        existingResponse.id,
-        context.profile.center_id,
-        { completed }
-      );
+      await logAuditEvent({
+        userId: context.user.id,
+        action: AuditAction.UPDATE,
+        entityType: "questionnaire_response",
+        entityId: existingResponse.id,
+        centerId: context.profile.center_id,
+        changes: { completed }
+      });
     }
 
     return NextResponse.json({ response }, { status: 200 });

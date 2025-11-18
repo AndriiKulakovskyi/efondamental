@@ -72,14 +72,14 @@ export async function PATCH(
         visit = await startVisit(id, context.user.id);
 
         if (context.profile.center_id) {
-          await logAuditEvent(
-            context.user.id,
-            AuditAction.UPDATE,
-            "visit",
-            id,
-            context.profile.center_id,
-            { action: "start_visit" }
-          );
+          await logAuditEvent({
+            userId: context.user.id,
+            action: AuditAction.UPDATE,
+            entityType: "visit",
+            entityId: id,
+            centerId: context.profile.center_id,
+            changes: { action: "start_visit" }
+          });
         }
         break;
 
@@ -100,14 +100,14 @@ export async function PATCH(
         visit = await completeVisit(id);
 
         if (context.profile.center_id) {
-          await logAuditEvent(
-            context.user.id,
-            AuditAction.UPDATE,
-            "visit",
-            id,
-            context.profile.center_id,
-            { action: "complete_visit", completionPercentage: 100 }
-          );
+          await logAuditEvent({
+            userId: context.user.id,
+            action: AuditAction.UPDATE,
+            entityType: "visit",
+            entityId: id,
+            centerId: context.profile.center_id,
+            changes: { action: "complete_visit", completionPercentage: 100 }
+          });
         }
         break;
 
@@ -115,14 +115,14 @@ export async function PATCH(
         visit = await cancelVisit(id);
 
         if (context.profile.center_id) {
-          await logAuditEvent(
-            context.user.id,
-            AuditAction.UPDATE,
-            "visit",
-            id,
-            context.profile.center_id,
-            { action: "cancel_visit" }
-          );
+          await logAuditEvent({
+            userId: context.user.id,
+            action: AuditAction.UPDATE,
+            entityType: "visit",
+            entityId: id,
+            centerId: context.profile.center_id,
+            changes: { action: "cancel_visit" }
+          });
         }
         break;
 
@@ -137,14 +137,14 @@ export async function PATCH(
         visit = await rescheduleVisit(id, scheduledDate);
 
         if (context.profile.center_id) {
-          await logAuditEvent(
-            context.user.id,
-            AuditAction.UPDATE,
-            "visit",
-            id,
-            context.profile.center_id,
-            { action: "reschedule_visit", newDate: scheduledDate }
-          );
+          await logAuditEvent({
+            userId: context.user.id,
+            action: AuditAction.UPDATE,
+            entityType: "visit",
+            entityId: id,
+            centerId: context.profile.center_id,
+            changes: { action: "reschedule_visit", newDate: scheduledDate }
+          });
         }
         break;
 
@@ -152,14 +152,14 @@ export async function PATCH(
         visit = await updateVisit(id, { notes: notes || null });
 
         if (context.profile.center_id) {
-          await logAuditEvent(
-            context.user.id,
-            AuditAction.UPDATE,
-            "visit",
-            id,
-            context.profile.center_id,
-            { action: "update_notes" }
-          );
+          await logAuditEvent({
+            userId: context.user.id,
+            action: AuditAction.UPDATE,
+            entityType: "visit",
+            entityId: id,
+            centerId: context.profile.center_id,
+            changes: { action: "update_notes" }
+          });
         }
         break;
 

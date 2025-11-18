@@ -83,14 +83,12 @@ export function EnhancedPatientsTable({ patients, pathology }: EnhancedPatientsT
   const columns = useMemo(() => createColumns(pathology), [pathology]);
 
   const exportToCSV = () => {
-    const headers = ["Name", "MRN", "Age", "Gender", "Last Visit", "Next Visit", "Status"];
+    const headers = ["Name", "MRN", "Age", "Gender", "Status"];
     const rows = patients.map(p => [
       `${p.first_name} ${p.last_name}`,
       p.medical_record_number,
       calculateAge(p.date_of_birth),
       p.gender || "",
-      p.last_visit_date ? formatShortDate(p.last_visit_date) : "",
-      p.next_visit_date ? formatShortDate(p.next_visit_date) : "",
       p.active ? "Active" : "Inactive",
     ]);
 

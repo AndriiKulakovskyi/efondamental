@@ -16,11 +16,6 @@ import { Search, X, Clock, Filter } from "lucide-react";
 import { PatientFull } from "@/lib/types/database.types";
 import { calculateAge } from "@/lib/utils/date";
 import Link from "next/link";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/dropdown-menu";
 
 interface PatientSearchProps {
   pathology: string;
@@ -42,7 +37,7 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
   const [showFilters, setShowFilters] = useState(false);
   
   const searchRef = useRef<HTMLDivElement>(null);
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Close dropdown when clicking outside
   useEffect(() => {

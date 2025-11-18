@@ -18,7 +18,7 @@ export function DashboardQuickSearch({ pathology }: DashboardQuickSearchProps) {
   const [showResults, setShowResults] = useState(false);
   
   const searchRef = useRef<HTMLDivElement>(null);
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

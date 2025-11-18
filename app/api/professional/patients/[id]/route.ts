@@ -46,14 +46,14 @@ export async function PATCH(
     const updatedPatient = await updatePatient(id, { email });
 
     // Log audit event
-    await logAuditEvent(
-      context.user.id,
-      AuditAction.UPDATE,
-      "patient",
-      id,
-      context.profile.center_id,
-      { oldEmail: patient.email, newEmail: email }
-    );
+    await logAuditEvent({
+      userId: context.user.id,
+      action: AuditAction.UPDATE,
+      entityType: "patient",
+      entityId: id,
+      centerId: context.profile.center_id,
+      changes: { oldEmail: patient.email, newEmail: email }
+    });
 
     // Send invitation if requested
     let invitationResult = null;
@@ -138,17 +138,17 @@ export async function DELETE(
     }
 
     // Log audit event before deletion
-    await logAuditEvent(
-      context.user.id,
-      AuditAction.DELETE,
-      "patient",
-      id,
-      context.profile.center_id,
-      { 
+    await logAuditEvent({
+      userId: context.user.id,
+      action: AuditAction.DELETE,
+      entityType: "patient",
+      entityId: id,
+      centerId: context.profile.center_id,
+      changes: { 
         patientName: `${patient.first_name} ${patient.last_name}`,
         medicalRecordNumber: patient.medical_record_number
       }
-    );
+    });
 
     // Delete the patient (soft delete with cleanup)
     await deletePatient(id, context.user.id);

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, TrendingUp, Activity, Pill } from "lucide-react";
 import { formatDateTime } from "@/lib/utils/date";
-import { VISIT_TYPE_NAMES } from "@/lib/types/enums";
+import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 import { cn } from "@/lib/utils";
 
 interface EvaluationsDisplayProps {
@@ -58,7 +58,7 @@ export function EvaluationsDisplay({ evaluations }: EvaluationsDisplayProps) {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">
                         <h4 className="font-semibold text-lg text-slate-900">
-                          {evaluation.visit_type && VISIT_TYPE_NAMES[evaluation.visit_type]}
+                          {evaluation.visit_type && VISIT_TYPE_NAMES[evaluation.visit_type as VisitType]}
                           {!evaluation.visit_type && "Clinical Evaluation"}
                         </h4>
                         {hasRiskAssessment && (

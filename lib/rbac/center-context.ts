@@ -268,7 +268,7 @@ export async function getCenterWithPathologies(centerId: string): Promise<{
 // ============================================================================
 
 export function buildCenterIsolationQuery(
-  supabase: ReturnType<Awaited<typeof createClient>>,
+  supabase: Awaited<ReturnType<typeof createClient>>,
   tableName: string,
   userId: string,
   userRole: UserRole,

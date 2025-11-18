@@ -17,10 +17,10 @@ interface CenterEditFormProps {
 }
 
 const PATHOLOGIES: { value: PathologyType; label: string }[] = [
-  { value: "bipolar", label: "Bipolar Disorder" },
-  { value: "schizophrenia", label: "Schizophrenia" },
-  { value: "asd_asperger", label: "Autism Spectrum Disorder - Asperger" },
-  { value: "depression", label: "Depression" },
+  { value: PathologyType.BIPOLAR, label: "Bipolar Disorder" },
+  { value: PathologyType.SCHIZOPHRENIA, label: "Schizophrenia" },
+  { value: PathologyType.ASD_ASPERGER, label: "Autism Spectrum Disorder - Asperger" },
+  { value: PathologyType.DEPRESSION, label: "Depression" },
 ];
 
 export function CenterEditForm({ center, assignedPathologies }: CenterEditFormProps) {

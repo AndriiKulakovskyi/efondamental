@@ -6,6 +6,7 @@ import {
   completeResponse,
   getResponseByVisitAndQuestionnaire,
 } from "@/lib/services/questionnaire.service";
+import { QuestionnaireResponseStatus } from "@/lib/types/enums";
 
 export async function GET(request: NextRequest) {
   try {
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
       completed_by: completed ? context.user.id : null,
       started_at: new Date().toISOString(),
       completed_at: completed ? new Date().toISOString() : null,
-      status: completed ? "completed" : "in_progress",
+      status: completed ? QuestionnaireResponseStatus.COMPLETED : QuestionnaireResponseStatus.IN_PROGRESS,
       metadata: {},
     });
 

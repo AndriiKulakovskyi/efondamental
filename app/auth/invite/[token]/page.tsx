@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 // Removed server-side imports - now using API routes instead
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { ROLE_NAMES } from "@/lib/types/enums";
+import { ROLE_NAMES, UserRole } from "@/lib/types/enums";
 
 export default function InvitationPage({
   params,
@@ -156,7 +156,7 @@ export default function InvitationPage({
             ) : (
               <span>
                 You&apos;ve been invited to join eFondaMental as a{" "}
-                <strong>{ROLE_NAMES[invitation.role]}</strong>
+                <strong>{ROLE_NAMES[invitation.role as UserRole]}</strong>
               </span>
             )}
           </CardDescription>
