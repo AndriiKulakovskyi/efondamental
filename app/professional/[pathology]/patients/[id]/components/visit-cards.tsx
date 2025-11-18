@@ -2,11 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Calendar, Clock, CheckCircle, XCircle, Eye, Play, ArrowRight } from "lucide-react";
+import { Calendar, Clock, CheckCircle, XCircle, Eye, Play, ArrowRight, Filter } from "lucide-react";
 import { formatShortDate } from "@/lib/utils/date";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { VISIT_TYPE_NAMES } from "@/lib/types/enums";
 
 interface VisitWithCompletion {
@@ -27,13 +34,37 @@ interface VisitCardsProps {
 }
 
 export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
-  const [filter, setFilter] = useState<'all' | 'completed' | 'upcoming'>('all');
+  const [selectedFilters, setSelectedFilters] = useState<Set<string>>(new Set(['upcoming']));
 
+  // Calculate visit counts
+  const allCount = visits.length;
+  const upcomingCount = visits.filter(v => v.status === 'scheduled' || v.status === 'in_progress').length;
+  const completedCount = visits.filter(v => v.status === 'completed').length;
+
+  // Handle filter toggle
+  const handleFilterToggle = (filterType: string) => {
+    const newFilters = new Set(selectedFilters);
+    if (newFilters.has(filterType)) {
+      newFilters.delete(filterType);
+    } else {
+      newFilters.add(filterType);
+    }
+    setSelectedFilters(newFilters);
+  };
+
+  // Filter visits based on selected filters
   const filteredVisits = visits.filter(visit => {
-    if (filter === 'all') return true;
-    if (filter === 'completed') return visit.status === 'completed';
-    if (filter === 'upcoming') return visit.status === 'scheduled' || visit.status === 'in_progress';
-    return true;
+    if (selectedFilters.size === 0) return false;
+    
+    if (selectedFilters.has('all')) return true;
+    
+    const isUpcoming = visit.status === 'scheduled' || visit.status === 'in_progress';
+    const isCompleted = visit.status === 'completed';
+    
+    if (selectedFilters.has('upcoming') && isUpcoming) return true;
+    if (selectedFilters.has('completed') && isCompleted) return true;
+    
+    return false;
   });
 
   const getStatusBadge = (status: string) => {
@@ -110,39 +141,64 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
 
   return (
     <div className="space-y-6">
-      {/* Filter Buttons */}
-      <div className="inline-flex bg-white rounded-lg p-1 border border-slate-200 shadow-sm">
-        <button
-          onClick={() => setFilter('all')}
-          className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${
-            filter === 'all'
-              ? 'bg-slate-900 text-white shadow-sm'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Toutes ({visits.length})
-        </button>
-        <button
-          onClick={() => setFilter('upcoming')}
-          className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${
-            filter === 'upcoming'
-              ? 'bg-slate-900 text-white shadow-sm'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          À venir ({visits.filter(v => v.status === 'scheduled' || v.status === 'in_progress').length})
-        </button>
-        <button
-          onClick={() => setFilter('completed')}
-          className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${
-            filter === 'completed'
-              ? 'bg-slate-900 text-white shadow-sm'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Terminées ({visits.filter(v => v.status === 'completed').length})
-        </button>
-      </div>
+      {/* Filter Dropdown */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="gap-2">
+            <Filter className="h-4 w-4" />
+            Filtrer les visites
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-56">
+          <DropdownMenuItem 
+            onSelect={(e) => {
+              e.preventDefault();
+              handleFilterToggle('all');
+            }}
+            className="flex items-center gap-2 cursor-pointer"
+          >
+            <Checkbox 
+              checked={selectedFilters.has('all')}
+              onCheckedChange={() => handleFilterToggle('all')}
+              onClick={(e) => e.stopPropagation()}
+            />
+            <span className="flex-1">Toutes</span>
+            <span className="text-slate-500">({allCount})</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem 
+            onSelect={(e) => {
+              e.preventDefault();
+              handleFilterToggle('upcoming');
+            }}
+            className="flex items-center gap-2 cursor-pointer"
+          >
+            <Checkbox 
+              checked={selectedFilters.has('upcoming')}
+              onCheckedChange={() => handleFilterToggle('upcoming')}
+              onClick={(e) => e.stopPropagation()}
+            />
+            <span className="flex-1">À venir</span>
+            <span className="text-slate-500">({upcomingCount})</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem 
+            onSelect={(e) => {
+              e.preventDefault();
+              handleFilterToggle('completed');
+            }}
+            className="flex items-center gap-2 cursor-pointer"
+          >
+            <Checkbox 
+              checked={selectedFilters.has('completed')}
+              onCheckedChange={() => handleFilterToggle('completed')}
+              onClick={(e) => e.stopPropagation()}
+            />
+            <span className="flex-1">Terminées</span>
+            <span className="text-slate-500">({completedCount})</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {/* Visit Cards Grid */}
       {filteredVisits.length > 0 ? (
@@ -208,9 +264,9 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
             Aucune visite trouvée
           </p>
           <p className="text-xs text-slate-400">
-            {filter === 'all' 
-              ? 'Ce patient n\'a pas encore de visites'
-              : 'Aucune visite dans cette catégorie'}
+            {selectedFilters.size === 0
+              ? 'Sélectionnez un filtre pour afficher les visites'
+              : 'Aucune visite dans les catégories sélectionnées'}
           </p>
         </div>
       )}

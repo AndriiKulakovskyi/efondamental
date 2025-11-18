@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, FileText, AlertTriangle, Clock } from "lucide-react";
+import { Calendar, FileText, Clock } from "lucide-react";
 
 interface PatientStatsProps {
   stats: {
@@ -8,20 +8,11 @@ interface PatientStatsProps {
     completedVisits: number;
     upcomingVisits: number;
   };
-  riskLevel: string;
-  riskColor: string;
   visits: any[];
   pathology: string;
 }
 
-export function PatientStatCards({ stats, riskLevel, riskColor, visits, pathology }: PatientStatsProps) {
-  const getRiskColorClass = () => {
-    if (riskColor.includes('red')) return '#EF4444';
-    if (riskColor.includes('amber') || riskColor.includes('yellow')) return '#F59E0B';
-    if (riskColor.includes('blue')) return '#3B82F6';
-    return '#64748B';
-  };
-
+export function PatientStatCards({ stats }: PatientStatsProps) {
   const cards = [
     {
       title: "Total visites",
@@ -41,17 +32,10 @@ export function PatientStatCards({ stats, riskLevel, riskColor, visits, patholog
       icon: Clock,
       color: "#F59E0B",
     },
-    {
-      title: "Niveau de risque",
-      value: riskLevel,
-      icon: AlertTriangle,
-      color: getRiskColorClass(),
-      isText: true,
-    },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {cards.map((card, index) => (
         <div
           key={index}
@@ -64,7 +48,7 @@ export function PatientStatCards({ stats, riskLevel, riskColor, visits, patholog
                   {card.title}
                 </p>
                 <p className="text-4xl font-bold text-slate-900">
-                  {card.isText ? card.value : card.value}
+                  {card.value}
                 </p>
               </div>
               <div

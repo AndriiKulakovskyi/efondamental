@@ -155,8 +155,6 @@ export default async function PatientDetailPage({
         {/* Stat Cards */}
         <PatientStatCards 
           stats={stats}
-          riskLevel={risk.label}
-          riskColor={risk.color}
           visits={visitsWithCompletion}
           pathology={pathology}
         />
