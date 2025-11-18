@@ -4,11 +4,13 @@ import {
   getCenterStatistics,
   getVisitTypeStatistics 
 } from "@/lib/services/statistics.service";
+import { getPatientDemographics } from "@/lib/services/patient.service";
 import { PathologyType, PATHOLOGY_NAMES, VISIT_TYPE_NAMES } from "@/lib/types/enums";
 import { StatCard } from "@/components/ui/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Calendar, CheckCircle, Clock, TrendingUp, BarChart3 } from "lucide-react";
 import { redirect } from "next/navigation";
+import { DemographicCharts } from "./components/demographic-charts";
 
 export default async function StatisticsPage({
   params,
@@ -24,11 +26,11 @@ export default async function StatisticsPage({
 
   const pathologyType = pathology as PathologyType;
 
-  const [professionalStats, visitTypeStats, centerStats] = await Promise.all([
+  const [professionalStats, visitTypeStats, centerStats, demographics] = await Promise.all([
     getProfessionalStatistics(context.user.id, context.profile.center_id, pathologyType),
     getVisitTypeStatistics(context.profile.center_id, context.user.id),
-    // Only fetch center stats if user has permission (we'll implement permission check later)
     getCenterStatistics(context.profile.center_id),
+    getPatientDemographics(context.profile.center_id, pathologyType),
   ]);
 
   return (
@@ -189,6 +191,12 @@ export default async function StatisticsPage({
             )}
           </CardContent>
         </Card>
+      </div>
+
+      {/* Demographics Section */}
+      <div>
+        <h3 className="text-xl font-semibold text-slate-900 mb-4">Patient Demographics</h3>
+        <DemographicCharts demographics={demographics} />
       </div>
     </div>
   );

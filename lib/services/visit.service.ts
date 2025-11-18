@@ -305,6 +305,78 @@ export async function getVisitCompletionStatus(visitId: string) {
 }
 
 // ============================================================================
+// PATIENT VISIT COMPLETION
+// ============================================================================
+
+export interface PatientVisitCompletion {
+  patientId: string;
+  visitId: string | null;
+  visitType: string | null;
+  scheduledDate: string | null;
+  completionPercentage: number;
+  conductedBy: string | null;
+}
+
+export async function getLatestVisitWithCompletion(
+  patientId: string
+): Promise<PatientVisitCompletion> {
+  const supabase = await createClient();
+
+  // Get the most recent visit (scheduled, in_progress, or completed)
+  const { data: visit } = await supabase
+    .from('visits')
+    .select('*')
+    .eq('patient_id', patientId)
+    .in('status', [VisitStatus.SCHEDULED, VisitStatus.IN_PROGRESS, VisitStatus.COMPLETED])
+    .order('scheduled_date', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (!visit) {
+    return {
+      patientId,
+      visitId: null,
+      visitType: null,
+      scheduledDate: null,
+      completionPercentage: 0,
+      conductedBy: null,
+    };
+  }
+
+  // Calculate completion percentage
+  const completion = await getVisitCompletionStatus(visit.id);
+
+  return {
+    patientId,
+    visitId: visit.id,
+    visitType: visit.visit_type,
+    scheduledDate: visit.scheduled_date,
+    completionPercentage: completion.completionPercentage,
+    conductedBy: visit.conducted_by,
+  };
+}
+
+export async function getMultiplePatientVisitCompletions(
+  patientIds: string[]
+): Promise<Map<string, PatientVisitCompletion>> {
+  const completions = new Map<string, PatientVisitCompletion>();
+
+  // Process in batches to avoid too many concurrent requests
+  const batchSize = 10;
+  for (let i = 0; i < patientIds.length; i += batchSize) {
+    const batch = patientIds.slice(i, i + batchSize);
+    const batchResults = await Promise.all(
+      batch.map(id => getLatestVisitWithCompletion(id))
+    );
+    batchResults.forEach(result => {
+      completions.set(result.patientId, result);
+    });
+  }
+
+  return completions;
+}
+
+// ============================================================================
 // VISIT STATISTICS
 // ============================================================================
 

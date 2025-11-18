@@ -500,3 +500,159 @@ export async function getPatientInvitationStatus(
     } : null,
   };
 }
+
+// ============================================================================
+// PATIENT ASSIGNMENT BY PROFESSIONAL
+// ============================================================================
+
+export async function getPatientsByProfessional(
+  professionalId: string,
+  pathology?: PathologyType
+): Promise<PatientFull[]> {
+  const supabase = await createClient();
+
+  // Get unique patient IDs from visits conducted by this professional
+  let visitsQuery = supabase
+    .from('visits')
+    .select('patient_id')
+    .eq('conducted_by', professionalId);
+
+  const { data: visits, error: visitsError } = await visitsQuery;
+
+  if (visitsError) {
+    throw new Error(`Failed to fetch professional's patients: ${visitsError.message}`);
+  }
+
+  if (!visits || visits.length === 0) {
+    return [];
+  }
+
+  // Get unique patient IDs
+  const patientIds = [...new Set(visits.map(v => v.patient_id))];
+
+  // Fetch full patient details
+  let patientsQuery = supabase
+    .from('v_patients_full')
+    .select('*')
+    .in('id', patientIds)
+    .eq('active', true);
+
+  if (pathology) {
+    patientsQuery = patientsQuery.eq('pathology_type', pathology);
+  }
+
+  const { data: patients, error: patientsError } = await patientsQuery
+    .order('last_name, first_name');
+
+  if (patientsError) {
+    throw new Error(`Failed to fetch patient details: ${patientsError.message}`);
+  }
+
+  return patients || [];
+}
+
+// ============================================================================
+// PATIENT DEMOGRAPHICS
+// ============================================================================
+
+export interface GenderDistribution {
+  male: number;
+  female: number;
+  other: number;
+  unspecified: number;
+}
+
+export interface AgeDistribution {
+  '0-18': number;
+  '19-30': number;
+  '31-50': number;
+  '51-70': number;
+  '70+': number;
+}
+
+export interface PatientDemographics {
+  gender: GenderDistribution;
+  age: AgeDistribution;
+  total: number;
+}
+
+export async function getPatientDemographics(
+  centerId: string,
+  pathology?: PathologyType
+): Promise<PatientDemographics> {
+  const supabase = await createClient();
+
+  let query = supabase
+    .from('v_patients_full')
+    .select('gender, date_of_birth')
+    .eq('center_id', centerId)
+    .eq('active', true);
+
+  if (pathology) {
+    query = query.eq('pathology_type', pathology);
+  }
+
+  const { data: patients, error } = await query;
+
+  if (error) {
+    throw new Error(`Failed to fetch patient demographics: ${error.message}`);
+  }
+
+  if (!patients) {
+    return {
+      gender: { male: 0, female: 0, other: 0, unspecified: 0 },
+      age: { '0-18': 0, '19-30': 0, '31-50': 0, '51-70': 0, '70+': 0 },
+      total: 0,
+    };
+  }
+
+  // Calculate gender distribution
+  const genderDist: GenderDistribution = {
+    male: 0,
+    female: 0,
+    other: 0,
+    unspecified: 0,
+  };
+
+  patients.forEach(p => {
+    const gender = p.gender?.toLowerCase();
+    if (gender === 'male' || gender === 'm' || gender === 'homme') {
+      genderDist.male++;
+    } else if (gender === 'female' || gender === 'f' || gender === 'femme') {
+      genderDist.female++;
+    } else if (gender) {
+      genderDist.other++;
+    } else {
+      genderDist.unspecified++;
+    }
+  });
+
+  // Calculate age distribution
+  const ageDist: AgeDistribution = {
+    '0-18': 0,
+    '19-30': 0,
+    '31-50': 0,
+    '51-70': 0,
+    '70+': 0,
+  };
+
+  const currentYear = new Date().getFullYear();
+  patients.forEach(p => {
+    if (p.date_of_birth) {
+      const birthYear = new Date(p.date_of_birth).getFullYear();
+      const age = currentYear - birthYear;
+      
+      if (age <= 18) ageDist['0-18']++;
+      else if (age <= 30) ageDist['19-30']++;
+      else if (age <= 50) ageDist['31-50']++;
+      else if (age <= 70) ageDist['51-70']++;
+      else ageDist['70+']++;
+    }
+  });
+
+  return {
+    gender: genderDist,
+    age: ageDist,
+    total: patients.length,
+  };
+}
