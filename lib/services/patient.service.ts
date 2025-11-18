@@ -511,44 +511,77 @@ export async function getPatientsByProfessional(
 ): Promise<PatientFull[]> {
   const supabase = await createClient();
 
-  // Get unique patient IDs from visits conducted by this professional
-  let visitsQuery = supabase
-    .from('visits')
-    .select('patient_id')
-    .eq('conducted_by', professionalId);
-
-  const { data: visits, error: visitsError } = await visitsQuery;
-
-  if (visitsError) {
-    throw new Error(`Failed to fetch professional's patients: ${visitsError.message}`);
-  }
-
-  if (!visits || visits.length === 0) {
-    return [];
-  }
-
-  // Get unique patient IDs
-  const patientIds = [...new Set(visits.map(v => v.patient_id))];
-
-  // Fetch full patient details
+  // Fetch patients assigned to this professional
   let patientsQuery = supabase
     .from('v_patients_full')
     .select('*')
-    .in('id', patientIds)
+    .eq('assigned_to', professionalId)
     .eq('active', true);
 
   if (pathology) {
     patientsQuery = patientsQuery.eq('pathology_type', pathology);
   }
 
-  const { data: patients, error: patientsError } = await patientsQuery
+  const { data: patients, error } = await patientsQuery
     .order('last_name, first_name');
 
-  if (patientsError) {
-    throw new Error(`Failed to fetch patient details: ${patientsError.message}`);
+  if (error) {
+    throw new Error(`Failed to fetch assigned patients: ${error.message}`);
   }
 
   return patients || [];
+}
+
+// ============================================================================
+// PATIENT REASSIGNMENT
+// ============================================================================
+
+export async function reassignPatient(
+  patientId: string,
+  newAssignedTo: string,
+  reassignedBy: string
+): Promise<Patient> {
+  const supabase = await createClient();
+
+  // Verify the patient exists and reassignedBy is the creator
+  const { data: patient, error: patientError } = await supabase
+    .from('patients')
+    .select('created_by, center_id')
+    .eq('id', patientId)
+    .single();
+
+  if (patientError || !patient) {
+    throw new Error('Patient not found');
+  }
+
+  if (patient.created_by !== reassignedBy) {
+    throw new Error('Only the creator can reassign this patient');
+  }
+
+  // Verify new assignee is from same center
+  const { data: assignee, error: assigneeError } = await supabase
+    .from('user_profiles')
+    .select('center_id')
+    .eq('id', newAssignedTo)
+    .single();
+
+  if (assigneeError || !assignee || assignee.center_id !== patient.center_id) {
+    throw new Error('New assignee must be from the same center');
+  }
+
+  // Update patient assignment
+  const { data, error } = await supabase
+    .from('patients')
+    .update({ assigned_to: newAssignedTo })
+    .eq('id', patientId)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to reassign patient: ${error.message}`);
+  }
+
+  return data;
 }
 
 // ============================================================================

@@ -106,6 +106,7 @@ export interface Patient {
   emergency_contact: EmergencyContact | null;
   metadata: Record<string, any>;
   active: boolean;
+  assigned_to: string | null;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -302,6 +303,8 @@ export interface PatientFull extends Patient {
   pathology_color: string | null;
   created_by_first_name: string | null;
   created_by_last_name: string | null;
+  assigned_to_first_name: string | null;
+  assigned_to_last_name: string | null;
 }
 
 export interface VisitFull extends Visit {

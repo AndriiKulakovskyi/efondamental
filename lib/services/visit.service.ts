@@ -33,6 +33,19 @@ export async function getVisitById(visitId: string): Promise<VisitFull | null> {
 export async function createVisit(visit: VisitInsert): Promise<Visit> {
   const supabase = await createClient();
 
+  // If conducted_by not specified, use patient's assigned_to
+  if (!visit.conducted_by) {
+    const { data: patient } = await supabase
+      .from('patients')
+      .select('assigned_to')
+      .eq('id', visit.patient_id)
+      .single();
+    
+    if (patient?.assigned_to) {
+      visit.conducted_by = patient.assigned_to;
+    }
+  }
+
   const { data, error } = await supabase
     .from('visits')
     .insert(visit)

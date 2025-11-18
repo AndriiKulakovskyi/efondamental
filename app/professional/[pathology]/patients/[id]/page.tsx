@@ -25,6 +25,8 @@ import { PatientOverview } from "./components/patient-overview";
 import { VisitTimeline } from "./components/visit-timeline";
 import { EvaluationsDisplay } from "./components/evaluations-display";
 import { AnalyticsSummary } from "./components/analytics-summary";
+import { ReassignPatientDialog } from "./components/reassign-patient-dialog";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function PatientDetailPage({
   params,
@@ -46,6 +48,15 @@ export default async function PatientDetailPage({
 
   // Record access for "recently viewed" feature
   await recordPatientAccess(context.user.id, id);
+
+  // Fetch all doctors from the same center for reassignment
+  const supabase = await createClient();
+  const { data: doctors } = await supabase
+    .from('user_profiles')
+    .select('id, first_name, last_name')
+    .eq('center_id', context.profile.center_id)
+    .eq('role', 'healthcare_professional')
+    .order('last_name, first_name');
 
   // Calculate date for last 12 months
   const twelveMonthsAgo = new Date();
@@ -99,6 +110,14 @@ export default async function PatientDetailPage({
             </div>
           </div>
           <div className="flex gap-2">
+            <ReassignPatientDialog
+              patientId={id}
+              patientName={`${patient.first_name} ${patient.last_name}`}
+              currentAssignedTo={patient.assigned_to}
+              createdBy={patient.created_by}
+              currentUserId={context.user.id}
+              doctors={doctors || []}
+            />
             <EditPatientEmail
               patientId={id}
               currentEmail={patient.email}

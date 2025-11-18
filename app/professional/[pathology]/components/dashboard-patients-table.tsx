@@ -14,7 +14,6 @@ interface DashboardPatientsTableProps {
   myPatients: PatientFull[];
   centerPatients: PatientFull[];
   visitCompletions: Map<string, PatientVisitCompletion>;
-  conductedByNames: Map<string, string>;
   pathology: string;
 }
 
@@ -24,7 +23,6 @@ export function DashboardPatientsTable({
   myPatients,
   centerPatients,
   visitCompletions,
-  conductedByNames,
   pathology,
 }: DashboardPatientsTableProps) {
   const [activeTab, setActiveTab] = useState<TabType>('my-patients');
@@ -109,7 +107,7 @@ export function DashboardPatientsTable({
               <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Prochaine visite</span>
             </div>
             <div className="col-span-2">
-              <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Suivi</span>
+              <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Médecin assigné</span>
             </div>
             <div className="col-span-4">
               <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Progression</span>
@@ -122,8 +120,10 @@ export function DashboardPatientsTable({
           {filteredPatients.length > 0 ? (
             filteredPatients.map((patient) => {
               const completion = visitCompletions.get(patient.id);
-              const doctorName = completion?.conductedBy 
-                ? conductedByNames.get(completion.conductedBy) || 'Non assigné'
+              
+              // Use assigned doctor from patient record
+              const doctorName = patient.assigned_to_first_name && patient.assigned_to_last_name
+                ? `Dr. ${patient.assigned_to_first_name} ${patient.assigned_to_last_name}`
                 : 'Non assigné';
 
               return (
@@ -172,7 +172,7 @@ export function DashboardPatientsTable({
                       )}
                     </div>
 
-                    {/* Doctor Column */}
+                    {/* Assigned Doctor Column */}
                     <div className="col-span-2">
                       <p className="text-sm text-slate-700">{doctorName}</p>
                     </div>

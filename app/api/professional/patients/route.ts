@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
       emergencyContactPhone,
       emergencyContactRelationship,
       pathology,
+      assignedTo,
     } = body;
 
     // Get pathology ID
@@ -67,6 +68,7 @@ export async function POST(request: NextRequest) {
       address: address || null,
       emergency_contact: emergencyContact,
       active: true,
+      assigned_to: assignedTo || context.user.id,
       created_by: context.user.id,
       metadata: {},
     });

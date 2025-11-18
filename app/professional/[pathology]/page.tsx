@@ -47,23 +47,8 @@ export default async function PathologyDashboard({
   const allPatientIds = [...new Set([...centerPatients.map(p => p.id), ...myPatients.map(p => p.id)])];
   const visitCompletions = await getMultiplePatientVisitCompletions(allPatientIds);
 
-  // Get doctor names for conducted_by
-  const supabase = await createClient();
-  const conductedByIds = Array.from(visitCompletions.values())
-    .map(v => v.conductedBy)
-    .filter(Boolean) as string[];
-  
-  const { data: professionals } = await supabase
-    .from('user_profiles')
-    .select('id, first_name, last_name')
-    .in('id', [...new Set(conductedByIds)]);
-
-  const conductedByNames = new Map<string, string>();
-  professionals?.forEach(prof => {
-    conductedByNames.set(prof.id, `Dr. ${prof.first_name} ${prof.last_name}`);
-  });
-
   // Count visits this month
+  const supabase = await createClient();
   const now = new Date();
   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -118,7 +103,6 @@ export default async function PathologyDashboard({
             myPatients={myPatients}
             centerPatients={centerPatients}
             visitCompletions={visitCompletions}
-            conductedByNames={conductedByNames}
             pathology={pathology}
           />
         </div>
