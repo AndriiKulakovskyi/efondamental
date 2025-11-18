@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MoreVertical, UserCog, Mail, Calendar, Trash2 } from "lucide-react";
+import { MoreVertical, UserCog, Mail, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { ReassignPatientDialog } from "./reassign-patient-dialog";
 import { EditPatientEmail } from "./edit-patient-email";
 import { DeletePatientDialog } from "./delete-patient-dialog";
-import Link from "next/link";
 
 interface Doctor {
   id: string;
@@ -73,13 +72,6 @@ export function QuickActionsMenu({
           <DropdownMenuItem onClick={() => setShowEmailDialog(true)}>
             <Mail className="mr-2 h-4 w-4" />
             Modifier l'email
-          </DropdownMenuItem>
-          
-          <DropdownMenuItem asChild>
-            <Link href={`/professional/${pathology}/patients/${patientId}/visits/new`}>
-              <Calendar className="mr-2 h-4 w-4" />
-              Planifier une visite
-            </Link>
           </DropdownMenuItem>
           
           <DropdownMenuSeparator />

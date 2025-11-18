@@ -20,7 +20,8 @@ import {
   XCircle, 
   Calendar, 
   Loader2,
-  MoreVertical
+  MoreVertical,
+  ArrowLeft
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -28,6 +29,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
 
 interface VisitActionsProps {
   visitId: string;
@@ -97,7 +99,7 @@ export default function VisitActions({
   const handleCompleteVisit = () => {
     if (completionStatus.completedQuestionnaires < completionStatus.totalQuestionnaires) {
       setError(
-        `Cannot complete visit. ${completionStatus.totalQuestionnaires - completionStatus.completedQuestionnaires} questionnaires remaining.`
+        `Impossible de terminer la visite. ${completionStatus.totalQuestionnaires - completionStatus.completedQuestionnaires} questionnaires restants.`
       );
       return;
     }
@@ -106,7 +108,7 @@ export default function VisitActions({
 
   const handleReschedule = () => {
     if (!rescheduleDate) {
-      setError("Please select a new date");
+      setError("Veuillez sélectionner une nouvelle date");
       return;
     }
     handleAction("reschedule", { scheduledDate: rescheduleDate });
@@ -118,92 +120,103 @@ export default function VisitActions({
 
   return (
     <>
-      <div className="flex gap-2">
-        {status === "scheduled" && (
-          <>
-            <Button onClick={handleStartVisit} disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Starting...
-                </>
-              ) : (
-                <>
-                  <Play className="mr-2 h-4 w-4" />
-                  Start Visit
-                </>
-              )}
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setShowRescheduleDialog(true)}>
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Reschedule
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setShowCancelDialog(true)}
-                  className="text-red-600"
-                >
-                  <XCircle className="mr-2 h-4 w-4" />
-                  Cancel Visit
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        )}
+      <div className="flex flex-col gap-2">
+        {/* Back to Patient Profile Button - Always visible */}
+        <Link href={`/professional/${pathology}/patients/${patientId}`}>
+          <Button variant="outline" className="w-full gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Retourner à fiche patient
+          </Button>
+        </Link>
 
-        {status === "in_progress" && (
-          <>
-            <Button onClick={handleCompleteVisit} disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Completing...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Complete Visit
-                </>
-              )}
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem 
-                  onClick={() => setShowCancelDialog(true)}
-                  className="text-red-600"
-                >
-                  <XCircle className="mr-2 h-4 w-4" />
-                  Cancel Visit
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        )}
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          {status === "scheduled" && (
+            <>
+              <Button onClick={handleStartVisit} disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Démarrage...
+                  </>
+                ) : (
+                  <>
+                    <Play className="mr-2 h-4 w-4" />
+                    Démarrer la visite
+                  </>
+                )}
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setShowRescheduleDialog(true)}>
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Reprogrammer
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setShowCancelDialog(true)}
+                    className="text-red-600"
+                  >
+                    <XCircle className="mr-2 h-4 w-4" />
+                    Annuler la visite
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
 
-        {status === "completed" && (
-          <div className="text-sm text-slate-600 flex items-center">
-            <CheckCircle className="mr-2 h-5 w-5 text-green-600" />
-            Visit Completed
-          </div>
-        )}
+          {status === "in_progress" && (
+            <>
+              <Button onClick={handleCompleteVisit} disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Finalisation...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Terminer la visite
+                  </>
+                )}
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem 
+                    onClick={() => setShowCancelDialog(true)}
+                    className="text-red-600"
+                  >
+                    <XCircle className="mr-2 h-4 w-4" />
+                    Annuler la visite
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
 
-        {status === "cancelled" && (
-          <div className="text-sm text-slate-600 flex items-center">
-            <XCircle className="mr-2 h-5 w-5 text-red-600" />
-            Visit Cancelled
-          </div>
-        )}
+          {status === "completed" && (
+            <div className="text-sm text-slate-600 flex items-center">
+              <CheckCircle className="mr-2 h-5 w-5 text-green-600" />
+              Visite terminée
+            </div>
+          )}
+
+          {status === "cancelled" && (
+            <div className="text-sm text-slate-600 flex items-center">
+              <XCircle className="mr-2 h-5 w-5 text-red-600" />
+              Visite annulée
+            </div>
+          )}
+        </div>
       </div>
 
       {error && (
@@ -215,14 +228,14 @@ export default function VisitActions({
       <Dialog open={showRescheduleDialog} onOpenChange={setShowRescheduleDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Reschedule Visit</DialogTitle>
+            <DialogTitle>Reprogrammer la visite</DialogTitle>
             <DialogDescription>
-              Select a new date and time for this visit.
+              Sélectionnez une nouvelle date et heure pour cette visite.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="reschedule-date">New Date & Time</Label>
+              <Label htmlFor="reschedule-date">Nouvelle date et heure</Label>
               <Input
                 id="reschedule-date"
                 type="datetime-local"
@@ -238,16 +251,16 @@ export default function VisitActions({
               onClick={() => setShowRescheduleDialog(false)}
               disabled={isLoading}
             >
-              Cancel
+              Annuler
             </Button>
             <Button onClick={handleReschedule} disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Rescheduling...
+                  Reprogrammation...
                 </>
               ) : (
-                "Reschedule"
+                "Reprogrammer"
               )}
             </Button>
           </DialogFooter>
@@ -257,9 +270,9 @@ export default function VisitActions({
       <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Cancel Visit</DialogTitle>
+            <DialogTitle>Annuler la visite</DialogTitle>
             <DialogDescription>
-              Are you sure you want to cancel this visit? This action cannot be undone.
+              Êtes-vous sûr de vouloir annuler cette visite ? Cette action ne peut pas être annulée.
             </DialogDescription>
           </DialogHeader>
           {error && <AlertBanner type="error" message={error} />}
@@ -269,7 +282,7 @@ export default function VisitActions({
               onClick={() => setShowCancelDialog(false)}
               disabled={isLoading}
             >
-              Keep Visit
+              Conserver la visite
             </Button>
             <Button 
               variant="destructive"
@@ -279,10 +292,10 @@ export default function VisitActions({
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Cancelling...
+                  Annulation...
                 </>
               ) : (
-                "Cancel Visit"
+                "Annuler la visite"
               )}
             </Button>
           </DialogFooter>

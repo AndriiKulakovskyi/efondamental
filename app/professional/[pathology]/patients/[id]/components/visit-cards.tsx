@@ -141,64 +141,73 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
 
   return (
     <div className="space-y-6">
-      {/* Filter Dropdown */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="gap-2">
-            <Filter className="h-4 w-4" />
-            Filtrer les visites
+      {/* Filter and Action Buttons */}
+      <div className="flex items-center gap-3">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="gap-2">
+              <Filter className="h-4 w-4" />
+              Filtrer les visites
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuItem 
+              onSelect={(e) => {
+                e.preventDefault();
+                handleFilterToggle('all');
+              }}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <Checkbox 
+                checked={selectedFilters.has('all')}
+                onCheckedChange={() => handleFilterToggle('all')}
+                onClick={(e) => e.stopPropagation()}
+              />
+              <span className="flex-1">Toutes</span>
+              <span className="text-slate-500">({allCount})</span>
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem 
+              onSelect={(e) => {
+                e.preventDefault();
+                handleFilterToggle('upcoming');
+              }}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <Checkbox 
+                checked={selectedFilters.has('upcoming')}
+                onCheckedChange={() => handleFilterToggle('upcoming')}
+                onClick={(e) => e.stopPropagation()}
+              />
+              <span className="flex-1">À venir</span>
+              <span className="text-slate-500">({upcomingCount})</span>
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem 
+              onSelect={(e) => {
+                e.preventDefault();
+                handleFilterToggle('completed');
+              }}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <Checkbox 
+                checked={selectedFilters.has('completed')}
+                onCheckedChange={() => handleFilterToggle('completed')}
+                onClick={(e) => e.stopPropagation()}
+              />
+              <span className="flex-1">Terminées</span>
+              <span className="text-slate-500">({completedCount})</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <Link href={`/professional/${pathology}/patients/${patientId}/visits/new`}>
+          <Button className="gap-2">
+            <Calendar className="h-4 w-4" />
+            Planifier une visite
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-56">
-          <DropdownMenuItem 
-            onSelect={(e) => {
-              e.preventDefault();
-              handleFilterToggle('all');
-            }}
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <Checkbox 
-              checked={selectedFilters.has('all')}
-              onCheckedChange={() => handleFilterToggle('all')}
-              onClick={(e) => e.stopPropagation()}
-            />
-            <span className="flex-1">Toutes</span>
-            <span className="text-slate-500">({allCount})</span>
-          </DropdownMenuItem>
-          
-          <DropdownMenuItem 
-            onSelect={(e) => {
-              e.preventDefault();
-              handleFilterToggle('upcoming');
-            }}
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <Checkbox 
-              checked={selectedFilters.has('upcoming')}
-              onCheckedChange={() => handleFilterToggle('upcoming')}
-              onClick={(e) => e.stopPropagation()}
-            />
-            <span className="flex-1">À venir</span>
-            <span className="text-slate-500">({upcomingCount})</span>
-          </DropdownMenuItem>
-          
-          <DropdownMenuItem 
-            onSelect={(e) => {
-              e.preventDefault();
-              handleFilterToggle('completed');
-            }}
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <Checkbox 
-              checked={selectedFilters.has('completed')}
-              onCheckedChange={() => handleFilterToggle('completed')}
-              onClick={(e) => e.stopPropagation()}
-            />
-            <span className="flex-1">Terminées</span>
-            <span className="text-slate-500">({completedCount})</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+        </Link>
+      </div>
 
       {/* Visit Cards Grid */}
       {filteredVisits.length > 0 ? (

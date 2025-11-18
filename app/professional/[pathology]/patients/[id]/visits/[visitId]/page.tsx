@@ -111,7 +111,10 @@ export default async function VisitDetailPage({
                       : 'bg-red-100 text-red-800 border-red-200'
                   )}
                 >
-                  {visit.status === 'in_progress' ? 'In Progress' : visit.status.charAt(0).toUpperCase() + visit.status.slice(1)}
+                  {visit.status === 'completed' ? 'Terminée' : 
+                   visit.status === 'in_progress' ? 'En cours' : 
+                   visit.status === 'scheduled' ? 'Planifiée' :
+                   visit.status === 'cancelled' ? 'Annulée' : visit.status}
                 </span>
               </div>
 
@@ -119,8 +122,8 @@ export default async function VisitDetailPage({
               <div className="mt-4 flex items-center gap-2 text-sm">
                 <div className="flex-1">
                   <div className="flex justify-between text-xs text-slate-600 mb-1">
-                    <span>Overall Progress</span>
-                    <span>{completionStatus.completedQuestionnaires}/{completionStatus.totalQuestionnaires} forms</span>
+                    <span>Progression globale</span>
+                    <span>{completionStatus.completedQuestionnaires}/{completionStatus.totalQuestionnaires} formulaires</span>
                   </div>
                   <div className="w-full bg-slate-200 rounded-full h-2.5">
                     <div
@@ -157,7 +160,7 @@ export default async function VisitDetailPage({
 
       {/* Clinical Modules */}
       <div className="space-y-4">
-        <h3 className="text-xl font-semibold text-slate-900">Clinical Modules</h3>
+        <h3 className="text-xl font-semibold text-slate-900">Modules cliniques</h3>
 
         {modulesWithQuestionnaires.map((module, index) => (
           <ExpandableModuleCard
@@ -175,7 +178,7 @@ export default async function VisitDetailPage({
       {visit.notes && (
         <Card className="hover:shadow-md transition-shadow duration-200">
           <CardHeader>
-            <CardTitle>Visit Notes</CardTitle>
+            <CardTitle>Notes de visite</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{visit.notes}</p>
