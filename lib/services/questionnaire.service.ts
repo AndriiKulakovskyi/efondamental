@@ -7,7 +7,7 @@ import {
   QuestionnaireResponseInsert,
   QuestionnaireResponseUpdate,
 } from '../types/database.types';
-import { UserRole } from '../types/enums';
+import { UserRole, QuestionnaireResponseStatus } from '../types/enums';
 
 // ============================================================================
 // QUESTIONNAIRE CRUD
@@ -146,7 +146,7 @@ export async function completeResponse(
   completedBy: string
 ): Promise<QuestionnaireResponse> {
   return updateResponse(responseId, {
-    status: 'completed',
+    status: QuestionnaireResponseStatus.COMPLETED,
     completed_at: new Date().toISOString(),
     completed_by: completedBy,
   });

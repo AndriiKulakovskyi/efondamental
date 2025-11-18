@@ -82,6 +82,9 @@ export interface UserInvitation {
   email: string;
   role: UserRole;
   center_id: string | null;
+  patient_id: string | null;
+  first_name: string | null;
+  last_name: string | null;
   token: string;
   status: InvitationStatus;
   invited_by: string;
@@ -110,6 +113,9 @@ export interface Patient {
   created_by: string;
   created_at: string;
   updated_at: string;
+  user_id: string | null;
+  deleted_at: string | null;
+  deleted_by: string | null;
 }
 
 export interface EmergencyContact {
@@ -325,7 +331,7 @@ export interface VisitFull extends Visit {
 export type CenterInsert = Omit<Center, 'id' | 'created_at' | 'updated_at'>;
 export type CenterUpdate = Partial<CenterInsert>;
 
-export type PatientInsert = Omit<Patient, 'id' | 'created_at' | 'updated_at'>;
+export type PatientInsert = Omit<Patient, 'id' | 'created_at' | 'updated_at' | 'user_id' | 'deleted_at' | 'deleted_by'>;
 export type PatientUpdate = Partial<Omit<PatientInsert, 'center_id' | 'created_by'>>;
 
 export type VisitInsert = Omit<Visit, 'id' | 'created_at' | 'updated_at'>;
@@ -334,7 +340,7 @@ export type VisitUpdate = Partial<Omit<VisitInsert, 'patient_id' | 'created_by'>
 export type QuestionnaireResponseInsert = Omit<QuestionnaireResponse, 'id' | 'created_at' | 'updated_at'>;
 export type QuestionnaireResponseUpdate = Partial<Omit<QuestionnaireResponseInsert, 'visit_id' | 'questionnaire_id' | 'patient_id'>>;
 
-export type UserInvitationInsert = Omit<UserInvitation, 'id' | 'created_at' | 'updated_at'>;
+export type UserInvitationInsert = Omit<UserInvitation, 'id' | 'created_at' | 'updated_at' | 'accepted_by'>;
 export type UserProfileInsert = Omit<UserProfile, 'created_at' | 'updated_at'>;
 export type UserProfileUpdate = Partial<Omit<UserProfileInsert, 'id' | 'created_by'>>;
 

@@ -59,7 +59,7 @@ export function ReassignPatientDialog({
 
   const handleReassign = async () => {
     if (!selectedDoctor) {
-      setError("Please select a doctor");
+      setError("Veuillez sélectionner un médecin");
       return;
     }
 
@@ -75,7 +75,7 @@ export function ReassignPatientDialog({
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to reassign patient");
+        throw new Error(data.error || "Échec de la réassignation du patient");
       }
 
       setOpen(false);
@@ -83,7 +83,7 @@ export function ReassignPatientDialog({
         onSuccess();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : "Une erreur s'est produite");
     } finally {
       setIsSubmitting(false);
     }
@@ -92,28 +92,28 @@ export function ReassignPatientDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="w-full justify-start">
           <UserCog className="w-4 h-4 mr-2" />
-          Reassign Doctor
+          Réassigner médecin
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Reassign Patient</DialogTitle>
+          <DialogTitle>Réassigner patient</DialogTitle>
           <DialogDescription>
-            Change the assigned doctor for {patientName}. Only the creator of the patient record can reassign.
+            Changer le médecin assigné pour {patientName}. Seul le créateur du dossier patient peut réassigner.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="doctor">Assigned Doctor</Label>
+            <Label htmlFor="doctor">Médecin assigné</Label>
             <Select
               value={selectedDoctor}
               onValueChange={setSelectedDoctor}
               disabled={isSubmitting}
             >
               <SelectTrigger id="doctor">
-                <SelectValue placeholder="Select a doctor" />
+                <SelectValue placeholder="Sélectionner un médecin" />
               </SelectTrigger>
               <SelectContent>
                 {doctors.map((doctor) => (
@@ -133,16 +133,16 @@ export function ReassignPatientDialog({
             onClick={() => setOpen(false)}
             disabled={isSubmitting}
           >
-            Cancel
+            Annuler
           </Button>
           <Button onClick={handleReassign} disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Reassigning...
+                Réassignation...
               </>
             ) : (
-              "Reassign"
+              "Réassigner"
             )}
           </Button>
         </DialogFooter>

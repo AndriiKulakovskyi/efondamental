@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   CheckCircle, 
   Mail, 
@@ -52,13 +51,13 @@ export function InvitationStatus({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to send invitation");
+        throw new Error(data.error || "Échec de l'envoi de l'invitation");
       }
 
-      setSuccess("Invitation sent successfully!");
+      setSuccess("Invitation envoyée avec succès!");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send invitation");
+      setError(err instanceof Error ? err.message : "Échec de l'envoi de l'invitation");
     } finally {
       setIsSending(false);
     }
@@ -81,13 +80,13 @@ export function InvitationStatus({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to resend invitation");
+        throw new Error(data.error || "Échec du renvoi de l'invitation");
       }
 
-      setSuccess("Invitation resent successfully!");
+      setSuccess("Invitation renvoyée avec succès!");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to resend invitation");
+      setError(err instanceof Error ? err.message : "Échec du renvoi de l'invitation");
     } finally {
       setIsSending(false);
     }
@@ -100,11 +99,11 @@ export function InvitationStatus({
         badge: (
           <Badge className="bg-green-100 text-green-800 border-green-200 border">
             <CheckCircle className="h-3 w-3 mr-1" />
-            Account Active
+            Compte actif
           </Badge>
         ),
         icon: <CheckCircle className="h-5 w-5 text-green-600" />,
-        message: "Patient has an active account and can access the portal",
+        message: "Le patient a un compte actif et peut accéder au portail",
         action: null,
       };
     }
@@ -117,11 +116,11 @@ export function InvitationStatus({
           badge: (
             <Badge className="bg-amber-100 text-amber-800 border-amber-200 border">
               <XCircle className="h-3 w-3 mr-1" />
-              Invitation Expired
+              Invitation expirée
             </Badge>
           ),
           icon: <XCircle className="h-5 w-5 text-amber-600" />,
-          message: `Invitation expired on ${new Date(pendingInvitation.expiresAt).toLocaleDateString()}`,
+          message: `Invitation expirée le ${new Date(pendingInvitation.expiresAt).toLocaleDateString('fr-FR')}`,
           action: (
             <Button
               size="sm"
@@ -131,12 +130,12 @@ export function InvitationStatus({
               {isSending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Sending...
+                  Envoi...
                 </>
               ) : (
                 <>
                   <Send className="mr-2 h-4 w-4" />
-                  Resend Invitation
+                  Renvoyer l'invitation
                 </>
               )}
             </Button>
@@ -148,11 +147,11 @@ export function InvitationStatus({
         badge: (
           <Badge className="bg-blue-100 text-blue-800 border-blue-200 border">
             <Clock className="h-3 w-3 mr-1" />
-            Invitation Pending
+            Invitation en attente
           </Badge>
         ),
         icon: <Clock className="h-5 w-5 text-blue-600" />,
-        message: `Invitation sent on ${new Date(pendingInvitation.sentAt).toLocaleDateString()}. Expires on ${new Date(pendingInvitation.expiresAt).toLocaleDateString()}`,
+        message: `Invitation envoyée le ${new Date(pendingInvitation.sentAt).toLocaleDateString('fr-FR')}. Expire le ${new Date(pendingInvitation.expiresAt).toLocaleDateString('fr-FR')}`,
         action: (
           <Button
             variant="outline"
@@ -163,12 +162,12 @@ export function InvitationStatus({
             {isSending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Sending...
+                Envoi...
               </>
             ) : (
               <>
                 <Send className="mr-2 h-4 w-4" />
-                Resend Invitation
+                Renvoyer l'invitation
               </>
             )}
           </Button>
@@ -181,11 +180,11 @@ export function InvitationStatus({
         badge: (
           <Badge className="bg-slate-100 text-slate-700 border-slate-200 border">
             <Mail className="h-3 w-3 mr-1" />
-            No Email
+            Aucun email
           </Badge>
         ),
         icon: <AlertTriangle className="h-5 w-5 text-slate-500" />,
-        message: "No email address provided. Patient cannot access the portal.",
+        message: "Aucune adresse email fournie. Le patient ne peut pas accéder au portail.",
         action: null,
       };
     }
@@ -194,11 +193,11 @@ export function InvitationStatus({
       badge: (
         <Badge className="bg-slate-100 text-slate-700 border-slate-200 border">
           <Mail className="h-3 w-3 mr-1" />
-          No Invitation
+          Aucune invitation
         </Badge>
       ),
       icon: <Mail className="h-5 w-5 text-slate-600" />,
-      message: "Email provided but invitation not sent yet",
+      message: "Email fourni mais invitation non envoyée",
       action: (
         <Button
           size="sm"
@@ -208,12 +207,12 @@ export function InvitationStatus({
           {isSending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Sending...
+              Envoi...
             </>
           ) : (
             <>
               <Send className="mr-2 h-4 w-4" />
-              Send Invitation
+              Envoyer l'invitation
             </>
           )}
         </Button>
@@ -224,32 +223,27 @@ export function InvitationStatus({
   const status = getStatus();
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base">Patient Portal Access</CardTitle>
-          {status.badge}
+    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-slate-900">Accès au portail patient</h3>
+        {status.badge}
+      </div>
+      <div className="flex items-start gap-3">
+        <div className="flex-shrink-0 mt-0.5">
+          {status.icon}
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 mt-0.5">
-            {status.icon}
-          </div>
-          <div className="flex-1">
-            <p className="text-sm text-slate-600 mb-3">{status.message}</p>
-            {patientEmail && (
-              <p className="text-xs text-slate-500 mb-3">
-                Email: <span className="font-medium">{patientEmail}</span>
-              </p>
-            )}
-            {error && <AlertBanner type="error" message={error} />}
-            {success && <AlertBanner type="success" message={success} />}
-            {status.action && <div className="mt-3">{status.action}</div>}
-          </div>
+        <div className="flex-1">
+          <p className="text-sm text-slate-600 mb-3">{status.message}</p>
+          {patientEmail && (
+            <p className="text-xs text-slate-500 mb-3">
+              Email: <span className="font-medium">{patientEmail}</span>
+            </p>
+          )}
+          {error && <AlertBanner type="error" message={error} />}
+          {success && <AlertBanner type="success" message={success} />}
+          {status.action && <div className="mt-3">{status.action}</div>}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
-

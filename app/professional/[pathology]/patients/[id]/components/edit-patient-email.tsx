@@ -45,7 +45,7 @@ export function EditPatientEmail({
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address");
+      setError("Veuillez entrer une adresse email valide");
       setIsSubmitting(false);
       return;
     }
@@ -63,13 +63,13 @@ export function EditPatientEmail({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to update email");
+        throw new Error(data.error || "Échec de la mise à jour de l'email");
       }
 
       setShowDialog(false);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : "Une erreur s'est produite");
     } finally {
       setIsSubmitting(false);
     }
@@ -80,22 +80,23 @@ export function EditPatientEmail({
       <Button
         variant="outline"
         size="sm"
+        className="w-full justify-start"
         onClick={() => setShowDialog(true)}
       >
         <Edit className="h-4 w-4 mr-2" />
-        {currentEmail ? "Update Email" : "Add Email"}
+        {currentEmail ? "Modifier email" : "Ajouter email"}
       </Button>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {currentEmail ? "Update Email Address" : "Add Email Address"}
+              {currentEmail ? "Modifier l'adresse email" : "Ajouter une adresse email"}
             </DialogTitle>
             <DialogDescription>
               {currentEmail
-                ? "Update the patient's email address and optionally send a portal invitation."
-                : "Add an email address to enable patient portal access."}
+                ? "Modifier l'adresse email du patient et envoyer éventuellement une invitation au portail."
+                : "Ajouter une adresse email pour permettre l'accès au portail patient."}
             </DialogDescription>
           </DialogHeader>
 
@@ -107,19 +108,19 @@ export function EditPatientEmail({
                 </div>
                 {currentEmail && (
                   <div className="text-xs text-slate-600 mt-1">
-                    Current email: {currentEmail}
+                    Email actuel: {currentEmail}
                   </div>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email">Adresse email</Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="patient@example.com"
+                  placeholder="patient@exemple.com"
                   required
                 />
               </div>
@@ -136,10 +137,10 @@ export function EditPatientEmail({
                     className="text-sm font-medium cursor-pointer"
                   >
                     <Mail className="h-4 w-4 inline mr-1" />
-                    Send portal invitation to this email
+                    Envoyer l'invitation au portail à cet email
                   </label>
                   <p className="text-xs text-slate-600 mt-1">
-                    Patient will receive an email to create their account and access the portal
+                    Le patient recevra un email pour créer son compte et accéder au portail
                   </p>
                 </div>
               </div>
@@ -154,16 +155,16 @@ export function EditPatientEmail({
                 onClick={() => setShowDialog(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                Annuler
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {currentEmail ? "Updating..." : "Adding..."}
+                    {currentEmail ? "Mise à jour..." : "Ajout..."}
                   </>
                 ) : (
-                  currentEmail ? "Update Email" : "Add Email"
+                  currentEmail ? "Mettre à jour" : "Ajouter"
                 )}
               </Button>
             </DialogFooter>
