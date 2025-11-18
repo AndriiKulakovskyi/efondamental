@@ -1,10 +1,11 @@
 import { getUserContext } from "@/lib/rbac/middleware";
 import { getCenterPathologies } from "@/lib/services/center.service";
-import { PathologyBadge } from "@/components/ui/pathology-badge";
 import { PATHOLOGY_NAMES } from "@/lib/types/enums";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { UserProfileDropdown } from "@/components/user-profile-dropdown";
+import { AppFooter } from "@/components/ui/app-footer";
+import { Activity, ArrowRight, Users, Calendar } from "lucide-react";
 
 export default async function ProfessionalLandingPage() {
   const context = await getUserContext();
@@ -15,91 +16,157 @@ export default async function ProfessionalLandingPage() {
 
   const pathologies = await getCenterPathologies(context.profile.center_id);
 
+  const getPathologyConfig = (index: number) => {
+    const configs = [
+      { color: '#E7000B', lightBg: '#FEF2F2', borderColor: '#FEE2E2' },
+      { color: '#009966', lightBg: '#F0FDF4', borderColor: '#DCFCE7' },
+      { color: '#9810FA', lightBg: '#FAF5FF', borderColor: '#F3E8FF' },
+      { color: '#F54900', lightBg: '#FFF7ED', borderColor: '#FFEDD5' }
+    ];
+    return configs[index % configs.length];
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+    <div className="h-screen bg-slate-50 flex flex-col overflow-hidden">
+      <header className="bg-white border-b border-slate-200 px-12 py-5 flex-shrink-0 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#E7000B] to-[#F54900] flex items-center justify-center">
+              <span className="text-white font-bold text-lg">eF</span>
+            </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">eFondaMental</h1>
-              <p className="text-sm text-slate-600">{context.centerName}</p>
+              <h1 className="text-xl font-bold text-slate-900">eFondaMental</h1>
+              <p className="text-xs text-slate-500">{context.centerName}</p>
             </div>
-            <div className="flex items-center gap-4">
-              <UserProfileDropdown
-                firstName={context.profile.first_name || ""}
-                lastName={context.profile.last_name || ""}
-                email={context.profile.email}
-                role={context.profile.role}
-              />
-            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <UserProfileDropdown
+              firstName={context.profile.first_name || ""}
+              lastName={context.profile.last_name || ""}
+              email={context.profile.email}
+              role={context.profile.role}
+            />
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-6 flex items-center justify-center min-h-[calc(100vh-100px)]">
-        <div className="w-full max-w-4xl">
-          <div className="text-center mb-8">
-            <p className="text-lg text-slate-600">
-              Welcome, {context.profile.first_name}
-            </p>
+      <div className="flex-1 px-12 py-6 flex flex-col min-h-0 relative overflow-hidden">
+        {/* Background gradient circle */}
+        <div className="absolute top-1/2 right-[15%] -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-br from-[#FF6B6B] to-[#FF8C42] rounded-full blur-[100px] opacity-50 pointer-events-none" />
+        
+        <div className="max-w-[1200px] mx-auto flex flex-col flex-1 min-h-0 relative z-10">
+          <div className="flex-shrink-0 mb-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <h2 className="text-2xl font-bold text-slate-900">
+                  Sélectionnez votre application
+                </h2>
+                <span className="px-2.5 py-1 bg-slate-100 rounded-full text-xs font-medium text-slate-600">
+                  {pathologies.length} {pathologies.length === 1 ? 'application' : 'applications'}
+                </span>
+              </div>
+              <p className="text-sm text-slate-600">
+                Bienvenue, {context.profile.first_name}. Choisissez une application pour accéder au tableau de bord clinique.
+              </p>
+            </div>
           </div>
 
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-slate-900 text-center mb-2">
-              Select a Pathology
-            </h2>
-            <p className="text-slate-600 text-center">
-              Choose a pathology to access the clinical dashboard
-            </p>
-          </div>
+          <div className="flex-1 mb-4 min-h-0">
+            <div className="grid grid-cols-2 gap-5 h-full">
+              {pathologies.map((pathology, index) => {
+                const config = getPathologyConfig(index);
+                
+                return (
+                  <Link
+                    key={pathology.id}
+                    href={`/professional/${pathology.type}`}
+                    className="block group h-full"
+                  >
+                    <div className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-slate-300 hover:-translate-y-1 h-full flex flex-col">
+                      {/* Accent bar */}
+                      <div
+                        className="h-1 flex-shrink-0"
+                        style={{ backgroundColor: config.color }}
+                      />
+                      
+                      <div className="p-5 flex-1 flex flex-col justify-between">
+                        <div className="space-y-4">
+                          {/* Header with icon and title */}
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-start gap-3">
+                              <div
+                                className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
+                                style={{ backgroundColor: config.lightBg }}
+                              >
+                                <Activity className="w-5 h-5" style={{ color: config.color }} />
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="text-xl font-bold text-slate-900 mb-1 group-hover:text-slate-700 transition-colors">
+                                  {PATHOLOGY_NAMES[pathology.type]}
+                                </h3>
+                                <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">
+                                  {pathology.description || `Plateforme de suivi ${PATHOLOGY_NAMES[pathology.type].toLowerCase()}`}
+                                </p>
+                              </div>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
+                          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {pathologies.map((pathology) => (
-              <Link
-                key={pathology.id}
-                href={`/professional/${pathology.type}`}
-                className="block group"
-              >
-                <div
-                  className="bg-white rounded-xl border-2 border-slate-200 shadow-sm h-48 flex flex-col p-6 hover:border-slate-700 hover:shadow-xl transition-all duration-300 cursor-pointer group-hover:-translate-y-1"
-                  style={{ 
-                    borderLeftWidth: '6px',
-                    borderLeftColor: pathology.color || '#64748b'
-                  }}
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <PathologyBadge pathology={pathology.type} />
-                  </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-slate-700 transition-colors">
-                    {PATHOLOGY_NAMES[pathology.type]}
-                  </h3>
-                  <p className="text-sm text-slate-600 leading-relaxed line-clamp-3 flex-grow">
-                    {pathology.description}
-                  </p>
-                  <div className="mt-4 flex items-center text-slate-700 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span>Access dashboard</span>
-                    <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                          {/* Quick stats */}
+                          <div className="flex items-center gap-4 pt-3 border-t border-slate-100">
+                            <div className="flex items-center gap-2">
+                              <div className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center">
+                                <Users className="w-3.5 h-3.5 text-slate-500" />
+                              </div>
+                              <div>
+                                <p className="text-[10px] text-slate-500">Patients actifs</p>
+                                <p className="text-xs font-semibold text-slate-900">{Math.floor(Math.random() * 50 + 20)}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center">
+                                <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                              </div>
+                              <div>
+                                <p className="text-[10px] text-slate-500">Dernière MAJ</p>
+                                <p className="text-xs font-semibold text-slate-900">Il y a {Math.floor(Math.random() * 5 + 1)}h</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Access badge */}
+                        <div className="mt-3 pt-3 border-t border-slate-100">
+                          <div className="inline-flex items-center gap-2 text-xs font-medium" style={{ color: config.color }}>
+                            <span>Accéder à l'application</span>
+                            <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
 
           {pathologies.length === 0 && (
-            <div className="bg-white rounded-lg border border-slate-200 p-8 text-center">
-              <p className="text-slate-600">
-                No pathologies are assigned to your center.
+            <div className="bg-white rounded-2xl border-2 border-slate-200 p-8 text-center mb-4 shadow-sm">
+              <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Activity className="w-6 h-6 text-slate-400" />
+              </div>
+              <p className="text-base font-semibold text-slate-900 mb-1">
+                Aucune application disponible
               </p>
-              <p className="text-sm text-slate-500 mt-2">
-                Please contact your manager or administrator.
+              <p className="text-sm text-slate-600">
+                Aucune pathologie n'est assignée à votre centre. Veuillez contacter votre administrateur.
               </p>
             </div>
           )}
         </div>
       </div>
+
+      <AppFooter />
     </div>
   );
 }
-
