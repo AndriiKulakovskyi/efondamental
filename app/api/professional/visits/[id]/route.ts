@@ -6,6 +6,7 @@ import {
   startVisit, 
   completeVisit, 
   cancelVisit,
+  deleteVisit,
   rescheduleVisit,
   getVisitCompletionStatus
 } from "@/lib/services/visit.service";
@@ -112,19 +113,25 @@ export async function PATCH(
         break;
 
       case "cancel":
-        visit = await cancelVisit(id);
+        // Hard delete the visit and all related data
+        await deleteVisit(id);
 
         if (context.profile.center_id) {
           await logAuditEvent({
             userId: context.user.id,
-            action: AuditAction.UPDATE,
+            action: AuditAction.DELETE,
             entityType: "visit",
             entityId: id,
             centerId: context.profile.center_id,
-            changes: { action: "cancel_visit" }
+            changes: { action: "delete_visit" }
           });
         }
-        break;
+        
+        // Return success without visit object (since it's deleted)
+        return NextResponse.json({ 
+          success: true, 
+          message: "Visit deleted successfully" 
+        }, { status: 200 });
 
       case "reschedule":
         if (!scheduledDate) {

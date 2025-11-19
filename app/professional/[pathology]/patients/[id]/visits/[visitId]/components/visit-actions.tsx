@@ -79,7 +79,7 @@ export default function VisitActions({
 
       router.refresh();
       
-      if (action === "complete") {
+      if (action === "complete" || action === "cancel") {
         router.push(`/professional/${pathology}/patients/${patientId}`);
       }
       
@@ -162,7 +162,7 @@ export default function VisitActions({
                     className="text-red-600"
                   >
                     <XCircle className="mr-2 h-4 w-4" />
-                    Annuler la visite
+                    Supprimer la visite
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -196,7 +196,7 @@ export default function VisitActions({
                     className="text-red-600"
                   >
                     <XCircle className="mr-2 h-4 w-4" />
-                    Annuler la visite
+                    Supprimer la visite
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -270,9 +270,9 @@ export default function VisitActions({
       <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Annuler la visite</DialogTitle>
+            <DialogTitle>Supprimer définitivement la visite ?</DialogTitle>
             <DialogDescription>
-              Êtes-vous sûr de vouloir annuler cette visite ? Cette action ne peut pas être annulée.
+              Cette action est irréversible. La visite et toutes les réponses aux questionnaires associés seront définitivement supprimés de la base de données.
             </DialogDescription>
           </DialogHeader>
           {error && <AlertBanner type="error" message={error} />}
@@ -292,10 +292,10 @@ export default function VisitActions({
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Annulation...
+                  Suppression...
                 </>
               ) : (
-                "Annuler la visite"
+                "Supprimer définitivement"
               )}
             </Button>
           </DialogFooter>
