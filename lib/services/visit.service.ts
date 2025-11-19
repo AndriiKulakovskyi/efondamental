@@ -13,14 +13,50 @@ import {
   getQidsResponse,
   getMdqResponse,
   getDiagnosticResponse,
-  getOrientationResponse
+  getOrientationResponse,
+  // Initial Evaluation - ETAT
+  getEq5d5lResponse,
+  getPriseMResponse,
+  getStaiYaResponse,
+  getMarsResponse,
+  getMathysResponse,
+  getPsqiResponse,
+  getEpworthResponse,
+  // Initial Evaluation - TRAITS
+  getAsrsResponse,
+  getCtqResponse,
+  getBis10Response,
+  getAls18Response,
+  getAimResponse,
+  getWurs25Response,
+  getAq12Response,
+  getCsmResponse,
+  getCtiResponse
 } from './questionnaire.service';
 import {
   ASRM_DEFINITION,
   QIDS_DEFINITION,
   MDQ_DEFINITION,
   DIAGNOSTIC_DEFINITION,
-  ORIENTATION_DEFINITION
+  ORIENTATION_DEFINITION,
+  // Initial Evaluation - ETAT
+  EQ5D5L_DEFINITION,
+  PRISE_M_DEFINITION,
+  STAI_YA_DEFINITION,
+  MARS_DEFINITION,
+  MATHYS_DEFINITION,
+  PSQI_DEFINITION,
+  EPWORTH_DEFINITION,
+  // Initial Evaluation - TRAITS
+  ASRS_DEFINITION,
+  CTQ_DEFINITION,
+  BIS10_DEFINITION,
+  ALS18_DEFINITION,
+  AIM_DEFINITION,
+  WURS25_DEFINITION,
+  AQ12_DEFINITION,
+  CSM_DEFINITION,
+  CTI_DEFINITION
 } from '../constants/questionnaires';
 
 // ============================================================================
@@ -273,6 +309,67 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
     ];
   }
 
+  if (visit.visit_type === 'initial_evaluation') {
+    return [
+      {
+        id: 'mod_nurse',
+        name: 'Infirmier',
+        description: 'Évaluation par l\'infirmier',
+        questionnaires: [] // To be implemented later
+      },
+      {
+        id: 'mod_thymic_eval',
+        name: 'Evaluation état thymique et fonctionnement',
+        description: 'Évaluation de l\'état thymique et du fonctionnement',
+        questionnaires: [] // To be implemented later
+      },
+      {
+        id: 'mod_medical_eval',
+        name: 'Evaluation Médicale',
+        description: 'Évaluation médicale complète',
+        questionnaires: [] // To be implemented later
+      },
+      {
+        id: 'mod_auto_etat',
+        name: 'Autoquestionnaires - ETAT',
+        description: 'Questionnaires sur l\'état actuel du patient',
+        questionnaires: [
+          EQ5D5L_DEFINITION,
+          PRISE_M_DEFINITION,
+          STAI_YA_DEFINITION,
+          MARS_DEFINITION,
+          MATHYS_DEFINITION,
+          ASRM_DEFINITION, // Reusing from screening
+          QIDS_DEFINITION, // Reusing from screening
+          PSQI_DEFINITION,
+          EPWORTH_DEFINITION
+        ]
+      },
+      {
+        id: 'mod_social',
+        name: 'Social',
+        description: 'Évaluation sociale',
+        questionnaires: [] // To be implemented later
+      },
+      {
+        id: 'mod_auto_traits',
+        name: 'Autoquestionnaires - TRAITS',
+        description: 'Questionnaires sur les traits du patient',
+        questionnaires: [
+          ASRS_DEFINITION,
+          CTQ_DEFINITION,
+          BIS10_DEFINITION,
+          ALS18_DEFINITION,
+          AIM_DEFINITION,
+          WURS25_DEFINITION,
+          AQ12_DEFINITION,
+          CSM_DEFINITION,
+          CTI_DEFINITION
+        ]
+      }
+    ];
+  }
+
   // Default/Fallback (e.g. other visit types not fully implemented yet)
   return [];
 }
@@ -283,9 +380,11 @@ export async function getVisitCompletionStatus(visitId: string) {
 
   let total = 0;
   let completed = 0;
+  let totalModules = 0;
 
   if (visit.visit_type === 'screening') {
     total = 5; // ASRM, QIDS, MDQ, Diag, Orient
+    totalModules = 2;
 
     const [asrm, qids, mdq, diag, orient] = await Promise.all([
       getAsrmResponse(visitId),
@@ -300,10 +399,58 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (mdq) completed++;
     if (diag) completed++;
     if (orient) completed++;
+  } else if (visit.visit_type === 'initial_evaluation') {
+    total = 18; // 16 new questionnaires + ASRM + QIDS (reused from screening)
+    totalModules = 6;
+
+    const [
+      eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,
+      asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti
+    ] = await Promise.all([
+      // ETAT questionnaires
+      getEq5d5lResponse(visitId),
+      getPriseMResponse(visitId),
+      getStaiYaResponse(visitId),
+      getMarsResponse(visitId),
+      getMathysResponse(visitId),
+      getAsrmResponse(visitId), // Reused
+      getQidsResponse(visitId), // Reused
+      getPsqiResponse(visitId),
+      getEpworthResponse(visitId),
+      // TRAITS questionnaires
+      getAsrsResponse(visitId),
+      getCtqResponse(visitId),
+      getBis10Response(visitId),
+      getAls18Response(visitId),
+      getAimResponse(visitId),
+      getWurs25Response(visitId),
+      getAq12Response(visitId),
+      getCsmResponse(visitId),
+      getCtiResponse(visitId)
+    ]);
+
+    if (eq5d5l) completed++;
+    if (priseM) completed++;
+    if (staiYa) completed++;
+    if (mars) completed++;
+    if (mathys) completed++;
+    if (asrm) completed++;
+    if (qids) completed++;
+    if (psqi) completed++;
+    if (epworth) completed++;
+    if (asrs) completed++;
+    if (ctq) completed++;
+    if (bis10) completed++;
+    if (als18) completed++;
+    if (aim) completed++;
+    if (wurs25) completed++;
+    if (aq12) completed++;
+    if (csm) completed++;
+    if (cti) completed++;
   }
 
   return {
-    totalModules: visit.visit_type === 'screening' ? 2 : 0,
+    totalModules,
     totalQuestionnaires: total,
     completedQuestionnaires: completed,
     completionPercentage: total > 0 ? Math.round((completed / total) * 100) : 0,

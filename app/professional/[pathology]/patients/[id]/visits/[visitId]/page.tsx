@@ -14,14 +14,50 @@ import {
   getQidsResponse, 
   getMdqResponse, 
   getDiagnosticResponse, 
-  getOrientationResponse 
+  getOrientationResponse,
+  // Initial Evaluation - ETAT
+  getEq5d5lResponse,
+  getPriseMResponse,
+  getStaiYaResponse,
+  getMarsResponse,
+  getMathysResponse,
+  getPsqiResponse,
+  getEpworthResponse,
+  // Initial Evaluation - TRAITS
+  getAsrsResponse,
+  getCtqResponse,
+  getBis10Response,
+  getAls18Response,
+  getAimResponse,
+  getWurs25Response,
+  getAq12Response,
+  getCsmResponse,
+  getCtiResponse
 } from "@/lib/services/questionnaire.service";
 import { 
   ASRM_DEFINITION, 
   QIDS_DEFINITION, 
   MDQ_DEFINITION, 
   DIAGNOSTIC_DEFINITION, 
-  ORIENTATION_DEFINITION 
+  ORIENTATION_DEFINITION,
+  // Initial Evaluation - ETAT
+  EQ5D5L_DEFINITION,
+  PRISE_M_DEFINITION,
+  STAI_YA_DEFINITION,
+  MARS_DEFINITION,
+  MATHYS_DEFINITION,
+  PSQI_DEFINITION,
+  EPWORTH_DEFINITION,
+  // Initial Evaluation - TRAITS
+  ASRS_DEFINITION,
+  CTQ_DEFINITION,
+  BIS10_DEFINITION,
+  ALS18_DEFINITION,
+  AIM_DEFINITION,
+  WURS25_DEFINITION,
+  AQ12_DEFINITION,
+  CSM_DEFINITION,
+  CTI_DEFINITION
 } from "@/lib/constants/questionnaires";
 
 export default async function VisitDetailPage({
@@ -120,6 +156,234 @@ export default async function VisitDetailPage({
     const completed = 
       autoModule.questionnaires.filter(q => q.completed).length + 
       medicalModule.questionnaires.filter(q => q.completed).length;
+    
+    completionStatus = {
+      totalQuestionnaires: total,
+      completedQuestionnaires: completed,
+      completionPercentage: total > 0 ? (completed / total) * 100 : 0
+    };
+  } else if (visit.visit_type === 'initial_evaluation') {
+    // Fetch all questionnaire responses for initial evaluation
+    const [
+      // ETAT responses
+      eq5d5lResponse, priseMResponse, staiYaResponse, marsResponse, mathysResponse,
+      asrmResponse, qidsResponse, psqiResponse, epworthResponse,
+      // TRAITS responses
+      asrsResponse, ctqResponse, bis10Response, als18Response, aimResponse,
+      wurs25Response, aq12Response, csmResponse, ctiResponse
+    ] = await Promise.all([
+      // ETAT
+      getEq5d5lResponse(visitId),
+      getPriseMResponse(visitId),
+      getStaiYaResponse(visitId),
+      getMarsResponse(visitId),
+      getMathysResponse(visitId),
+      getAsrmResponse(visitId),
+      getQidsResponse(visitId),
+      getPsqiResponse(visitId),
+      getEpworthResponse(visitId),
+      // TRAITS
+      getAsrsResponse(visitId),
+      getCtqResponse(visitId),
+      getBis10Response(visitId),
+      getAls18Response(visitId),
+      getAimResponse(visitId),
+      getWurs25Response(visitId),
+      getAq12Response(visitId),
+      getCsmResponse(visitId),
+      getCtiResponse(visitId)
+    ]);
+
+    // Module 1: Infirmier (empty for now)
+    const nurseModule = {
+      id: 'mod_nurse',
+      name: 'Infirmier',
+      description: 'Évaluation par l\'infirmier',
+      questionnaires: []
+    };
+
+    // Module 2: Evaluation état thymique et fonctionnement (empty for now)
+    const thymicModule = {
+      id: 'mod_thymic_eval',
+      name: 'Evaluation état thymique et fonctionnement',
+      description: 'Évaluation de l\'état thymique et du fonctionnement',
+      questionnaires: []
+    };
+
+    // Module 3: Evaluation Médicale (empty for now)
+    const medicalEvalModule = {
+      id: 'mod_medical_eval',
+      name: 'Evaluation Médicale',
+      description: 'Évaluation médicale complète',
+      questionnaires: []
+    };
+
+    // Module 4: Autoquestionnaires - ETAT
+    const etatModule = {
+      id: 'mod_auto_etat',
+      name: 'Autoquestionnaires - ETAT',
+      description: 'Questionnaires sur l\'état actuel du patient',
+      questionnaires: [
+        {
+          ...EQ5D5L_DEFINITION,
+          id: EQ5D5L_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!eq5d5lResponse,
+          completedAt: eq5d5lResponse?.completed_at,
+        },
+        {
+          ...PRISE_M_DEFINITION,
+          id: PRISE_M_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!priseMResponse,
+          completedAt: priseMResponse?.completed_at,
+        },
+        {
+          ...STAI_YA_DEFINITION,
+          id: STAI_YA_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!staiYaResponse,
+          completedAt: staiYaResponse?.completed_at,
+        },
+        {
+          ...MARS_DEFINITION,
+          id: MARS_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!marsResponse,
+          completedAt: marsResponse?.completed_at,
+        },
+        {
+          ...MATHYS_DEFINITION,
+          id: MATHYS_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!mathysResponse,
+          completedAt: mathysResponse?.completed_at,
+        },
+        {
+          ...ASRM_DEFINITION,
+          id: ASRM_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!asrmResponse,
+          completedAt: asrmResponse?.completed_at,
+        },
+        {
+          ...QIDS_DEFINITION,
+          id: QIDS_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!qidsResponse,
+          completedAt: qidsResponse?.completed_at,
+        },
+        {
+          ...PSQI_DEFINITION,
+          id: PSQI_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!psqiResponse,
+          completedAt: psqiResponse?.completed_at,
+        },
+        {
+          ...EPWORTH_DEFINITION,
+          id: EPWORTH_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!epworthResponse,
+          completedAt: epworthResponse?.completed_at,
+        }
+      ]
+    };
+
+    // Module 5: Social (empty for now)
+    const socialModule = {
+      id: 'mod_social',
+      name: 'Social',
+      description: 'Évaluation sociale',
+      questionnaires: []
+    };
+
+    // Module 6: Autoquestionnaires - TRAITS
+    const traitsModule = {
+      id: 'mod_auto_traits',
+      name: 'Autoquestionnaires - TRAITS',
+      description: 'Questionnaires sur les traits du patient',
+      questionnaires: [
+        {
+          ...ASRS_DEFINITION,
+          id: ASRS_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!asrsResponse,
+          completedAt: asrsResponse?.completed_at,
+        },
+        {
+          ...CTQ_DEFINITION,
+          id: CTQ_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!ctqResponse,
+          completedAt: ctqResponse?.completed_at,
+        },
+        {
+          ...BIS10_DEFINITION,
+          id: BIS10_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!bis10Response,
+          completedAt: bis10Response?.completed_at,
+        },
+        {
+          ...ALS18_DEFINITION,
+          id: ALS18_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!als18Response,
+          completedAt: als18Response?.completed_at,
+        },
+        {
+          ...AIM_DEFINITION,
+          id: AIM_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!aimResponse,
+          completedAt: aimResponse?.completed_at,
+        },
+        {
+          ...WURS25_DEFINITION,
+          id: WURS25_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!wurs25Response,
+          completedAt: wurs25Response?.completed_at,
+        },
+        {
+          ...AQ12_DEFINITION,
+          id: AQ12_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!aq12Response,
+          completedAt: aq12Response?.completed_at,
+        },
+        {
+          ...CSM_DEFINITION,
+          id: CSM_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!csmResponse,
+          completedAt: csmResponse?.completed_at,
+        },
+        {
+          ...CTI_DEFINITION,
+          id: CTI_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!ctiResponse,
+          completedAt: ctiResponse?.completed_at,
+        }
+      ]
+    };
+
+    modulesWithQuestionnaires = [
+      nurseModule,
+      thymicModule,
+      medicalEvalModule,
+      etatModule,
+      socialModule,
+      traitsModule
+    ];
+
+    // Calculate stats
+    const total = etatModule.questionnaires.length + traitsModule.questionnaires.length;
+    const completed = 
+      etatModule.questionnaires.filter(q => q.completed).length + 
+      traitsModule.questionnaires.filter(q => q.completed).length;
     
     completionStatus = {
       totalQuestionnaires: total,

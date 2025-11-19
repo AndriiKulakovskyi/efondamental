@@ -5,14 +5,50 @@ import {
   saveQidsResponse, 
   saveMdqResponse,
   saveDiagnosticResponse,
-  saveOrientationResponse
+  saveOrientationResponse,
+  // Initial Evaluation - ETAT
+  saveEq5d5lResponse,
+  savePriseMResponse,
+  saveStaiYaResponse,
+  saveMarsResponse,
+  saveMathysResponse,
+  savePsqiResponse,
+  saveEpworthResponse,
+  // Initial Evaluation - TRAITS
+  saveAsrsResponse,
+  saveCtqResponse,
+  saveBis10Response,
+  saveAls18Response,
+  saveAimResponse,
+  saveWurs25Response,
+  saveAq12Response,
+  saveCsmResponse,
+  saveCtiResponse
 } from '@/lib/services/questionnaire.service';
 import { 
   AsrmResponseInsert, 
   QidsResponseInsert, 
   MdqResponseInsert,
   BipolarDiagnosticResponseInsert,
-  OrientationResponseInsert
+  OrientationResponseInsert,
+  // Initial Evaluation - ETAT
+  Eq5d5lResponseInsert,
+  PriseMResponseInsert,
+  StaiYaResponseInsert,
+  MarsResponseInsert,
+  MathysResponseInsert,
+  PsqiResponseInsert,
+  EpworthResponseInsert,
+  // Initial Evaluation - TRAITS
+  AsrsResponseInsert,
+  CtqResponseInsert,
+  Bis10ResponseInsert,
+  Als18ResponseInsert,
+  AimResponseInsert,
+  Wurs25ResponseInsert,
+  Aq12ResponseInsert,
+  CsmResponseInsert,
+  CtiResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -63,6 +99,136 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as OrientationResponseInsert);
+        break;
+
+      // Initial Evaluation - ETAT
+      case 'EQ5D5L':
+        result = await saveEq5d5lResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Eq5d5lResponseInsert);
+        break;
+
+      case 'PRISE_M':
+        result = await savePriseMResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as PriseMResponseInsert);
+        break;
+
+      case 'STAI_YA':
+        result = await saveStaiYaResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as StaiYaResponseInsert);
+        break;
+
+      case 'MARS':
+        result = await saveMarsResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as MarsResponseInsert);
+        break;
+
+      case 'MATHYS':
+        result = await saveMathysResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as MathysResponseInsert);
+        break;
+
+      case 'PSQI':
+        result = await savePsqiResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as PsqiResponseInsert);
+        break;
+
+      case 'EPWORTH':
+        result = await saveEpworthResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as EpworthResponseInsert);
+        break;
+
+      // Initial Evaluation - TRAITS
+      case 'ASRS':
+        result = await saveAsrsResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as AsrsResponseInsert);
+        break;
+
+      case 'CTQ':
+        result = await saveCtqResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as CtqResponseInsert);
+        break;
+
+      case 'BIS10':
+        result = await saveBis10Response({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Bis10ResponseInsert);
+        break;
+
+      case 'ALS18':
+        result = await saveAls18Response({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Als18ResponseInsert);
+        break;
+
+      case 'AIM':
+        result = await saveAimResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as AimResponseInsert);
+        break;
+
+      case 'WURS25':
+        result = await saveWurs25Response({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Wurs25ResponseInsert);
+        break;
+
+      case 'AQ12':
+        result = await saveAq12Response({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Aq12ResponseInsert);
+        break;
+
+      case 'CSM':
+        result = await saveCsmResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as CsmResponseInsert);
+        break;
+
+      case 'CTI':
+        result = await saveCtiResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as CtiResponseInsert);
         break;
         
       default:

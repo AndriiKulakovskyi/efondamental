@@ -57,7 +57,12 @@ export function QuestionnairePageClient({
       setJustSubmitted(true);
       
       // If no scoring (Diagnostic/Orientation), redirect?
-      const hasScoring = ['ASRM_FR', 'QIDS_SR16_FR', 'MDQ_FR'].includes(questionnaire.code);
+      const hasScoring = [
+        'ASRM_FR', 'QIDS_SR16_FR', 'MDQ_FR',
+        // Initial Evaluation questionnaires all have scoring
+        'EQ5D5L', 'PRISE_M', 'STAI_YA', 'MARS', 'MATHYS', 'PSQI', 'EPWORTH',
+        'ASRS', 'CTQ', 'BIS10', 'ALS18', 'AIM', 'WURS25', 'AQ12', 'CSM', 'CTI'
+      ].includes(questionnaire.code);
       if (!hasScoring) {
          router.back();
          router.refresh();
