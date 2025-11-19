@@ -241,3 +241,130 @@ export const FAGERSTROM_DEFINITION: QuestionnaireDefinition = {
   }
 };
 
+// ===== PHYSICAL PARAMETERS =====
+
+export const PHYSICAL_PARAMS_QUESTIONS: Question[] = [
+  {
+    id: 'height_cm',
+    text: 'Taille (en cm)',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'weight_kg',
+    text: 'Poids (en kg)',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'bmi',
+    text: 'IMC (Indice de Masse Corporelle)',
+    help: 'Calculé automatiquement à partir de la taille et du poids: Poids(kg) / (Taille(m))²',
+    type: 'text',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'abdominal_circumference_cm',
+    text: 'Périmètre abdominal (en cm)',
+    type: 'number',
+    required: false
+  }
+];
+
+export const PHYSICAL_PARAMS_DEFINITION: QuestionnaireDefinition = {
+  id: 'physical_params',
+  code: 'PHYSICAL_PARAMS',
+  title: 'Paramètres Physiques',
+  description: 'Mesures physiques: taille, poids, périmètre abdominal. IMC calculé automatiquement.',
+  questions: PHYSICAL_PARAMS_QUESTIONS,
+  metadata: {
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ===== BLOOD PRESSURE & HEART RATE =====
+
+export const BLOOD_PRESSURE_QUESTIONS: Question[] = [
+  // Blood Pressure & Heart Rate - Lying Down Section
+  {
+    id: 'section_bp_lying',
+    text: 'Pression artérielle couché (en mm de Mercure)',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'bp_lying_systolic',
+    text: 'Pression Systolique (mmHg)',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'bp_lying_diastolic',
+    text: 'Pression Diastolique (mmHg)',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'tension_lying',
+    text: 'Tension couché',
+    help: 'Format: Systolique/Diastolique (calculé automatiquement)',
+    type: 'text',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'heart_rate_lying',
+    text: 'Fréquence cardiaque couché (battements par minute)',
+    type: 'number',
+    required: false
+  },
+  
+  // Blood Pressure & Heart Rate - Standing Section
+  {
+    id: 'section_bp_standing',
+    text: 'Pression artérielle debout (en mm de Mercure)',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'bp_standing_systolic',
+    text: 'Pression Systolique (mmHg)',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'bp_standing_diastolic',
+    text: 'Pression Diastolique (mmHg)',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'tension_standing',
+    text: 'Tension debout',
+    help: 'Format: Systolique/Diastolique (calculé automatiquement)',
+    type: 'text',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'heart_rate_standing',
+    text: 'Fréquence cardiaque debout (battements par minute)',
+    type: 'number',
+    required: false
+  }
+];
+
+export const BLOOD_PRESSURE_DEFINITION: QuestionnaireDefinition = {
+  id: 'blood_pressure',
+  code: 'BLOOD_PRESSURE',
+  title: 'Pression artérielle & Fréquence cardiaque',
+  description: 'Mesures de la pression artérielle et de la fréquence cardiaque (couché et debout)',
+  questions: BLOOD_PRESSURE_QUESTIONS,
+  metadata: {
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+

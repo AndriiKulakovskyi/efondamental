@@ -1,10 +1,10 @@
 /**
  * Infirmier Section Questionnaire Services
- * Handles tobacco assessment and Fagerstrom test responses
+ * Handles tobacco assessment, Fagerstrom test, physical parameters, and blood pressure responses
  */
 
 import { createClient } from '@/lib/supabase/server';
-import { TobaccoResponse, TobaccoResponseInsert, FagerstromResponse, FagerstromResponseInsert } from '@/lib/types/database.types';
+import { TobaccoResponse, TobaccoResponseInsert, FagerstromResponse, FagerstromResponseInsert, PhysicalParamsResponse, PhysicalParamsResponseInsert, BloodPressureResponse, BloodPressureResponseInsert } from '@/lib/types/database.types';
 
 // ===== TOBACCO ASSESSMENT =====
 
@@ -159,6 +159,111 @@ export async function saveFagerstromResponse(
       ...response,
       dependence_level: dependenceLevel,
       interpretation: interpretation.trim(),
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ===== PHYSICAL PARAMETERS =====
+
+export async function getPhysicalParamsResponse(
+  visitId: string
+): Promise<PhysicalParamsResponse | null> {
+  const supabase = await createClient();
+  const { data, error} = await supabase
+    .from('responses_physical_params')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No data found
+    if (error.code === 'PGRST205') {
+      // Table doesn't exist yet - migration not applied
+      console.warn(`Table responses_physical_params not found. Please run migrations.`);
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function savePhysicalParamsResponse(
+  response: PhysicalParamsResponseInsert
+): Promise<PhysicalParamsResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // BMI is calculated automatically by the database, remove it from the request if present
+  const { bmi, ...responseWithoutBmi } = response as any;
+
+  const { data, error } = await supabase
+    .from('responses_physical_params')
+    .upsert({
+      ...responseWithoutBmi,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ===== BLOOD PRESSURE & HEART RATE =====
+
+export async function getBloodPressureResponse(
+  visitId: string
+): Promise<BloodPressureResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_blood_pressure')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No data found
+    if (error.code === 'PGRST205') {
+      // Table doesn't exist yet - migration not applied
+      console.warn(`Table responses_blood_pressure not found. Please run migrations.`);
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveBloodPressureResponse(
+  response: BloodPressureResponseInsert
+): Promise<BloodPressureResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove tension fields if they were sent (they should be calculated, not received)
+  const { tension_lying: _, tension_standing: __, ...responseData } = response as any;
+
+  // Calculate tension_lying and tension_standing as "systolic/diastolic" format
+  let tensionLying = null;
+  if (responseData.bp_lying_systolic && responseData.bp_lying_diastolic) {
+    tensionLying = `${responseData.bp_lying_systolic}/${responseData.bp_lying_diastolic}`;
+  }
+
+  let tensionStanding = null;
+  if (responseData.bp_standing_systolic && responseData.bp_standing_diastolic) {
+    tensionStanding = `${responseData.bp_standing_systolic}/${responseData.bp_standing_diastolic}`;
+  }
+
+  const { data, error } = await supabase
+    .from('responses_blood_pressure')
+    .upsert({
+      ...responseData,
+      tension_lying: tensionLying,
+      tension_standing: tensionStanding,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

@@ -49,7 +49,9 @@ import {
 } from "@/lib/services/questionnaire-social.service";
 import {
   getTobaccoResponse,
-  getFagerstromResponse
+  getFagerstromResponse,
+  getPhysicalParamsResponse,
+  getBloodPressureResponse
 } from "@/lib/services/questionnaire-infirmier.service";
 import { 
   ASRM_DEFINITION, 
@@ -91,7 +93,9 @@ import {
 } from "@/lib/constants/questionnaires-social";
 import {
   TOBACCO_DEFINITION,
-  FAGERSTROM_DEFINITION
+  FAGERSTROM_DEFINITION,
+  PHYSICAL_PARAMS_DEFINITION,
+  BLOOD_PRESSURE_DEFINITION
 } from "@/lib/constants/questionnaires-infirmier";
 
 export default async function VisitDetailPage({
@@ -211,7 +215,7 @@ export default async function VisitDetailPage({
       // SOCIAL response
       socialResponse,
       // INFIRMIER responses
-      tobaccoResponse, fagerstromResponse
+      tobaccoResponse, fagerstromResponse, physicalParamsResponse, bloodPressureResponse
     ] = await Promise.all([
       // ETAT
       getEq5d5lResponse(visitId),
@@ -245,7 +249,9 @@ export default async function VisitDetailPage({
       getSocialResponse(visitId),
       // INFIRMIER
       getTobaccoResponse(visitId),
-      getFagerstromResponse(visitId)
+      getFagerstromResponse(visitId),
+      getPhysicalParamsResponse(visitId),
+      getBloodPressureResponse(visitId)
     ]);
 
     // Module 1: Infirmier
@@ -267,6 +273,20 @@ export default async function VisitDetailPage({
           target_role: 'healthcare_professional',
           completed: !!fagerstromResponse,
           completedAt: fagerstromResponse?.completed_at,
+        },
+        {
+          ...PHYSICAL_PARAMS_DEFINITION,
+          id: PHYSICAL_PARAMS_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!physicalParamsResponse,
+          completedAt: physicalParamsResponse?.completed_at,
+        },
+        {
+          ...BLOOD_PRESSURE_DEFINITION,
+          id: BLOOD_PRESSURE_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!bloodPressureResponse,
+          completedAt: bloodPressureResponse?.completed_at,
         }
       ]
     };

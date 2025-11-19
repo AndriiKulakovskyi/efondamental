@@ -48,7 +48,9 @@ import {
 } from './questionnaire-social.service';
 import {
   getTobaccoResponse,
-  getFagerstromResponse
+  getFagerstromResponse,
+  getPhysicalParamsResponse,
+  getBloodPressureResponse
 } from './questionnaire-infirmier.service';
 import {
   ASRM_DEFINITION,
@@ -90,7 +92,9 @@ import {
 } from '../constants/questionnaires-social';
 import {
   TOBACCO_DEFINITION,
-  FAGERSTROM_DEFINITION
+  FAGERSTROM_DEFINITION,
+  PHYSICAL_PARAMS_DEFINITION,
+  BLOOD_PRESSURE_DEFINITION
 } from '../constants/questionnaires-infirmier';
 
 // ============================================================================
@@ -349,7 +353,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_nurse',
         name: 'Infirmier',
         description: 'Évaluation par l\'infirmier',
-        questionnaires: [TOBACCO_DEFINITION, FAGERSTROM_DEFINITION]
+        questionnaires: [TOBACCO_DEFINITION, FAGERSTROM_DEFINITION, PHYSICAL_PARAMS_DEFINITION, BLOOD_PRESSURE_DEFINITION]
       },
       {
         id: 'mod_thymic_eval',
@@ -442,14 +446,14 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diag) completed++;
     if (orient) completed++;
   } else if (visit.visit_type === 'initial_evaluation') {
-    total = 28; // 16 auto questionnaires + ASRM + QIDS (reused) + 7 hetero questionnaires + 1 social + 2 infirmier (tobacco + fagerstrom)
+    total = 30; // 16 auto questionnaires + ASRM + QIDS (reused) + 7 hetero questionnaires + 1 social + 4 infirmier (tobacco + fagerstrom + physical_params + blood_pressure)
     totalModules = 6;
 
     const [
       eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,
       asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti,
       madrs, ymrs, cgi, egf, alda, etatPatient, fast, social,
-      tobacco, fagerstrom
+      tobacco, fagerstrom, physicalParams, bloodPressure
     ] = await Promise.all([
       // ETAT questionnaires
       getEq5d5lResponse(visitId),
@@ -483,7 +487,9 @@ export async function getVisitCompletionStatus(visitId: string) {
       getSocialResponse(visitId),
       // INFIRMIER questionnaires
       getTobaccoResponse(visitId),
-      getFagerstromResponse(visitId)
+      getFagerstromResponse(visitId),
+      getPhysicalParamsResponse(visitId),
+      getBloodPressureResponse(visitId)
     ]);
 
     if (eq5d5l) completed++;
@@ -514,6 +520,8 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (social) completed++;
     if (tobacco) completed++;
     if (fagerstrom) completed++;
+    if (physicalParams) completed++;
+    if (bloodPressure) completed++;
   }
 
   return {

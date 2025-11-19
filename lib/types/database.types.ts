@@ -979,3 +979,41 @@ export interface FagerstromResponse {
 }
 
 export type FagerstromResponseInsert = Omit<FagerstromResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score'>;
+
+// ===== Physical Parameters Response =====
+export interface PhysicalParamsResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  height_cm?: number | null;
+  weight_kg?: number | null;
+  bmi?: number | null; // Auto-calculated
+  abdominal_circumference_cm?: number | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PhysicalParamsResponseInsert = Omit<PhysicalParamsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'bmi'>;
+
+// ===== Blood Pressure & Heart Rate Response =====
+export interface BloodPressureResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  bp_lying_systolic?: number | null;
+  bp_lying_diastolic?: number | null;
+  tension_lying?: string | null; // Format: "systolic/diastolic"
+  heart_rate_lying?: number | null;
+  bp_standing_systolic?: number | null;
+  bp_standing_diastolic?: number | null;
+  tension_standing?: string | null; // Format: "systolic/diastolic"
+  heart_rate_standing?: number | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type BloodPressureResponseInsert = Omit<BloodPressureResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;

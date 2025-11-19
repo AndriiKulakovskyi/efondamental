@@ -56,6 +56,62 @@ export function QuestionnaireRenderer({
     setResponses(initializeResponses());
   }, [initializeResponses]);
 
+  // Compute derived fields (BMI, tension) when their dependencies change
+  useEffect(() => {
+    setResponses((prev) => {
+      const updated = { ...prev };
+      let hasChanges = false;
+
+      // Compute BMI if height and weight are available
+      if (prev.height_cm && prev.weight_kg) {
+        const heightInMeters = prev.height_cm / 100;
+        const calculatedBMI = prev.weight_kg / (heightInMeters * heightInMeters);
+        const bmiRounded = Math.round(calculatedBMI * 100) / 100; // Round to 2 decimals
+        if (updated.bmi !== bmiRounded) {
+          updated.bmi = bmiRounded;
+          hasChanges = true;
+        }
+      } else if (prev.bmi) {
+        // Clear BMI if height or weight is missing
+        delete updated.bmi;
+        hasChanges = true;
+      }
+
+      // Compute tension_lying if both values are available
+      if (prev.bp_lying_systolic && prev.bp_lying_diastolic) {
+        const tensionLying = `${prev.bp_lying_systolic}/${prev.bp_lying_diastolic}`;
+        if (updated.tension_lying !== tensionLying) {
+          updated.tension_lying = tensionLying;
+          hasChanges = true;
+        }
+      } else if (prev.tension_lying) {
+        delete updated.tension_lying;
+        hasChanges = true;
+      }
+
+      // Compute tension_standing if both values are available
+      if (prev.bp_standing_systolic && prev.bp_standing_diastolic) {
+        const tensionStanding = `${prev.bp_standing_systolic}/${prev.bp_standing_diastolic}`;
+        if (updated.tension_standing !== tensionStanding) {
+          updated.tension_standing = tensionStanding;
+          hasChanges = true;
+        }
+      } else if (prev.tension_standing) {
+        delete updated.tension_standing;
+        hasChanges = true;
+      }
+
+      return hasChanges ? updated : prev;
+    });
+  }, [
+    responses.height_cm,
+    responses.weight_kg,
+    responses.bp_lying_systolic,
+    responses.bp_lying_diastolic,
+    responses.bp_standing_systolic,
+    responses.bp_standing_diastolic,
+  ]);
+
   const { visibleQuestions, requiredQuestions } = evaluateConditionalLogic(
     questionnaire,
     responses
@@ -127,8 +183,9 @@ export function QuestionnaireRenderer({
             type="text"
             value={value || ""}
             onChange={(e) => handleResponseChange(question.id, e.target.value)}
-            disabled={readonly}
+            disabled={readonly || question.readonly}
             required={isRequired}
+            className={question.readonly ? "bg-slate-50 text-slate-700" : ""}
           />
         )}
 
@@ -140,8 +197,9 @@ export function QuestionnaireRenderer({
             onChange={(e) => handleResponseChange(question.id, Number(e.target.value))}
             min={question.min}
             max={question.max}
-            disabled={readonly}
+            disabled={readonly || question.readonly}
             required={isRequired}
+            className={question.readonly ? "bg-slate-50 text-slate-700" : ""}
           />
         )}
 
