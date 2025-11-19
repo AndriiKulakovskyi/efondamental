@@ -12,7 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Questionnaire, Question } from "@/lib/types/database.types";
+import { QuestionnaireDefinition } from "@/lib/constants/questionnaires";
+import { Question } from "@/lib/types/database.types";
 import {
   evaluateConditionalLogic,
   validateQuestionnaireResponse,
@@ -20,7 +21,7 @@ import {
 import { Loader2 } from "lucide-react";
 
 interface QuestionnaireRendererProps {
-  questionnaire: Questionnaire;
+  questionnaire: QuestionnaireDefinition;
   initialResponses?: Record<string, any>;
   onSubmit: (responses: Record<string, any>) => Promise<void>;
   onSave?: (responses: Record<string, any>) => Promise<void>;
@@ -99,6 +100,10 @@ export function QuestionnaireRenderer({
           {question.text}
           {isRequired && <span className="text-red-500 ml-1">*</span>}
         </Label>
+        
+        {question.help && (
+          <p className="text-sm text-muted-foreground">{question.help}</p>
+        )}
 
         {question.type === "text" && (
           <Input
@@ -149,8 +154,13 @@ export function QuestionnaireRenderer({
 
         {question.type === "single_choice" && question.options && (
           <Select
-            value={value?.toString() || ""}
-            onValueChange={(val) => handleResponseChange(question.id, Number(val))}
+            value={value !== undefined ? value.toString() : ""}
+            onValueChange={(val) => {
+              // Try to convert to number if the option code is a number
+              const numVal = Number(val);
+              const finalVal = isNaN(numVal) ? val : numVal;
+              handleResponseChange(question.id, finalVal);
+            }}
             disabled={readonly}
             required={isRequired}
           >
@@ -163,7 +173,7 @@ export function QuestionnaireRenderer({
                 const optionValue = typeof option === 'string' ? option : option.code;
                 const optionLabel = typeof option === 'string' ? option : option.label;
                 return (
-                  <SelectItem key={optionValue} value={optionValue.toString()}>
+                  <SelectItem key={optionValue.toString()} value={optionValue.toString()}>
                     {optionLabel}
                   </SelectItem>
                 );
@@ -180,7 +190,7 @@ export function QuestionnaireRenderer({
               const optionLabel = typeof option === 'string' ? option : option.label;
               const checked = Array.isArray(value) && value.includes(optionValue);
               return (
-                <div key={optionValue} className="flex items-center space-x-2">
+                <div key={optionValue.toString()} className="flex items-center space-x-2">
                   <Checkbox
                     id={`${question.id}-${optionValue}`}
                     checked={checked}
@@ -188,7 +198,7 @@ export function QuestionnaireRenderer({
                       const currentValues = Array.isArray(value) ? value : [];
                       const newValues = isChecked
                         ? [...currentValues, optionValue]
-                        : currentValues.filter((v) => v !== optionValue);
+                        : currentValues.filter((v: any) => v !== optionValue);
                       handleResponseChange(question.id, newValues);
                     }}
                     disabled={readonly}
@@ -219,7 +229,7 @@ export function QuestionnaireRenderer({
               htmlFor={question.id}
               className="text-sm font-normal cursor-pointer"
             >
-              Yes
+              Oui
             </label>
           </div>
         )}
@@ -247,7 +257,7 @@ export function QuestionnaireRenderer({
       {errors.length > 0 && (
         <div className="rounded-lg bg-red-50 border border-red-200 p-4">
           <h4 className="text-sm font-semibold text-red-800 mb-2">
-            Please correct the following errors:
+            Veuillez corriger les erreurs suivantes :
           </h4>
           <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
             {errors.map((error, index) => (
@@ -269,10 +279,10 @@ export function QuestionnaireRenderer({
               {isSaving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
+                  Sauvegarde...
                 </>
               ) : (
-                "Save Progress"
+                "Sauvegarder"
               )}
             </Button>
           )}
@@ -280,10 +290,10 @@ export function QuestionnaireRenderer({
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Submitting...
+                Envoi...
               </>
             ) : (
-              "Submit Questionnaire"
+              "Envoyer le questionnaire"
             )}
           </Button>
         </div>
@@ -291,4 +301,3 @@ export function QuestionnaireRenderer({
     </form>
   );
 }
-

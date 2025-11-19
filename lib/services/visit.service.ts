@@ -8,6 +8,20 @@ import {
   VisitFull,
 } from '../types/database.types';
 import { VisitType, VisitStatus } from '../types/enums';
+import {
+  getAsrmResponse,
+  getQidsResponse,
+  getMdqResponse,
+  getDiagnosticResponse,
+  getOrientationResponse
+} from './questionnaire.service';
+import {
+  ASRM_DEFINITION,
+  QIDS_DEFINITION,
+  MDQ_DEFINITION,
+  DIAGNOSTIC_DEFINITION,
+  ORIENTATION_DEFINITION
+} from '../constants/questionnaires';
 
 // ============================================================================
 // VISIT CRUD
@@ -227,93 +241,72 @@ export async function getUpcomingVisitsByCenter(
 }
 
 // ============================================================================
-// VISIT MODULES
+// VISIT MODULES & COMPLETION (Refactored)
 // ============================================================================
 
-export async function getVisitModules(visitId: string) {
-  const supabase = await createClient();
+export type VirtualModule = {
+  id: string;
+  name: string;
+  description: string;
+  questionnaires: any[];
+};
 
-  // Get visit details
-  const { data: visit } = await supabase
-    .from('visits')
-    .select('visit_template_id')
-    .eq('id', visitId)
-    .single();
+export async function getVisitModules(visitId: string): Promise<VirtualModule[]> {
+  // Fetch visit to check type
+  const visit = await getVisitById(visitId);
+  if (!visit) throw new Error('Visit not found');
 
-  if (!visit) {
-    throw new Error('Visit not found');
+  if (visit.visit_type === 'screening') {
+    return [
+      {
+        id: 'mod_auto',
+        name: 'Autoquestionnaires',
+        description: 'Questionnaires à remplir par le patient',
+        questionnaires: [ASRM_DEFINITION, QIDS_DEFINITION, MDQ_DEFINITION]
+      },
+      {
+        id: 'mod_medical',
+        name: 'Partie médicale',
+        description: 'Évaluation clinique par le professionnel de santé',
+        questionnaires: [DIAGNOSTIC_DEFINITION, ORIENTATION_DEFINITION]
+      }
+    ];
   }
 
-  // Get modules for this visit template
-  const { data: modules, error } = await supabase
-    .from('modules')
-    .select('*')
-    .eq('visit_template_id', visit.visit_template_id)
-    .eq('active', true)
-    .order('order_index');
-
-  if (error) {
-    throw new Error(`Failed to fetch visit modules: ${error.message}`);
-  }
-
-  return modules || [];
+  // Default/Fallback (e.g. other visit types not fully implemented yet)
+  return [];
 }
-
-export async function getVisitModuleQuestionnaires(moduleId: string) {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('questionnaires')
-    .select('*')
-    .eq('module_id', moduleId)
-    .eq('active', true)
-    .order('created_at');
-
-  if (error) {
-    throw new Error(`Failed to fetch module questionnaires: ${error.message}`);
-  }
-
-  return data || [];
-}
-
-// ============================================================================
-// VISIT COMPLETION STATUS
-// ============================================================================
 
 export async function getVisitCompletionStatus(visitId: string) {
-  const supabase = await createClient();
+  const visit = await getVisitById(visitId);
+  if (!visit) throw new Error('Visit not found');
 
-  const modules = await getVisitModules(visitId);
-  let totalQuestionnaires = 0;
-  let completedQuestionnaires = 0;
+  let total = 0;
+  let completed = 0;
 
-  for (const module of modules) {
-    const questionnaires = await getVisitModuleQuestionnaires(module.id);
-    totalQuestionnaires += questionnaires.length;
+  if (visit.visit_type === 'screening') {
+    total = 5; // ASRM, QIDS, MDQ, Diag, Orient
 
-    for (const questionnaire of questionnaires) {
-      const { data: response } = await supabase
-        .from('questionnaire_responses')
-        .select('id')
-        .eq('visit_id', visitId)
-        .eq('questionnaire_id', questionnaire.id)
-        .eq('status', 'completed')
-        .single();
+    const [asrm, qids, mdq, diag, orient] = await Promise.all([
+      getAsrmResponse(visitId),
+      getQidsResponse(visitId),
+      getMdqResponse(visitId),
+      getDiagnosticResponse(visitId),
+      getOrientationResponse(visitId)
+    ]);
 
-      if (response) {
-        completedQuestionnaires++;
-      }
-    }
+    if (asrm) completed++;
+    if (qids) completed++;
+    if (mdq) completed++;
+    if (diag) completed++;
+    if (orient) completed++;
   }
 
   return {
-    totalModules: modules.length,
-    totalQuestionnaires,
-    completedQuestionnaires,
-    completionPercentage:
-      totalQuestionnaires > 0
-        ? Math.round((completedQuestionnaires / totalQuestionnaires) * 100)
-        : 0,
+    totalModules: visit.visit_type === 'screening' ? 2 : 0,
+    totalQuestionnaires: total,
+    completedQuestionnaires: completed,
+    completionPercentage: total > 0 ? Math.round((completed / total) * 100) : 0,
   };
 }
 
@@ -335,7 +328,7 @@ export async function getLatestVisitWithCompletion(
 ): Promise<PatientVisitCompletion> {
   const supabase = await createClient();
 
-  // Get the most recent visit (scheduled, in_progress, or completed)
+  // Get the most recent visit
   const { data: visit } = await supabase
     .from('visits')
     .select('*')
@@ -356,7 +349,6 @@ export async function getLatestVisitWithCompletion(
     };
   }
 
-  // Calculate completion percentage
   const completion = await getVisitCompletionStatus(visit.id);
 
   return {
@@ -374,7 +366,7 @@ export async function getMultiplePatientVisitCompletions(
 ): Promise<Map<string, PatientVisitCompletion>> {
   const completions = new Map<string, PatientVisitCompletion>();
 
-  // Process in batches to avoid too many concurrent requests
+  // Process in batches
   const batchSize = 10;
   for (let i = 0; i < patientIds.length; i += batchSize) {
     const batch = patientIds.slice(i, i + batchSize);
@@ -432,4 +424,3 @@ export async function getVisitStats(centerId: string, fromDate?: string, toDate?
 
   return stats;
 }
-

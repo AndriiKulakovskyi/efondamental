@@ -51,7 +51,7 @@ export default async function QuestionnairesPage() {
           <div className="grid grid-cols-1 gap-4">
             {pendingQuestionnaires.map((questionnaire) => (
               <div
-                key={questionnaire.id}
+                key={questionnaire.composite_id}
                 className="bg-white rounded-lg border border-slate-200 p-6 hover:border-blue-300 transition-colors"
               >
                 <div className="flex items-start justify-between">
@@ -76,7 +76,7 @@ export default async function QuestionnairesPage() {
                       )}
                     </div>
                   </div>
-                  <Link href={`/patient/questionnaires/${questionnaire.id}`}>
+                  <Link href={`/patient/questionnaires/${questionnaire.composite_id}`}>
                     <Button className="ml-4">
                       Commencer
                     </Button>
@@ -100,4 +100,3 @@ export default async function QuestionnairesPage() {
     </div>
   );
 }
-

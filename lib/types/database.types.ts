@@ -137,63 +137,25 @@ export interface VisitTemplate {
   updated_at: string;
 }
 
-export interface Module {
-  id: string;
-  visit_template_id: string;
-  name: string;
-  description: string | null;
-  order_index: number;
-  metadata: Record<string, any>;
-  active: boolean;
-  created_at: string;
-  updated_at: string;
-}
+// Removed Module interface as table is dropped
 
+// UI/Logic Types (Not DB Tables anymore, but used in code)
 export interface Question {
   id: string;
   type: QuestionType;
   text: string;
   required: boolean;
-  options?: string[];
+  options?: (string | { code: string | number; label: string; score?: number })[];
   min?: number;
   max?: number;
   minLabel?: string;
   maxLabel?: string;
+  help?: string;
   metadata?: Record<string, any>;
+  display_if?: any; // For simple condition logic if needed in UI
 }
 
-export interface ConditionalLogic {
-  rules: ConditionalRule[];
-}
-
-export interface ConditionalRule {
-  condition: {
-    questionId: string;
-    operator: 'equals' | 'not_equals' | 'greater_than' | 'less_than' | 'contains';
-    value: any;
-  };
-  action: {
-    type: 'show_question' | 'hide_question' | 'show_subquestionnaire' | 'required';
-    questionId?: string;
-    questionnaire?: string;
-  };
-}
-
-export interface Questionnaire {
-  id: string;
-  module_id: string | null;
-  code: string;
-  title: string;
-  description: string | null;
-  target_role: UserRole | null;
-  questions: Question[];
-  conditional_logic: ConditionalLogic | null;
-  metadata: Record<string, any>;
-  version: number;
-  active: boolean;
-  created_at: string;
-  updated_at: string;
-}
+// Removed ConditionalLogic, ConditionalRule, Questionnaire interfaces
 
 export interface Visit {
   id: string;
@@ -211,17 +173,102 @@ export interface Visit {
   updated_at: string;
 }
 
-export interface QuestionnaireResponse {
+// New Specific Response Tables
+
+export interface AsrmResponse {
   id: string;
   visit_id: string;
-  questionnaire_id: string;
   patient_id: string;
-  responses: Record<string, any>;
-  completed_by: string | null;
-  started_at: string;
-  completed_at: string | null;
-  status: QuestionnaireResponseStatus;
-  metadata: Record<string, any>;
+  q1: number;
+  q2: number;
+  q3: number;
+  q4: number;
+  q5: number;
+  total_score?: number; // Generated
+  interpretation?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface QidsResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  q1: number;
+  q2: number;
+  q3: number;
+  q4: number;
+  q5: number;
+  q6: number;
+  q7: number;
+  q8: number;
+  q9: number;
+  q10: number;
+  q11: number;
+  q12: number;
+  q13: number;
+  q14: number;
+  q15: number;
+  q16: number;
+  total_score?: number | null;
+  interpretation?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MdqResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  q1_1: boolean;
+  q1_2: boolean;
+  q1_3: boolean;
+  q1_4: boolean;
+  q1_5: boolean;
+  q1_6: boolean;
+  q1_7: boolean;
+  q1_8: boolean;
+  q1_9: boolean;
+  q1_10: boolean;
+  q1_11: boolean;
+  q1_12: boolean;
+  q1_13: boolean;
+  q2?: boolean | null;
+  q3?: number | null;
+  positive_screen?: boolean | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BipolarDiagnosticResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  diagnostic_principal: 'bipolar_1' | 'bipolar_2' | 'cyclothymia' | 'other_bipolar' | 'no_bipolar';
+  episode_actuel?: 'manic' | 'hypomanic' | 'depressive' | 'mixed' | 'euthymic' | null;
+  comorbidites?: string[] | null;
+  antecedents_psychiatriques?: string | null;
+  notes_cliniques?: string | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OrientationResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  eligible_centre_expert: boolean;
+  criteres_eligibilite?: string[] | null;
+  urgence_orientation?: 'immediate' | 'rapid' | 'standard' | null;
+  centre_expert_propose?: string | null;
+  commentaires?: string | null;
+  completed_by?: string | null;
+  completed_at: string;
   created_at: string;
   updated_at: string;
 }
@@ -337,10 +384,12 @@ export type PatientUpdate = Partial<Omit<PatientInsert, 'center_id' | 'created_b
 export type VisitInsert = Omit<Visit, 'id' | 'created_at' | 'updated_at'>;
 export type VisitUpdate = Partial<Omit<VisitInsert, 'patient_id' | 'created_by'>>;
 
-export type QuestionnaireResponseInsert = Omit<QuestionnaireResponse, 'id' | 'created_at' | 'updated_at'>;
-export type QuestionnaireResponseUpdate = Partial<Omit<QuestionnaireResponseInsert, 'visit_id' | 'questionnaire_id' | 'patient_id'>>;
+export type AsrmResponseInsert = Omit<AsrmResponse, 'id' | 'created_at' | 'updated_at' | 'total_score' | 'interpretation' | 'completed_at'>;
+export type QidsResponseInsert = Omit<QidsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type MdqResponseInsert = Omit<MdqResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type BipolarDiagnosticResponseInsert = Omit<BipolarDiagnosticResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type OrientationResponseInsert = Omit<OrientationResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 export type UserInvitationInsert = Omit<UserInvitation, 'id' | 'created_at' | 'updated_at' | 'accepted_by'>;
 export type UserProfileInsert = Omit<UserProfile, 'created_at' | 'updated_at'>;
 export type UserProfileUpdate = Partial<Omit<UserProfileInsert, 'id' | 'created_by'>>;
-

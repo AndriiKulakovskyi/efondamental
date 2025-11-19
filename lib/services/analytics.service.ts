@@ -144,26 +144,8 @@ export async function getPatientTimeline(patientId: string) {
 }
 
 export async function getPatientMoodTrend(patientId: string) {
-  const supabase = await createClient();
-
-  // Get mood questionnaire responses over time
-  const { data: responses } = await supabase
-    .from('questionnaire_responses')
-    .select('responses, completed_at, questionnaire:questionnaires(code)')
-    .eq('patient_id', patientId)
-    .eq('status', 'completed')
-    .order('completed_at', { ascending: true });
-
-  // Extract mood values from responses
-  const moodData = responses
-    ?.filter((r: any) => r.questionnaire?.code === 'MOOD_SELF')
-    .map((r: any) => ({
-      date: r.completed_at,
-      value: r.responses?.m1 || 0, // m1 is the mood scale question
-      source: 'self_report',
-    }));
-
-  return moodData || [];
+  // Mood trend analysis disabled in current version due to schema refactor
+  return [];
 }
 
 export async function getPatientRiskHistory(patientId: string) {
@@ -325,4 +307,3 @@ export async function getVisitTrends(
     completionRate: data.total > 0 ? Math.round((data.completed / data.total) * 100) : 0,
   }));
 }
-

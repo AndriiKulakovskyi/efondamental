@@ -1,7 +1,7 @@
 // eFondaMental Platform - Client-Safe Questionnaire Logic
 // These functions can be used in both client and server components
 
-import { Questionnaire } from '../types/database.types';
+import { QuestionnaireDefinition } from '@/lib/constants/questionnaires';
 import { evaluateCondition as evaluateJSONLogicCondition } from '@/lib/questionnaires/validation';
 
 // ============================================================================
@@ -9,96 +9,36 @@ import { evaluateCondition as evaluateJSONLogicCondition } from '@/lib/questionn
 // ============================================================================
 
 export function evaluateConditionalLogic(
-  questionnaire: Questionnaire,
+  questionnaire: QuestionnaireDefinition,
   responses: Record<string, any>
 ): {
   visibleQuestions: string[];
   requiredQuestions: string[];
-  subQuestionnaires: string[];
 } {
   const visibleQuestions: string[] = [];
   const requiredQuestions: string[] = [];
-  const subQuestionnaires: string[] = [];
 
   // Evaluate display_if conditions for each question
   questionnaire.questions.forEach((q) => {
+    // If no display_if, default is visible
     const isVisible = !q.display_if || evaluateJSONLogicCondition(q.display_if, responses);
     
     if (isVisible) {
       visibleQuestions.push(q.id);
       
       // Check if required
-      const isRequired = q.required_if 
-        ? evaluateJSONLogicCondition(q.required_if, responses)
-        : q.required;
-        
+      const isRequired = q.required || (q.required !== false && q.metadata?.required === true); // Normalize required
+      // Note: The Question interface has 'required: boolean'. 
+      // But if we have conditional requirement, we might store it in a special field or use logic.
+      // For now, we assume static required. If we need conditional required, we'd need to add 'required_if' to Question interface.
+      
       if (isRequired) {
         requiredQuestions.push(q.id);
       }
     }
   });
 
-  if (!questionnaire.conditional_logic?.rules) {
-    return { visibleQuestions, requiredQuestions, subQuestionnaires };
-  }
-
-  // Evaluate each rule
-  for (const rule of questionnaire.conditional_logic.rules) {
-    const { condition, action } = rule;
-    const responseValue = responses[condition.questionId];
-
-    let conditionMet = false;
-
-    switch (condition.operator) {
-      case 'equals':
-        conditionMet = responseValue === condition.value;
-        break;
-      case 'not_equals':
-        conditionMet = responseValue !== condition.value;
-        break;
-      case 'greater_than':
-        conditionMet = Number(responseValue) > Number(condition.value);
-        break;
-      case 'less_than':
-        conditionMet = Number(responseValue) < Number(condition.value);
-        break;
-      case 'contains':
-        conditionMet =
-          Array.isArray(responseValue) &&
-          responseValue.includes(condition.value);
-        break;
-    }
-
-    if (conditionMet) {
-      switch (action.type) {
-        case 'show_question':
-          if (action.questionId && !visibleQuestions.includes(action.questionId)) {
-            visibleQuestions.push(action.questionId);
-          }
-          break;
-        case 'hide_question':
-          if (action.questionId) {
-            const index = visibleQuestions.indexOf(action.questionId);
-            if (index > -1) {
-              visibleQuestions.splice(index, 1);
-            }
-          }
-          break;
-        case 'show_subquestionnaire':
-          if (action.questionnaire) {
-            subQuestionnaires.push(action.questionnaire);
-          }
-          break;
-        case 'required':
-          if (action.questionId && !requiredQuestions.includes(action.questionId)) {
-            requiredQuestions.push(action.questionId);
-          }
-          break;
-      }
-    }
-  }
-
-  return { visibleQuestions, requiredQuestions, subQuestionnaires };
+  return { visibleQuestions, requiredQuestions };
 }
 
 // ============================================================================
@@ -106,7 +46,7 @@ export function evaluateConditionalLogic(
 // ============================================================================
 
 export function validateQuestionnaireResponse(
-  questionnaire: Questionnaire,
+  questionnaire: QuestionnaireDefinition,
   responses: Record<string, any>
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
@@ -125,7 +65,7 @@ export function validateQuestionnaireResponse(
         responses[questionId] === '')
     ) {
       const question = questionnaire.questions.find((q) => q.id === questionId);
-      errors.push(`${question?.text || questionId} is required`);
+      errors.push(`${question?.text || questionId} est obligatoire`);
     }
   }
 
@@ -134,18 +74,18 @@ export function validateQuestionnaireResponse(
     if (!visibleQuestions.includes(question.id)) continue;
 
     const response = responses[question.id];
-    if (response === undefined || response === null) continue;
+    if (response === undefined || response === null || response === '') continue;
 
     switch (question.type) {
       case 'number':
         if (isNaN(Number(response))) {
-          errors.push(`${question.text} must be a number`);
+          errors.push(`${question.text} doit être un nombre`);
         }
         if (question.min !== undefined && Number(response) < question.min) {
-          errors.push(`${question.text} must be at least ${question.min}`);
+          errors.push(`${question.text} doit être au moins ${question.min}`);
         }
         if (question.max !== undefined && Number(response) > question.max) {
-          errors.push(`${question.text} must be at most ${question.max}`);
+          errors.push(`${question.text} doit être au plus ${question.max}`);
         }
         break;
 
@@ -155,23 +95,29 @@ export function validateQuestionnaireResponse(
           const validValues = question.options.map(opt => 
             typeof opt === 'string' ? opt : opt.code
           );
-          if (!validValues.includes(Number(response)) && !validValues.includes(response)) {
-            errors.push(`${question.text} has an invalid option`);
+          // Relax check to allow string/number mismatch if loosely equal
+          if (!validValues.some(v => v == response)) {
+             // Strict check might fail if form submits "1" but option is 1.
+             // Let's double check logic.
+             // Renderer handles value changes.
+             // validValues might be strings or numbers.
+             // response might be string or number.
+             // Let's trust standard comparison or lenient check.
+             errors.push(`${question.text} a une option invalide`);
           }
         }
         break;
 
       case 'multiple_choice':
         if (question.options && Array.isArray(response)) {
-          // Handle both string options and object options {code, label, score}
           const validValues = question.options.map(opt => 
             typeof opt === 'string' ? opt : opt.code
           );
           const invalidOptions = response.filter(
-            (r) => !validValues.includes(r)
+            (r) => !validValues.some(v => v == r)
           );
           if (invalidOptions.length > 0) {
-            errors.push(`${question.text} has invalid options`);
+            errors.push(`${question.text} a des options invalides`);
           }
         }
         break;
@@ -183,4 +129,3 @@ export function validateQuestionnaireResponse(
     errors,
   };
 }
-

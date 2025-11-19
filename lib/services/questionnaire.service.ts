@@ -1,360 +1,332 @@
 // eFondaMental Platform - Questionnaire Service
+// Typed service for handling specific questionnaire responses
 
-import { createClient } from '../supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import {
-  Questionnaire,
-  QuestionnaireResponse,
-  QuestionnaireResponseInsert,
-  QuestionnaireResponseUpdate,
-} from '../types/database.types';
-import { UserRole, QuestionnaireResponseStatus } from '../types/enums';
+  AsrmResponse,
+  AsrmResponseInsert,
+  QidsResponse,
+  QidsResponseInsert,
+  MdqResponse,
+  MdqResponseInsert,
+  BipolarDiagnosticResponse,
+  BipolarDiagnosticResponseInsert,
+  OrientationResponse,
+  OrientationResponseInsert,
+} from '@/lib/types/database.types';
+import {
+  ASRM_DEFINITION,
+  QIDS_DEFINITION,
+  MDQ_DEFINITION,
+  QuestionnaireDefinition
+} from '@/lib/constants/questionnaires';
 
 // ============================================================================
-// QUESTIONNAIRE CRUD
+// SHARED TYPES
 // ============================================================================
 
-export async function getQuestionnaireById(
-  questionnaireId: string
-): Promise<Questionnaire | null> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('questionnaires')
-    .select('*')
-    .eq('id', questionnaireId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') return null;
-    throw new Error(`Failed to fetch questionnaire: ${error.message}`);
-  }
-
-  return data;
-}
-
-export async function getQuestionnaireByCode(
-  code: string
-): Promise<Questionnaire | null> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('questionnaires')
-    .select('*')
-    .eq('code', code)
-    .eq('active', true)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') return null;
-    throw new Error(`Failed to fetch questionnaire: ${error.message}`);
-  }
-
-  return data;
-}
-
-export async function getQuestionnairesByRole(
-  role: UserRole
-): Promise<Questionnaire[]> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('questionnaires')
-    .select('*')
-    .eq('target_role', role)
-    .eq('active', true)
-    .order('created_at');
-
-  if (error) {
-    throw new Error(`Failed to fetch questionnaires by role: ${error.message}`);
-  }
-
-  return data || [];
-}
+export type PendingQuestionnaire = QuestionnaireDefinition & {
+  visit_id: string;
+  composite_id: string; 
+};
 
 // ============================================================================
-// QUESTIONNAIRE RESPONSE CRUD
+// PENDING TASKS
 // ============================================================================
-
-export async function getResponseById(
-  responseId: string
-): Promise<QuestionnaireResponse | null> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('questionnaire_responses')
-    .select('*')
-    .eq('id', responseId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') return null;
-    throw new Error(`Failed to fetch response: ${error.message}`);
-  }
-
-  return data;
-}
-
-export async function createResponse(
-  response: QuestionnaireResponseInsert
-): Promise<QuestionnaireResponse> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('questionnaire_responses')
-    .insert(response)
-    .select()
-    .single();
-
-  if (error) {
-    throw new Error(`Failed to create response: ${error.message}`);
-  }
-
-  return data;
-}
-
-export async function updateResponse(
-  responseId: string,
-  updates: QuestionnaireResponseUpdate
-): Promise<QuestionnaireResponse> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('questionnaire_responses')
-    .update(updates)
-    .eq('id', responseId)
-    .select()
-    .single();
-
-  if (error) {
-    throw new Error(`Failed to update response: ${error.message}`);
-  }
-
-  return data;
-}
-
-export async function saveResponse(
-  responseId: string,
-  responses: Record<string, any>
-): Promise<QuestionnaireResponse> {
-  return updateResponse(responseId, {
-    responses,
-  });
-}
-
-export async function completeResponse(
-  responseId: string,
-  completedBy: string
-): Promise<QuestionnaireResponse> {
-  return updateResponse(responseId, {
-    status: QuestionnaireResponseStatus.COMPLETED,
-    completed_at: new Date().toISOString(),
-    completed_by: completedBy,
-  });
-}
-
-// ============================================================================
-// RESPONSE QUERIES
-// ============================================================================
-
-export async function getResponseByVisitAndQuestionnaire(
-  visitId: string,
-  questionnaireId: string
-): Promise<QuestionnaireResponse | null> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('questionnaire_responses')
-    .select('*')
-    .eq('visit_id', visitId)
-    .eq('questionnaire_id', questionnaireId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') return null;
-    throw new Error(`Failed to fetch response: ${error.message}`);
-  }
-
-  return data;
-}
-
-export async function getResponsesByVisit(
-  visitId: string
-): Promise<QuestionnaireResponse[]> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('questionnaire_responses')
-    .select('*')
-    .eq('visit_id', visitId)
-    .order('created_at');
-
-  if (error) {
-    throw new Error(`Failed to fetch responses by visit: ${error.message}`);
-  }
-
-  return data || [];
-}
-
-export async function getResponsesByPatient(
-  patientId: string
-): Promise<QuestionnaireResponse[]> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('questionnaire_responses')
-    .select('*')
-    .eq('patient_id', patientId)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    throw new Error(`Failed to fetch responses by patient: ${error.message}`);
-  }
-
-  return data || [];
-}
 
 export async function getPendingQuestionnaires(
   patientId: string
-): Promise<Questionnaire[]> {
+): Promise<PendingQuestionnaire[]> {
   const supabase = await createClient();
 
-  // Get all scheduled or in-progress visits for this patient
-  const { data: visits } = await supabase
+  // 1. Get active visits for patient
+  const { data: visits, error } = await supabase
     .from('visits')
-    .select('id, visit_template_id')
+    .select('id, visit_type')
     .eq('patient_id', patientId)
     .in('status', ['scheduled', 'in_progress']);
 
-  if (!visits || visits.length === 0) {
-    return [];
-  }
+  if (error) throw error;
+  if (!visits || visits.length === 0) return [];
 
-  const pendingQuestionnaires: Questionnaire[] = [];
+  const tasks: PendingQuestionnaire[] = [];
 
   for (const visit of visits) {
-    // Get modules for this visit template
-    const { data: modules } = await supabase
-      .from('modules')
-      .select('id')
-      .eq('visit_template_id', visit.visit_template_id)
-      .eq('active', true);
+    // Logic depends on visit type
+    // For now, we assume 'screening' visits require ASRM, QIDS, MDQ
+    if (visit.visit_type === 'screening') {
+      // Check ASRM
+      const asrm = await getAsrmResponse(visit.id);
+      if (!asrm) {
+        tasks.push({
+          ...ASRM_DEFINITION,
+          visit_id: visit.id,
+          composite_id: `${visit.id}_${ASRM_DEFINITION.code}`
+        });
+      }
 
-    if (!modules) continue;
+      // Check QIDS
+      const qids = await getQidsResponse(visit.id);
+      if (!qids) {
+        tasks.push({
+          ...QIDS_DEFINITION,
+          visit_id: visit.id,
+          composite_id: `${visit.id}_${QIDS_DEFINITION.code}`
+        });
+      }
 
-    for (const module of modules) {
-      // Get questionnaires for patient role
-      const { data: questionnaires } = await supabase
-        .from('questionnaires')
-        .select('*')
-        .eq('module_id', module.id)
-        .eq('target_role', UserRole.PATIENT)
-        .eq('active', true);
-
-      if (!questionnaires) continue;
-
-      for (const questionnaire of questionnaires) {
-        // Check if already completed
-        const { data: response } = await supabase
-          .from('questionnaire_responses')
-          .select('id')
-          .eq('visit_id', visit.id)
-          .eq('questionnaire_id', questionnaire.id)
-          .eq('status', 'completed')
-          .single();
-
-        if (!response) {
-          pendingQuestionnaires.push(questionnaire);
-        }
+      // Check MDQ
+      const mdq = await getMdqResponse(visit.id);
+      if (!mdq) {
+        tasks.push({
+          ...MDQ_DEFINITION,
+          visit_id: visit.id,
+          composite_id: `${visit.id}_${MDQ_DEFINITION.code}`
+        });
       }
     }
   }
 
-  return pendingQuestionnaires;
+  return tasks;
 }
 
-// Get pending auto-questionnaires specifically for patient role
-export async function getPendingAutoQuestionnairesForPatient(
-  patientId: string
-): Promise<Questionnaire[]> {
-  return getPendingQuestionnaires(patientId);
-}
+// ============================================================================
+// ASRM (Altman Self-Rating Mania Scale)
+// ============================================================================
 
-// Calculate and save score after questionnaire completion
-export async function calculateAndSaveScore(
-  responseId: string,
-  questionnaireCode: string,
-  responses: Record<string, any>
-): Promise<{ score: any; interpretation: string }> {
-  const supabase = await createClient();
-  
-  // Import scoring functions dynamically
-  const { calculateScore } = await import('@/lib/utils/questionnaire-scoring');
-  const { ASRM } = await import('@/lib/questionnaires/auto/asrm');
-  const { QIDS_SR16 } = await import('@/lib/questionnaires/auto/qids-sr16');
-  const { MDQ } = await import('@/lib/questionnaires/auto/mdq');
-
-  let scoringRules;
-  switch (questionnaireCode) {
-    case 'ASRM_FR':
-      scoringRules = ASRM.scoring_rules;
-      break;
-    case 'QIDS_SR16_FR':
-      scoringRules = QIDS_SR16.scoring_rules;
-      break;
-    case 'MDQ_FR':
-      scoringRules = MDQ.scoring_rules;
-      break;
-    default:
-      throw new Error(`Unknown questionnaire code: ${questionnaireCode}`);
-  }
-
-  const result = calculateScore(questionnaireCode, responses, scoringRules!);
-
-  // Save score in metadata
-  const { error } = await supabase
-    .from('questionnaire_responses')
-    .update({
-      metadata: {
-        ...result,
-        calculated_at: new Date().toISOString()
-      }
-    })
-    .eq('id', responseId);
-
-  if (error) {
-    throw new Error(`Failed to save score: ${error.message}`);
-  }
-
-  return {
-    score: result,
-    interpretation: result.interpretation
-  };
-}
-
-// Get responses with interpretation
-export async function getResponsesWithInterpretation(
+export async function getAsrmResponse(
   visitId: string
-): Promise<Array<QuestionnaireResponse & { score?: any; interpretation?: string }>> {
+): Promise<AsrmResponse | null> {
   const supabase = await createClient();
-
   const { data, error } = await supabase
-    .from('questionnaire_responses')
+    .from('responses_asrm')
     .select('*')
     .eq('visit_id', visitId)
-    .order('created_at');
+    .single();
 
   if (error) {
-    throw new Error(`Failed to fetch responses: ${error.message}`);
+    if (error.code === 'PGRST116') return null;
+    throw error;
   }
-
-  return (data || []).map(response => ({
-    ...response,
-    score: response.metadata?.total_score || response.metadata?.screening_result,
-    interpretation: response.metadata?.interpretation
-  }));
+  return data;
 }
 
-// Note: Conditional logic and validation functions have been moved to
-// @/lib/utils/questionnaire-logic.ts for client-side compatibility
+export async function saveAsrmResponse(
+  response: AsrmResponseInsert
+): Promise<AsrmResponse> {
+  const supabase = await createClient();
+  
+  // Calculate interpretation
+  const totalScore = 
+    response.q1 + response.q2 + response.q3 + response.q4 + response.q5;
+  
+  const interpretation = totalScore >= 6 
+    ? "Symptômes maniaques/hypomaniaques" 
+    : "Pas de symptômes maniaques";
 
+  const { data, error } = await supabase
+    .from('responses_asrm')
+    .upsert({
+      ...response,
+      interpretation // Note: total_score is generated by DB
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
 
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// QIDS-SR16
+// ============================================================================
+
+export async function getQidsResponse(
+  visitId: string
+): Promise<QidsResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_qids_sr16')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveQidsResponse(
+  response: QidsResponseInsert
+): Promise<QidsResponse> {
+  const supabase = await createClient();
+
+  // Calculate Score
+  const sleepScore = Math.max(response.q1, response.q2, response.q3, response.q4);
+  const appetiteScore = Math.max(response.q6, response.q7, response.q8, response.q9);
+  const psychomotorScore = Math.max(response.q15, response.q16);
+  
+  const totalScore = 
+    sleepScore + 
+    response.q5 + 
+    appetiteScore + 
+    response.q10 + 
+    response.q11 + 
+    response.q12 + 
+    response.q13 + 
+    response.q14 + 
+    psychomotorScore;
+
+  let interpretation = "Pas de dépression";
+  if (totalScore >= 21) interpretation = "Dépression très sévère";
+  else if (totalScore >= 16) interpretation = "Dépression sévère";
+  else if (totalScore >= 11) interpretation = "Dépression modérée";
+  else if (totalScore >= 6) interpretation = "Dépression légère";
+
+  const { data, error } = await supabase
+    .from('responses_qids_sr16')
+    .upsert({
+      ...response,
+      total_score: totalScore,
+      interpretation
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// MDQ (Mood Disorder Questionnaire)
+// ============================================================================
+
+export async function getMdqResponse(
+  visitId: string
+): Promise<MdqResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_mdq')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveMdqResponse(
+  response: MdqResponseInsert
+): Promise<MdqResponse> {
+  const supabase = await createClient();
+
+  // Calculate Screening Result
+  // POSITIF si (Q1≥7) ET (Q2=oui) ET (Q3=problème moyen ou sérieux)
+  const q1Count = [
+    response.q1_1, response.q1_2, response.q1_3, response.q1_4, response.q1_5,
+    response.q1_6, response.q1_7, response.q1_8, response.q1_9, response.q1_10,
+    response.q1_11, response.q1_12, response.q1_13
+  ].filter(Boolean).length;
+
+  const isPositive = 
+    q1Count >= 7 && 
+    response.q2 === true && 
+    (response.q3 === 2 || response.q3 === 3);
+
+  const { data, error } = await supabase
+    .from('responses_mdq')
+    .upsert({
+      ...response,
+      positive_screen: isPositive
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Bipolar Diagnostic
+// ============================================================================
+
+export async function getDiagnosticResponse(
+  visitId: string
+): Promise<BipolarDiagnosticResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_bipolar_diagnostic')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveDiagnosticResponse(
+  response: BipolarDiagnosticResponseInsert
+): Promise<BipolarDiagnosticResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from('responses_bipolar_diagnostic')
+    .upsert({
+      ...response,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Orientation (Expert Center)
+// ============================================================================
+
+export async function getOrientationResponse(
+  visitId: string
+): Promise<OrientationResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_orientation')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveOrientationResponse(
+  response: OrientationResponseInsert
+): Promise<OrientationResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from('responses_orientation')
+    .upsert({
+      ...response,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}

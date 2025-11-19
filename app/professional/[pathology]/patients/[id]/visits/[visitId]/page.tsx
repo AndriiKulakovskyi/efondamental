@@ -1,4 +1,4 @@
-import { getVisitById, getVisitModules, getVisitCompletionStatus } from "@/lib/services/visit.service";
+import { getVisitById, getVisitCompletionStatus } from "@/lib/services/visit.service";
 import { getUserContext } from "@/lib/rbac/middleware";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDateTime } from "@/lib/utils/date";
@@ -9,11 +9,25 @@ import { ExpandableModuleCard } from "./components/expandable-module-card";
 import { VisitQuickStats } from "./components/visit-quick-stats";
 import { CircularProgress } from "./components/circular-progress";
 import { cn } from "@/lib/utils";
+import { 
+  getAsrmResponse, 
+  getQidsResponse, 
+  getMdqResponse, 
+  getDiagnosticResponse, 
+  getOrientationResponse 
+} from "@/lib/services/questionnaire.service";
+import { 
+  ASRM_DEFINITION, 
+  QIDS_DEFINITION, 
+  MDQ_DEFINITION, 
+  DIAGNOSTIC_DEFINITION, 
+  ORIENTATION_DEFINITION 
+} from "@/lib/constants/questionnaires";
 
 export default async function VisitDetailPage({
   params,
 }: {
-  params: Promise<{ pathology: string; id: string; visitId: string }>;
+  params: { pathology: string; id: string; visitId: string };
 }) {
   const { pathology, id: patientId, visitId } = await params;
   const context = await getUserContext();
@@ -28,48 +42,91 @@ export default async function VisitDetailPage({
     notFound();
   }
 
-  const [modules, completionStatus] = await Promise.all([
-    getVisitModules(visitId),
-    getVisitCompletionStatus(visitId),
-  ]);
+  // Construct modules and check status based on visit type
+  let modulesWithQuestionnaires = [];
+  let completionStatus = {
+    completedQuestionnaires: 0,
+    totalQuestionnaires: 0,
+    completionPercentage: 0
+  };
 
-  // Get questionnaires for each module
-  const modulesWithQuestionnaires = await Promise.all(
-    modules.map(async (module) => {
-      const supabase = await (await import("@/lib/supabase/server")).createClient();
-      
-      const { data: questionnaires } = await supabase
-        .from("questionnaires")
-        .select("*")
-        .eq("module_id", module.id)
-        .eq("active", true);
+  if (visit.visit_type === 'screening') {
+    // Module 1: Autoquestionnaires
+    const asrmResponse = await getAsrmResponse(visitId);
+    const qidsResponse = await getQidsResponse(visitId);
+    const mdqResponse = await getMdqResponse(visitId);
 
-      // Check completion status for each questionnaire
-      const questionnairesWithStatus = await Promise.all(
-        (questionnaires || []).map(async (q) => {
-          const { data: response } = await supabase
-            .from("questionnaire_responses")
-            .select("id, status, completed_at, completed_by")
-            .eq("visit_id", visitId)
-            .eq("questionnaire_id", q.id)
-            .single();
+    const autoModule = {
+      id: 'mod_auto',
+      name: 'Autoquestionnaires',
+      description: 'Questionnaires à remplir par le patient',
+      questionnaires: [
+        {
+          ...ASRM_DEFINITION,
+          id: ASRM_DEFINITION.code, // Use code as ID for routing
+          target_role: 'patient',
+          completed: !!asrmResponse,
+          completedAt: asrmResponse?.completed_at,
+        },
+        {
+          ...QIDS_DEFINITION,
+          id: QIDS_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!qidsResponse,
+          completedAt: qidsResponse?.completed_at,
+        },
+        {
+          ...MDQ_DEFINITION,
+          id: MDQ_DEFINITION.code,
+          target_role: 'patient',
+          completed: !!mdqResponse,
+          completedAt: mdqResponse?.completed_at,
+        }
+      ]
+    };
 
-          return {
-            ...q,
-            responseId: response?.id || null,
-            completed: response?.status === "completed",
-            completedAt: response?.completed_at || null,
-            completedBy: response?.completed_by || null,
-          };
-        })
-      );
+    // Module 2: Partie Médicale
+    const diagResponse = await getDiagnosticResponse(visitId);
+    const orientResponse = await getOrientationResponse(visitId);
 
-      return {
-        ...module,
-        questionnaires: questionnairesWithStatus,
-      };
-    })
-  );
+    const medicalModule = {
+      id: 'mod_medical',
+      name: 'Partie médicale',
+      description: 'Évaluation clinique par le professionnel de santé',
+      questionnaires: [
+        {
+          ...DIAGNOSTIC_DEFINITION,
+          id: DIAGNOSTIC_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!diagResponse,
+          completedAt: diagResponse?.completed_at,
+          completedBy: diagResponse?.completed_by
+        },
+        {
+          ...ORIENTATION_DEFINITION,
+          id: ORIENTATION_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!orientResponse,
+          completedAt: orientResponse?.completed_at,
+          completedBy: orientResponse?.completed_by
+        }
+      ]
+    };
+
+    modulesWithQuestionnaires = [autoModule, medicalModule];
+
+    // Calculate stats
+    const total = autoModule.questionnaires.length + medicalModule.questionnaires.length;
+    const completed = 
+      autoModule.questionnaires.filter(q => q.completed).length + 
+      medicalModule.questionnaires.filter(q => q.completed).length;
+    
+    completionStatus = {
+      totalQuestionnaires: total,
+      completedQuestionnaires: completed,
+      completionPercentage: total > 0 ? (completed / total) * 100 : 0
+    };
+  }
 
   return (
     <div className="space-y-6">
@@ -152,7 +209,7 @@ export default async function VisitDetailPage({
 
       {/* Quick Stats */}
       <VisitQuickStats
-        totalModules={modules.length}
+        totalModules={modulesWithQuestionnaires.length}
         totalQuestionnaires={completionStatus.totalQuestionnaires}
         completedQuestionnaires={completionStatus.completedQuestionnaires}
         completionPercentage={completionStatus.completionPercentage}
@@ -188,4 +245,3 @@ export default async function VisitDetailPage({
     </div>
   );
 }
-

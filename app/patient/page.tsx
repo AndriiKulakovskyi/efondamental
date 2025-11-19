@@ -5,6 +5,7 @@ import { Calendar, FileText, Clock } from "lucide-react";
 import { formatShortDate } from "@/lib/utils/date";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { getPendingQuestionnaires } from "@/lib/services/questionnaire.service";
 
 export default async function PatientDashboard() {
   const context = await requireUserContext();
@@ -14,25 +15,26 @@ export default async function PatientDashboard() {
   const { data: patient } = await supabase
     .from('patients')
     .select('id')
-    .eq('id', context.user.id)
+    .eq('user_id', context.user.id)
     .single();
+
+  if (!patient) {
+      return <div>Patient record not found</div>;
+  }
 
   // Get upcoming visits
   const { data: upcomingVisits } = await supabase
     .from('v_visits_full')
     .select('*')
-    .eq('patient_id', patient?.id || context.user.id)
+    .eq('patient_id', patient.id)
     .eq('status', 'scheduled')
     .gte('scheduled_date', new Date().toISOString())
     .order('scheduled_date', { ascending: true })
     .limit(5);
 
-  // Get pending questionnaires count
-  const { count: pendingQuestionnaires } = await supabase
-    .from('questionnaire_responses')
-    .select('*', { count: 'exact', head: true })
-    .eq('patient_id', patient?.id || context.user.id)
-    .eq('status', 'in_progress');
+  // Get pending questionnaires count using the new service
+  const pendingTasks = await getPendingQuestionnaires(patient.id);
+  const pendingQuestionnairesCount = pendingTasks.length;
 
   return (
     <div className="space-y-6">
@@ -51,7 +53,7 @@ export default async function PatientDashboard() {
         />
         <StatCard
           title="Pending Questionnaires"
-          value={pendingQuestionnaires || 0}
+          value={pendingQuestionnairesCount}
           icon={FileText}
         />
         <StatCard
@@ -100,10 +102,10 @@ export default async function PatientDashboard() {
               <Button size="sm" variant="outline">View All</Button>
             </Link>
           </div>
-          {pendingQuestionnaires && pendingQuestionnaires > 0 ? (
+          {pendingQuestionnairesCount > 0 ? (
             <div className="p-3 border border-amber-200 bg-amber-50 rounded-lg">
               <p className="text-sm text-amber-900">
-                You have {pendingQuestionnaires} questionnaire{pendingQuestionnaires !== 1 ? 's' : ''} to complete
+                You have {pendingQuestionnairesCount} questionnaire{pendingQuestionnairesCount !== 1 ? 's' : ''} to complete
               </p>
               <Link href="/patient/questionnaires">
                 <Button size="sm" className="mt-2">Complete Now</Button>
@@ -129,4 +131,3 @@ export default async function PatientDashboard() {
     </div>
   );
 }
-

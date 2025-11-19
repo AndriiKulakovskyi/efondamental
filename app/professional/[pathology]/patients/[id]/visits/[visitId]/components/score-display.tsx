@@ -6,41 +6,46 @@ import { Card } from "@/components/ui/card";
 
 interface ScoreDisplayProps {
   code: string;
-  score: any;
-  interpretation: string;
-  clinicalAlerts?: string[];
+  data: any; // DB Row
 }
 
-export function ScoreDisplay({ code, score, interpretation, clinicalAlerts }: ScoreDisplayProps) {
-  const getScoreSeverity = () => {
+export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
+  const getSeverity = () => {
     if (code === 'ASRM_FR') {
-      if (score.total_score >= 12) return 'error';
-      if (score.total_score >= 6) return 'warning';
+      // ASRM: Total >= 6 -> mania/hypomania
+      if (data.total_score >= 12) return 'error';
+      if (data.total_score >= 6) return 'warning';
       return 'info';
     }
     
     if (code === 'QIDS_SR16_FR') {
-      if (score.total_score >= 16) return 'error';
-      if (score.total_score >= 11) return 'warning';
-      if (score.total_score >= 6) return 'info';
+      // QIDS: 0-5, 6-10, 11-15, 16-20, 21+
+      if (data.total_score >= 21) return 'error';
+      if (data.total_score >= 16) return 'error';
+      if (data.total_score >= 11) return 'warning';
+      if (data.total_score >= 6) return 'info';
       return 'success';
     }
     
     if (code === 'MDQ_FR') {
-      return score.screening_result === 'POSITIF' ? 'warning' : 'info';
+      return data.positive_screen ? 'warning' : 'info';
     }
     
     return 'info';
   };
 
-  const severity = getScoreSeverity();
-  
+  const severity = getSeverity();
+  const interpretation = data.interpretation || 
+    (code === 'MDQ_FR' ? (data.positive_screen ? 'Dépistage Positif' : 'Dépistage Négatif') : '');
+
   const getAlertIcon = () => {
     switch (severity) {
       case 'error':
         return <AlertCircle className="h-5 w-5 text-red-600" />;
       case 'warning':
         return <AlertTriangle className="h-5 w-5 text-orange-600" />;
+      case 'success':
+        return <TrendingUp className="h-5 w-5 text-green-600" />;
       default:
         return <Info className="h-5 w-5 text-blue-600" />;
     }
@@ -59,6 +64,30 @@ export function ScoreDisplay({ code, score, interpretation, clinicalAlerts }: Sc
     }
   };
 
+  // Calculations for MDQ details
+  const getMdqDetails = () => {
+    if (code !== 'MDQ_FR') return null;
+    
+    // Sum Q1
+    const q1Keys = [
+      'q1_1', 'q1_2', 'q1_3', 'q1_4', 'q1_5', 'q1_6', 'q1_7', 
+      'q1_8', 'q1_9', 'q1_10', 'q1_11', 'q1_12', 'q1_13'
+    ];
+    const q1Total = q1Keys.reduce((acc, key) => acc + (data[key] ? 1 : 0), 0);
+    
+    const impactLabels = [
+      "Pas de problème", 
+      "Problème mineur", 
+      "Problème moyen", 
+      "Problème sérieux"
+    ];
+    const impactLabel = impactLabels[data.q3] || "N/A";
+
+    return { q1Total, impactLabel };
+  };
+
+  const mdqDetails = getMdqDetails();
+
   return (
     <Card className={`p-4 border-2 ${getScoreColor()}`}>
       <div className="space-y-3">
@@ -75,76 +104,40 @@ export function ScoreDisplay({ code, score, interpretation, clinicalAlerts }: Sc
           <div className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
             <span className="text-xl font-bold">
-              {code === 'MDQ_FR' ? score.screening_result : `${score.total_score}${score.range ? `/${score.range[1]}` : ''}`}
+              {code === 'MDQ_FR' 
+                ? (data.positive_screen ? 'POSITIF' : 'NÉGATIF') 
+                : (data.total_score !== undefined ? data.total_score : '-')}
+              {code === 'ASRM_FR' && '/20'}
+              {code === 'QIDS_SR16_FR' && '/27'}
             </span>
           </div>
         </div>
 
-        {/* Severity/Probability Badge */}
-        {score.severity && (
-          <Badge variant={severity === 'error' ? 'destructive' : severity === 'warning' ? 'default' : 'secondary'}>
-            {score.severity}
-          </Badge>
-        )}
-        
-        {score.probability && (
-          <Badge variant={severity === 'error' || severity === 'warning' ? 'destructive' : 'secondary'}>
-            {score.probability}
-          </Badge>
-        )}
-
-        {/* Domain Scores (QIDS) */}
-        {score.domain_scores && (
-          <div className="grid grid-cols-3 gap-2 text-xs">
-            {Object.entries(score.domain_scores).map(([domain, value]) => (
-              <div key={domain} className="flex justify-between">
-                <span className="capitalize">{domain.replace('_', ' ')}:</span>
-                <span className="font-semibold">{String(value)}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
         {/* MDQ Details */}
-        {code === 'MDQ_FR' && (
-          <div className="text-xs space-y-1">
+        {code === 'MDQ_FR' && mdqDetails && (
+          <div className="text-xs space-y-1 mt-2">
             <div className="flex justify-between">
               <span>Symptômes Q1:</span>
-              <span className="font-semibold">{score.q1_total}/13</span>
+              <span className="font-semibold">{mdqDetails.q1Total}/13</span>
             </div>
             <div className="flex justify-between">
               <span>Simultanéité (Q2):</span>
-              <span className="font-semibold">{score.q2_concurrent ? 'Oui' : 'Non'}</span>
+              <span className="font-semibold">{data.q2 ? 'Oui' : 'Non'}</span>
             </div>
             <div className="flex justify-between">
               <span>Impact (Q3):</span>
-              <span className="font-semibold">{score.q3_impact_label}</span>
+              <span className="font-semibold">{mdqDetails.impactLabel}</span>
             </div>
           </div>
         )}
 
         {/* Interpretation */}
-        <p className="text-sm leading-relaxed">
-          {interpretation}
-        </p>
-
-        {/* Clinical Alerts */}
-        {clinicalAlerts && clinicalAlerts.length > 0 && (
-          <div className={`rounded-md p-3 ${severity === 'error' ? 'bg-red-100' : 'bg-orange-100'}`}>
-            <div className="flex items-start gap-2">
-              <AlertCircle className={`h-4 w-4 mt-0.5 flex-shrink-0 ${severity === 'error' ? 'text-red-700' : 'text-orange-700'}`} />
-              <div className="space-y-1 text-xs">
-                {clinicalAlerts.map((alert, idx) => (
-                  <p key={idx} className={severity === 'error' ? 'text-red-800 font-medium' : 'text-orange-800'}>
-                    {alert}
-                  </p>
-                ))}
-              </div>
-            </div>
-          </div>
+        {interpretation && (
+          <p className="text-sm leading-relaxed font-medium">
+            {interpretation}
+          </p>
         )}
       </div>
     </Card>
   );
 }
-
