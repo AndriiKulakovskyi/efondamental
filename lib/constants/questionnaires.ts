@@ -193,21 +193,21 @@ export const QIDS_DEFINITION: QuestionnaireDefinition = {
 };
 
 export const MDQ_QUESTIONS: Question[] = [
-  { id: "q1_1", text: "1.1 … vous vous sentiez si bien et si remonté que d'autres pensaient que vous n'étiez pas comme d'habitude ou que vous alliez vous attirer des ennuis", type: "boolean", required: true },
-  { id: "q1_2", text: "1.2 … vous étiez si irritable que vous criiez après les gens ou provoquiez des bagarres ou des disputes", type: "boolean", required: true },
-  { id: "q1_3", text: "1.3 … vous vous sentiez beaucoup plus sûr(e) de vous que d'habitude", type: "boolean", required: true },
-  { id: "q1_4", text: "1.4 … vous dormiez beaucoup moins que d'habitude et cela ne vous manquait pas vraiment", type: "boolean", required: true },
-  { id: "q1_5", text: "1.5 … vous étiez beaucoup plus bavard(e) et parliez beaucoup plus vite que d'habitude", type: "boolean", required: true },
-  { id: "q1_6", text: "1.6 … des pensées traversaient rapidement votre tête et vous ne pouviez pas les ralentir", type: "boolean", required: true },
-  { id: "q1_7", text: "1.7 … vous étiez si facilement distrait(e) que vous aviez des difficultés à vous concentrer ou à poursuivre la même idée", type: "boolean", required: true },
-  { id: "q1_8", text: "1.8 … vous aviez beaucoup plus d'énergie que d'habitude", type: "boolean", required: true },
-  { id: "q1_9", text: "1.9 … vous étiez beaucoup plus actif(ve) ou faisiez beaucoup plus de choses que d'habitude", type: "boolean", required: true },
-  { id: "q1_10", text: "1.10 … vous étiez beaucoup plus sociable ou extraverti(e), par ex. vous téléphoniez à vos amis la nuit", type: "boolean", required: true },
-  { id: "q1_11", text: "1.11 … vous étiez beaucoup plus intéressé(e) par le sexe que d'habitude", type: "boolean", required: true },
-  { id: "q1_12", text: "1.12 … vous faisiez des choses inhabituelles ou jugées excessives, imprudentes ou risquées", type: "boolean", required: true },
-  { id: "q1_13", text: "1.13 … vous dépensiez de l'argent d'une manière si inadaptée que cela vous attirait des ennuis pour vous ou votre famille", type: "boolean", required: true },
+  { id: "q1_1", text: "1.1 … vous vous sentiez si bien et si remonté que d'autres pensaient que vous n'étiez pas comme d'habitude ou que vous alliez vous attirer des ennuis", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
+  { id: "q1_2", text: "1.2 … vous étiez si irritable que vous criiez après les gens ou provoquiez des bagarres ou des disputes", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
+  { id: "q1_3", text: "1.3 … vous vous sentiez beaucoup plus sûr(e) de vous que d'habitude", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
+  { id: "q1_4", text: "1.4 … vous dormiez beaucoup moins que d'habitude et cela ne vous manquait pas vraiment", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
+  { id: "q1_5", text: "1.5 … vous étiez beaucoup plus bavard(e) et parliez beaucoup plus vite que d'habitude", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
+  { id: "q1_6", text: "1.6 … des pensées traversaient rapidement votre tête et vous ne pouviez pas les ralentir", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
+  { id: "q1_7", text: "1.7 … vous étiez si facilement distrait(e) que vous aviez des difficultés à vous concentrer ou à poursuivre la même idée", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
+  { id: "q1_8", text: "1.8 … vous aviez beaucoup plus d'énergie que d'habitude", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
+  { id: "q1_9", text: "1.9 … vous étiez beaucoup plus actif(ve) ou faisiez beaucoup plus de choses que d'habitude", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
+  { id: "q1_10", text: "1.10 … vous étiez beaucoup plus sociable ou extraverti(e), par ex. vous téléphoniez à vos amis la nuit", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
+  { id: "q1_11", text: "1.11 … vous étiez beaucoup plus intéressé(e) par le sexe que d'habitude", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
+  { id: "q1_12", text: "1.12 … vous faisiez des choses inhabituelles ou jugées excessives, imprudentes ou risquées", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
+  { id: "q1_13", text: "1.13 … vous dépensiez de l'argent d'une manière si inadaptée que cela vous attirait des ennuis pour vous ou votre famille", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
   
-  { id: "q2", text: "2. Si ≥2 réponses ''oui'' à la Q1, ces réponses sont-elles apparues durant la même période ?", type: "boolean", required: false },
+  { id: "q2", text: "2. Si ≥2 réponses ''oui'' à la Q1, ces réponses sont-elles apparues durant la même période ?", type: "single_choice", required: false, options: [{ code: 1, label: "Oui" }, { code: 0, label: "Non" }] },
   
   { id: "q3", text: "3. À quel point ces problèmes ont-ils eu un impact sur votre fonctionnement ?", type: "single_choice", required: false, options: [
     { code: 0, label: "Pas de problème", score: 0 },
