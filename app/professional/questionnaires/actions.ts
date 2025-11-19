@@ -35,6 +35,9 @@ import {
   saveEtatPatientResponse,
   saveFastResponse
 } from '@/lib/services/questionnaire-hetero.service';
+import {
+  saveSocialResponse
+} from '@/lib/services/questionnaire-social.service';
 import { 
   AsrmResponseInsert, 
   QidsResponseInsert, 
@@ -66,7 +69,8 @@ import {
   EgfResponseInsert,
   AldaResponseInsert,
   EtatPatientResponseInsert,
-  FastResponseInsert
+  FastResponseInsert,
+  SocialResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -304,6 +308,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as FastResponseInsert);
+        break;
+
+      case 'SOCIAL':
+        result = await saveSocialResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as SocialResponseInsert);
         break;
         
       default:

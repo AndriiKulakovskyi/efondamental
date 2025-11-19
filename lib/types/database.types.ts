@@ -909,3 +909,32 @@ export interface FastResponse {
   updated_at: string;
 }
 export type FastResponseInsert = Omit<FastResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'autonomy_score' | 'occupational_score' | 'cognitive_score' | 'financial_score' | 'interpersonal_score' | 'leisure_score' | 'total_score' | 'interpretation'>;
+
+// ============================================================================
+// Social Questionnaire
+// ============================================================================
+
+export interface SocialResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  marital_status?: string | null;
+  education?: string | null;
+  professional_status?: string | null;
+  first_job_age?: string | null;
+  longest_work_period?: number | null;
+  total_work_duration?: number | null;
+  housing_type?: string | null;
+  living_mode?: string | null;
+  household_size?: number | null;
+  main_companion?: string | null;
+  protection_measures?: string | null;
+  current_work_leave?: string | null;
+  past_year_work_leave?: string | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SocialResponseInsert = Omit<SocialResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;

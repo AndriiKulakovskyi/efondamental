@@ -44,6 +44,9 @@ import {
   getFastResponse
 } from './questionnaire-hetero.service';
 import {
+  getSocialResponse
+} from './questionnaire-social.service';
+import {
   ASRM_DEFINITION,
   QIDS_DEFINITION,
   MDQ_DEFINITION,
@@ -78,6 +81,9 @@ import {
   ETAT_PATIENT_DEFINITION,
   FAST_DEFINITION
 } from '../constants/questionnaires-hetero';
+import {
+  SOCIAL_DEFINITION
+} from '../constants/questionnaires-social';
 
 // ============================================================================
 // VISIT CRUD
@@ -377,7 +383,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_social',
         name: 'Social',
         description: 'Évaluation sociale',
-        questionnaires: [] // To be implemented later
+        questionnaires: [SOCIAL_DEFINITION]
       },
       {
         id: 'mod_auto_traits',
@@ -428,13 +434,13 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diag) completed++;
     if (orient) completed++;
   } else if (visit.visit_type === 'initial_evaluation') {
-    total = 25; // 16 auto questionnaires + ASRM + QIDS (reused) + 7 hetero questionnaires
+    total = 26; // 16 auto questionnaires + ASRM + QIDS (reused) + 7 hetero questionnaires + 1 social
     totalModules = 6;
 
     const [
       eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,
       asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti,
-      madrs, ymrs, cgi, egf, alda, etatPatient, fast
+      madrs, ymrs, cgi, egf, alda, etatPatient, fast, social
     ] = await Promise.all([
       // ETAT questionnaires
       getEq5d5lResponse(visitId),
@@ -463,7 +469,9 @@ export async function getVisitCompletionStatus(visitId: string) {
       getEgfResponse(visitId),
       getAldaResponse(visitId),
       getEtatPatientResponse(visitId),
-      getFastResponse(visitId)
+      getFastResponse(visitId),
+      // SOCIAL questionnaire
+      getSocialResponse(visitId)
     ]);
 
     if (eq5d5l) completed++;
@@ -491,6 +499,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (alda) completed++;
     if (etatPatient) completed++;
     if (fast) completed++;
+    if (social) completed++;
   }
 
   return {

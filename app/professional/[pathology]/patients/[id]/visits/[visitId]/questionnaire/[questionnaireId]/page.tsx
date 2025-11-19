@@ -36,6 +36,9 @@ import {
   ETAT_PATIENT_DEFINITION,
   FAST_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
+import {
+  SOCIAL_DEFINITION
+} from "@/lib/constants/questionnaires-social";
 import { 
   getAsrmResponse, 
   getQidsResponse, 
@@ -71,6 +74,9 @@ import {
   getEtatPatientResponse,
   getFastResponse
 } from "@/lib/services/questionnaire-hetero.service";
+import {
+  getSocialResponse
+} from "@/lib/services/questionnaire-social.service";
 import { QuestionnairePageClient } from "./page-client";
 
 export default async function ProfessionalQuestionnairePage({
@@ -119,6 +125,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ALDA_DEFINITION.code) questionnaire = ALDA_DEFINITION;
   else if (code === ETAT_PATIENT_DEFINITION.code) questionnaire = ETAT_PATIENT_DEFINITION;
   else if (code === FAST_DEFINITION.code) questionnaire = FAST_DEFINITION;
+  // Social questionnaire
+  else if (code === SOCIAL_DEFINITION.code) questionnaire = SOCIAL_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -159,6 +167,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ALDA_DEFINITION.code) existingResponse = await getAldaResponse(visitId);
   else if (code === ETAT_PATIENT_DEFINITION.code) existingResponse = await getEtatPatientResponse(visitId);
   else if (code === FAST_DEFINITION.code) existingResponse = await getFastResponse(visitId);
+  // Social questionnaire
+  else if (code === SOCIAL_DEFINITION.code) existingResponse = await getSocialResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

@@ -44,6 +44,9 @@ import {
   getEtatPatientResponse,
   getFastResponse
 } from "@/lib/services/questionnaire-hetero.service";
+import {
+  getSocialResponse
+} from "@/lib/services/questionnaire-social.service";
 import { 
   ASRM_DEFINITION, 
   QIDS_DEFINITION, 
@@ -79,6 +82,9 @@ import {
   ETAT_PATIENT_DEFINITION,
   FAST_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
+import {
+  SOCIAL_DEFINITION
+} from "@/lib/constants/questionnaires-social";
 
 export default async function VisitDetailPage({
   params,
@@ -193,7 +199,9 @@ export default async function VisitDetailPage({
       wurs25Response, aq12Response, csmResponse, ctiResponse,
       // HETERO responses
       madrsResponse, ymrsResponse, cgiResponse, egfResponse, aldaResponse,
-      etatPatientResponse, fastResponse
+      etatPatientResponse, fastResponse,
+      // SOCIAL response
+      socialResponse
     ] = await Promise.all([
       // ETAT
       getEq5d5lResponse(visitId),
@@ -222,7 +230,9 @@ export default async function VisitDetailPage({
       getEgfResponse(visitId),
       getAldaResponse(visitId),
       getEtatPatientResponse(visitId),
-      getFastResponse(visitId)
+      getFastResponse(visitId),
+      // SOCIAL
+      getSocialResponse(visitId)
     ]);
 
     // Module 1: Infirmier (empty for now)
@@ -371,12 +381,20 @@ export default async function VisitDetailPage({
       ]
     };
 
-    // Module 5: Social (empty for now)
+    // Module 5: Social
     const socialModule = {
       id: 'mod_social',
       name: 'Social',
       description: 'Évaluation sociale',
-      questionnaires: []
+      questionnaires: [
+        {
+          ...SOCIAL_DEFINITION,
+          id: SOCIAL_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!socialResponse,
+          completedAt: socialResponse?.completed_at,
+        }
+      ]
     };
 
     // Module 6: Autoquestionnaires - TRAITS
@@ -461,10 +479,11 @@ export default async function VisitDetailPage({
     ];
 
     // Calculate stats
-    const total = thymicModule.questionnaires.length + etatModule.questionnaires.length + traitsModule.questionnaires.length;
+    const total = thymicModule.questionnaires.length + etatModule.questionnaires.length + socialModule.questionnaires.length + traitsModule.questionnaires.length;
     const completed = 
       thymicModule.questionnaires.filter(q => q.completed).length +
       etatModule.questionnaires.filter(q => q.completed).length + 
+      socialModule.questionnaires.filter(q => q.completed).length +
       traitsModule.questionnaires.filter(q => q.completed).length;
     
     completionStatus = {

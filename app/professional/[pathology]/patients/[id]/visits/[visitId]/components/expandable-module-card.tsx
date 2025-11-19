@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, CheckCircle, Circle, FileText, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatShortDate } from "@/lib/utils/date";
 import Link from "next/link";
 
 interface ExpandableModuleCardProps {
@@ -126,7 +127,7 @@ export function ExpandableModuleCard({
                         <>
                           <span className="text-xs text-slate-400">•</span>
                           <p className="text-xs text-slate-500">
-                            Completed {new Date(questionnaire.completedAt).toLocaleDateString()}
+                            Completed {formatShortDate(questionnaire.completedAt)}
                           </p>
                         </>
                       )}
