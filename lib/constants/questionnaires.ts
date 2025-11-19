@@ -1,4 +1,3 @@
-
 import { Question } from '@/lib/types/database.types';
 
 export type QuestionnaireDefinition = {
@@ -7,6 +6,7 @@ export type QuestionnaireDefinition = {
   title: string;
   description: string;
   questions: Question[];
+  metadata?: Record<string, any>;
 };
 
 export const ASRM_QUESTIONS: Question[] = [
@@ -225,57 +225,134 @@ export const MDQ_DEFINITION: QuestionnaireDefinition = {
   questions: MDQ_QUESTIONS
 };
 
+// Diagnostic - Main diagnostic form for medical evaluation
 export const DIAGNOSTIC_QUESTIONS: Question[] = [
   {
-    id: "diagnostic_principal",
-    type: "single_choice",
-    text: "Diagnostic principal",
+    id: 'date_recueil',
+    text: 'Date de recueil des informations',
+    type: 'date',
+    required: true,
+    metadata: { default: 'today' }
+  },
+  {
+    id: 'diag_prealable',
+    text: 'Diagnostic de trouble bipolaire posé préalablement',
+    type: 'single_choice',
     required: true,
     options: [
-      { code: "bipolar_1", label: "Trouble bipolaire type I" },
-      { code: "bipolar_2", label: "Trouble bipolaire type II" },
-      { code: "cyclothymia", label: "Trouble cyclothymique" },
-      { code: "other_bipolar", label: "Autre trouble du spectre bipolaire" },
-      { code: "no_bipolar", label: "Pas de diagnostic bipolaire" }
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'je_ne_sais_pas', label: 'Je ne sais pas' }
     ]
   },
   {
-    id: "episode_actuel",
-    type: "single_choice",
-    text: "Épisode actuel",
-    required: false,
+    id: 'diag_evoque',
+    text: 'Diagnostic de trouble bipolaire évoqué au terme du screening',
+    type: 'single_choice',
+    required: true,
     options: [
-      { code: "manic", label: "Maniaque" },
-      { code: "hypomanic", label: "Hypomaniaque" },
-      { code: "depressive", label: "Dépressif" },
-      { code: "mixed", label: "Mixte" },
-      { code: "euthymic", label: "Euthymique" }
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'differe', label: 'Différé' }
     ]
   },
+  
+  // Branch 1: If 'oui' -> Bilan programmé
   {
-    id: "comorbidites",
-    type: "multiple_choice",
-    text: "Comorbidités psychiatriques",
-    required: false,
+    id: 'bilan_programme',
+    text: 'Bilan programmé',
+    type: 'single_choice',
+    required: false, // Required via logic
+    display_if: {
+      "==": [{ "var": "answers.diag_evoque" }, "oui"]
+    },
+    required_if: {
+      "==": [{ "var": "answers.diag_evoque" }, "oui"]
+    },
     options: [
-      "Trouble anxieux",
-      "Trouble de l'usage de substances",
-      "TDAH",
-      "Trouble de la personnalité",
-      "Autre"
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
     ]
   },
   {
-    id: "antecedents_psychiatriques",
-    type: "text",
-    text: "Antécédents psychiatriques",
-    required: false
+    id: 'bilan_programme_precision',
+    text: 'Si non, préciser',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      "and": [
+        { "==": [{ "var": "answers.diag_evoque" }, "oui"] },
+        { "==": [{ "var": "answers.bilan_programme" }, "non"] }
+      ]
+    },
+    required_if: {
+      "and": [
+        { "==": [{ "var": "answers.diag_evoque" }, "oui"] },
+        { "==": [{ "var": "answers.bilan_programme" }, "non"] }
+      ]
+    },
+    options: [
+      { code: 'diagnostic_refuse', label: 'Diagnostic refusé' },
+      { code: 'etat_clinique_incompatible', label: 'Etat clinique non compatible lors de la visite de screening' },
+      { code: 'consultation_suffisante', label: 'Consultation spécialisée de screening suffisante pour donner un avis' },
+      { code: 'patient_non_disponible', label: 'Patient non disponible' },
+      { code: 'refus_patient', label: 'Refus du patient' },
+      { code: 'autre', label: 'Autre' }
+    ]
+  },
+
+  // Branch 2: If 'non' -> Préciser diagnostic probable
+  {
+    id: 'diag_recuse_precision',
+    text: 'Si diagnostic récusé lors du screening, préciser le diagnostic le plus probable',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      "==": [{ "var": "answers.diag_evoque" }, "non"]
+    },
+    required_if: {
+      "==": [{ "var": "answers.diag_evoque" }, "non"]
+    },
+    options: [
+      { code: 'edm_unipolaire', label: 'EDM / Unipolaire' },
+      { code: 'schizo_affectif', label: 'Schizo-affectif' },
+      { code: 'schizophrene', label: 'Schizophrène' },
+      { code: 'borderline', label: 'Borderline' },
+      { code: 'autres_troubles_personnalite', label: 'Autres troubles de la personnalité' },
+      { code: 'addiction', label: 'Addiction' },
+      { code: 'autres', label: 'Autres' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
   },
   {
-    id: "notes_cliniques",
-    type: "text",
-    text: "Notes cliniques",
-    required: false
+    id: 'diag_recuse_autre_text',
+    text: 'Préciser (Autres)',
+    type: 'text',
+    required: false,
+    display_if: {
+      "and": [
+        { "==": [{ "var": "answers.diag_evoque" }, "non"] },
+        { "==": [{ "var": "answers.diag_recuse_precision" }, "autres"] }
+      ]
+    },
+    required_if: {
+      "and": [
+        { "==": [{ "var": "answers.diag_evoque" }, "non"] },
+        { "==": [{ "var": "answers.diag_recuse_precision" }, "autres"] }
+      ]
+    }
+  },
+
+  // 4. Lettre d'information
+  {
+    id: 'lettre_information',
+    text: "Lettre d'information remise au patient",
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   }
 ];
 
@@ -283,59 +360,80 @@ export const DIAGNOSTIC_DEFINITION: QuestionnaireDefinition = {
   id: 'diagnostic',
   code: 'EBIP_SCR_DIAG',
   title: 'Diagnostic',
-  description: 'Évaluation diagnostique clinique',
-  questions: DIAGNOSTIC_QUESTIONS
+  description: 'Évaluation diagnostique et orientation',
+  questions: DIAGNOSTIC_QUESTIONS,
+  metadata: {
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
 };
 
-export const ORIENTATION_QUESTIONS: Question[] = [
+// Orientation Centre Expert - Specific to bipolar disorder screening
+export const BIPOLAR_ORIENTATION_QUESTIONS: Question[] = [
   {
-    id: "eligible_centre_expert",
-    type: "boolean",
-    text: "Patient éligible pour orientation vers centre expert",
-    required: true
-  },
-  {
-    id: "criteres_eligibilite",
-    type: "multiple_choice",
-    text: "Critères d'éligibilité remplis",
-    required: false,
+    id: 'trouble_bipolaire_ou_suspicion',
+    text: 'Patient souffrant d\'un trouble bipolaire ou suspicion de trouble bipolaire',
+    type: 'single_choice',
+    required: true,
     options: [
-      "Diagnostic de trouble bipolaire confirmé",
-      "Acceptation du suivi",
-      "Disponibilité pour les visites régulières",
-      "Consentement éclairé"
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
     ]
   },
   {
-    id: "urgence_orientation",
-    type: "single_choice",
-    text: "Urgence de l'orientation",
-    required: false,
+    id: 'etat_thymique_compatible',
+    text: 'Etat thymique compatible avec l\'évaluation',
+    type: 'single_choice',
+    required: true,
     options: [
-      { code: "immediate", label: "Immédiate" },
-      { code: "rapid", label: "Rapide (sous 2 semaines)" },
-      { code: "standard", label: "Standard (sous 1 mois)" }
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
     ]
   },
   {
-    id: "centre_expert_propose",
-    type: "text",
-    text: "Centre expert proposé",
-    required: false
+    id: 'prise_en_charge_100_ou_accord',
+    text: 'Prise en charge à 100% ou accord du patient pour assumer les frais',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
-    id: "commentaires",
-    type: "text",
-    text: "Commentaires sur l'orientation",
-    required: false
+    id: 'accord_evaluation_centre_expert',
+    text: 'Accord du patient pour une évaluation dans le cadre du centre expert',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'accord_transmission_cr',
+    text: 'Accord du patient pour une transmission du CR à son psychiatre référent',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   }
 ];
 
-export const ORIENTATION_DEFINITION: QuestionnaireDefinition = {
-  id: 'orientation',
+export const BIPOLAR_ORIENTATION_DEFINITION: QuestionnaireDefinition = {
+  id: 'bipolar_orientation',
   code: 'EBIP_SCR_ORIENT',
   title: 'Orientation Centre Expert',
-  description: "Décision d'orientation vers un centre expert",
-  questions: ORIENTATION_QUESTIONS
+  description: 'Critères d\'orientation vers un centre expert pour trouble bipolaire',
+  questions: BIPOLAR_ORIENTATION_QUESTIONS,
+  metadata: {
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
 };
 
+// Legacy export for backwards compatibility
+export const ORIENTATION_DEFINITION = BIPOLAR_ORIENTATION_DEFINITION;
+export const ORIENTATION_QUESTIONS = BIPOLAR_ORIENTATION_QUESTIONS;

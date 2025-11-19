@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,10 +35,26 @@ export function QuestionnaireRenderer({
   onSave,
   readonly = false,
 }: QuestionnaireRendererProps) {
-  const [responses, setResponses] = useState<Record<string, any>>(initialResponses);
+  // Initialize responses with defaults for date fields
+  const initializeResponses = useCallback(() => {
+    const initialized = { ...initialResponses };
+    questionnaire.questions.forEach((q) => {
+      if (q.type === 'date' && q.metadata?.default === 'today' && !initialized[q.id]) {
+        initialized[q.id] = new Date().toISOString().split('T')[0];
+      }
+    });
+    return initialized;
+  }, [initialResponses, questionnaire.questions]);
+
+  const [responses, setResponses] = useState<Record<string, any>>(initializeResponses);
   const [errors, setErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Update responses when initialResponses changes
+  useEffect(() => {
+    setResponses(initializeResponses());
+  }, [initializeResponses]);
 
   const { visibleQuestions, requiredQuestions } = evaluateConditionalLogic(
     questionnaire,
@@ -154,7 +170,7 @@ export function QuestionnaireRenderer({
 
         {question.type === "single_choice" && question.options && (
           <Select
-            value={value !== undefined ? value.toString() : ""}
+            value={value !== undefined && value !== null ? value.toString() : ""}
             onValueChange={(val) => {
               // Try to convert to number if the option code is a number
               const numVal = Number(val);
@@ -173,7 +189,7 @@ export function QuestionnaireRenderer({
                 const optionValue = typeof option === 'string' ? option : option.code;
                 const optionLabel = typeof option === 'string' ? option : option.label;
                 return (
-                  <SelectItem key={optionValue.toString()} value={optionValue.toString()}>
+                  <SelectItem key={optionValue?.toString() || ''} value={optionValue?.toString() || ''}>
                     {optionLabel}
                   </SelectItem>
                 );
@@ -190,7 +206,7 @@ export function QuestionnaireRenderer({
               const optionLabel = typeof option === 'string' ? option : option.label;
               const checked = Array.isArray(value) && value.includes(optionValue);
               return (
-                <div key={optionValue.toString()} className="flex items-center space-x-2">
+                <div key={optionValue?.toString() || ''} className="flex items-center space-x-2">
                   <Checkbox
                     id={`${question.id}-${optionValue}`}
                     checked={checked}

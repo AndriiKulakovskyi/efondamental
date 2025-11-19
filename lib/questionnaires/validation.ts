@@ -159,6 +159,10 @@ export function evaluateCondition(
     const [left, right] = condition['=='];
     const leftValue = evaluateExpression(left, answers);
     const rightValue = evaluateExpression(right, answers);
+    // Use loose equality to handle null/undefined cases but strict for actual values
+    if (leftValue === null || leftValue === undefined) {
+      return rightValue === null || rightValue === undefined;
+    }
     return leftValue === rightValue;
   }
 
@@ -177,6 +181,10 @@ function evaluateExpression(expr: any, answers: QuestionnaireAnswers): any {
   if (typeof expr === 'number') {
     return expr;
   }
+  
+  if (typeof expr === 'string') {
+    return expr;
+  }
 
   if (expr['+']) {
     return expr['+'].reduce((sum: number, item: any) => {
@@ -189,9 +197,9 @@ function evaluateExpression(expr: any, answers: QuestionnaireAnswers): any {
     // Support for "answers.q1_1" format
     if (varPath.startsWith('answers.')) {
       const key = varPath.substring(8);
-      return answers[key] || 0;
+      return answers[key] !== undefined ? answers[key] : null;
     }
-    return answers[varPath] || 0;
+    return answers[varPath] !== undefined ? answers[varPath] : null;
   }
 
   return expr;

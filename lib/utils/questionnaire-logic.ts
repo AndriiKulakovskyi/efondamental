@@ -26,11 +26,11 @@ export function evaluateConditionalLogic(
     if (isVisible) {
       visibleQuestions.push(q.id);
       
-      // Check if required
-      const isRequired = q.required || (q.required !== false && q.metadata?.required === true); // Normalize required
-      // Note: The Question interface has 'required: boolean'. 
-      // But if we have conditional requirement, we might store it in a special field or use logic.
-      // For now, we assume static required. If we need conditional required, we'd need to add 'required_if' to Question interface.
+      // Check if required - either static or conditional
+      let isRequired = q.required;
+      if (q.required_if) {
+        isRequired = evaluateJSONLogicCondition(q.required_if, responses);
+      }
       
       if (isRequired) {
         requiredQuestions.push(q.id);

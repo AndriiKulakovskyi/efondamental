@@ -52,7 +52,7 @@ export default async function ProfessionalQuestionnairePage({
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).
-  // For Diagnostic/Orientation, keys match columns (diagnostic_principal...).
+  // For Diagnostic/Orientation, keys match columns.
   // So we can just pass the object, filtering out metadata.
   
   let initialResponses = {};
