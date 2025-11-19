@@ -34,6 +34,16 @@ import {
   getCtiResponse
 } from './questionnaire.service';
 import {
+  // Hetero questionnaires
+  getMadrsResponse,
+  getYmrsResponse,
+  getCgiResponse,
+  getEgfResponse,
+  getAldaResponse,
+  getEtatPatientResponse,
+  getFastResponse
+} from './questionnaire-hetero.service';
+import {
   ASRM_DEFINITION,
   QIDS_DEFINITION,
   MDQ_DEFINITION,
@@ -58,6 +68,16 @@ import {
   CSM_DEFINITION,
   CTI_DEFINITION
 } from '../constants/questionnaires';
+import {
+  // Hetero questionnaire definitions
+  MADRS_DEFINITION,
+  YMRS_DEFINITION,
+  CGI_DEFINITION,
+  EGF_DEFINITION,
+  ALDA_DEFINITION,
+  ETAT_PATIENT_DEFINITION,
+  FAST_DEFINITION
+} from '../constants/questionnaires-hetero';
 
 // ============================================================================
 // VISIT CRUD
@@ -321,7 +341,15 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_thymic_eval',
         name: 'Evaluation état thymique et fonctionnement',
         description: 'Évaluation de l\'état thymique et du fonctionnement',
-        questionnaires: [] // To be implemented later
+        questionnaires: [
+          MADRS_DEFINITION,
+          YMRS_DEFINITION,
+          CGI_DEFINITION,
+          EGF_DEFINITION,
+          ALDA_DEFINITION,
+          ETAT_PATIENT_DEFINITION,
+          FAST_DEFINITION
+        ]
       },
       {
         id: 'mod_medical_eval',
@@ -400,12 +428,13 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diag) completed++;
     if (orient) completed++;
   } else if (visit.visit_type === 'initial_evaluation') {
-    total = 18; // 16 new questionnaires + ASRM + QIDS (reused from screening)
+    total = 25; // 16 auto questionnaires + ASRM + QIDS (reused) + 7 hetero questionnaires
     totalModules = 6;
 
     const [
       eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,
-      asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti
+      asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti,
+      madrs, ymrs, cgi, egf, alda, etatPatient, fast
     ] = await Promise.all([
       // ETAT questionnaires
       getEq5d5lResponse(visitId),
@@ -426,7 +455,15 @@ export async function getVisitCompletionStatus(visitId: string) {
       getWurs25Response(visitId),
       getAq12Response(visitId),
       getCsmResponse(visitId),
-      getCtiResponse(visitId)
+      getCtiResponse(visitId),
+      // HETERO questionnaires
+      getMadrsResponse(visitId),
+      getYmrsResponse(visitId),
+      getCgiResponse(visitId),
+      getEgfResponse(visitId),
+      getAldaResponse(visitId),
+      getEtatPatientResponse(visitId),
+      getFastResponse(visitId)
     ]);
 
     if (eq5d5l) completed++;
@@ -447,6 +484,13 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (aq12) completed++;
     if (csm) completed++;
     if (cti) completed++;
+    if (madrs) completed++;
+    if (ymrs) completed++;
+    if (cgi) completed++;
+    if (egf) completed++;
+    if (alda) completed++;
+    if (etatPatient) completed++;
+    if (fast) completed++;
   }
 
   return {

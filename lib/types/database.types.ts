@@ -732,3 +732,180 @@ export interface CtiResponse {
 }
 
 export type CtiResponseInsert = Omit<CtiResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
+// Hetero Questionnaires (Clinician-Rated)
+// ============================================================================
+
+// MADRS (Montgomery-Åsberg Depression Rating Scale)
+export interface MadrsResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  q1?: number | null; // Tristesse apparente (0-6)
+  q2?: number | null; // Tristesse exprimée (0-6)
+  q3?: number | null; // Tension intérieure (0-6)
+  q4?: number | null; // Réduction du sommeil (0-6)
+  q5?: number | null; // Réduction de l'appétit (0-6)
+  q6?: number | null; // Difficultés de concentration (0-6)
+  q7?: number | null; // Lassitude (0-6)
+  q8?: number | null; // Incapacité à ressentir (0-6)
+  q9?: number | null; // Pensées pessimistes (0-6)
+  q10?: number | null; // Idées de suicide (0-6)
+  total_score?: number | null;
+  interpretation?: string | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+export type MadrsResponseInsert = Omit<MadrsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score' | 'interpretation'>;
+
+// YMRS (Young Mania Rating Scale)
+export interface YmrsResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  q1?: number | null; // Élévation de l'humeur (0-4)
+  q2?: number | null; // Augmentation de l'activité motrice (0-4)
+  q3?: number | null; // Intérêt sexuel (0-4)
+  q4?: number | null; // Sommeil (0-4)
+  q5?: number | null; // Irritabilité (0-8, double weighted)
+  q6?: number | null; // Débit verbal (0-8, double weighted)
+  q7?: number | null; // Troubles du cours de la pensée (0-4)
+  q8?: number | null; // Contenu de la pensée (0-8, double weighted)
+  q9?: number | null; // Comportement agressif (0-8, double weighted)
+  q10?: number | null; // Apparence (0-4)
+  q11?: number | null; // Insight (0-4)
+  total_score?: number | null;
+  interpretation?: string | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+export type YmrsResponseInsert = Omit<YmrsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score' | 'interpretation'>;
+
+// CGI (Clinical Global Impressions)
+export interface CgiResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  visit_type?: 'baseline' | 'followup' | null;
+  cgi_s?: number | null; // Severity (0-7, 0=not assessed)
+  cgi_i?: number | null; // Improvement (0-7, 0=not assessed, only for followup)
+  therapeutic_effect?: number | null; // 0-4, 0=not assessed
+  side_effects?: number | null; // 0-4, 0=not assessed
+  therapeutic_index?: number | null;
+  therapeutic_index_label?: string | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+export type CgiResponseInsert = Omit<CgiResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'therapeutic_index' | 'therapeutic_index_label'>;
+
+// EGF (Échelle de Fonctionnement Global)
+export interface EgfResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  current_functioning?: number | null; // 1-100
+  worst_past_year?: number | null; // 1-100
+  best_past_year?: number | null; // 1-100
+  current_interpretation?: string | null;
+  worst_interpretation?: string | null;
+  best_interpretation?: string | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+export type EgfResponseInsert = Omit<EgfResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'current_interpretation' | 'worst_interpretation' | 'best_interpretation'>;
+
+// ALDA (Lithium Response Scale)
+export interface AldaResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  a_score?: number | null; // 0-10
+  b1?: number | null; // 0-2
+  b2?: number | null; // 0-2
+  b3?: number | null; // 0-2
+  b4?: number | null; // 0-2
+  b5?: number | null; // 0-2
+  b_total_score?: number | null;
+  alda_score?: number | null; // A - B
+  interpretation?: string | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+export type AldaResponseInsert = Omit<AldaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'b_total_score' | 'alda_score' | 'interpretation'>;
+
+// Etat du patient (Patient State)
+export interface EtatPatientResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  euthymia_severity?: number | null; // 0-3
+  euthymia_duration?: number | null;
+  mania_severity?: number | null; // 0-3
+  mania_duration?: number | null;
+  depression_severity?: number | null; // 0-3
+  depression_duration?: number | null;
+  mixed_severity?: number | null; // 0-3
+  mixed_duration?: number | null;
+  current_state?: string | null;
+  state_details?: string | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+export type EtatPatientResponseInsert = Omit<EtatPatientResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'current_state' | 'state_details'>;
+
+// FAST (Functioning Assessment Short Test)
+export interface FastResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  q1?: number | null;
+  q2?: number | null;
+  q3?: number | null;
+  q4?: number | null;
+  q5?: number | null;
+  q6?: number | null;
+  q7?: number | null;
+  q8?: number | null;
+  q9?: number | null;
+  q10?: number | null;
+  q11?: number | null;
+  q12?: number | null;
+  q13?: number | null;
+  q14?: number | null;
+  q15?: number | null;
+  q16?: number | null;
+  q17?: number | null;
+  q18?: number | null;
+  q19?: number | null;
+  q20?: number | null;
+  q21?: number | null;
+  q22?: number | null;
+  q23?: number | null;
+  q24?: number | null;
+  autonomy_score?: number | null;
+  occupational_score?: number | null;
+  cognitive_score?: number | null;
+  financial_score?: number | null;
+  interpersonal_score?: number | null;
+  leisure_score?: number | null;
+  total_score?: number | null;
+  interpretation?: string | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+export type FastResponseInsert = Omit<FastResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'autonomy_score' | 'occupational_score' | 'cognitive_score' | 'financial_score' | 'interpersonal_score' | 'leisure_score' | 'total_score' | 'interpretation'>;

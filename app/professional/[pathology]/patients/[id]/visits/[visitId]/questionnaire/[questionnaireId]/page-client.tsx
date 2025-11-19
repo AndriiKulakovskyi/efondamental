@@ -61,7 +61,9 @@ export function QuestionnairePageClient({
         'ASRM_FR', 'QIDS_SR16_FR', 'MDQ_FR',
         // Initial Evaluation questionnaires all have scoring
         'EQ5D5L', 'PRISE_M', 'STAI_YA', 'MARS', 'MATHYS', 'PSQI', 'EPWORTH',
-        'ASRS', 'CTQ', 'BIS10', 'ALS18', 'AIM', 'WURS25', 'AQ12', 'CSM', 'CTI'
+        'ASRS', 'CTQ', 'BIS10', 'ALS18', 'AIM', 'WURS25', 'AQ12', 'CSM', 'CTI',
+        // Hetero questionnaires all have scoring
+        'MADRS', 'YMRS', 'CGI', 'EGF', 'ALDA', 'ETAT_PATIENT', 'FAST'
       ].includes(questionnaire.code);
       if (!hasScoring) {
          router.back();

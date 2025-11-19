@@ -34,6 +34,16 @@ import {
   getCsmResponse,
   getCtiResponse
 } from "@/lib/services/questionnaire.service";
+import {
+  // Hetero questionnaires
+  getMadrsResponse,
+  getYmrsResponse,
+  getCgiResponse,
+  getEgfResponse,
+  getAldaResponse,
+  getEtatPatientResponse,
+  getFastResponse
+} from "@/lib/services/questionnaire-hetero.service";
 import { 
   ASRM_DEFINITION, 
   QIDS_DEFINITION, 
@@ -59,6 +69,16 @@ import {
   CSM_DEFINITION,
   CTI_DEFINITION
 } from "@/lib/constants/questionnaires";
+import {
+  // Hetero questionnaires
+  MADRS_DEFINITION,
+  YMRS_DEFINITION,
+  CGI_DEFINITION,
+  EGF_DEFINITION,
+  ALDA_DEFINITION,
+  ETAT_PATIENT_DEFINITION,
+  FAST_DEFINITION
+} from "@/lib/constants/questionnaires-hetero";
 
 export default async function VisitDetailPage({
   params,
@@ -170,7 +190,10 @@ export default async function VisitDetailPage({
       asrmResponse, qidsResponse, psqiResponse, epworthResponse,
       // TRAITS responses
       asrsResponse, ctqResponse, bis10Response, als18Response, aimResponse,
-      wurs25Response, aq12Response, csmResponse, ctiResponse
+      wurs25Response, aq12Response, csmResponse, ctiResponse,
+      // HETERO responses
+      madrsResponse, ymrsResponse, cgiResponse, egfResponse, aldaResponse,
+      etatPatientResponse, fastResponse
     ] = await Promise.all([
       // ETAT
       getEq5d5lResponse(visitId),
@@ -191,7 +214,15 @@ export default async function VisitDetailPage({
       getWurs25Response(visitId),
       getAq12Response(visitId),
       getCsmResponse(visitId),
-      getCtiResponse(visitId)
+      getCtiResponse(visitId),
+      // HETERO
+      getMadrsResponse(visitId),
+      getYmrsResponse(visitId),
+      getCgiResponse(visitId),
+      getEgfResponse(visitId),
+      getAldaResponse(visitId),
+      getEtatPatientResponse(visitId),
+      getFastResponse(visitId)
     ]);
 
     // Module 1: Infirmier (empty for now)
@@ -202,12 +233,62 @@ export default async function VisitDetailPage({
       questionnaires: []
     };
 
-    // Module 2: Evaluation état thymique et fonctionnement (empty for now)
+    // Module 2: Evaluation état thymique et fonctionnement
     const thymicModule = {
       id: 'mod_thymic_eval',
       name: 'Evaluation état thymique et fonctionnement',
       description: 'Évaluation de l\'état thymique et du fonctionnement',
-      questionnaires: []
+      questionnaires: [
+        {
+          ...MADRS_DEFINITION,
+          id: MADRS_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!madrsResponse,
+          completedAt: madrsResponse?.completed_at,
+        },
+        {
+          ...YMRS_DEFINITION,
+          id: YMRS_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!ymrsResponse,
+          completedAt: ymrsResponse?.completed_at,
+        },
+        {
+          ...CGI_DEFINITION,
+          id: CGI_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!cgiResponse,
+          completedAt: cgiResponse?.completed_at,
+        },
+        {
+          ...EGF_DEFINITION,
+          id: EGF_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!egfResponse,
+          completedAt: egfResponse?.completed_at,
+        },
+        {
+          ...ALDA_DEFINITION,
+          id: ALDA_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!aldaResponse,
+          completedAt: aldaResponse?.completed_at,
+        },
+        {
+          ...ETAT_PATIENT_DEFINITION,
+          id: ETAT_PATIENT_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!etatPatientResponse,
+          completedAt: etatPatientResponse?.completed_at,
+        },
+        {
+          ...FAST_DEFINITION,
+          id: FAST_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!fastResponse,
+          completedAt: fastResponse?.completed_at,
+        }
+      ]
     };
 
     // Module 3: Evaluation Médicale (empty for now)
@@ -380,8 +461,9 @@ export default async function VisitDetailPage({
     ];
 
     // Calculate stats
-    const total = etatModule.questionnaires.length + traitsModule.questionnaires.length;
+    const total = thymicModule.questionnaires.length + etatModule.questionnaires.length + traitsModule.questionnaires.length;
     const completed = 
+      thymicModule.questionnaires.filter(q => q.completed).length +
       etatModule.questionnaires.filter(q => q.completed).length + 
       traitsModule.questionnaires.filter(q => q.completed).length;
     

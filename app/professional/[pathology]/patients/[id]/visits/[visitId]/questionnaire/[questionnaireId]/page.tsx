@@ -26,6 +26,16 @@ import {
   CTI_DEFINITION,
   QuestionnaireDefinition 
 } from "@/lib/constants/questionnaires";
+import {
+  // Hetero questionnaires
+  MADRS_DEFINITION,
+  YMRS_DEFINITION,
+  CGI_DEFINITION,
+  EGF_DEFINITION,
+  ALDA_DEFINITION,
+  ETAT_PATIENT_DEFINITION,
+  FAST_DEFINITION
+} from "@/lib/constants/questionnaires-hetero";
 import { 
   getAsrmResponse, 
   getQidsResponse, 
@@ -51,6 +61,16 @@ import {
   getCsmResponse,
   getCtiResponse
 } from "@/lib/services/questionnaire.service";
+import {
+  // Hetero questionnaires
+  getMadrsResponse,
+  getYmrsResponse,
+  getCgiResponse,
+  getEgfResponse,
+  getAldaResponse,
+  getEtatPatientResponse,
+  getFastResponse
+} from "@/lib/services/questionnaire-hetero.service";
 import { QuestionnairePageClient } from "./page-client";
 
 export default async function ProfessionalQuestionnairePage({
@@ -91,6 +111,14 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === AQ12_DEFINITION.code) questionnaire = AQ12_DEFINITION;
   else if (code === CSM_DEFINITION.code) questionnaire = CSM_DEFINITION;
   else if (code === CTI_DEFINITION.code) questionnaire = CTI_DEFINITION;
+  // Hetero questionnaires
+  else if (code === MADRS_DEFINITION.code) questionnaire = MADRS_DEFINITION;
+  else if (code === YMRS_DEFINITION.code) questionnaire = YMRS_DEFINITION;
+  else if (code === CGI_DEFINITION.code) questionnaire = CGI_DEFINITION;
+  else if (code === EGF_DEFINITION.code) questionnaire = EGF_DEFINITION;
+  else if (code === ALDA_DEFINITION.code) questionnaire = ALDA_DEFINITION;
+  else if (code === ETAT_PATIENT_DEFINITION.code) questionnaire = ETAT_PATIENT_DEFINITION;
+  else if (code === FAST_DEFINITION.code) questionnaire = FAST_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -123,6 +151,14 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === AQ12_DEFINITION.code) existingResponse = await getAq12Response(visitId);
   else if (code === CSM_DEFINITION.code) existingResponse = await getCsmResponse(visitId);
   else if (code === CTI_DEFINITION.code) existingResponse = await getCtiResponse(visitId);
+  // Hetero questionnaires
+  else if (code === MADRS_DEFINITION.code) existingResponse = await getMadrsResponse(visitId);
+  else if (code === YMRS_DEFINITION.code) existingResponse = await getYmrsResponse(visitId);
+  else if (code === CGI_DEFINITION.code) existingResponse = await getCgiResponse(visitId);
+  else if (code === EGF_DEFINITION.code) existingResponse = await getEgfResponse(visitId);
+  else if (code === ALDA_DEFINITION.code) existingResponse = await getAldaResponse(visitId);
+  else if (code === ETAT_PATIENT_DEFINITION.code) existingResponse = await getEtatPatientResponse(visitId);
+  else if (code === FAST_DEFINITION.code) existingResponse = await getFastResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

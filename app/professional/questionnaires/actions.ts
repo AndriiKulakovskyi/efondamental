@@ -25,6 +25,16 @@ import {
   saveCsmResponse,
   saveCtiResponse
 } from '@/lib/services/questionnaire.service';
+import {
+  // Hetero questionnaires
+  saveMadrsResponse,
+  saveYmrsResponse,
+  saveCgiResponse,
+  saveEgfResponse,
+  saveAldaResponse,
+  saveEtatPatientResponse,
+  saveFastResponse
+} from '@/lib/services/questionnaire-hetero.service';
 import { 
   AsrmResponseInsert, 
   QidsResponseInsert, 
@@ -48,7 +58,15 @@ import {
   Wurs25ResponseInsert,
   Aq12ResponseInsert,
   CsmResponseInsert,
-  CtiResponseInsert
+  CtiResponseInsert,
+  // Hetero questionnaires
+  MadrsResponseInsert,
+  YmrsResponseInsert,
+  CgiResponseInsert,
+  EgfResponseInsert,
+  AldaResponseInsert,
+  EtatPatientResponseInsert,
+  FastResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -229,6 +247,63 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as CtiResponseInsert);
+        break;
+
+      // Hetero questionnaires
+      case 'MADRS':
+        result = await saveMadrsResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as MadrsResponseInsert);
+        break;
+
+      case 'YMRS':
+        result = await saveYmrsResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as YmrsResponseInsert);
+        break;
+
+      case 'CGI':
+        result = await saveCgiResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as CgiResponseInsert);
+        break;
+
+      case 'EGF':
+        result = await saveEgfResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as EgfResponseInsert);
+        break;
+
+      case 'ALDA':
+        result = await saveAldaResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as AldaResponseInsert);
+        break;
+
+      case 'ETAT_PATIENT':
+        result = await saveEtatPatientResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as EtatPatientResponseInsert);
+        break;
+
+      case 'FAST':
+        result = await saveFastResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as FastResponseInsert);
         break;
         
       default:
