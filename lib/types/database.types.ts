@@ -938,3 +938,44 @@ export interface SocialResponse {
 }
 
 export type SocialResponseInsert = Omit<SocialResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ===== Tobacco Assessment Response =====
+export interface TobaccoResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  smoking_status: 'non_smoker' | 'current_smoker' | 'ex_smoker' | 'unknown';
+  pack_years?: number | null;
+  smoking_start_age?: string | null;
+  smoking_end_age?: string | null;
+  has_substitution?: boolean | null;
+  substitution_methods?: string[] | null; // Array of substitution method codes
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type TobaccoResponseInsert = Omit<TobaccoResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ===== Fagerstrom Test for Nicotine Dependence =====
+export interface FagerstromResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  q1: number; // Time to first cigarette (0-3)
+  q2: number; // Difficult to refrain (0-1)
+  q3: number; // Which cigarette hardest to give up (0-1)
+  q4: number; // Cigarettes per day (0-3)
+  q5: number; // Smoke more in morning (0-1)
+  q6: number; // Smoke when ill (0-1)
+  total_score?: number;
+  dependence_level?: string | null;
+  interpretation?: string | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type FagerstromResponseInsert = Omit<FagerstromResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score'>;

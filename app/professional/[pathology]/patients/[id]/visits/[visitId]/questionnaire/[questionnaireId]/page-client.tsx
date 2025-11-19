@@ -63,7 +63,11 @@ export function QuestionnairePageClient({
         'EQ5D5L', 'PRISE_M', 'STAI_YA', 'MARS', 'MATHYS', 'PSQI', 'EPWORTH',
         'ASRS', 'CTQ', 'BIS10', 'ALS18', 'AIM', 'WURS25', 'AQ12', 'CSM', 'CTI',
         // Hetero questionnaires all have scoring
-        'MADRS', 'YMRS', 'CGI', 'EGF', 'ALDA', 'ETAT_PATIENT', 'FAST'
+        'MADRS', 'YMRS', 'CGI', 'EGF', 'ALDA', 'ETAT_PATIENT', 'FAST',
+        // Social questionnaire has no scoring but we track completion
+        'SOCIAL',
+        // Infirmier questionnaires - Fagerstrom has scoring, Tobacco doesn't
+        'TOBACCO', 'FAGERSTROM'
       ].includes(questionnaire.code);
       if (!hasScoring) {
          router.back();

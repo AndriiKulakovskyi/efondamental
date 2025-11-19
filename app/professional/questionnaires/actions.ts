@@ -38,6 +38,10 @@ import {
 import {
   saveSocialResponse
 } from '@/lib/services/questionnaire-social.service';
+import {
+  saveTobaccoResponse,
+  saveFagerstromResponse
+} from '@/lib/services/questionnaire-infirmier.service';
 import { 
   AsrmResponseInsert, 
   QidsResponseInsert, 
@@ -70,7 +74,9 @@ import {
   AldaResponseInsert,
   EtatPatientResponseInsert,
   FastResponseInsert,
-  SocialResponseInsert
+  SocialResponseInsert,
+  TobaccoResponseInsert,
+  FagerstromResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -316,6 +322,22 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as SocialResponseInsert);
+        break;
+
+      case 'TOBACCO':
+        result = await saveTobaccoResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as TobaccoResponseInsert);
+        break;
+
+      case 'FAGERSTROM':
+        result = await saveFagerstromResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as FagerstromResponseInsert);
         break;
         
       default:

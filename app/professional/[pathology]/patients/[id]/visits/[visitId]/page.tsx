@@ -47,6 +47,10 @@ import {
 import {
   getSocialResponse
 } from "@/lib/services/questionnaire-social.service";
+import {
+  getTobaccoResponse,
+  getFagerstromResponse
+} from "@/lib/services/questionnaire-infirmier.service";
 import { 
   ASRM_DEFINITION, 
   QIDS_DEFINITION, 
@@ -85,6 +89,10 @@ import {
 import {
   SOCIAL_DEFINITION
 } from "@/lib/constants/questionnaires-social";
+import {
+  TOBACCO_DEFINITION,
+  FAGERSTROM_DEFINITION
+} from "@/lib/constants/questionnaires-infirmier";
 
 export default async function VisitDetailPage({
   params,
@@ -201,7 +209,9 @@ export default async function VisitDetailPage({
       madrsResponse, ymrsResponse, cgiResponse, egfResponse, aldaResponse,
       etatPatientResponse, fastResponse,
       // SOCIAL response
-      socialResponse
+      socialResponse,
+      // INFIRMIER responses
+      tobaccoResponse, fagerstromResponse
     ] = await Promise.all([
       // ETAT
       getEq5d5lResponse(visitId),
@@ -232,15 +242,33 @@ export default async function VisitDetailPage({
       getEtatPatientResponse(visitId),
       getFastResponse(visitId),
       // SOCIAL
-      getSocialResponse(visitId)
+      getSocialResponse(visitId),
+      // INFIRMIER
+      getTobaccoResponse(visitId),
+      getFagerstromResponse(visitId)
     ]);
 
-    // Module 1: Infirmier (empty for now)
+    // Module 1: Infirmier
     const nurseModule = {
       id: 'mod_nurse',
       name: 'Infirmier',
       description: 'Évaluation par l\'infirmier',
-      questionnaires: []
+      questionnaires: [
+        {
+          ...TOBACCO_DEFINITION,
+          id: TOBACCO_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!tobaccoResponse,
+          completedAt: tobaccoResponse?.completed_at,
+        },
+        {
+          ...FAGERSTROM_DEFINITION,
+          id: FAGERSTROM_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!fagerstromResponse,
+          completedAt: fagerstromResponse?.completed_at,
+        }
+      ]
     };
 
     // Module 2: Evaluation état thymique et fonctionnement
@@ -479,8 +507,9 @@ export default async function VisitDetailPage({
     ];
 
     // Calculate stats
-    const total = thymicModule.questionnaires.length + etatModule.questionnaires.length + socialModule.questionnaires.length + traitsModule.questionnaires.length;
+    const total = nurseModule.questionnaires.length + thymicModule.questionnaires.length + etatModule.questionnaires.length + socialModule.questionnaires.length + traitsModule.questionnaires.length;
     const completed = 
+      nurseModule.questionnaires.filter(q => q.completed).length +
       thymicModule.questionnaires.filter(q => q.completed).length +
       etatModule.questionnaires.filter(q => q.completed).length + 
       socialModule.questionnaires.filter(q => q.completed).length +

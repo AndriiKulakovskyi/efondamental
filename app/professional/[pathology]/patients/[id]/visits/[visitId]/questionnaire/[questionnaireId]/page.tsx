@@ -39,6 +39,10 @@ import {
 import {
   SOCIAL_DEFINITION
 } from "@/lib/constants/questionnaires-social";
+import {
+  TOBACCO_DEFINITION,
+  FAGERSTROM_DEFINITION
+} from "@/lib/constants/questionnaires-infirmier";
 import { 
   getAsrmResponse, 
   getQidsResponse, 
@@ -77,6 +81,10 @@ import {
 import {
   getSocialResponse
 } from "@/lib/services/questionnaire-social.service";
+import {
+  getTobaccoResponse,
+  getFagerstromResponse
+} from "@/lib/services/questionnaire-infirmier.service";
 import { QuestionnairePageClient } from "./page-client";
 
 export default async function ProfessionalQuestionnairePage({
@@ -127,6 +135,9 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === FAST_DEFINITION.code) questionnaire = FAST_DEFINITION;
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) questionnaire = SOCIAL_DEFINITION;
+  // Infirmier questionnaires
+  else if (code === TOBACCO_DEFINITION.code) questionnaire = TOBACCO_DEFINITION;
+  else if (code === FAGERSTROM_DEFINITION.code) questionnaire = FAGERSTROM_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -169,6 +180,9 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === FAST_DEFINITION.code) existingResponse = await getFastResponse(visitId);
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) existingResponse = await getSocialResponse(visitId);
+  // Infirmier questionnaires
+  else if (code === TOBACCO_DEFINITION.code) existingResponse = await getTobaccoResponse(visitId);
+  else if (code === FAGERSTROM_DEFINITION.code) existingResponse = await getFagerstromResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).
