@@ -5,9 +5,58 @@ import {
   updateResponse,
   completeResponse,
   getResponseByVisitAndQuestionnaire,
+  getQuestionnaireById,
 } from "@/lib/services/questionnaire.service";
 import { logAuditEvent } from "@/lib/services/audit.service";
 import { AuditAction, QuestionnaireResponseStatus } from "@/lib/types/enums";
+import { calculateScore } from "@/lib/utils/questionnaire-scoring";
+import { ASRM } from "@/lib/questionnaires/auto/asrm";
+import { QIDS_SR16 } from "@/lib/questionnaires/auto/qids-sr16";
+import { MDQ } from "@/lib/questionnaires/auto/mdq";
+
+// Calculate score if questionnaire has scoring
+async function calculateQuestionnaireScore(questionnaireId: string, responses: Record<string, any>) {
+  const questionnaire = await getQuestionnaireById(questionnaireId);
+  
+  if (!questionnaire || !questionnaire.code) {
+    return null;
+  }
+
+  // Only calculate for auto-questionnaires with scoring
+  const scorableQuestionnaires = ['ASRM_FR', 'QIDS_SR16_FR', 'MDQ_FR'];
+  if (!scorableQuestionnaires.includes(questionnaire.code)) {
+    return null;
+  }
+
+  try {
+    let scoringRules;
+    switch (questionnaire.code) {
+      case 'ASRM_FR':
+        scoringRules = ASRM.scoring_rules;
+        break;
+      case 'QIDS_SR16_FR':
+        scoringRules = QIDS_SR16.scoring_rules;
+        break;
+      case 'MDQ_FR':
+        scoringRules = MDQ.scoring_rules;
+        break;
+      default:
+        return null;
+    }
+
+    if (!scoringRules) return null;
+
+    const result = calculateScore(questionnaire.code, responses, scoringRules);
+    
+    return {
+      ...result,
+      calculated_at: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error('Error calculating score:', error);
+    return null;
+  }
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -69,6 +118,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Create new response
+    let metadata: any = {};
+    
+    // Calculate score if completing
+    if (completed) {
+      const scoreResult = await calculateQuestionnaireScore(questionnaireId, responses || {});
+      if (scoreResult) {
+        metadata = scoreResult;
+      }
+    }
+
     const response = await createResponse({
       visit_id: visitId,
       questionnaire_id: questionnaireId,
@@ -78,7 +137,7 @@ export async function POST(request: NextRequest) {
       started_at: new Date().toISOString(),
       completed_at: completed ? new Date().toISOString() : null,
       status: completed ? QuestionnaireResponseStatus.COMPLETED : QuestionnaireResponseStatus.IN_PROGRESS,
-      metadata: {},
+      metadata,
     });
 
     // Log audit event
@@ -130,6 +189,12 @@ export async function PUT(request: NextRequest) {
         updates.status = "completed";
         updates.completed_at = new Date().toISOString();
         updates.completed_by = context.user.id;
+        
+        // Calculate score if completing
+        const scoreResult = await calculateQuestionnaireScore(questionnaireId, responses || {});
+        if (scoreResult) {
+          updates.metadata = scoreResult;
+        }
       }
 
       const response = await updateResponse(responseId, updates);
@@ -164,6 +229,16 @@ export async function PUT(request: NextRequest) {
 
     if (!existingResponse) {
       // Create new response instead
+      let metadata: any = {};
+      
+      // Calculate score if completing
+      if (completed) {
+        const scoreResult = await calculateQuestionnaireScore(questionnaireId, responses || {});
+        if (scoreResult) {
+          metadata = scoreResult;
+        }
+      }
+
       const response = await createResponse({
         visit_id: visitId,
         questionnaire_id: questionnaireId,
@@ -173,7 +248,7 @@ export async function PUT(request: NextRequest) {
         started_at: new Date().toISOString(),
         completed_at: completed ? new Date().toISOString() : null,
         status: completed ? QuestionnaireResponseStatus.COMPLETED : QuestionnaireResponseStatus.IN_PROGRESS,
-        metadata: {},
+        metadata,
       });
 
       if (context.profile.center_id) {
@@ -199,6 +274,12 @@ export async function PUT(request: NextRequest) {
       updates.status = "completed";
       updates.completed_at = new Date().toISOString();
       updates.completed_by = context.user.id;
+      
+      // Calculate score if completing
+      const scoreResult = await calculateQuestionnaireScore(questionnaireId, responses || {});
+      if (scoreResult) {
+        updates.metadata = scoreResult;
+      }
     }
 
     const response = await updateResponse(existingResponse.id, updates);

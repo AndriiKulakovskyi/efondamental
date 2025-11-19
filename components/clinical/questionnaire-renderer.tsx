@@ -149,20 +149,25 @@ export function QuestionnaireRenderer({
 
         {question.type === "single_choice" && question.options && (
           <Select
-            value={value || ""}
-            onValueChange={(val) => handleResponseChange(question.id, val)}
+            value={value?.toString() || ""}
+            onValueChange={(val) => handleResponseChange(question.id, Number(val))}
             disabled={readonly}
             required={isRequired}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select an option" />
+              <SelectValue placeholder="Sélectionnez une option" />
             </SelectTrigger>
             <SelectContent>
-              {question.options.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
+              {question.options.map((option) => {
+                // Handle both string options and object options {code, label, score}
+                const optionValue = typeof option === 'string' ? option : option.code;
+                const optionLabel = typeof option === 'string' ? option : option.label;
+                return (
+                  <SelectItem key={optionValue} value={optionValue.toString()}>
+                    {optionLabel}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         )}
@@ -170,26 +175,29 @@ export function QuestionnaireRenderer({
         {question.type === "multiple_choice" && question.options && (
           <div className="space-y-2">
             {question.options.map((option) => {
-              const checked = Array.isArray(value) && value.includes(option);
+              // Handle both string options and object options {code, label, score}
+              const optionValue = typeof option === 'string' ? option : option.code;
+              const optionLabel = typeof option === 'string' ? option : option.label;
+              const checked = Array.isArray(value) && value.includes(optionValue);
               return (
-                <div key={option} className="flex items-center space-x-2">
+                <div key={optionValue} className="flex items-center space-x-2">
                   <Checkbox
-                    id={`${question.id}-${option}`}
+                    id={`${question.id}-${optionValue}`}
                     checked={checked}
                     onCheckedChange={(isChecked) => {
                       const currentValues = Array.isArray(value) ? value : [];
                       const newValues = isChecked
-                        ? [...currentValues, option]
-                        : currentValues.filter((v) => v !== option);
+                        ? [...currentValues, optionValue]
+                        : currentValues.filter((v) => v !== optionValue);
                       handleResponseChange(question.id, newValues);
                     }}
                     disabled={readonly}
                   />
                   <label
-                    htmlFor={`${question.id}-${option}`}
+                    htmlFor={`${question.id}-${optionValue}`}
                     className="text-sm font-normal cursor-pointer"
                   >
-                    {option}
+                    {optionLabel}
                   </label>
                 </div>
               );

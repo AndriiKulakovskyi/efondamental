@@ -272,6 +272,89 @@ export async function getPendingQuestionnaires(
   return pendingQuestionnaires;
 }
 
+// Get pending auto-questionnaires specifically for patient role
+export async function getPendingAutoQuestionnairesForPatient(
+  patientId: string
+): Promise<Questionnaire[]> {
+  return getPendingQuestionnaires(patientId);
+}
+
+// Calculate and save score after questionnaire completion
+export async function calculateAndSaveScore(
+  responseId: string,
+  questionnaireCode: string,
+  responses: Record<string, any>
+): Promise<{ score: any; interpretation: string }> {
+  const supabase = await createClient();
+  
+  // Import scoring functions dynamically
+  const { calculateScore } = await import('@/lib/utils/questionnaire-scoring');
+  const { ASRM } = await import('@/lib/questionnaires/auto/asrm');
+  const { QIDS_SR16 } = await import('@/lib/questionnaires/auto/qids-sr16');
+  const { MDQ } = await import('@/lib/questionnaires/auto/mdq');
+
+  let scoringRules;
+  switch (questionnaireCode) {
+    case 'ASRM_FR':
+      scoringRules = ASRM.scoring_rules;
+      break;
+    case 'QIDS_SR16_FR':
+      scoringRules = QIDS_SR16.scoring_rules;
+      break;
+    case 'MDQ_FR':
+      scoringRules = MDQ.scoring_rules;
+      break;
+    default:
+      throw new Error(`Unknown questionnaire code: ${questionnaireCode}`);
+  }
+
+  const result = calculateScore(questionnaireCode, responses, scoringRules!);
+
+  // Save score in metadata
+  const { error } = await supabase
+    .from('questionnaire_responses')
+    .update({
+      metadata: {
+        ...result,
+        calculated_at: new Date().toISOString()
+      }
+    })
+    .eq('id', responseId);
+
+  if (error) {
+    throw new Error(`Failed to save score: ${error.message}`);
+  }
+
+  return {
+    score: result,
+    interpretation: result.interpretation
+  };
+}
+
+// Get responses with interpretation
+export async function getResponsesWithInterpretation(
+  visitId: string
+): Promise<Array<QuestionnaireResponse & { score?: any; interpretation?: string }>> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('questionnaire_responses')
+    .select('*')
+    .eq('visit_id', visitId)
+    .order('created_at');
+
+  if (error) {
+    throw new Error(`Failed to fetch responses: ${error.message}`);
+  }
+
+  return (data || []).map(response => ({
+    ...response,
+    score: response.metadata?.total_score || response.metadata?.screening_result,
+    interpretation: response.metadata?.interpretation
+  }));
+}
+
 // Note: Conditional logic and validation functions have been moved to
 // @/lib/utils/questionnaire-logic.ts for client-side compatibility
+
 

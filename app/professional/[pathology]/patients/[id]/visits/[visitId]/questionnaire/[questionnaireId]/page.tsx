@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ScoreDisplay } from "../../components/score-display";
 
 export default function QuestionnaireCompletionPage() {
   const router = useRouter();
@@ -18,6 +19,8 @@ export default function QuestionnaireCompletionPage() {
   const [existingResponse, setExistingResponse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [scoreResult, setScoreResult] = useState<any>(null);
+  const [showingScore, setShowingScore] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -93,11 +96,28 @@ export default function QuestionnaireCompletionPage() {
         throw new Error("Failed to submit questionnaire");
       }
 
-      router.push(`/professional/${pathology}/patients/${patientId}/visits/${visitId}`);
-      router.refresh();
+      const data = await response.json();
+      
+      // Check if questionnaire has scoring (ASRM, QIDS, MDQ)
+      const hasScoring = ['ASRM_FR', 'QIDS_SR16_FR', 'MDQ_FR'].includes(questionnaire.code);
+      
+      if (hasScoring && data.response?.metadata) {
+        // Show score before redirecting
+        setScoreResult(data.response.metadata);
+        setShowingScore(true);
+      } else {
+        // No scoring, redirect immediately
+        router.push(`/professional/${pathology}/patients/${patientId}/visits/${visitId}`);
+        router.refresh();
+      }
     } catch (err) {
       throw err;
     }
+  };
+
+  const handleContinueAfterScore = () => {
+    router.push(`/professional/${pathology}/patients/${patientId}/visits/${visitId}`);
+    router.refresh();
   };
 
   if (loading) {
@@ -120,6 +140,44 @@ export default function QuestionnaireCompletionPage() {
     );
   }
 
+  // Show score result if available
+  if (showingScore && scoreResult) {
+    return (
+      <div className="max-w-3xl space-y-6">
+        <Card>
+          <CardHeader className="bg-green-50">
+            <div className="flex items-center gap-3">
+              <CheckCircle2 className="h-8 w-8 text-green-600" />
+              <div>
+                <CardTitle className="text-green-900">Questionnaire complété</CardTitle>
+                <p className="text-sm text-green-700 mt-1">
+                  Le questionnaire a été soumis avec succès
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6 space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Résultat du score</h3>
+              <ScoreDisplay
+                code={questionnaire.code}
+                score={scoreResult}
+                interpretation={scoreResult.interpretation}
+                clinicalAlerts={scoreResult.clinical_alerts}
+              />
+            </div>
+            
+            <div className="flex justify-end pt-4 border-t">
+              <Button onClick={handleContinueAfterScore}>
+                Retour à la visite
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-3xl">
       <Button
@@ -128,7 +186,7 @@ export default function QuestionnaireCompletionPage() {
         className="mb-4"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Visit
+        Retour à la visite
       </Button>
 
       <Card>

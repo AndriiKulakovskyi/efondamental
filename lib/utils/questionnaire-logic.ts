@@ -2,6 +2,7 @@
 // These functions can be used in both client and server components
 
 import { Questionnaire } from '../types/database.types';
+import { evaluateCondition as evaluateJSONLogicCondition } from '@/lib/questionnaires/validation';
 
 // ============================================================================
 // CONDITIONAL LOGIC EVALUATION
@@ -19,11 +20,21 @@ export function evaluateConditionalLogic(
   const requiredQuestions: string[] = [];
   const subQuestionnaires: string[] = [];
 
-  // Start with all questions visible
+  // Evaluate display_if conditions for each question
   questionnaire.questions.forEach((q) => {
-    visibleQuestions.push(q.id);
-    if (q.required) {
-      requiredQuestions.push(q.id);
+    const isVisible = !q.display_if || evaluateJSONLogicCondition(q.display_if, responses);
+    
+    if (isVisible) {
+      visibleQuestions.push(q.id);
+      
+      // Check if required
+      const isRequired = q.required_if 
+        ? evaluateJSONLogicCondition(q.required_if, responses)
+        : q.required;
+        
+      if (isRequired) {
+        requiredQuestions.push(q.id);
+      }
     }
   });
 
@@ -139,15 +150,25 @@ export function validateQuestionnaireResponse(
         break;
 
       case 'single_choice':
-        if (question.options && !question.options.includes(response)) {
-          errors.push(`${question.text} has an invalid option`);
+        if (question.options) {
+          // Handle both string options and object options {code, label, score}
+          const validValues = question.options.map(opt => 
+            typeof opt === 'string' ? opt : opt.code
+          );
+          if (!validValues.includes(Number(response)) && !validValues.includes(response)) {
+            errors.push(`${question.text} has an invalid option`);
+          }
         }
         break;
 
       case 'multiple_choice':
         if (question.options && Array.isArray(response)) {
+          // Handle both string options and object options {code, label, score}
+          const validValues = question.options.map(opt => 
+            typeof opt === 'string' ? opt : opt.code
+          );
           const invalidOptions = response.filter(
-            (r) => !question.options?.includes(r)
+            (r) => !validValues.includes(r)
           );
           if (invalidOptions.length > 0) {
             errors.push(`${question.text} has invalid options`);

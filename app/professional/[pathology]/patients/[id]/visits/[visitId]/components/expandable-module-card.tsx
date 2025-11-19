@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, CheckCircle, Circle, FileText } from "lucide-react";
+import { ChevronDown, CheckCircle, Circle, FileText, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -137,8 +137,17 @@ export function ExpandableModuleCard({
                   {questionnaire.completed ? (
                     <div className="flex items-center gap-2">
                       <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-700 font-medium">
-                        Completed
+                        Complété
                       </span>
+                      <Link
+                        href={`/professional/${pathology}/patients/${patientId}/visits/${visitId}/questionnaire/${questionnaire.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <RotateCcw className="h-3 w-3" />
+                          Reprendre
+                        </Button>
+                      </Link>
                     </div>
                   ) : (
                     <Link
@@ -147,7 +156,7 @@ export function ExpandableModuleCard({
                     >
                       <Button size="sm" className="gap-2">
                         <FileText className="h-4 w-4" />
-                        Fill Questionnaire
+                        Remplir
                       </Button>
                     </Link>
                   )}
