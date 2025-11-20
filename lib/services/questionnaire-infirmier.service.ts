@@ -4,7 +4,8 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
-import { TobaccoResponse, TobaccoResponseInsert, FagerstromResponse, FagerstromResponseInsert, PhysicalParamsResponse, PhysicalParamsResponseInsert, BloodPressureResponse, BloodPressureResponseInsert, SleepApneaResponse, SleepApneaResponseInsert } from '@/lib/types/database.types';
+import { TobaccoResponse, TobaccoResponseInsert, FagerstromResponse, FagerstromResponseInsert, PhysicalParamsResponse, PhysicalParamsResponseInsert, BloodPressureResponse, BloodPressureResponseInsert, SleepApneaResponse, SleepApneaResponseInsert, BiologicalAssessmentResponse, BiologicalAssessmentResponseInsert } from '@/lib/types/database.types';
+import { getPatientById } from '@/lib/services/patient.service';
 
 // ===== TOBACCO ASSESSMENT =====
 
@@ -375,6 +376,147 @@ export async function saveSleepApneaResponse(
 
   const { data, error } = await supabase
     .from('responses_sleep_apnea')
+    .upsert(normalizedResponse, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ===== BIOLOGICAL ASSESSMENT =====
+
+export async function getBiologicalAssessmentResponse(
+  visitId: string
+): Promise<BiologicalAssessmentResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_biological_assessment')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No data found
+    if (error.code === 'PGRST205') {
+      // Table doesn't exist yet - migration not applied
+      console.warn(`Table responses_biological_assessment not found. Please run migrations.`);
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveBiologicalAssessmentResponse(
+  response: BiologicalAssessmentResponseInsert
+): Promise<BiologicalAssessmentResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Fetch patient profile for age and gender
+  const patient = await getPatientById(response.patient_id);
+  if (!patient) {
+    throw new Error('Patient not found');
+  }
+
+  // Fetch physical params for weight
+  const physicalParams = await getPhysicalParamsResponse(response.visit_id);
+
+  // Normalize response - convert 'yes'/'no' strings to booleans for control questions
+  const normalizedResponse: any = {
+    visit_id: response.visit_id,
+    patient_id: response.patient_id,
+    collection_date: (response as any).collection_date || null,
+    collection_location: (response as any).collection_location || null,
+    completed_by: user.data.user?.id
+  };
+
+  // Convert control questions from 'yes'/'no' to boolean
+  const onNeuroleptics = (response as any).on_neuroleptics;
+  normalizedResponse.on_neuroleptics = onNeuroleptics === true || onNeuroleptics === 'yes' || onNeuroleptics === 'true' ? true : (onNeuroleptics === false || onNeuroleptics === 'no' || onNeuroleptics === 'false' ? false : null);
+
+  const womanChildbearingAge = (response as any).woman_childbearing_age;
+  normalizedResponse.woman_childbearing_age = womanChildbearingAge === true || womanChildbearingAge === 'yes' || womanChildbearingAge === 'true' ? true : (womanChildbearingAge === false || womanChildbearingAge === 'no' || womanChildbearingAge === 'false' ? false : null);
+
+  // Convert treatment_taken_morning from 'yes'/'no' to boolean
+  const treatmentTakenMorning = (response as any).treatment_taken_morning;
+  normalizedResponse.treatment_taken_morning = treatmentTakenMorning === true || treatmentTakenMorning === 'yes' || treatmentTakenMorning === 'true' ? true : (treatmentTakenMorning === false || treatmentTakenMorning === 'no' || treatmentTakenMorning === 'false' ? false : null);
+
+  // Convert vitamin_d_supplementation from 'yes'/'no' to boolean
+  const vitaminDSupplementation = (response as any).vitamin_d_supplementation;
+  normalizedResponse.vitamin_d_supplementation = vitaminDSupplementation === true || vitaminDSupplementation === 'yes' || vitaminDSupplementation === 'true' ? true : (vitaminDSupplementation === false || vitaminDSupplementation === 'no' || vitaminDSupplementation === 'false' ? false : null);
+
+  // Convert toxoplasmosis boolean fields
+  const toxoSerologyDone = (response as any).toxo_serology_done;
+  normalizedResponse.toxo_serology_done = toxoSerologyDone === true || toxoSerologyDone === 'yes' || toxoSerologyDone === 'true' ? true : (toxoSerologyDone === false || toxoSerologyDone === 'no' || toxoSerologyDone === 'false' ? false : null);
+
+  const toxoIgmPositive = (response as any).toxo_igm_positive;
+  normalizedResponse.toxo_igm_positive = toxoIgmPositive === true || toxoIgmPositive === 'yes' || toxoIgmPositive === 'true' ? true : (toxoIgmPositive === false || toxoIgmPositive === 'no' || toxoIgmPositive === 'false' ? false : null);
+
+  const toxoIggPositive = (response as any).toxo_igg_positive;
+  normalizedResponse.toxo_igg_positive = toxoIggPositive === true || toxoIggPositive === 'yes' || toxoIggPositive === 'true' ? true : (toxoIggPositive === false || toxoIggPositive === 'no' || toxoIggPositive === 'false' ? false : null);
+
+  const toxoPcrDone = (response as any).toxo_pcr_done;
+  normalizedResponse.toxo_pcr_done = toxoPcrDone === true || toxoPcrDone === 'yes' || toxoPcrDone === 'true' ? true : (toxoPcrDone === false || toxoPcrDone === 'no' || toxoPcrDone === 'false' ? false : null);
+
+  const toxoPcrPositive = (response as any).toxo_pcr_positive;
+  normalizedResponse.toxo_pcr_positive = toxoPcrPositive === true || toxoPcrPositive === 'yes' || toxoPcrPositive === 'true' ? true : (toxoPcrPositive === false || toxoPcrPositive === 'no' || toxoPcrPositive === 'false' ? false : null);
+
+  // Copy all other fields
+  const fieldsToCopy = [
+    'sodium', 'potassium', 'chlore', 'bicarbonates', 'protidemie', 'albumine', 'uree', 'acide_urique', 'creatinine',
+    'phosphore', 'fer', 'ferritine', 'calcemie',
+    'hdl', 'hdl_unit', 'ldl', 'ldl_unit', 'cholesterol_total', 'triglycerides',
+    'pal', 'asat', 'alat', 'bilirubine_totale', 'bilirubine_unit', 'ggt',
+    'tsh', 'tsh_unit', 't3_libre', 't4_libre',
+    'leucocytes', 'hematies', 'hemoglobine', 'hemoglobine_unit', 'hematocrite', 'hematocrite_unit',
+    'neutrophiles', 'basophiles', 'eosinophiles', 'lymphocytes', 'monocytes', 'vgm',
+    'tcmh', 'tcmh_unit', 'ccmh', 'ccmh_unit', 'plaquettes',
+    'beta_hcg', 'prolactine', 'prolactine_unit',
+    'clozapine', 'teralithe_type', 'lithium_plasma', 'lithium_erythrocyte',
+    'valproic_acid', 'carbamazepine', 'oxcarbazepine', 'lamotrigine',
+    'vitamin_d_level', 'outdoor_time', 'skin_phototype',
+    'toxo_igg_value'
+  ];
+
+  fieldsToCopy.forEach(field => {
+    if ((response as any)[field] !== undefined && (response as any)[field] !== null) {
+      normalizedResponse[field] = (response as any)[field];
+    }
+  });
+
+  // Calculate creatinine clearance if we have all required data
+  if (normalizedResponse.creatinine && physicalParams?.weight_kg && patient.date_of_birth) {
+    const creatinine = parseFloat(normalizedResponse.creatinine);
+    const weight = parseFloat(physicalParams.weight_kg.toString());
+    
+    // Calculate age from date_of_birth
+    const birthDate = new Date(patient.date_of_birth);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const adjustedAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
+
+    if (creatinine > 0 && weight > 0 && adjustedAge > 0) {
+      // Determine gender
+      const gender = patient.gender?.toLowerCase();
+      const isMale = gender === 'male' || gender === 'm' || gender === 'homme';
+
+      // Calculate clearance: Male: 1.23 × weight × (140 - age) / creatinine, Female: 1.04 × weight × (140 - age) / creatinine
+      const multiplier = isMale ? 1.23 : 1.04;
+      const clearance = (multiplier * weight * (140 - adjustedAge)) / creatinine;
+      
+      // Round to 2 decimal places and ensure it's within valid range
+      const roundedClearance = Math.round(clearance * 100) / 100;
+      if (roundedClearance >= 10 && roundedClearance <= 200) {
+        normalizedResponse.clairance_creatinine = roundedClearance;
+      }
+    }
+  }
+
+  const { data, error } = await supabase
+    .from('responses_biological_assessment')
     .upsert(normalizedResponse, { onConflict: 'visit_id' })
     .select()
     .single();

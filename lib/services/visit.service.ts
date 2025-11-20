@@ -51,7 +51,8 @@ import {
   getFagerstromResponse,
   getPhysicalParamsResponse,
   getBloodPressureResponse,
-  getSleepApneaResponse
+  getSleepApneaResponse,
+  getBiologicalAssessmentResponse
 } from './questionnaire-infirmier.service';
 import {
   ASRM_DEFINITION,
@@ -96,7 +97,8 @@ import {
   FAGERSTROM_DEFINITION,
   PHYSICAL_PARAMS_DEFINITION,
   BLOOD_PRESSURE_DEFINITION,
-  SLEEP_APNEA_DEFINITION
+  SLEEP_APNEA_DEFINITION,
+  BIOLOGICAL_ASSESSMENT_DEFINITION
 } from '../constants/questionnaires-infirmier';
 
 // ============================================================================
@@ -355,7 +357,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_nurse',
         name: 'Infirmier',
         description: 'Évaluation par l\'infirmier',
-        questionnaires: [TOBACCO_DEFINITION, FAGERSTROM_DEFINITION, PHYSICAL_PARAMS_DEFINITION, BLOOD_PRESSURE_DEFINITION, SLEEP_APNEA_DEFINITION]
+        questionnaires: [TOBACCO_DEFINITION, FAGERSTROM_DEFINITION, PHYSICAL_PARAMS_DEFINITION, BLOOD_PRESSURE_DEFINITION, SLEEP_APNEA_DEFINITION, BIOLOGICAL_ASSESSMENT_DEFINITION]
       },
       {
         id: 'mod_thymic_eval',
@@ -448,14 +450,14 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diag) completed++;
     if (orient) completed++;
   } else if (visit.visit_type === 'initial_evaluation') {
-    total = 31; // 16 auto questionnaires + ASRM + QIDS (reused) + 7 hetero questionnaires + 1 social + 5 infirmier (tobacco + fagerstrom + physical_params + blood_pressure + sleep_apnea)
+    total = 32; // 16 auto questionnaires + ASRM + QIDS (reused) + 7 hetero questionnaires + 1 social + 6 infirmier (tobacco + fagerstrom + physical_params + blood_pressure + sleep_apnea + biological_assessment)
     totalModules = 6;
 
     const [
       eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,
       asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti,
       madrs, ymrs, cgi, egf, alda, etatPatient, fast, social,
-      tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea
+      tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biologicalAssessment
     ] = await Promise.all([
       // ETAT questionnaires
       getEq5d5lResponse(visitId),
@@ -492,7 +494,8 @@ export async function getVisitCompletionStatus(visitId: string) {
       getFagerstromResponse(visitId),
       getPhysicalParamsResponse(visitId),
       getBloodPressureResponse(visitId),
-      getSleepApneaResponse(visitId)
+      getSleepApneaResponse(visitId),
+      getBiologicalAssessmentResponse(visitId)
     ]);
 
     if (eq5d5l) completed++;
@@ -526,6 +529,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (physicalParams) completed++;
     if (bloodPressure) completed++;
     if (sleepApnea) completed++;
+    if (biologicalAssessment) completed++;
   }
 
   return {

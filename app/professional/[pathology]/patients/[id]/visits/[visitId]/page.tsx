@@ -52,7 +52,8 @@ import {
   getFagerstromResponse,
   getPhysicalParamsResponse,
   getBloodPressureResponse,
-  getSleepApneaResponse
+  getSleepApneaResponse,
+  getBiologicalAssessmentResponse
 } from "@/lib/services/questionnaire-infirmier.service";
 import { 
   ASRM_DEFINITION, 
@@ -97,7 +98,8 @@ import {
   FAGERSTROM_DEFINITION,
   PHYSICAL_PARAMS_DEFINITION,
   BLOOD_PRESSURE_DEFINITION,
-  SLEEP_APNEA_DEFINITION
+  SLEEP_APNEA_DEFINITION,
+  BIOLOGICAL_ASSESSMENT_DEFINITION
 } from "@/lib/constants/questionnaires-infirmier";
 
 export default async function VisitDetailPage({
@@ -217,7 +219,7 @@ export default async function VisitDetailPage({
       // SOCIAL response
       socialResponse,
       // INFIRMIER responses
-      tobaccoResponse, fagerstromResponse, physicalParamsResponse, bloodPressureResponse, sleepApneaResponse
+      tobaccoResponse, fagerstromResponse, physicalParamsResponse, bloodPressureResponse, sleepApneaResponse, biologicalAssessmentResponse
     ] = await Promise.all([
       // ETAT
       getEq5d5lResponse(visitId),
@@ -254,7 +256,8 @@ export default async function VisitDetailPage({
       getFagerstromResponse(visitId),
       getPhysicalParamsResponse(visitId),
       getBloodPressureResponse(visitId),
-      getSleepApneaResponse(visitId)
+      getSleepApneaResponse(visitId),
+      getBiologicalAssessmentResponse(visitId)
     ]);
 
     // Module 1: Infirmier
@@ -297,6 +300,13 @@ export default async function VisitDetailPage({
           target_role: 'healthcare_professional',
           completed: !!sleepApneaResponse,
           completedAt: sleepApneaResponse?.completed_at,
+        },
+        {
+          ...BIOLOGICAL_ASSESSMENT_DEFINITION,
+          id: BIOLOGICAL_ASSESSMENT_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!biologicalAssessmentResponse,
+          completedAt: biologicalAssessmentResponse?.completed_at,
         }
       ]
     };

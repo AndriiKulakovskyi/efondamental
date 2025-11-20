@@ -43,7 +43,8 @@ import {
   saveFagerstromResponse,
   savePhysicalParamsResponse,
   saveBloodPressureResponse,
-  saveSleepApneaResponse
+  saveSleepApneaResponse,
+  saveBiologicalAssessmentResponse
 } from '@/lib/services/questionnaire-infirmier.service';
 import { 
   AsrmResponseInsert, 
@@ -82,7 +83,8 @@ import {
   FagerstromResponseInsert,
   PhysicalParamsResponseInsert,
   BloodPressureResponseInsert,
-  SleepApneaResponseInsert
+  SleepApneaResponseInsert,
+  BiologicalAssessmentResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -368,6 +370,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as SleepApneaResponseInsert);
+        break;
+        
+      case 'BIOLOGICAL_ASSESSMENT':
+        result = await saveBiologicalAssessmentResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as BiologicalAssessmentResponseInsert);
         break;
         
       default:

@@ -1095,3 +1095,113 @@ export interface SleepApneaResponse {
 }
 
 export type SleepApneaResponseInsert = Omit<SleepApneaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'stop_bang_score'>;
+
+// ===== Biological Assessment (Bilan biologique) Response =====
+export interface BiologicalAssessmentResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Date and Location
+  collection_date?: string | null;
+  collection_location?: 'sur_site' | 'hors_site' | null;
+  
+  // Control Questions
+  on_neuroleptics?: boolean | null;
+  woman_childbearing_age?: boolean | null;
+  
+  // Biochimie
+  sodium?: number | null;
+  potassium?: number | null;
+  chlore?: number | null;
+  bicarbonates?: number | null;
+  protidemie?: number | null;
+  albumine?: number | null;
+  uree?: number | null;
+  acide_urique?: number | null;
+  creatinine?: number | null;
+  clairance_creatinine?: number | null; // Computed
+  phosphore?: number | null;
+  fer?: number | null;
+  ferritine?: number | null;
+  calcemie?: number | null;
+  
+  // Bilan Lipidique
+  hdl?: number | null;
+  hdl_unit?: 'mmol_L' | 'g_L' | null;
+  ldl?: number | null;
+  ldl_unit?: 'mmol_L' | 'g_L' | null;
+  cholesterol_total?: number | null;
+  triglycerides?: number | null;
+  
+  // Bilan Hépatique
+  pal?: number | null;
+  asat?: number | null;
+  alat?: number | null;
+  bilirubine_totale?: number | null;
+  bilirubine_unit?: 'umol_L' | 'mmol_L' | 'mg_L' | null;
+  ggt?: number | null;
+  
+  // Bilan Thyroïdien
+  tsh?: number | null;
+  tsh_unit?: 'pmol_L' | 'uUI_mL' | 'mUI_L' | null;
+  t3_libre?: number | null;
+  t4_libre?: number | null;
+  
+  // NFS
+  leucocytes?: number | null;
+  hematies?: number | null;
+  hemoglobine?: number | null;
+  hemoglobine_unit?: 'g_dL' | 'mmol_L' | null;
+  hematocrite?: number | null;
+  hematocrite_unit?: 'percent' | 'L_L' | null;
+  neutrophiles?: number | null;
+  basophiles?: number | null;
+  eosinophiles?: number | null;
+  lymphocytes?: number | null;
+  monocytes?: number | null;
+  vgm?: number | null;
+  tcmh?: number | null;
+  tcmh_unit?: 'pg' | 'percent' | null;
+  ccmh?: number | null;
+  ccmh_unit?: 'percent' | 'g_dL' | 'g_L' | null;
+  plaquettes?: number | null;
+  
+  // HCG & Prolactine
+  beta_hcg?: number | null;
+  prolactine?: number | null;
+  prolactine_unit?: 'mg_L' | 'uIU_mL' | 'ng_mL' | 'ug_L' | null;
+  
+  // Dosage Psychotropes
+  treatment_taken_morning?: boolean | null;
+  clozapine?: number | null;
+  teralithe_type?: '250' | 'LP400' | null;
+  lithium_plasma?: number | null;
+  lithium_erythrocyte?: number | null;
+  valproic_acid?: number | null;
+  carbamazepine?: number | null;
+  oxcarbazepine?: number | null;
+  lamotrigine?: number | null;
+  
+  // Vitamine D
+  vitamin_d_level?: number | null;
+  outdoor_time?: 'less_than_1h_per_week' | 'less_than_1h_per_day_several_hours_per_week' | 'at_least_1h_per_day' | 'more_than_4h_per_day' | null;
+  skin_phototype?: 'I' | 'II' | 'III' | 'IV' | 'V' | 'VI' | null;
+  vitamin_d_supplementation?: boolean | null;
+  
+  // Sérologie Toxoplasmose
+  toxo_serology_done?: boolean | null;
+  toxo_igm_positive?: boolean | null;
+  toxo_igg_positive?: boolean | null;
+  toxo_igg_value?: number | null;
+  toxo_pcr_done?: boolean | null;
+  toxo_pcr_positive?: boolean | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type BiologicalAssessmentResponseInsert = Omit<BiologicalAssessmentResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'clairance_creatinine'>;

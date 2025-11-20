@@ -528,3 +528,837 @@ export const SLEEP_APNEA_DEFINITION: QuestionnaireDefinition = {
   }
 };
 
+// ===== BIOLOGICAL ASSESSMENT (Bilan biologique) =====
+
+export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
+  // Date and Location Section
+  {
+    id: 'section_date_location',
+    text: 'Date et lieu de prélèvement',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'collection_date',
+    text: 'Date de prélèvement',
+    type: 'date',
+    required: true
+  },
+  {
+    id: 'collection_location',
+    text: 'Prélèvement effectué',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'sur_site', label: 'Sur site' },
+      { code: 'hors_site', label: 'Hors site' }
+    ]
+  },
+  
+  // Control Questions
+  {
+    id: 'section_control',
+    text: 'Informations de contrôle',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'on_neuroleptics',
+    text: 'Patient traité par neuroleptiques/antipsychotiques ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ]
+  },
+  {
+    id: 'woman_childbearing_age',
+    text: 'Femme en âge de procréer ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ]
+  },
+  
+  // ===== BIOCHIMIE =====
+  {
+    id: 'section_biochimie',
+    text: 'BIOCHIMIE',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'sodium',
+    text: 'Sodium (mmol/L)',
+    type: 'number',
+    required: false,
+    min: 120,
+    max: 170
+  },
+  {
+    id: 'potassium',
+    text: 'Potassium (mmol/L)',
+    type: 'number',
+    required: false,
+    min: 2.0,
+    max: 7.0
+  },
+  {
+    id: 'chlore',
+    text: 'Chlore (Chlorure) (mmol/L)',
+    type: 'number',
+    required: false,
+    min: 80,
+    max: 130
+  },
+  {
+    id: 'bicarbonates',
+    text: 'Bicarbonates (mmol/L)',
+    type: 'number',
+    required: false,
+    min: 10,
+    max: 40
+  },
+  {
+    id: 'protidemie',
+    text: 'Protidémie (Protéines totales) (g/L)',
+    type: 'number',
+    required: false,
+    min: 50,
+    max: 90
+  },
+  {
+    id: 'albumine',
+    text: 'Albumine (g/L)',
+    type: 'number',
+    required: false,
+    min: 30,
+    max: 55
+  },
+  {
+    id: 'uree',
+    text: 'Urée (mmol/L)',
+    type: 'number',
+    required: false,
+    min: 1,
+    max: 20
+  },
+  {
+    id: 'acide_urique',
+    text: 'Acide urique (µmol/L)',
+    type: 'number',
+    required: false,
+    min: 100,
+    max: 500
+  },
+  {
+    id: 'creatinine',
+    text: 'Créatinine (µmol/L)',
+    type: 'number',
+    required: false,
+    min: 30,
+    max: 400
+  },
+  {
+    id: 'clairance_creatinine',
+    text: 'Clairance de la créatinine (ml/min)',
+    help: 'Calculée automatiquement',
+    type: 'number',
+    required: false,
+    readonly: true,
+    min: 10,
+    max: 200
+  },
+  {
+    id: 'phosphore',
+    text: 'Phosphore (mmol/L)',
+    type: 'number',
+    required: false,
+    min: 0.5,
+    max: 2.0
+  },
+  {
+    id: 'fer',
+    text: 'Fer (µmol/L)',
+    type: 'number',
+    required: false,
+    min: 5,
+    max: 40
+  },
+  {
+    id: 'ferritine',
+    text: 'Ferritine (µg/L)',
+    type: 'number',
+    required: false,
+    min: 5,
+    max: 1000
+  },
+  {
+    id: 'calcemie',
+    text: 'Calcémie (Calcium total) (mmol/L)',
+    type: 'number',
+    required: false,
+    min: 1.50,
+    max: 2.75
+  },
+  
+  // ===== BILAN LIPIDIQUE =====
+  {
+    id: 'section_lipidique',
+    text: 'BILAN LIPIDIQUE',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'hdl',
+    text: 'HDL',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'hdl_unit',
+    text: 'Unité HDL',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'mmol_L', label: 'mmol/L' },
+      { code: 'g_L', label: 'g/L' }
+    ],
+    display_if: {
+      '!=': [{ var: 'hdl' }, null]
+    }
+  },
+  {
+    id: 'ldl',
+    text: 'LDL',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'ldl_unit',
+    text: 'Unité LDL',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'mmol_L', label: 'mmol/L' },
+      { code: 'g_L', label: 'g/L' }
+    ],
+    display_if: {
+      '!=': [{ var: 'ldl' }, null]
+    }
+  },
+  {
+    id: 'cholesterol_total',
+    text: 'Cholestérol total (mmol/L)',
+    type: 'number',
+    required: false,
+    min: 1,
+    max: 15
+  },
+  {
+    id: 'triglycerides',
+    text: 'Triglycérides (mmol/L)',
+    type: 'number',
+    required: false,
+    min: 0.2,
+    max: 20
+  },
+  
+  // ===== BILAN HÉPATIQUE =====
+  {
+    id: 'section_hepatique',
+    text: 'BILAN HÉPATIQUE',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'pal',
+    text: 'Phosphatases alcalines (PAL) (UI/L)',
+    type: 'number',
+    required: false,
+    min: 20,
+    max: 400
+  },
+  {
+    id: 'asat',
+    text: 'ASAT / TGO (UI/L)',
+    type: 'number',
+    required: false,
+    min: 5,
+    max: 500
+  },
+  {
+    id: 'alat',
+    text: 'ALAT / TGP (UI/L)',
+    type: 'number',
+    required: false,
+    min: 5,
+    max: 500
+  },
+  {
+    id: 'bilirubine_totale',
+    text: 'Bilirubine totale',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'bilirubine_unit',
+    text: 'Unité Bilirubine',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'umol_L', label: 'µmol/L' },
+      { code: 'mmol_L', label: 'mmol/L' },
+      { code: 'mg_L', label: 'mg/L' }
+    ],
+    display_if: {
+      '!=': [{ var: 'bilirubine_totale' }, null]
+    }
+  },
+  {
+    id: 'ggt',
+    text: 'Gamma-GT (UI/L)',
+    type: 'number',
+    required: false,
+    min: 5,
+    max: 1500
+  },
+  
+  // ===== BILAN THYROÏDIEN =====
+  {
+    id: 'section_thyroidien',
+    text: 'BILAN THYROÏDIEN',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'tsh',
+    text: 'TSH ultrasensible',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'tsh_unit',
+    text: 'Unité TSH',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'pmol_L', label: 'pmol/L' },
+      { code: 'uUI_mL', label: 'µUI/mL' },
+      { code: 'mUI_L', label: 'mUI/L' }
+    ],
+    display_if: {
+      '!=': [{ var: 'tsh' }, null]
+    }
+  },
+  {
+    id: 't3_libre',
+    text: 'T3 libre (pmol/L)',
+    type: 'number',
+    required: false,
+    min: 1,
+    max: 30
+  },
+  {
+    id: 't4_libre',
+    text: 'T4 libre (pmol/L)',
+    type: 'number',
+    required: false,
+    min: 5,
+    max: 50
+  },
+  
+  // ===== NFS (NUMÉRATION FORMULE SANGUINE) =====
+  {
+    id: 'section_nfs',
+    text: 'NFS (NUMÉRATION FORMULE SANGUINE)',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'leucocytes',
+    text: 'Leucocytes (GB) (G/L)',
+    type: 'number',
+    required: false,
+    min: 0.5,
+    max: 200
+  },
+  {
+    id: 'hematies',
+    text: 'Hématies (GR) (T/L)',
+    type: 'number',
+    required: false,
+    min: 1,
+    max: 8
+  },
+  {
+    id: 'hemoglobine',
+    text: 'Hémoglobine (Hb)',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'hemoglobine_unit',
+    text: 'Unité Hémoglobine',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'g_dL', label: 'g/dL' },
+      { code: 'mmol_L', label: 'mmol/L' }
+    ],
+    display_if: {
+      '!=': [{ var: 'hemoglobine' }, null]
+    }
+  },
+  {
+    id: 'hematocrite',
+    text: 'Hématocrite (Ht)',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'hematocrite_unit',
+    text: 'Unité Hématocrite',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'percent', label: '%' },
+      { code: 'L_L', label: 'L/L' }
+    ],
+    display_if: {
+      '!=': [{ var: 'hematocrite' }, null]
+    }
+  },
+  {
+    id: 'neutrophiles',
+    text: 'Neutrophiles (G/L)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'basophiles',
+    text: 'Basophiles (G/L)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 5
+  },
+  {
+    id: 'eosinophiles',
+    text: 'Éosinophiles (G/L)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 10
+  },
+  {
+    id: 'lymphocytes',
+    text: 'Lymphocytes (G/L)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 20
+  },
+  {
+    id: 'monocytes',
+    text: 'Monocytes (G/L)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 5
+  },
+  {
+    id: 'vgm',
+    text: 'VGM (fL)',
+    type: 'number',
+    required: false,
+    min: 50,
+    max: 130
+  },
+  {
+    id: 'tcmh',
+    text: 'TCMH',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'tcmh_unit',
+    text: 'Unité TCMH',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'pg', label: 'pg' },
+      { code: 'percent', label: '%' }
+    ],
+    display_if: {
+      '!=': [{ var: 'tcmh' }, null]
+    }
+  },
+  {
+    id: 'ccmh',
+    text: 'CCMH',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'ccmh_unit',
+    text: 'Unité CCMH',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'percent', label: '%' },
+      { code: 'g_dL', label: 'g/dL' },
+      { code: 'g_L', label: 'g/L' }
+    ],
+    display_if: {
+      '!=': [{ var: 'ccmh' }, null]
+    }
+  },
+  {
+    id: 'plaquettes',
+    text: 'Plaquettes (G/L)',
+    type: 'number',
+    required: false,
+    min: 10,
+    max: 1000
+  },
+  
+  // ===== HCG =====
+  {
+    id: 'section_hcg',
+    text: 'HCG – Femmes en âge de procréer',
+    type: 'section',
+    required: false,
+    display_if: {
+      '==': [{ var: 'woman_childbearing_age' }, 'yes']
+    }
+  },
+  {
+    id: 'beta_hcg',
+    text: 'Dosage β-HCG (UI)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 500000,
+    display_if: {
+      '==': [{ var: 'woman_childbearing_age' }, 'yes']
+    }
+  },
+  
+  // ===== PROLACTINE =====
+  {
+    id: 'section_prolactine',
+    text: 'Prolactine',
+    help: 'Pour les patients traités par neuroleptiques/antipsychotiques',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'prolactine',
+    text: 'Taux prolactine',
+    type: 'number',
+    required: false,
+    min: 0
+  },
+  {
+    id: 'prolactine_unit',
+    text: 'Unité Prolactine',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'mg_L', label: 'mg/L' },
+      { code: 'uIU_mL', label: 'µIU/mL' },
+      { code: 'ng_mL', label: 'ng/mL' },
+      { code: 'ug_L', label: 'µg/L' }
+    ],
+    display_if: {
+      '!=': [{ var: 'prolactine' }, null]
+    }
+  },
+  
+  // ===== DOSAGE PSYCHOTROPES =====
+  {
+    id: 'section_psychotropes',
+    text: 'Dosage des psychotropes',
+    help: 'S\'assurer que le patient n\'ait pas pris son traitement le matin du dosage. Si le patient a pris son traitement, ne pas faire le dosage.',
+    type: 'section',
+    required: false,
+    display_if: {
+      '==': [{ var: 'on_neuroleptics' }, 'yes']
+    }
+  },
+  {
+    id: 'treatment_taken_morning',
+    text: 'Prise du traitement par le patient le matin du prélèvement',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      '==': [{ var: 'on_neuroleptics' }, 'yes']
+    }
+  },
+  {
+    id: 'clozapine',
+    text: 'Dosage plasmatique de la clozapine (mmol/L)',
+    type: 'number',
+    required: false,
+    display_if: {
+      'and': [
+        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
+        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
+      ]
+    }
+  },
+  {
+    id: 'teralithe_type',
+    text: 'Téralithe',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: '250', label: '250' },
+      { code: 'LP400', label: 'LP400' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
+        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
+      ]
+    }
+  },
+  {
+    id: 'lithium_plasma',
+    text: 'Taux de lithium plasmatique (mmol/L)',
+    type: 'number',
+    required: false,
+    display_if: {
+      'and': [
+        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
+        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
+      ]
+    }
+  },
+  {
+    id: 'lithium_erythrocyte',
+    text: 'Taux de lithium intra-érythrocytaire (mmol/L)',
+    type: 'number',
+    required: false,
+    display_if: {
+      'and': [
+        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
+        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
+      ]
+    }
+  },
+  {
+    id: 'valproic_acid',
+    text: 'Taux d\'acide valproïque plasmatique (mg/L)',
+    type: 'number',
+    required: false,
+    display_if: {
+      'and': [
+        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
+        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
+      ]
+    }
+  },
+  {
+    id: 'carbamazepine',
+    text: 'Taux de carbamazépine (mg/L)',
+    type: 'number',
+    required: false,
+    display_if: {
+      'and': [
+        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
+        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
+      ]
+    }
+  },
+  {
+    id: 'oxcarbazepine',
+    text: 'Taux d\'oxcarbazépine (µg/ml)',
+    type: 'number',
+    required: false,
+    display_if: {
+      'and': [
+        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
+        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
+      ]
+    }
+  },
+  {
+    id: 'lamotrigine',
+    text: 'Taux de lamotrigine',
+    type: 'number',
+    required: false,
+    display_if: {
+      'and': [
+        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
+        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
+      ]
+    }
+  },
+  
+  // ===== VITAMINE D =====
+  {
+    id: 'section_vitamine_d',
+    text: 'Questionnaire vitamine D',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'vitamin_d_level',
+    text: 'Dosage sanguin de vitamine D (ng/ml)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 300
+  },
+  {
+    id: 'outdoor_time',
+    text: 'Temps moyen passé à l\'extérieur',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'less_than_1h_per_week', label: 'moins de 1 heure par semaine' },
+      { code: 'less_than_1h_per_day_several_hours_per_week', label: 'moins de 1 heure par jour mais plusieurs heures par semaine' },
+      { code: 'at_least_1h_per_day', label: 'au moins 1 heure par jour en moyenne' },
+      { code: 'more_than_4h_per_day', label: 'plus de 4 heures par jour' }
+    ]
+  },
+  {
+    id: 'skin_phototype',
+    text: 'Caractérisation du phototype cutané',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'I', label: 'phototype I' },
+      { code: 'II', label: 'phototype II' },
+      { code: 'III', label: 'phototype III' },
+      { code: 'IV', label: 'phototype IV' },
+      { code: 'V', label: 'phototype V' },
+      { code: 'VI', label: 'phototype VI' }
+    ]
+  },
+  {
+    id: 'vitamin_d_supplementation',
+    text: 'Supplémentation en vitamine D dans les 12 mois précédents',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ]
+  },
+  
+  // ===== SÉROLOGIE TOXOPLASMOSE =====
+  {
+    id: 'section_toxo',
+    text: 'Sérologie toxoplasmose',
+    help: 'Rappel : le dosage est à faire à chaque visite, même en cas de sérologie positive antérieure',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'toxo_serology_done',
+    text: 'Le patient a-t-il eu une sérologie toxoplasmique ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ]
+  },
+  {
+    id: 'toxo_igm_positive',
+    text: 'Le statut IgM est-il positif ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      '==': [{ var: 'toxo_serology_done' }, 'yes']
+    }
+  },
+  {
+    id: 'toxo_igg_positive',
+    text: 'Le statut IgG est-il positif ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      '==': [{ var: 'toxo_serology_done' }, 'yes']
+    }
+  },
+  {
+    id: 'toxo_igg_value',
+    text: 'IgG (UI/mL)',
+    type: 'number',
+    required: false,
+    min: 0,
+    display_if: {
+      'and': [
+        { '==': [{ var: 'toxo_serology_done' }, 'yes'] },
+        { '==': [{ var: 'toxo_igg_positive' }, 'yes'] }
+      ]
+    }
+  },
+  {
+    id: 'toxo_pcr_done',
+    text: 'Une PCR ADN a-t-elle été réalisée ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ var: 'toxo_serology_done' }, 'yes'] },
+        { '==': [{ var: 'toxo_igg_positive' }, 'yes'] }
+      ]
+    }
+  },
+  {
+    id: 'toxo_pcr_positive',
+    text: 'La PCR ADN était-elle positive ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ var: 'toxo_serology_done' }, 'yes'] },
+        { '==': [{ var: 'toxo_igg_positive' }, 'yes'] },
+        { '==': [{ var: 'toxo_pcr_done' }, 'yes'] }
+      ]
+    }
+  }
+];
+
+export const BIOLOGICAL_ASSESSMENT_DEFINITION: QuestionnaireDefinition = {
+  id: 'biological_assessment',
+  code: 'BIOLOGICAL_ASSESSMENT',
+  title: 'Bilan biologique',
+  description: 'Évaluation biologique complète incluant biochimie, bilan lipidique, hépatique, thyroïdien, NFS, HCG, prolactine, dosages psychotropes, vitamine D et sérologie toxoplasmose',
+  questions: BIOLOGICAL_ASSESSMENT_QUESTIONS,
+  metadata: {
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+

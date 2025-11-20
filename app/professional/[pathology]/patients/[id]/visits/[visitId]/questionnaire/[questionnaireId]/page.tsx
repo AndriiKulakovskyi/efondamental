@@ -44,7 +44,8 @@ import {
   FAGERSTROM_DEFINITION,
   PHYSICAL_PARAMS_DEFINITION,
   BLOOD_PRESSURE_DEFINITION,
-  SLEEP_APNEA_DEFINITION
+  SLEEP_APNEA_DEFINITION,
+  BIOLOGICAL_ASSESSMENT_DEFINITION
 } from "@/lib/constants/questionnaires-infirmier";
 import { 
   getAsrmResponse, 
@@ -89,8 +90,10 @@ import {
   getFagerstromResponse,
   getPhysicalParamsResponse,
   getBloodPressureResponse,
-  getSleepApneaResponse
+  getSleepApneaResponse,
+  getBiologicalAssessmentResponse
 } from "@/lib/services/questionnaire-infirmier.service";
+import { getPatientById } from "@/lib/services/patient.service";
 import { QuestionnairePageClient } from "./page-client";
 
 export default async function ProfessionalQuestionnairePage({
@@ -147,6 +150,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === PHYSICAL_PARAMS_DEFINITION.code) questionnaire = PHYSICAL_PARAMS_DEFINITION;
   else if (code === BLOOD_PRESSURE_DEFINITION.code) questionnaire = BLOOD_PRESSURE_DEFINITION;
   else if (code === SLEEP_APNEA_DEFINITION.code) questionnaire = SLEEP_APNEA_DEFINITION;
+  else if (code === BIOLOGICAL_ASSESSMENT_DEFINITION.code) questionnaire = BIOLOGICAL_ASSESSMENT_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -195,6 +199,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === PHYSICAL_PARAMS_DEFINITION.code) existingResponse = await getPhysicalParamsResponse(visitId);
   else if (code === BLOOD_PRESSURE_DEFINITION.code) existingResponse = await getBloodPressureResponse(visitId);
   else if (code === SLEEP_APNEA_DEFINITION.code) existingResponse = await getSleepApneaResponse(visitId);
+  else if (code === BIOLOGICAL_ASSESSMENT_DEFINITION.code) existingResponse = await getBiologicalAssessmentResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).
@@ -205,6 +210,34 @@ export default async function ProfessionalQuestionnairePage({
   if (existingResponse) {
     // Destructure to remove metadata if needed, but passing everything is usually fine as extra keys are ignored by Renderer if not in questions list.
     initialResponses = { ...existingResponse };
+  }
+
+  // For biological assessment, fetch patient data and physical params for creatinine clearance computation
+  if (code === BIOLOGICAL_ASSESSMENT_DEFINITION.code) {
+    const [patient, physicalParams] = await Promise.all([
+      getPatientById(patientId),
+      getPhysicalParamsResponse(visitId)
+    ]);
+
+    if (patient) {
+      // Calculate age from date_of_birth
+      if (patient.date_of_birth) {
+        const birthDate = new Date(patient.date_of_birth);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const adjustedAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
+        initialResponses = { ...initialResponses, patient_age: adjustedAge };
+      }
+      
+      if (patient.gender) {
+        initialResponses = { ...initialResponses, patient_gender: patient.gender };
+      }
+    }
+
+    if (physicalParams?.weight_kg) {
+      initialResponses = { ...initialResponses, weight_kg: physicalParams.weight_kg };
+    }
   }
 
   return (
