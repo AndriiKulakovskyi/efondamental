@@ -1,10 +1,10 @@
 /**
  * Infirmier Section Questionnaire Services
- * Handles tobacco assessment, Fagerstrom test, physical parameters, and blood pressure responses
+ * Handles tobacco assessment, Fagerstrom test, physical parameters, blood pressure, and sleep apnea responses
  */
 
 import { createClient } from '@/lib/supabase/server';
-import { TobaccoResponse, TobaccoResponseInsert, FagerstromResponse, FagerstromResponseInsert, PhysicalParamsResponse, PhysicalParamsResponseInsert, BloodPressureResponse, BloodPressureResponseInsert } from '@/lib/types/database.types';
+import { TobaccoResponse, TobaccoResponseInsert, FagerstromResponse, FagerstromResponseInsert, PhysicalParamsResponse, PhysicalParamsResponseInsert, BloodPressureResponse, BloodPressureResponseInsert, SleepApneaResponse, SleepApneaResponseInsert } from '@/lib/types/database.types';
 
 // ===== TOBACCO ASSESSMENT =====
 
@@ -266,6 +266,116 @@ export async function saveBloodPressureResponse(
       tension_standing: tensionStanding,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ===== SLEEP APNEA (STOP-BANG) =====
+
+export async function getSleepApneaResponse(
+  visitId: string
+): Promise<SleepApneaResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_sleep_apnea')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No data found
+    if (error.code === 'PGRST205') {
+      // Table doesn't exist yet - migration not applied
+      console.warn(`Table responses_sleep_apnea not found. Please run migrations.`);
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveSleepApneaResponse(
+  response: SleepApneaResponseInsert
+): Promise<SleepApneaResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  const normalizedResponse: any = {
+    visit_id: response.visit_id,
+    patient_id: response.patient_id,
+    diagnosed_sleep_apnea: response.diagnosed_sleep_apnea,
+    completed_by: user.data.user?.id
+  };
+
+  if (response.diagnosed_sleep_apnea === 'yes') {
+    // Convert string 'yes'/'no' to boolean
+    const hasCpap = (response as any).has_cpap_device;
+    normalizedResponse.has_cpap_device = hasCpap === true || hasCpap === 'true' || hasCpap === 'yes';
+  } else if (response.diagnosed_sleep_apnea === 'no' || response.diagnosed_sleep_apnea === 'unknown') {
+    // STOP-Bang questions - convert string 'yes'/'no' to boolean
+    const snoring = (response as any).snoring;
+    const tiredness = (response as any).tiredness;
+    const observedApnea = (response as any).observed_apnea;
+    const hypertension = (response as any).hypertension;
+    const bmiOver35 = (response as any).bmi_over_35;
+    const ageOver50 = (response as any).age_over_50;
+    const largeNeck = (response as any).large_neck;
+    const maleGender = (response as any).male_gender;
+
+    normalizedResponse.snoring = snoring === true || snoring === 'true' || snoring === 'yes';
+    normalizedResponse.tiredness = tiredness === true || tiredness === 'true' || tiredness === 'yes';
+    normalizedResponse.observed_apnea = observedApnea === true || observedApnea === 'true' || observedApnea === 'yes';
+    normalizedResponse.hypertension = hypertension === true || hypertension === 'true' || hypertension === 'yes';
+    normalizedResponse.bmi_over_35 = bmiOver35 === true || bmiOver35 === 'true' || bmiOver35 === 'yes';
+    normalizedResponse.age_over_50 = ageOver50 === true || ageOver50 === 'true' || ageOver50 === 'yes';
+    normalizedResponse.large_neck = largeNeck === true || largeNeck === 'true' || largeNeck === 'yes';
+    normalizedResponse.male_gender = maleGender === true || maleGender === 'true' || maleGender === 'yes';
+
+    // Calculate STOP-Bang score (each "Yes" = 1 point)
+    const score = [
+      normalizedResponse.snoring,
+      normalizedResponse.tiredness,
+      normalizedResponse.observed_apnea,
+      normalizedResponse.hypertension,
+      normalizedResponse.bmi_over_35,
+      normalizedResponse.age_over_50,
+      normalizedResponse.large_neck,
+      normalizedResponse.male_gender
+    ].filter(Boolean).length;
+
+    normalizedResponse.stop_bang_score = score;
+
+    // Determine risk level
+    let riskLevel = '';
+    let interpretation = '';
+
+    if (score <= 2) {
+      riskLevel = 'low_risk';
+      interpretation = `Score STOP-Bang: ${score}/8. Faible risque d'apnées obstructives du sommeil.`;
+    } else if (score >= 3 && score <= 4) {
+      riskLevel = 'intermediate_risk';
+      interpretation = `Score STOP-Bang: ${score}/8. Risque intermédiaire d'apnées obstructives du sommeil. Considérer une évaluation plus approfondie.`;
+    } else {
+      riskLevel = 'high_risk';
+      interpretation = `Score STOP-Bang: ${score}/8. Haut risque d'apnées obstructives du sommeil. Recommandation forte pour une polysomnographie.`;
+    }
+
+    // High risk conditions (score ≥3 + major risk factors)
+    if (score >= 3 && (normalizedResponse.bmi_over_35 || normalizedResponse.hypertension || normalizedResponse.large_neck)) {
+      riskLevel = 'high_risk';
+      interpretation += ' Facteurs de risque majeurs présents (IMC > 35, HTA, ou tour de cou important).';
+    }
+
+    normalizedResponse.risk_level = riskLevel;
+    normalizedResponse.interpretation = interpretation;
+  }
+
+  const { data, error } = await supabase
+    .from('responses_sleep_apnea')
+    .upsert(normalizedResponse, { onConflict: 'visit_id' })
     .select()
     .single();
 

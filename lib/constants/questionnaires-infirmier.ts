@@ -368,3 +368,163 @@ export const BLOOD_PRESSURE_DEFINITION: QuestionnaireDefinition = {
   }
 };
 
+// ===== SLEEP APNEA (STOP-BANG) =====
+
+export const SLEEP_APNEA_QUESTIONS: Question[] = [
+  {
+    id: 'diagnosed_sleep_apnea',
+    text: 'Avez-vous été diagnostiqué comme souffrant d\'apnées du sommeil ? (examen du sommeil, polysomnographie)',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' },
+      { code: 'unknown', label: 'NSP (Ne Sais Pas)' }
+    ]
+  },
+  
+  // If diagnosed = yes - ONLY show CPAP device question
+  {
+    id: 'has_cpap_device',
+    text: 'Êtes-vous appareillé ?',
+    help: 'Utilisez-vous un appareil CPAP pour traiter vos apnées du sommeil ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      '==': [{ var: 'diagnosed_sleep_apnea' }, 'yes']
+    }
+  },
+  
+  // STOP-Bang questions (if diagnosed = no or unknown)
+  {
+    id: 'section_stop_bang',
+    text: 'Dépistage des Apnées du Sommeil (STOP-Bang)',
+    help: 'Répondez aux questions suivantes pour évaluer votre risque d\'apnées du sommeil',
+    type: 'section',
+    required: false,
+    display_if: {
+      'in': [{ var: 'diagnosed_sleep_apnea' }, ['no', 'unknown']]
+    }
+  },
+  {
+    id: 'snoring',
+    text: 'Ronflements ? Ronflez-vous fort (suffisamment fort pour qu\'on vous entende à travers une porte fermée ou que votre partenaire vous donne des coups de coude parce que vous ronflez la nuit) ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      'in': [{ var: 'diagnosed_sleep_apnea' }, ['no', 'unknown']]
+    }
+  },
+  {
+    id: 'tiredness',
+    text: 'Fatigue ? Vous sentez-vous souvent fatigué(e), épuisé(e) ou somnolent(e) pendant la journée (comme par exemple s\'endormir au volant) ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      'in': [{ var: 'diagnosed_sleep_apnea' }, ['no', 'unknown']]
+    }
+  },
+  {
+    id: 'observed_apnea',
+    text: 'Observation ? Quelqu\'un a-t-il observé que vous arrêtiez de respirer ou que vous vous étouffiez/suffoquiez pendant votre sommeil ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      'in': [{ var: 'diagnosed_sleep_apnea' }, ['no', 'unknown']]
+    }
+  },
+  {
+    id: 'hypertension',
+    text: 'Tension ? Êtes-vous atteint(e) d\'hypertension artérielle ou êtes-vous traité(e) pour ce problème ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      'in': [{ var: 'diagnosed_sleep_apnea' }, ['no', 'unknown']]
+    }
+  },
+  {
+    id: 'bmi_over_35',
+    text: 'Indice de Masse Corporelle supérieur à 35 kg/m² ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      'in': [{ var: 'diagnosed_sleep_apnea' }, ['no', 'unknown']]
+    }
+  },
+  {
+    id: 'age_over_50',
+    text: 'Âge supérieur à 50 ans ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      'in': [{ var: 'diagnosed_sleep_apnea' }, ['no', 'unknown']]
+    }
+  },
+  {
+    id: 'large_neck',
+    text: 'Tour de cou important ? (mesuré au niveau de la pomme d\'Adam) Pour les hommes, votre tour de cou est-il supérieur ou égal à 43 cm ? Pour les femmes, votre tour de cou est-il supérieur ou égal à 41 cm ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      'in': [{ var: 'diagnosed_sleep_apnea' }, ['no', 'unknown']]
+    }
+  },
+  {
+    id: 'male_gender',
+    text: 'Sexe = Masculin ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      'in': [{ var: 'diagnosed_sleep_apnea' }, ['no', 'unknown']]
+    }
+  }
+];
+
+export const SLEEP_APNEA_DEFINITION: QuestionnaireDefinition = {
+  id: 'sleep_apnea',
+  code: 'SLEEP_APNEA',
+  title: 'Apnées du sommeil',
+  description: 'Dépistage des apnées du sommeil avec score STOP-Bang',
+  questions: SLEEP_APNEA_QUESTIONS,
+  metadata: {
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+

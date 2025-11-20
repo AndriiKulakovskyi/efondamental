@@ -50,7 +50,8 @@ import {
   getTobaccoResponse,
   getFagerstromResponse,
   getPhysicalParamsResponse,
-  getBloodPressureResponse
+  getBloodPressureResponse,
+  getSleepApneaResponse
 } from './questionnaire-infirmier.service';
 import {
   ASRM_DEFINITION,
@@ -94,7 +95,8 @@ import {
   TOBACCO_DEFINITION,
   FAGERSTROM_DEFINITION,
   PHYSICAL_PARAMS_DEFINITION,
-  BLOOD_PRESSURE_DEFINITION
+  BLOOD_PRESSURE_DEFINITION,
+  SLEEP_APNEA_DEFINITION
 } from '../constants/questionnaires-infirmier';
 
 // ============================================================================
@@ -353,7 +355,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_nurse',
         name: 'Infirmier',
         description: 'Évaluation par l\'infirmier',
-        questionnaires: [TOBACCO_DEFINITION, FAGERSTROM_DEFINITION, PHYSICAL_PARAMS_DEFINITION, BLOOD_PRESSURE_DEFINITION]
+        questionnaires: [TOBACCO_DEFINITION, FAGERSTROM_DEFINITION, PHYSICAL_PARAMS_DEFINITION, BLOOD_PRESSURE_DEFINITION, SLEEP_APNEA_DEFINITION]
       },
       {
         id: 'mod_thymic_eval',
@@ -446,14 +448,14 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diag) completed++;
     if (orient) completed++;
   } else if (visit.visit_type === 'initial_evaluation') {
-    total = 30; // 16 auto questionnaires + ASRM + QIDS (reused) + 7 hetero questionnaires + 1 social + 4 infirmier (tobacco + fagerstrom + physical_params + blood_pressure)
+    total = 31; // 16 auto questionnaires + ASRM + QIDS (reused) + 7 hetero questionnaires + 1 social + 5 infirmier (tobacco + fagerstrom + physical_params + blood_pressure + sleep_apnea)
     totalModules = 6;
 
     const [
       eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,
       asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti,
       madrs, ymrs, cgi, egf, alda, etatPatient, fast, social,
-      tobacco, fagerstrom, physicalParams, bloodPressure
+      tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea
     ] = await Promise.all([
       // ETAT questionnaires
       getEq5d5lResponse(visitId),
@@ -489,7 +491,8 @@ export async function getVisitCompletionStatus(visitId: string) {
       getTobaccoResponse(visitId),
       getFagerstromResponse(visitId),
       getPhysicalParamsResponse(visitId),
-      getBloodPressureResponse(visitId)
+      getBloodPressureResponse(visitId),
+      getSleepApneaResponse(visitId)
     ]);
 
     if (eq5d5l) completed++;
@@ -522,6 +525,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (fagerstrom) completed++;
     if (physicalParams) completed++;
     if (bloodPressure) completed++;
+    if (sleepApnea) completed++;
   }
 
   return {

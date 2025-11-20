@@ -43,7 +43,8 @@ import {
   TOBACCO_DEFINITION,
   FAGERSTROM_DEFINITION,
   PHYSICAL_PARAMS_DEFINITION,
-  BLOOD_PRESSURE_DEFINITION
+  BLOOD_PRESSURE_DEFINITION,
+  SLEEP_APNEA_DEFINITION
 } from "@/lib/constants/questionnaires-infirmier";
 import { 
   getAsrmResponse, 
@@ -87,7 +88,8 @@ import {
   getTobaccoResponse,
   getFagerstromResponse,
   getPhysicalParamsResponse,
-  getBloodPressureResponse
+  getBloodPressureResponse,
+  getSleepApneaResponse
 } from "@/lib/services/questionnaire-infirmier.service";
 import { QuestionnairePageClient } from "./page-client";
 
@@ -144,6 +146,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === FAGERSTROM_DEFINITION.code) questionnaire = FAGERSTROM_DEFINITION;
   else if (code === PHYSICAL_PARAMS_DEFINITION.code) questionnaire = PHYSICAL_PARAMS_DEFINITION;
   else if (code === BLOOD_PRESSURE_DEFINITION.code) questionnaire = BLOOD_PRESSURE_DEFINITION;
+  else if (code === SLEEP_APNEA_DEFINITION.code) questionnaire = SLEEP_APNEA_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -191,6 +194,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === FAGERSTROM_DEFINITION.code) existingResponse = await getFagerstromResponse(visitId);
   else if (code === PHYSICAL_PARAMS_DEFINITION.code) existingResponse = await getPhysicalParamsResponse(visitId);
   else if (code === BLOOD_PRESSURE_DEFINITION.code) existingResponse = await getBloodPressureResponse(visitId);
+  else if (code === SLEEP_APNEA_DEFINITION.code) existingResponse = await getSleepApneaResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

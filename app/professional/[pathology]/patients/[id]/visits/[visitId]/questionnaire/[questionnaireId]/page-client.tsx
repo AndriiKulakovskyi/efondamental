@@ -67,7 +67,7 @@ export function QuestionnairePageClient({
         // Social questionnaire has no scoring but we track completion
         'SOCIAL',
         // Infirmier questionnaires - Fagerstrom has scoring, Tobacco doesn't
-        'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE'
+        'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA'
       ].includes(questionnaire.code);
       if (!hasScoring) {
          router.back();

@@ -1017,3 +1017,81 @@ export interface BloodPressureResponse {
 }
 
 export type BloodPressureResponseInsert = Omit<BloodPressureResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ===== Sleep Apnea (STOP-Bang) Response =====
+export interface SleepApneaResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  diagnosed_sleep_apnea: 'yes' | 'no' | 'unknown';
+  has_cpap_device?: boolean | null;
+  snoring?: boolean | null;
+  tiredness?: boolean | null;
+  observed_apnea?: boolean | null;
+  hypertension?: boolean | null;
+  bmi_over_35?: boolean | null;
+  age_over_50?: boolean | null;
+  large_neck?: boolean | null;
+  male_gender?: boolean | null;
+  stop_bang_score?: number | null;
+  risk_level?: string | null;
+  interpretation?: string | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SleepApneaResponseInsert = Omit<SleepApneaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'stop_bang_score' | 'risk_level' | 'interpretation'>;
+
+// ===== Sleep Apnea Response =====
+export interface SleepApneaResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  diagnosed_sleep_apnea: 'yes' | 'no' | 'unknown';
+  has_cpap_device?: boolean | null;
+  snoring?: boolean | null;
+  tiredness?: boolean | null;
+  observed_apnea?: boolean | null;
+  high_blood_pressure?: boolean | null;
+  bmi_over_35?: boolean | null;
+  age_over_50?: boolean | null;
+  large_neck_circumference?: boolean | null;
+  male_gender?: boolean | null;
+  stopbang_score?: number | null;
+  risk_level?: string | null;
+  interpretation?: string | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SleepApneaResponseInsert = Omit<SleepApneaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ===== Sleep Apnea Assessment (STOP-Bang) =====
+export interface SleepApneaResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  diagnosed_sleep_apnea: 'yes' | 'no' | 'unknown';
+  has_device?: boolean | null;
+  snoring?: boolean | null;
+  tiredness?: boolean | null;
+  observed_apnea?: boolean | null;
+  high_blood_pressure?: boolean | null;
+  bmi_over_35?: boolean | null;
+  age_over_50?: boolean | null;
+  large_neck?: boolean | null;
+  male_gender?: boolean | null;
+  stop_bang_score?: number | null; // Auto-calculated (0-8)
+  risk_level?: string | null;
+  interpretation?: string | null;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SleepApneaResponseInsert = Omit<SleepApneaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'stop_bang_score'>;
