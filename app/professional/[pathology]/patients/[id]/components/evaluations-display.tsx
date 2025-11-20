@@ -30,9 +30,9 @@ export function EvaluationsDisplay({ evaluations }: EvaluationsDisplayProps) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Clinical Evaluations</h3>
+        <h3 className="text-lg font-semibold">Évaluations Cliniques</h3>
         <div className="text-sm text-slate-600">
-          {evaluations.length} evaluation{evaluations.length !== 1 ? 's' : ''} recorded
+          {evaluations.length} évaluation{evaluations.length !== 1 ? 's' : ''} enregistrée{evaluations.length !== 1 ? 's' : ''}
         </div>
       </div>
 
@@ -59,7 +59,7 @@ export function EvaluationsDisplay({ evaluations }: EvaluationsDisplayProps) {
                       <div className="flex items-center gap-3 mb-3">
                         <h4 className="font-semibold text-lg text-slate-900">
                           {evaluation.visit_type && VISIT_TYPE_NAMES[evaluation.visit_type as VisitType]}
-                          {!evaluation.visit_type && "Clinical Evaluation"}
+                          {!evaluation.visit_type && "Évaluation Clinique"}
                         </h4>
                         {hasRiskAssessment && (
                           <div className="flex gap-2">
@@ -76,7 +76,7 @@ export function EvaluationsDisplay({ evaluations }: EvaluationsDisplayProps) {
                                 "text-xs px-2.5 py-1 rounded-full border font-medium",
                                 getRiskColor(evaluation.risk_assessment.relapse_risk)
                               )}>
-                                Relapse: {evaluation.risk_assessment.relapse_risk}
+                                Rechute: {evaluation.risk_assessment.relapse_risk}
                               </span>
                             )}
                           </div>
@@ -84,7 +84,7 @@ export function EvaluationsDisplay({ evaluations }: EvaluationsDisplayProps) {
                       </div>
 
                       <p className="text-sm text-slate-600 mb-4">
-                        Evaluated by {evaluation.evaluator_name} on{" "}
+                        Évalué par {evaluation.evaluator_name} le{" "}
                         {formatDateTime(evaluation.evaluation_date)}
                       </p>
 
@@ -94,7 +94,7 @@ export function EvaluationsDisplay({ evaluations }: EvaluationsDisplayProps) {
                           <div className="flex items-center gap-2">
                             <Activity className="h-4 w-4 text-slate-500" />
                             <div>
-                              <span className="text-xs text-slate-500">Mood</span>
+                              <span className="text-xs text-slate-500">Humeur</span>
                               <p className="text-base font-bold text-slate-900">{evaluation.mood_score}/10</p>
                             </div>
                           </div>
@@ -103,7 +103,7 @@ export function EvaluationsDisplay({ evaluations }: EvaluationsDisplayProps) {
                           <div className="flex items-center gap-2">
                             <Pill className="h-4 w-4 text-slate-500" />
                             <div>
-                              <span className="text-xs text-slate-500">Adherence</span>
+                              <span className="text-xs text-slate-500">Adhésion</span>
                               <p className="text-base font-bold text-slate-900">{evaluation.medication_adherence}%</p>
                             </div>
                           </div>
@@ -130,7 +130,7 @@ export function EvaluationsDisplay({ evaluations }: EvaluationsDisplayProps) {
                       {evaluation.notes && (
                         <div className="bg-slate-50 rounded-lg p-4">
                           <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">
-                            Clinical Notes
+                            Notes Cliniques
                           </p>
                           <p className="text-sm text-slate-700 leading-relaxed">{evaluation.notes}</p>
                         </div>
@@ -139,29 +139,29 @@ export function EvaluationsDisplay({ evaluations }: EvaluationsDisplayProps) {
                       {evaluation.risk_assessment && (
                         <div>
                           <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">
-                            Full Risk Assessment
+                            Évaluation Complète des Risques
                           </p>
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <p className="text-sm font-medium text-slate-700">Suicide Risk</p>
+                              <p className="text-sm font-medium text-slate-700">Risque de Suicide</p>
                               <p className={cn(
                                 "text-sm font-semibold capitalize mt-1",
                                 evaluation.risk_assessment.suicide_risk === 'high' ? 'text-red-600' :
                                 evaluation.risk_assessment.suicide_risk === 'moderate' ? 'text-amber-600' :
                                 'text-slate-600'
                               )}>
-                                {evaluation.risk_assessment.suicide_risk || 'None'}
+                                {evaluation.risk_assessment.suicide_risk || 'Aucun'}
                               </p>
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-slate-700">Relapse Risk</p>
+                              <p className="text-sm font-medium text-slate-700">Risque de Rechute</p>
                               <p className={cn(
                                 "text-sm font-semibold capitalize mt-1",
                                 evaluation.risk_assessment.relapse_risk === 'high' ? 'text-red-600' :
                                 evaluation.risk_assessment.relapse_risk === 'moderate' ? 'text-amber-600' :
                                 'text-slate-600'
                               )}>
-                                {evaluation.risk_assessment.relapse_risk || 'None'}
+                                {evaluation.risk_assessment.relapse_risk || 'Aucun'}
                               </p>
                             </div>
                           </div>
@@ -177,9 +177,9 @@ export function EvaluationsDisplay({ evaluations }: EvaluationsDisplayProps) {
       ) : (
         <div className="text-center py-12 bg-white rounded-lg border border-slate-200">
           <TrendingUp className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-          <p className="text-slate-600">No clinical evaluations recorded yet</p>
+          <p className="text-slate-600">Aucune évaluation clinique enregistrée pour le moment</p>
           <p className="text-sm text-slate-500 mt-2">
-            Evaluations will appear here after visits are completed
+            Les évaluations apparaîtront ici une fois les visites terminées
           </p>
         </div>
       )}

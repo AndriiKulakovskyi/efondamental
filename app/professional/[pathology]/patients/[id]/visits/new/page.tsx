@@ -71,14 +71,14 @@ export default function NewVisitPage() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to create visit");
+        throw new Error(data.error || "Échec de la création de la visite");
       }
 
       const { visit } = await response.json();
       router.push(`/professional/${pathology}/patients/${patientId}/visits/${visit.id}`);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : "Une erreur s'est produite");
     } finally {
       setIsSubmitting(false);
     }
@@ -95,18 +95,18 @@ export default function NewVisitPage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
-        <h2 className="text-3xl font-bold text-slate-900">Schedule Visit</h2>
-        <p className="text-slate-600">Schedule a new visit for this patient</p>
+        <h2 className="text-3xl font-bold text-slate-900">Planifier une visite</h2>
+        <p className="text-slate-600">Planifier une nouvelle visite pour ce patient</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Visit Details</CardTitle>
+          <CardTitle>Détails de la visite</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="visitType">Visit Type *</Label>
+              <Label htmlFor="visitType">Type de visite *</Label>
               <Select
                 value={formData.visitType}
                 onValueChange={(value) => {
@@ -120,7 +120,7 @@ export default function NewVisitPage() {
                 required
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select visit type" />
+                  <SelectValue placeholder="Sélectionner le type de visite" />
                 </SelectTrigger>
                 <SelectContent>
                   {Object.entries(VISIT_TYPE_NAMES).map(([value, label]) => (
@@ -133,7 +133,7 @@ export default function NewVisitPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="scheduledDate">Scheduled Date *</Label>
+              <Label htmlFor="scheduledDate">Date planifiée *</Label>
               <Input
                 id="scheduledDate"
                 type="datetime-local"
@@ -154,7 +154,7 @@ export default function NewVisitPage() {
                   setFormData({ ...formData, notes: e.target.value })
                 }
                 className="w-full min-h-[100px] px-3 py-2 text-sm rounded-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-950"
-                placeholder="Additional notes or instructions for this visit..."
+                placeholder="Notes ou instructions supplémentaires pour cette visite..."
               />
             </div>
 
@@ -167,16 +167,16 @@ export default function NewVisitPage() {
                 onClick={() => router.back()}
                 disabled={isSubmitting}
               >
-                Cancel
+                Annuler
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Scheduling...
+                    Planification...
                   </>
                 ) : (
-                  "Schedule Visit"
+                  "Planifier"
                 )}
               </Button>
             </div>

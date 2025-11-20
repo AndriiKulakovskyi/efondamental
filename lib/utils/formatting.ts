@@ -2,7 +2,7 @@
 
 export function formatFullName(firstName: string | null, lastName: string | null): string {
   const parts = [firstName, lastName].filter(Boolean);
-  return parts.join(' ') || 'Unknown';
+  return parts.join(' ') || 'Inconnu';
 }
 
 export function formatInitials(firstName: string | null, lastName: string | null): string {
@@ -53,10 +53,10 @@ export function formatRiskLevel(risk: 'none' | 'low' | 'moderate' | 'high'): {
   color: string;
 } {
   const formats = {
-    none: { label: 'None', color: 'text-slate-500' },
-    low: { label: 'Low', color: 'text-green-600' },
-    moderate: { label: 'Moderate', color: 'text-amber-600' },
-    high: { label: 'High', color: 'text-red-600' },
+    none: { label: 'Aucun', color: 'text-slate-500' },
+    low: { label: 'Faible', color: 'text-green-600' },
+    moderate: { label: 'Modéré', color: 'text-amber-600' },
+    high: { label: 'Élevé', color: 'text-red-600' },
   };
   
   return formats[risk];
@@ -67,10 +67,10 @@ export function formatVisitStatus(status: string): {
   color: string;
 } {
   const formats: Record<string, { label: string; color: string }> = {
-    scheduled: { label: 'Scheduled', color: 'text-blue-600' },
-    in_progress: { label: 'In Progress', color: 'text-amber-600' },
-    completed: { label: 'Completed', color: 'text-green-600' },
-    cancelled: { label: 'Cancelled', color: 'text-slate-500' },
+    scheduled: { label: 'Planifiée', color: 'text-blue-600' },
+    in_progress: { label: 'En cours', color: 'text-amber-600' },
+    completed: { label: 'Terminée', color: 'text-green-600' },
+    cancelled: { label: 'Annulée', color: 'text-slate-500' },
   };
   
   return formats[status] || { label: status, color: 'text-slate-600' };

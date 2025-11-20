@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +5,7 @@ import Link from "next/link";
 import { formatShortDate, formatDateTime } from "@/lib/utils/date";
 import { ChevronDown, Clock, CheckCircle, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
 interface VisitTimelineProps {
   visits: any[];
@@ -61,25 +60,25 @@ export function VisitTimeline({ visits, pathology, patientId }: VisitTimelinePro
             variant={filter === 'all' ? 'default' : 'outline'}
             onClick={() => setFilter('all')}
           >
-            All ({visits.length})
+            Toutes ({visits.length})
           </Button>
           <Button
             size="sm"
             variant={filter === 'completed' ? 'default' : 'outline'}
             onClick={() => setFilter('completed')}
           >
-            Completed ({visits.filter(v => v.status === 'completed').length})
+            Terminées ({visits.filter(v => v.status === 'completed').length})
           </Button>
           <Button
             size="sm"
             variant={filter === 'upcoming' ? 'default' : 'outline'}
             onClick={() => setFilter('upcoming')}
           >
-            Upcoming ({visits.filter(v => v.status === 'scheduled' || v.status === 'in_progress').length})
+            À venir ({visits.filter(v => v.status === 'scheduled' || v.status === 'in_progress').length})
           </Button>
         </div>
         <Link href={`/professional/${pathology}/patients/${patientId}/visits/new`}>
-          <Button size="sm">Schedule New Visit</Button>
+          <Button size="sm">Planifier une visite</Button>
         </Link>
       </div>
 
@@ -121,7 +120,10 @@ export function VisitTimeline({ visits, pathology, patientId }: VisitTimelinePro
                             "text-xs px-2.5 py-1 rounded-full border font-medium",
                             getStatusColor(visit.status)
                           )}>
-                            {visit.status === 'in_progress' ? 'In Progress' : visit.status}
+                            {visit.status === 'in_progress' ? 'En cours' : 
+                             visit.status === 'completed' ? 'Terminée' :
+                             visit.status === 'scheduled' ? 'Planifiée' :
+                             visit.status}
                           </span>
                         </div>
                         <div className="flex items-center gap-4 text-sm text-slate-600">
@@ -129,7 +131,9 @@ export function VisitTimeline({ visits, pathology, patientId }: VisitTimelinePro
                             <Calendar className="h-4 w-4" />
                             {visit.scheduled_date && formatShortDate(visit.scheduled_date)}
                           </span>
-                          <span className="capitalize">{visit.visit_type?.replace(/_/g, ' ')}</span>
+                          <span className="capitalize">
+                            {visit.visit_type && VISIT_TYPE_NAMES[visit.visit_type as VisitType]}
+                          </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -138,7 +142,7 @@ export function VisitTimeline({ visits, pathology, patientId }: VisitTimelinePro
                           onClick={(e) => e.stopPropagation()}
                         >
                           <Button size="sm" variant="outline">
-                            View Details
+                            Voir détails
                           </Button>
                         </Link>
                         <ChevronDown 
@@ -171,7 +175,7 @@ export function VisitTimeline({ visits, pathology, patientId }: VisitTimelinePro
                           {visit.created_at && (
                             <div>
                               <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">
-                                Created
+                                Créé le
                               </p>
                               <p className="text-sm text-slate-900">{formatDateTime(visit.created_at)}</p>
                             </div>
@@ -179,7 +183,7 @@ export function VisitTimeline({ visits, pathology, patientId }: VisitTimelinePro
                           {visit.completed_at && (
                             <div>
                               <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">
-                                Completed
+                                Terminé le
                               </p>
                               <p className="text-sm text-slate-900">{formatDateTime(visit.completed_at)}</p>
                             </div>
@@ -196,10 +200,10 @@ export function VisitTimeline({ visits, pathology, patientId }: VisitTimelinePro
       ) : (
         <div className="text-center py-12 bg-white rounded-lg border border-slate-200">
           <Calendar className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-          <p className="text-slate-600">No visits found for this filter</p>
+          <p className="text-slate-600">Aucune visite trouvée pour ce filtre</p>
           <Link href={`/professional/${pathology}/patients/${patientId}/visits/new`}>
             <Button className="mt-4" size="sm">
-              Schedule First Visit
+              Planifier la première visite
             </Button>
           </Link>
         </div>

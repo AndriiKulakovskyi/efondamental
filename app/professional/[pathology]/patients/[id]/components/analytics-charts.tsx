@@ -31,12 +31,12 @@ export function AnalyticsCharts({
 
   const numberToRiskLevel = (num: number) => {
     const map: Record<number, string> = {
-      0: 'None',
-      1: 'Low',
-      2: 'Moderate',
-      3: 'High',
+      0: 'Aucun',
+      1: 'Faible',
+      2: 'Modéré',
+      3: 'Élevé',
     };
-    return map[num] || 'None';
+    return map[num] || 'Aucun';
   };
 
   return (
@@ -44,7 +44,7 @@ export function AnalyticsCharts({
       {/* Mood Trend Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Mood Trend Over Time</CardTitle>
+          <CardTitle>Évolution de l'humeur</CardTitle>
         </CardHeader>
         <CardContent>
           {moodTrend.length > 0 ? (
@@ -72,13 +72,13 @@ export function AnalyticsCharts({
                 ))}
               </div>
               <div className="flex justify-between text-xs text-slate-500">
-                <span>Scale: 0 (worst) - 10 (best)</span>
-                <span>{moodTrend.length} data points</span>
+                <span>Échelle: 0 (pire) - 10 (meilleur)</span>
+                <span>{moodTrend.length} points de données</span>
               </div>
             </div>
           ) : (
             <div className="text-center py-12 text-slate-500">
-              No mood data available
+              Aucune donnée d'humeur disponible
             </div>
           )}
         </CardContent>
@@ -87,14 +87,14 @@ export function AnalyticsCharts({
       {/* Risk History Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Risk Assessment History</CardTitle>
+          <CardTitle>Historique d'évaluation des risques</CardTitle>
         </CardHeader>
         <CardContent>
           {riskHistory.length > 0 ? (
             <div className="space-y-6">
               {/* Suicide Risk */}
               <div>
-                <h4 className="text-sm font-semibold text-slate-700 mb-3">Suicide Risk</h4>
+                <h4 className="text-sm font-semibold text-slate-700 mb-3">Risque de Suicide</h4>
                 <div className="h-32 flex items-end justify-between gap-2">
                   {riskHistory.map((data, index) => {
                     const level = riskLevelToNumber(data.suicide_risk);
@@ -125,7 +125,7 @@ export function AnalyticsCharts({
 
               {/* Relapse Risk */}
               <div>
-                <h4 className="text-sm font-semibold text-slate-700 mb-3">Relapse Risk</h4>
+                <h4 className="text-sm font-semibold text-slate-700 mb-3">Risque de Rechute</h4>
                 <div className="h-32 flex items-end justify-between gap-2">
                   {riskHistory.map((data, index) => {
                     const level = riskLevelToNumber(data.relapse_risk);
@@ -157,25 +157,25 @@ export function AnalyticsCharts({
               <div className="flex gap-4 text-xs">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-slate-200"></div>
-                  <span>None</span>
+                  <span>Aucun</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-blue-400"></div>
-                  <span>Low</span>
+                  <span>Faible</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-amber-400"></div>
-                  <span>Moderate</span>
+                  <span>Modéré</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-red-500"></div>
-                  <span>High</span>
+                  <span>Élevé</span>
                 </div>
               </div>
             </div>
           ) : (
             <div className="text-center py-12 text-slate-500">
-              No risk assessment data available
+              Aucune donnée d'évaluation des risques disponible
             </div>
           )}
         </CardContent>
@@ -184,7 +184,7 @@ export function AnalyticsCharts({
       {/* Medication Adherence */}
       <Card>
         <CardHeader>
-          <CardTitle>Medication Adherence</CardTitle>
+          <CardTitle>Adhésion médicamenteuse</CardTitle>
         </CardHeader>
         <CardContent>
           {adherenceTrend.length > 0 ? (
@@ -221,23 +221,23 @@ export function AnalyticsCharts({
                 <div className="flex gap-4">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded bg-green-500"></div>
-                    <span>Good (80%+)</span>
+                    <span>Bonne (80%+)</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded bg-amber-400"></div>
-                    <span>Fair (50-79%)</span>
+                    <span>Moyenne (50-79%)</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded bg-red-500"></div>
-                    <span>Poor (&lt;50%)</span>
+                    <span>Faible (&lt;50%)</span>
                   </div>
                 </div>
-                <span className="text-slate-500">{adherenceTrend.length} data points</span>
+                <span className="text-slate-500">{adherenceTrend.length} points de données</span>
               </div>
             </div>
           ) : (
             <div className="text-center py-12 text-slate-500">
-              No adherence data available
+              Aucune donnée d'adhésion disponible
             </div>
           )}
         </CardContent>

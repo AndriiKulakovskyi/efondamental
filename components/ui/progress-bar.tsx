@@ -25,7 +25,9 @@ export function ProgressBar({
     <div className={`flex items-center gap-3 ${className}`}>
       <div className={`flex-1 bg-slate-200 rounded-full overflow-hidden ${sizeClasses[size]}`}>
         <div
-          className="h-full bg-blue-500 rounded-full transition-all duration-500 ease-out"
+          className={`h-full rounded-full transition-all duration-500 ease-out ${
+            clampedPercentage === 100 ? 'bg-green-500' : 'bg-blue-500'
+          }`}
           style={{ width: `${clampedPercentage}%` }}
         />
       </div>

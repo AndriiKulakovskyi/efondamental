@@ -219,7 +219,7 @@ export default async function PatientDetailPage({
                 moodTrend={moodTrend}
                 riskHistory={riskHistory}
                 adherenceTrend={adherenceTrend}
-                currentRiskLevel={risk.label}
+                currentRiskLevel={riskLevel}
               />
               
               <AnalyticsCharts

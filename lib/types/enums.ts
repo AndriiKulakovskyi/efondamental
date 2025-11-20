@@ -63,27 +63,27 @@ export enum AuditAction {
 
 // Pathology display names
 export const PATHOLOGY_NAMES: Record<PathologyType, string> = {
-  [PathologyType.BIPOLAR]: 'Bipolar Disorder',
-  [PathologyType.SCHIZOPHRENIA]: 'Schizophrenia',
-  [PathologyType.ASD_ASPERGER]: 'Autism Spectrum Disorder - Asperger',
-  [PathologyType.DEPRESSION]: 'Depression',
+  [PathologyType.BIPOLAR]: 'Troubles Bipolaires',
+  [PathologyType.SCHIZOPHRENIA]: 'Schizophrénie',
+  [PathologyType.ASD_ASPERGER]: 'Trouble du Spectre de l\'Autisme - Asperger',
+  [PathologyType.DEPRESSION]: 'Dépression',
 };
 
 // Role display names
 export const ROLE_NAMES: Record<UserRole, string> = {
-  [UserRole.ADMINISTRATOR]: 'Administrator',
+  [UserRole.ADMINISTRATOR]: 'Administrateur',
   [UserRole.MANAGER]: 'Manager',
-  [UserRole.HEALTHCARE_PROFESSIONAL]: 'Healthcare Professional',
+  [UserRole.HEALTHCARE_PROFESSIONAL]: 'Professionnel de Santé',
   [UserRole.PATIENT]: 'Patient',
 };
 
 // Visit type display names
 export const VISIT_TYPE_NAMES: Record<VisitType, string> = {
-  [VisitType.SCREENING]: 'Screening Visit',
-  [VisitType.INITIAL_EVALUATION]: 'Initial Evaluation',
-  [VisitType.BIANNUAL_FOLLOWUP]: 'Biannual Follow-up',
-  [VisitType.ANNUAL_EVALUATION]: 'Annual Evaluation',
-  [VisitType.OFF_SCHEDULE]: 'Off-Schedule Visit',
+  [VisitType.SCREENING]: 'Visite de Dépistage',
+  [VisitType.INITIAL_EVALUATION]: 'Évaluation Initiale',
+  [VisitType.BIANNUAL_FOLLOWUP]: 'Suivi Semestriel',
+  [VisitType.ANNUAL_EVALUATION]: 'Évaluation Annuelle',
+  [VisitType.OFF_SCHEDULE]: 'Visite Hors Programme',
 };
 
 // Permission categories

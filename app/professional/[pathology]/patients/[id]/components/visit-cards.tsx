@@ -8,6 +8,7 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -103,12 +104,14 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
   };
 
   const getActionButton = (visit: VisitWithCompletion) => {
+    const isComplete = visit.completionPercentage === 100;
+
     if (visit.status === 'completed') {
       return (
         <Link href={`/professional/${pathology}/patients/${patientId}/visits/${visit.id}`}>
           <Button variant="outline" size="sm" className="w-full">
             <Eye className="w-4 h-4 mr-2" />
-            Voir détails
+            Revoir
           </Button>
         </Link>
       );
@@ -117,20 +120,37 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
     if (visit.status === 'in_progress') {
       return (
         <Link href={`/professional/${pathology}/patients/${patientId}/visits/${visit.id}`}>
-          <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700">
-            <ArrowRight className="w-4 h-4 mr-2" />
-            Continuer
+          <Button size="sm" className={cn(
+            "w-full",
+            isComplete ? "bg-slate-900 hover:bg-slate-800" : "bg-blue-600 hover:bg-blue-700"
+          )}>
+            {isComplete ? (
+              <Eye className="w-4 h-4 mr-2" />
+            ) : (
+              <ArrowRight className="w-4 h-4 mr-2" />
+            )}
+            {isComplete ? "Revoir" : "Continuer"}
           </Button>
         </Link>
       );
     }
     
     if (visit.status === 'scheduled') {
+      const hasStarted = visit.completionPercentage > 0;
       return (
         <Link href={`/professional/${pathology}/patients/${patientId}/visits/${visit.id}`}>
-          <Button size="sm" className="w-full bg-slate-900 hover:bg-slate-800">
-            <Play className="w-4 h-4 mr-2" />
-            Commencer
+          <Button size="sm" className={cn(
+            "w-full",
+            hasStarted && !isComplete ? "bg-blue-600 hover:bg-blue-700" : "bg-slate-900 hover:bg-slate-800"
+          )}>
+            {isComplete ? (
+              <Eye className="w-4 h-4 mr-2" />
+            ) : hasStarted ? (
+              <ArrowRight className="w-4 h-4 mr-2" />
+            ) : (
+              <Play className="w-4 h-4 mr-2" />
+            )}
+            {isComplete ? "Revoir" : hasStarted ? "Continuer" : "Commencer"}
           </Button>
         </Link>
       );

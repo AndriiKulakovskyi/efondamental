@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, AlertTriangle, Pill, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatRiskLevel } from "@/lib/utils/formatting";
 
 interface AnalyticsSummaryProps {
   moodTrend: any[];
@@ -35,11 +36,7 @@ export function AnalyticsSummary({
   const latestMood = moodTrend.length > 0 ? moodTrend[moodTrend.length - 1].mood_score : null;
   const latestAdherence = adherenceTrend.length > 0 ? adherenceTrend[adherenceTrend.length - 1].adherence : null;
 
-  const getTrendIcon = (direction: string, isPositive: boolean) => {
-    if (direction === 'up') return isPositive ? TrendingUp : TrendingUp;
-    if (direction === 'down') return isPositive ? TrendingDown : TrendingDown;
-    return Minus;
-  };
+  const riskInfo = formatRiskLevel(currentRiskLevel as 'none' | 'low' | 'moderate' | 'high');
 
   const getTrendColor = (direction: string, isPositive: boolean) => {
     if (direction === 'stable') return 'text-slate-500';
@@ -47,25 +44,12 @@ export function AnalyticsSummary({
     return isGoodChange ? 'text-green-600' : 'text-red-600';
   };
 
-  const getRiskColor = (risk: string) => {
-    switch (risk) {
-      case 'High':
-        return 'text-red-600';
-      case 'Moderate':
-        return 'text-amber-600';
-      case 'Low':
-        return 'text-blue-600';
-      default:
-        return 'text-slate-600';
-    }
-  };
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <Card className="hover:shadow-md transition-shadow duration-200">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-slate-600">
-            Latest Mood Score
+            Dernier score d'humeur
           </CardTitle>
           <Activity className="h-4 w-4 text-slate-500" />
         </CardHeader>
@@ -86,7 +70,7 @@ export function AnalyticsSummary({
             )}
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            {moodTrend.length > 0 ? 'From last evaluation' : 'No data available'}
+            {moodTrend.length > 0 ? 'Depuis la dernière évaluation' : 'Aucune donnée disponible'}
           </p>
         </CardContent>
       </Card>
@@ -94,16 +78,16 @@ export function AnalyticsSummary({
       <Card className="hover:shadow-md transition-shadow duration-200">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-slate-600">
-            Current Risk Level
+            Niveau de risque actuel
           </CardTitle>
           <AlertTriangle className="h-4 w-4 text-slate-500" />
         </CardHeader>
         <CardContent>
-          <div className={cn("text-3xl font-bold", getRiskColor(currentRiskLevel))}>
-            {currentRiskLevel}
+          <div className={cn("text-3xl font-bold", riskInfo.color)}>
+            {riskInfo.label}
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Based on recent assessments
+            Basé sur les évaluations récentes
           </p>
         </CardContent>
       </Card>
@@ -111,7 +95,7 @@ export function AnalyticsSummary({
       <Card className="hover:shadow-md transition-shadow duration-200">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-slate-600">
-            Medication Adherence
+            Adhésion médicamenteuse
           </CardTitle>
           <Pill className="h-4 w-4 text-slate-500" />
         </CardHeader>
@@ -132,7 +116,7 @@ export function AnalyticsSummary({
             )}
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            {adherenceTrend.length > 0 ? 'Latest reported adherence' : 'No data available'}
+            {adherenceTrend.length > 0 ? 'Dernière adhésion rapportée' : 'Aucune donnée disponible'}
           </p>
         </CardContent>
       </Card>
