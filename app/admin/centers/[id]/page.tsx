@@ -6,6 +6,7 @@ import { Users, UserCheck, Calendar, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PathologyType } from "@/lib/types/enums";
 
 export default async function CenterDetailPage({
   params,
@@ -109,7 +110,7 @@ export default async function CenterDetailPage({
           </h3>
           <div className="flex flex-wrap gap-2">
             {pathologies.map((pathology) => (
-              <PathologyBadge key={pathology.id} pathology={pathology.type} />
+              <PathologyBadge key={pathology.id} pathology={pathology.type as PathologyType} />
             ))}
           </div>
           {pathologies.length === 0 && (

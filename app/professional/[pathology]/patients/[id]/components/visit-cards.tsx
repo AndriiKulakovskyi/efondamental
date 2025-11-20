@@ -16,15 +16,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { VISIT_TYPE_NAMES } from "@/lib/types/enums";
+import { VisitFull } from "@/lib/types/database.types";
 
-interface VisitWithCompletion {
-  id: string;
-  visit_type: string;
-  scheduled_date: string | null;
-  status: string;
-  template_name: string;
-  conducted_by_first_name: string | null;
-  conducted_by_last_name: string | null;
+interface VisitWithCompletion extends VisitFull {
   completionPercentage: number;
 }
 

@@ -1,4 +1,4 @@
-import { getVisitById, getVisitCompletionStatus } from "@/lib/services/visit.service";
+import { getVisitById, getVisitCompletionStatus, VirtualModule } from "@/lib/services/visit.service";
 import { getUserContext } from "@/lib/rbac/middleware";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDateTime } from "@/lib/utils/date";
@@ -121,7 +121,7 @@ export default async function VisitDetailPage({
   }
 
   // Construct modules and check status based on visit type
-  let modulesWithQuestionnaires = [];
+  let modulesWithQuestionnaires: VirtualModule[] = [];
   let completionStatus = {
     completedQuestionnaires: 0,
     totalQuestionnaires: 0,

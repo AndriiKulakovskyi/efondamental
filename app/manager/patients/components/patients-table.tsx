@@ -7,11 +7,7 @@ import { PathologyBadge } from "@/components/ui/pathology-badge";
 import { calculateAge } from "@/lib/utils/date";
 import Link from "next/link";
 
-type PatientWithPathology = PatientFull & {
-  pathology_type: string;
-};
-
-const columns: ColumnDef<PatientWithPathology>[] = [
+const columns: ColumnDef<PatientFull>[] = [
   {
     accessorKey: "medical_record_number",
     header: "MRN",
@@ -73,7 +69,7 @@ const columns: ColumnDef<PatientWithPathology>[] = [
 ];
 
 interface PatientsTableProps {
-  patients: PatientWithPathology[];
+  patients: PatientFull[];
   pathologies: { type: string; name: string }[];
 }
 

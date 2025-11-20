@@ -3,7 +3,8 @@
  * For Initial Evaluation visit - Bipolar disorder
  */
 
-import { Question, QuestionnaireDefinition } from '@/lib/types/questionnaire.types';
+import { Question } from '@/lib/types/database.types';
+import { QuestionnaireDefinition } from '@/lib/constants/questionnaires';
 
 // ===== TOBACCO ASSESSMENT =====
 

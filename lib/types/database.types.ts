@@ -1,4 +1,154 @@
-// eFondaMental Platform - Questionnaire Response Types
+// eFondaMental Platform - Database Types
+
+// ============================================================================
+// Center Types
+// ============================================================================
+
+export interface Center {
+  id: string;
+  name: string;
+  code: string;
+  city: string | null;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type CenterInsert = Omit<Center, 'id' | 'created_at' | 'updated_at'>;
+export type CenterUpdate = Partial<Omit<Center, 'id' | 'created_at' | 'updated_at'>>;
+
+export interface Pathology {
+  id: string;
+  type: string;
+  name: string;
+  description: string | null;
+  color: string | null;
+  created_at: string;
+}
+
+export interface UserProfile {
+  id: string;
+  role: string;
+  center_id: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  email: string;
+  phone: string | null;
+  username: string | null;
+  active: boolean;
+  metadata: Record<string, any> | null;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+}
+
+export type UserProfileInsert = Omit<UserProfile, 'created_at' | 'updated_at'>;
+export type UserProfileUpdate = Partial<Omit<UserProfile, 'id' | 'created_at' | 'updated_at'>>;
+
+export interface UserInvitation {
+  id: string;
+  email: string;
+  role: string;
+  center_id: string | null;
+  patient_id: string | null;
+  token: string;
+  status: string;
+  invited_by: string;
+  accepted_by: string | null;
+  expires_at: string;
+  first_name: string | null;
+  last_name: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type UserInvitationInsert = Omit<UserInvitation, 'id' | 'created_at' | 'updated_at' | 'accepted_by'>;
+
+export interface Patient {
+  id: string;
+  center_id: string;
+  pathology_id: string;
+  medical_record_number: string;
+  first_name: string;
+  last_name: string;
+  date_of_birth: string;
+  gender: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  emergency_contact: Record<string, any> | null;
+  metadata: Record<string, any> | null;
+  active: boolean;
+  assigned_to: string | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  user_id: string | null;
+  deleted_at: string | null;
+  deleted_by: string | null;
+}
+
+export interface PatientFull extends Patient {
+  center_name: string | null;
+  center_code: string | null;
+  pathology_name: string | null;
+  pathology_type: string | null;
+  pathology_color: string | null;
+  created_by_first_name: string | null;
+  created_by_last_name: string | null;
+  assigned_to_first_name: string | null;
+  assigned_to_last_name: string | null;
+}
+
+export type PatientInsert = Omit<Patient, 'id' | 'created_at' | 'updated_at' | 'user_id' | 'deleted_at' | 'deleted_by'>;
+export type PatientUpdate = Partial<Omit<Patient, 'id' | 'created_at' | 'updated_at' | 'user_id' | 'deleted_at' | 'deleted_by'>>;
+
+export interface Visit {
+  id: string;
+  patient_id: string;
+  visit_template_id: string;
+  visit_type: string;
+  scheduled_date: string | null;
+  completed_date: string | null;
+  status: string;
+  notes: string | null;
+  conducted_by: string | null;
+  metadata: Record<string, any> | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VisitFull extends Visit {
+  patient_first_name: string | null;
+  patient_last_name: string | null;
+  medical_record_number: string | null;
+  template_name: string | null;
+  pathology_id: string | null;
+  pathology_name: string | null;
+  conducted_by_first_name: string | null;
+  conducted_by_last_name: string | null;
+}
+
+export type VisitInsert = Omit<Visit, 'id' | 'created_at' | 'updated_at'>;
+export type VisitUpdate = Partial<Omit<Visit, 'id' | 'created_at' | 'updated_at'>>;
+
+export interface AuditLog {
+  id: string;
+  user_id: string | null;
+  action: string;
+  entity_type: string | null;
+  entity_id: string | null;
+  center_id: string | null;
+  ip_address: string | null;
+  user_agent: string | null;
+  changes: Record<string, any> | null;
+  metadata: Record<string, any> | null;
+  created_at: string;
+}
 
 // ============================================================================
 // Question Types (Simplified for Constants)
@@ -13,8 +163,10 @@ export interface QuestionOption {
 export interface Question {
   id: string;
   text: string;
-  type: 'single_choice' | 'multiple_choice' | 'text' | 'number' | 'scale' | 'boolean' | 'date';
+  type: 'single_choice' | 'multiple_choice' | 'text' | 'number' | 'scale' | 'boolean' | 'date' | 'section';
   required: boolean;
+  readonly?: boolean;
+  section?: string;
   options?: (QuestionOption | string)[];
   help?: string;
   min?: number;
@@ -1042,8 +1194,6 @@ export interface SleepApneaResponse {
   updated_at: string;
 }
 
-export type SleepApneaResponseInsert = Omit<SleepApneaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'stop_bang_score' | 'risk_level' | 'interpretation'>;
-
 // ===== Sleep Apnea Response =====
 export interface SleepApneaResponse {
   id: string;
@@ -1068,33 +1218,7 @@ export interface SleepApneaResponse {
   updated_at: string;
 }
 
-export type SleepApneaResponseInsert = Omit<SleepApneaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
-
-// ===== Sleep Apnea Assessment (STOP-Bang) =====
-export interface SleepApneaResponse {
-  id: string;
-  visit_id: string;
-  patient_id: string;
-  diagnosed_sleep_apnea: 'yes' | 'no' | 'unknown';
-  has_device?: boolean | null;
-  snoring?: boolean | null;
-  tiredness?: boolean | null;
-  observed_apnea?: boolean | null;
-  high_blood_pressure?: boolean | null;
-  bmi_over_35?: boolean | null;
-  age_over_50?: boolean | null;
-  large_neck?: boolean | null;
-  male_gender?: boolean | null;
-  stop_bang_score?: number | null; // Auto-calculated (0-8)
-  risk_level?: string | null;
-  interpretation?: string | null;
-  completed_by?: string | null;
-  completed_at: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export type SleepApneaResponseInsert = Omit<SleepApneaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'stop_bang_score'>;
+export type SleepApneaResponseInsert = Omit<SleepApneaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'stopbang_score' | 'risk_level' | 'interpretation'>;
 
 // ===== Biological Assessment (Bilan biologique) Response =====
 export interface BiologicalAssessmentResponse {

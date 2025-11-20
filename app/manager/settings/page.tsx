@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { PathologyBadge } from "@/components/ui/pathology-badge";
 import { StatCard } from "@/components/ui/stat-card";
 import { Users, UserCheck, Calendar } from "lucide-react";
+import { PathologyType } from "@/lib/types/enums";
 
 export default async function ManagerSettingsPage() {
   const context = await getUserContext();
@@ -101,7 +102,7 @@ export default async function ManagerSettingsPage() {
             <dt className="text-sm font-medium text-slate-500">Assigned Pathologies</dt>
             <dd className="mt-2 flex flex-wrap gap-2">
               {pathologies.map((pathology) => (
-                <PathologyBadge key={pathology.id} pathology={pathology.type} />
+                <PathologyBadge key={pathology.id} pathology={pathology.type as PathologyType} />
               ))}
               {pathologies.length === 0 && (
                 <span className="text-sm text-slate-400">No pathologies assigned</span>

@@ -21,7 +21,7 @@ export default async function CentersPage() {
       const pathologies = await getCenterPathologies(center.id);
       return {
         ...center,
-        pathologies: pathologies.map((p) => p.type),
+        pathologies: pathologies.map((p) => p.type as PathologyType),
       };
     })
   );

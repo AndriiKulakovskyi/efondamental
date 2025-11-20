@@ -69,8 +69,8 @@ export async function requireUserProfile(): Promise<UserProfile> {
 export async function requireRole(allowedRoles: UserRole[]) {
   const profile = await requireUserProfile();
 
-  if (!allowedRoles.includes(profile.role)) {
-    const defaultRedirect = getDefaultRedirectForRole(profile.role);
+  if (!allowedRoles.includes(profile.role as UserRole)) {
+    const defaultRedirect = getDefaultRedirectForRole(profile.role as UserRole);
     redirect(defaultRedirect);
   }
 
@@ -165,8 +165,8 @@ export async function checkPermission(
 export async function protectRoute(pathname: string) {
   const profile = await requireUserProfile();
 
-  if (!canAccessRoute(pathname, profile.role)) {
-    const defaultRedirect = getDefaultRedirectForRole(profile.role);
+  if (!canAccessRoute(pathname, profile.role as UserRole)) {
+    const defaultRedirect = getDefaultRedirectForRole(profile.role as UserRole);
     redirect(defaultRedirect);
   }
 

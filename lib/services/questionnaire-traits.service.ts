@@ -543,8 +543,7 @@ export async function saveCsmResponse(
   // Calculate total for interpretation
   const totalScore = response.q1 + response.q2 + response.q3 + response.q4 +
                      response.q5 + response.q6 + response.q7 + response.q8 +
-                     response.q9 + response.q10 + response.q11 + response.q12 +
-                     response.q13;
+                     response.q9 + response.q10 + response.q11 + response.q12;
 
   let interpretation = `Score total: ${totalScore}/55. `;
   if (totalScore >= 44) {

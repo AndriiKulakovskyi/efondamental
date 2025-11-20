@@ -51,7 +51,7 @@ export default async function QuestionnairesPage() {
           <div className="grid grid-cols-1 gap-4">
             {pendingQuestionnaires.map((questionnaire) => (
               <div
-                key={questionnaire.composite_id}
+                key={questionnaire.id}
                 className="bg-white rounded-lg border border-slate-200 p-6 hover:border-blue-300 transition-colors"
               >
                 <div className="flex items-start justify-between">
@@ -68,15 +68,15 @@ export default async function QuestionnairesPage() {
                       </p>
                     )}
                     <div className="flex items-center gap-4 text-xs text-slate-500">
-                      <span>{questionnaire.questions.length} questions</span>
-                      {questionnaire.code && (
+                      <span>~{questionnaire.estimatedTime} min</span>
+                      {questionnaire.id && (
                         <span className="px-2 py-1 bg-slate-100 rounded-md">
-                          {questionnaire.code}
+                          {questionnaire.id}
                         </span>
                       )}
                     </div>
                   </div>
-                  <Link href={`/patient/questionnaires/${questionnaire.composite_id}`}>
+                  <Link href={`/patient/questionnaires/${questionnaire.id}`}>
                     <Button className="ml-4">
                       Commencer
                     </Button>

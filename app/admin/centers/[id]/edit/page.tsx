@@ -1,6 +1,7 @@
 import { getCenterById, getCenterPathologies } from "@/lib/services/center.service";
 import { notFound, redirect } from "next/navigation";
 import { CenterEditForm } from "./components/center-edit-form";
+import { PathologyType } from "@/lib/types/enums";
 
 export default async function EditCenterPage({
   params,
@@ -26,7 +27,7 @@ export default async function EditCenterPage({
 
       <CenterEditForm
         center={center}
-        assignedPathologies={pathologies.map((p) => p.type)}
+        assignedPathologies={pathologies.map((p) => p.type as PathologyType)}
       />
     </div>
   );

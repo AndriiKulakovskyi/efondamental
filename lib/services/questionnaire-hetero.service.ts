@@ -57,7 +57,7 @@ export async function saveMadrsResponse(
     response.q6, response.q7, response.q8, response.q9, response.q10
   ];
   
-  const totalScore = items.reduce((sum, item) => sum + (item ?? 0), 0);
+  const totalScore = items.reduce((sum: number, item) => sum + (item ?? 0), 0);
 
   // Determine interpretation based on cutoffs
   let interpretation = '';
@@ -129,8 +129,8 @@ export async function saveYmrsResponse(
     response.q5, response.q6, response.q8, response.q9
   ];
 
-  const regularScore = regularItems.reduce((sum, item) => sum + (item ?? 0), 0);
-  const doubleScore = doubleWeightedItems.reduce((sum, item) => sum + (item ?? 0), 0);
+  const regularScore = regularItems.reduce((sum: number, item) => sum + (item ?? 0), 0);
+  const doubleScore = doubleWeightedItems.reduce((sum: number, item) => sum + (item ?? 0), 0);
   const totalScore = regularScore + doubleScore;
 
   // Determine interpretation
@@ -338,7 +338,7 @@ export async function saveAldaResponse(
 
   // Calculate B total score
   const bItems = [response.b1, response.b2, response.b3, response.b4, response.b5];
-  const bTotalScore = bItems.reduce((sum, item) => sum + (item ?? 0), 0);
+  const bTotalScore = bItems.reduce((sum: number, item) => sum + (item ?? 0), 0);
 
   // Calculate ALDA score (A - B)
   const aScore = response.a_score ?? 0;

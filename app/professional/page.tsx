@@ -1,6 +1,6 @@
 import { getUserContext } from "@/lib/rbac/middleware";
 import { getCenterPathologies } from "@/lib/services/center.service";
-import { PATHOLOGY_NAMES } from "@/lib/types/enums";
+import { PATHOLOGY_NAMES, PathologyType } from "@/lib/types/enums";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { UserProfileDropdown } from "@/components/user-profile-dropdown";
@@ -102,10 +102,10 @@ export default async function ProfessionalLandingPage() {
                               </div>
                               <div className="flex-1">
                                 <h3 className="text-xl font-bold text-slate-900 mb-1 group-hover:text-slate-700 transition-colors">
-                                  {PATHOLOGY_NAMES[pathology.type]}
+                                  {PATHOLOGY_NAMES[pathology.type as PathologyType]}
                                 </h3>
                                 <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">
-                                  {pathology.description || `Plateforme de suivi ${PATHOLOGY_NAMES[pathology.type].toLowerCase()}`}
+                                  {pathology.description || `Plateforme de suivi ${PATHOLOGY_NAMES[pathology.type as PathologyType].toLowerCase()}`}
                                 </p>
                               </div>
                             </div>
