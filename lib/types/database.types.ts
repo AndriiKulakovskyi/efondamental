@@ -1329,3 +1329,393 @@ export interface BiologicalAssessmentResponse {
 }
 
 export type BiologicalAssessmentResponseInsert = Omit<BiologicalAssessmentResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'clairance_creatinine'>;
+
+// ============================================================================
+// DSM5 - Mood Disorders (Troubles de l'humeur)
+// ============================================================================
+
+export interface Dsm5HumeurResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Section 1: Mood Disorder Presence and Type
+  has_mood_disorder?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  disorder_type?: 'bipolaire_type_1' | 'bipolaire_type_2' | 'bipolaire_non_specifie' | 
+    'trouble_depressif_majeur_isole' | 'trouble_depressif_majeur_recurrent' | 
+    'trouble_dysthymique_precoce' | 'trouble_dysthymique_tardif' | null;
+  
+  // Medical condition
+  medical_condition_affection_type?: 'endocrinienne' | 'neurologique' | 'cardio_vasculaire' | 'autre' | null;
+  medical_condition_affection_autre?: string | null;
+  medical_condition_trouble_type?: 'episode_allure_depression_majeure' | 'episode_caracteristiques_depressives' | 
+    'episode_caracteristiques_maniaques' | 'episode_caracteristiques_mixtes' | 'ne_sais_pas' | null;
+  
+  // Substance-induced
+  substance_type?: 'alcool' | 'cannabis' | 'opiaces' | 'cocaine' | 'hallucinogene' | 'drogues_multiples' | 
+    'sedatif_hypnotique' | 'stimulants' | 'anxiolytique' | 'antidepresseurs' | 'corticoides' | 
+    'interferon' | 'antipaludeen' | 'autre' | null;
+  substance_autre?: string | null;
+  substance_trouble_type?: 'episode_allure_depression_majeure' | 'episode_caracteristiques_depressives' | 
+    'episode_caracteristiques_maniaques' | 'episode_caracteristiques_mixtes' | 'ne_sais_pas' | null;
+  
+  // Unspecified depression
+  unspecified_depression_post_schizophrenie?: boolean | null;
+  unspecified_depression_majeur_surajout?: boolean | null;
+  unspecified_depression_dysphorique_premenstruel?: boolean | null;
+  unspecified_depression_mineur?: boolean | null;
+  unspecified_depression_bref_recurrent?: boolean | null;
+  unspecified_depression_autre?: boolean | null;
+  unspecified_depression_ne_sais_pas?: boolean | null;
+  
+  cyclothymic?: boolean | null;
+  other_specify?: string | null;
+  
+  // Section 2: First Episode Characteristics
+  first_episode_type?: 'edm_sans_psychotiques' | 'edm_avec_psychotiques' | 'hypomanie' | 
+    'manie_sans_psychotiques' | 'manie_avec_psychotiques' | 'ne_sais_pas' | null;
+  postpartum_first?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  initial_cyclothymic_period?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Section 3: Lifetime Characteristics
+  // 3.1 Major depressive episodes
+  num_edm?: number | null;
+  age_first_edm?: number | null;
+  edm_with_psychotic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  num_edm_psychotic?: number | null;
+  edm_with_mixed?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  num_edm_mixed?: number | null;
+  
+  // 3.2 Hypomanic episodes
+  num_hypomanic?: number | null;
+  age_first_hypomanic?: number | null;
+  
+  // 3.3 Manic episodes
+  num_manic?: number | null;
+  age_first_manic?: number | null;
+  manic_with_psychotic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  num_manic_psychotic?: number | null;
+  manic_with_mixed?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  num_manic_mixed?: number | null;
+  induced_episodes?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  num_induced_episodes?: number | null;
+  rapid_cycling?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  complete_remission?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  seasonal_pattern?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  seasonal_depression?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  seasonal_hypomania?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  seasonal_seasons?: string | null;
+  
+  age_first_psychotrope?: number | null;
+  age_first_thymoregulator?: number | null;
+  age_first_hospitalization?: number | null;
+  num_hospitalizations?: number | null;
+  total_hospitalization_months?: number | null;
+  
+  // 3.4 12-month characteristics
+  past_year_episode?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  past_year_num_edm?: number | null;
+  past_year_edm_psychotic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  past_year_num_edm_psychotic?: number | null;
+  past_year_edm_mixed?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  past_year_num_edm_mixed?: number | null;
+  past_year_num_hypomanic?: number | null;
+  past_year_num_manic?: number | null;
+  past_year_manic_psychotic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  past_year_num_manic_psychotic?: number | null;
+  past_year_manic_mixed?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  past_year_num_manic_mixed?: number | null;
+  past_year_num_hospitalizations?: number | null;
+  past_year_hospitalization_weeks?: number | null;
+  
+  // Work leave subsection
+  past_year_work_leave?: 'oui' | 'non' | 'non_applicable' | null;
+  past_year_num_work_leaves?: string | null;
+  past_year_work_leave_weeks?: number | null;
+  
+  // Section 4: Most Recent Episode
+  recent_episode_start_date?: string | null;
+  recent_episode_end_date?: string | null;
+  recent_episode_type?: 'edm' | 'hypomanie' | 'manie' | 'non_specifie' | 'ne_sais_pas' | null;
+  
+  // EDM specific
+  recent_edm_subtype?: 'sans_caracteristique' | 'melancolique' | 'atypique' | 'catatonique' | 'mixte' | null;
+  recent_edm_severity?: 'leger' | 'modere' | 'severe_sans_psychotiques' | 
+    'severe_psychotiques_non_congruentes' | 'severe_psychotiques_congruentes' | null;
+  recent_edm_chronic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  recent_edm_postpartum?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Hypomanie specific
+  recent_hypomanie_postpartum?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Manie specific
+  recent_manie_catatonic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  recent_manie_mixed?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  recent_manie_severity?: 'leger' | 'modere' | 'severe_sans_psychotiques' | 
+    'severe_psychotiques_non_congruentes' | 'severe_psychotiques_congruentes' | null;
+  recent_manie_postpartum?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Non-specified episode
+  recent_non_specifie_catatonic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  recent_non_specifie_severity?: 'leger' | 'modere' | 'severe_sans_psychotiques' | 
+    'severe_psychotiques_non_congruentes' | 'severe_psychotiques_congruentes' | null;
+  recent_non_specifie_postpartum?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Section 5: Current Episode
+  current_episode_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  current_episode_type?: 'edm' | 'hypomanie' | 'manie' | 'non_specifie' | 'ne_sais_pas' | null;
+  
+  // EDM specific
+  current_edm_subtype?: 'sans_caracteristique' | 'melancolique' | 'atypique' | 'catatonique' | 'mixte' | null;
+  current_edm_severity?: 'leger' | 'modere' | 'severe_sans_psychotiques' | 
+    'severe_psychotiques_non_congruentes' | 'severe_psychotiques_congruentes' | null;
+  current_edm_chronic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  current_edm_postpartum?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Hypomanie specific
+  current_hypomanie_postpartum?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Manie specific
+  current_manie_catatonic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  current_manie_mixed?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  current_manie_severity?: 'leger' | 'modere' | 'severe_sans_psychotiques' | 
+    'severe_psychotiques_non_congruentes' | 'severe_psychotiques_congruentes' | null;
+  current_manie_postpartum?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Non-specified episode
+  current_non_specifie_catatonic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  current_non_specifie_severity?: 'leger' | 'modere' | 'severe_sans_psychotiques' | 
+    'severe_psychotiques_non_congruentes' | 'severe_psychotiques_congruentes' | null;
+  current_non_specifie_postpartum?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Dsm5HumeurResponseInsert = Omit<Dsm5HumeurResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
+// DSM5 - Psychotic Disorders (Trouble Psychotique)
+// ============================================================================
+
+export interface Dsm5PsychoticResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  has_psychotic_disorder?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  psychotic_disorder_date?: string | null;
+  disorder_type?: 'schizophrenie' | 'trouble_schizophreniforme' | 'trouble_schizo_affectif' | 
+    'troubles_delirants' | 'trouble_psychotique_bref' | 'trouble_psychotique_partage' | 
+    'trouble_psychotique_affection_medicale' | 'trouble_psychotique_substance' | 
+    'trouble_psychotique_non_specifie' | null;
+  symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Dsm5PsychoticResponseInsert = Omit<Dsm5PsychoticResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
+// DSM5 - Comorbid Disorders (Troubles comorbides)
+// ============================================================================
+
+export interface Dsm5ComorbidResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Section 1: Anxiety Disorders
+  has_anxiety_disorder?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  panic_no_agoraphobia_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  panic_no_agoraphobia_age_debut?: number | null;
+  panic_no_agoraphobia_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  panic_with_agoraphobia_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  panic_with_agoraphobia_age_debut?: number | null;
+  panic_with_agoraphobia_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  agoraphobia_no_panic_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  agoraphobia_no_panic_age_debut?: number | null;
+  agoraphobia_no_panic_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  social_phobia_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  social_phobia_age_debut?: number | null;
+  social_phobia_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  specific_phobia_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  specific_phobia_age_debut?: number | null;
+  specific_phobia_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  ocd_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  ocd_age_debut?: number | null;
+  ocd_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  ptsd_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  ptsd_age_debut?: number | null;
+  ptsd_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  gad_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  gad_age_debut?: number | null;
+  gad_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  anxiety_medical_condition_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  anxiety_medical_condition_affection?: string | null;
+  anxiety_medical_condition_age_debut?: number | null;
+  anxiety_medical_condition_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  anxiety_substance_induced_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  anxiety_substance_induced_substance?: string | null;
+  anxiety_substance_induced_age_debut?: number | null;
+  anxiety_substance_induced_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  anxiety_unspecified_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  anxiety_unspecified_age_debut?: number | null;
+  anxiety_unspecified_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Section 2: Substance-Related Disorders
+  has_substance_disorder?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  alcohol_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  alcohol_type?: 'abus' | 'dependance' | null;
+  alcohol_age_debut?: number | null;
+  alcohol_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  alcohol_duration_months?: number | null;
+  sedatives_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sedatives_type?: 'abus' | 'dependance' | null;
+  sedatives_age_debut?: number | null;
+  sedatives_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sedatives_duration_months?: number | null;
+  cannabis_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  cannabis_type?: 'abus' | 'dependance' | null;
+  cannabis_age_debut?: number | null;
+  cannabis_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  cannabis_duration_months?: number | null;
+  stimulants_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  stimulants_type?: 'abus' | 'dependance' | null;
+  stimulants_age_debut?: number | null;
+  stimulants_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  stimulants_duration_months?: number | null;
+  opiates_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  opiates_type?: 'abus' | 'dependance' | null;
+  opiates_age_debut?: number | null;
+  opiates_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  opiates_duration_months?: number | null;
+  cocaine_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  cocaine_type?: 'abus' | 'dependance' | null;
+  cocaine_age_debut?: number | null;
+  cocaine_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  cocaine_duration_months?: number | null;
+  hallucinogens_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  hallucinogens_type?: 'abus' | 'dependance' | null;
+  hallucinogens_age_debut?: number | null;
+  hallucinogens_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  hallucinogens_duration_months?: number | null;
+  other_substance_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  other_substance_name?: string | null;
+  other_substance_type?: 'abus' | 'dependance' | null;
+  other_substance_age_debut?: number | null;
+  other_substance_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  other_substance_duration_months?: number | null;
+  induced_disorder_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  induced_substances?: string[] | null;
+  induced_disorder_type?: 'delirium' | 'demence_persistante' | 'trouble_amnesique' | 
+    'trouble_psychotique' | 'trouble_humeur' | 'trouble_anxieux' | 'trouble_sommeil' | 
+    'trouble_perceptions_hallucinogenes' | null;
+  induced_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Section 3: Eating Disorders
+  has_eating_disorder?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  anorexia_restrictive_amenorrhea?: boolean | null;
+  anorexia_restrictive_age_debut?: number | null;
+  anorexia_restrictive_age_fin?: number | null;
+  anorexia_restrictive_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  anorexia_restrictive_current?: boolean | null;
+  anorexia_bulimic_amenorrhea?: boolean | null;
+  anorexia_bulimic_age_debut?: number | null;
+  anorexia_bulimic_age_fin?: number | null;
+  anorexia_bulimic_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  anorexia_bulimic_current?: boolean | null;
+  bulimia_age_debut?: number | null;
+  bulimia_age_fin?: number | null;
+  bulimia_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  bulimia_current?: boolean | null;
+  binge_eating_age_debut?: number | null;
+  binge_eating_age_fin?: number | null;
+  binge_eating_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  binge_eating_current?: boolean | null;
+  eating_unspecified_age_debut?: number | null;
+  eating_unspecified_age_fin?: number | null;
+  eating_unspecified_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  eating_unspecified_current?: boolean | null;
+  night_eating_age_debut?: number | null;
+  night_eating_age_fin?: number | null;
+  night_eating_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  night_eating_current?: boolean | null;
+  
+  // Section 4: Somatoform Disorder
+  has_somatoform_disorder?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  somatoform_type?: 'trouble_somatisation' | 'trouble_douloureux' | 'trouble_indifferencie' | 
+    'hypocondrie' | 'peur_dysmorphie_corporelle' | null;
+  somatoform_age_debut?: number | null;
+  somatoform_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Section 5: ADHD DIVA Assessment
+  diva_evaluated?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  diva_a1a_adult?: boolean | null;
+  diva_a1a_childhood?: boolean | null;
+  diva_a1b_adult?: boolean | null;
+  diva_a1b_childhood?: boolean | null;
+  diva_a1c_adult?: boolean | null;
+  diva_a1c_childhood?: boolean | null;
+  diva_a1d_adult?: boolean | null;
+  diva_a1d_childhood?: boolean | null;
+  diva_a1e_adult?: boolean | null;
+  diva_a1e_childhood?: boolean | null;
+  diva_a1f_adult?: boolean | null;
+  diva_a1f_childhood?: boolean | null;
+  diva_a1g_adult?: boolean | null;
+  diva_a1g_childhood?: boolean | null;
+  diva_a1h_adult?: boolean | null;
+  diva_a1h_childhood?: boolean | null;
+  diva_a1i_adult?: boolean | null;
+  diva_a1i_childhood?: boolean | null;
+  diva_a2a_adult?: boolean | null;
+  diva_a2a_childhood?: boolean | null;
+  diva_a2b_adult?: boolean | null;
+  diva_a2b_childhood?: boolean | null;
+  diva_a2c_adult?: boolean | null;
+  diva_a2c_childhood?: boolean | null;
+  diva_a2d_adult?: boolean | null;
+  diva_a2d_childhood?: boolean | null;
+  diva_a2e_adult?: boolean | null;
+  diva_a2e_childhood?: boolean | null;
+  diva_a2f_adult?: boolean | null;
+  diva_a2f_childhood?: boolean | null;
+  diva_a2g_adult?: boolean | null;
+  diva_a2g_childhood?: boolean | null;
+  diva_a2h_adult?: boolean | null;
+  diva_a2h_childhood?: boolean | null;
+  diva_a2i_adult?: boolean | null;
+  diva_a2i_childhood?: boolean | null;
+  diva_total_inattention_adult?: number | null;
+  diva_total_inattention_childhood?: number | null;
+  diva_total_hyperactivity_adult?: number | null;
+  diva_total_hyperactivity_childhood?: number | null;
+  diva_criteria_a_inattention_gte6?: boolean | null;
+  diva_criteria_a_hyperactivity_gte6?: boolean | null;
+  diva_criteria_b_lifetime_persistence?: boolean | null;
+  diva_criteria_cd_impairment_childhood?: boolean | null;
+  diva_criteria_cd_impairment_adult?: boolean | null;
+  diva_criteria_e_better_explained?: boolean | null;
+  diva_criteria_e_explanation?: string | null;
+  diva_collateral_parents?: number | null;
+  diva_collateral_partner?: number | null;
+  diva_collateral_school_reports?: number | null;
+  diva_collateral_details?: string | null;
+  diva_diagnosis?: 'non' | '314_01_combined' | '314_00_inattentive' | '314_01_hyperactive_impulsive' | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Dsm5ComorbidResponseInsert = Omit<Dsm5ComorbidResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;

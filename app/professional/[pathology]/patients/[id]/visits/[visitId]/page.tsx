@@ -101,6 +101,16 @@ import {
   SLEEP_APNEA_DEFINITION,
   BIOLOGICAL_ASSESSMENT_DEFINITION
 } from "@/lib/constants/questionnaires-infirmier";
+import {
+  DSM5_HUMEUR_DEFINITION,
+  DSM5_PSYCHOTIC_DEFINITION,
+  DSM5_COMORBID_DEFINITION
+} from "@/lib/constants/questionnaires-dsm5";
+import {
+  getDsm5HumeurResponse,
+  getDsm5PsychoticResponse,
+  getDsm5ComorbidResponse
+} from "@/lib/services/questionnaire-dsm5.service";
 
 export default async function VisitDetailPage({
   params,
@@ -219,7 +229,9 @@ export default async function VisitDetailPage({
       // SOCIAL response
       socialResponse,
       // INFIRMIER responses
-      tobaccoResponse, fagerstromResponse, physicalParamsResponse, bloodPressureResponse, sleepApneaResponse, biologicalAssessmentResponse
+      tobaccoResponse, fagerstromResponse, physicalParamsResponse, bloodPressureResponse, sleepApneaResponse, biologicalAssessmentResponse,
+      // DSM5 responses
+      dsm5HumeurResponse, dsm5PsychoticResponse, dsm5ComorbidResponse
     ] = await Promise.all([
       // ETAT
       getEq5d5lResponse(visitId),
@@ -257,7 +269,11 @@ export default async function VisitDetailPage({
       getPhysicalParamsResponse(visitId),
       getBloodPressureResponse(visitId),
       getSleepApneaResponse(visitId),
-      getBiologicalAssessmentResponse(visitId)
+      getBiologicalAssessmentResponse(visitId),
+      // DSM5
+      getDsm5HumeurResponse(visitId),
+      getDsm5PsychoticResponse(visitId),
+      getDsm5ComorbidResponse(visitId)
     ]);
 
     // Module 1: Infirmier
@@ -369,12 +385,34 @@ export default async function VisitDetailPage({
       ]
     };
 
-    // Module 3: Evaluation Médicale (empty for now)
+    // Module 3: Evaluation Médicale
     const medicalEvalModule = {
       id: 'mod_medical_eval',
       name: 'Evaluation Médicale',
       description: 'Évaluation médicale complète',
-      questionnaires: []
+      questionnaires: [
+        {
+          ...DSM5_HUMEUR_DEFINITION,
+          id: DSM5_HUMEUR_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!dsm5HumeurResponse,
+          completedAt: dsm5HumeurResponse?.completed_at,
+        },
+        {
+          ...DSM5_PSYCHOTIC_DEFINITION,
+          id: DSM5_PSYCHOTIC_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!dsm5PsychoticResponse,
+          completedAt: dsm5PsychoticResponse?.completed_at,
+        },
+        {
+          ...DSM5_COMORBID_DEFINITION,
+          id: DSM5_COMORBID_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!dsm5ComorbidResponse,
+          completedAt: dsm5ComorbidResponse?.completed_at,
+        }
+      ]
     };
 
     // Module 4: Autoquestionnaires - ETAT
@@ -547,10 +585,11 @@ export default async function VisitDetailPage({
     ];
 
     // Calculate stats
-    const total = nurseModule.questionnaires.length + thymicModule.questionnaires.length + etatModule.questionnaires.length + socialModule.questionnaires.length + traitsModule.questionnaires.length;
+    const total = nurseModule.questionnaires.length + thymicModule.questionnaires.length + medicalEvalModule.questionnaires.length + etatModule.questionnaires.length + socialModule.questionnaires.length + traitsModule.questionnaires.length;
     const completed = 
       nurseModule.questionnaires.filter(q => q.completed).length +
       thymicModule.questionnaires.filter(q => q.completed).length +
+      medicalEvalModule.questionnaires.filter(q => q.completed).length +
       etatModule.questionnaires.filter(q => q.completed).length + 
       socialModule.questionnaires.filter(q => q.completed).length +
       traitsModule.questionnaires.filter(q => q.completed).length;

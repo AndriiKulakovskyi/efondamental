@@ -695,3 +695,6 @@ export {
   getCtiResponse,
   saveCtiResponse
 } from './questionnaire-traits.service';
+
+// DSM5 exports
+export { getDsm5HumeurResponse, saveDsm5HumeurResponse, getDsm5PsychoticResponse, saveDsm5PsychoticResponse, getDsm5ComorbidResponse, saveDsm5ComorbidResponse } from './questionnaire-dsm5.service';

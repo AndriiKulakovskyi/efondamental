@@ -55,6 +55,11 @@ import {
   getBiologicalAssessmentResponse
 } from './questionnaire-infirmier.service';
 import {
+  getDsm5HumeurResponse,
+  getDsm5PsychoticResponse,
+  getDsm5ComorbidResponse
+} from './questionnaire-dsm5.service';
+import {
   ASRM_DEFINITION,
   QIDS_DEFINITION,
   MDQ_DEFINITION,
@@ -100,6 +105,11 @@ import {
   SLEEP_APNEA_DEFINITION,
   BIOLOGICAL_ASSESSMENT_DEFINITION
 } from '../constants/questionnaires-infirmier';
+import {
+  DSM5_HUMEUR_DEFINITION,
+  DSM5_PSYCHOTIC_DEFINITION,
+  DSM5_COMORBID_DEFINITION
+} from '../constants/questionnaires-dsm5';
 
 // ============================================================================
 // VISIT CRUD
@@ -377,7 +387,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_medical_eval',
         name: 'Evaluation Médicale',
         description: 'Évaluation médicale complète',
-        questionnaires: [] // To be implemented later
+        questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION]
       },
       {
         id: 'mod_auto_etat',
@@ -450,14 +460,15 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diag) completed++;
     if (orient) completed++;
   } else if (visit.visit_type === 'initial_evaluation') {
-    total = 32; // 16 auto questionnaires + ASRM + QIDS (reused) + 7 hetero questionnaires + 1 social + 6 infirmier (tobacco + fagerstrom + physical_params + blood_pressure + sleep_apnea + biological_assessment)
+    total = 35; // 16 auto questionnaires + ASRM + QIDS (reused) + 7 hetero questionnaires + 1 social + 6 infirmier (tobacco + fagerstrom + physical_params + blood_pressure + sleep_apnea + biological_assessment) + 3 DSM5 (dsm5_humeur + dsm5_psychotic + dsm5_comorbid)
     totalModules = 6;
 
     const [
       eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,
       asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti,
       madrs, ymrs, cgi, egf, alda, etatPatient, fast, social,
-      tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biologicalAssessment
+      tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biologicalAssessment,
+      dsm5Humeur, dsm5Psychotic, dsm5Comorbid
     ] = await Promise.all([
       // ETAT questionnaires
       getEq5d5lResponse(visitId),
@@ -495,7 +506,11 @@ export async function getVisitCompletionStatus(visitId: string) {
       getPhysicalParamsResponse(visitId),
       getBloodPressureResponse(visitId),
       getSleepApneaResponse(visitId),
-      getBiologicalAssessmentResponse(visitId)
+      getBiologicalAssessmentResponse(visitId),
+      // DSM5 questionnaires
+      getDsm5HumeurResponse(visitId),
+      getDsm5PsychoticResponse(visitId),
+      getDsm5ComorbidResponse(visitId)
     ]);
 
     if (eq5d5l) completed++;
@@ -530,6 +545,9 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (bloodPressure) completed++;
     if (sleepApnea) completed++;
     if (biologicalAssessment) completed++;
+    if (dsm5Humeur) completed++;
+    if (dsm5Psychotic) completed++;
+    if (dsm5Comorbid) completed++;
   }
 
   return {

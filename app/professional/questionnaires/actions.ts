@@ -46,6 +46,11 @@ import {
   saveSleepApneaResponse,
   saveBiologicalAssessmentResponse
 } from '@/lib/services/questionnaire-infirmier.service';
+import {
+  saveDsm5HumeurResponse,
+  saveDsm5PsychoticResponse,
+  saveDsm5ComorbidResponse
+} from '@/lib/services/questionnaire-dsm5.service';
 import { 
   AsrmResponseInsert, 
   QidsResponseInsert, 
@@ -84,7 +89,10 @@ import {
   PhysicalParamsResponseInsert,
   BloodPressureResponseInsert,
   SleepApneaResponseInsert,
-  BiologicalAssessmentResponseInsert
+  BiologicalAssessmentResponseInsert,
+  Dsm5HumeurResponseInsert,
+  Dsm5PsychoticResponseInsert,
+  Dsm5ComorbidResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -378,6 +386,30 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as BiologicalAssessmentResponseInsert);
+        break;
+
+      case 'DSM5_HUMEUR_FR':
+        result = await saveDsm5HumeurResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Dsm5HumeurResponseInsert);
+        break;
+
+      case 'DSM5_PSYCHOTIC_FR':
+        result = await saveDsm5PsychoticResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Dsm5PsychoticResponseInsert);
+        break;
+
+      case 'DSM5_COMORBID_FR':
+        result = await saveDsm5ComorbidResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Dsm5ComorbidResponseInsert);
         break;
         
       default:

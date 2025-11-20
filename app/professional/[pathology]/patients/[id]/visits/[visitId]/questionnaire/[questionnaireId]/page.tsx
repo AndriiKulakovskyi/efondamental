@@ -47,6 +47,11 @@ import {
   SLEEP_APNEA_DEFINITION,
   BIOLOGICAL_ASSESSMENT_DEFINITION
 } from "@/lib/constants/questionnaires-infirmier";
+import {
+  DSM5_HUMEUR_DEFINITION,
+  DSM5_PSYCHOTIC_DEFINITION,
+  DSM5_COMORBID_DEFINITION
+} from "@/lib/constants/questionnaires-dsm5";
 import { 
   getAsrmResponse, 
   getQidsResponse, 
@@ -93,6 +98,11 @@ import {
   getSleepApneaResponse,
   getBiologicalAssessmentResponse
 } from "@/lib/services/questionnaire-infirmier.service";
+import {
+  getDsm5HumeurResponse,
+  getDsm5PsychoticResponse,
+  getDsm5ComorbidResponse
+} from "@/lib/services/questionnaire-dsm5.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { QuestionnairePageClient } from "./page-client";
 
@@ -151,6 +161,10 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === BLOOD_PRESSURE_DEFINITION.code) questionnaire = BLOOD_PRESSURE_DEFINITION;
   else if (code === SLEEP_APNEA_DEFINITION.code) questionnaire = SLEEP_APNEA_DEFINITION;
   else if (code === BIOLOGICAL_ASSESSMENT_DEFINITION.code) questionnaire = BIOLOGICAL_ASSESSMENT_DEFINITION;
+  // DSM5 questionnaires
+  else if (code === DSM5_HUMEUR_DEFINITION.code) questionnaire = DSM5_HUMEUR_DEFINITION;
+  else if (code === DSM5_PSYCHOTIC_DEFINITION.code) questionnaire = DSM5_PSYCHOTIC_DEFINITION;
+  else if (code === DSM5_COMORBID_DEFINITION.code) questionnaire = DSM5_COMORBID_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -200,6 +214,10 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === BLOOD_PRESSURE_DEFINITION.code) existingResponse = await getBloodPressureResponse(visitId);
   else if (code === SLEEP_APNEA_DEFINITION.code) existingResponse = await getSleepApneaResponse(visitId);
   else if (code === BIOLOGICAL_ASSESSMENT_DEFINITION.code) existingResponse = await getBiologicalAssessmentResponse(visitId);
+  // DSM5 questionnaires
+  else if (code === DSM5_HUMEUR_DEFINITION.code) existingResponse = await getDsm5HumeurResponse(visitId);
+  else if (code === DSM5_PSYCHOTIC_DEFINITION.code) existingResponse = await getDsm5PsychoticResponse(visitId);
+  else if (code === DSM5_COMORBID_DEFINITION.code) existingResponse = await getDsm5ComorbidResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).
