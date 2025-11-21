@@ -1343,38 +1343,21 @@ export interface Dsm5HumeurResponse {
   has_mood_disorder?: 'oui' | 'non' | 'ne_sais_pas' | null;
   disorder_type?: 'bipolaire_type_1' | 'bipolaire_type_2' | 'bipolaire_non_specifie' | 
     'trouble_depressif_majeur_isole' | 'trouble_depressif_majeur_recurrent' | 
-    'trouble_dysthymique_precoce' | 'trouble_dysthymique_tardif' | null;
+    'trouble_dysthymique' | 'trouble_cyclothymique' | 'trouble_depressif_non_specifie' |
+    'trouble_humeur_affection_medicale' | 'trouble_humeur_induit_substance' | null;
   
   // Medical condition
   medical_condition_affection_type?: 'endocrinienne' | 'neurologique' | 'cardio_vasculaire' | 'autre' | null;
   medical_condition_affection_autre?: string | null;
-  medical_condition_trouble_type?: 'episode_allure_depression_majeure' | 'episode_caracteristiques_depressives' | 
-    'episode_caracteristiques_maniaques' | 'episode_caracteristiques_mixtes' | 'ne_sais_pas' | null;
   
   // Substance-induced
-  substance_type?: 'alcool' | 'cannabis' | 'opiaces' | 'cocaine' | 'hallucinogene' | 'drogues_multiples' | 
-    'sedatif_hypnotique' | 'stimulants' | 'anxiolytique' | 'antidepresseurs' | 'corticoides' | 
-    'interferon' | 'antipaludeen' | 'autre' | null;
+  substance_types?: string[] | null; // Array of substance types
   substance_autre?: string | null;
-  substance_trouble_type?: 'episode_allure_depression_majeure' | 'episode_caracteristiques_depressives' | 
-    'episode_caracteristiques_maniaques' | 'episode_caracteristiques_mixtes' | 'ne_sais_pas' | null;
-  
-  // Unspecified depression
-  unspecified_depression_post_schizophrenie?: boolean | null;
-  unspecified_depression_majeur_surajout?: boolean | null;
-  unspecified_depression_dysphorique_premenstruel?: boolean | null;
-  unspecified_depression_mineur?: boolean | null;
-  unspecified_depression_bref_recurrent?: boolean | null;
-  unspecified_depression_autre?: boolean | null;
-  unspecified_depression_ne_sais_pas?: boolean | null;
-  
-  cyclothymic?: boolean | null;
-  other_specify?: string | null;
   
   // Section 2: First Episode Characteristics
   first_episode_type?: 'edm_sans_psychotiques' | 'edm_avec_psychotiques' | 'hypomanie' | 
     'manie_sans_psychotiques' | 'manie_avec_psychotiques' | 'ne_sais_pas' | null;
-  postpartum_first?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  postpartum_first?: boolean | null;
   initial_cyclothymic_period?: 'oui' | 'non' | 'ne_sais_pas' | null;
   
   // Section 3: Lifetime Characteristics
@@ -1402,15 +1385,10 @@ export interface Dsm5HumeurResponse {
   rapid_cycling?: 'oui' | 'non' | 'ne_sais_pas' | null;
   complete_remission?: 'oui' | 'non' | 'ne_sais_pas' | null;
   seasonal_pattern?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  seasonal_depression?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  seasonal_hypomania?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  seasonal_seasons?: string | null;
+  seasonal_types?: string[] | null; // Array of seasonal patterns
   
   age_first_psychotrope?: number | null;
-  age_first_thymoregulator?: number | null;
   age_first_hospitalization?: number | null;
-  num_hospitalizations?: number | null;
-  total_hospitalization_months?: number | null;
   
   // 3.4 12-month characteristics
   past_year_episode?: 'oui' | 'non' | 'ne_sais_pas' | null;
@@ -1430,8 +1408,6 @@ export interface Dsm5HumeurResponse {
   
   // Work leave subsection
   past_year_work_leave?: 'oui' | 'non' | 'non_applicable' | null;
-  past_year_num_work_leaves?: string | null;
-  past_year_work_leave_weeks?: number | null;
   
   // Section 4: Most Recent Episode
   recent_episode_start_date?: string | null;
@@ -1439,7 +1415,7 @@ export interface Dsm5HumeurResponse {
   recent_episode_type?: 'edm' | 'hypomanie' | 'manie' | 'non_specifie' | 'ne_sais_pas' | null;
   
   // EDM specific
-  recent_edm_subtype?: 'sans_caracteristique' | 'melancolique' | 'atypique' | 'catatonique' | 'mixte' | null;
+  recent_edm_subtypes?: string[] | null; // Array of subtypes
   recent_edm_severity?: 'leger' | 'modere' | 'severe_sans_psychotiques' | 
     'severe_psychotiques_non_congruentes' | 'severe_psychotiques_congruentes' | null;
   recent_edm_chronic?: 'oui' | 'non' | 'ne_sais_pas' | null;
@@ -1466,7 +1442,7 @@ export interface Dsm5HumeurResponse {
   current_episode_type?: 'edm' | 'hypomanie' | 'manie' | 'non_specifie' | 'ne_sais_pas' | null;
   
   // EDM specific
-  current_edm_subtype?: 'sans_caracteristique' | 'melancolique' | 'atypique' | 'catatonique' | 'mixte' | null;
+  current_edm_subtypes?: string[] | null; // Array of subtypes
   current_edm_severity?: 'leger' | 'modere' | 'severe_sans_psychotiques' | 
     'severe_psychotiques_non_congruentes' | 'severe_psychotiques_congruentes' | null;
   current_edm_chronic?: 'oui' | 'non' | 'ne_sais_pas' | null;
@@ -1622,12 +1598,12 @@ export interface Dsm5ComorbidResponse {
   
   // Section 3: Eating Disorders
   has_eating_disorder?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  anorexia_restrictive_amenorrhea?: boolean | null;
+  anorexia_restrictive_amenorrhea?: 'oui' | 'non' | null;
   anorexia_restrictive_age_debut?: number | null;
   anorexia_restrictive_age_fin?: number | null;
   anorexia_restrictive_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
   anorexia_restrictive_current?: boolean | null;
-  anorexia_bulimic_amenorrhea?: boolean | null;
+  anorexia_bulimic_amenorrhea?: 'oui' | 'non' | null;
   anorexia_bulimic_age_debut?: number | null;
   anorexia_bulimic_age_fin?: number | null;
   anorexia_bulimic_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;

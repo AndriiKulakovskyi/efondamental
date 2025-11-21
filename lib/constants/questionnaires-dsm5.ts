@@ -36,25 +36,29 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
       { code: 'bipolaire_type_1', label: 'Bipolaire de Type I' },
       { code: 'bipolaire_type_2', label: 'Bipolaire de Type II' },
       { code: 'bipolaire_non_specifie', label: 'Bipolaire non spécifié' },
-      { code: 'trouble_depressif_majeur_isole', label: 'Trouble Dépressif Majeur - Isolé' },
-      { code: 'trouble_depressif_majeur_recurrent', label: 'Trouble Dépressif Majeur - Récurrent' },
-      { code: 'trouble_dysthymique_precoce', label: 'Trouble dysthymique - Précoce' },
-      { code: 'trouble_dysthymique_tardif', label: 'Trouble dysthymique - Tardif' }
-    ]
+      { code: 'trouble_depressif_majeur_isole', label: 'Trouble Dépressif Majeur Isolé' },
+      { code: 'trouble_depressif_majeur_recurrent', label: 'Trouble Dépressif Majeur Récurrent' },
+      { code: 'trouble_dysthymique', label: 'Trouble dysthymique' },
+      { code: 'trouble_cyclothymique', label: 'Trouble Cyclothymique' },
+      { code: 'trouble_depressif_non_specifie', label: 'Trouble dépressif non spécifié' },
+      { code: 'trouble_humeur_affection_medicale', label: 'Trouble de l\'humeur dû à une affection médicale générale' },
+      { code: 'trouble_humeur_induit_substance', label: 'Trouble de l\'humeur induit par l\'utilisation d\'une substance' }
+    ],
+    help: 'ATTENTION: Si Dysthymie, Cyclothymie ou Dépressif non spécifié est sélectionné, le patient sort de la cohorte (critère d\'exclusion)'
   },
   
   // Medical condition subsection
   {
     id: 'medical_condition_affection_type',
-    text: 'Trouble de l\'humeur dû à une affection médicale générale - Préciser le type d\'affection',
+    text: 'Si affection médicale générale, préciser le type d\'affection',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] },
+    display_if: { '==': [{ var: 'disorder_type' }, 'trouble_humeur_affection_medicale'] },
     options: [
       { code: 'endocrinienne', label: 'Endocrinienne' },
       { code: 'neurologique', label: 'Neurologique' },
       { code: 'cardio_vasculaire', label: 'Cardio-vasculaire' },
-      { code: 'autre', label: 'Autre (spécifier)' }
+      { code: 'autre', label: 'Autre' }
     ]
   },
   {
@@ -64,43 +68,29 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     required: false,
     display_if: { '==': [{ var: 'medical_condition_affection_type' }, 'autre'] }
   },
-  {
-    id: 'medical_condition_trouble_type',
-    text: 'Préciser le type de trouble',
-    type: 'single_choice',
-    required: false,
-    display_if: { '!=': [{ var: 'medical_condition_affection_type' }, null] },
-    options: [
-      { code: 'episode_allure_depression_majeure', label: 'Episode d\'allure de dépression majeure' },
-      { code: 'episode_caracteristiques_depressives', label: 'Episode avec caractéristiques dépressives' },
-      { code: 'episode_caracteristiques_maniaques', label: 'Episode avec caractéristiques maniaques' },
-      { code: 'episode_caracteristiques_mixtes', label: 'Episode avec caractéristiques mixtes' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
   
   // Substance-induced subsection
   {
-    id: 'substance_type',
-    text: 'Trouble de l\'humeur induit par l\'utilisation d\'une substance - Préciser le type de substance',
-    type: 'single_choice',
+    id: 'substance_types',
+    text: 'Si induit par une substance, préciser le type de substance (sélection multiple possible)',
+    type: 'multiple_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] },
+    display_if: { '==': [{ var: 'disorder_type' }, 'trouble_humeur_induit_substance'] },
     options: [
-      { code: 'alcool', label: 'Alcool' },
-      { code: 'cannabis', label: 'Cannabis' },
-      { code: 'opiaces', label: 'Opiacés' },
-      { code: 'cocaine', label: 'Cocaïne' },
-      { code: 'hallucinogene', label: 'Hallucinogène' },
-      { code: 'drogues_multiples', label: 'Drogues multiples' },
-      { code: 'sedatif_hypnotique', label: 'Sédatif ou Hypnotique' },
-      { code: 'stimulants', label: 'Stimulants' },
-      { code: 'anxiolytique', label: 'Anxiolytique' },
-      { code: 'antidepresseurs', label: 'Antidépresseurs' },
-      { code: 'corticoides', label: 'Corticoïdes' },
-      { code: 'interferon', label: 'Interféron' },
-      { code: 'antipaludeen', label: 'Antipaludéen' },
-      { code: 'autre', label: 'Autre (spécifier)' }
+      'Alcool',
+      'Cannabis',
+      'Opiacés',
+      'Cocaïne',
+      'Hallucinogène',
+      'Drogues multiples',
+      'Sédatif ou Hypnotique',
+      'Stimulants',
+      'Anxiolytique',
+      'Antidépresseurs',
+      'Corticoïdes',
+      'Interféron',
+      'Antipaludéen',
+      'Autre'
     ]
   },
   {
@@ -108,88 +98,9 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     text: 'Autre substance (spécifier)',
     type: 'text',
     required: false,
-    display_if: { '==': [{ var: 'substance_type' }, 'autre'] }
-  },
-  {
-    id: 'substance_trouble_type',
-    text: 'Préciser le type de trouble induit par la substance',
-    type: 'single_choice',
-    required: false,
-    display_if: { '!=': [{ var: 'substance_type' }, null] },
-    options: [
-      { code: 'episode_allure_depression_majeure', label: 'Episode d\'allure de dépression majeure' },
-      { code: 'episode_caracteristiques_depressives', label: 'Episode avec caractéristiques dépressives' },
-      { code: 'episode_caracteristiques_maniaques', label: 'Episode avec caractéristiques maniaques' },
-      { code: 'episode_caracteristiques_mixtes', label: 'Episode avec caractéristiques mixtes' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  
-  // Unspecified depression subsection
-  {
-    id: 'unspecified_depression_post_schizophrenie',
-    text: 'Trouble dépressif non spécifié - Trouble dépressif post psychotique à une schizophrénie',
-    type: 'boolean',
-    required: false,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
-  },
-  {
-    id: 'unspecified_depression_majeur_surajout',
-    text: 'Trouble dépressif non spécifié - Trouble dépressif majeur surajouté à un trouble psychotique',
-    type: 'boolean',
-    required: false,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
-  },
-  {
-    id: 'unspecified_depression_dysphorique_premenstruel',
-    text: 'Trouble dépressif non spécifié - Trouble dysphorique prémenstruel',
-    type: 'boolean',
-    required: false,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
-  },
-  {
-    id: 'unspecified_depression_mineur',
-    text: 'Trouble dépressif non spécifié - Trouble dépressif mineur',
-    type: 'boolean',
-    required: false,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
-  },
-  {
-    id: 'unspecified_depression_bref_recurrent',
-    text: 'Trouble dépressif non spécifié - Trouble dépressif bref récurrent',
-    type: 'boolean',
-    required: false,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
-  },
-  {
-    id: 'unspecified_depression_autre',
-    text: 'Trouble dépressif non spécifié - Autre',
-    type: 'boolean',
-    required: false,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
-  },
-  {
-    id: 'unspecified_depression_ne_sais_pas',
-    text: 'Trouble dépressif non spécifié - Ne sais pas',
-    type: 'boolean',
-    required: false,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
-  },
-  
-  // Cyclothymic and Other
-  {
-    id: 'cyclothymic',
-    text: 'Trouble Cyclothymique',
-    type: 'boolean',
-    required: false,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
-  },
-  {
-    id: 'other_specify',
-    text: 'Autre (préciser)',
-    type: 'text',
-    required: false,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
+    display_if: {
+      'in': ['Autre', { var: 'substance_types' }]
+    }
   },
   
   // ========================================================================
@@ -220,14 +131,9 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   {
     id: 'postpartum_first',
     text: 'Survenue en post-partum (dans les 6 premiers mois)',
-    type: 'single_choice',
+    type: 'boolean',
     required: false,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
+    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
   },
   {
     id: 'initial_cyclothymic_period',
@@ -443,48 +349,25 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'seasonal_depression',
-    text: 'Dépression saisonnière',
-    type: 'single_choice',
+    id: 'seasonal_types',
+    text: 'Si oui, précisez le type et la saison (sélection multiple possible)',
+    type: 'multiple_choice',
     required: false,
     display_if: { '==': [{ var: 'seasonal_pattern' }, 'oui'] },
     options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+      'Dépression saisonnière - Printemps',
+      'Dépression saisonnière - Été',
+      'Dépression saisonnière - Automne',
+      'Dépression saisonnière - Hiver',
+      '(Hypo)manie saisonnière - Printemps',
+      '(Hypo)manie saisonnière - Été',
+      '(Hypo)manie saisonnière - Automne',
+      '(Hypo)manie saisonnière - Hiver'
     ]
-  },
-  {
-    id: 'seasonal_hypomania',
-    text: '(hypo)manie saisonnière',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'seasonal_pattern' }, 'oui'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'seasonal_seasons',
-    text: 'Saisons (préciser)',
-    type: 'text',
-    required: false,
-    display_if: { '==': [{ var: 'seasonal_pattern' }, 'oui'] },
-    help: 'Exemple: Printemps, Été, Automne, Hiver'
   },
   {
     id: 'age_first_psychotrope',
     text: 'Age du premier traitement psychotrope',
-    type: 'number',
-    required: false,
-    min: 1,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
-  },
-  {
-    id: 'age_first_thymoregulator',
-    text: 'Age du premier traitement psychotrope thymorégulateur',
     type: 'number',
     required: false,
     min: 1,
@@ -496,22 +379,6 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 1,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
-  },
-  {
-    id: 'num_hospitalizations',
-    text: 'Nombre d\'hospitalisations',
-    type: 'number',
-    required: false,
-    min: 0,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
-  },
-  {
-    id: 'total_hospitalization_months',
-    text: 'Durée totale des hospitalisations (en mois)',
-    type: 'number',
-    required: false,
-    min: 0,
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
   },
   
@@ -662,28 +529,12 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     text: 'Arrêt de travail au cours de l\'année passée',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'past_year_episode' }, 'oui'] },
+    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] },
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
       { code: 'non_applicable', label: 'Non applicable' }
     ]
-  },
-  {
-    id: 'past_year_num_work_leaves',
-    text: 'Nombre d\'arrêts de travail sur l\'année écoulée',
-    type: 'text',
-    required: false,
-    display_if: { '==': [{ var: 'past_year_work_leave' }, 'oui'] },
-    help: 'Indiquer un nombre ou "ne sais pas"'
-  },
-  {
-    id: 'past_year_work_leave_weeks',
-    text: 'Durée totale des arrêts de travail sur l\'année écoulée (en semaines)',
-    type: 'number',
-    required: false,
-    min: 0,
-    display_if: { '==': [{ var: 'past_year_work_leave' }, 'oui'] }
   },
   
   // ========================================================================
@@ -728,16 +579,16 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   // EDM recent episode specific fields
   {
     id: 'recent_edm_subtype',
-    text: 'Si l\'épisode le plus récent est un Episode Dépressif Majeur - Préciser le type',
-    type: 'single_choice',
+    text: 'Si l\'épisode le plus récent est un Episode Dépressif Majeur - Préciser le type (sélection multiple possible)',
+    type: 'multiple_choice',
     required: false,
     display_if: { '==': [{ var: 'recent_episode_type' }, 'edm'] },
     options: [
-      { code: 'sans_caracteristique', label: 'Sans caractéristique mélancolique atypique catatonique ou mixte' },
-      { code: 'melancolique', label: 'Mélancolique' },
-      { code: 'atypique', label: 'Atypique' },
-      { code: 'catatonique', label: 'Catatonique' },
-      { code: 'mixte', label: 'Mixte' }
+      'Sans caractéristique mélancolique atypique catatonique ou mixte',
+      'Mélancolique',
+      'Atypique',
+      'Catatonique',
+      'Mixte'
     ]
   },
   {
@@ -925,16 +776,16 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   // EDM current episode specific fields
   {
     id: 'current_edm_subtype',
-    text: 'Si l\'épisode actuel est un Episode Dépressif Majeur - Préciser le type',
-    type: 'single_choice',
+    text: 'Si l\'épisode actuel est un Episode Dépressif Majeur - Préciser le type (sélection multiple possible)',
+    type: 'multiple_choice',
     required: false,
     display_if: { '==': [{ var: 'current_episode_type' }, 'edm'] },
     options: [
-      { code: 'sans_caracteristique', label: 'Sans caractéristique mélancolique atypique catatonique ou mixte' },
-      { code: 'melancolique', label: 'Mélancolique' },
-      { code: 'atypique', label: 'Atypique' },
-      { code: 'catatonique', label: 'Catatonique' },
-      { code: 'mixte', label: 'Mixte' }
+      'Sans caractéristique mélancolique atypique catatonique ou mixte',
+      'Mélancolique',
+      'Atypique',
+      'Catatonique',
+      'Mixte'
     ]
   },
   {
@@ -2135,9 +1986,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
   {
     id: 'anorexia_restrictive_amenorrhea',
     text: 'Anorexie type restrictive - Aménorrhée',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'anorexia_restrictive_age_debut',
@@ -2181,9 +2036,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
   {
     id: 'anorexia_bulimic_amenorrhea',
     text: 'Anorexie type boulimie - Aménorrhée',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'anorexia_bulimic_age_debut',
