@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, CheckCircle, Circle, FileText, RotateCcw } from "lucide-react";
@@ -24,6 +24,11 @@ export function ExpandableModuleCard({
   visitId 
 }: ExpandableModuleCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   const completedCount = module.questionnaires.filter((q: any) => q.completed).length;
   const totalCount = module.questionnaires.length;
@@ -88,15 +93,18 @@ export function ExpandableModuleCard({
         </div>
       </CardHeader>
 
-      <div
-        className={cn(
-          "overflow-hidden transition-all duration-300",
-          isExpanded ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
-        )}
-      >
-        <CardContent className="pt-0">
-          <div className="space-y-2">
-            {module.questionnaires.map((questionnaire: any) => (
+      {mounted && (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateRows: isExpanded ? '1fr' : '0fr',
+            transition: 'grid-template-rows 300ms'
+          }}
+        >
+          <div style={{ overflow: 'hidden' }}>
+            <CardContent className="pt-0">
+              <div className="space-y-2">
+                {module.questionnaires.map((questionnaire: any) => (
               <div
                 key={questionnaire.id}
                 className={cn(
@@ -163,10 +171,12 @@ export function ExpandableModuleCard({
                   )}
                 </div>
               </div>
-            ))}
+              ))}
+            </div>
+          </CardContent>
           </div>
-        </CardContent>
-      </div>
+        </div>
+      )}
     </Card>
   );
 }

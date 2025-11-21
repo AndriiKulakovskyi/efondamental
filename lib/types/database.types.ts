@@ -1995,3 +1995,93 @@ export interface IsaResponse {
 
 export type IsaResponseInsert = Omit<IsaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ===== C-SSRS History (Histoire des Conduites Suicidaires) Response =====
+export interface CssrsHistoryResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Historical Overview
+  ts_first_date?: string | null; // Date of first suicide attempt
+  ts_total_count?: number | null; // Total number of attempts
+  
+  // Violent Attempts
+  ts_violent_presence?: number | null; // 0=No, 1=Yes, 99=Don't know
+  ts_violent_count?: number | null;
+  
+  // Serious Non-Violent Attempts
+  ts_serious_presence?: number | null; // 0=No, 1=Yes, 99=Don't know
+  ts_serious_count?: number | null;
+  
+  // Interrupted Attempts
+  ts_interrupted_presence?: number | null; // 0=No, 1=Yes
+  ts_interrupted_count?: number | null;
+  
+  // Aborted Attempts
+  ts_aborted_presence?: number | null; // 0=No, 1=Yes
+  ts_aborted_count?: number | null;
+  
+  // Preparations
+  ts_preparations?: number | null; // 0=No, 1=Yes
+  
+  // Lethality - Most Recent
+  lethality_recent?: number | null; // 0-5 scale
+  date_recent?: string | null;
+  
+  // Lethality - Most Lethal
+  lethality_most_lethal?: number | null; // 0-5 scale
+  date_most_lethal?: string | null;
+  
+  // Lethality - First
+  lethality_first?: number | null; // 0-5 scale
+  date_first_confirm?: string | null;
+  
+  // Potential Lethality
+  potential_lethality?: string | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type CssrsHistoryResponseInsert = Omit<CssrsHistoryResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ===== SIS (Suicide Intent Scale) Response =====
+export interface SisResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Section 1: Circumstances of the Act (items 1-8)
+  sis_01?: number | null; // Isolation (0-2)
+  sis_02?: number | null; // Timing (0-2)
+  sis_03?: number | null; // Precautions against discovery (0-2)
+  sis_04?: number | null; // Seeking help (0-2)
+  sis_05?: number | null; // Final acts (0-2)
+  sis_06?: number | null; // Active preparation (0-2)
+  sis_07?: number | null; // Notes/letters (0-2)
+  sis_08?: number | null; // Communication of intent (0-2)
+  
+  // Section 2: Subject's Conception (items 9-15)
+  sis_09?: number | null; // Alleged purpose (0-2)
+  sis_10?: number | null; // Opinion on outcome (0-2)
+  sis_11?: number | null; // Conception of lethality (0-2)
+  sis_12?: number | null; // Seriousness (0-2)
+  sis_13?: number | null; // Attitude toward living/dying (0-2)
+  sis_14?: number | null; // Opinion on efficacy of care (0-2)
+  sis_15?: number | null; // Degree of premeditation (0-2)
+  
+  // Scores (computed)
+  total_score?: number | null; // 0-30
+  circumstances_subscore?: number | null; // 0-16 (items 1-8)
+  conception_subscore?: number | null; // 0-14 (items 9-15)
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SisResponseInsert = Omit<SisResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score' | 'circumstances_subscore' | 'conception_subscore'>;
+

@@ -1882,3 +1882,372 @@ export const ISA_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// C-SSRS History (Histoire des Conduites Suicidaires)
+// ============================================================================
+
+export const CSSRS_HISTORY_QUESTIONS: Question[] = [
+  {
+    id: 'ts_first_date',
+    text: '1. Date de la première Tentative de Suicide (TS)',
+    type: 'text',
+    required: true
+  },
+  {
+    id: 'ts_total_count',
+    text: '2. Combien de fois avez-vous tenté de vous suicider ?',
+    type: 'number',
+    required: true
+  },
+  {
+    id: 'ts_violent_presence',
+    text: '3. Existe-t-il des TS violentes (arme à feu, immolation, noyade, saut, pendaison, autre) ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 99, label: 'Ne sais pas', score: 99 }
+    ]
+  },
+  {
+    id: 'ts_violent_count',
+    text: 'Si oui, nombre de TS violentes :',
+    type: 'number',
+    required: false,
+    display_if: {
+      '==': [{ var: 'ts_violent_presence' }, 1]
+    }
+  },
+  {
+    id: 'ts_serious_presence',
+    text: '4. Existe-t-il des TS graves (passage en réanimation) non violentes (médicamenteuses, phlébotomie) ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 99, label: 'Ne sais pas', score: 99 }
+    ]
+  },
+  {
+    id: 'ts_serious_count',
+    text: 'Si oui, nombre de TS graves :',
+    type: 'number',
+    required: false,
+    display_if: {
+      '==': [{ var: 'ts_serious_presence' }, 1]
+    }
+  },
+  {
+    id: 'ts_interrupted_presence',
+    text: 'Tentative interrompue : Vous est-il arrivé de commencer à faire quelque chose pour mettre fin à vos jours, mais d\'en être empêché(e) par quelqu\'un ou quelque chose ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'ts_interrupted_count',
+    text: 'Nombre total des tentatives interrompues :',
+    type: 'number',
+    required: false,
+    display_if: {
+      '==': [{ var: 'ts_interrupted_presence' }, 1]
+    }
+  },
+  {
+    id: 'ts_aborted_presence',
+    text: 'Tentative avortée : Vous est-il arrivé de commencer à faire quelque chose... mais de vous arrêter de vous-même ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'ts_aborted_count',
+    text: 'Nombre total des tentatives avortées :',
+    type: 'number',
+    required: false,
+    display_if: {
+      '==': [{ var: 'ts_aborted_presence' }, 1]
+    }
+  },
+  {
+    id: 'ts_preparations',
+    text: 'Préparatifs : Avez-vous pris certaines mesures pour faire une tentative de suicide ou pour préparer votre suicide ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'lethality_recent',
+    text: 'Létalité/lésions médicales observées (Tentative la plus récente)',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: '0 - Aucune atteinte physique ou très légère', score: 0 },
+      { code: 1, label: '1 - Atteinte physique légère', score: 1 },
+      { code: 2, label: '2 - Atteinte physique modérée (soins médicaux)', score: 2 },
+      { code: 3, label: '3 - Atteinte physique grave (soins intensifs probables)', score: 3 },
+      { code: 4, label: '4 - Atteinte physique très grave (soins intensifs nécessaires)', score: 4 },
+      { code: 5, label: '5 - Décès', score: 5 }
+    ]
+  },
+  {
+    id: 'date_recent',
+    text: 'Date de la tentative la plus récente :',
+    type: 'text',
+    required: false
+  },
+  {
+    id: 'lethality_most_lethal',
+    text: 'Létalité/lésions médicales observées (Tentative la plus létale)',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: '0 - Aucune atteinte physique ou très légère', score: 0 },
+      { code: 1, label: '1 - Atteinte physique légère', score: 1 },
+      { code: 2, label: '2 - Atteinte physique modérée (soins médicaux)', score: 2 },
+      { code: 3, label: '3 - Atteinte physique grave (soins intensifs probables)', score: 3 },
+      { code: 4, label: '4 - Atteinte physique très grave (soins intensifs nécessaires)', score: 4 },
+      { code: 5, label: '5 - Décès', score: 5 }
+    ]
+  },
+  {
+    id: 'date_most_lethal',
+    text: 'Date de la tentative la plus létale :',
+    type: 'text',
+    required: false
+  },
+  {
+    id: 'lethality_first',
+    text: 'Létalité/lésions médicales observées (Première tentative)',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: '0 - Aucune atteinte physique ou très légère', score: 0 },
+      { code: 1, label: '1 - Atteinte physique légère', score: 1 },
+      { code: 2, label: '2 - Atteinte physique modérée (soins médicaux)', score: 2 },
+      { code: 3, label: '3 - Atteinte physique grave (soins intensifs probables)', score: 3 },
+      { code: 4, label: '4 - Atteinte physique très grave (soins intensifs nécessaires)', score: 4 },
+      { code: 5, label: '5 - Décès', score: 5 }
+    ]
+  },
+  {
+    id: 'date_first_confirm',
+    text: 'Date de la première tentative :',
+    type: 'text',
+    required: false
+  },
+  {
+    id: 'potential_lethality',
+    text: 'Létalité probable d\'une tentative avérée en l\'absence de lésions médicales (si létalité observée = 0)',
+    type: 'text',
+    required: false
+  }
+];
+
+export const CSSRS_HISTORY_DEFINITION: QuestionnaireDefinition = {
+  id: 'cssrs_history',
+  code: 'CSSRS_HISTORY_FR',
+  title: 'Histoire des Conduites Suicidaires (C-SSRS Supplement)',
+  description: 'Recueil détaillé de l\'historique des tentatives de suicide, incluant la violence, la gravité médicale (létalité) et les comportements interrompus/avortés.',
+  questions: CSSRS_HISTORY_QUESTIONS,
+  metadata: {
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
+// SIS (Suicide Intent Scale) - Beck
+// ============================================================================
+
+export const SIS_QUESTIONS: Question[] = [
+  {
+    id: 'sis_01',
+    text: '1) Isolement',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Quelqu\'un était présent', score: 0 },
+      { code: 1, label: 'Quelqu\'un était à proximité ou en contact (par exemple au téléphone)', score: 1 },
+      { code: 2, label: 'Personne n\'était à proximité', score: 2 }
+    ]
+  },
+  {
+    id: 'sis_02',
+    text: '2) « Timing »',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Geste organisé, de sorte qu\'une intervention est probable', score: 0 },
+      { code: 1, label: 'L\'intervention d\'un tiers n\'est pas probable', score: 1 },
+      { code: 2, label: 'L\'intervention d\'un tiers est hautement improbable', score: 2 }
+    ]
+  },
+  {
+    id: 'sis_03',
+    text: '3) Précautions contre la découverte',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune précaution', score: 0 },
+      { code: 1, label: 'Précautions passives (comme se soustraire aux autres sans rien faire pour éviter leur intervention: être seul dans la pièce, porte non verrouillée)', score: 1 },
+      { code: 2, label: 'Précautions actives (porte verrouillée)', score: 2 }
+    ]
+  },
+  {
+    id: 'sis_04',
+    text: '4) Recherche de secours pendant ou après la TS',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'En a parlé à un sauveteur potentiel', score: 0 },
+      { code: 1, label: 'A contacté un sauveteur potentiel, mais sans mentionner son geste', score: 1 },
+      { code: 2, label: 'N\'a contacté ou avisé personne', score: 2 }
+    ]
+  },
+  {
+    id: 'sis_05',
+    text: '5) « Derniers actes » anticipant la mort (dernières volontés, dons, assurances...)',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucun', score: 0 },
+      { code: 1, label: 'Préparation partielle (y a pensé ou a fait quelques arrangements)', score: 1 },
+      { code: 2, label: 'Plans définis et réalisés (changement dans les dernières volontés, assurance...)', score: 2 }
+    ]
+  },
+  {
+    id: 'sis_06',
+    text: '6) Préparation active de la tentative de suicide',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune', score: 0 },
+      { code: 1, label: 'Minime à modérée', score: 1 },
+      { code: 2, label: 'Etendue', score: 2 }
+    ]
+  },
+  {
+    id: 'sis_07',
+    text: '7) Notes ou lettres laissées',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Pas de message', score: 0 },
+      { code: 1, label: 'Message écrit puis déchiré, a pensé à laisser un message', score: 1 },
+      { code: 2, label: 'Présence d\'un message', score: 2 }
+    ]
+  },
+  {
+    id: 'sis_08',
+    text: '8) Communication claire de l\'intention avant la tentative de suicide',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune', score: 0 },
+      { code: 1, label: 'Communication équivoque', score: 1 },
+      { code: 2, label: 'Communication non équivoque', score: 2 }
+    ]
+  },
+  {
+    id: 'sis_09',
+    text: '9) But allégué de la tentative',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Attirer l\'attention, manipuler l\'environnement, se venger...', score: 0 },
+      { code: 1, label: 'Entre 0 et 2', score: 1 },
+      { code: 2, label: 'Pour s\'enfuir, disparaître, résoudre ses problèmes', score: 2 }
+    ]
+  },
+  {
+    id: 'sis_10',
+    text: '10) Opinion sur l\'issue du geste',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Pensait que la mort était improbable', score: 0 },
+      { code: 1, label: 'Pensait que la mort était possible', score: 1 },
+      { code: 2, label: 'Pensait que la mort était probable, voire certaine', score: 2 }
+    ]
+  },
+  {
+    id: 'sis_11',
+    text: '11) Conception sur la létalité de la méthode',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Le sujet n\'était pas sûr que ce qu\'il faisait était mortel', score: 0 },
+      { code: 1, label: 'Le sujet a fait moins que ce qu\'il pensait être mortel', score: 1 },
+      { code: 2, label: 'Le sujet a égalé ou dépassé ce qu\'il pensait être mortel', score: 2 }
+    ]
+  },
+  {
+    id: 'sis_12',
+    text: '12) Gravité de la tentative',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Pense ne pas sérieusement avoir tenté de mettre fin à ses jours', score: 0 },
+      { code: 1, label: 'N\'est pas sûr d\'avoir sérieusement tenté de mettre fin à ses jours', score: 1 },
+      { code: 2, label: 'Pense avoir sérieusement tenté de mettre fin à ses jours', score: 2 }
+    ]
+  },
+  {
+    id: 'sis_13',
+    text: '13) Attitude à l\'égard de vivre ou de mourir',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Ne voulait pas mourir', score: 0 },
+      { code: 1, label: 'Entre 0 et 2', score: 1 },
+      { code: 2, label: 'Voulait mourir', score: 2 }
+    ]
+  },
+  {
+    id: 'sis_14',
+    text: '14) Opinion sur l\'efficacité des soins éventuels',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Pensait que la mort était improbable s\'il recevait une aide médicale', score: 0 },
+      { code: 1, label: 'Ne savait pas clairement si la mort pouvait être prévenue par une intervention médicale', score: 1 },
+      { code: 2, label: 'Était certain de mourir même s\'il recevait une aide médicale', score: 2 }
+    ]
+  },
+  {
+    id: 'sis_15',
+    text: '15) Degré de préméditation',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'T.S. impulsive, sans préméditation', score: 0 },
+      { code: 1, label: 'Acte envisagé moins de 3 heures avant la T.S.', score: 1 },
+      { code: 2, label: 'Acte envisagé plus de 3 heures avant la T.S.', score: 2 }
+    ]
+  }
+];
+
+export const SIS_DEFINITION: QuestionnaireDefinition = {
+  id: 'sis',
+  code: 'SIS_FR',
+  title: 'SIS (Suicide Intent Scale) - Tentative la plus récente',
+  description: 'Évaluation de l\'intentionnalité suicidaire basée sur les circonstances du geste et la conception du sujet lors de la tentative la plus récente (Beck).',
+  questions: SIS_QUESTIONS,
+  metadata: {
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

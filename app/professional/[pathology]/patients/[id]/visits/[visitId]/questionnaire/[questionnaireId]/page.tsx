@@ -38,7 +38,9 @@ import {
   DIVA_DEFINITION,
   FAMILY_HISTORY_DEFINITION,
   CSSRS_DEFINITION,
-  ISA_DEFINITION
+  ISA_DEFINITION,
+  CSSRS_HISTORY_DEFINITION,
+  SIS_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -93,7 +95,9 @@ import {
   getDivaResponse,
   getFamilyHistoryResponse,
   getCssrsResponse,
-  getIsaResponse
+  getIsaResponse,
+  getCssrsHistoryResponse,
+  getSisResponse
 } from "@/lib/services/questionnaire-hetero.service";
 import {
   getSocialResponse
@@ -164,6 +168,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === FAMILY_HISTORY_DEFINITION.code) questionnaire = FAMILY_HISTORY_DEFINITION;
   else if (code === CSSRS_DEFINITION.code) questionnaire = CSSRS_DEFINITION;
   else if (code === ISA_DEFINITION.code) questionnaire = ISA_DEFINITION;
+  else if (code === CSSRS_HISTORY_DEFINITION.code) questionnaire = CSSRS_HISTORY_DEFINITION;
+  else if (code === SIS_DEFINITION.code) questionnaire = SIS_DEFINITION;
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) questionnaire = SOCIAL_DEFINITION;
   // Infirmier questionnaires
@@ -221,6 +227,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === FAMILY_HISTORY_DEFINITION.code) existingResponse = await getFamilyHistoryResponse(visitId);
   else if (code === CSSRS_DEFINITION.code) existingResponse = await getCssrsResponse(visitId);
   else if (code === ISA_DEFINITION.code) existingResponse = await getIsaResponse(visitId);
+  else if (code === CSSRS_HISTORY_DEFINITION.code) existingResponse = await getCssrsHistoryResponse(visitId);
+  else if (code === SIS_DEFINITION.code) existingResponse = await getSisResponse(visitId);
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) existingResponse = await getSocialResponse(visitId);
   // Infirmier questionnaires

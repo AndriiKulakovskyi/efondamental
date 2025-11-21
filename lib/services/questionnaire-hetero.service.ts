@@ -24,7 +24,11 @@ import {
   CssrsResponse,
   CssrsResponseInsert,
   IsaResponse,
-  IsaResponseInsert
+  IsaResponseInsert,
+  CssrsHistoryResponse,
+  CssrsHistoryResponseInsert,
+  SisResponse,
+  SisResponseInsert
 } from '@/lib/types/database.types';
 
 // ============================================================================
@@ -732,6 +736,82 @@ export async function saveIsaResponse(
 
   const { data, error } = await supabase
     .from('responses_isa')
+    .upsert({
+      ...response
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// C-SSRS History (Histoire des Conduites Suicidaires)
+// ============================================================================
+
+export async function getCssrsHistoryResponse(
+  visitId: string
+): Promise<CssrsHistoryResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_cssrs_history')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveCssrsHistoryResponse(
+  response: CssrsHistoryResponseInsert
+): Promise<CssrsHistoryResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_cssrs_history')
+    .upsert({
+      ...response
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// SIS (Suicide Intent Scale)
+// ============================================================================
+
+export async function getSisResponse(
+  visitId: string
+): Promise<SisResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_sis')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveSisResponse(
+  response: SisResponseInsert
+): Promise<SisResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_sis')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })

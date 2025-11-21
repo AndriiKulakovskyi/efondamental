@@ -37,7 +37,9 @@ import {
   saveDivaResponse,
   saveFamilyHistoryResponse,
   saveCssrsResponse,
-  saveIsaResponse
+  saveIsaResponse,
+  saveCssrsHistoryResponse,
+  saveSisResponse
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveSocialResponse
@@ -91,6 +93,8 @@ import {
   FamilyHistoryResponseInsert,
   CssrsResponseInsert,
   IsaResponseInsert,
+  CssrsHistoryResponseInsert,
+  SisResponseInsert,
   SocialResponseInsert,
   TobaccoResponseInsert,
   FagerstromResponseInsert,
@@ -370,6 +374,22 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as IsaResponseInsert);
+        break;
+
+      case 'CSSRS_HISTORY_FR':
+        result = await saveCssrsHistoryResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as CssrsHistoryResponseInsert);
+        break;
+
+      case 'SIS_FR':
+        result = await saveSisResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as SisResponseInsert);
         break;
 
       case 'SOCIAL':
