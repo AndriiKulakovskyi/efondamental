@@ -20,7 +20,9 @@ import {
   DivaResponse,
   DivaResponseInsert,
   FamilyHistoryResponse,
-  FamilyHistoryResponseInsert
+  FamilyHistoryResponseInsert,
+  CssrsResponse,
+  CssrsResponseInsert
 } from '@/lib/types/database.types';
 
 // ============================================================================
@@ -649,6 +651,46 @@ export async function saveFamilyHistoryResponse(
 
   const { data, error } = await supabase
     .from('responses_family_history')
+    .upsert({
+      ...response,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// C-SSRS (Columbia-Suicide Severity Rating Scale)
+// ============================================================================
+
+export async function getCssrsResponse(
+  visitId: string
+): Promise<CssrsResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_cssrs')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveCssrsResponse(
+  response: CssrsResponseInsert
+): Promise<CssrsResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from('responses_cssrs')
     .upsert({
       ...response,
       completed_by: user.data.user?.id

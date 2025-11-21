@@ -1928,3 +1928,36 @@ export interface FamilyHistoryResponse {
 
 export type FamilyHistoryResponseInsert = Omit<FamilyHistoryResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ============================================================================
+// C-SSRS (Columbia-Suicide Severity Rating Scale)
+// ============================================================================
+
+export interface CssrsResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Suicidal Ideation Questions
+  q1_wish_dead?: boolean | null;
+  q2_non_specific?: boolean | null;
+  q3_method_no_intent?: boolean | null;
+  q4_intent_no_plan?: boolean | null;
+  q5_plan_intent?: boolean | null;
+  
+  // Intensity of Ideation
+  int_most_severe?: number | null; // 1-5
+  int_frequency?: number | null; // 1-5
+  int_duration?: number | null; // 1-5
+  int_control?: number | null; // 0-5
+  int_deterrents?: number | null; // 1-5
+  int_causes?: number | null; // 0-5
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type CssrsResponseInsert = Omit<CssrsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+

@@ -36,7 +36,8 @@ import {
   ETAT_PATIENT_DEFINITION,
   FAST_DEFINITION,
   DIVA_DEFINITION,
-  FAMILY_HISTORY_DEFINITION
+  FAMILY_HISTORY_DEFINITION,
+  CSSRS_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -89,7 +90,8 @@ import {
   getEtatPatientResponse,
   getFastResponse,
   getDivaResponse,
-  getFamilyHistoryResponse
+  getFamilyHistoryResponse,
+  getCssrsResponse
 } from "@/lib/services/questionnaire-hetero.service";
 import {
   getSocialResponse
@@ -158,6 +160,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === FAST_DEFINITION.code) questionnaire = FAST_DEFINITION;
   else if (code === DIVA_DEFINITION.code) questionnaire = DIVA_DEFINITION;
   else if (code === FAMILY_HISTORY_DEFINITION.code) questionnaire = FAMILY_HISTORY_DEFINITION;
+  else if (code === CSSRS_DEFINITION.code) questionnaire = CSSRS_DEFINITION;
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) questionnaire = SOCIAL_DEFINITION;
   // Infirmier questionnaires
@@ -213,6 +216,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === FAST_DEFINITION.code) existingResponse = await getFastResponse(visitId);
   else if (code === DIVA_DEFINITION.code) existingResponse = await getDivaResponse(visitId);
   else if (code === FAMILY_HISTORY_DEFINITION.code) existingResponse = await getFamilyHistoryResponse(visitId);
+  else if (code === CSSRS_DEFINITION.code) existingResponse = await getCssrsResponse(visitId);
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) existingResponse = await getSocialResponse(visitId);
   // Infirmier questionnaires
