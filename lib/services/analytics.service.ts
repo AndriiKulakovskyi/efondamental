@@ -10,67 +10,79 @@ import { PathologyType } from '../types/enums';
 export async function getGlobalStatistics() {
   const supabase = await createClient();
 
-  // Total centers
-  const { count: totalCenters } = await supabase
-    .from('centers')
-    .select('*', { count: 'exact', head: true });
-
-  // Active centers
-  const { count: activeCenters } = await supabase
-    .from('centers')
-    .select('*', { count: 'exact', head: true })
-    .eq('active', true);
-
-  // Total patients
-  const { count: totalPatients } = await supabase
-    .from('patients')
-    .select('*', { count: 'exact', head: true });
-
-  // Active patients
-  const { count: activePatients } = await supabase
-    .from('patients')
-    .select('*', { count: 'exact', head: true })
-    .eq('active', true);
-
-  // Visits this month
   const firstDayOfMonth = new Date();
   firstDayOfMonth.setDate(1);
   firstDayOfMonth.setHours(0, 0, 0, 0);
+  const firstDayISO = firstDayOfMonth.toISOString();
 
-  const { count: visitsThisMonth } = await supabase
-    .from('visits')
-    .select('*', { count: 'exact', head: true })
-    .gte('scheduled_date', firstDayOfMonth.toISOString());
+  const [
+    totalCentersResult,
+    activeCentersResult,
+    totalPatientsResult,
+    activePatientsResult,
+    visitsThisMonthResult,
+    completedVisitsThisMonthResult,
+    totalProfessionalsResult,
+    activeProfessionalsResult
+  ] = await Promise.all([
+    // Total centers
+    supabase
+      .from('centers')
+      .select('*', { count: 'exact', head: true }),
 
-  // Completed visits this month
-  const { count: completedVisitsThisMonth } = await supabase
-    .from('visits')
-    .select('*', { count: 'exact', head: true })
-    .gte('scheduled_date', firstDayOfMonth.toISOString())
-    .eq('status', 'completed');
+    // Active centers
+    supabase
+      .from('centers')
+      .select('*', { count: 'exact', head: true })
+      .eq('active', true),
 
-  // Total professionals
-  const { count: totalProfessionals } = await supabase
-    .from('user_profiles')
-    .select('*', { count: 'exact', head: true })
-    .in('role', ['healthcare_professional', 'manager']);
+    // Total patients
+    supabase
+      .from('patients')
+      .select('*', { count: 'exact', head: true }),
 
-  // Active professionals
-  const { count: activeProfessionals } = await supabase
-    .from('user_profiles')
-    .select('*', { count: 'exact', head: true })
-    .in('role', ['healthcare_professional', 'manager'])
-    .eq('active', true);
+    // Active patients
+    supabase
+      .from('patients')
+      .select('*', { count: 'exact', head: true })
+      .eq('active', true),
+
+    // Visits this month
+    supabase
+      .from('visits')
+      .select('*', { count: 'exact', head: true })
+      .gte('scheduled_date', firstDayISO),
+
+    // Completed visits this month
+    supabase
+      .from('visits')
+      .select('*', { count: 'exact', head: true })
+      .gte('scheduled_date', firstDayISO)
+      .eq('status', 'completed'),
+
+    // Total professionals
+    supabase
+      .from('user_profiles')
+      .select('*', { count: 'exact', head: true })
+      .in('role', ['healthcare_professional', 'manager']),
+
+    // Active professionals
+    supabase
+      .from('user_profiles')
+      .select('*', { count: 'exact', head: true })
+      .in('role', ['healthcare_professional', 'manager'])
+      .eq('active', true)
+  ]);
 
   return {
-    totalCenters: totalCenters || 0,
-    activeCenters: activeCenters || 0,
-    totalPatients: totalPatients || 0,
-    activePatients: activePatients || 0,
-    visitsThisMonth: visitsThisMonth || 0,
-    completedVisitsThisMonth: completedVisitsThisMonth || 0,
-    totalProfessionals: totalProfessionals || 0,
-    activeProfessionals: activeProfessionals || 0,
+    totalCenters: totalCentersResult.count || 0,
+    activeCenters: activeCentersResult.count || 0,
+    totalPatients: totalPatientsResult.count || 0,
+    activePatients: activePatientsResult.count || 0,
+    visitsThisMonth: visitsThisMonthResult.count || 0,
+    completedVisitsThisMonth: completedVisitsThisMonthResult.count || 0,
+    totalProfessionals: totalProfessionalsResult.count || 0,
+    activeProfessionals: activeProfessionalsResult.count || 0,
   };
 }
 
@@ -81,14 +93,35 @@ export async function getGlobalStatistics() {
 export async function getCenterAnalytics(centerId: string) {
   const supabase = await createClient();
 
-  // Patient count by pathology
-  const { data: patientsByPathology } = await supabase
-    .from('patients')
-    .select('pathology_id, pathologies(type, name)')
-    .eq('center_id', centerId)
-    .eq('active', true);
+  const [patientsByPathologyResult, totalVisitsResult, completedVisitsResult] = await Promise.all([
+    // Patient count by pathology
+    supabase
+      .from('patients')
+      .select('pathology_id, pathologies(type, name)')
+      .eq('center_id', centerId)
+      .eq('active', true),
 
-  const pathologyBreakdown = patientsByPathology?.reduce((acc, p: any) => {
+    // Total visits
+    supabase
+      .from('visits')
+      .select('*, patient:patients!inner(center_id)', {
+        count: 'exact',
+        head: true,
+      })
+      .eq('patient.center_id', centerId),
+
+    // Completed visits
+    supabase
+      .from('visits')
+      .select('*, patient:patients!inner(center_id)', {
+        count: 'exact',
+        head: true,
+      })
+      .eq('patient.center_id', centerId)
+      .eq('status', 'completed')
+  ]);
+
+  const pathologyBreakdown = patientsByPathologyResult.data?.reduce((acc, p: any) => {
     const type = p.pathologies?.type;
     if (type) {
       acc[type] = (acc[type] || 0) + 1;
@@ -96,33 +129,17 @@ export async function getCenterAnalytics(centerId: string) {
     return acc;
   }, {} as Record<string, number>);
 
-  // Visit completion rate
-  const { count: totalVisits } = await supabase
-    .from('visits')
-    .select('*, patient:patients!inner(center_id)', {
-      count: 'exact',
-      head: true,
-    })
-    .eq('patient.center_id', centerId);
-
-  const { count: completedVisits } = await supabase
-    .from('visits')
-    .select('*, patient:patients!inner(center_id)', {
-      count: 'exact',
-      head: true,
-    })
-    .eq('patient.center_id', centerId)
-    .eq('status', 'completed');
-
+  const totalVisits = totalVisitsResult.count || 0;
+  const completedVisits = completedVisitsResult.count || 0;
   const completionRate =
-    totalVisits && totalVisits > 0
-      ? Math.round((completedVisits || 0 / totalVisits) * 100)
+    totalVisits > 0
+      ? Math.round((completedVisits / totalVisits) * 100)
       : 0;
 
   return {
     pathologyBreakdown,
-    totalVisits: totalVisits || 0,
-    completedVisits: completedVisits || 0,
+    totalVisits,
+    completedVisits,
     completionRate,
   };
 }

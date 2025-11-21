@@ -22,18 +22,20 @@ export default async function PatientDashboard() {
       return <div>Patient record not found</div>;
   }
 
-  // Get upcoming visits
-  const { data: upcomingVisits } = await supabase
-    .from('v_visits_full')
-    .select('*')
-    .eq('patient_id', patient.id)
-    .eq('status', 'scheduled')
-    .gte('scheduled_date', new Date().toISOString())
-    .order('scheduled_date', { ascending: true })
-    .limit(5);
+  // Parallel fetch data
+  const [upcomingVisitsResult, pendingTasks] = await Promise.all([
+    supabase
+      .from('v_visits_full')
+      .select('*')
+      .eq('patient_id', patient.id)
+      .eq('status', 'scheduled')
+      .gte('scheduled_date', new Date().toISOString())
+      .order('scheduled_date', { ascending: true })
+      .limit(5),
+    getPendingQuestionnaires(patient.id)
+  ]);
 
-  // Get pending questionnaires count using the new service
-  const pendingTasks = await getPendingQuestionnaires(patient.id);
+  const upcomingVisits = upcomingVisitsResult.data;
   const pendingQuestionnairesCount = pendingTasks.length;
 
   return (

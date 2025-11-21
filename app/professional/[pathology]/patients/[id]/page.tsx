@@ -1,5 +1,5 @@
 import { getPatientById, getPatientStats, getPatientRiskLevel, getPatientInvitationStatus } from "@/lib/services/patient.service";
-import { getVisitsByPatient, getVisitCompletionStatus } from "@/lib/services/visit.service";
+import { getVisitsByPatient, getBulkVisitCompletionStatus } from "@/lib/services/visit.service";
 import { 
   getEvaluationsByPatient, 
   getMoodTrend, 
@@ -70,16 +70,13 @@ export default async function PatientDetailPage({
     getPatientInvitationStatus(id),
   ]);
 
-  // Get completion percentage for each visit
-  const visitsWithCompletion = await Promise.all(
-    visits.map(async (visit) => {
-      const completion = await getVisitCompletionStatus(visit.id);
-      return {
-        ...visit,
-        completionPercentage: completion.completionPercentage,
-      };
-    })
-  );
+  // Get completion percentage for all visits at once using bulk function
+  const visitCompletions = await getBulkVisitCompletionStatus(visits.map(v => v.id));
+  
+  const visitsWithCompletion = visits.map(visit => ({
+    ...visit,
+    completionPercentage: visitCompletions.get(visit.id)?.completionPercentage || 0,
+  }));
 
   const risk = formatRiskLevel(riskLevel);
 

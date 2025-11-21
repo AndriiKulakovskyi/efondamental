@@ -1,6 +1,7 @@
 // eFondaMental Platform - RBAC Middleware
 
 import { redirect } from 'next/navigation';
+import { cache } from 'react';
 import { createClient } from '../supabase/server';
 import { UserRole } from '../types/enums';
 import { UserProfile } from '../types/database.types';
@@ -29,24 +30,30 @@ export async function requireAuth() {
 // USER PROFILE RETRIEVAL
 // ============================================================================
 
-export async function getCurrentUserProfile(): Promise<UserProfile | null> {
+export const getCurrentUserProfile = cache(async (userId?: string): Promise<UserProfile | null> => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  
+  let targetUserId = userId;
+  
+  if (!targetUserId) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user) {
-    return null;
+    if (!user) {
+      return null;
+    }
+    targetUserId = user.id;
   }
 
   const { data: profile } = await supabase
     .from('user_profiles')
     .select('*')
-    .eq('id', user.id)
+    .eq('id', targetUserId)
     .single();
 
   return profile;
-}
+});
 
 export async function requireUserProfile(): Promise<UserProfile> {
   const profile = await getCurrentUserProfile();
@@ -101,22 +108,27 @@ export async function requirePatient() {
 // PERMISSION-BASED ACCESS CONTROL
 // ============================================================================
 
-export async function getUserPermissions(userId: string): Promise<string[]> {
+export const getUserPermissions = cache(async (userId: string, profile?: UserProfile): Promise<string[]> => {
   const supabase = await createClient();
 
-  // Get user's role
-  const { data: profile } = await supabase
-    .from('user_profiles')
-    .select('role')
-    .eq('id', userId)
-    .single();
+  // Get user's role if not provided
+  let userRole = profile?.role;
 
-  if (!profile) {
-    return [];
+  if (!userRole) {
+    const { data: fetchedProfile } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', userId)
+      .single();
+
+    if (!fetchedProfile) {
+      return [];
+    }
+    userRole = fetchedProfile.role;
   }
 
   // Get default permissions for role
-  const defaultPermissions = getDefaultPermissionsForRole(profile.role);
+  const defaultPermissions = getDefaultPermissionsForRole(userRole);
 
   // Get additional permissions granted to user
   const { data: userPermissions } = await supabase
@@ -133,7 +145,7 @@ export async function getUserPermissions(userId: string): Promise<string[]> {
   return Array.from(
     new Set([...defaultPermissions, ...additionalPermissions])
   );
-}
+});
 
 export async function requirePermission(requiredPermission: string) {
   const user = await requireAuth();
@@ -269,7 +281,7 @@ export interface UserContext {
   pathologies?: string[];
 }
 
-export async function getUserContext(): Promise<UserContext | null> {
+export const getUserContext = cache(async (): Promise<UserContext | null> => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -279,12 +291,33 @@ export async function getUserContext(): Promise<UserContext | null> {
     return null;
   }
 
-  const profile = await getCurrentUserProfile();
+  // Fetch profile and permissions in parallel for performance
+  const [profileResult, permissionsResult] = await Promise.all([
+    supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single(),
+    supabase
+      .from('user_permissions')
+      .select('permission:permissions(code)')
+      .eq('user_id', user.id)
+  ]);
+
+  const profile = profileResult.data;
   if (!profile) {
     return null;
   }
 
-  const permissions = await getUserPermissions(user.id);
+  // Calculate permissions
+  const defaultPermissions = getDefaultPermissionsForRole(profile.role);
+  const additionalPermissions = permissionsResult.data
+    ?.map((up: any) => up.permission?.code)
+    .filter(Boolean) || [];
+  
+  const permissions = Array.from(
+    new Set([...defaultPermissions, ...additionalPermissions])
+  );
 
   // Get center and pathology information
   let centerName: string | undefined;
@@ -311,7 +344,7 @@ export async function getUserContext(): Promise<UserContext | null> {
     centerName,
     pathologies,
   };
-}
+});
 
 export async function requireUserContext(): Promise<UserContext> {
   const context = await getUserContext();

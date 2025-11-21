@@ -239,55 +239,64 @@ export async function getPathologyByType(type: PathologyType): Promise<Pathology
 export async function getCenterStats(centerId: string) {
   const supabase = await createClient();
 
-  // Get patient count
-  const { count: patientCount } = await supabase
-    .from('patients')
-    .select('*', { count: 'exact', head: true })
-    .eq('center_id', centerId)
-    .eq('active', true);
+  const [
+    patientCountResult,
+    userCountResult,
+    totalVisitsResult,
+    completedVisitsResult,
+    scheduledVisitsResult
+  ] = await Promise.all([
+    // Get patient count
+    supabase
+      .from('patients')
+      .select('*', { count: 'exact', head: true })
+      .eq('center_id', centerId)
+      .eq('active', true),
 
-  // Get user count
-  const { count: userCount } = await supabase
-    .from('user_profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('center_id', centerId)
-    .eq('active', true);
+    // Get user count
+    supabase
+      .from('user_profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('center_id', centerId)
+      .eq('active', true),
 
-  // Get visit counts
-  const { count: totalVisits } = await supabase
-    .from('visits')
-    .select('*, patient:patients!inner(center_id)', {
-      count: 'exact',
-      head: true,
-    })
-    .eq('patient.center_id', centerId);
+    // Get total visit counts
+    supabase
+      .from('visits')
+      .select('*, patient:patients!inner(center_id)', {
+        count: 'exact',
+        head: true,
+      })
+      .eq('patient.center_id', centerId),
 
-  const { count: completedVisits } = await supabase
-    .from('visits')
-    .select('*, patient:patients!inner(center_id)', {
-      count: 'exact',
-      head: true,
-    })
-    .eq('patient.center_id', centerId)
-    .eq('status', 'completed');
+    // Get completed visits
+    supabase
+      .from('visits')
+      .select('*, patient:patients!inner(center_id)', {
+        count: 'exact',
+        head: true,
+      })
+      .eq('patient.center_id', centerId)
+      .eq('status', 'completed'),
 
-  // Get scheduled visits (upcoming)
-  const { count: scheduledVisits } = await supabase
-    .from('visits')
-    .select('*, patient:patients!inner(center_id)', {
-      count: 'exact',
-      head: true,
-    })
-    .eq('patient.center_id', centerId)
-    .eq('status', 'scheduled')
-    .gte('scheduled_date', new Date().toISOString());
+    // Get scheduled visits (upcoming)
+    supabase
+      .from('visits')
+      .select('*, patient:patients!inner(center_id)', {
+        count: 'exact',
+        head: true,
+      })
+      .eq('patient.center_id', centerId)
+      .eq('status', 'scheduled')
+      .gte('scheduled_date', new Date().toISOString())
+  ]);
 
   return {
-    patientCount: patientCount || 0,
-    userCount: userCount || 0,
-    totalVisits: totalVisits || 0,
-    completedVisits: completedVisits || 0,
-    scheduledVisits: scheduledVisits || 0,
+    patientCount: patientCountResult.count || 0,
+    userCount: userCountResult.count || 0,
+    totalVisits: totalVisitsResult.count || 0,
+    completedVisits: completedVisitsResult.count || 0,
+    scheduledVisits: scheduledVisitsResult.count || 0,
   };
 }
 

@@ -48,72 +48,73 @@ export async function getEvaluationsByPatient(
       return [];
     }
 
-    // Fetch evaluator and visit info separately for each evaluation
-    const evaluationsWithDetails = await Promise.all(
-      data.map(async (evaluation: any) => {
-        // Get evaluator info
-        let evaluatorName = 'Unknown';
-        if (evaluation.evaluator_id) {
-          try {
-            const { data: evaluator } = await supabase
-              .from('user_profiles')
-              .select('first_name, last_name')
-              .eq('id', evaluation.evaluator_id)
-              .single();
-            
-            if (evaluator) {
-              evaluatorName = `${evaluator.first_name} ${evaluator.last_name}`;
-            }
-          } catch (err) {
-            console.error('Error fetching evaluator:', err);
-          }
-        }
+    // Extract unique evaluator IDs and visit IDs for bulk fetching
+    const evaluatorIds = [...new Set(data.map(e => e.evaluator_id).filter(Boolean))] as string[];
+    const visitIds = [...new Set(data.map(e => e.visit_id).filter(Boolean))] as string[];
 
-        // Get visit type
-        let visitType = null;
-        if (evaluation.visit_id) {
-          try {
-            const { data: visit } = await supabase
-              .from('visits')
-              .select('visit_type')
-              .eq('id', evaluation.visit_id)
-              .single();
-            
-            if (visit) {
-              visitType = visit.visit_type;
-            }
-          } catch (err) {
-            console.error('Error fetching visit:', err);
-          }
-        }
+    // Bulk fetch evaluators and visits in parallel
+    const [evaluatorsResult, visitsResult] = await Promise.all([
+      evaluatorIds.length > 0
+        ? supabase
+            .from('user_profiles')
+            .select('id, first_name, last_name')
+            .in('id', evaluatorIds)
+        : Promise.resolve({ data: [] }),
+      visitIds.length > 0
+        ? supabase
+            .from('visits')
+            .select('id, visit_type')
+            .in('id', visitIds)
+        : Promise.resolve({ data: [] })
+    ]);
 
-        // Extract mood_score and medication_adherence from metadata
-        const moodScore = evaluation.metadata && typeof evaluation.metadata === 'object' && 'mood_score' in evaluation.metadata
-          ? (evaluation.metadata as any).mood_score
-          : null;
-        
-        const medicationAdherence = evaluation.metadata && typeof evaluation.metadata === 'object' && 'medication_adherence' in evaluation.metadata
-          ? (evaluation.metadata as any).medication_adherence
-          : null;
-
-        return {
-          id: evaluation.id,
-          patient_id: evaluation.patient_id,
-          visit_id: evaluation.visit_id,
-          evaluation_date: evaluation.evaluation_date,
-          evaluator_id: evaluation.evaluator_id,
-          evaluator_name: evaluatorName,
-          visit_type: visitType,
-          diagnosis: evaluation.diagnosis,
-          clinical_notes: evaluation.clinical_notes,
-          risk_assessment: evaluation.risk_assessment,
-          treatment_plan: evaluation.treatment_plan,
-          mood_score: moodScore,
-          medication_adherence: medicationAdherence,
-          notes: evaluation.clinical_notes, // Use clinical_notes as notes
-        };
-      })
+    // Create lookup maps for O(1) access
+    const evaluatorsMap = new Map(
+      (evaluatorsResult.data || []).map(e => [
+        e.id,
+        `${e.first_name} ${e.last_name}`
+      ])
     );
+    const visitsMap = new Map(
+      (visitsResult.data || []).map(v => [v.id, v.visit_type])
+    );
+
+    // Map evaluations with fetched data
+    const evaluationsWithDetails = data.map((evaluation: any) => {
+      const evaluatorName = evaluation.evaluator_id
+        ? evaluatorsMap.get(evaluation.evaluator_id) || 'Unknown'
+        : 'Unknown';
+      
+      const visitType = evaluation.visit_id
+        ? visitsMap.get(evaluation.visit_id) || null
+        : null;
+
+      // Extract mood_score and medication_adherence from metadata
+      const moodScore = evaluation.metadata && typeof evaluation.metadata === 'object' && 'mood_score' in evaluation.metadata
+        ? (evaluation.metadata as any).mood_score
+        : null;
+      
+      const medicationAdherence = evaluation.metadata && typeof evaluation.metadata === 'object' && 'medication_adherence' in evaluation.metadata
+        ? (evaluation.metadata as any).medication_adherence
+        : null;
+
+      return {
+        id: evaluation.id,
+        patient_id: evaluation.patient_id,
+        visit_id: evaluation.visit_id,
+        evaluation_date: evaluation.evaluation_date,
+        evaluator_id: evaluation.evaluator_id,
+        evaluator_name: evaluatorName,
+        visit_type: visitType,
+        diagnosis: evaluation.diagnosis,
+        clinical_notes: evaluation.clinical_notes,
+        risk_assessment: evaluation.risk_assessment,
+        treatment_plan: evaluation.treatment_plan,
+        mood_score: moodScore,
+        medication_adherence: medicationAdherence,
+        notes: evaluation.clinical_notes, // Use clinical_notes as notes
+      };
+    });
 
     return evaluationsWithDetails;
   } catch (error) {

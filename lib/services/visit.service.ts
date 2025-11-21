@@ -243,7 +243,7 @@ export async function getVisitsByPatient(patientId: string): Promise<VisitFull[]
 
   const { data, error } = await supabase
     .from('v_visits_full')
-    .select('*')
+    .select('id, patient_id, visit_template_id, visit_type, status, scheduled_date, completed_date, conducted_by, notes, created_at, updated_at, patient_first_name, patient_last_name, medical_record_number, template_name, pathology_id, pathology_name, conducted_by_first_name, conducted_by_last_name')
     .eq('patient_id', patientId)
     .order('scheduled_date', { ascending: false });
 
@@ -261,11 +261,11 @@ export async function getUpcomingVisitsByPatient(
 
   const { data, error } = await supabase
     .from('v_visits_full')
-    .select('*')
+    .select('id, patient_id, visit_template_id, visit_type, status, scheduled_date, completed_date, conducted_by, notes, template_name, pathology_name')
     .eq('patient_id', patientId)
     .eq('status', VisitStatus.SCHEDULED)
     .gte('scheduled_date', new Date().toISOString())
-    .order('scheduled_date', { ascending: true });
+    .order('scheduled_date', { ascending: true});
 
   if (error) {
     throw new Error(`Failed to fetch upcoming visits: ${error.message}`);
@@ -282,7 +282,7 @@ export async function getVisitsByProfessional(
 
   let query = supabase
     .from('v_visits_full')
-    .select('*')
+    .select('id, patient_id, visit_template_id, visit_type, status, scheduled_date, completed_date, conducted_by, notes, patient_first_name, patient_last_name, medical_record_number, template_name, pathology_name')
     .eq('conducted_by', professionalId);
 
   if (status) {
@@ -571,6 +571,170 @@ export async function getVisitCompletionStatus(visitId: string) {
     completedQuestionnaires: completed,
     completionPercentage: total > 0 ? Math.round((completed / total) * 100) : 0,
   };
+}
+
+// Bulk version for fetching multiple visit completions efficiently
+export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<Map<string, { completionPercentage: number; completedQuestionnaires: number; totalQuestionnaires: number }>> {
+  if (visitIds.length === 0) {
+    return new Map();
+  }
+
+  const supabase = await createClient();
+  
+  // Fetch all visits at once
+  const { data: visits, error } = await supabase
+    .from('visits')
+    .select('id, visit_type')
+    .in('id', visitIds);
+
+  if (error || !visits) {
+    return new Map();
+  }
+
+  // Group visits by type for batch processing
+  const screeningVisits = visits.filter(v => v.visit_type === 'screening');
+  const initialEvalVisits = visits.filter(v => v.visit_type === 'initial_evaluation');
+
+  const completionMap = new Map<string, { completionPercentage: number; completedQuestionnaires: number; totalQuestionnaires: number }>();
+
+  // Process screening visits
+  if (screeningVisits.length > 0) {
+    const screeningIds = screeningVisits.map(v => v.id);
+    
+    const [asrmResults, qidsResults, mdqResults, diagResults, orientResults] = await Promise.all([
+      supabase.from('responses_asrm').select('visit_id').in('visit_id', screeningIds),
+      supabase.from('responses_qids_sr16').select('visit_id').in('visit_id', screeningIds),
+      supabase.from('responses_mdq').select('visit_id').in('visit_id', screeningIds),
+      supabase.from('responses_medical_diagnostic').select('visit_id').in('visit_id', screeningIds),
+      supabase.from('responses_bipolar_orientation').select('visit_id').in('visit_id', screeningIds)
+    ]);
+
+    const asrmSet = new Set(asrmResults.data?.map(r => r.visit_id) || []);
+    const qidsSet = new Set(qidsResults.data?.map(r => r.visit_id) || []);
+    const mdqSet = new Set(mdqResults.data?.map(r => r.visit_id) || []);
+    const diagSet = new Set(diagResults.data?.map(r => r.visit_id) || []);
+    const orientSet = new Set(orientResults.data?.map(r => r.visit_id) || []);
+
+    for (const visit of screeningVisits) {
+      const completed = [asrmSet, qidsSet, mdqSet, diagSet, orientSet].filter(set => set.has(visit.id)).length;
+      const total = 5;
+      completionMap.set(visit.id, {
+        completedQuestionnaires: completed,
+        totalQuestionnaires: total,
+        completionPercentage: total > 0 ? Math.round((completed / total) * 100) : 0
+      });
+    }
+  }
+
+  // Process initial evaluation visits
+  if (initialEvalVisits.length > 0) {
+    const evalIds = initialEvalVisits.map(v => v.id);
+    
+    const [
+      eq5d5lResults, priseMResults, staiYaResults, marsResults, mathysResults,
+      asrmResults, qidsResults, psqiResults, epworthResults,
+      asrsResults, ctqResults, bis10Results, als18Results, aimResults,
+      wurs25Results, aq12Results, csmResults, ctiResults,
+      madrsResults, ymrsResults, cgiResults, egfResults, aldaResults,
+      etatPatientResults, fastResults, socialResults,
+      tobaccoResults, fagerstromResults, physicalParamsResults, bloodPressureResults,
+      sleepApneaResults, biologicalAssessmentResults,
+      dsm5HumeurResults, dsm5PsychoticResults, dsm5ComorbidResults,
+      divaResults, familyHistoryResults, cssrsResults
+    ] = await Promise.all([
+      supabase.from('responses_eq5d5l').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_prise_m').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_stai_ya').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_mars').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_mathys').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_asrm').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_qids_sr16').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_psqi').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_epworth').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_asrs').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_ctq').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_bis10').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_als18').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_aim').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_wurs25').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_aq12').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_csm').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_cti').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_madrs').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_ymrs').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_cgi').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_egf').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_alda').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_etat_patient').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_fast').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_social').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_tobacco').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_fagerstrom').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_physical_params').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_blood_pressure').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_sleep_apnea').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_biological_assessment').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_dsm5_humeur').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_dsm5_psychotic').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_dsm5_comorbid').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_diva').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_family_history').select('visit_id').in('visit_id', evalIds),
+      supabase.from('responses_cssrs').select('visit_id').in('visit_id', evalIds)
+    ]);
+
+    const responseSets = [
+      new Set(eq5d5lResults.data?.map(r => r.visit_id) || []),
+      new Set(priseMResults.data?.map(r => r.visit_id) || []),
+      new Set(staiYaResults.data?.map(r => r.visit_id) || []),
+      new Set(marsResults.data?.map(r => r.visit_id) || []),
+      new Set(mathysResults.data?.map(r => r.visit_id) || []),
+      new Set(asrmResults.data?.map(r => r.visit_id) || []),
+      new Set(qidsResults.data?.map(r => r.visit_id) || []),
+      new Set(psqiResults.data?.map(r => r.visit_id) || []),
+      new Set(epworthResults.data?.map(r => r.visit_id) || []),
+      new Set(asrsResults.data?.map(r => r.visit_id) || []),
+      new Set(ctqResults.data?.map(r => r.visit_id) || []),
+      new Set(bis10Results.data?.map(r => r.visit_id) || []),
+      new Set(als18Results.data?.map(r => r.visit_id) || []),
+      new Set(aimResults.data?.map(r => r.visit_id) || []),
+      new Set(wurs25Results.data?.map(r => r.visit_id) || []),
+      new Set(aq12Results.data?.map(r => r.visit_id) || []),
+      new Set(csmResults.data?.map(r => r.visit_id) || []),
+      new Set(ctiResults.data?.map(r => r.visit_id) || []),
+      new Set(madrsResults.data?.map(r => r.visit_id) || []),
+      new Set(ymrsResults.data?.map(r => r.visit_id) || []),
+      new Set(cgiResults.data?.map(r => r.visit_id) || []),
+      new Set(egfResults.data?.map(r => r.visit_id) || []),
+      new Set(aldaResults.data?.map(r => r.visit_id) || []),
+      new Set(etatPatientResults.data?.map(r => r.visit_id) || []),
+      new Set(fastResults.data?.map(r => r.visit_id) || []),
+      new Set(socialResults.data?.map(r => r.visit_id) || []),
+      new Set(tobaccoResults.data?.map(r => r.visit_id) || []),
+      new Set(fagerstromResults.data?.map(r => r.visit_id) || []),
+      new Set(physicalParamsResults.data?.map(r => r.visit_id) || []),
+      new Set(bloodPressureResults.data?.map(r => r.visit_id) || []),
+      new Set(sleepApneaResults.data?.map(r => r.visit_id) || []),
+      new Set(biologicalAssessmentResults.data?.map(r => r.visit_id) || []),
+      new Set(dsm5HumeurResults.data?.map(r => r.visit_id) || []),
+      new Set(dsm5PsychoticResults.data?.map(r => r.visit_id) || []),
+      new Set(dsm5ComorbidResults.data?.map(r => r.visit_id) || []),
+      new Set(divaResults.data?.map(r => r.visit_id) || []),
+      new Set(familyHistoryResults.data?.map(r => r.visit_id) || []),
+      new Set(cssrsResults.data?.map(r => r.visit_id) || [])
+    ];
+
+    for (const visit of initialEvalVisits) {
+      const completed = responseSets.filter(set => set.has(visit.id)).length;
+      const total = 38;
+      completionMap.set(visit.id, {
+        completedQuestionnaires: completed,
+        totalQuestionnaires: total,
+        completionPercentage: total > 0 ? Math.round((completed / total) * 100) : 0
+      });
+    }
+  }
+
+  return completionMap;
 }
 
 // ============================================================================

@@ -31,7 +31,18 @@ export async function getProfessionalStatistics(
   const startOfMonth = fromDate || new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   const endOfMonth = toDate || new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString();
 
-  // Total patients assigned to this professional
+  // Get pathology ID if specified
+  let pathologyId: string | null = null;
+  if (pathology) {
+    const { data: pathologyData } = await supabase
+      .from('pathologies')
+      .select('id')
+      .eq('type', pathology)
+      .single();
+    pathologyId = pathologyData?.id || null;
+  }
+
+  // Build patient query
   let patientQuery = supabase
     .from('patients')
     .select('id', { count: 'exact', head: true })
@@ -39,46 +50,48 @@ export async function getProfessionalStatistics(
     .eq('created_by', professionalId)
     .eq('active', true);
 
-  if (pathology) {
-    const { data: pathologyData } = await supabase
-      .from('pathologies')
-      .select('id')
-      .eq('type', pathology)
-      .single();
-    
-    if (pathologyData) {
-      patientQuery = patientQuery.eq('pathology_id', pathologyData.id);
-    }
+  if (pathologyId) {
+    patientQuery = patientQuery.eq('pathology_id', pathologyId);
   }
 
-  const { count: totalPatients } = await patientQuery;
+  const [
+    totalPatientsResult,
+    patientsWithVisitsResult,
+    visitsThisMonthResult,
+    completedVisitsThisMonthResult
+  ] = await Promise.all([
+    // Total patients assigned to this professional
+    patientQuery,
 
-  // Patients with visits this month
-  const { data: patientsWithVisits } = await supabase
-    .from('visits')
-    .select('patient_id', { count: 'exact' })
-    .eq('conducted_by', professionalId)
-    .gte('scheduled_date', startOfMonth)
-    .lte('scheduled_date', endOfMonth);
+    // Patients with visits this month
+    supabase
+      .from('visits')
+      .select('patient_id', { count: 'exact' })
+      .eq('conducted_by', professionalId)
+      .gte('scheduled_date', startOfMonth)
+      .lte('scheduled_date', endOfMonth),
 
-  const activePatientsThisMonth = new Set(patientsWithVisits?.map(v => v.patient_id) || []).size;
+    // Visits this month
+    supabase
+      .from('visits')
+      .select('*', { count: 'exact', head: true })
+      .eq('conducted_by', professionalId)
+      .gte('scheduled_date', startOfMonth)
+      .lte('scheduled_date', endOfMonth),
 
-  // Visits this month
-  const { count: visitsThisMonth } = await supabase
-    .from('visits')
-    .select('*', { count: 'exact', head: true })
-    .eq('conducted_by', professionalId)
-    .gte('scheduled_date', startOfMonth)
-    .lte('scheduled_date', endOfMonth);
+    // Completed visits this month
+    supabase
+      .from('visits')
+      .select('*', { count: 'exact', head: true })
+      .eq('conducted_by', professionalId)
+      .eq('status', 'completed')
+      .gte('scheduled_date', startOfMonth)
+      .lte('scheduled_date', endOfMonth)
+  ]);
 
-  // Completed visits this month
-  const { count: completedVisitsThisMonth } = await supabase
-    .from('visits')
-    .select('*', { count: 'exact', head: true })
-    .eq('conducted_by', professionalId)
-    .eq('status', 'completed')
-    .gte('scheduled_date', startOfMonth)
-    .lte('scheduled_date', endOfMonth);
+  const activePatientsThisMonth = new Set(patientsWithVisitsResult.data?.map(v => v.patient_id) || []).size;
+  const visitsThisMonth = visitsThisMonthResult.count || 0;
+  const completedVisitsThisMonth = completedVisitsThisMonthResult.count || 0;
 
   // Pending questionnaires
   // NOTE: With the new schema, calculating pending questionnaires globally is expensive.
@@ -88,14 +101,14 @@ export async function getProfessionalStatistics(
 
   // Visit completion rate
   const visitCompletionRate = visitsThisMonth 
-    ? ((completedVisitsThisMonth || 0) / visitsThisMonth) * 100 
+    ? (completedVisitsThisMonth / visitsThisMonth) * 100 
     : 0;
 
   return {
-    totalPatients: totalPatients || 0,
+    totalPatients: totalPatientsResult.count || 0,
     activePatientsThisMonth,
-    visitsThisMonth: visitsThisMonth || 0,
-    completedVisitsThisMonth: completedVisitsThisMonth || 0,
+    visitsThisMonth,
+    completedVisitsThisMonth,
     pendingQuestionnaires,
     averageVisitDuration: null, // Would need visit duration tracking
     visitCompletionRate: Math.round(visitCompletionRate),
