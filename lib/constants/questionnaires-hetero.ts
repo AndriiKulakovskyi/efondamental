@@ -1737,3 +1737,148 @@ export const CSSRS_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// ISA (Intentionnalité Suicidaire Actuelle)
+// ============================================================================
+
+export const ISA_QUESTIONS: Question[] = [
+  {
+    id: 'intro',
+    text: 'Cette échelle doit toujours être administrée, même en cas d\'absence de tentative de suicide avérée.',
+    type: 'text',
+    required: false
+  },
+  {
+    id: 'q1_life_worth',
+    text: '1. Avez-vous déjà eu l\'impression que la vie ne vaut pas la peine d\'être vécue ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q1_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q1_life_worth' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: '2w_12m', label: 'Il y a entre deux semaines et douze mois', score: 0 },
+      { code: 'more_1y', label: 'Il y a plus d\'un an', score: 0 }
+    ]
+  },
+  {
+    id: 'q2_wish_death',
+    text: '2. Avez-vous déjà souhaité mourir, par exemple, de vous coucher et de ne pas vous réveiller ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q2_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q2_wish_death' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: '2w_12m', label: 'Il y a entre deux semaines et douze mois', score: 0 },
+      { code: 'more_1y', label: 'Il y a plus d\'un an', score: 0 }
+    ]
+  },
+  {
+    id: 'q3_thoughts',
+    text: '3. Avez-vous déjà pensé à vous donner la mort, même si vous ne le feriez jamais ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q3_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q3_thoughts' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: '2w_12m', label: 'Il y a entre deux semaines et douze mois', score: 0 },
+      { code: 'more_1y', label: 'Il y a plus d\'un an', score: 0 }
+    ]
+  },
+  {
+    id: 'q4_plan',
+    text: '4. Avez-vous déjà sérieusement envisagé de vous donner la mort ou planifié la façon de vous y prendre ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q4_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q4_plan' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: '2w_12m', label: 'Il y a entre deux semaines et douze mois', score: 0 },
+      { code: 'more_1y', label: 'Il y a plus d\'un an', score: 0 }
+    ]
+  },
+  {
+    id: 'q5_attempt',
+    text: '5. Avez-vous déjà essayé de vous donner la mort ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q5_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q5_attempt' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: '2w_12m', label: 'Il y a entre deux semaines et douze mois', score: 0 },
+      { code: 'more_1y', label: 'Il y a plus d\'un an', score: 0 }
+    ]
+  }
+];
+
+export const ISA_DEFINITION: QuestionnaireDefinition = {
+  id: 'isa',
+  code: 'ISA_FR',
+  title: 'Intentionnalité Suicidaire Actuelle',
+  description: 'Échelle évaluant les pensées, désirs et tentatives de suicide, ainsi que leur temporalité récente ou passée.',
+  questions: ISA_QUESTIONS,
+  metadata: {
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

@@ -121,14 +121,14 @@ export const getUserPermissions = cache(async (userId: string, profile?: UserPro
       .eq('id', userId)
       .single();
 
-    if (!fetchedProfile) {
+    if (!fetchedProfile || !fetchedProfile.role) {
       return [];
     }
     userRole = fetchedProfile.role;
   }
 
   // Get default permissions for role
-  const defaultPermissions = getDefaultPermissionsForRole(userRole);
+  const defaultPermissions = getDefaultPermissionsForRole(userRole as UserRole);
 
   // Get additional permissions granted to user
   const { data: userPermissions } = await supabase

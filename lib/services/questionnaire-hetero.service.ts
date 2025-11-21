@@ -22,7 +22,9 @@ import {
   FamilyHistoryResponse,
   FamilyHistoryResponseInsert,
   CssrsResponse,
-  CssrsResponseInsert
+  CssrsResponseInsert,
+  IsaResponse,
+  IsaResponseInsert
 } from '@/lib/types/database.types';
 
 // ============================================================================
@@ -694,6 +696,44 @@ export async function saveCssrsResponse(
     .upsert({
       ...response,
       completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// ISA (Intentionnalité Suicidaire Actuelle)
+// ============================================================================
+
+export async function getIsaResponse(
+  visitId: string
+): Promise<IsaResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_isa')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveIsaResponse(
+  response: IsaResponseInsert
+): Promise<IsaResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_isa')
+    .upsert({
+      ...response
     }, { onConflict: 'visit_id' })
     .select()
     .single();

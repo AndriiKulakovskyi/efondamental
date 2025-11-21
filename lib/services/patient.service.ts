@@ -156,7 +156,7 @@ export async function getPatientsByCenter(centerId: string): Promise<PatientFull
 
   const { data, error } = await supabase
     .from('v_patients_full')
-    .select('id, first_name, last_name, medical_record_number, birth_date, gender, phone, email, address, center_id, center_name, pathology_id, pathology_name, pathology_type, pathology_color, assigned_to, assigned_to_first_name, assigned_to_last_name, user_id, active, created_at, created_by')
+    .select('*')
     .eq('center_id', centerId)
     .eq('active', true)
     .order('last_name, first_name');
@@ -176,7 +176,7 @@ export async function getPatientsByCenterAndPathology(
 
   const { data, error } = await supabase
     .from('v_patients_full')
-    .select('id, first_name, last_name, medical_record_number, birth_date, gender, phone, email, address, center_id, center_name, pathology_id, pathology_name, pathology_type, pathology_color, assigned_to, assigned_to_first_name, assigned_to_last_name, user_id, active, created_at, created_by')
+    .select('*')
     .eq('center_id', centerId)
     .eq('pathology_type', pathology)
     .eq('active', true)
@@ -265,7 +265,7 @@ export async function searchPatients(
 
   let query = supabase
     .from('v_patients_full')
-    .select('id, first_name, last_name, medical_record_number, birth_date, gender, pathology_type, pathology_name, center_name, active')
+    .select('*')
     .eq('center_id', centerId)
     .eq('active', true);
 
@@ -514,7 +514,7 @@ export async function getPatientsByProfessional(
   // Fetch patients assigned to this professional
   let patientsQuery = supabase
     .from('v_patients_full')
-    .select('id, first_name, last_name, medical_record_number, birth_date, gender, phone, email, address, center_id, center_name, pathology_id, pathology_name, pathology_type, pathology_color, assigned_to, assigned_to_first_name, assigned_to_last_name, user_id, active, created_at, created_by')
+    .select('*')
     .eq('assigned_to', professionalId)
     .eq('active', true);
 

@@ -1,9 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Enable SWC minification for faster builds
-  swcMinify: true,
-
   // Optimize package imports for better tree-shaking
   experimental: {
     optimizePackageImports: [

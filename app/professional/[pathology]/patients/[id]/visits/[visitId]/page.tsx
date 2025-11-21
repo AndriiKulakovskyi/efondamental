@@ -45,7 +45,8 @@ import {
   getFastResponse,
   getDivaResponse,
   getFamilyHistoryResponse,
-  getCssrsResponse
+  getCssrsResponse,
+  getIsaResponse
 } from "@/lib/services/questionnaire-hetero.service";
 import {
   getSocialResponse
@@ -94,7 +95,8 @@ import {
   FAST_DEFINITION,
   DIVA_DEFINITION,
   FAMILY_HISTORY_DEFINITION,
-  CSSRS_DEFINITION
+  CSSRS_DEFINITION,
+  ISA_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -243,7 +245,9 @@ export default async function VisitDetailPage({
       // Family History response
       familyHistoryResponse,
       // C-SSRS response
-      cssrsResponse
+      cssrsResponse,
+      // ISA response
+      isaResponse
     ] = await Promise.all([
       // ETAT
       getEq5d5lResponse(visitId),
@@ -291,7 +295,9 @@ export default async function VisitDetailPage({
       // Family History
       getFamilyHistoryResponse(visitId),
       // C-SSRS
-      getCssrsResponse(visitId)
+      getCssrsResponse(visitId),
+      // ISA
+      getIsaResponse(visitId)
     ]);
 
     // Module 1: Infirmier
@@ -450,6 +456,13 @@ export default async function VisitDetailPage({
           target_role: 'healthcare_professional',
           completed: !!cssrsResponse,
           completedAt: cssrsResponse?.completed_at,
+        },
+        {
+          ...ISA_DEFINITION,
+          id: ISA_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!isaResponse,
+          completedAt: isaResponse?.completed_at,
         }
       ]
     };

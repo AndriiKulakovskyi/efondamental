@@ -1961,3 +1961,37 @@ export interface CssrsResponse {
 
 export type CssrsResponseInsert = Omit<CssrsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ===== ISA (Intentionnalité Suicidaire Actuelle) Response =====
+export interface IsaResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Question 1: Life not worth living
+  q1_life_worth?: number | null; // 0 or 1
+  q1_time?: 'last_week' | '2w_12m' | 'more_1y' | null;
+  
+  // Question 2: Wish to die
+  q2_wish_death?: number | null; // 0 or 1
+  q2_time?: 'last_week' | '2w_12m' | 'more_1y' | null;
+  
+  // Question 3: Thoughts of suicide
+  q3_thoughts?: number | null; // 0 or 1
+  q3_time?: 'last_week' | '2w_12m' | 'more_1y' | null;
+  
+  // Question 4: Plan/serious consideration
+  q4_plan?: number | null; // 0 or 1
+  q4_time?: 'last_week' | '2w_12m' | 'more_1y' | null;
+  
+  // Question 5: Attempt
+  q5_attempt?: number | null; // 0 or 1
+  q5_time?: 'last_week' | '2w_12m' | 'more_1y' | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type IsaResponseInsert = Omit<IsaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+

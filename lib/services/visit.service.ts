@@ -44,7 +44,8 @@ import {
   getFastResponse,
   getDivaResponse,
   getFamilyHistoryResponse,
-  getCssrsResponse
+  getCssrsResponse,
+  getIsaResponse
 } from './questionnaire-hetero.service';
 import {
   getSocialResponse
@@ -98,7 +99,8 @@ import {
   FAST_DEFINITION,
   DIVA_DEFINITION,
   FAMILY_HISTORY_DEFINITION,
-  CSSRS_DEFINITION
+  CSSRS_DEFINITION,
+  ISA_DEFINITION
 } from '../constants/questionnaires-hetero';
 import {
   SOCIAL_DEFINITION
@@ -243,7 +245,7 @@ export async function getVisitsByPatient(patientId: string): Promise<VisitFull[]
 
   const { data, error } = await supabase
     .from('v_visits_full')
-    .select('id, patient_id, visit_template_id, visit_type, status, scheduled_date, completed_date, conducted_by, notes, created_at, updated_at, patient_first_name, patient_last_name, medical_record_number, template_name, pathology_id, pathology_name, conducted_by_first_name, conducted_by_last_name')
+    .select('*')
     .eq('patient_id', patientId)
     .order('scheduled_date', { ascending: false });
 
@@ -261,7 +263,7 @@ export async function getUpcomingVisitsByPatient(
 
   const { data, error } = await supabase
     .from('v_visits_full')
-    .select('id, patient_id, visit_template_id, visit_type, status, scheduled_date, completed_date, conducted_by, notes, template_name, pathology_name')
+    .select('*')
     .eq('patient_id', patientId)
     .eq('status', VisitStatus.SCHEDULED)
     .gte('scheduled_date', new Date().toISOString())
@@ -282,7 +284,7 @@ export async function getVisitsByProfessional(
 
   let query = supabase
     .from('v_visits_full')
-    .select('id, patient_id, visit_template_id, visit_type, status, scheduled_date, completed_date, conducted_by, notes, patient_first_name, patient_last_name, medical_record_number, template_name, pathology_name')
+    .select('*')
     .eq('conducted_by', professionalId);
 
   if (status) {
@@ -393,7 +395,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_medical_eval',
         name: 'Evaluation Médicale',
         description: 'Évaluation médicale complète',
-        questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION, DIVA_DEFINITION, FAMILY_HISTORY_DEFINITION, CSSRS_DEFINITION]
+        questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION, DIVA_DEFINITION, FAMILY_HISTORY_DEFINITION, CSSRS_DEFINITION, ISA_DEFINITION]
       },
       {
         id: 'mod_auto_etat',
@@ -466,7 +468,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diag) completed++;
     if (orient) completed++;
   } else if (visit.visit_type === 'initial_evaluation') {
-    total = 35; // 16 auto questionnaires + ASRM + QIDS (reused) + 7 hetero questionnaires + 1 social + 6 infirmier (tobacco + fagerstrom + physical_params + blood_pressure + sleep_apnea + biological_assessment) + 3 DSM5 (dsm5_humeur + dsm5_psychotic + dsm5_comorbid)
+    total = 36; // 16 auto questionnaires + ASRM + QIDS (reused) + 7 hetero questionnaires + 1 social + 6 infirmier (tobacco + fagerstrom + physical_params + blood_pressure + sleep_apnea + biological_assessment) + 4 DSM5/Medical Eval (dsm5_humeur + dsm5_psychotic + dsm5_comorbid + diva + family_history + cssrs + isa)
     totalModules = 6;
 
     const [
@@ -474,7 +476,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti,
       madrs, ymrs, cgi, egf, alda, etatPatient, fast, social,
       tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biologicalAssessment,
-      dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs
+      dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs, isa
     ] = await Promise.all([
       // ETAT questionnaires
       getEq5d5lResponse(visitId),
@@ -522,7 +524,9 @@ export async function getVisitCompletionStatus(visitId: string) {
       // Family History
       getFamilyHistoryResponse(visitId),
       // C-SSRS
-      getCssrsResponse(visitId)
+      getCssrsResponse(visitId),
+      // ISA
+      getIsaResponse(visitId)
     ]);
 
     if (eq5d5l) completed++;
@@ -563,6 +567,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diva) completed++;
     if (familyHistory) completed++;
     if (cssrs) completed++;
+    if (isa) completed++;
   }
 
   return {
