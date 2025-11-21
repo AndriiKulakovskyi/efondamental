@@ -18,7 +18,9 @@ import {
   FastResponse,
   FastResponseInsert,
   DivaResponse,
-  DivaResponseInsert
+  DivaResponseInsert,
+  FamilyHistoryResponse,
+  FamilyHistoryResponseInsert
 } from '@/lib/types/database.types';
 
 // ============================================================================
@@ -609,6 +611,46 @@ export async function saveDivaResponse(
       total_inattention_childhood: totalInattentionChildhood,
       total_hyperactivity_adult: totalHyperactivityAdult,
       total_hyperactivity_childhood: totalHyperactivityChildhood,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// FAMILY HISTORY (Antécédents Familiaux)
+// ============================================================================
+
+export async function getFamilyHistoryResponse(
+  visitId: string
+): Promise<FamilyHistoryResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_family_history')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveFamilyHistoryResponse(
+  response: FamilyHistoryResponseInsert
+): Promise<FamilyHistoryResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from('responses_family_history')
+    .upsert({
+      ...response,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

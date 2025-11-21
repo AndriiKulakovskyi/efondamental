@@ -42,7 +42,8 @@ import {
   getAldaResponse,
   getEtatPatientResponse,
   getFastResponse,
-  getDivaResponse
+  getDivaResponse,
+  getFamilyHistoryResponse
 } from './questionnaire-hetero.service';
 import {
   getSocialResponse
@@ -94,7 +95,8 @@ import {
   ALDA_DEFINITION,
   ETAT_PATIENT_DEFINITION,
   FAST_DEFINITION,
-  DIVA_DEFINITION
+  DIVA_DEFINITION,
+  FAMILY_HISTORY_DEFINITION
 } from '../constants/questionnaires-hetero';
 import {
   SOCIAL_DEFINITION
@@ -389,7 +391,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_medical_eval',
         name: 'Evaluation Médicale',
         description: 'Évaluation médicale complète',
-        questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION, DIVA_DEFINITION]
+        questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION, DIVA_DEFINITION, FAMILY_HISTORY_DEFINITION]
       },
       {
         id: 'mod_auto_etat',
@@ -470,7 +472,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti,
       madrs, ymrs, cgi, egf, alda, etatPatient, fast, social,
       tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biologicalAssessment,
-      dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva
+      dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory
     ] = await Promise.all([
       // ETAT questionnaires
       getEq5d5lResponse(visitId),
@@ -514,7 +516,9 @@ export async function getVisitCompletionStatus(visitId: string) {
       getDsm5PsychoticResponse(visitId),
       getDsm5ComorbidResponse(visitId),
       // DIVA questionnaire
-      getDivaResponse(visitId)
+      getDivaResponse(visitId),
+      // Family History
+      getFamilyHistoryResponse(visitId)
     ]);
 
     if (eq5d5l) completed++;
@@ -553,6 +557,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (dsm5Psychotic) completed++;
     if (dsm5Comorbid) completed++;
     if (diva) completed++;
+    if (familyHistory) completed++;
   }
 
   return {

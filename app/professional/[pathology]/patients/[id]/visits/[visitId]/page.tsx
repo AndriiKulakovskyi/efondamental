@@ -43,7 +43,8 @@ import {
   getAldaResponse,
   getEtatPatientResponse,
   getFastResponse,
-  getDivaResponse
+  getDivaResponse,
+  getFamilyHistoryResponse
 } from "@/lib/services/questionnaire-hetero.service";
 import {
   getSocialResponse
@@ -90,7 +91,8 @@ import {
   ALDA_DEFINITION,
   ETAT_PATIENT_DEFINITION,
   FAST_DEFINITION,
-  DIVA_DEFINITION
+  DIVA_DEFINITION,
+  FAMILY_HISTORY_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -235,7 +237,9 @@ export default async function VisitDetailPage({
       // DSM5 responses
       dsm5HumeurResponse, dsm5PsychoticResponse, dsm5ComorbidResponse,
       // DIVA response
-      divaResponse
+      divaResponse,
+      // Family History response
+      familyHistoryResponse
     ] = await Promise.all([
       // ETAT
       getEq5d5lResponse(visitId),
@@ -279,7 +283,9 @@ export default async function VisitDetailPage({
       getDsm5PsychoticResponse(visitId),
       getDsm5ComorbidResponse(visitId),
       // DIVA
-      getDivaResponse(visitId)
+      getDivaResponse(visitId),
+      // Family History
+      getFamilyHistoryResponse(visitId)
     ]);
 
     // Module 1: Infirmier
@@ -424,6 +430,13 @@ export default async function VisitDetailPage({
           target_role: 'healthcare_professional',
           completed: !!divaResponse,
           completedAt: divaResponse?.completed_at,
+        },
+        {
+          ...FAMILY_HISTORY_DEFINITION,
+          id: FAMILY_HISTORY_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!familyHistoryResponse,
+          completedAt: familyHistoryResponse?.completed_at,
         }
       ]
     };

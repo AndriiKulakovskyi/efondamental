@@ -1788,3 +1788,143 @@ export interface DivaResponse {
 
 export type DivaResponseInsert = Omit<DivaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ============================================================================
+// FAMILY HISTORY (Antécédents Familiaux)
+// ============================================================================
+
+export interface FamilyHistoryResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Mother
+  mother_deceased?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  mother_death_cause?: string | null;
+  mother_psy_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  mother_psy_thymic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  mother_psy_thymic_type?: 'unipolaire' | 'bipolaire' | 'nsp' | null;
+  mother_psy_schizo?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  mother_psy_suicide?: number | null;
+  mother_psy_dementia?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  mother_psy_substance?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  mother_psy_substance_types?: string[] | null;
+  mother_psy_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  mother_cardio_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  mother_cardio_types?: string[] | null;
+  mother_diabetes_type?: number | null;
+  
+  // Father
+  father_deceased?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  father_death_cause?: string | null;
+  father_psy_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  father_psy_thymic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  father_psy_thymic_type?: 'unipolaire' | 'bipolaire' | 'nsp' | null;
+  father_psy_schizo?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  father_psy_suicide?: number | null;
+  father_psy_dementia?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  father_psy_substance?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  father_psy_substance_types?: string[] | null;
+  father_psy_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  father_cardio_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  father_cardio_types?: string[] | null;
+  father_diabetes_type?: number | null;
+  
+  // Grandparents
+  gp_maternal_grandmother_notes?: string | null;
+  gp_maternal_grandfather_notes?: string | null;
+  gp_paternal_grandmother_notes?: string | null;
+  gp_paternal_grandfather_notes?: string | null;
+  
+  // Children
+  has_children?: 'oui' | 'non' | null;
+  children_psy_count?: number | null;
+  children_cardio_count?: number | null;
+  
+  child1_gender?: 'M' | 'F' | null;
+  child1_dob?: string | null;
+  child1_psy_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  child1_psy_details?: string[] | null;
+  child1_cardio?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  child2_gender?: 'M' | 'F' | null;
+  child2_dob?: string | null;
+  child2_psy_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  child2_psy_details?: string[] | null;
+  child2_cardio?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  child3_gender?: 'M' | 'F' | null;
+  child3_dob?: string | null;
+  child3_psy_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  child3_psy_details?: string[] | null;
+  child3_cardio?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  child4_gender?: 'M' | 'F' | null;
+  child4_dob?: string | null;
+  child4_psy_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  child4_psy_details?: string[] | null;
+  child4_cardio?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Siblings
+  has_siblings?: 'oui' | 'non' | null;
+  
+  sibling1_gender?: 'M' | 'F' | null;
+  sibling1_deceased?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling1_death_cause?: string | null;
+  sibling1_psy_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling1_psy_thymic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling1_psy_thymic_type?: 'unipolaire' | 'bipolaire' | 'nsp' | null;
+  sibling1_psy_schizo?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling1_psy_suicide?: number | null;
+  sibling1_psy_substance?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling1_psy_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling1_cardio_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling1_cardio_types?: string[] | null;
+  
+  sibling2_gender?: 'M' | 'F' | null;
+  sibling2_deceased?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling2_death_cause?: string | null;
+  sibling2_psy_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling2_psy_thymic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling2_psy_thymic_type?: 'unipolaire' | 'bipolaire' | 'nsp' | null;
+  sibling2_psy_schizo?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling2_psy_suicide?: number | null;
+  sibling2_psy_substance?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling2_psy_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling2_cardio_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling2_cardio_types?: string[] | null;
+  
+  sibling3_gender?: 'M' | 'F' | null;
+  sibling3_deceased?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling3_death_cause?: string | null;
+  sibling3_psy_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling3_psy_thymic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling3_psy_thymic_type?: 'unipolaire' | 'bipolaire' | 'nsp' | null;
+  sibling3_psy_schizo?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling3_psy_suicide?: number | null;
+  sibling3_psy_substance?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling3_psy_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling3_cardio_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling3_cardio_types?: string[] | null;
+  
+  sibling4_gender?: 'M' | 'F' | null;
+  sibling4_deceased?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling4_death_cause?: string | null;
+  sibling4_psy_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling4_psy_thymic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling4_psy_thymic_type?: 'unipolaire' | 'bipolaire' | 'nsp' | null;
+  sibling4_psy_schizo?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling4_psy_suicide?: number | null;
+  sibling4_psy_substance?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling4_psy_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling4_cardio_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  sibling4_cardio_types?: string[] | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type FamilyHistoryResponseInsert = Omit<FamilyHistoryResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
