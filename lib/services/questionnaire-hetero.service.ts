@@ -16,7 +16,9 @@ import {
   EtatPatientResponse,
   EtatPatientResponseInsert,
   FastResponse,
-  FastResponseInsert
+  FastResponseInsert,
+  DivaResponse,
+  DivaResponseInsert
 } from '@/lib/types/database.types';
 
 // ============================================================================
@@ -545,6 +547,68 @@ export async function saveFastResponse(
       leisure_score: leisureScore,
       total_score: totalScore,
       interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// DIVA 2.0 (Diagnostic Interview for ADHD in Adults)
+// ============================================================================
+
+export async function getDivaResponse(
+  visitId: string
+): Promise<DivaResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_diva')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveDivaResponse(
+  response: DivaResponseInsert
+): Promise<DivaResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Helper to count adult/childhood symptoms from multiple_choice responses
+  const countSymptoms = (responses: Record<string, any>, period: 'adult' | 'childhood', prefix: string, count: number) => {
+    let total = 0;
+    for (let i = 1; i <= count; i++) {
+      const key = `${prefix}${String.fromCharCode(96 + i)}_${period}`; // a1a_adult, a1b_adult, etc.
+      if (responses[key] === true) {
+        total++;
+      }
+    }
+    return total;
+  };
+
+  // Calculate totals
+  const totalInattentionAdult = response.total_inattention_adult ?? countSymptoms(response, 'adult', 'a1', 9);
+  const totalInattentionChildhood = response.total_inattention_childhood ?? countSymptoms(response, 'childhood', 'a1', 9);
+  const totalHyperactivityAdult = response.total_hyperactivity_adult ?? countSymptoms(response, 'adult', 'a2', 9);
+  const totalHyperactivityChildhood = response.total_hyperactivity_childhood ?? countSymptoms(response, 'childhood', 'a2', 9);
+
+  const { data, error } = await supabase
+    .from('responses_diva')
+    .upsert({
+      ...response,
+      total_inattention_adult: totalInattentionAdult,
+      total_inattention_childhood: totalInattentionChildhood,
+      total_hyperactivity_adult: totalHyperactivityAdult,
+      total_hyperactivity_childhood: totalHyperactivityChildhood,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

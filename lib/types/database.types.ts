@@ -1695,3 +1695,96 @@ export interface Dsm5ComorbidResponse {
 }
 
 export type Dsm5ComorbidResponseInsert = Omit<Dsm5ComorbidResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
+// DIVA 2.0 - Diagnostic Interview for ADHD in Adults
+// ============================================================================
+
+export interface DivaResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Introduction
+  evaluated?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Criterion A - Inattention (A1a to A1i)
+  a1a_adult?: boolean | null;
+  a1a_childhood?: boolean | null;
+  a1b_adult?: boolean | null;
+  a1b_childhood?: boolean | null;
+  a1c_adult?: boolean | null;
+  a1c_childhood?: boolean | null;
+  a1d_adult?: boolean | null;
+  a1d_childhood?: boolean | null;
+  a1e_adult?: boolean | null;
+  a1e_childhood?: boolean | null;
+  a1f_adult?: boolean | null;
+  a1f_childhood?: boolean | null;
+  a1g_adult?: boolean | null;
+  a1g_childhood?: boolean | null;
+  a1h_adult?: boolean | null;
+  a1h_childhood?: boolean | null;
+  a1i_adult?: boolean | null;
+  a1i_childhood?: boolean | null;
+  
+  // Total inattention scores
+  total_inattention_adult?: number | null;
+  total_inattention_childhood?: number | null;
+  
+  // Criterion A - Hyperactivity/Impulsivity (A2a to A2i)
+  a2a_adult?: boolean | null;
+  a2a_childhood?: boolean | null;
+  a2b_adult?: boolean | null;
+  a2b_childhood?: boolean | null;
+  a2c_adult?: boolean | null;
+  a2c_childhood?: boolean | null;
+  a2d_adult?: boolean | null;
+  a2d_childhood?: boolean | null;
+  a2e_adult?: boolean | null;
+  a2e_childhood?: boolean | null;
+  a2f_adult?: boolean | null;
+  a2f_childhood?: boolean | null;
+  a2g_adult?: boolean | null;
+  a2g_childhood?: boolean | null;
+  a2h_adult?: boolean | null;
+  a2h_childhood?: boolean | null;
+  a2i_adult?: boolean | null;
+  a2i_childhood?: boolean | null;
+  
+  // Total hyperactivity/impulsivity scores
+  total_hyperactivity_adult?: number | null;
+  total_hyperactivity_childhood?: number | null;
+  
+  // Scoring - Childhood
+  criteria_a_inattention_child_gte6?: boolean | null;
+  criteria_hi_hyperactivity_child_gte6?: boolean | null;
+  
+  // Scoring - Adult
+  criteria_a_inattention_adult_gte6?: boolean | null;
+  criteria_hi_hyperactivity_adult_gte6?: boolean | null;
+  
+  // General Criteria
+  criteria_b_lifetime_persistence?: boolean | null;
+  criteria_cd_impairment_childhood?: boolean | null;
+  criteria_cd_impairment_adult?: boolean | null;
+  criteria_e_better_explained?: boolean | null;
+  criteria_e_explanation?: string | null;
+  
+  // Collateral Information
+  collateral_parents?: number | null;
+  collateral_partner?: number | null;
+  collateral_school_reports?: number | null;
+  
+  // Final Diagnosis
+  final_diagnosis?: 'non' | 'combine' | 'inattentif' | 'hyperactif' | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type DivaResponseInsert = Omit<DivaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+

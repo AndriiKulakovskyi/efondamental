@@ -734,3 +734,260 @@ export const FAST_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// DIVA 2.0 (Diagnostic Interview for ADHD in Adults)
+// ============================================================================
+
+// Helper function to create ADHD symptom questions (adult + childhood)
+const createADHDSymptom = (id: string, text: string): Question => ({
+  id,
+  text,
+  type: 'multiple_choice',
+  required: false,
+  options: [
+    'Présent à l\'âge adulte',
+    'Présent dans l\'enfance'
+  ]
+});
+
+export const DIVA_QUESTIONS: Question[] = [
+  {
+    id: 'evaluated',
+    text: 'Le patient a-t-il été évalué avec la DIVA pour le TDAH ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  // Criterion A - Inattention
+  {
+    id: 'section_inattention',
+    text: 'Critère A - Déficit de l\'Attention',
+    type: 'section',
+    required: false
+  },
+  createADHDSymptom('a1a', 'A1. Souvent, ne parvient pas à prêter attention aux détails, ou fait des fautes d\'étourderie dans les devoirs scolaires, le travail ou d\'autres activités'),
+  createADHDSymptom('a1b', 'A2. A souvent du mal à soutenir son attention au travail ou dans les jeux'),
+  createADHDSymptom('a1c', 'A3. Semble souvent ne pas écouter quand on lui parle personnellement'),
+  createADHDSymptom('a1d', 'A4. Souvent, ne se conforme pas aux consignes et ne parvient pas à mener à terme ses devoirs scolaires, ses tâches domestiques ou ses obligations professionnelles'),
+  createADHDSymptom('a1e', 'A5. A souvent du mal à organiser ses travaux ou ses activités'),
+  createADHDSymptom('a1f', 'A6. Souvent, évite, a en aversion, ou fait à contrecoeur les tâches qui nécessitent un effort mental soutenu'),
+  createADHDSymptom('a1g', 'A7. Perd souvent les objets nécessaires à son travail ou à ses activités'),
+  createADHDSymptom('a1h', 'A8. Souvent, se laisse facilement distraire par des stimuli externes'),
+  createADHDSymptom('a1i', 'A9. A des oublis fréquents dans la vie quotidienne'),
+  
+  {
+    id: 'total_inattention_adult',
+    text: 'Nombre total de critères de Déficit Attentionnel à l\'âge adulte (/9)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 9
+  },
+  {
+    id: 'total_inattention_childhood',
+    text: 'Nombre total de critères de Déficit Attentionnel dans l\'enfance (/9)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 9
+  },
+  
+  // Criterion A - Hyperactivity/Impulsivity
+  {
+    id: 'section_hyperactivity',
+    text: 'Critère H/I - Hyperactivité/Impulsivité',
+    type: 'section',
+    required: false
+  },
+  createADHDSymptom('a2a', 'H/I 1. Remue souvent les mains ou les pieds, ou se tortille sur son siège'),
+  createADHDSymptom('a2b', 'H/I 2. Se lève souvent en classe ou dans d\'autres situations où il est supposé rester assis'),
+  createADHDSymptom('a2c', 'H/I 3. Souvent, court ou grimpe partout, dans des situations où cela est inapproprié (sentiment subjectif d\'impatience chez l\'adulte)'),
+  createADHDSymptom('a2d', 'H/I 4. A souvent du mal à se tenir tranquille dans les jeux ou les activités de loisir'),
+  createADHDSymptom('a2e', 'H/I 5. Est souvent « sur la brèche » ou agit souvent comme s\'il était « monté sur ressorts »'),
+  createADHDSymptom('a2f', 'H/I 6. Parle souvent trop'),
+  createADHDSymptom('a2g', 'H/I 7. Laisse souvent échapper la réponse à une question qui n\'est pas encore entièrement posée'),
+  createADHDSymptom('a2h', 'H/I 8. A souvent du mal à attendre son tour'),
+  createADHDSymptom('a2i', 'H/I 9. Interrompt souvent les autres ou impose sa présence'),
+  
+  {
+    id: 'total_hyperactivity_adult',
+    text: 'Nombre total de critères d\'Hyperactivité et d\'Impulsivité à l\'âge adulte (/9)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 9
+  },
+  {
+    id: 'total_hyperactivity_childhood',
+    text: 'Nombre total de critères d\'Hyperactivité et d\'Impulsivité dans l\'enfance (/9)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 9
+  },
+  
+  // Scoring - Childhood
+  {
+    id: 'section_scoring_child',
+    text: 'Cotation - Enfance',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'criteria_a_inattention_child_gte6',
+    text: 'Enfance: Le nombre de symptômes du critère A (inattention) est-il >= 6 ?',
+    type: 'boolean',
+    required: false
+  },
+  {
+    id: 'criteria_hi_hyperactivity_child_gte6',
+    text: 'Enfance: Le nombre de symptômes du critère H/I (hyperactivité/impulsivité) est-il >= 6 ?',
+    type: 'boolean',
+    required: false
+  },
+  
+  // Scoring - Adult
+  {
+    id: 'section_scoring_adult',
+    text: 'Cotation - Age Adulte',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'criteria_a_inattention_adult_gte6',
+    text: 'Age Adulte: Le nombre de symptômes du critère A (inattention) est-il >= 6 (ou >= 4 selon recherches) ?',
+    type: 'boolean',
+    required: false
+  },
+  {
+    id: 'criteria_hi_hyperactivity_adult_gte6',
+    text: 'Age Adulte: Le nombre de symptômes du critère H/I (hyperactivité/impulsivité) est-il >= 6 (ou >= 4 selon recherches) ?',
+    type: 'boolean',
+    required: false
+  },
+  
+  // General Criteria
+  {
+    id: 'section_general_criteria',
+    text: 'Cotation - Critères Généraux',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'criteria_b_lifetime_persistence',
+    text: 'Critère B: Y a-t-il des indications en faveur de la persistance sur la vie entière d\'un ensemble de symptômes et d\'une altération du fonctionnement ?',
+    type: 'boolean',
+    required: false
+  },
+  {
+    id: 'criteria_cd_impairment_childhood',
+    text: 'Critères C et D: Présence de symptômes et d\'une altération du fonctionnement dans au moins deux types différents d\'environnement dans l\'enfance ?',
+    type: 'boolean',
+    required: false
+  },
+  {
+    id: 'criteria_cd_impairment_adult',
+    text: 'Critères C et D: Présence de symptômes et d\'une altération du fonctionnement dans au moins deux types différents d\'environnement à l\'âge adulte ?',
+    type: 'boolean',
+    required: false
+  },
+  {
+    id: 'criteria_e_better_explained',
+    text: 'Critère E: Les symptômes peuvent-ils être (mieux) expliqués par la présence d\'un autre diagnostic de trouble psychiatrique ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'non', label: 'Non (Pas d\'autre diagnostic expliquant mieux)' },
+      { code: 'oui', label: 'Oui (Expliqué par un autre trouble)' }
+    ]
+  },
+  {
+    id: 'criteria_e_explanation',
+    text: 'Si Oui (expliqué par un autre trouble), préciser lequel :',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ var: 'criteria_e_better_explained' }, 'oui'] }
+  },
+  
+  // Collateral Information
+  {
+    id: 'section_collateral',
+    text: 'Informations Collatérales',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'collateral_parents',
+    text: 'Le diagnostic est-il conforté par: Parent(s)/frère/soeur/autre',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: -1, label: 'N/A', score: -1 },
+      { code: 0, label: '0 (Aucun/faible support)', score: 0 },
+      { code: 1, label: '1 (Quelque support)', score: 1 },
+      { code: 2, label: '2 (Support net)', score: 2 }
+    ]
+  },
+  {
+    id: 'collateral_partner',
+    text: 'Le diagnostic est-il conforté par: Partenaire/ami proche/autre',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: -1, label: 'N/A', score: -1 },
+      { code: 0, label: '0 (Aucun/faible support)', score: 0 },
+      { code: 1, label: '1 (Quelque support)', score: 1 },
+      { code: 2, label: '2 (Support net)', score: 2 }
+    ]
+  },
+  {
+    id: 'collateral_school_reports',
+    text: 'Le diagnostic est-il conforté par: Livrets scolaires',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: -1, label: 'N/A', score: -1 },
+      { code: 0, label: '0 (Aucun/faible support)', score: 0 },
+      { code: 1, label: '1 (Quelque support)', score: 1 },
+      { code: 2, label: '2 (Support net)', score: 2 }
+    ]
+  },
+  
+  // Final Diagnosis
+  {
+    id: 'section_diagnosis',
+    text: 'Diagnostic Final',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'final_diagnosis',
+    text: 'Diagnostic TDAH',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'non', label: 'Non' },
+      { code: 'combine', label: 'Oui, Type combiné (314.01)' },
+      { code: 'inattentif', label: 'Oui, Type inattentif prédominant (314.00)' },
+      { code: 'hyperactif', label: 'Oui, Type hyperactif/impulsif prédominant (314.01)' }
+    ]
+  }
+];
+
+export const DIVA_DEFINITION: QuestionnaireDefinition = {
+  id: 'diva',
+  code: 'DIVA_2_FR',
+  title: 'DIVA 2.0 - Entretien Diagnostique pour le TDAH chez l\'adulte',
+  description: 'Évaluation clinique structurée des critères du TDAH (DSM-IV) à l\'âge adulte et dans l\'enfance.',
+  questions: DIVA_QUESTIONS,
+  metadata: {
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

@@ -34,7 +34,8 @@ import {
   EGF_DEFINITION,
   ALDA_DEFINITION,
   ETAT_PATIENT_DEFINITION,
-  FAST_DEFINITION
+  FAST_DEFINITION,
+  DIVA_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -85,7 +86,8 @@ import {
   getEgfResponse,
   getAldaResponse,
   getEtatPatientResponse,
-  getFastResponse
+  getFastResponse,
+  getDivaResponse
 } from "@/lib/services/questionnaire-hetero.service";
 import {
   getSocialResponse
@@ -152,6 +154,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ALDA_DEFINITION.code) questionnaire = ALDA_DEFINITION;
   else if (code === ETAT_PATIENT_DEFINITION.code) questionnaire = ETAT_PATIENT_DEFINITION;
   else if (code === FAST_DEFINITION.code) questionnaire = FAST_DEFINITION;
+  else if (code === DIVA_DEFINITION.code) questionnaire = DIVA_DEFINITION;
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) questionnaire = SOCIAL_DEFINITION;
   // Infirmier questionnaires
@@ -205,6 +208,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ALDA_DEFINITION.code) existingResponse = await getAldaResponse(visitId);
   else if (code === ETAT_PATIENT_DEFINITION.code) existingResponse = await getEtatPatientResponse(visitId);
   else if (code === FAST_DEFINITION.code) existingResponse = await getFastResponse(visitId);
+  else if (code === DIVA_DEFINITION.code) existingResponse = await getDivaResponse(visitId);
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) existingResponse = await getSocialResponse(visitId);
   // Infirmier questionnaires
