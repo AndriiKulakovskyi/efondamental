@@ -810,10 +810,13 @@ export async function saveSisResponse(
 ): Promise<SisResponse> {
   const supabase = await createClient();
 
+  // Remove generated columns if present (total_score, circumstances_subscore, conception_subscore)
+  const { total_score, circumstances_subscore, conception_subscore, ...responseWithoutGeneratedFields } = response as any;
+
   const { data, error } = await supabase
     .from('responses_sis')
     .upsert({
-      ...response
+      ...responseWithoutGeneratedFields
     }, { onConflict: 'visit_id' })
     .select()
     .single();

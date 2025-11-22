@@ -155,10 +155,13 @@ export async function saveEpworthResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
+  // Remove total_score if present (it's a generated column)
+  const { total_score, ...responseWithoutGeneratedFields } = response as any;
+
   // Total score is computed by database (generated column)
   // But we calculate severity here
-  const totalScore = response.q1 + response.q2 + response.q3 + response.q4 +
-                     response.q5 + response.q6 + response.q7 + response.q8;
+  const totalScore = responseWithoutGeneratedFields.q1 + responseWithoutGeneratedFields.q2 + responseWithoutGeneratedFields.q3 + responseWithoutGeneratedFields.q4 +
+                     responseWithoutGeneratedFields.q5 + responseWithoutGeneratedFields.q6 + responseWithoutGeneratedFields.q7 + responseWithoutGeneratedFields.q8;
 
   let severity = '';
   let interpretation = '';
@@ -177,20 +180,20 @@ export async function saveEpworthResponse(
   }
 
   let clinicalContext = '';
-  if (response.q9 !== undefined && response.q9 !== null) {
+  if (responseWithoutGeneratedFields.q9 !== undefined && responseWithoutGeneratedFields.q9 !== null) {
     const contexts = [
       'seulement après les repas',
       'à certaines heures du jour, toujours les mêmes',
       'la nuit',
       "n'importe quelle heure du jour"
     ];
-    clinicalContext = contexts[response.q9] || '';
+    clinicalContext = contexts[responseWithoutGeneratedFields.q9] || '';
   }
 
   const { data, error } = await supabase
     .from('responses_epworth')
     .upsert({
-      ...response,
+      ...responseWithoutGeneratedFields,
       severity,
       clinical_context: clinicalContext,
       interpretation,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, CheckCircle, Circle, FileText, RotateCcw } from "lucide-react";
@@ -24,11 +24,6 @@ export function ExpandableModuleCard({
   visitId 
 }: ExpandableModuleCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
   
   const completedCount = module.questionnaires.filter((q: any) => q.completed).length;
   const totalCount = module.questionnaires.length;
@@ -93,90 +88,88 @@ export function ExpandableModuleCard({
         </div>
       </CardHeader>
 
-      {mounted && (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateRows: isExpanded ? '1fr' : '0fr',
-            transition: 'grid-template-rows 300ms'
-          }}
-        >
-          <div style={{ overflow: 'hidden' }}>
-            <CardContent className="pt-0">
-              <div className="space-y-2">
-                {module.questionnaires.map((questionnaire: any) => (
-              <div
-                key={questionnaire.id}
-                className={cn(
-                  "flex items-center justify-between p-4 border border-slate-200 rounded-lg transition-all duration-200",
-                  questionnaire.completed 
-                    ? "bg-green-50 border-green-200" 
-                    : "bg-white hover:shadow-md hover:border-slate-300"
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateRows: isExpanded ? '1fr' : '0fr',
+          transition: 'grid-template-rows 300ms'
+        }}
+      >
+        <div style={{ overflow: 'hidden' }}>
+          <CardContent className="pt-0">
+            <div className="space-y-2">
+              {module.questionnaires.map((questionnaire: any) => (
+            <div
+              key={questionnaire.id}
+              className={cn(
+                "flex items-center justify-between p-4 border border-slate-200 rounded-lg transition-all duration-200",
+                questionnaire.completed 
+                  ? "bg-green-50 border-green-200" 
+                  : "bg-white hover:shadow-md hover:border-slate-300"
+              )}
+            >
+              <div className="flex items-center gap-3 flex-1">
+                {questionnaire.completed ? (
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                ) : (
+                  <Circle className="h-5 w-5 text-slate-300 flex-shrink-0" />
                 )}
-              >
-                <div className="flex items-center gap-3 flex-1">
-                  {questionnaire.completed ? (
-                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
-                  ) : (
-                    <Circle className="h-5 w-5 text-slate-300 flex-shrink-0" />
-                  )}
-                  <div className="flex-1">
-                    <p className={cn(
-                      "font-medium",
-                      questionnaire.completed ? "text-green-900" : "text-slate-900"
-                    )}>
-                      {questionnaire.title}
+                <div className="flex-1">
+                  <p className={cn(
+                    "font-medium",
+                    questionnaire.completed ? "text-green-900" : "text-slate-900"
+                  )}>
+                    {questionnaire.title}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-xs text-slate-500 capitalize">
+                      For: {questionnaire.target_role?.replace(/_/g, " ")}
                     </p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <p className="text-xs text-slate-500 capitalize">
-                        For: {questionnaire.target_role?.replace(/_/g, " ")}
-                      </p>
-                      {questionnaire.completed && questionnaire.completedAt && (
-                        <>
-                          <span className="text-xs text-slate-400">•</span>
-                          <p className="text-xs text-slate-500">
-                            Completed {formatShortDate(questionnaire.completedAt)}
-                          </p>
-                        </>
-                      )}
-                    </div>
+                    {questionnaire.completed && questionnaire.completedAt && (
+                      <>
+                        <span className="text-xs text-slate-400">•</span>
+                        <p className="text-xs text-slate-500">
+                          Completed {formatShortDate(questionnaire.completedAt)}
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0 ml-4">
-                  {questionnaire.completed ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-700 font-medium">
-                        Complété
-                      </span>
-                      <Link
-                        href={`/professional/${pathology}/patients/${patientId}/visits/${visitId}/questionnaire/${questionnaire.id}`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <RotateCcw className="h-3 w-3" />
-                          Reprendre
-                        </Button>
-                      </Link>
-                    </div>
-                  ) : (
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                {questionnaire.completed ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-700 font-medium">
+                      Complété
+                    </span>
                     <Link
                       href={`/professional/${pathology}/patients/${patientId}/visits/${visitId}/questionnaire/${questionnaire.id}`}
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <Button size="sm" className="gap-2">
-                        <FileText className="h-4 w-4" />
-                        Remplir
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <RotateCcw className="h-3 w-3" />
+                        Reprendre
                       </Button>
                     </Link>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <Link
+                    href={`/professional/${pathology}/patients/${patientId}/visits/${visitId}/questionnaire/${questionnaire.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Button size="sm" className="gap-2">
+                      <FileText className="h-4 w-4" />
+                      Remplir
+                    </Button>
+                  </Link>
+                )}
               </div>
-              ))}
             </div>
-          </CardContent>
+            ))}
           </div>
+        </CardContent>
         </div>
-      )}
+      </div>
     </Card>
   );
 }

@@ -50,7 +50,8 @@ import {
   savePhysicalParamsResponse,
   saveBloodPressureResponse,
   saveSleepApneaResponse,
-  saveBiologicalAssessmentResponse
+  saveBiologicalAssessmentResponse,
+  saveEcgResponse
 } from '@/lib/services/questionnaire-infirmier.service';
 import {
   saveDsm5HumeurResponse,
@@ -102,6 +103,7 @@ import {
   BloodPressureResponseInsert,
   SleepApneaResponseInsert,
   BiologicalAssessmentResponseInsert,
+  EcgResponseInsert,
   Dsm5HumeurResponseInsert,
   Dsm5PsychoticResponseInsert,
   Dsm5ComorbidResponseInsert
@@ -446,6 +448,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as BiologicalAssessmentResponseInsert);
+        break;
+
+      case 'ECG':
+        result = await saveEcgResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as EcgResponseInsert);
         break;
 
       case 'DSM5_HUMEUR_FR':

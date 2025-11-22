@@ -427,11 +427,14 @@ export async function saveWurs25Response(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
+  // Remove total_score if present (it's a generated column)
+  const { total_score, ...responseWithoutGeneratedFields } = response as any;
+
   // Total score is computed by database (generated column)
   // Calculate total for interpretation
   let totalScore = 0;
   for (let i = 1; i <= 25; i++) {
-    totalScore += response[`q${i}` as keyof Wurs25ResponseInsert] as number;
+    totalScore += responseWithoutGeneratedFields[`q${i}` as keyof Wurs25ResponseInsert] as number;
   }
 
   const adhdLikely = totalScore >= 46;
@@ -442,7 +445,7 @@ export async function saveWurs25Response(
   const { data, error } = await supabase
     .from('responses_wurs25')
     .upsert({
-      ...response,
+      ...responseWithoutGeneratedFields,
       adhd_likely: adhdLikely,
       interpretation,
       completed_by: user.data.user?.id
@@ -539,11 +542,14 @@ export async function saveCsmResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
+  // Remove total_score if present (it's a generated column)
+  const { total_score, ...responseWithoutGeneratedFields } = response as any;
+
   // Total score is computed by database (generated column)
   // Calculate total for interpretation
-  const totalScore = response.q1 + response.q2 + response.q3 + response.q4 +
-                     response.q5 + response.q6 + response.q7 + response.q8 +
-                     response.q9 + response.q10 + response.q11 + response.q12;
+  const totalScore = responseWithoutGeneratedFields.q1 + responseWithoutGeneratedFields.q2 + responseWithoutGeneratedFields.q3 + responseWithoutGeneratedFields.q4 +
+                     responseWithoutGeneratedFields.q5 + responseWithoutGeneratedFields.q6 + responseWithoutGeneratedFields.q7 + responseWithoutGeneratedFields.q8 +
+                     responseWithoutGeneratedFields.q9 + responseWithoutGeneratedFields.q10 + responseWithoutGeneratedFields.q11 + responseWithoutGeneratedFields.q12;
 
   let interpretation = `Score total: ${totalScore}/55. `;
   if (totalScore >= 44) {
@@ -557,7 +563,7 @@ export async function saveCsmResponse(
   const { data, error } = await supabase
     .from('responses_csm')
     .upsert({
-      ...response,
+      ...responseWithoutGeneratedFields,
       interpretation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })

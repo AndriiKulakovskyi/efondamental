@@ -1363,3 +1363,156 @@ export const BIOLOGICAL_ASSESSMENT_DEFINITION: QuestionnaireDefinition = {
   }
 };
 
+// ===== ECG (ELECTROCARDIOGRAMME) =====
+
+export const ECG_QUESTIONS: Question[] = [
+  {
+    id: 'ecg_performed',
+    text: 'Electrocardiogramme effectué',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ]
+  },
+  {
+    id: 'section_measurements',
+    text: 'Mesures',
+    type: 'section',
+    required: false,
+    display_if: {
+      '==': [{ var: 'ecg_performed' }, 'yes']
+    }
+  },
+  {
+    id: 'heart_rate',
+    text: 'Fréquence cardiaque (bpm)',
+    type: 'number',
+    required: false,
+    min: 30,
+    max: 250,
+    display_if: {
+      '==': [{ var: 'ecg_performed' }, 'yes']
+    }
+  },
+  {
+    id: 'qt_measured',
+    text: 'Mesure du QT en seconde (0.xxx)',
+    help: 'Ex: 0.400',
+    type: 'number',
+    required: false,
+    min: 0.2,
+    max: 0.7,
+    display_if: {
+      '==': [{ var: 'ecg_performed' }, 'yes']
+    }
+  },
+  {
+    id: 'rr_measured',
+    text: 'Mesure du RR en seconde (0.xxx)',
+    help: 'RR est l\'intervalle de temps séparant deux ondes R consécutives. Ex: 0.850',
+    type: 'number',
+    required: false,
+    min: 0.3,
+    max: 2.0,
+    display_if: {
+      '==': [{ var: 'ecg_performed' }, 'yes']
+    }
+  },
+  {
+    id: 'qtc_calculated',
+    text: 'QT calculé (QTc)',
+    help: 'Formule : QTc = QTm / √RR. Interprétation : < 0.35s (Hypercalcémie/Imprégnation digitalique). Normal : 0.35-0.43 (H), 0.35-0.48 (F). Long : >0.43 (H), >0.48 (F). Menaçant : >0.468 (H), >0.528 (F).',
+    type: 'number',
+    required: false,
+    readonly: true,
+    display_if: {
+      '==': [{ var: 'ecg_performed' }, 'yes']
+    }
+  },
+  {
+    id: 'section_followup',
+    text: 'Suivi',
+    type: 'section',
+    required: false,
+    display_if: {
+      '==': [{ var: 'ecg_performed' }, 'yes']
+    }
+  },
+  {
+    id: 'ecg_sent_to_cardiologist',
+    text: 'ECG envoyé à un cardiologue ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      '==': [{ var: 'ecg_performed' }, 'yes']
+    }
+  },
+  {
+    id: 'cardiologist_consultation_requested',
+    text: 'Demande de consultation ou d\'avis auprès d\'un cardiologue',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'yes', label: 'Oui' },
+      { code: 'no', label: 'Non' }
+    ],
+    display_if: {
+      '==': [{ var: 'ecg_performed' }, 'yes']
+    }
+  },
+  {
+    id: 'section_cardiologist_details',
+    text: 'Coordonnées Cardiologue',
+    type: 'section',
+    required: false,
+    display_if: {
+      'and': [
+        { '==': [{ var: 'ecg_performed' }, 'yes'] },
+        { '==': [{ var: 'cardiologist_consultation_requested' }, 'yes'] }
+      ]
+    }
+  },
+  {
+    id: 'cardiologist_name',
+    text: 'Nom du cardiologue',
+    type: 'text',
+    required: false,
+    display_if: {
+      'and': [
+        { '==': [{ var: 'ecg_performed' }, 'yes'] },
+        { '==': [{ var: 'cardiologist_consultation_requested' }, 'yes'] }
+      ]
+    }
+  },
+  {
+    id: 'cardiologist_city',
+    text: 'Ville du cardiologue',
+    type: 'text',
+    required: false,
+    display_if: {
+      'and': [
+        { '==': [{ var: 'ecg_performed' }, 'yes'] },
+        { '==': [{ var: 'cardiologist_consultation_requested' }, 'yes'] }
+      ]
+    }
+  }
+];
+
+export const ECG_DEFINITION: QuestionnaireDefinition = {
+  id: 'ecg',
+  code: 'ECG',
+  title: 'Fiche de Recueil ECG (Electrocardiogramme)',
+  description: 'Formulaire de saisie des paramètres électrocardiographiques avec calcul du QTc et critères de gravité',
+  questions: ECG_QUESTIONS,
+  metadata: {
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+

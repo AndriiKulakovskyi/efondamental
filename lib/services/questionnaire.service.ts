@@ -73,9 +73,12 @@ export async function saveAsrmResponse(
 ): Promise<AsrmResponse> {
   const supabase = await createClient();
 
+  // Remove total_score if present (it's a generated column)
+  const { total_score, ...responseWithoutGeneratedFields } = response as any;
+
   const { data, error } = await supabase
     .from('responses_asrm')
-    .upsert(response, { onConflict: 'visit_id' })
+    .upsert(responseWithoutGeneratedFields, { onConflict: 'visit_id' })
     .select()
     .single();
 
@@ -350,13 +353,16 @@ export async function saveEq5d5lResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
+  // Remove profile_string if present (it's a generated column)
+  const { profile_string, ...responseWithoutGeneratedFields } = response as any;
+
   // Calculate index value (simplified - in production would use crosswalk table)
   const dimensions = [
-    response.mobility,
-    response.self_care,
-    response.usual_activities,
-    response.pain_discomfort,
-    response.anxiety_depression
+    responseWithoutGeneratedFields.mobility,
+    responseWithoutGeneratedFields.self_care,
+    responseWithoutGeneratedFields.usual_activities,
+    responseWithoutGeneratedFields.pain_discomfort,
+    responseWithoutGeneratedFields.anxiety_depression
   ];
   
   // Simple calculation: 1 - ((sum of levels - 5) / 20)
@@ -366,7 +372,7 @@ export async function saveEq5d5lResponse(
   const { data, error } = await supabase
     .from('responses_eq5d5l')
     .upsert({
-      ...response,
+      ...responseWithoutGeneratedFields,
       index_value: Number(indexValue.toFixed(3)),
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
@@ -545,12 +551,15 @@ export async function saveMarsResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
+  // Remove adherence_percentage if present (it's a generated column)
+  const { adherence_percentage, ...responseWithoutGeneratedFields } = response as any;
+
   // MARS scoring: items 7,8 are positive (YES=1), others are negative (NO=1)
   const positiveItems = [7, 8];
   let totalScore = 0;
 
   for (let i = 1; i <= 10; i++) {
-    const value = response[`q${i}` as keyof MarsResponseInsert] as number;
+    const value = responseWithoutGeneratedFields[`q${i}` as keyof MarsResponseInsert] as number;
     if (positiveItems.includes(i)) {
       totalScore += value; // YES=1, NO=0
     } else {
@@ -563,7 +572,7 @@ export async function saveMarsResponse(
   const { data, error } = await supabase
     .from('responses_mars')
     .upsert({
-      ...response,
+      ...responseWithoutGeneratedFields,
       total_score: totalScore,
       interpretation,
       completed_by: user.data.user?.id

@@ -51,7 +51,8 @@ import {
   PHYSICAL_PARAMS_DEFINITION,
   BLOOD_PRESSURE_DEFINITION,
   SLEEP_APNEA_DEFINITION,
-  BIOLOGICAL_ASSESSMENT_DEFINITION
+  BIOLOGICAL_ASSESSMENT_DEFINITION,
+  ECG_DEFINITION
 } from "@/lib/constants/questionnaires-infirmier";
 import {
   DSM5_HUMEUR_DEFINITION,
@@ -108,7 +109,8 @@ import {
   getPhysicalParamsResponse,
   getBloodPressureResponse,
   getSleepApneaResponse,
-  getBiologicalAssessmentResponse
+  getBiologicalAssessmentResponse,
+  getEcgResponse
 } from "@/lib/services/questionnaire-infirmier.service";
 import {
   getDsm5HumeurResponse,
@@ -179,6 +181,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === BLOOD_PRESSURE_DEFINITION.code) questionnaire = BLOOD_PRESSURE_DEFINITION;
   else if (code === SLEEP_APNEA_DEFINITION.code) questionnaire = SLEEP_APNEA_DEFINITION;
   else if (code === BIOLOGICAL_ASSESSMENT_DEFINITION.code) questionnaire = BIOLOGICAL_ASSESSMENT_DEFINITION;
+  else if (code === ECG_DEFINITION.code) questionnaire = ECG_DEFINITION;
   // DSM5 questionnaires
   else if (code === DSM5_HUMEUR_DEFINITION.code) questionnaire = DSM5_HUMEUR_DEFINITION;
   else if (code === DSM5_PSYCHOTIC_DEFINITION.code) questionnaire = DSM5_PSYCHOTIC_DEFINITION;
@@ -238,6 +241,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === BLOOD_PRESSURE_DEFINITION.code) existingResponse = await getBloodPressureResponse(visitId);
   else if (code === SLEEP_APNEA_DEFINITION.code) existingResponse = await getSleepApneaResponse(visitId);
   else if (code === BIOLOGICAL_ASSESSMENT_DEFINITION.code) existingResponse = await getBiologicalAssessmentResponse(visitId);
+  else if (code === ECG_DEFINITION.code) existingResponse = await getEcgResponse(visitId);
   // DSM5 questionnaires
   else if (code === DSM5_HUMEUR_DEFINITION.code) existingResponse = await getDsm5HumeurResponse(visitId);
   else if (code === DSM5_PSYCHOTIC_DEFINITION.code) existingResponse = await getDsm5PsychoticResponse(visitId);

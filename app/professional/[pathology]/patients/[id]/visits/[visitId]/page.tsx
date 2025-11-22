@@ -59,7 +59,8 @@ import {
   getPhysicalParamsResponse,
   getBloodPressureResponse,
   getSleepApneaResponse,
-  getBiologicalAssessmentResponse
+  getBiologicalAssessmentResponse,
+  getEcgResponse
 } from "@/lib/services/questionnaire-infirmier.service";
 import { 
   ASRM_DEFINITION, 
@@ -111,7 +112,8 @@ import {
   PHYSICAL_PARAMS_DEFINITION,
   BLOOD_PRESSURE_DEFINITION,
   SLEEP_APNEA_DEFINITION,
-  BIOLOGICAL_ASSESSMENT_DEFINITION
+  BIOLOGICAL_ASSESSMENT_DEFINITION,
+  ECG_DEFINITION
 } from "@/lib/constants/questionnaires-infirmier";
 import {
   DSM5_HUMEUR_DEFINITION,
@@ -241,7 +243,7 @@ export default async function VisitDetailPage({
       // SOCIAL response
       socialResponse,
       // INFIRMIER responses
-      tobaccoResponse, fagerstromResponse, physicalParamsResponse, bloodPressureResponse, sleepApneaResponse, biologicalAssessmentResponse,
+      tobaccoResponse, fagerstromResponse, physicalParamsResponse, bloodPressureResponse, sleepApneaResponse, biologicalAssessmentResponse, ecgResponse,
       // DSM5 responses
       dsm5HumeurResponse, dsm5PsychoticResponse, dsm5ComorbidResponse,
       // DIVA response
@@ -294,6 +296,7 @@ export default async function VisitDetailPage({
       getBloodPressureResponse(visitId),
       getSleepApneaResponse(visitId),
       getBiologicalAssessmentResponse(visitId),
+      getEcgResponse(visitId),
       // DSM5
       getDsm5HumeurResponse(visitId),
       getDsm5PsychoticResponse(visitId),
@@ -359,6 +362,13 @@ export default async function VisitDetailPage({
           target_role: 'healthcare_professional',
           completed: !!biologicalAssessmentResponse,
           completedAt: biologicalAssessmentResponse?.completed_at,
+        },
+        {
+          ...ECG_DEFINITION,
+          id: ECG_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!ecgResponse,
+          completedAt: ecgResponse?.completed_at,
         }
       ]
     };

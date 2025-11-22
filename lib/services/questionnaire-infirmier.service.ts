@@ -1,10 +1,10 @@
 /**
  * Infirmier Section Questionnaire Services
- * Handles tobacco assessment, Fagerstrom test, physical parameters, blood pressure, and sleep apnea responses
+ * Handles tobacco assessment, Fagerstrom test, physical parameters, blood pressure, sleep apnea, biological assessment, and ECG responses
  */
 
 import { createClient } from '@/lib/supabase/server';
-import { TobaccoResponse, TobaccoResponseInsert, FagerstromResponse, FagerstromResponseInsert, PhysicalParamsResponse, PhysicalParamsResponseInsert, BloodPressureResponse, BloodPressureResponseInsert, SleepApneaResponse, SleepApneaResponseInsert, BiologicalAssessmentResponse, BiologicalAssessmentResponseInsert } from '@/lib/types/database.types';
+import { TobaccoResponse, TobaccoResponseInsert, FagerstromResponse, FagerstromResponseInsert, PhysicalParamsResponse, PhysicalParamsResponseInsert, BloodPressureResponse, BloodPressureResponseInsert, SleepApneaResponse, SleepApneaResponseInsert, BiologicalAssessmentResponse, BiologicalAssessmentResponseInsert, EcgResponse, EcgResponseInsert } from '@/lib/types/database.types';
 import { getPatientById } from '@/lib/services/patient.service';
 
 // ===== TOBACCO ASSESSMENT =====
@@ -107,11 +107,11 @@ export async function saveFagerstromResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Total score is calculated automatically by the database, remove it from the request if present
-  const { total_score, ...responseWithoutTotalScore } = response as any;
+  // Remove total_score if present (it's a generated column)
+  const { total_score, ...responseWithoutGeneratedFields } = response as any;
 
-  // Calculate total score for interpretation (0-10)
-  const totalScore = response.q1 + response.q2 + response.q3 + response.q4 + response.q5 + response.q6;
+  // Calculate total score (0-10)
+  const totalScore = responseWithoutGeneratedFields.q1 + responseWithoutGeneratedFields.q2 + responseWithoutGeneratedFields.q3 + responseWithoutGeneratedFields.q4 + responseWithoutGeneratedFields.q5 + responseWithoutGeneratedFields.q6;
 
   // Determine dependence level
   let dependenceLevel = '';
@@ -132,15 +132,15 @@ export async function saveFagerstromResponse(
   }
 
   // Add specific item interpretations
-  if (response.q1 >= 2) {
+  if (responseWithoutGeneratedFields.q1 >= 2) {
     interpretation += ' Cigarette matinale précoce (dépendance physique).';
   }
   
-  if (response.q4 >= 2) {
+  if (responseWithoutGeneratedFields.q4 >= 2) {
     interpretation += ' Consommation importante (>20 cigarettes/jour).';
   }
   
-  if (response.q3 === 1) {
+  if (responseWithoutGeneratedFields.q3 === 1) {
     interpretation += ' Première cigarette difficilement remplaçable.';
   }
 
@@ -149,18 +149,18 @@ export async function saveFagerstromResponse(
     interpretation += ' Score très élevé (≥8). Dépendance nicotinique forte. Envisager un accompagnement au sevrage tabagique.';
   }
 
-  if (response.q1 === 3) {
+  if (responseWithoutGeneratedFields.q1 === 3) {
     interpretation += ' Cigarette dans les 5 minutes après réveil: indicateur fort de dépendance physique.';
   }
 
-  if (response.q4 === 3) {
+  if (responseWithoutGeneratedFields.q4 === 3) {
     interpretation += ' Consommation ≥31 cigarettes/jour: risque sanitaire majeur.';
   }
 
   const { data, error } = await supabase
     .from('responses_fagerstrom')
     .upsert({
-      ...responseWithoutTotalScore,
+      ...responseWithoutGeneratedFields,
       dependence_level: dependenceLevel,
       interpretation: interpretation.trim(),
       completed_by: user.data.user?.id
@@ -521,6 +521,91 @@ export async function saveBiologicalAssessmentResponse(
   const { data, error } = await supabase
     .from('responses_biological_assessment')
     .upsert(normalizedResponse, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ===== ECG (ELECTROCARDIOGRAMME) =====
+
+export async function getEcgResponse(
+  visitId: string
+): Promise<EcgResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_ecg')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No data found
+    if (error.code === 'PGRST205') {
+      // Table doesn't exist yet - migration not applied
+      console.warn(`Table responses_ecg not found. Please run migrations.`);
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveEcgResponse(
+  response: EcgResponseInsert
+): Promise<EcgResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  let interpretation = '';
+  let alertMessage = '';
+
+  if (response.ecg_performed === 'yes' && response.qt_measured && response.rr_measured) {
+    // Calculate QTc using Bazett's formula: QTc = QT / √RR
+    const qtc = response.qt_measured / Math.sqrt(response.rr_measured);
+
+    // Generate interpretation based on QTc value
+    if (qtc < 0.35) {
+      alertMessage = 'ATTENTION : QTc court. Rechercher une hypercalcémie ou une imprégnation digitalique.';
+      interpretation = `QTc = ${qtc.toFixed(3)}s. ${alertMessage}`;
+    } else if (qtc >= 0.35 && qtc <= 0.43) {
+      interpretation = `QTc = ${qtc.toFixed(3)}s. QTc normal (homme).`;
+    } else if (qtc > 0.43 && qtc <= 0.468) {
+      interpretation = `QTc = ${qtc.toFixed(3)}s. QTc légèrement allongé (homme) ou normal (femme ≤0.48).`;
+    } else if (qtc > 0.468 && qtc <= 0.48) {
+      alertMessage = 'ATTENTION : QTc allongé chez l\'homme. Envisager une consultation cardiologique.';
+      interpretation = `QTc = ${qtc.toFixed(3)}s. ${alertMessage}`;
+    } else if (qtc > 0.48 && qtc <= 0.528) {
+      alertMessage = 'ATTENTION : QTc allongé. Envisager une consultation cardiologique.';
+      interpretation = `QTc = ${qtc.toFixed(3)}s. ${alertMessage}`;
+    } else {
+      alertMessage = 'ALERTE : QTc très allongé (>0.528). Risque élevé de torsade de pointes. Consultation cardiologique urgente recommandée.';
+      interpretation = `QTc = ${qtc.toFixed(3)}s. ${alertMessage}`;
+    }
+
+    // Additional interpretation based on heart rate
+    if (response.heart_rate) {
+      if (response.heart_rate < 50) {
+        interpretation += ' Bradycardie.';
+      } else if (response.heart_rate > 100) {
+        interpretation += ' Tachycardie.';
+      }
+    }
+  } else if (response.ecg_performed === 'yes') {
+    interpretation = 'ECG effectué. Mesures incomplètes pour le calcul du QTc.';
+  } else {
+    interpretation = 'ECG non effectué.';
+  }
+
+  const { data, error } = await supabase
+    .from('responses_ecg')
+    .upsert({
+      ...response,
+      interpretation,
+      alert_message: alertMessage || null,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
     .select()
     .single();
 

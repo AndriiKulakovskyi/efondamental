@@ -112,6 +112,25 @@ export function QuestionnaireRenderer({
         hasChanges = true;
       }
 
+      // Compute QTc (ECG) if QT and RR are available
+      // Formula: QTc = QT / √RR (Bazett's formula)
+      if (prev.qt_measured && prev.rr_measured) {
+        const qtMeasured = parseFloat(prev.qt_measured);
+        const rrMeasured = parseFloat(prev.rr_measured);
+        if (qtMeasured > 0 && rrMeasured > 0) {
+          const qtcCalculated = qtMeasured / Math.sqrt(rrMeasured);
+          const qtcRounded = Math.round(qtcCalculated * 1000) / 1000; // Round to 3 decimals
+          if (updated.qtc_calculated !== qtcRounded) {
+            updated.qtc_calculated = qtcRounded;
+            hasChanges = true;
+          }
+        }
+      } else if (prev.qtc_calculated) {
+        // Clear QTc if QT or RR is missing
+        delete updated.qtc_calculated;
+        hasChanges = true;
+      }
+
       // Compute clairance_creatinine if creatinine, weight, age, and gender are available
       // Note: weight comes from physical params questionnaire, age/gender from patient profile
       // This will compute if weight is available in responses (e.g., from initialResponses that includes data from other questionnaires)
@@ -160,6 +179,8 @@ export function QuestionnaireRenderer({
     responses.bp_lying_diastolic,
     responses.bp_standing_systolic,
     responses.bp_standing_diastolic,
+    responses.qt_measured,
+    responses.rr_measured,
     responses.creatinine,
     responses.patient_age,
     responses.patient_gender,

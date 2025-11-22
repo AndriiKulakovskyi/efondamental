@@ -1330,6 +1330,42 @@ export interface BiologicalAssessmentResponse {
 
 export type BiologicalAssessmentResponseInsert = Omit<BiologicalAssessmentResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'clairance_creatinine'>;
 
+// ===== ECG (Electrocardiogramme) Response =====
+export interface EcgResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // ECG performed
+  ecg_performed: 'yes' | 'no';
+
+  // Measurements
+  heart_rate?: number | null; // bpm
+  qt_measured?: number | null; // in seconds
+  rr_measured?: number | null; // in seconds
+  qtc_calculated?: number | null; // calculated QTc
+
+  // Follow-up
+  ecg_sent_to_cardiologist?: 'yes' | 'no' | null;
+  cardiologist_consultation_requested?: 'yes' | 'no' | null;
+
+  // Cardiologist details
+  cardiologist_name?: string | null;
+  cardiologist_city?: string | null;
+
+  // Interpretation and alerts
+  interpretation?: string | null;
+  alert_message?: string | null;
+
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type EcgResponseInsert = Omit<EcgResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
 // ============================================================================
 // DSM5 - Mood Disorders (Troubles de l'humeur)
 // ============================================================================
