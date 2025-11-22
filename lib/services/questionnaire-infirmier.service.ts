@@ -107,7 +107,10 @@ export async function saveFagerstromResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Calculate total score (0-10)
+  // Total score is calculated automatically by the database, remove it from the request if present
+  const { total_score, ...responseWithoutTotalScore } = response as any;
+
+  // Calculate total score for interpretation (0-10)
   const totalScore = response.q1 + response.q2 + response.q3 + response.q4 + response.q5 + response.q6;
 
   // Determine dependence level
@@ -157,7 +160,7 @@ export async function saveFagerstromResponse(
   const { data, error } = await supabase
     .from('responses_fagerstrom')
     .upsert({
-      ...response,
+      ...responseWithoutTotalScore,
       dependence_level: dependenceLevel,
       interpretation: interpretation.trim(),
       completed_by: user.data.user?.id
