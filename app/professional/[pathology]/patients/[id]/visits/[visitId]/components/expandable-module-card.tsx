@@ -89,6 +89,7 @@ export function ExpandableModuleCard({
       </CardHeader>
 
       <div
+        suppressHydrationWarning
         style={{
           display: 'grid',
           gridTemplateRows: isExpanded ? '1fr' : '0fr',
@@ -96,7 +97,7 @@ export function ExpandableModuleCard({
         }}
       >
         <div style={{ overflow: 'hidden' }}>
-          <CardContent className="pt-0">
+          <CardContent className="pt-0" suppressHydrationWarning>
             <div className="space-y-2">
               {module.questionnaires.map((questionnaire: any) => (
             <div

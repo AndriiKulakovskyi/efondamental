@@ -350,6 +350,13 @@ export default async function VisitDetailPage({
           completedAt: bloodPressureResponse?.completed_at,
         },
         {
+          ...ECG_DEFINITION,
+          id: ECG_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: !!ecgResponse,
+          completedAt: ecgResponse?.completed_at,
+        },
+        {
           ...SLEEP_APNEA_DEFINITION,
           id: SLEEP_APNEA_DEFINITION.code,
           target_role: 'healthcare_professional',
@@ -362,13 +369,6 @@ export default async function VisitDetailPage({
           target_role: 'healthcare_professional',
           completed: !!biologicalAssessmentResponse,
           completedAt: biologicalAssessmentResponse?.completed_at,
-        },
-        {
-          ...ECG_DEFINITION,
-          id: ECG_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!ecgResponse,
-          completedAt: ecgResponse?.completed_at,
         }
       ]
     };
