@@ -444,17 +444,24 @@ export const ORIENTATION_QUESTIONS = BIPOLAR_ORIENTATION_QUESTIONS;
 
 // EQ-5D-5L (Health status questionnaire)
 export const EQ5D5L_QUESTIONS: Question[] = [
+  // Section: Système descriptif
+  {
+    id: 'section_descriptive',
+    text: 'Système descriptif',
+    type: 'section',
+    required: false
+  },
   {
     id: 'mobility',
     text: 'Mobilité',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 1, label: "Je n'ai aucun problème pour marcher", score: 1 },
-      { code: 2, label: "J'ai des problèmes légers pour marcher", score: 2 },
-      { code: 3, label: "J'ai des problèmes modérés pour marcher", score: 3 },
-      { code: 4, label: "J'ai des problèmes sévères pour marcher", score: 4 },
-      { code: 5, label: "Je suis incapable de marcher", score: 5 }
+      { code: 1, label: "Je n'ai aucun problème pour me déplacer à pied", score: 1 },
+      { code: 2, label: "J'ai des problèmes légers pour me déplacer à pied", score: 2 },
+      { code: 3, label: "J'ai des problèmes modérés pour me déplacer à pied", score: 3 },
+      { code: 4, label: "J'ai des problèmes sévères pour me déplacer à pied", score: 4 },
+      { code: 5, label: "Je suis incapable de me déplacer à pied", score: 5 }
     ]
   },
   {
@@ -463,16 +470,16 @@ export const EQ5D5L_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: true,
     options: [
-      { code: 1, label: "Je n'ai aucun problème pour me laver ou m'habiller tout(e) seul(e)", score: 1 },
-      { code: 2, label: "J'ai des problèmes légers pour me laver ou m'habiller tout(e) seul(e)", score: 2 },
-      { code: 3, label: "J'ai des problèmes modérés pour me laver ou m'habiller tout(e) seul(e)", score: 3 },
-      { code: 4, label: "J'ai des problèmes sévères pour me laver ou m'habiller tout(e) seul(e)", score: 4 },
-      { code: 5, label: "Je suis incapable de me laver ou m'habiller tout(e) seul(e)", score: 5 }
+      { code: 1, label: "Je n'ai aucun problème pour me laver ou m'habiller tout seul", score: 1 },
+      { code: 2, label: "J'ai des problèmes légers pour me laver ou m'habiller tout seul", score: 2 },
+      { code: 3, label: "J'ai des problèmes modérés pour me laver ou m'habiller tout seul", score: 3 },
+      { code: 4, label: "J'ai des problèmes sévères pour me laver ou m'habiller tout seul", score: 4 },
+      { code: 5, label: "Je suis incapable de me laver ou de m'habiller tout(e) seul(e)", score: 5 }
     ]
   },
   {
     id: 'usual_activities',
-    text: 'Activités courantes (ex : travail, études, travaux domestiques, activités familiales ou loisirs)',
+    text: 'Activités courantes (exemples : travail, études, travaux domestiques, activités familiales ou loisirs)',
     type: 'single_choice',
     required: true,
     options: [
@@ -485,11 +492,11 @@ export const EQ5D5L_QUESTIONS: Question[] = [
   },
   {
     id: 'pain_discomfort',
-    text: 'Douleurs/gêne',
+    text: 'Douleurs, gêne',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 1, label: "Je n'ai ni douleurs ni gêne", score: 1 },
+      { code: 1, label: "Je n'ai ni douleur, ni gêne", score: 1 },
       { code: 2, label: "J'ai des douleurs ou une gêne légère(s)", score: 2 },
       { code: 3, label: "J'ai des douleurs ou une gêne modérée(s)", score: 3 },
       { code: 4, label: "J'ai des douleurs ou une gêne sévère(s)", score: 4 },
@@ -498,26 +505,33 @@ export const EQ5D5L_QUESTIONS: Question[] = [
   },
   {
     id: 'anxiety_depression',
-    text: 'Anxiété/dépression',
+    text: 'Anxiété, dépression',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 1, label: "Je ne suis ni anxieux(se) ni déprimé(e)", score: 1 },
+      { code: 1, label: "Je ne suis ni anxieux(se), ni déprimé(e)", score: 1 },
       { code: 2, label: "Je suis légèrement anxieux(se) ou déprimé(e)", score: 2 },
       { code: 3, label: "Je suis modérément anxieux(se) ou déprimé(e)", score: 3 },
       { code: 4, label: "Je suis sévèrement anxieux(se) ou déprimé(e)", score: 4 },
       { code: 5, label: "Je suis extrêmement anxieux(se) ou déprimé(e)", score: 5 }
     ]
   },
+
+  // Section: Échelle Visuelle Analogique (EVA)
+  {
+    id: 'section_vas',
+    text: 'Échelle Visuelle Analogique (EVA)',
+    type: 'section',
+    required: false
+  },
   {
     id: 'vas_score',
-    text: 'Nous aimerions connaître votre état de santé TEL QUE VOUS LE RESSENTEZ. Cette échelle est graduée de 0 à 100. 100 correspond à la meilleure santé que vous puissiez imaginer. 0 correspond à la pire santé que vous puissiez imaginer. Indiquez votre état de santé AUJOURD\'HUI.',
-    type: 'scale',
+    text: 'Nous aimerions savoir dans quelle mesure votre santé est bonne ou mauvaise AUJOURD\'HUI. Votre état de santé aujourd\'hui [valeur entre 0 et 100] ?',
+    type: 'number',
     required: true,
     min: 0,
     max: 100,
-    minLabel: 'La pire santé imaginable',
-    maxLabel: 'La meilleure santé imaginable'
+    help: 'Cette échelle est numérotée de 0 à 100. 100 correspond à la meilleure santé que vous puissiez imaginer. 0 correspond à la pire santé que vous puissiez imaginer. Maintenant, veuillez noter dans la case ci-dessous le chiffre que vous avez coché sur l\'échelle.'
   }
 ];
 
@@ -525,11 +539,14 @@ export const EQ5D5L_DEFINITION: QuestionnaireDefinition = {
   id: 'eq5d5l',
   code: 'EQ5D5L',
   title: 'EQ-5D-5L',
-  description: 'Questionnaire générique de qualité de vie liée à la santé',
+  description: 'Instrument standardisé de mesure de l\'état de santé comprenant 5 dimensions et une échelle visuelle analogique (EVA), avec formulation spécifique des items.',
   questions: EQ5D5L_QUESTIONS,
   metadata: {
     pathologies: ['bipolar'],
-    target_role: 'patient'
+    target_role: 'patient',
+    version: '5L (User Text)',
+    language: 'fr-FR',
+    singleColumn: true
   }
 };
 

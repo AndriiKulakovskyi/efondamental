@@ -331,6 +331,7 @@ export interface Eq5d5lResponse {
   vas_score: number;
   profile_string?: string;
   index_value?: number | null;
+  interpretation?: string | null;
   completed_by?: string | null;
   completed_at: string;
   created_at: string;
