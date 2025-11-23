@@ -1402,7 +1402,8 @@ export interface Dsm5HumeurResponse {
   disorder_type?: 'bipolaire_type_1' | 'bipolaire_type_2' | 'bipolaire_non_specifie' | 
     'trouble_depressif_majeur_isole' | 'trouble_depressif_majeur_recurrent' | 
     'trouble_dysthymique' | 'trouble_cyclothymique' | 'trouble_depressif_non_specifie' |
-    'trouble_humeur_affection_medicale' | 'trouble_humeur_induit_substance' | null;
+    'trouble_humeur_affection_medicale' | 'trouble_humeur_induit_substance' | 'autre' | null;
+  disorder_type_autre?: string | null;
   
   // Medical condition
   medical_condition_affection_type?: 'endocrinienne' | 'neurologique' | 'cardio_vasculaire' | 'autre' | null;
@@ -1410,12 +1411,11 @@ export interface Dsm5HumeurResponse {
   
   // Substance-induced
   substance_types?: string[] | null; // Array of substance types
-  substance_autre?: string | null;
   
   // Section 2: First Episode Characteristics
   first_episode_type?: 'edm_sans_psychotiques' | 'edm_avec_psychotiques' | 'hypomanie' | 
     'manie_sans_psychotiques' | 'manie_avec_psychotiques' | 'ne_sais_pas' | null;
-  postpartum_first?: boolean | null;
+  postpartum_first?: 'oui' | 'non' | null;
   initial_cyclothymic_period?: 'oui' | 'non' | 'ne_sais_pas' | null;
   
   // Section 3: Lifetime Characteristics
@@ -1447,6 +1447,8 @@ export interface Dsm5HumeurResponse {
   
   age_first_psychotrope?: number | null;
   age_first_hospitalization?: number | null;
+  number_of_hospitalizations?: number | null;
+  total_hospitalization_duration_months?: number | null;
   
   // 3.4 12-month characteristics
   past_year_episode?: 'oui' | 'non' | 'ne_sais_pas' | null;
@@ -1466,6 +1468,7 @@ export interface Dsm5HumeurResponse {
   
   // Work leave subsection
   past_year_work_leave?: 'oui' | 'non' | 'non_applicable' | null;
+  past_year_work_leave_weeks?: number | null;
   
   // Section 4: Most Recent Episode
   recent_episode_start_date?: string | null;
@@ -1660,28 +1663,28 @@ export interface Dsm5ComorbidResponse {
   anorexia_restrictive_age_debut?: number | null;
   anorexia_restrictive_age_fin?: number | null;
   anorexia_restrictive_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  anorexia_restrictive_current?: boolean | null;
+  anorexia_restrictive_current?: 'oui' | 'non' | null;
   anorexia_bulimic_amenorrhea?: 'oui' | 'non' | null;
   anorexia_bulimic_age_debut?: number | null;
   anorexia_bulimic_age_fin?: number | null;
   anorexia_bulimic_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  anorexia_bulimic_current?: boolean | null;
+  anorexia_bulimic_current?: 'oui' | 'non' | null;
   bulimia_age_debut?: number | null;
   bulimia_age_fin?: number | null;
   bulimia_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  bulimia_current?: boolean | null;
+  bulimia_current?: 'oui' | 'non' | null;
   binge_eating_age_debut?: number | null;
   binge_eating_age_fin?: number | null;
   binge_eating_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  binge_eating_current?: boolean | null;
+  binge_eating_current?: 'oui' | 'non' | null;
   eating_unspecified_age_debut?: number | null;
   eating_unspecified_age_fin?: number | null;
   eating_unspecified_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  eating_unspecified_current?: boolean | null;
+  eating_unspecified_current?: 'oui' | 'non' | null;
   night_eating_age_debut?: number | null;
   night_eating_age_fin?: number | null;
   night_eating_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  night_eating_current?: boolean | null;
+  night_eating_current?: 'oui' | 'non' | null;
   
   // Section 4: Somatoform Disorder
   has_somatoform_disorder?: 'oui' | 'non' | 'ne_sais_pas' | null;
@@ -1692,42 +1695,42 @@ export interface Dsm5ComorbidResponse {
   
   // Section 5: ADHD DIVA Assessment
   diva_evaluated?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  diva_a1a_adult?: boolean | null;
-  diva_a1a_childhood?: boolean | null;
-  diva_a1b_adult?: boolean | null;
-  diva_a1b_childhood?: boolean | null;
-  diva_a1c_adult?: boolean | null;
-  diva_a1c_childhood?: boolean | null;
-  diva_a1d_adult?: boolean | null;
-  diva_a1d_childhood?: boolean | null;
-  diva_a1e_adult?: boolean | null;
-  diva_a1e_childhood?: boolean | null;
-  diva_a1f_adult?: boolean | null;
-  diva_a1f_childhood?: boolean | null;
-  diva_a1g_adult?: boolean | null;
-  diva_a1g_childhood?: boolean | null;
-  diva_a1h_adult?: boolean | null;
-  diva_a1h_childhood?: boolean | null;
-  diva_a1i_adult?: boolean | null;
-  diva_a1i_childhood?: boolean | null;
-  diva_a2a_adult?: boolean | null;
-  diva_a2a_childhood?: boolean | null;
-  diva_a2b_adult?: boolean | null;
-  diva_a2b_childhood?: boolean | null;
-  diva_a2c_adult?: boolean | null;
-  diva_a2c_childhood?: boolean | null;
-  diva_a2d_adult?: boolean | null;
-  diva_a2d_childhood?: boolean | null;
-  diva_a2e_adult?: boolean | null;
-  diva_a2e_childhood?: boolean | null;
-  diva_a2f_adult?: boolean | null;
-  diva_a2f_childhood?: boolean | null;
-  diva_a2g_adult?: boolean | null;
-  diva_a2g_childhood?: boolean | null;
-  diva_a2h_adult?: boolean | null;
-  diva_a2h_childhood?: boolean | null;
-  diva_a2i_adult?: boolean | null;
-  diva_a2i_childhood?: boolean | null;
+  diva_a1a_adult?: 'oui' | 'non' | null;
+  diva_a1a_childhood?: 'oui' | 'non' | null;
+  diva_a1b_adult?: 'oui' | 'non' | null;
+  diva_a1b_childhood?: 'oui' | 'non' | null;
+  diva_a1c_adult?: 'oui' | 'non' | null;
+  diva_a1c_childhood?: 'oui' | 'non' | null;
+  diva_a1d_adult?: 'oui' | 'non' | null;
+  diva_a1d_childhood?: 'oui' | 'non' | null;
+  diva_a1e_adult?: 'oui' | 'non' | null;
+  diva_a1e_childhood?: 'oui' | 'non' | null;
+  diva_a1f_adult?: 'oui' | 'non' | null;
+  diva_a1f_childhood?: 'oui' | 'non' | null;
+  diva_a1g_adult?: 'oui' | 'non' | null;
+  diva_a1g_childhood?: 'oui' | 'non' | null;
+  diva_a1h_adult?: 'oui' | 'non' | null;
+  diva_a1h_childhood?: 'oui' | 'non' | null;
+  diva_a1i_adult?: 'oui' | 'non' | null;
+  diva_a1i_childhood?: 'oui' | 'non' | null;
+  diva_a2a_adult?: 'oui' | 'non' | null;
+  diva_a2a_childhood?: 'oui' | 'non' | null;
+  diva_a2b_adult?: 'oui' | 'non' | null;
+  diva_a2b_childhood?: 'oui' | 'non' | null;
+  diva_a2c_adult?: 'oui' | 'non' | null;
+  diva_a2c_childhood?: 'oui' | 'non' | null;
+  diva_a2d_adult?: 'oui' | 'non' | null;
+  diva_a2d_childhood?: 'oui' | 'non' | null;
+  diva_a2e_adult?: 'oui' | 'non' | null;
+  diva_a2e_childhood?: 'oui' | 'non' | null;
+  diva_a2f_adult?: 'oui' | 'non' | null;
+  diva_a2f_childhood?: 'oui' | 'non' | null;
+  diva_a2g_adult?: 'oui' | 'non' | null;
+  diva_a2g_childhood?: 'oui' | 'non' | null;
+  diva_a2h_adult?: 'oui' | 'non' | null;
+  diva_a2h_childhood?: 'oui' | 'non' | null;
+  diva_a2i_adult?: 'oui' | 'non' | null;
+  diva_a2i_childhood?: 'oui' | 'non' | null;
   diva_total_inattention_adult?: number | null;
   diva_total_inattention_childhood?: number | null;
   diva_total_hyperactivity_adult?: number | null;

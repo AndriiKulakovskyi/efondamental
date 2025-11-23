@@ -42,9 +42,17 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
       { code: 'trouble_cyclothymique', label: 'Trouble Cyclothymique' },
       { code: 'trouble_depressif_non_specifie', label: 'Trouble dépressif non spécifié' },
       { code: 'trouble_humeur_affection_medicale', label: 'Trouble de l\'humeur dû à une affection médicale générale' },
-      { code: 'trouble_humeur_induit_substance', label: 'Trouble de l\'humeur induit par l\'utilisation d\'une substance' }
+      { code: 'trouble_humeur_induit_substance', label: 'Trouble de l\'humeur induit par l\'utilisation d\'une substance' },
+      { code: 'autre', label: 'Autre' }
     ],
     help: 'ATTENTION: Si Dysthymie, Cyclothymie ou Dépressif non spécifié est sélectionné, le patient sort de la cohorte (critère d\'exclusion)'
+  },
+  {
+    id: 'disorder_type_autre',
+    text: 'Préciser',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ var: 'disorder_type' }, 'autre'] }
   },
   
   // Medical condition subsection
@@ -93,15 +101,6 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
       'Autre'
     ]
   },
-  {
-    id: 'substance_autre',
-    text: 'Autre substance (spécifier)',
-    type: 'text',
-    required: false,
-    display_if: {
-      'in': ['Autre', { var: 'substance_types' }]
-    }
-  },
   
   // ========================================================================
   // SECTION 2: First Episode Characteristics
@@ -131,9 +130,13 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   {
     id: 'postpartum_first',
     text: 'Survenue en post-partum (dans les 6 premiers mois)',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'initial_cyclothymic_period',
@@ -378,8 +381,24 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     text: 'Age de la première hospitalisation',
     type: 'number',
     required: false,
-    min: 1,
+    min: 0,
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
+  },
+  {
+    id: 'number_of_hospitalizations',
+    text: 'Nombre d\'hospitalisations',
+    type: 'number',
+    required: false,
+    min: 0,
+    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
+  },
+  {
+    id: 'total_hospitalization_duration_months',
+    text: 'Durée totale des hospitalisations (en mois)',
+    type: 'number',
+    required: false,
+    min: 0,
+    display_if: { '>': [{ var: 'number_of_hospitalizations' }, 0] }
   },
   
   // 3.4 12-month characteristics
@@ -535,6 +554,14 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
       { code: 'non', label: 'Non' },
       { code: 'non_applicable', label: 'Non applicable' }
     ]
+  },
+  {
+    id: 'past_year_work_leave_weeks',
+    text: 'Durée totale des arrêts de travail sur l\'année écoulée (en semaines)',
+    type: 'number',
+    required: false,
+    min: 0,
+    display_if: { '==': [{ var: 'past_year_work_leave' }, 'oui'] }
   },
   
   // ========================================================================
@@ -939,7 +966,10 @@ export const DSM5_HUMEUR_DEFINITION: QuestionnaireDefinition = {
   code: 'DSM5_HUMEUR_FR',
   title: 'DSM5 - Troubles de l\'humeur',
   description: 'Diagnostic DSM5 des troubles de l\'humeur pour l\'évaluation initiale du trouble bipolaire',
-  questions: DSM5_HUMEUR_QUESTIONS
+  questions: DSM5_HUMEUR_QUESTIONS,
+  metadata: {
+    singleColumn: true
+  }
 };
 
 // ============================================================================
@@ -2027,9 +2057,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
   {
     id: 'anorexia_restrictive_current',
     text: 'Trouble actuel',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   
   // 3.2.2 Anorexia bulimic
@@ -2077,9 +2111,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
   {
     id: 'anorexia_bulimic_current',
     text: 'Trouble actuel',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   
   // 3.2.3 Bulimia
@@ -2116,9 +2154,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
   {
     id: 'bulimia_current',
     text: 'Trouble actuel',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   
   // 3.2.4 Binge eating
@@ -2155,9 +2197,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
   {
     id: 'binge_eating_current',
     text: 'Trouble actuel',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   
   // 3.2.5 Unspecified eating disorder
@@ -2194,9 +2240,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
   {
     id: 'eating_unspecified_current',
     text: 'Trouble actuel',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   
   // 3.2.6 Night eating syndrome
@@ -2233,9 +2283,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
   {
     id: 'night_eating_current',
     text: 'Trouble actuel',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   }
 ];
 
@@ -2327,133 +2381,205 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     text: '5.2.1 Critères d\'Inattention',
     type: 'section',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
   },
   {
     id: 'diva_a1a_adult',
     text: 'A1a – Souvent, ne parvient pas à prêter attention aux détails ou fait des fautes d\'étourderie - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1a_childhood',
     text: 'A1a - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1b_adult',
     text: 'A1b – A souvent du mal à soutenir son attention au travail ou dans les jeux - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1b_childhood',
     text: 'A1b - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1c_adult',
     text: 'A1c – Semble souvent ne pas écouter quand on lui parle personnellement - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1c_childhood',
     text: 'A1c - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1d_adult',
     text: 'A1d – Souvent, ne se conforme pas aux consignes et ne parvient pas à mener à terme ses devoirs - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1d_childhood',
     text: 'A1d - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1e_adult',
     text: 'A1e – A souvent du mal à organiser ses travaux ou ses activités - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1e_childhood',
     text: 'A1e - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1f_adult',
     text: 'A1f – Souvent, évite, a en aversion ou fait à contre-cœur les tâches nécessitant un effort mental soutenu - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1f_childhood',
     text: 'A1f - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1g_adult',
     text: 'A1g – Perd souvent les objets nécessaires à son travail ou à ses activités - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1g_childhood',
     text: 'A1g - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1h_adult',
     text: 'A1h – Se laisse facilement distraire par des stimuli externes - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1h_childhood',
     text: 'A1h - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1i_adult',
     text: 'A1i – A des oublis fréquents dans la vie quotidienne - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a1i_childhood',
     text: 'A1i - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   
   // 5.2.2 Hyperactivity/Impulsivity symptoms (A2a-A2i)
@@ -2462,133 +2588,205 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     text: '5.2.2 Critères Hyperactivité-Impulsivité',
     type: 'section',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
   },
   {
     id: 'diva_a2a_adult',
     text: 'A2a – Remue souvent les mains ou les pieds, ou se tortille sur son siège - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2a_childhood',
     text: 'A2a - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2b_adult',
     text: 'A2b – Se lève souvent en classe ou dans d\'autres situations où il est supposé rester assis - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2b_childhood',
     text: 'A2b - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2c_adult',
     text: 'A2c – Court ou grimpe souvent partout dans des situations inappropriées (chez l\'adulte: sentiment d\'impatience motrice) - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2c_childhood',
     text: 'A2c - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2d_adult',
     text: 'A2d – A souvent du mal à se tenir tranquille dans les jeux ou activités de loisir - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2d_childhood',
     text: 'A2d - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2e_adult',
     text: 'A2e – Est souvent « sur la brèche » ou agit comme s\'il était « monté sur ressorts » - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2e_childhood',
     text: 'A2e - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2f_adult',
     text: 'A2f – Parle souvent trop - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2f_childhood',
     text: 'A2f - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2g_adult',
     text: 'A2g – Laisse souvent échapper la réponse à une question avant qu\'elle ne soit entièrement posée - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2g_childhood',
     text: 'A2g - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2h_adult',
     text: 'A2h – A souvent du mal à attendre son tour - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2h_childhood',
     text: 'A2h - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2i_adult',
     text: 'A2i – Interrompt souvent les autres ou impose sa présence - Présent à l\'âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_a2i_childhood',
     text: 'A2i - Présent dans l\'enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   
   // 5.3 Totals
@@ -2597,7 +2795,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     text: '5.3 Totaux des critères',
     type: 'section',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
   },
   {
     id: 'diva_total_inattention_adult',
@@ -2606,7 +2804,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 9,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
   },
   {
     id: 'diva_total_inattention_childhood',
@@ -2615,7 +2813,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 9,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
   },
   {
     id: 'diva_total_hyperactivity_adult',
@@ -2624,7 +2822,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 9,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
   },
   {
     id: 'diva_total_hyperactivity_childhood',
@@ -2633,7 +2831,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 9,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
   },
   
   // 5.4 DSM-IV Criteria
@@ -2642,49 +2840,73 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     text: '5.4 Critères diagnostiques',
     type: 'section',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
   },
   {
     id: 'diva_criteria_a_inattention_gte6',
     text: 'DSM-IV Critère A - Nombre de symptômes A ≥ 6?',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_criteria_a_hyperactivity_gte6',
     text: 'DSM-IV Critère A - Nombre de symptômes H/I ≥ 6?',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_criteria_b_lifetime_persistence',
     text: 'DSM-IV Critère B - Persistance sur la vie entière?',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_criteria_cd_impairment_childhood',
     text: 'DSM-IV Critères C et D - Altération dans ≥ 2 environnements: Enfance',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_criteria_cd_impairment_adult',
     text: 'DSM-IV Critères C et D - Altération dans ≥ 2 environnements: Âge adulte',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_criteria_e_better_explained',
     text: 'DSM-IV Critère E - Symptômes mieux expliqués par un autre trouble?',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'diva_criteria_e_explanation',
@@ -2700,7 +2922,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     text: '5.5 Informations collatérales',
     type: 'section',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
   },
   {
     id: 'diva_collateral_parents',
@@ -2746,7 +2968,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     text: 'Détails',
     type: 'text',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
   },
   
   // 5.6 ADHD Diagnosis
@@ -2755,7 +2977,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     text: '5.6 Diagnostic TDAH',
     type: 'section',
     required: false,
-    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] }
+    display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
   },
   {
     id: 'diva_diagnosis',
@@ -2786,6 +3008,9 @@ export const DSM5_COMORBID_DEFINITION: QuestionnaireDefinition = {
   code: 'DSM5_COMORBID_FR',
   title: 'DSM5 - Troubles comorbides',
   description: 'Diagnostic DSM5 des troubles comorbides pour l\'évaluation initiale du trouble bipolaire',
-  questions: DSM5_COMORBID_ALL_QUESTIONS
+  questions: DSM5_COMORBID_ALL_QUESTIONS,
+  metadata: {
+    singleColumn: true
+  }
 };
 
