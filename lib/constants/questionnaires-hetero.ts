@@ -573,105 +573,356 @@ export const ALDA_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
-// État du patient (Patient State)
+// État du patient (DSM-IV Symptoms)
 // ============================================================================
 
 export const ETAT_PATIENT_QUESTIONS: Question[] = [
+  // Section: Depressive Symptoms
   {
-    id: 'euthymia_severity',
-    text: 'Euthymie - Sévérité',
+    id: 'section_dep',
+    text: 'SYMPTOMES DEPRESSIFS ACTUELS',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q1',
+    text: 'Humeur dépressive la majeure partie de la journée',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Absent', score: 0 },
-      { code: 1, label: '1 - Léger', score: 1 },
-      { code: 2, label: '2 - Modéré', score: 2 },
-      { code: 3, label: '3 - Sévère', score: 3 }
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
     ]
   },
   {
-    id: 'euthymia_duration',
-    text: 'Euthymie - Durée (jours)',
-    type: 'number',
+    id: 'q1a',
+    text: 'Impression subjective d\'hyper-réactivité émotionnelle',
+    type: 'single_choice',
     required: false,
-    display_if: { ">": [{ "var": "answers.euthymia_severity" }, 0] },
-    required_if: { ">": [{ "var": "answers.euthymia_severity" }, 0] },
-    min: 0
+    display_if: { '==': [{ 'var': 'answers.q1' }, 1] },
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
   },
   {
-    id: 'mania_severity',
-    text: 'Manie - Sévérité',
+    id: 'q1b',
+    text: 'Impression subjective d\'hypo-réactivité ou d\'anesthésie',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ 'var': 'answers.q1' }, 1] },
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q2',
+    text: 'Diminution marquée d\'intérêt ou de plaisir dans toutes ou presque les activités habituelles, presque toute la journée',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Absent', score: 0 },
-      { code: 1, label: '1 - Léger', score: 1 },
-      { code: 2, label: '2 - Modéré', score: 2 },
-      { code: 3, label: '3 - Sévère', score: 3 }
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
     ]
   },
   {
-    id: 'mania_duration',
-    text: 'Manie - Durée (jours)',
-    type: 'number',
-    required: false,
-    display_if: { ">": [{ "var": "answers.mania_severity" }, 0] },
-    required_if: { ">": [{ "var": "answers.mania_severity" }, 0] },
-    min: 0
-  },
-  {
-    id: 'depression_severity',
-    text: 'Dépression - Sévérité',
+    id: 'q3',
+    text: 'Perte ou gain de poids significatif, ou diminution ou augmentation de l\'appétit',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Absent', score: 0 },
-      { code: 1, label: '1 - Léger', score: 1 },
-      { code: 2, label: '2 - Modéré', score: 2 },
-      { code: 3, label: '3 - Sévère', score: 3 }
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
     ]
   },
   {
-    id: 'depression_duration',
-    text: 'Dépression - Durée (jours)',
-    type: 'number',
+    id: 'q3a',
+    text: 'Perte de poids',
+    type: 'single_choice',
     required: false,
-    display_if: { ">": [{ "var": "answers.depression_severity" }, 0] },
-    required_if: { ">": [{ "var": "answers.depression_severity" }, 0] },
-    min: 0
+    display_if: { '==': [{ 'var': 'answers.q3' }, 1] },
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
   },
   {
-    id: 'mixed_severity',
-    text: 'État mixte - Sévérité',
+    id: 'q3b',
+    text: 'Gain de poids',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ 'var': 'answers.q3' }, 1] },
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q4',
+    text: 'Insomnie ou hypersomnie',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Absent', score: 0 },
-      { code: 1, label: '1 - Léger', score: 1 },
-      { code: 2, label: '2 - Modéré', score: 2 },
-      { code: 3, label: '3 - Sévère', score: 3 }
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
     ]
   },
   {
-    id: 'mixed_duration',
-    text: 'État mixte - Durée (jours)',
-    type: 'number',
+    id: 'q4a',
+    text: 'Insomnie',
+    type: 'single_choice',
     required: false,
-    display_if: { ">": [{ "var": "answers.mixed_severity" }, 0] },
-    required_if: { ">": [{ "var": "answers.mixed_severity" }, 0] },
-    min: 0
+    display_if: { '==': [{ 'var': 'answers.q4' }, 1] },
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q4b',
+    text: 'Hypersomnie',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ 'var': 'answers.q4' }, 1] },
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q5',
+    text: 'Agitation ou ralentissement psychomoteur',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q5a',
+    text: 'Agitation',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ 'var': 'answers.q5' }, 1] },
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q5b',
+    text: 'Ralentissement',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ 'var': 'answers.q5' }, 1] },
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q6',
+    text: 'Fatigue ou perte d\'énergie',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q7',
+    text: 'Sentiment de dévalorisation ou de culpabilité excessive ou inappropriée',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q8',
+    text: 'Diminution de l\'aptitude à penser ou se concentrer ou indécision chaque jour',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q8a',
+    text: 'Impression d\'accélération idéïque',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ 'var': 'answers.q8' }, 1] },
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q8b',
+    text: 'Impression de ralentissement idéïque',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ 'var': 'answers.q8' }, 1] },
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q9',
+    text: 'Pensées récurrentes de mort, idéation suicidaire récurrente sans plan spécifique, ou tentative de suicide ou plan précis pour se suicider',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  // Section: Manic Symptoms
+  {
+    id: 'section_man',
+    text: 'SYMPTOMES MANIAQUES ACTUELS',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q10',
+    text: 'Humeur élevée, expansive',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q11',
+    text: 'Humeur irritable',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q12',
+    text: 'Augmentation de l\'estime de soi ou idées de grandeur',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q13',
+    text: 'Réduction du besoin de sommeil',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q14',
+    text: 'Plus grande communicabilité que d\'habitude ou désir de parler constamment',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q15',
+    text: 'Fuite des idées ou sensation subjective que les pensées défilent',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q16',
+    text: 'Distractibilité : l\'attention du sujet étant trop facilement attirée par des stimuli extérieurs sans pertinence',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q17',
+    text: 'Activité dirigée vers un but : augmentation de l\'activité ou agitation psychomotrice',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
+  },
+  {
+    id: 'q18',
+    text: 'Engagement excessif dans des activités agréables mais à potentiel élevé de conséquences dommageables',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sais pas', score: 9 }
+    ]
   }
 ];
 
 export const ETAT_PATIENT_DEFINITION: QuestionnaireDefinition = {
   id: 'etat_patient',
   code: 'ETAT_PATIENT',
-  title: 'État du patient',
-  description: 'Évaluation de l\'état thymique actuel du patient (euthymie, manie, dépression, mixte).',
+  title: 'ETAT DU PATIENT (DSM-IV Symptoms)',
+  description: 'Liste de contrôle des symptômes dépressifs et maniaques selon le DSM-IV, à remplir quel que soit l\'état thymique du patient.',
   questions: ETAT_PATIENT_QUESTIONS,
   metadata: {
     pathologies: ['bipolar'],
-    target_role: 'healthcare_professional'
+    target_role: 'healthcare_professional',
+    version: '1.0',
+    language: 'fr-FR',
+    singleColumn: true
   }
 };
 

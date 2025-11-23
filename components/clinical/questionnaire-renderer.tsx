@@ -636,7 +636,7 @@ export function QuestionnaireRenderer({
             
             {isSectionExpanded && visibleGroupQuestions.length > 0 && (
               <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className={`grid gap-6 ${questionnaire.metadata?.singleColumn ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
                   {(() => {
                     const rendered = new Set<string>();
                     return visibleGroupQuestions.map((question, qIndex) => {

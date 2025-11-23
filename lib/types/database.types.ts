@@ -992,27 +992,51 @@ export interface AldaResponse {
 }
 export type AldaResponseInsert = Omit<AldaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'b_total_score' | 'alda_score' | 'interpretation'>;
 
-// Etat du patient (Patient State)
+// Etat du patient (Patient State - DSM-IV Symptoms)
 export interface EtatPatientResponse {
   id: string;
   visit_id: string;
   patient_id: string;
-  euthymia_severity?: number | null; // 0-3
-  euthymia_duration?: number | null;
-  mania_severity?: number | null; // 0-3
-  mania_duration?: number | null;
-  depression_severity?: number | null; // 0-3
-  depression_duration?: number | null;
-  mixed_severity?: number | null; // 0-3
-  mixed_duration?: number | null;
-  current_state?: string | null;
-  state_details?: string | null;
+  // Depressive symptoms (Q1-Q9)
+  q1?: number | null; // Humeur dépressive
+  q1a?: number | null; // Hyper-réactivité émotionnelle
+  q1b?: number | null; // Hypo-réactivité
+  q2?: number | null; // Diminution d'intérêt
+  q3?: number | null; // Perte/gain de poids
+  q3a?: number | null; // Perte de poids
+  q3b?: number | null; // Gain de poids
+  q4?: number | null; // Insomnie/hypersomnie
+  q4a?: number | null; // Insomnie
+  q4b?: number | null; // Hypersomnie
+  q5?: number | null; // Agitation/ralentissement
+  q5a?: number | null; // Agitation
+  q5b?: number | null; // Ralentissement
+  q6?: number | null; // Fatigue
+  q7?: number | null; // Dévalorisation
+  q8?: number | null; // Diminution aptitude à penser
+  q8a?: number | null; // Accélération idéïque
+  q8b?: number | null; // Ralentissement idéïque
+  q9?: number | null; // Pensées de mort/suicide
+  // Manic symptoms (Q10-Q18)
+  q10?: number | null; // Humeur élevée
+  q11?: number | null; // Humeur irritable
+  q12?: number | null; // Augmentation estime de soi
+  q13?: number | null; // Réduction besoin sommeil
+  q14?: number | null; // Plus grande communicabilité
+  q15?: number | null; // Fuite des idées
+  q16?: number | null; // Distractibilité
+  q17?: number | null; // Activité dirigée vers un but
+  q18?: number | null; // Engagement excessif
+  // Scoring
+  depression_count?: number | null; // Count of depressive symptoms endorsed
+  mania_count?: number | null; // Count of manic symptoms endorsed
+  interpretation?: string | null;
   completed_by?: string | null;
   completed_at: string;
   created_at: string;
   updated_at: string;
 }
-export type EtatPatientResponseInsert = Omit<EtatPatientResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'current_state' | 'state_details'>;
+export type EtatPatientResponseInsert = Omit<EtatPatientResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'depression_count' | 'mania_count' | 'interpretation'>;
 
 // FAST (Functioning Assessment Short Test)
 export interface FastResponse {

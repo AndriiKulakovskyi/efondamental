@@ -376,7 +376,7 @@ export async function saveAldaResponse(
 }
 
 // ============================================================================
-// État du patient (Patient State)
+// État du patient (Patient State - DSM-IV Symptoms)
 // ============================================================================
 
 export async function getEtatPatientResponse(
@@ -407,47 +407,44 @@ export async function saveEtatPatientResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Determine current state based on highest severity
-  const states = [
-    { name: 'Euthymie', severity: response.euthymia_severity ?? 0, duration: response.euthymia_duration },
-    { name: 'Manie', severity: response.mania_severity ?? 0, duration: response.mania_duration },
-    { name: 'Dépression', severity: response.depression_severity ?? 0, duration: response.depression_duration },
-    { name: 'État mixte', severity: response.mixed_severity ?? 0, duration: response.mixed_duration }
-  ];
+  // Count depressive symptoms (Q1-Q9) where value is 1 (Oui)
+  const depressiveQuestions = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9'];
+  const depressionCount = depressiveQuestions.reduce((count, key) => {
+    const value = response[key as keyof EtatPatientResponseInsert];
+    return count + (value === 1 ? 1 : 0);
+  }, 0);
 
-  // Find the state with highest severity
-  const maxSeverity = Math.max(...states.map(s => s.severity));
-  const dominantStates = states.filter(s => s.severity === maxSeverity && s.severity > 0);
+  // Count manic symptoms (Q10-Q18) where value is 1 (Oui)
+  const manicQuestions = ['q10', 'q11', 'q12', 'q13', 'q14', 'q15', 'q16', 'q17', 'q18'];
+  const maniaCount = manicQuestions.reduce((count, key) => {
+    const value = response[key as keyof EtatPatientResponseInsert];
+    return count + (value === 1 ? 1 : 0);
+  }, 0);
 
-  let currentState = '';
-  let stateDetails = '';
-
-  if (dominantStates.length === 0) {
-    currentState = 'Aucun état pathologique';
-    stateDetails = 'Tous les états sont cotés à 0 (absent)';
-  } else if (dominantStates.length === 1) {
-    currentState = dominantStates[0].name;
-    stateDetails = `Sévérité: ${dominantStates[0].severity}/3`;
-    if (dominantStates[0].duration) {
-      stateDetails += `, Durée: ${dominantStates[0].duration} jours`;
-    }
+  // Create interpretation
+  let interpretation = '';
+  if (depressionCount > 0 && maniaCount > 0) {
+    interpretation = `Symptômes mixtes : ${depressionCount} symptôme(s) dépressif(s), ${maniaCount} symptôme(s) maniaque(s)`;
+  } else if (depressionCount > 0) {
+    interpretation = `${depressionCount} symptôme(s) dépressif(s) présent(s)`;
+  } else if (maniaCount > 0) {
+    interpretation = `${maniaCount} symptôme(s) maniaque(s) présent(s)`;
   } else {
-    // Multiple states with same severity
-    currentState = 'États multiples';
-    stateDetails = dominantStates.map(s => {
-      let detail = `${s.name} (sévérité: ${s.severity}/3`;
-      if (s.duration) detail += `, durée: ${s.duration} jours`;
-      detail += ')';
-      return detail;
-    }).join('; ');
+    interpretation = 'Aucun symptôme dépressif ou maniaque significatif';
+  }
+
+  // Alert if suicidal ideation is present
+  if (response.q9 === 1) {
+    interpretation += ' - ALERTE: Idéation suicidaire présente';
   }
 
   const { data, error } = await supabase
     .from('responses_etat_patient')
     .upsert({
       ...response,
-      current_state: currentState,
-      state_details: stateDetails,
+      depression_count: depressionCount,
+      mania_count: maniaCount,
+      interpretation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
