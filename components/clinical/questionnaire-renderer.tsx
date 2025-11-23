@@ -661,8 +661,8 @@ export function QuestionnaireRenderer({
                         rendered.add(question.id);
                         rendered.add(nextQuestion.id);
                         return (
-                          <div key={`grouped-${question.id}`} className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="md:col-span-2">
+                          <div key={`grouped-${question.id}`} className={questionnaire.metadata?.singleColumn ? 'col-span-1 grid grid-cols-3 gap-4' : 'col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4'}>
+                            <div className={questionnaire.metadata?.singleColumn ? 'col-span-2' : 'md:col-span-2'}>
                               {renderQuestion(question, true)}
                             </div>
                             <div>
@@ -674,7 +674,7 @@ export function QuestionnaireRenderer({
                       
                       rendered.add(question.id);
                       return (
-                        <div key={question.id} className={question.type === 'date' ? 'md:col-span-2' : ''}>
+                        <div key={question.id} className={!questionnaire.metadata?.singleColumn && question.type === 'date' ? 'md:col-span-2' : ''}>
                           {renderQuestion(question, true)}
                         </div>
                       );

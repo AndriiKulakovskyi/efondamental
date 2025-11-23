@@ -931,47 +931,355 @@ export const ETAT_PATIENT_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 
 export const FAST_QUESTIONS: Question[] = [
-  // Autonomy (q1-q4)
-  { id: 'q1', text: '1. Faire les tâches ménagères', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q2', text: '2. Vivre seul', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q3', text: '3. Faire les courses', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q4', text: '4. Prendre soin de soi (hygiène, alimentation, vêtements)', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  // Occupational (q5-q9)
-  { id: 'q5', text: '5. Avoir un travail rémunéré', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q6', text: '6. Accomplir les tâches aussi vite qu\'il le faudrait', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q7', text: '7. Travailler dans le domaine pour lequel j\'ai été formé', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q8', text: '8. Gagner de l\'argent conformément au poste occupé', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q9', text: '9. Terminer les tâches entreprises', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  // Cognitive (q10-q14)
-  { id: 'q10', text: '10. Se concentrer sur un livre, un film', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q11', text: '11. Faire des calculs mentaux', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q12', text: '12. Résoudre un problème de façon adéquate', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q13', text: '13. Se souvenir de nouvelles personnes', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q14', text: '14. Apprendre une nouvelle information', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  // Financial (q15-q16)
-  { id: 'q15', text: '15. Gérer son propre argent', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q16', text: '16. Dépenser de l\'argent de façon équilibrée', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  // Interpersonal (q17-q22)
-  { id: 'q17', text: '17. Garder des amitiés', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q18', text: '18. Participer à des activités sociales', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q19', text: '19. S\'entendre avec les gens proches', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q20', text: '20. Relations familiales', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q21', text: '21. Avoir des relations sexuelles satisfaisantes', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q22', text: '22. Pouvoir défendre ses intérêts', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  // Leisure (q23-q24)
-  { id: 'q23', text: '23. Pratiquer un sport ou participer à des jeux', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] },
-  { id: 'q24', text: '24. Avoir un passe-temps', type: 'single_choice', required: true, options: [{ code: 0, label: '0 - Aucune difficulté', score: 0 }, { code: 1, label: '1 - Difficulté légère', score: 1 }, { code: 2, label: '2 - Difficulté modérée', score: 2 }, { code: 3, label: '3 - Difficulté sévère', score: 3 }] }
+  // AUTONOMIE Section
+  {
+    id: 'section_autonomie',
+    text: 'AUTONOMIE',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q1',
+    text: 'Prendre des responsabilités au sein de la maison',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q2',
+    text: 'Vivre seul(e)',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q3',
+    text: 'Faire les courses',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q4',
+    text: 'Prendre soin de soi (aspect physique, hygiène...)',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+
+  // ACTIVITE PROFESSIONNELLE Section
+  {
+    id: 'section_travail',
+    text: 'ACTIVITE PROFESSIONNELLE',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q5',
+    text: 'Avoir un emploi rémunéré',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q6',
+    text: 'Terminer les tâches le plus rapidement possible',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q7',
+    text: 'Travailler dans le champ correspondant à votre formation',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q8',
+    text: 'Recevoir le salaire que vous méritez',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q9',
+    text: 'Gérer correctement la somme de travail',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+
+  // FONCTIONNEMENT COGNITIF Section
+  {
+    id: 'section_cognitif',
+    text: 'FONCTIONNEMENT COGNITIF',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q10',
+    text: 'Capacité à se concentrer devant un film, un livre..',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q11',
+    text: 'Capacité au calcul mental',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q12',
+    text: 'Capacité à résoudre des problèmes correctement',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q13',
+    text: 'Capacité à se souvenir des noms récemment appris',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q14',
+    text: 'Capacité à apprendre de nouvelles informations',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+
+  // FINANCES Section
+  {
+    id: 'section_finances',
+    text: 'FINANCES',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q15',
+    text: 'Gérer votre propre argent',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q16',
+    text: 'Dépenser façon équilibrée',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+
+  // RELATIONS INTERPERSONNELLES Section
+  {
+    id: 'section_relations',
+    text: 'RELATIONS INTERPERSONNELLES',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q17',
+    text: 'Conserver des amitiés',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q18',
+    text: 'Participer à des activités sociales',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q19',
+    text: 'Avoir de bonnes relations avec vos proches',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q20',
+    text: 'Habiter avec votre famille',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q21',
+    text: 'Avoir des relations sexuelles satisfaisantes',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q22',
+    text: 'Être capable de défendre vos intérêts',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+
+  // LOISIRS Section
+  {
+    id: 'section_loisirs',
+    text: 'LOISIRS',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q23',
+    text: 'Faire de l\'exercice ou pratiquer un sport',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  },
+  {
+    id: 'q24',
+    text: 'Avoir des loisirs',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Aucune difficulté', score: 0 },
+      { code: 1, label: 'Difficulté légère', score: 1 },
+      { code: 2, label: 'Difficulté modérée', score: 2 },
+      { code: 3, label: 'Difficulté sévère', score: 3 }
+    ]
+  }
 ];
 
 export const FAST_DEFINITION: QuestionnaireDefinition = {
   id: 'fast',
   code: 'FAST',
-  title: 'Test Bref d\'Évaluation du Fonctionnement (FAST)',
-  description: 'Évaluation du fonctionnement dans 6 domaines : autonomie, professionnel, cognitif, financier, interpersonnel, loisirs.',
+  title: 'Echelle Brève d\'évaluation du Fonctionnement du Patient (FAST)',
+  description: 'Questionnaire évaluant le degré de difficulté rencontré par le patient dans différents aspects de son fonctionnement (Autonomie, Travail, Cognition, Finances, Relations, Loisirs).',
   questions: FAST_QUESTIONS,
   metadata: {
     pathologies: ['bipolar'],
-    target_role: 'healthcare_professional'
+    target_role: 'healthcare_professional',
+    version: 'French',
+    language: 'fr-FR',
+    singleColumn: true
   }
 };
 
