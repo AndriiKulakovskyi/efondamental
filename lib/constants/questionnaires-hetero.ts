@@ -190,161 +190,149 @@ export const MADRS_DEFINITION: QuestionnaireDefinition = {
 export const YMRS_QUESTIONS: Question[] = [
   {
     id: 'q1',
-    text: "1 - Élévation de l'humeur",
+    text: "1. Elévation de l'humeur",
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Absent', score: 0 },
-      { code: 1, label: '1 - Légère ou possible quand on le fait remarquer', score: 1 },
-      { code: 2, label: "2 - Subjective nette ou élévation modérée de l'humeur, optimiste, confiant en soi ; enjoué, approprié au contexte", score: 2 },
-      { code: 3, label: "3 - Élévation marquée de l'humeur, exubérant ; sentiment de bien-être ; enjouement inapproprié", score: 3 },
-      { code: 4, label: '4 - Euphorique ; rires inappropriés ; chantonne', score: 4 }
+      { code: 0, label: 'Absente', score: 0 },
+      { code: 1, label: "Légèrement ou possiblement élevée lorsqu'on l'interroge", score: 1 },
+      { code: 2, label: "Elévation subjective nette; optimiste, plein d'assurance; gai; contenu approprié", score: 2 },
+      { code: 3, label: "Elevée, au contenu approprié, plaisantin", score: 3 },
+      { code: 4, label: 'Euphorique; rires inappropriés; chante', score: 4 }
     ]
   },
   {
     id: 'q2',
-    text: "2 - Augmentation de l'activité motrice et de l'énergie",
+    text: "2. Activité motrice et énergie augmentées",
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Absente', score: 0 },
-      { code: 1, label: '1 - Subjective', score: 1 },
-      { code: 2, label: '2 - Animé ; augmentation de la gestuelle', score: 2 },
-      { code: 3, label: '3 - Énergie excessive ; hyperactif par moments ; agité (peut être calmé)', score: 3 },
-      { code: 4, label: '4 - Excitation motrice ; hyperactivité continuelle (ne peut être calmé)', score: 4 }
+      { code: 0, label: 'Absentes', score: 0 },
+      { code: 1, label: 'Subjectivement élevées', score: 1 },
+      { code: 2, label: 'Animé; expression gestuelle plus élevée', score: 2 },
+      { code: 3, label: 'Energie excessive; parfois hyperactif; agité (peut être calmé)', score: 3 },
+      { code: 4, label: 'Excitation motrice; hyperactivité continuelle (ne peut être calmé)', score: 4 }
     ]
   },
   {
     id: 'q3',
-    text: '3 - Intérêt sexuel',
+    text: '3. Intérêt sexuel',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Normal ; pas d\'augmentation', score: 0 },
-      { code: 1, label: '1 - Légère ou possible augmentation', score: 1 },
-      { code: 2, label: '2 - Augmentation subjective nette quand on l\'interroge', score: 2 },
-      { code: 3, label: '3 - Discours à contenu sexuel spontané ; se vante de ses prouesses ; augmentation marquée quand on l\'interroge', score: 3 },
-      { code: 4, label: '4 - Actes sexuels manifestes (envers des patients, le personnel ou l\'interviewer)', score: 4 }
+      { code: 0, label: 'Normal, non augmenté', score: 0 },
+      { code: 1, label: 'Augmentation légère ou possible', score: 1 },
+      { code: 2, label: "Clairement augmenté lorsqu'on l'interroge", score: 2 },
+      { code: 3, label: "Parle spontanément de la sexualité; élabore sur des thèmes sexuels; se décrit comme étant hyper sexuel", score: 3 },
+      { code: 4, label: "Agissements sexuels manifestes (envers les patients, les membres de l'équipe, ou l'évaluateur)", score: 4 }
     ]
   },
   {
     id: 'q4',
-    text: '4 - Sommeil',
+    text: '4. Sommeil',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Pas de diminution de sommeil', score: 0 },
-      { code: 1, label: '1 - Dort moins que d\'habitude (jusqu\'à 1 heure de moins)', score: 1 },
-      { code: 2, label: '2 - Dort moins que d\'habitude (plus d\'1 heure de moins)', score: 2 },
-      { code: 3, label: '3 - Diminution du besoin de sommeil', score: 3 },
-      { code: 4, label: '4 - Nie avoir besoin de sommeil', score: 4 }
+      { code: 0, label: 'Ne rapporte pas de diminution de sommeil', score: 0 },
+      { code: 1, label: "Dort jusqu'à une heure de moins que d'habitude", score: 1 },
+      { code: 2, label: "Sommeil réduit de plus d'une heure par rapport à d'habitude", score: 2 },
+      { code: 3, label: 'Rapporte un moins grand besoin de sommeil', score: 3 },
+      { code: 4, label: 'Nie le besoin de sommeil', score: 4 }
     ]
   },
   {
     id: 'q5',
-    text: '5 - Irritabilité',
+    text: '5. Irritabilité',
+    help: 'Cet item est coté sur une échelle de 0 à 8.',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Absente', score: 0 },
-      { code: 1, label: '1', score: 1 },
-      { code: 2, label: '2 - Subjective', score: 2 },
-      { code: 3, label: '3', score: 3 },
-      { code: 4, label: '4 - Irritable par moments durant l\'entretien ; épisodes récents d\'emportement ou de contrariété dans le service', score: 4 },
-      { code: 5, label: '5', score: 5 },
-      { code: 6, label: '6 - Souvent irritable durant l\'entretien ; bref et sec', score: 6 },
-      { code: 7, label: '7', score: 7 },
-      { code: 8, label: '8 - Hostile ; peu coopératif ; entretien impossible', score: 8 }
+      { code: 0, label: 'Absente', score: 0 },
+      { code: 2, label: 'Subjectivement augmentée', score: 2 },
+      { code: 4, label: "Irritable par moment durant l'entretien; épisodes récents d'énervement ou de colère dans le service", score: 4 },
+      { code: 6, label: "Fréquemment irritable durant l'entretien; brusque; abrupt", score: 6 },
+      { code: 8, label: 'Hostile, non coopératif; évaluation impossible', score: 8 }
     ]
   },
   {
     id: 'q6',
-    text: '6 - Débit verbal (débit et quantité)',
+    text: '6. Discours (débit et quantité)',
+    help: 'Cet item est coté sur une échelle de 0 à 8.',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Pas d\'augmentation', score: 0 },
-      { code: 1, label: '1', score: 1 },
-      { code: 2, label: '2 - Se sent bavard', score: 2 },
-      { code: 3, label: '3', score: 3 },
-      { code: 4, label: '4 - Augmentation du débit ou de la quantité par moments ; prolixe', score: 4 },
-      { code: 5, label: '5', score: 5 },
-      { code: 6, label: '6 - Poussée ; constamment augmenté ; difficile à interrompre', score: 6 },
-      { code: 7, label: '7', score: 7 },
-      { code: 8, label: '8 - Sous pression ; impossible à interrompre ; discours continu', score: 8 }
+      { code: 0, label: 'Pas augmenté', score: 0 },
+      { code: 2, label: 'Se sent bavard', score: 2 },
+      { code: 4, label: 'Augmentation du débit et de la quantité par moment; prolixe par moment', score: 4 },
+      { code: 6, label: 'Soutenu; augmentation consistante du débit ou de la quantité; difficile à interrompre', score: 6 },
+      { code: 8, label: 'Sous pression; impossible à interrompre; discours continu', score: 8 }
     ]
   },
   {
     id: 'q7',
-    text: '7 - Troubles du cours de la pensée',
+    text: '7. Langage - troubles de la pensée',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Absents', score: 0 },
-      { code: 1, label: '1 - Circonstanciels ; légère distractibilité ; pensées rapides', score: 1 },
-      { code: 2, label: '2 - Distractible ; perd le fil ; change de sujet fréquemment ; pensées accélérées', score: 2 },
-      { code: 3, label: '3 - Fuite des idées ; tangentialité ; difficultés à suivre ; rime, écholalie', score: 3 },
-      { code: 4, label: '4 - Incohérent ; communication impossible', score: 4 }
+      { code: 0, label: 'Absent', score: 0 },
+      { code: 1, label: 'Circonstanciel; légère distractivité; pensées rapides', score: 1 },
+      { code: 2, label: 'Distractivité; perd le fil de ses idées; change fréquemment de sujet; pensées accélérées', score: 2 },
+      { code: 3, label: "Fuite des idées; réponses hors sujet; difficile à suivre; fait des rimes; écholalie", score: 3 },
+      { code: 4, label: 'Incohérent; communication impossible', score: 4 }
     ]
   },
   {
     id: 'q8',
-    text: '8 - Contenu de la pensée',
+    text: '8. Contenu',
+    help: 'Cet item est coté sur une échelle de 0 à 8.',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Normal', score: 0 },
-      { code: 1, label: '1', score: 1 },
-      { code: 2, label: '2 - Projets discutables ; nouveaux intérêts', score: 2 },
-      { code: 3, label: '3', score: 3 },
-      { code: 4, label: '4 - Projets spéciaux ; hyperreligiosité', score: 4 },
-      { code: 5, label: '5', score: 5 },
-      { code: 6, label: '6 - Idées de grandeur ou idées paranoides ; idées de référence', score: 6 },
-      { code: 7, label: '7', score: 7 },
-      { code: 8, label: '8 - Idées délirantes ; hallucinations', score: 8 }
+      { code: 0, label: 'Normal', score: 0 },
+      { code: 2, label: 'Projets discutables; intérêts nouveaux', score: 2 },
+      { code: 4, label: 'Projet(s) particulier(s); hyper religieux', score: 4 },
+      { code: 6, label: 'Idées de grandeur ou de persécution; idées de référence', score: 6 },
+      { code: 8, label: 'Délires; hallucinations', score: 8 }
     ]
   },
   {
     id: 'q9',
-    text: '9 - Comportement agressif',
+    text: '9. Comportement agressif et perturbateur',
+    help: 'Cet item est coté sur une échelle de 0 à 8.',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Absent', score: 0 },
-      { code: 1, label: '1', score: 1 },
-      { code: 2, label: '2 - Sarcastique ; voix forte par moments ; sur la défensive', score: 2 },
-      { code: 3, label: '3', score: 3 },
-      { code: 4, label: '4 - Revendicateur ; menaces dans le service', score: 4 },
-      { code: 5, label: '5', score: 5 },
-      { code: 6, label: '6 - Menace l\'interviewer ; crie ; entretien difficile', score: 6 },
-      { code: 7, label: '7', score: 7 },
-      { code: 8, label: '8 - Agressif ; destructeur ; entretien impossible', score: 8 }
+      { code: 0, label: 'Absent, coopératif', score: 0 },
+      { code: 2, label: 'Sarcastique; parle fort par moment, sur la défensive', score: 2 },
+      { code: 4, label: 'Exigeant; fait des menaces dans le service', score: 4 },
+      { code: 6, label: "Menace l'évaluateur; crie; évaluation difficile", score: 6 },
+      { code: 8, label: 'Agressif physiquement; destructeur; évaluation impossible', score: 8 }
     ]
   },
   {
     id: 'q10',
-    text: '10 - Apparence',
+    text: '10. Apparence',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Tenue et toilette appropriées', score: 0 },
-      { code: 1, label: '1 - Négligé au minimum', score: 1 },
-      { code: 2, label: '2 - Mal tenu ; modérément ébouriffé ; trop habillé', score: 2 },
-      { code: 3, label: '3 - Ébouriffé ; à moitié nu ; maquillage criard', score: 3 },
-      { code: 4, label: '4 - Complètement négligé ; parure excessive ; vêtements bizarres', score: 4 }
+      { code: 0, label: 'Soignée et habillement adéquat', score: 0 },
+      { code: 1, label: 'Légèrement négligé', score: 1 },
+      { code: 2, label: 'Peu soigné; modérément débraillé; trop habillé', score: 2 },
+      { code: 3, label: 'Débraillé; à moitié nu; maquillage criard', score: 3 },
+      { code: 4, label: 'Complètement négligé; orné; accoutrement bizarre', score: 4 }
     ]
   },
   {
     id: 'q11',
-    text: '11 - Insight',
+    text: '11. Introspection',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - Conscience d\'être malade ; admet un changement de comportement', score: 0 },
-      { code: 1, label: '1 - Admet un changement de comportement possible', score: 1 },
-      { code: 2, label: '2 - Admet un changement de comportement mais nie être malade', score: 2 },
-      { code: 3, label: '3 - Admet un changement de comportement possible mais nie être malade', score: 3 },
-      { code: 4, label: '4 - Nie tout changement de comportement', score: 4 }
+      { code: 0, label: 'Présente; admet être malade; reconnaît le besoin de traitement', score: 0 },
+      { code: 1, label: 'Eventuellement malade', score: 1 },
+      { code: 2, label: 'Admet des changements de comportement, mais nie la maladie', score: 2 },
+      { code: 3, label: 'Admet de possibles changements de comportement, mais nie la maladie', score: 3 },
+      { code: 4, label: 'Nie tout changement de comportement', score: 4 }
     ]
   }
 ];
@@ -352,12 +340,14 @@ export const YMRS_QUESTIONS: Question[] = [
 export const YMRS_DEFINITION: QuestionnaireDefinition = {
   id: 'ymrs',
   code: 'YMRS',
-  title: 'Échelle de Manie de Young (YMRS)',
-  description: 'Échelle clinique pour évaluer la sévérité des symptômes maniaques. 11 items avec cotation hétérogène.',
+  title: 'Young Mania Rating Scale (YMRS)',
+  description: 'Echelle d\'évaluation de la manie hétéro-administrée comportant 11 items. Version française (Favre, Aubry, McQuillan, Bertschy, 2003).',
   questions: YMRS_QUESTIONS,
   metadata: {
     pathologies: ['bipolar'],
-    target_role: 'healthcare_professional'
+    target_role: 'healthcare_professional',
+    version: 'French Version (Favre, Aubry, McQuillan, Bertschy, 2003)',
+    language: 'fr-FR'
   }
 };
 

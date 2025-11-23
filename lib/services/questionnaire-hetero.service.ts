@@ -130,25 +130,20 @@ export async function saveYmrsResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Calculate total score with heterogeneous scoring
-  // Items 1,2,3,4,7,10,11 are scored 0-4
-  // Items 5,6,8,9 are scored 0-8 (double weighted)
-  const regularItems = [
-    response.q1, response.q2, response.q3, response.q4,
-    response.q7, response.q10, response.q11
+  // Calculate total score
+  // All 11 items are summed directly
+  const items = [
+    response.q1, response.q2, response.q3, response.q4, response.q5,
+    response.q6, response.q7, response.q8, response.q9, response.q10, response.q11
   ];
-  const doubleWeightedItems = [
-    response.q5, response.q6, response.q8, response.q9
-  ];
+  
+  const totalScore = items.reduce((sum: number, item) => sum + (item ?? 0), 0);
 
-  const regularScore = regularItems.reduce((sum: number, item) => sum + (item ?? 0), 0);
-  const doubleScore = doubleWeightedItems.reduce((sum: number, item) => sum + (item ?? 0), 0);
-  const totalScore = regularScore + doubleScore;
-
-  // Determine interpretation
+  // Determine interpretation based on cutoffs
+  // Range: 0-60
   let interpretation = '';
   if (totalScore <= 11) {
-    interpretation = 'Pas de symptômes maniaques significatifs';
+    interpretation = 'Pas d\'hypomanie';
   } else if (totalScore <= 20) {
     interpretation = 'Hypomanie';
   } else {

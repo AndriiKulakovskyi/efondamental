@@ -922,13 +922,13 @@ export interface YmrsResponse {
   q2?: number | null; // Augmentation de l'activité motrice (0-4)
   q3?: number | null; // Intérêt sexuel (0-4)
   q4?: number | null; // Sommeil (0-4)
-  q5?: number | null; // Irritabilité (0-8, double weighted)
-  q6?: number | null; // Débit verbal (0-8, double weighted)
-  q7?: number | null; // Troubles du cours de la pensée (0-4)
-  q8?: number | null; // Contenu de la pensée (0-8, double weighted)
-  q9?: number | null; // Comportement agressif (0-8, double weighted)
+  q5?: number | null; // Irritabilité (0, 2, 4, 6, 8)
+  q6?: number | null; // Discours (0, 2, 4, 6, 8)
+  q7?: number | null; // Langage - troubles de la pensée (0-4)
+  q8?: number | null; // Contenu (0, 2, 4, 6, 8)
+  q9?: number | null; // Comportement agressif et perturbateur (0, 2, 4, 6, 8)
   q10?: number | null; // Apparence (0-4)
-  q11?: number | null; // Insight (0-4)
+  q11?: number | null; // Introspection (0-4)
   total_score?: number | null;
   interpretation?: string | null;
   completed_by?: string | null;
