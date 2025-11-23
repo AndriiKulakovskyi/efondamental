@@ -31,6 +31,13 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return data.positive_screen ? 'warning' : 'info';
     }
     
+    if (code === 'ALDA') {
+      // ALDA: Total score 7-10 = good responder, 4-6 = partial, 0-3 = non-responder
+      if (data.alda_score >= 7) return 'success';
+      if (data.alda_score >= 4) return 'warning';
+      return 'info';
+    }
+    
     return 'info';
   };
 
@@ -99,6 +106,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'ASRM_FR' && 'Score ASRM'}
               {code === 'QIDS_SR16_FR' && 'Score QIDS-SR16'}
               {code === 'MDQ_FR' && 'Résultat MDQ'}
+              {code === 'ALDA' && 'Score Alda'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -106,12 +114,35 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <span className="text-xl font-bold">
               {code === 'MDQ_FR' 
                 ? (data.positive_screen ? 'POSITIF' : 'NÉGATIF') 
+                : code === 'ALDA'
+                ? (data.alda_score !== undefined ? data.alda_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM_FR' && '/20'}
               {code === 'QIDS_SR16_FR' && '/27'}
+              {code === 'ALDA' && '/10'}
             </span>
           </div>
         </div>
+
+        {/* ALDA Details */}
+        {code === 'ALDA' && data.q0 === 1 && (
+          <div className="text-sm space-y-2 mt-2 pt-2 border-t">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Score A (Amélioration):</span>
+                <span className="font-semibold">{data.qa ?? '-'}/10</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Score B (Confusions):</span>
+                <span className="font-semibold">{data.b_total_score ?? '-'}/10</span>
+              </div>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">Score Total (A - B):</span>
+              <span className="font-bold text-lg">{data.alda_score ?? '-'}/10</span>
+            </div>
+          </div>
+        )}
 
         {/* MDQ Details */}
         {code === 'MDQ_FR' && mdqDetails && (

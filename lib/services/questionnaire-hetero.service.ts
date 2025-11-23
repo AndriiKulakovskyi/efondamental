@@ -341,22 +341,53 @@ export async function saveAldaResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Calculate B total score
-  const bItems = [response.b1, response.b2, response.b3, response.b4, response.b5];
+  // If patient is not on lithium (q0 = 0), set all scores to null/0
+  if (response.q0 === 0 || response.q0 === null) {
+    const { data, error } = await supabase
+      .from('responses_alda')
+      .upsert({
+        ...response,
+        qa: null,
+        qb1: null,
+        qb2: null,
+        qb3: null,
+        qb4: null,
+        qb5: null,
+        b_total_score: null,
+        alda_score: null,
+        interpretation: 'Patient non traité par lithium - questionnaire non applicable',
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  // Calculate B total score (sum of B1-B5)
+  const bItems = [response.qb1, response.qb2, response.qb3, response.qb4, response.qb5];
   const bTotalScore = bItems.reduce((sum: number, item) => sum + (item ?? 0), 0);
 
-  // Calculate ALDA score (A - B)
-  const aScore = response.a_score ?? 0;
-  const aldaScore = aScore - bTotalScore;
+  // Get Score A
+  const scoreA = response.qa ?? 0;
 
-  // Determine interpretation
+  // Calculate Total Score with special rules:
+  // 1) If Score A < 7, Total Score = 0
+  // 2) Total Score = MAX(0, A - B)
+  let aldaScore = 0;
+  if (scoreA >= 7) {
+    aldaScore = Math.max(0, scoreA - bTotalScore);
+  }
+
+  // Determine interpretation based on Total Score
   let interpretation = '';
-  if (aldaScore >= 7) {
-    interpretation = 'Bonne réponse au lithium';
-  } else if (aldaScore >= 2) {
-    interpretation = 'Réponse partielle au lithium';
+  if (aldaScore >= 7 && aldaScore <= 10) {
+    interpretation = 'Bon répondeur (Réponse certaine)';
+  } else if (aldaScore >= 4 && aldaScore <= 6) {
+    interpretation = 'Répondeur partiel / Réponse possible';
   } else {
-    interpretation = 'Réponse insuffisante au lithium';
+    interpretation = 'Non-répondeur / Réponse improbable';
   }
 
   const { data, error } = await supabase

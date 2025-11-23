@@ -977,14 +977,15 @@ export interface AldaResponse {
   id: string;
   visit_id: string;
   patient_id: string;
-  a_score?: number | null; // 0-10
-  b1?: number | null; // 0-2
-  b2?: number | null; // 0-2
-  b3?: number | null; // 0-2
-  b4?: number | null; // 0-2
-  b5?: number | null; // 0-2
-  b_total_score?: number | null;
-  alda_score?: number | null; // A - B
+  q0?: number | null; // Screening: 0=No, 1=Yes
+  qa?: number | null; // Criterion A: 0-10
+  qb1?: number | null; // Criterion B1: 0-2
+  qb2?: number | null; // Criterion B2: 0-2
+  qb3?: number | null; // Criterion B3: 0-2
+  qb4?: number | null; // Criterion B4: 0-2
+  qb5?: number | null; // Criterion B5: 0-2
+  b_total_score?: number | null; // Sum of B1-B5
+  alda_score?: number | null; // Total Score = A - B (with rules)
   interpretation?: string | null;
   completed_by?: string | null;
   completed_at: string;

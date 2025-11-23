@@ -494,68 +494,128 @@ export const EGF_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 
 export const ALDA_QUESTIONS: Question[] = [
+  // Dépistage Section
   {
-    id: 'a_score',
-    text: 'A - Score de réponse',
-    help: 'Évaluer l\'amélioration globale attribuable au traitement au lithium (0 = pas de changement, 10 = excellente réponse)',
-    type: 'scale',
-    required: true,
-    min: 0,
-    max: 10
+    id: 'section_screening',
+    text: 'Dépistage',
+    type: 'section',
+    required: false
   },
   {
-    id: 'b1',
-    text: 'B1 - Nombre d\'épisodes avant traitement',
+    id: 'q0',
+    text: 'Le patient est-il actuellement traité par lithium ?',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: '0 - 5 épisodes ou plus', score: 0 },
-      { code: 1, label: '1 - 3-4 épisodes', score: 1 },
-      { code: 2, label: '2 - 2 épisodes ou moins', score: 2 }
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+
+  // Critère A Section
+  {
+    id: 'section_a',
+    text: 'Critère A',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'answers.q0' }, 1] }
+  },
+  {
+    id: 'qa',
+    text: 'Veuillez coter le degré d\'amélioration clinique globale observée sous traitement.',
+    help: 'Si le Score A est inférieur à 7, le Score Total sera automatiquement de 0.',
+    type: 'single_choice',
+    required: true,
+    display_if: { '==': [{ 'var': 'answers.q0' }, 1] },
+    options: [
+      { code: 0, label: '0 - Aucun changement, ni péjoration', score: 0 },
+      { code: 1, label: '1 - Amélioration minime. Réduction de l\'activité de maladie de 0-10%', score: 1 },
+      { code: 2, label: '2 - Amélioration légère. Réduction de l\'activité de maladie de 10-20%', score: 2 },
+      { code: 3, label: '3 - Amélioration légère. Réduction de l\'activité de maladie de 20-35%', score: 3 },
+      { code: 4, label: '4 - Amélioration modérée. Réduction de l\'activité de maladie de 35-50%', score: 4 },
+      { code: 5, label: '5 - Bonne modérée. Réduction de l\'activité de maladie de 50-56%', score: 5 },
+      { code: 6, label: '6 - Bonne réponse. Réduction de l\'activité de maladie de 65-80%', score: 6 },
+      { code: 7, label: '7 - Bonne réponse. Réduction de l\'activité de maladie de 80-90%', score: 7 },
+      { code: 8, label: '8 - Très bonne réponse. l\'activité de la maladie réduite de plus de 90%', score: 8 },
+      { code: 9, label: '9 - Très bonnes réponse, aucune récurrence mais le patient peut encore avoir des symptômes résiduels minimes (anxiété passagère, perturbation du sommeil, dysphorie, irritabilité) n\'exigeant aucune intervention', score: 9 },
+      { code: 10, label: '10 - Réponse complète, aucune récurrence mais le patient peut encore avoir des symptômes résiduels et récupération fonctionnelle totale', score: 10 }
+    ]
+  },
+
+  // Critère B Section
+  {
+    id: 'section_b',
+    text: 'Critère B',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'answers.q0' }, 1] }
+  },
+  {
+    id: 'qb_intro',
+    text: 'Critère B : Facteurs de confusion. Veuillez répondre aux questions suivantes pour établir le score B.',
+    type: 'text',
+    required: false,
+    readonly: true,
+    display_if: { '==': [{ 'var': 'answers.q0' }, 1] }
+  },
+  {
+    id: 'qb1',
+    text: 'B1: nombre d\'épisodes avant le traitement',
+    type: 'single_choice',
+    required: true,
+    display_if: { '==': [{ 'var': 'answers.q0' }, 1] },
+    options: [
+      { code: 0, label: '4 épisodes ou plus', score: 0 },
+      { code: 1, label: '2 ou 3 épisodes', score: 1 },
+      { code: 2, label: '1 épisode', score: 2 }
     ]
   },
   {
-    id: 'b2',
-    text: 'B2 - Fréquence des épisodes avant traitement',
+    id: 'qb2',
+    text: 'B2: Fréquence des épisodes avant le traitement.',
     type: 'single_choice',
     required: true,
+    display_if: { '==': [{ 'var': 'answers.q0' }, 1] },
     options: [
-      { code: 0, label: '0 - Au moins 2 épisodes par an', score: 0 },
-      { code: 1, label: '1 - 1 épisode par an', score: 1 },
-      { code: 2, label: '2 - Moins d\'1 épisode par an', score: 2 }
+      { code: 0, label: 'Moyenne à élevée, incluant les cycles rapides', score: 0 },
+      { code: 1, label: 'Faible, rémissions spontanées de 3 ans ou plus en moyenne', score: 1 },
+      { code: 2, label: '1 seul épisode, risque de récurrence ne peut être établi', score: 2 }
     ]
   },
   {
-    id: 'b3',
-    text: 'B3 - Durée du traitement',
+    id: 'qb3',
+    text: 'B3: Durée du traitement;',
     type: 'single_choice',
     required: true,
+    display_if: { '==': [{ 'var': 'answers.q0' }, 1] },
     options: [
-      { code: 0, label: '0 - 2 ans ou plus', score: 0 },
-      { code: 1, label: '1 - 1-2 ans', score: 1 },
-      { code: 2, label: '2 - Moins d\'1 an', score: 2 }
+      { code: 0, label: '2 ans ou plus', score: 0 },
+      { code: 1, label: '1-2 ans', score: 1 },
+      { code: 2, label: 'moins d\'un an', score: 2 }
     ]
   },
   {
-    id: 'b4',
-    text: 'B4 - Observance',
+    id: 'qb4',
+    text: 'B4: Compliance durant la/les période(s) de stabilité',
     type: 'single_choice',
     required: true,
+    display_if: { '==': [{ 'var': 'answers.q0' }, 1] },
     options: [
-      { code: 0, label: '0 - Excellente (lithémie adéquate documentée)', score: 0 },
-      { code: 1, label: '1 - Bonne (lithémie probablement adéquate)', score: 1 },
-      { code: 2, label: '2 - Mauvaise (lithémie inadéquate ou inconnue)', score: 2 }
+      { code: 0, label: 'Excellente, documentée par des taux dans les limites thérapeutiques', score: 0 },
+      { code: 1, label: 'Bonne, plus de 80% des taux dans les limites thérapeutiques', score: 1 },
+      { code: 2, label: 'Pauvre, répétitivement hors traitements, moins de 80% des taux dans les limites thérapeutiques', score: 2 }
     ]
   },
   {
-    id: 'b5',
-    text: 'B5 - Utilisation de traitements additionnels',
+    id: 'qb5',
+    text: 'B5 Usage de médication additionnelle durant la phase de stabilité',
     type: 'single_choice',
     required: true,
+    display_if: { '==': [{ 'var': 'answers.q0' }, 1] },
     options: [
-      { code: 0, label: '0 - Aucun traitement additionnel', score: 0 },
-      { code: 1, label: '1 - Traitement additionnel occasionnel', score: 1 },
-      { code: 2, label: '2 - Traitement additionnel continu', score: 2 }
+      { code: 0, label: 'Aucun hormis de rares somnifères (1 par semaine ou moins); pas d\'autres stabilisateurs pour contrôler les symptômes thymiques', score: 0 },
+      { code: 1, label: 'Antidépresseurs ou antipsychotiques à faible dose comme une sécurité, ou recours prolongé à des somnifères', score: 1 },
+      { code: 2, label: 'Usage prolongé ou systématique d\'un antidépresseur ou antipsychotique', score: 2 }
     ]
   }
 ];
@@ -563,12 +623,15 @@ export const ALDA_QUESTIONS: Question[] = [
 export const ALDA_DEFINITION: QuestionnaireDefinition = {
   id: 'alda',
   code: 'ALDA',
-  title: 'Échelle de Réponse au Lithium d\'Alda',
-  description: 'Évaluation de la réponse au traitement par lithium dans le trouble bipolaire.',
+  title: 'Echelle d\'Alda (Alda Scale) - Modified',
+  description: 'Échelle d\'évaluation rétrospective de la réponse prophylactique au lithium, incluant un dépistage et des critères spécifiques de cotation.',
   questions: ALDA_QUESTIONS,
   metadata: {
     pathologies: ['bipolar'],
-    target_role: 'healthcare_professional'
+    target_role: 'healthcare_professional',
+    version: 'French Version (User Provided Text)',
+    language: 'fr-FR',
+    singleColumn: true
   }
 };
 
