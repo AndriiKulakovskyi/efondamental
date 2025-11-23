@@ -283,25 +283,23 @@ export async function saveEgfResponse(
   const getInterpretation = (score: number | null | undefined): string | null => {
     if (!score) return null;
     
-    if (score >= 91) return 'Fonctionnement supérieur';
-    if (score >= 81) return 'Symptômes absents ou minimes';
-    if (score >= 71) return 'Symptômes transitoires';
-    if (score >= 61) return 'Symptômes légers';
-    if (score >= 51) return 'Symptômes modérés';
-    if (score >= 41) return 'Symptômes graves';
-    if (score >= 31) return 'Altération du fonctionnement';
-    if (score >= 21) return 'Altération marquée du fonctionnement';
-    if (score >= 11) return 'Besoin de supervision';
-    return 'Danger persistant';
+    if (score >= 91) return 'Niveau supérieur de fonctionnement. Absence de symptômes.';
+    if (score >= 81) return 'Symptômes absents ou minimes, fonctionnement satisfaisant.';
+    if (score >= 71) return 'Symptômes transitoires, handicap léger.';
+    if (score >= 61) return 'Symptômes légers, fonctionne assez bien.';
+    if (score >= 51) return 'Symptômes d\'intensité moyenne.';
+    if (score >= 41) return 'Symptômes importants ou handicap important.';
+    if (score >= 31) return 'Altération du sens de la réalité ou handicap majeur.';
+    if (score >= 21) return 'Comportement influencé par délires ou incapacité majeure.';
+    if (score >= 11) return 'Danger d\'agression ou incapacité hygiène.';
+    return 'Danger persistant ou incapacité durable.';
   };
 
   const { data, error } = await supabase
     .from('responses_egf')
     .upsert({
       ...response,
-      current_interpretation: getInterpretation(response.current_functioning),
-      worst_interpretation: getInterpretation(response.worst_past_year),
-      best_interpretation: getInterpretation(response.best_past_year),
+      interpretation: getInterpretation(response.egf_score),
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

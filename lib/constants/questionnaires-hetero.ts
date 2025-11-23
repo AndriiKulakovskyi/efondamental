@@ -450,27 +450,24 @@ export const CGI_DEFINITION: QuestionnaireDefinition = {
 
 export const EGF_QUESTIONS: Question[] = [
   {
-    id: 'current_functioning',
-    text: 'Fonctionnement actuel',
-    help: 'Évaluer le fonctionnement global actuel du patient sur une échelle de 1 à 100',
-    type: 'number',
-    required: true,
-    min: 1,
-    max: 100
-  },
-  {
-    id: 'worst_past_year',
-    text: 'Pire fonctionnement de l\'année écoulée',
-    help: 'Évaluer le pire niveau de fonctionnement au cours de l\'année écoulée',
-    type: 'number',
-    required: true,
-    min: 1,
-    max: 100
-  },
-  {
-    id: 'best_past_year',
-    text: 'Meilleur fonctionnement de l\'année écoulée',
-    help: 'Évaluer le meilleur niveau de fonctionnement au cours de l\'année écoulée',
+    id: 'egf_score',
+    text: 'Score à l\'échelle EGF',
+    help: `Consignes : Evaluer le fonctionnement psychologique, social et professionnel. Ne pas tenir compte d'un handicap dû à des facteurs physiques ou environnementaux. Utiliser des codes intermédiaires lorsque cela est justifié (p. ex. 45, 68, 72).
+
+GUIDE DE COTATION :
+100-91 : Niveau supérieur de fonctionnement dans une grande variété d'activité. N'êtes jamais débordé par les problèmes rencontrés. Êtes recherché par autrui en raison de ses nombreuses qualités. Absence de symptômes.
+90-81 : Symptômes absents ou minimes (p. ex. anxiété légère avant un examen), fonctionnement satisfaisant dans tous les domaines, intéressé et impliqué dans une grande variété d'activités, socialement efficace, en général satisfait de la vie, pas plus de problèmes ou de préoccupations que les soucis de tous les jours (p.ex conflit occassionnel avec des membres de la famille).
+80-71 : Si des symptômes sont présents, ils sont transitoires et il s'agit de réactions prévisibles à des facteurs de stress (p. ex. des difficultés de concentration après une dispute familiale) ; pas plus qu'un handicap léger du fonctionnement social, professionnel ou scolaire (p. ex. fléchissement temporaire du travail scolaire).
+70-61 : Quelques symptômes légers (p. ex. humeur dépressive et insomnie légère) ou une certaine difficulté dans le fonctionnement social, professionnel ou scolaire (p. ex. école buissonnière épisodique ou vol en famille) mais fonctionne assez bien de façon générale et entretient plusieurs relations interpersonnelles positives.
+60-51 : Symptômes d'intensité moyenne (p. ex. émoussement affectif, prolixité circonlocutoire, attaques de panique épisodiques) ou difficultés d'intensité moyenne dans le fonctionnement social, professionnel ou scolaire (p. ex. peu d'amis, conflits avec les collègues de travail).
+50-41 : Symptômes importants (p. ex. idéation suicidaire, rituels obsessionnels sévères, vols répétés dans les grands magasins) ou handicap important dans le fonctionnement social, professionnel ou scolaire (p. ex. absence d'amis, incapacité à garder un emploi).
+40-31 : Existence d'une certaine altération du sens de la réalité ou de la communication (p. ex. discours par moments illogique, obscur ou inadapté) ou handicap majeur dans plusieurs domaines, p. ex. le travail, l'école, les relations familiales, le jugement, la pensée ou l'humeur (p. ex. un homme déprimé évite ses amis, néglige sa famille et est incapable de travailler ; un enfant bat fréquemment des enfants plus jeunes que lui, se montre provoquant à la maison et échoue à l'école).
+30-21 : Le comportement est notablement influencé par des idées délirantes ou des hallucinations ou trouble grave de la communication ou de jugement (par ex. parfois incohérent, actes grossièrement inadaptés, préoccupation suicidaire) ou incapable de fonctionner dans tous les domaines (par ex. reste au lit toute la journée, absence de travail, de foyer ou d'amis).
+21-11 : Existence d'un certain danger d'auto ou d'hétéro-agression (p. ex. tentative de suicide sans attente précise de la mort, violence fréquente, excitation maniaque).
+Ou incapacité temporaire à maintenir une hygiène corporelle minimum (p. ex. se barbouille d'excréments).
+Ou altération massive de la communication (p. ex. incohérence indiscutable ou mutisme).
+10-1 : Danger persistant d'hétéro-agression grave (p. ex. accès répétés de violence)
+Ou incapacité durable à maintenir une hygiène corporelle minimum ou geste suicidaire avec attente précise de la mort.`,
     type: 'number',
     required: true,
     min: 1,
@@ -481,12 +478,14 @@ export const EGF_QUESTIONS: Question[] = [
 export const EGF_DEFINITION: QuestionnaireDefinition = {
   id: 'egf',
   code: 'EGF',
-  title: 'Échelle de Fonctionnement Global (EGF)',
-  description: 'Évaluation du fonctionnement psychologique, social et professionnel sur un continuum de 1 à 100.',
+  title: 'Échelle Globale de Fonctionnement (EGF)',
+  description: 'Évaluation du fonctionnement psychologique, social et professionnel sur un continuum hypothétique allant de la santé mentale à la maladie.',
   questions: EGF_QUESTIONS,
   metadata: {
     pathologies: ['bipolar'],
-    target_role: 'healthcare_professional'
+    target_role: 'healthcare_professional',
+    version: 'Standard',
+    language: 'fr-FR'
   }
 };
 

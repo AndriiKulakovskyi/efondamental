@@ -962,18 +962,14 @@ export interface EgfResponse {
   id: string;
   visit_id: string;
   patient_id: string;
-  current_functioning?: number | null; // 1-100
-  worst_past_year?: number | null; // 1-100
-  best_past_year?: number | null; // 1-100
-  current_interpretation?: string | null;
-  worst_interpretation?: string | null;
-  best_interpretation?: string | null;
+  egf_score?: number | null; // 1-100
+  interpretation?: string | null;
   completed_by?: string | null;
   completed_at: string;
   created_at: string;
   updated_at: string;
 }
-export type EgfResponseInsert = Omit<EgfResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'current_interpretation' | 'worst_interpretation' | 'best_interpretation'>;
+export type EgfResponseInsert = Omit<EgfResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'interpretation'>;
 
 // ALDA (Lithium Response Scale)
 export interface AldaResponse {

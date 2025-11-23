@@ -381,7 +381,13 @@ export function QuestionnaireRenderer({
         </Label>
         
         {question.help && (
-          <p className="text-sm text-muted-foreground">{question.help}</p>
+          <div className="text-sm text-muted-foreground space-y-1">
+            {question.help.split('\n').map((line, index) => (
+              <p key={index} className={line.trim() === '' ? 'h-2' : ''}>
+                {line || '\u00A0'}
+              </p>
+            ))}
+          </div>
         )}
 
         {question.type === "text" && (
