@@ -75,13 +75,6 @@ export default async function ProfessionalLandingPage() {
             </div>
 
         <div className="flex items-center gap-4">
-          <div className="text-right hidden sm:block">
-            <p className="text-sm font-medium text-slate-900">
-              {context.profile.first_name} {context.profile.last_name}
-            </p>
-              <p className="text-xs text-slate-500">{context.centerName}</p>
-          </div>
-          <div className="h-8 w-px bg-slate-200 hidden sm:block"></div>
             <UserProfileDropdown
               firstName={context.profile.first_name || ""}
               lastName={context.profile.last_name || ""}
@@ -131,7 +124,7 @@ export default async function ProfessionalLandingPage() {
                       <Activity className="w-7 h-7" />
                     </div>
                     <span className={`px-3 py-1 rounded-full bg-slate-50 text-slate-500 text-xs font-medium border border-slate-100 transition`}>
-                      v4.2.0
+                      v4.0
                     </span>
                               </div>
 
