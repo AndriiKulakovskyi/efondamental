@@ -34,7 +34,7 @@ export function StatisticsClient({
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-12">
+    <div className="max-w-7xl mx-auto space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -61,10 +61,10 @@ export function StatisticsClient({
       </div>
 
       {/* KPI Cards */}
-      <section>
+      <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Total Patients */}
-          <div className="group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between hover:shadow-md hover:border-blue-300 transition-all cursor-pointer">
+          <div className="group bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between hover:shadow-md hover:border-blue-300 transition-all cursor-pointer">
             <div>
               <p className="text-xs font-medium text-slate-500 uppercase tracking-wide group-hover:text-blue-600 transition">
                 Total Patients
@@ -78,7 +78,7 @@ export function StatisticsClient({
           </div>
 
           {/* Visits This Month */}
-          <div className="group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between hover:shadow-md hover:border-brand transition-all cursor-pointer">
+          <div className="group bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between hover:shadow-md hover:border-brand transition-all cursor-pointer">
             <div>
               <p className="text-xs font-medium text-slate-500 uppercase tracking-wide group-hover:text-brand transition">
                 Visites (Mois)
@@ -92,7 +92,7 @@ export function StatisticsClient({
           </div>
 
           {/* Completion Rate */}
-          <div className="group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between hover:shadow-md hover:border-emerald-300 transition-all cursor-pointer">
+          <div className="group bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between hover:shadow-md hover:border-emerald-300 transition-all cursor-pointer">
             <div>
               <p className="text-xs font-medium text-slate-500 uppercase tracking-wide group-hover:text-emerald-600 transition">
                 Taux de Complétion
@@ -106,7 +106,7 @@ export function StatisticsClient({
           </div>
 
           {/* Active This Month */}
-          <div className="group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between hover:shadow-md hover:border-orange-300 transition-all cursor-pointer">
+          <div className="group bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between hover:shadow-md hover:border-orange-300 transition-all cursor-pointer">
             <div>
               <p className="text-xs font-medium text-slate-500 uppercase tracking-wide group-hover:text-orange-600 transition">
                 Actifs (Mois)
@@ -122,7 +122,7 @@ export function StatisticsClient({
       </section>
 
       {/* Activity Graph */}
-      <section className="space-y-4">
+      <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 space-y-6">
         <div>
           <h3 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
             <ActivityIcon className="w-5 h-5 text-slate-400" />
@@ -136,7 +136,7 @@ export function StatisticsClient({
       </section>
 
       {/* Visit Type Breakdown */}
-      <section className="max-w-4xl mx-auto w-full space-y-4">
+      <section className="max-w-4xl mx-auto w-full bg-white rounded-2xl border border-slate-200 shadow-sm p-8 space-y-6">
         <div className="text-center">
           <h3 className="text-lg font-bold text-slate-900 mb-2 flex items-center justify-center gap-2">
             <PieChartIcon className="w-5 h-5 text-brand" />
@@ -147,7 +147,7 @@ export function StatisticsClient({
           </p>
         </div>
         
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 space-y-8">
+        <div className="space-y-8">
           {visitTypeStats.length > 0 ? (
             visitTypeStats.map((stat) => {
               const completionPercentage = stat.count > 0 ? (stat.completedCount / stat.count) * 100 : 0;
@@ -189,7 +189,7 @@ export function StatisticsClient({
       </section>
 
       {/* Demographics */}
-      <section className="space-y-4">
+      <section className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 space-y-6">
         <div className="text-center">
           <h3 className="text-lg font-bold text-slate-900 mb-2">Données Démographiques des Patients</h3>
           <p className="text-sm text-slate-500 max-w-2xl mx-auto">
