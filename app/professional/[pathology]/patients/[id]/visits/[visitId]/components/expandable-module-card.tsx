@@ -39,17 +39,19 @@ export function ExpandableModuleCard({
       {/* Timeline indicator */}
       <div className="flex-shrink-0 flex flex-col items-center">
         <div className={cn(
-          "w-10 h-10 rounded-full flex items-center justify-center z-10",
-          isCompleted && "bg-teal-500 border-4 border-white shadow-md",
-          isInProgress && "bg-white border-[3px] border-brand shadow-md",
-          isPending && "bg-slate-50 border-2 border-slate-300"
-        )}>
+          "w-10 h-10 rounded-full flex items-center justify-center z-10 relative",
+          isCompleted && "bg-teal-500 border-4 border-white shadow-lg",
+          isInProgress && "bg-brand border-4 border-white shadow-lg",
+          isPending && "bg-slate-300 border-4 border-white shadow-sm"
+    )}>
           {isCompleted ? (
-            <CheckCircle className="w-5 h-5 text-white" strokeWidth={3} />
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+            </svg>
           ) : (
             <span className={cn(
               "text-sm font-bold",
-              isInProgress ? "text-brand" : "text-slate-400"
+              isInProgress ? "text-white" : "text-white"
             )}>
               {index + 1}
             </span>
@@ -82,7 +84,7 @@ export function ExpandableModuleCard({
                 isInProgress && "text-brand text-xl",
                 isPending && "text-slate-700"
               )}>
-                {module.name}
+                  {module.name}
               </h4>
               {isCompleted && (
                 <span className="px-2 py-0.5 rounded bg-teal-50 text-teal-700 text-[10px] font-bold uppercase tracking-wide border border-teal-100">
@@ -93,7 +95,7 @@ export function ExpandableModuleCard({
                 <span className="px-2.5 py-0.5 rounded bg-red-50 text-brand text-[10px] font-bold uppercase tracking-wide border border-red-100 animate-pulse">
                   En cours
                 </span>
-              )}
+                )}
             </div>
             <p className={cn(
               "text-sm mb-5",
@@ -158,54 +160,54 @@ export function ExpandableModuleCard({
         </div>
 
         {/* Expandable questionnaires list */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateRows: isExpanded ? '1fr' : '0fr',
-            transition: 'grid-template-rows 300ms'
-          }}
-        >
-          <div style={{ overflow: 'hidden' }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateRows: isExpanded ? '1fr' : '0fr',
+          transition: 'grid-template-rows 300ms'
+        }}
+      >
+        <div style={{ overflow: 'hidden' }}>
             <div className="space-y-3 mt-5">
               {module.questionnaires.map((questionnaire: any) => (
-                <div
-                  key={questionnaire.id}
-                  className={cn(
+            <div
+              key={questionnaire.id}
+              className={cn(
                     "flex items-center justify-between p-5 border border-slate-200 rounded-xl transition-all duration-200",
-                    questionnaire.completed 
+                questionnaire.completed 
                       ? "bg-teal-50 border-teal-200" 
-                      : "bg-white hover:shadow-md hover:border-slate-300"
-                  )}
-                >
+                  : "bg-white hover:shadow-md hover:border-slate-300"
+              )}
+            >
                   <div className="flex items-center gap-4 flex-1">
-                    {questionnaire.completed ? (
+                {questionnaire.completed ? (
                       <CheckCircle className="h-6 w-6 text-teal-600 flex-shrink-0" />
-                    ) : (
+                ) : (
                       <Circle className="h-6 w-6 text-slate-300 flex-shrink-0" />
-                    )}
-                    <div className="flex-1">
-                      <p className={cn(
+                )}
+                <div className="flex-1">
+                  <p className={cn(
                         "font-medium text-base",
                         questionnaire.completed ? "text-teal-900" : "text-slate-900"
-                      )}>
-                        {questionnaire.title}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <p className="text-xs text-slate-500 capitalize">
+                  )}>
+                    {questionnaire.title}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-xs text-slate-500 capitalize">
                           Pour: {questionnaire.target_role?.replace(/_/g, " ")}
-                        </p>
-                        {questionnaire.completed && questionnaire.completedAt && (
-                          <>
-                            <span className="text-xs text-slate-400">•</span>
-                            <p className="text-xs text-slate-500">
+                    </p>
+                    {questionnaire.completed && questionnaire.completedAt && (
+                      <>
+                        <span className="text-xs text-slate-400">•</span>
+                        <p className="text-xs text-slate-500">
                               Complété le {formatShortDate(questionnaire.completedAt)}
-                            </p>
-                          </>
-                        )}
-                      </div>
-                    </div>
+                        </p>
+                      </>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                </div>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0 ml-4">
                     <Link
                       href={`/professional/${pathology}/patients/${patientId}/visits/${visitId}/questionnaire/${questionnaire.id}`}
                     >
@@ -219,7 +221,7 @@ export function ExpandableModuleCard({
                       </Button>
                     </Link>
                   </div>
-                </div>
+              </div>
               ))}
             </div>
           </div>

@@ -76,12 +76,12 @@ function StatCard({
     <div className={`group bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between hover:shadow-md ${hoverBorderColor} transition-all cursor-pointer`}>
       <div>
         <p className="text-xs font-medium text-slate-500 uppercase tracking-wide group-hover:${iconColor} transition">
-          {title}
-        </p>
+              {title}
+            </p>
         <p className={`text-4xl font-bold mt-2 ${valueColor}`}>
-          {value}
-        </p>
-      </div>
+              {value}
+            </p>
+          </div>
       <div className={`w-12 h-12 rounded-xl ${iconBgColor} ${iconColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
         <Icon className="w-6 h-6" />
       </div>

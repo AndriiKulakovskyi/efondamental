@@ -25,11 +25,11 @@ export function VisitQuickStats({
         <div>
           <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Progression Globale</p>
           <p className="text-3xl font-bold text-slate-900 mt-1">{completionPercentage.toFixed(0)}%</p>
-        </div>
+            </div>
         <div className="w-14 h-14 rounded-full border-[4px] border-orange-100 border-t-orange-500 flex items-center justify-center bg-orange-50">
           <Zap className="w-7 h-7 text-orange-500" />
-        </div>
-      </div>
+            </div>
+          </div>
 
       {/* Modules Card */}
       <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -37,8 +37,8 @@ export function VisitQuickStats({
         <div className="flex items-baseline gap-2 mt-1">
           <p className="text-3xl font-bold text-slate-900">{totalModules}</p>
           <span className="text-sm font-medium text-slate-400">actifs</span>
-        </div>
-      </div>
+            </div>
+          </div>
 
       {/* Forms Done Card */}
       <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -46,8 +46,8 @@ export function VisitQuickStats({
         <div className="flex items-baseline gap-2 mt-1">
           <p className="text-3xl font-bold text-teal-600">{completedQuestionnaires}</p>
           <span className="text-sm font-medium text-slate-400">/ {totalQuestionnaires} total</span>
-        </div>
-      </div>
+            </div>
+          </div>
 
       {/* Pending Card */}
       <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -55,8 +55,8 @@ export function VisitQuickStats({
         <div className="flex items-baseline gap-2 mt-1">
           <p className="text-3xl font-bold text-brand">{pendingQuestionnaires}</p>
           <span className="text-sm font-medium text-slate-400">formulaires</span>
-        </div>
-      </div>
+            </div>
+          </div>
     </div>
   );
 }

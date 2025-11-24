@@ -103,16 +103,16 @@ export default async function PatientDetailPage({
             <div className="w-20 h-20 rounded-full bg-slate-900 text-white flex items-center justify-center text-2xl font-bold tracking-wider">
               {patient.first_name[0]}{patient.last_name[0]}
             </div>
-            <div>
+              <div>
               <h2 className="text-2xl font-bold text-slate-900">
-                {patient.first_name} {patient.last_name}
-              </h2>
+                  {patient.first_name} {patient.last_name}
+                </h2>
               <div className="flex items-center gap-3 mt-1 text-slate-500 text-sm">
                 <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-medium border border-slate-200">
                   DMI: {patient.medical_record_number}
-                </span>
+                  </span>
                 <span>&bull;</span>
-                <span>{patient.pathology_name}</span>
+                  <span>{patient.pathology_name}</span>
               </div>
             </div>
           </div>
@@ -120,28 +120,28 @@ export default async function PatientDetailPage({
             <MoreVertical className="w-4 h-4" />
             Actions rapides
           </button>
-        </div>
+          </div>
 
-        {/* Risk Alert */}
-        {riskLevel !== 'none' && (
+          {/* Risk Alert */}
+          {riskLevel !== 'none' && (
           <div className={`border-l-4 rounded-lg p-4 ${
-            riskLevel === 'high' ? 'bg-red-50 border-red-500' :
-            riskLevel === 'moderate' ? 'bg-amber-50 border-amber-500' :
-            'bg-blue-50 border-blue-500'
-          }`}>
-            <div className="flex items-center gap-3">
-              <AlertTriangle className={`h-5 w-5 ${risk.color}`} />
-              <div>
-                <span className={`font-bold ${risk.color}`}>
-                  Niveau de risque {risk.label.toLowerCase()}
-                </span>
-                <p className="text-xs text-slate-600 mt-0.5">
-                  Nécessite attention clinique et suivi
-                </p>
+              riskLevel === 'high' ? 'bg-red-50 border-red-500' :
+              riskLevel === 'moderate' ? 'bg-amber-50 border-amber-500' :
+              'bg-blue-50 border-blue-500'
+            }`}>
+              <div className="flex items-center gap-3">
+                <AlertTriangle className={`h-5 w-5 ${risk.color}`} />
+                <div>
+                  <span className={`font-bold ${risk.color}`}>
+                    Niveau de risque {risk.label.toLowerCase()}
+                  </span>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    Nécessite attention clinique et suivi
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
         {/* Stat Cards */}
         <PatientStatCards 
@@ -151,7 +151,7 @@ export default async function PatientDetailPage({
         />
 
         {/* Tabs with Actions */}
-        <Tabs defaultValue="visits" className="w-full">
+          <Tabs defaultValue="visits" className="w-full">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-slate-200 pb-1">
             <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
               <TabsList className="bg-transparent border-0 p-0">
@@ -194,46 +194,46 @@ export default async function PatientDetailPage({
                 </button>
               </Link>
             </div>
-          </div>
+            </div>
 
-          <TabsContent value="visits" className="mt-6">
-            <VisitCards 
-              visits={visitsWithCompletion}
-              pathology={pathology}
-              patientId={id}
-            />
-          </TabsContent>
+            <TabsContent value="visits" className="mt-6">
+              <VisitCards 
+                visits={visitsWithCompletion}
+                pathology={pathology}
+                patientId={id}
+              />
+            </TabsContent>
 
-          <TabsContent value="overview" className="space-y-6 mt-6">
-            <InvitationStatus
-              patientId={id}
-              patientEmail={patient.email}
-              hasUserAccount={invitationStatus.hasUserAccount}
-              pendingInvitation={invitationStatus.pendingInvitation}
-            />
+            <TabsContent value="overview" className="space-y-6 mt-6">
+              <InvitationStatus
+                patientId={id}
+                patientEmail={patient.email}
+                hasUserAccount={invitationStatus.hasUserAccount}
+                pendingInvitation={invitationStatus.pendingInvitation}
+              />
 
-            <PatientOverview patient={patient} />
-          </TabsContent>
+              <PatientOverview patient={patient} />
+            </TabsContent>
 
-          <TabsContent value="evaluations" className="mt-6">
-            <EvaluationsDisplay evaluations={evaluations} />
-          </TabsContent>
+            <TabsContent value="evaluations" className="mt-6">
+              <EvaluationsDisplay evaluations={evaluations} />
+            </TabsContent>
 
-          <TabsContent value="analytics" className="space-y-6 mt-6">
-            <AnalyticsSummary 
-              moodTrend={moodTrend}
-              riskHistory={riskHistory}
-              adherenceTrend={adherenceTrend}
-              currentRiskLevel={riskLevel}
-            />
-            
-            <AnalyticsCharts
-              moodTrend={moodTrend}
-              riskHistory={riskHistory}
-              adherenceTrend={adherenceTrend}
-            />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="analytics" className="space-y-6 mt-6">
+              <AnalyticsSummary 
+                moodTrend={moodTrend}
+                riskHistory={riskHistory}
+                adherenceTrend={adherenceTrend}
+                currentRiskLevel={riskLevel}
+              />
+              
+              <AnalyticsCharts
+                moodTrend={moodTrend}
+                riskHistory={riskHistory}
+                adherenceTrend={adherenceTrend}
+              />
+            </TabsContent>
+          </Tabs>
       </div>
     </div>
   );

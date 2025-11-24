@@ -763,17 +763,17 @@ export default async function VisitDetailPage({
         </h3>
 
         <div className="relative space-y-6 pl-2">
-          {modulesWithQuestionnaires.map((module, index) => (
-            <ExpandableModuleCard
-              key={module.id}
-              module={module}
-              index={index}
-              pathology={pathology}
-              patientId={patientId}
-              visitId={visitId}
+        {modulesWithQuestionnaires.map((module, index) => (
+          <ExpandableModuleCard
+            key={module.id}
+            module={module}
+            index={index}
+            pathology={pathology}
+            patientId={patientId}
+            visitId={visitId}
               totalModules={modulesWithQuestionnaires.length}
-            />
-          ))}
+          />
+        ))}
         </div>
       </div>
 

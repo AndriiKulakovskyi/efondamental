@@ -72,22 +72,22 @@ export default async function ProfessionalLandingPage() {
             <span className="text-slate-900">Fondation</span>{" "}
             <span className="text-brand">FondaMental</span>
           </h1>
-        </div>
+            </div>
 
         <div className="flex items-center gap-4">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-medium text-slate-900">
               {context.profile.first_name} {context.profile.last_name}
             </p>
-            <p className="text-xs text-slate-500">{context.centerName}</p>
+              <p className="text-xs text-slate-500">{context.centerName}</p>
           </div>
           <div className="h-8 w-px bg-slate-200 hidden sm:block"></div>
-          <UserProfileDropdown
-            firstName={context.profile.first_name || ""}
-            lastName={context.profile.last_name || ""}
-            email={context.profile.email}
-            role={context.profile.role}
-          />
+            <UserProfileDropdown
+              firstName={context.profile.first_name || ""}
+              lastName={context.profile.last_name || ""}
+              email={context.profile.email}
+              role={context.profile.role}
+            />
         </div>
       </header>
 
@@ -98,52 +98,52 @@ export default async function ProfessionalLandingPage() {
           {/* Title Section */}
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3">
-              Sélectionnez votre application
-            </h2>
+                  Sélectionnez votre application
+                </h2>
             <p className="text-slate-500 text-lg max-w-2xl mx-auto">
               Bienvenue, {context.profile.first_name}. Choisissez une pathologie pour accéder à votre tableau de bord clinique et gérer vos patients.
-            </p>
+              </p>
           </div>
 
           {/* Pathology Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {pathologies.map((pathology, index) => {
-              const config = getPathologyConfig(index);
-              
-              return (
-                <Link
-                  key={pathology.id}
-                  href={`/professional/${pathology.type}`}
+              {pathologies.map((pathology, index) => {
+                const config = getPathologyConfig(index);
+                
+                return (
+                  <Link
+                    key={pathology.id}
+                    href={`/professional/${pathology.type}`}
                   className={`group relative bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-xl ${config.hoverShadow} ${config.hoverBorder} transition-all duration-300 hover:-translate-y-1 overflow-hidden block`}
                 >
                   {/* Decorative background element */}
-                  <div 
+                      <div
                     className={`absolute top-0 right-0 w-32 h-32 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110`}
                     style={{ backgroundColor: config.mediumBg }}
-                  />
-                  
+                      />
+                      
                   {/* Header with Icon and Version */}
                   <div className="flex items-start justify-between mb-6 relative z-10">
-                    <div 
+                              <div
                       className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}
                       style={{ backgroundColor: config.lightBg, color: config.color }}
-                    >
+                              >
                       <Activity className="w-7 h-7" />
                     </div>
                     <span className={`px-3 py-1 rounded-full bg-slate-50 text-slate-500 text-xs font-medium border border-slate-100 transition`}>
                       v4.2.0
                     </span>
-                  </div>
+                              </div>
 
                   {/* Title and Description */}
                   <div className="relative z-10">
                     <h3 className={`text-2xl font-bold text-slate-900 mb-2 ${config.hoverText} transition-colors`}>
-                      {PATHOLOGY_NAMES[pathology.type as PathologyType]}
-                    </h3>
+                                  {PATHOLOGY_NAMES[pathology.type as PathologyType]}
+                                </h3>
                     <p className="text-slate-500 text-sm mb-8 leading-relaxed">
-                      {pathology.description || `Plateforme de suivi ${PATHOLOGY_NAMES[pathology.type as PathologyType].toLowerCase()}`}
-                    </p>
-                  </div>
+                                  {pathology.description || `Plateforme de suivi ${PATHOLOGY_NAMES[pathology.type as PathologyType].toLowerCase()}`}
+                                </p>
+                          </div>
 
                   {/* Stats Footer */}
                   <div className="flex items-center gap-4 pt-6 border-t border-slate-100 relative z-10">
@@ -154,7 +154,7 @@ export default async function ProfessionalLandingPage() {
                       <span className="text-lg font-bold text-slate-900">
                         {Math.floor(Math.random() * 50 + 20)}
                       </span>
-                    </div>
+                              </div>
                     <div className="w-px h-8 bg-slate-100"></div>
                     <div className="flex flex-col">
                       <span className="text-xs text-slate-400 font-medium uppercase tracking-wider">
@@ -163,16 +163,16 @@ export default async function ProfessionalLandingPage() {
                       <span className="text-sm font-medium text-slate-600">
                         Il y a {Math.floor(Math.random() * 5 + 1)}h
                       </span>
-                    </div>
+                              </div>
                     <div className="ml-auto">
                       <span className={`flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 text-slate-300 ${config.hoverBg} group-hover:text-white transition-all`}>
                         <ArrowRight className="w-4 h-4" />
                       </span>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              );
-            })}
+                  </Link>
+                );
+              })}
           </div>
 
           {/* Empty State */}

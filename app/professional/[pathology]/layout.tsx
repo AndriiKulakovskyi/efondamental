@@ -30,20 +30,20 @@ export default async function PathologyLayout({
             <span className="text-slate-900">Fondation</span>{" "}
             <span className="text-brand">FondaMental</span>
           </h1>
-        </div>
+            </div>
 
-        <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4">
           <button className="p-2 text-slate-400 hover:text-slate-600 transition relative">
             <Bell className="w-6 h-6" />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand rounded-full"></span>
           </button>
           <div className="h-6 w-px bg-slate-200"></div>
-          <UserProfileDropdown
-            firstName={context.profile.first_name || ""}
-            lastName={context.profile.last_name || ""}
-            email={context.profile.email}
-            role={context.profile.role}
-          />
+              <UserProfileDropdown
+                firstName={context.profile.first_name || ""}
+                lastName={context.profile.last_name || ""}
+                email={context.profile.email}
+                role={context.profile.role}
+              />
         </div>
       </header>
 

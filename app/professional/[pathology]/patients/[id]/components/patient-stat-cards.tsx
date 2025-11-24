@@ -67,12 +67,12 @@ export function PatientStatCards({ stats }: PatientStatsProps) {
           
           <div>
             <p className={`text-xs font-medium text-slate-500 uppercase tracking-wide group-hover:${card.iconColor} transition`}>
-              {card.title}
-            </p>
+                  {card.title}
+                </p>
             <div className="flex items-baseline gap-2 mt-1">
               <p className={`text-3xl font-bold ${card.valueColor || 'text-slate-900'}`}>
-                {card.value}
-              </p>
+                  {card.value}
+                </p>
               {card.badge && (
                 <span className="text-xs text-red-400 font-medium">{card.badge}</span>
               )}

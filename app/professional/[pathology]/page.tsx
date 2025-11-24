@@ -70,33 +70,33 @@ export default async function PathologyDashboard({
         <div className="flex items-start gap-4 mb-6">
           <div className="w-12 h-12 rounded-xl bg-brand/10 text-brand flex items-center justify-center shrink-0">
             <LayoutGrid className="w-6 h-6" />
-          </div>
-          <div>
+              </div>
+              <div>
             <h2 className="text-3xl font-bold text-slate-900">
-              {PATHOLOGY_NAMES[pathologyType]}
+                  {PATHOLOGY_NAMES[pathologyType]}
             </h2>
             <p className="text-slate-500 mt-1">
               {pathologyData?.description || 'Mood disorder characterized by episodes of mania and depression'}
-            </p>
+                </p>
+            </div>
           </div>
+
+          {/* Stats Cards */}
+          <DashboardStatsRedesign
+            totalPatients={centerPatients.length}
+            alertsCount={patientsRequiringFollowup.length}
+            visitsThisMonth={visitsThisMonth || 0}
+            demographics={demographics}
+          />
+
+          {/* Patients Table */}
+          <DashboardPatientsTable
+            myPatients={myPatients}
+            centerPatients={centerPatients}
+            visitCompletions={visitCompletions}
+            pathology={pathology}
+          />
         </div>
-
-        {/* Stats Cards */}
-        <DashboardStatsRedesign
-          totalPatients={centerPatients.length}
-          alertsCount={patientsRequiringFollowup.length}
-          visitsThisMonth={visitsThisMonth || 0}
-          demographics={demographics}
-        />
-
-        {/* Patients Table */}
-        <DashboardPatientsTable
-          myPatients={myPatients}
-          centerPatients={centerPatients}
-          visitCompletions={visitCompletions}
-          pathology={pathology}
-        />
-      </div>
     </main>
   );
 }

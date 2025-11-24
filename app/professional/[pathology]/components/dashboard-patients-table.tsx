@@ -46,53 +46,53 @@ export function DashboardPatientsTable({
         <div className="flex items-center gap-6 w-full md:w-auto">
           <h3 className="text-lg font-bold text-slate-900">Liste des patients</h3>
           <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
-            <button
-              onClick={() => setActiveTab('my-patients')}
+        <button
+          onClick={() => setActiveTab('my-patients')}
               className={`px-3 py-1.5 text-xs font-bold rounded transition-all ${
-                activeTab === 'my-patients'
+            activeTab === 'my-patients'
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-              }`}
-            >
-              Mes patients
-            </button>
-            <button
-              onClick={() => setActiveTab('center-patients')}
+          }`}
+        >
+          Mes patients
+        </button>
+        <button
+          onClick={() => setActiveTab('center-patients')}
               className={`px-3 py-1.5 text-xs font-medium rounded transition-all ${
-                activeTab === 'center-patients'
+            activeTab === 'center-patients'
                   ? 'bg-white text-slate-900 shadow-sm'
                   : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-              }`}
-            >
-              Patients du centre
-            </button>
+          }`}
+        >
+          Patients du centre
+        </button>
           </div>
-        </div>
+      </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
-          {/* Search Input */}
+            {/* Search Input */}
           <div className="relative flex-1 md:w-64">
             <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Rechercher un patient..."
               className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition"
-            />
-          </div>
-          
+              />
+            </div>
+
           {/* Create Patient Button */}
-          <Link href={`/professional/${pathology}/patients/new`}>
-            <button 
+            <Link href={`/professional/${pathology}/patients/new`}>
+              <button 
               className="flex items-center gap-2 px-4 py-2 bg-brand hover:bg-brand-dark text-white text-sm font-bold rounded-lg transition shadow-sm"
-            >
-              <UserPlus className="w-4 h-4" />
-              Créer un patient
-            </button>
-          </Link>
+              >
+                <UserPlus className="w-4 h-4" />
+                Créer un patient
+              </button>
+            </Link>
+          </div>
         </div>
-      </div>
 
       {/* Table */}
       <table className="w-full text-left border-collapse">
@@ -138,14 +138,14 @@ export function DashboardPatientsTable({
                       </div>
                     </Link>
                   </td>
-                  
+
                   <td className="px-6 py-4">
                     <Link href={`/professional/${pathology}/patients/${patient.id}`} className="block">
                       {completion?.scheduledDate ? (
                         <div className="flex flex-col">
                           <div className="flex items-center gap-2 text-sm text-slate-900 font-medium">
                             <Calendar className="w-4 h-4 text-slate-400" />
-                            {formatShortDate(completion.scheduledDate)}
+                              {formatShortDate(completion.scheduledDate)}
                           </div>
                           {completion.visitType && (
                             <span className="text-xs text-slate-500 ml-6">
@@ -163,7 +163,7 @@ export function DashboardPatientsTable({
                     <Link href={`/professional/${pathology}/patients/${patient.id}`} className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-brand text-white flex items-center justify-center text-[10px] font-bold">
                         {doctorInitials}
-                      </div>
+                    </div>
                       <span className="text-sm text-slate-600">{doctorName}</span>
                     </Link>
                   </td>
@@ -174,8 +174,8 @@ export function DashboardPatientsTable({
                         <div 
                           className="h-full bg-brand rounded-full" 
                           style={{ width: `${completion?.completionPercentage || 0}%` }}
-                        />
-                      </div>
+                      />
+                    </div>
                       <span className="text-xs font-bold text-slate-700">
                         {completion?.completionPercentage || 0}%
                       </span>
@@ -187,7 +187,7 @@ export function DashboardPatientsTable({
                       <button className="text-slate-400 hover:text-brand transition">
                         <ChevronRight className="w-5 h-5" />
                       </button>
-                    </Link>
+                </Link>
                   </td>
                 </tr>
               );
@@ -196,14 +196,14 @@ export function DashboardPatientsTable({
             <tr>
               <td colSpan={5} className="px-6 py-12 text-center">
                 <User className="w-12 h-12 text-slate-200 mx-auto mb-3" />
-                <p className="text-sm font-medium text-slate-600 mb-1">
-                  Aucun patient trouvé
-                </p>
-                <p className="text-xs text-slate-400">
-                  {searchTerm 
-                    ? "Essayez de modifier votre recherche"
-                    : "Aucun patient dans cette catégorie"}
-                </p>
+              <p className="text-sm font-medium text-slate-600 mb-1">
+                Aucun patient trouvé
+              </p>
+              <p className="text-xs text-slate-400">
+                {searchTerm 
+                  ? "Essayez de modifier votre recherche"
+                  : "Aucun patient dans cette catégorie"}
+              </p>
               </td>
             </tr>
           )}

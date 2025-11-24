@@ -188,20 +188,20 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
                       "text-lg font-bold",
                       isCompleted ? "text-emerald-900" : "text-slate-900"
                     )}>
-                      {VISIT_TYPE_NAMES[visit.visit_type as keyof typeof VISIT_TYPE_NAMES] || visit.template_name}
-                    </h3>
+                        {VISIT_TYPE_NAMES[visit.visit_type as keyof typeof VISIT_TYPE_NAMES] || visit.template_name}
+                      </h3>
                   </div>
 
                   {/* Date and Doctor */}
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center gap-2 text-sm text-slate-500">
                       <Calendar className="w-4 h-4 text-slate-400" />
-                      {visit.scheduled_date ? formatShortDate(visit.scheduled_date) : 'Date non définie'}
+                        {visit.scheduled_date ? formatShortDate(visit.scheduled_date) : 'Date non définie'}
                     </div>
                     <div className="flex items-center gap-2 text-sm text-slate-500">
                       <User className="w-4 h-4 text-slate-400" />
                       {doctorName}
-                    </div>
+                  </div>
                   </div>
 
                   {/* Progress Bar */}
@@ -218,7 +218,7 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
                             isCompleted ? "bg-emerald-500" : "bg-brand"
                           )}
                           style={{ width: `${visit.completionPercentage}%` }}
-                        />
+                      />
                       </div>
                     </div>
                   )}
@@ -229,7 +229,7 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
                   "p-4 border-t",
                   isCompleted ? "bg-emerald-100/60 border-emerald-200" : "bg-brand/5 border-brand/10"
                 )}>
-                  {getActionButton(visit)}
+                    {getActionButton(visit)}
                 </div>
               </div>
             );
