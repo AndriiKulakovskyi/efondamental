@@ -2,20 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, Calendar, BarChart3, Home } from "lucide-react";
+import { Users, BarChart3, LayoutGrid, ArrowLeft } from "lucide-react";
 
 interface PathologyNavProps {
   pathology: string;
+  pathologyName: string;
 }
 
-export default function PathologyNav({ pathology }: PathologyNavProps) {
+export default function PathologyNav({ pathology, pathologyName }: PathologyNavProps) {
   const pathname = usePathname();
 
   const navItems = [
     {
       href: `/professional/${pathology}`,
       label: "Dashboard",
-      icon: Calendar,
+      icon: LayoutGrid,
       exact: true,
     },
     {
@@ -40,17 +41,25 @@ export default function PathologyNav({ pathology }: PathologyNavProps) {
   };
 
   return (
-    <aside className="w-64 flex-shrink-0">
-      <div className="mb-4">
+    <aside className="w-64 bg-[#F8F7F5] border-r border-slate-200 text-slate-600 flex flex-col z-20">
+      <div className="p-6">
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+          Application
+        </p>
+        <p className="text-sm font-medium text-slate-700 mt-1">
+          {pathologyName}
+        </p>
+      </div>
+
+      <nav className="flex-1 px-3 space-y-1">
         <Link
           href="/professional"
-          className="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-slate-200 hover:text-slate-900 transition"
         >
-          <Home className="h-4 w-4" />
+          <ArrowLeft className="w-5 h-5 text-slate-400" />
           Back to Pathologies
         </Link>
-      </div>
-      <nav className="space-y-1">
+
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href, item.exact);
@@ -59,13 +68,13 @@ export default function PathologyNav({ pathology }: PathologyNavProps) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition ${
                 active
-                  ? "bg-slate-900 text-white"
-                  : "text-slate-700 hover:bg-slate-100"
+                  ? "bg-brand text-white shadow-md shadow-brand/20"
+                  : "text-slate-700 hover:bg-slate-200 hover:text-slate-900"
               }`}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="w-5 h-5" />
               {item.label}
             </Link>
           );

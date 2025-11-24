@@ -23,7 +23,9 @@ export function DashboardStatsRedesign({
         title="Patients du centre"
         value={totalPatients}
         icon={Users}
-        accentColor="#3B82F6"
+        iconBgColor="bg-blue-50"
+        iconColor="text-blue-600"
+        hoverBorderColor="hover:border-blue-300"
       />
 
       {/* Card 2: Active Alerts */}
@@ -31,7 +33,10 @@ export function DashboardStatsRedesign({
         title="Alertes actives"
         value={alertsCount}
         icon={AlertTriangle}
-        accentColor="#F59E0B"
+        iconBgColor="bg-red-50"
+        iconColor="text-red-600"
+        hoverBorderColor="hover:border-red-400"
+        valueColor="text-red-600"
       />
 
       {/* Card 3: Visits This Month */}
@@ -39,43 +44,47 @@ export function DashboardStatsRedesign({
         title="Visites ce mois-ci"
         value={visitsThisMonth}
         icon={Calendar}
-        accentColor="#10B981"
+        iconBgColor="bg-emerald-50"
+        iconColor="text-emerald-600"
+        hoverBorderColor="hover:border-emerald-300"
       />
     </div>
   );
 }
 
-// Simple stat card component
+// Enhanced stat card component matching HTML mockup
 interface StatCardProps {
   title: string;
   value: number;
   icon: React.ElementType;
-  accentColor: string;
+  iconBgColor: string;
+  iconColor: string;
+  hoverBorderColor: string;
+  valueColor?: string;
 }
 
-function StatCard({ title, value, icon: Icon, accentColor }: StatCardProps) {
+function StatCard({ 
+  title, 
+  value, 
+  icon: Icon, 
+  iconBgColor,
+  iconColor,
+  hoverBorderColor,
+  valueColor = "text-slate-900"
+}: StatCardProps) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all hover:border-slate-300">
-      <div className="p-6">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <p className="text-sm font-medium text-slate-600 mb-2">
-              {title}
-            </p>
-            <p className="text-4xl font-bold text-slate-900">
-              {value}
-            </p>
-          </div>
-          <div
-            className="w-12 h-12 rounded-lg flex items-center justify-center"
-            style={{ backgroundColor: `${accentColor}15` }}
-          >
-            <Icon className="w-6 h-6" style={{ color: accentColor }} />
-          </div>
-        </div>
+    <div className={`group bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between hover:shadow-md ${hoverBorderColor} transition-all cursor-pointer`}>
+      <div>
+        <p className="text-xs font-medium text-slate-500 uppercase tracking-wide group-hover:${iconColor} transition">
+          {title}
+        </p>
+        <p className={`text-4xl font-bold mt-2 ${valueColor}`}>
+          {value}
+        </p>
       </div>
-      {/* Subtle bottom accent */}
-      <div className="h-1" style={{ backgroundColor: accentColor }} />
+      <div className={`w-12 h-12 rounded-xl ${iconBgColor} ${iconColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+        <Icon className="w-6 h-6" />
+      </div>
     </div>
   );
 }

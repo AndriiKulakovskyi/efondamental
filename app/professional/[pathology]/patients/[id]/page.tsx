@@ -8,7 +8,7 @@ import {
 } from "@/lib/services/evaluation.service";
 import { getUserContext } from "@/lib/rbac/middleware";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, User as UserIcon } from "lucide-react";
+import { AlertTriangle, MoreVertical, Filter, Calendar } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { notFound, redirect } from "next/navigation";
 import { formatRiskLevel } from "@/lib/utils/formatting";
@@ -23,6 +23,7 @@ import { EvaluationsDisplay } from "./components/evaluations-display";
 import { AnalyticsSummary } from "./components/analytics-summary";
 import { QuickActionsMenu } from "./components/quick-actions-menu";
 import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
 
 export default async function PatientDetailPage({
   params,
@@ -81,73 +82,66 @@ export default async function PatientDetailPage({
   const risk = formatRiskLevel(riskLevel);
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-12">
+    <div className="min-h-screen bg-[#FDFBFA] pb-12">
       <div className="px-12 py-8 space-y-6">
-        <Breadcrumb
-          items={[
-            { label: "Tableau de bord", href: `/professional/${pathology}` },
-            { label: "Patients", href: `/professional/${pathology}/patients` },
-            { label: `${patient.first_name} ${patient.last_name}` },
-          ]}
-        />
+        {/* Breadcrumb */}
+        <nav className="flex text-sm text-slate-400 font-medium">
+          <a href={`/professional/${pathology}`} className="hover:text-slate-600 transition">
+            Tableau de bord
+          </a>
+          <span className="mx-2">/</span>
+          <a href={`/professional/${pathology}/patients`} className="hover:text-slate-600 transition">
+            Patients
+          </a>
+          <span className="mx-2">/</span>
+          <span className="text-slate-900">{patient.first_name} {patient.last_name}</span>
+        </nav>
 
         {/* Patient Header Card */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start gap-4">
-              <Avatar 
-                firstName={patient.first_name} 
-                lastName={patient.last_name}
-                className="h-16 w-16 text-lg"
-              />
-              <div>
-                <h2 className="text-3xl font-bold text-slate-900 mb-1">
-                  {patient.first_name} {patient.last_name}
-                </h2>
-                <div className="flex items-center gap-4 text-sm text-slate-600">
-                  <span className="flex items-center gap-1">
-                    <UserIcon className="h-4 w-4" />
-                    DMI: <span className="font-mono font-medium">{patient.medical_record_number}</span>
-                  </span>
-                  <span className="text-slate-400">•</span>
-                  <span>{patient.pathology_name}</span>
-                </div>
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex items-start justify-between">
+          <div className="flex items-center gap-5">
+            <div className="w-20 h-20 rounded-full bg-slate-900 text-white flex items-center justify-center text-2xl font-bold tracking-wider">
+              {patient.first_name[0]}{patient.last_name[0]}
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900">
+                {patient.first_name} {patient.last_name}
+              </h2>
+              <div className="flex items-center gap-3 mt-1 text-slate-500 text-sm">
+                <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-medium border border-slate-200">
+                  DMI: {patient.medical_record_number}
+                </span>
+                <span>&bull;</span>
+                <span>{patient.pathology_name}</span>
               </div>
             </div>
-            <QuickActionsMenu
-              patientId={id}
-              patientFirstName={patient.first_name}
-              patientLastName={patient.last_name}
-              currentEmail={patient.email}
-              currentAssignedTo={patient.assigned_to}
-              createdBy={patient.created_by}
-              currentUserId={context.user.id}
-              doctors={doctors || []}
-              pathology={pathology}
-            />
           </div>
+          <button className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg transition shadow-sm flex items-center gap-2">
+            <MoreVertical className="w-4 h-4" />
+            Actions rapides
+          </button>
+        </div>
 
-          {/* Risk Alert */}
-          {riskLevel !== 'none' && (
-            <div className={`mt-4 border-l-4 rounded-lg p-4 ${
-              riskLevel === 'high' ? 'bg-red-50 border-red-500' :
-              riskLevel === 'moderate' ? 'bg-amber-50 border-amber-500' :
-              'bg-blue-50 border-blue-500'
-            }`}>
-              <div className="flex items-center gap-3">
-                <AlertTriangle className={`h-5 w-5 ${risk.color}`} />
-                <div>
-                  <span className={`font-bold ${risk.color}`}>
-                    Niveau de risque {risk.label.toLowerCase()}
-                  </span>
-                  <p className="text-xs text-slate-600 mt-0.5">
-                    Nécessite attention clinique et suivi
-                  </p>
-                </div>
+        {/* Risk Alert */}
+        {riskLevel !== 'none' && (
+          <div className={`border-l-4 rounded-lg p-4 ${
+            riskLevel === 'high' ? 'bg-red-50 border-red-500' :
+            riskLevel === 'moderate' ? 'bg-amber-50 border-amber-500' :
+            'bg-blue-50 border-blue-500'
+          }`}>
+            <div className="flex items-center gap-3">
+              <AlertTriangle className={`h-5 w-5 ${risk.color}`} />
+              <div>
+                <span className={`font-bold ${risk.color}`}>
+                  Niveau de risque {risk.label.toLowerCase()}
+                </span>
+                <p className="text-xs text-slate-600 mt-0.5">
+                  Nécessite attention clinique et suivi
+                </p>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Stat Cards */}
         <PatientStatCards 
@@ -156,77 +150,90 @@ export default async function PatientDetailPage({
           pathology={pathology}
         />
 
-        {/* Tabs */}
-        <div className="space-y-6">
-          <Tabs defaultValue="visits" className="w-full">
-            <div className="inline-flex bg-white rounded-lg p-1 border border-slate-200 shadow-sm">
+        {/* Tabs with Actions */}
+        <Tabs defaultValue="visits" className="w-full">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-slate-200 pb-1">
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
               <TabsList className="bg-transparent border-0 p-0">
                 <TabsTrigger 
                   value="visits"
-                  className="data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=inactive]:text-slate-600 px-6 py-2 rounded-md"
+                  className="px-4 py-2 bg-white text-slate-900 text-sm font-semibold rounded-lg shadow-sm data-[state=inactive]:bg-transparent data-[state=inactive]:shadow-none data-[state=inactive]:text-slate-500"
                 >
                   Visites
                 </TabsTrigger>
                 <TabsTrigger 
                   value="overview"
-                  className="data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=inactive]:text-slate-600 px-6 py-2 rounded-md"
+                  className="px-4 py-2 text-slate-500 hover:text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200/50 transition data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm"
                 >
                   Vue d'ensemble
                 </TabsTrigger>
                 <TabsTrigger 
                   value="evaluations"
-                  className="data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=inactive]:text-slate-600 px-6 py-2 rounded-md"
+                  className="px-4 py-2 text-slate-500 hover:text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200/50 transition data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm"
                 >
                   Évaluations
                 </TabsTrigger>
                 <TabsTrigger 
                   value="analytics"
-                  className="data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=inactive]:text-slate-600 px-6 py-2 rounded-md"
+                  className="px-4 py-2 text-slate-500 hover:text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200/50 transition data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm"
                 >
                   Analyses
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            <TabsContent value="visits" className="mt-6">
-              <VisitCards 
-                visits={visitsWithCompletion}
-                pathology={pathology}
-                patientId={id}
-              />
-            </TabsContent>
+            <div className="flex items-center gap-3">
+              <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition shadow-sm">
+                <Filter className="w-4 h-4" />
+                Filtrer
+              </button>
+              <Link href={`/professional/${pathology}/patients/${id}/visits/new`}>
+                <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition shadow-md">
+                  <Calendar className="w-4 h-4" />
+                  Planifier une visite
+                </button>
+              </Link>
+            </div>
+          </div>
 
-            <TabsContent value="overview" className="space-y-6 mt-6">
-              <InvitationStatus
-                patientId={id}
-                patientEmail={patient.email}
-                hasUserAccount={invitationStatus.hasUserAccount}
-                pendingInvitation={invitationStatus.pendingInvitation}
-              />
+          <TabsContent value="visits" className="mt-6">
+            <VisitCards 
+              visits={visitsWithCompletion}
+              pathology={pathology}
+              patientId={id}
+            />
+          </TabsContent>
 
-              <PatientOverview patient={patient} />
-            </TabsContent>
+          <TabsContent value="overview" className="space-y-6 mt-6">
+            <InvitationStatus
+              patientId={id}
+              patientEmail={patient.email}
+              hasUserAccount={invitationStatus.hasUserAccount}
+              pendingInvitation={invitationStatus.pendingInvitation}
+            />
 
-            <TabsContent value="evaluations" className="mt-6">
-              <EvaluationsDisplay evaluations={evaluations} />
-            </TabsContent>
+            <PatientOverview patient={patient} />
+          </TabsContent>
 
-            <TabsContent value="analytics" className="space-y-6 mt-6">
-              <AnalyticsSummary 
-                moodTrend={moodTrend}
-                riskHistory={riskHistory}
-                adherenceTrend={adherenceTrend}
-                currentRiskLevel={riskLevel}
-              />
-              
-              <AnalyticsCharts
-                moodTrend={moodTrend}
-                riskHistory={riskHistory}
-                adherenceTrend={adherenceTrend}
-              />
-            </TabsContent>
-          </Tabs>
-        </div>
+          <TabsContent value="evaluations" className="mt-6">
+            <EvaluationsDisplay evaluations={evaluations} />
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6 mt-6">
+            <AnalyticsSummary 
+              moodTrend={moodTrend}
+              riskHistory={riskHistory}
+              adherenceTrend={adherenceTrend}
+              currentRiskLevel={riskLevel}
+            />
+            
+            <AnalyticsCharts
+              moodTrend={moodTrend}
+              riskHistory={riskHistory}
+              adherenceTrend={adherenceTrend}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

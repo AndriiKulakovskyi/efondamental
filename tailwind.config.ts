@@ -11,6 +11,11 @@ export default {
   theme: {
     extend: {
       colors: {
+        brand: {
+          DEFAULT: '#FF4A3F',
+          dark: '#E0392E',
+          light: '#FFF0EF'
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

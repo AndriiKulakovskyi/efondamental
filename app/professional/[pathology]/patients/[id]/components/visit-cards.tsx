@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Calendar, Clock, CheckCircle, XCircle, Eye, Play, ArrowRight, Filter } from "lucide-react";
+import { Calendar, Clock, CheckCircle, XCircle, Eye, Play, ArrowRight, Filter, User } from "lucide-react";
 import { formatShortDate } from "@/lib/utils/date";
-import { ProgressBar } from "@/components/ui/progress-bar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -62,35 +61,38 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
     return false;
   });
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, completionPercentage: number) => {
+    // Show completed badge if 100% complete, regardless of status
+    if (completionPercentage === 100 || status === 'completed') {
+      return (
+        <span className="bg-emerald-100 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide flex items-center gap-1.5">
+          <CheckCircle className="w-3 h-3" />
+          Terminée
+        </span>
+      );
+    }
+    
     switch (status) {
-      case 'completed':
-        return (
-          <Badge className="bg-green-100 text-green-700 border-green-200">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            Terminée
-          </Badge>
-        );
       case 'in_progress':
         return (
-          <Badge className="bg-blue-100 text-blue-700 border-blue-200">
-            <Clock className="w-3 h-3 mr-1" />
+          <span className="bg-orange-50 text-orange-600 border border-orange-100 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse"></span>
             En cours
-          </Badge>
+          </span>
         );
       case 'scheduled':
         return (
-          <Badge className="bg-slate-100 text-slate-700 border-slate-200">
-            <Calendar className="w-3 h-3 mr-1" />
+          <span className="bg-orange-50 text-orange-600 border border-orange-100 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse"></span>
             Planifiée
-          </Badge>
+          </span>
         );
       case 'cancelled':
         return (
-          <Badge className="bg-red-100 text-red-700 border-red-200">
-            <XCircle className="w-3 h-3 mr-1" />
+          <span className="bg-red-100 text-red-800 border border-red-200 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide flex items-center gap-1.5">
+            <XCircle className="w-3 h-3" />
             Annulée
-          </Badge>
+          </span>
         );
       default:
         return null;
@@ -98,54 +100,26 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
   };
 
   const getActionButton = (visit: VisitWithCompletion) => {
-    const isComplete = visit.completionPercentage === 100;
-
-    if (visit.status === 'completed') {
+    // Show review button if 100% complete, regardless of status
+    if (visit.completionPercentage === 100 || visit.status === 'completed') {
       return (
         <Link href={`/professional/${pathology}/patients/${patientId}/visits/${visit.id}`}>
-          <Button variant="outline" size="sm" className="w-full">
-            <Eye className="w-4 h-4 mr-2" />
+          <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 shadow-sm">
+            <Eye className="w-4 h-4" />
             Revoir
-          </Button>
+          </button>
         </Link>
       );
     }
     
-    if (visit.status === 'in_progress') {
-      return (
-        <Link href={`/professional/${pathology}/patients/${patientId}/visits/${visit.id}`}>
-          <Button size="sm" className={cn(
-            "w-full",
-            isComplete ? "bg-slate-900 hover:bg-slate-800" : "bg-blue-600 hover:bg-blue-700"
-          )}>
-            {isComplete ? (
-              <Eye className="w-4 h-4 mr-2" />
-            ) : (
-              <ArrowRight className="w-4 h-4 mr-2" />
-            )}
-            {isComplete ? "Revoir" : "Continuer"}
-          </Button>
-        </Link>
-      );
-    }
-    
-    if (visit.status === 'scheduled') {
+    if (visit.status === 'in_progress' || visit.status === 'scheduled') {
       const hasStarted = visit.completionPercentage > 0;
       return (
         <Link href={`/professional/${pathology}/patients/${patientId}/visits/${visit.id}`}>
-          <Button size="sm" className={cn(
-            "w-full",
-            hasStarted && !isComplete ? "bg-blue-600 hover:bg-blue-700" : "bg-slate-900 hover:bg-slate-800"
-          )}>
-            {isComplete ? (
-              <Eye className="w-4 h-4 mr-2" />
-            ) : hasStarted ? (
-              <ArrowRight className="w-4 h-4 mr-2" />
-            ) : (
-              <Play className="w-4 h-4 mr-2" />
-            )}
-            {isComplete ? "Revoir" : hasStarted ? "Continuer" : "Commencer"}
-          </Button>
+          <button className="w-full py-2.5 bg-brand hover:bg-brand-dark text-white rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 shadow-sm">
+            {hasStarted ? 'Continuer' : 'Commencer'}
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </Link>
       );
     }
@@ -225,56 +199,76 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
 
       {/* Visit Cards Grid */}
       {filteredVisits.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredVisits.map((visit) => {
             const doctorName = visit.conducted_by_first_name && visit.conducted_by_last_name
               ? `Dr. ${visit.conducted_by_first_name} ${visit.conducted_by_last_name}`
               : 'Non assigné';
 
+            // A visit is completed if status is 'completed' OR if completion is 100%
+            const isCompleted = visit.status === 'completed' || visit.completionPercentage === 100;
+            const isInProgress = !isCompleted && (visit.status === 'in_progress' || visit.status === 'scheduled');
+
             return (
               <div
                 key={visit.id}
-                className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden"
+                className={cn(
+                  "rounded-2xl overflow-hidden flex flex-col group transition-all cursor-pointer",
+                  isCompleted && "bg-emerald-50/70 border-2 border-emerald-300 shadow-lg shadow-emerald-200/60 hover:shadow-xl hover:border-emerald-400",
+                  isInProgress && "bg-white border-2 border-brand/10 shadow-lg shadow-brand/5 hover:border-brand/30",
+                  !isCompleted && !isInProgress && "bg-white border border-slate-200"
+                )}
               >
-                <div className="p-6 space-y-4">
+                <div className="p-6 flex-1">
                   {/* Header */}
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-1">
-                        {VISIT_TYPE_NAMES[visit.visit_type as keyof typeof VISIT_TYPE_NAMES] || visit.template_name}
-                      </h3>
-                      <p className="text-sm text-slate-500 flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        {visit.scheduled_date ? formatShortDate(visit.scheduled_date) : 'Date non définie'}
-                      </p>
-                    </div>
-                    {getStatusBadge(visit.status)}
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className={cn(
+                      "text-lg font-bold",
+                      isCompleted ? "text-emerald-900" : "text-slate-900"
+                    )}>
+                      {VISIT_TYPE_NAMES[visit.visit_type as keyof typeof VISIT_TYPE_NAMES] || visit.template_name}
+                    </h3>
+                    {getStatusBadge(visit.status, visit.completionPercentage)}
                   </div>
 
-                  {/* Doctor */}
-                  <div className="text-sm text-slate-600">
-                    <span className="font-medium">Médecin:</span> {doctorName}
+                  {/* Date and Doctor */}
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                      <Calendar className="w-4 h-4 text-slate-400" />
+                      {visit.scheduled_date ? formatShortDate(visit.scheduled_date) : 'Date non définie'}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                      <User className="w-4 h-4 text-slate-400" />
+                      {doctorName}
+                    </div>
                   </div>
 
                   {/* Progress Bar */}
                   {visit.status !== 'cancelled' && (
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                          Progression
-                        </span>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-xs font-semibold uppercase tracking-wide">
+                        <span className="text-slate-500">Progression</span>
+                        <span className={isCompleted ? "text-emerald-600 font-bold" : "text-slate-900"}>{visit.completionPercentage}%</span>
                       </div>
-                      <ProgressBar 
-                        percentage={visit.completionPercentage}
-                        size="md"
-                      />
+                      <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div 
+                          className={cn(
+                            "h-full rounded-full",
+                            isCompleted ? "bg-emerald-500" : "bg-brand"
+                          )}
+                          style={{ width: `${visit.completionPercentage}%` }}
+                        />
+                      </div>
                     </div>
                   )}
+                </div>
 
-                  {/* Action Button */}
-                  <div className="pt-2">
-                    {getActionButton(visit)}
-                  </div>
+                {/* Footer with Action Button */}
+                <div className={cn(
+                  "p-4 border-t",
+                  isCompleted ? "bg-emerald-100/60 border-emerald-200" : "bg-brand/5 border-brand/10"
+                )}>
+                  {getActionButton(visit)}
                 </div>
               </div>
             );

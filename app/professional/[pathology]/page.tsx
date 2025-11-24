@@ -11,8 +11,7 @@ import { PathologyType, PATHOLOGY_NAMES } from "@/lib/types/enums";
 import { redirect } from "next/navigation";
 import { DashboardStatsRedesign } from "./components/dashboard-stats-redesign";
 import { DashboardPatientsTable } from "./components/dashboard-patients-table";
-import { Activity } from "lucide-react";
-import { AppFooter } from "@/components/ui/app-footer";
+import { LayoutGrid } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function PathologyDashboard({
@@ -64,53 +63,41 @@ export default async function PathologyDashboard({
   const { count: visitsThisMonth } = await visitsQuery;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Main Content */}
-      <div className="flex-1 relative overflow-hidden">
-        {/* Background gradient circle - more subtle */}
-        <div className="absolute top-1/4 right-[10%] -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-red-50 to-orange-50 rounded-full blur-3xl opacity-40 pointer-events-none" />
+    <main className="flex-1 overflow-y-auto p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         
-        <div className="relative z-10 px-12 py-8 space-y-8">
-          {/* Header - simplified */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {/* Pathology Icon - smaller, more subtle */}
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#E7000B] to-[#F54900] flex items-center justify-center shadow-sm">
-                <Activity className="w-6 h-6 text-white" />
-              </div>
-              
-              <div>
-                <h1 className="text-3xl font-bold text-slate-900">
-                  {PATHOLOGY_NAMES[pathologyType]}
-                </h1>
-                <p className="text-sm text-slate-600 mt-1">
-                  {pathologyData?.description || 'Suivi de la dépression résistante'}
-                </p>
-              </div>
-            </div>
+        {/* Header */}
+        <div className="flex items-start gap-4 mb-6">
+          <div className="w-12 h-12 rounded-xl bg-brand/10 text-brand flex items-center justify-center shrink-0">
+            <LayoutGrid className="w-6 h-6" />
           </div>
-
-          {/* Stats Cards */}
-          <DashboardStatsRedesign
-            totalPatients={centerPatients.length}
-            alertsCount={patientsRequiringFollowup.length}
-            visitsThisMonth={visitsThisMonth || 0}
-            demographics={demographics}
-          />
-
-          {/* Patients Table */}
-          <DashboardPatientsTable
-            myPatients={myPatients}
-            centerPatients={centerPatients}
-            visitCompletions={visitCompletions}
-            pathology={pathology}
-          />
+          <div>
+            <h2 className="text-3xl font-bold text-slate-900">
+              {PATHOLOGY_NAMES[pathologyType]}
+            </h2>
+            <p className="text-slate-500 mt-1">
+              {pathologyData?.description || 'Mood disorder characterized by episodes of mania and depression'}
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Footer */}
-      <AppFooter />
-    </div>
+        {/* Stats Cards */}
+        <DashboardStatsRedesign
+          totalPatients={centerPatients.length}
+          alertsCount={patientsRequiringFollowup.length}
+          visitsThisMonth={visitsThisMonth || 0}
+          demographics={demographics}
+        />
+
+        {/* Patients Table */}
+        <DashboardPatientsTable
+          myPatients={myPatients}
+          centerPatients={centerPatients}
+          visitCompletions={visitCompletions}
+          pathology={pathology}
+        />
+      </div>
+    </main>
   );
 }
 

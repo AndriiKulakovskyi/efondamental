@@ -691,8 +691,8 @@ export default async function VisitDetailPage({
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Header with Progress Visualization */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+      {/* Enhanced Header with Sticky Navigation */}
+      <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-xl shadow-sm p-6 sticky top-0 z-10">
         <div className="flex items-start justify-between gap-6">
           <div className="flex items-start gap-6 flex-1">
             {/* Circular Progress */}
@@ -719,16 +719,22 @@ export default async function VisitDetailPage({
               <div>
                 <span
                   className={cn(
-                    "inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium border",
+                    "inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold border",
                     visit.status === 'completed'
-                      ? 'bg-green-100 text-green-800 border-green-200'
+                      ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
                       : visit.status === 'in_progress'
                       ? 'bg-blue-100 text-blue-800 border-blue-200'
                       : visit.status === 'scheduled'
-                      ? 'bg-slate-100 text-slate-800 border-slate-200'
+                      ? 'bg-orange-100 text-orange-800 border-orange-200'
                       : 'bg-red-100 text-red-800 border-red-200'
                   )}
                 >
+                  <span className={cn(
+                    "w-2.5 h-2.5 rounded-full",
+                    visit.status === 'completed' ? 'bg-emerald-500' :
+                    visit.status === 'in_progress' ? 'bg-blue-500' :
+                    visit.status === 'scheduled' ? 'bg-orange-400' : 'bg-red-500'
+                  )}></span>
                   {visit.status === 'completed' ? 'Terminée' : 
                    visit.status === 'in_progress' ? 'En cours' : 
                    visit.status === 'scheduled' ? 'Planifiée' :
@@ -747,7 +753,7 @@ export default async function VisitDetailPage({
                     <div
                       className={cn(
                         "h-2.5 rounded-full transition-all duration-500",
-                        completionStatus.completionPercentage === 100 ? "bg-green-600" : "bg-blue-600"
+                        completionStatus.completionPercentage === 100 ? "bg-emerald-600" : "bg-brand"
                       )}
                       style={{ width: `${completionStatus.completionPercentage}%` }}
                     />
@@ -778,18 +784,27 @@ export default async function VisitDetailPage({
 
       {/* Clinical Modules */}
       <div className="space-y-4">
-        <h3 className="text-xl font-semibold text-slate-900">Modules cliniques</h3>
+        <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+          Parcours de Soin
+          <span className="h-px flex-1 bg-slate-200 ml-4"></span>
+        </h3>
 
-        {modulesWithQuestionnaires.map((module, index) => (
-          <ExpandableModuleCard
-            key={module.id}
-            module={module}
-            index={index}
-            pathology={pathology}
-            patientId={patientId}
-            visitId={visitId}
-          />
-        ))}
+        <div className="relative space-y-6 pl-4">
+          {/* Timeline connector line */}
+          <div className="absolute top-5 left-[31px] w-0.5 h-[calc(100%-40px)] bg-slate-200 -z-10"></div>
+
+          {modulesWithQuestionnaires.map((module, index) => (
+            <ExpandableModuleCard
+              key={module.id}
+              module={module}
+              index={index}
+              pathology={pathology}
+              patientId={patientId}
+              visitId={visitId}
+              totalModules={modulesWithQuestionnaires.length}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Visit Notes */}

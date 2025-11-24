@@ -59,6 +59,10 @@ import {
   saveDsm5ComorbidResponse
 } from '@/lib/services/questionnaire-dsm5.service';
 import { 
+  getVisitCompletionStatus,
+  completeVisit
+} from '@/lib/services/visit.service';
+import { 
   AsrmResponseInsert, 
   QidsResponseInsert, 
   MdqResponseInsert,
@@ -484,6 +488,18 @@ export async function submitProfessionalQuestionnaireAction(
         
       default:
         throw new Error(`Unknown questionnaire code: ${questionnaireCode}`);
+    }
+    
+    // Check if visit is now 100% complete and auto-complete it
+    try {
+      const completionStatus = await getVisitCompletionStatus(visitId);
+      if (completionStatus.completionPercentage === 100) {
+        await completeVisit(visitId);
+        console.log(`Visit ${visitId} automatically completed (100% questionnaires filled)`);
+      }
+    } catch (error) {
+      // Log but don't fail the questionnaire submission if auto-complete fails
+      console.error('Failed to auto-complete visit:', error);
     }
     
     revalidatePath('/professional'); // Broad revalidation or specific if we knew the path
