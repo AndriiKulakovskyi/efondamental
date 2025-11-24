@@ -690,9 +690,9 @@ export default async function VisitDetailPage({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto px-8 space-y-8">
       {/* Enhanced Header with Sticky Navigation */}
-      <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-xl shadow-sm p-6 sticky top-0 z-10">
+      <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm p-8 sticky top-0 z-10">
         <div className="flex items-start justify-between gap-6">
           <div className="flex items-start gap-6 flex-1">
             {/* Circular Progress */}
@@ -704,13 +704,13 @@ export default async function VisitDetailPage({
                 {visit.template_name}
               </h2>
               <div className="flex items-center gap-4 text-sm text-slate-600 mb-3">
-                <span className="flex items-center gap-1">
-                  <User className="h-4 w-4" />
+                <span className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
                   {visit.patient_first_name} {visit.patient_last_name}
                 </span>
                 <span className="text-slate-400">•</span>
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
+                <span className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
                   {visit.scheduled_date && formatDateTime(visit.scheduled_date)}
                 </span>
               </div>
@@ -783,16 +783,13 @@ export default async function VisitDetailPage({
       />
 
       {/* Clinical Modules */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+      <div className="space-y-6">
+        <h3 className="text-xl font-bold text-slate-900 flex items-center gap-3">
           Parcours de Soin
           <span className="h-px flex-1 bg-slate-200 ml-4"></span>
         </h3>
 
-        <div className="relative space-y-6 pl-4">
-          {/* Timeline connector line */}
-          <div className="absolute top-5 left-[31px] w-0.5 h-[calc(100%-40px)] bg-slate-200 -z-10"></div>
-
+        <div className="relative space-y-6 pl-2">
           {modulesWithQuestionnaires.map((module, index) => (
             <ExpandableModuleCard
               key={module.id}
@@ -809,7 +806,7 @@ export default async function VisitDetailPage({
 
       {/* Visit Notes */}
       {visit.notes && (
-        <Card className="hover:shadow-md transition-shadow duration-200">
+        <Card className="hover:shadow-md transition-shadow duration-200 rounded-2xl">
           <CardHeader>
             <CardTitle>Notes de visite</CardTitle>
           </CardHeader>
