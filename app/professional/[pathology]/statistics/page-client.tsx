@@ -5,6 +5,7 @@ import { Users, Calendar, CheckCircle, TrendingUp, PieChart as PieChartIcon, Tre
 import { PatientDemographics } from "@/lib/services/patient.service";
 import { DemographicCharts } from "./components/demographic-charts";
 import { ActivityGraph } from "./components/activity-graph";
+import { VisitTypeDonuts } from "./components/visit-type-donuts";
 
 interface StatisticsClientProps {
   pathologyName: string;
@@ -136,56 +137,18 @@ export function StatisticsClient({
       </section>
 
       {/* Visit Type Breakdown */}
-      <section className="max-w-4xl mx-auto w-full bg-white rounded-2xl border border-slate-200 shadow-sm p-8 space-y-6">
+      <section className="max-w-6xl mx-auto w-full bg-white rounded-2xl border border-slate-200 shadow-sm p-8 space-y-6">
         <div className="text-center">
           <h3 className="text-lg font-bold text-slate-900 mb-2 flex items-center justify-center gap-2">
             <PieChartIcon className="w-5 h-5 text-brand" />
             Répartition des Visites
           </h3>
           <p className="text-sm text-slate-500 max-w-2xl mx-auto">
-            Visualisez la progression de vos visites par type. Les barres de progression indiquent le taux de complétion pour chaque catégorie de visite.
+            Visualisez la progression de vos visites par type. Les graphiques circulaires indiquent le taux de complétion pour chaque catégorie de visite.
           </p>
         </div>
         
-        <div className="space-y-8">
-          {visitTypeStats.length > 0 ? (
-            visitTypeStats.map((stat) => {
-              const completionPercentage = stat.count > 0 ? (stat.completedCount / stat.count) * 100 : 0;
-              const getBarColor = () => {
-                if (completionPercentage === 0) return 'bg-slate-300';
-                if (completionPercentage < 50) return 'bg-brand';
-                return 'bg-emerald-500';
-              };
-
-              return (
-                <div key={stat.visitType}>
-                  <div className="flex justify-between items-end mb-2">
-                    <div>
-                      <h4 className="text-base font-bold text-slate-900">{stat.visitTypeName}</h4>
-                      <p className="text-sm text-slate-400">
-                        {stat.completedCount} of {stat.count} completed
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xl font-bold text-slate-900">{stat.count}</span>
-                      <span className="text-xs text-slate-400 block uppercase font-medium">Total</span>
-                    </div>
-                  </div>
-                  <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full ${getBarColor()} rounded-full transition-all duration-500`}
-                      style={{ width: `${completionPercentage}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <div className="text-center py-12 text-slate-500">
-              Aucune visite ce mois
-            </div>
-          )}
-        </div>
+        <VisitTypeDonuts visitTypeStats={visitTypeStats} />
       </section>
 
       {/* Demographics */}

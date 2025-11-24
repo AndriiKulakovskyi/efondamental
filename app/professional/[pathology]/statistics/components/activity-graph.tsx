@@ -34,7 +34,7 @@ export function ActivityGraph({ data }: ActivityGraphProps) {
     <div className="space-y-4">
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 relative">
         {/* Graph Container - Fixed height with relative positioning */}
-        <div className="relative h-64 mb-6">
+        <div className="relative h-44 mb-6">
           {/* Grid Lines - positioned absolutely to cover the chart area */}
           <div className="absolute inset-x-0 top-0 bottom-8 flex flex-col justify-between pointer-events-none z-0">
             <div className="w-full h-px bg-slate-300 opacity-30"></div>
@@ -48,7 +48,7 @@ export function ActivityGraph({ data }: ActivityGraphProps) {
           <div className="relative h-full flex items-end justify-between gap-1.5 md:gap-2 pb-8 z-10">
             {graphData.map((item, index) => {
               // Calculate height in pixels, normalized to max count
-              const barHeight = maxCount > 0 ? Math.round((item.count / maxCount) * 200) : 0;
+              const barHeight = maxCount > 0 ? Math.round((item.count / maxCount) * 140) : 0;
               const minHeight = item.count > 0 ? 16 : 4;
               const finalHeight = Math.max(barHeight, item.count > 0 ? minHeight : 0);
               
@@ -64,7 +64,7 @@ export function ActivityGraph({ data }: ActivityGraphProps) {
                   onMouseLeave={() => setHoveredIndex(null)}
                 >
                   {/* Bar wrapper with fixed height */}
-                  <div className="w-full relative" style={{ height: '200px' }}>
+                  <div className="w-full relative" style={{ height: '140px' }}>
                     {/* The actual bar - positioned at bottom */}
                     <div className="absolute bottom-0 left-0 right-0 flex flex-col justify-end">
                       <div
