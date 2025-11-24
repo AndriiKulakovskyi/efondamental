@@ -692,7 +692,7 @@ export default async function VisitDetailPage({
   return (
     <div className="max-w-7xl mx-auto px-8 space-y-8">
       {/* Enhanced Header with Sticky Navigation */}
-      <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm p-8 sticky top-0 z-10">
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-md p-8 sticky top-0 z-50 mb-2">
         <div className="flex items-start justify-between gap-6">
           <div className="flex items-start gap-6 flex-1">
             {/* Circular Progress */}
@@ -712,33 +712,6 @@ export default async function VisitDetailPage({
                 <span className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
                   {visit.scheduled_date && formatDateTime(visit.scheduled_date)}
-                </span>
-              </div>
-              
-              {/* Status Badge */}
-              <div>
-                <span
-                  className={cn(
-                    "inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold border",
-                    visit.status === 'completed'
-                      ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
-                      : visit.status === 'in_progress'
-                      ? 'bg-blue-100 text-blue-800 border-blue-200'
-                      : visit.status === 'scheduled'
-                      ? 'bg-orange-100 text-orange-800 border-orange-200'
-                      : 'bg-red-100 text-red-800 border-red-200'
-                  )}
-                >
-                  <span className={cn(
-                    "w-2.5 h-2.5 rounded-full",
-                    visit.status === 'completed' ? 'bg-emerald-500' :
-                    visit.status === 'in_progress' ? 'bg-blue-500' :
-                    visit.status === 'scheduled' ? 'bg-orange-400' : 'bg-red-500'
-                  )}></span>
-                  {visit.status === 'completed' ? 'Terminée' : 
-                   visit.status === 'in_progress' ? 'En cours' : 
-                   visit.status === 'scheduled' ? 'Planifiée' :
-                   visit.status === 'cancelled' ? 'Annulée' : visit.status}
                 </span>
               </div>
 

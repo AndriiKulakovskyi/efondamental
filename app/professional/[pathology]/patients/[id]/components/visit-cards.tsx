@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Calendar, Clock, CheckCircle, XCircle, Eye, Play, ArrowRight, Filter, User } from "lucide-react";
+import { Calendar, Clock, Eye, Play, ArrowRight, Filter, User } from "lucide-react";
 import { formatShortDate } from "@/lib/utils/date";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -60,44 +60,6 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
     
     return false;
   });
-
-  const getStatusBadge = (status: string, completionPercentage: number) => {
-    // Show completed badge if 100% complete, regardless of status
-    if (completionPercentage === 100 || status === 'completed') {
-      return (
-        <span className="bg-emerald-100 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide flex items-center gap-1.5">
-          <CheckCircle className="w-3 h-3" />
-          Terminée
-        </span>
-      );
-    }
-    
-    switch (status) {
-      case 'in_progress':
-        return (
-          <span className="bg-orange-50 text-orange-600 border border-orange-100 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse"></span>
-            En cours
-          </span>
-        );
-      case 'scheduled':
-        return (
-          <span className="bg-orange-50 text-orange-600 border border-orange-100 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse"></span>
-            Planifiée
-          </span>
-        );
-      case 'cancelled':
-        return (
-          <span className="bg-red-100 text-red-800 border border-red-200 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide flex items-center gap-1.5">
-            <XCircle className="w-3 h-3" />
-            Annulée
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
 
   const getActionButton = (visit: VisitWithCompletion) => {
     // Show review button if 100% complete, regardless of status
@@ -221,14 +183,13 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
               >
                 <div className="p-6 flex-1">
                   {/* Header */}
-                  <div className="flex justify-between items-start mb-4">
+                  <div className="mb-4">
                     <h3 className={cn(
                       "text-lg font-bold",
                       isCompleted ? "text-emerald-900" : "text-slate-900"
                     )}>
                       {VISIT_TYPE_NAMES[visit.visit_type as keyof typeof VISIT_TYPE_NAMES] || visit.template_name}
                     </h3>
-                    {getStatusBadge(visit.status, visit.completionPercentage)}
                   </div>
 
                   {/* Date and Doctor */}
