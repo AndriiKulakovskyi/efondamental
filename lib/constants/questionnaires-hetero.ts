@@ -635,8 +635,7 @@ export const ALDA_DEFINITION: QuestionnaireDefinition = {
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional',
     version: 'French Version (User Provided Text)',
-    language: 'fr-FR',
-    singleColumn: true
+    language: 'fr-FR'
   }
 };
 
@@ -990,8 +989,7 @@ export const ETAT_PATIENT_DEFINITION: QuestionnaireDefinition = {
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional',
     version: '1.0',
-    language: 'fr-FR',
-    singleColumn: true
+    language: 'fr-FR'
   }
 };
 
@@ -1348,8 +1346,7 @@ export const FAST_DEFINITION: QuestionnaireDefinition = {
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional',
     version: 'French',
-    language: 'fr-FR',
-    singleColumn: true
+    language: 'fr-FR'
   }
 };
 

@@ -345,7 +345,11 @@ export function QuestionnaireRenderer({
 
     // Handle section rendering
     if (question.type === 'section') {
-      return renderSection(question, questionnaire.questions);
+      // Calculate section number based on position in questions array
+      const sectionNumber = questionnaire.questions
+        .filter(q => q.type === 'section')
+        .findIndex(q => q.id === question.id) + 1;
+      return renderSection(question, questionnaire.questions, sectionNumber);
     }
 
     const isRequired = requiredQuestions.includes(question.id);
