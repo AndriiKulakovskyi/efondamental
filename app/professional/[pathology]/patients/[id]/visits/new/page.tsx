@@ -12,10 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertBanner } from "@/components/ui/alert-banner";
-import { Loader2 } from "lucide-react";
+import { Loader2, ClipboardList, Edit3, Calendar as CalendarIcon, Plus, ChevronRight } from "lucide-react";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
+import Link from "next/link";
 
 export default function NewVisitPage() {
   const router = useRouter();
@@ -23,6 +23,7 @@ export default function NewVisitPage() {
   const pathology = params.pathology as string;
   const patientId = params.id as string;
 
+  const [patientName, setPatientName] = useState<string>("");
   const [visitTemplates, setVisitTemplates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -35,21 +36,29 @@ export default function NewVisitPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    async function loadTemplates() {
+    async function loadData() {
       try {
+        // Load patient name
+        const patientResponse = await fetch(`/api/professional/patients/${patientId}`);
+        if (patientResponse.ok) {
+          const patientData = await patientResponse.json();
+          setPatientName(`${patientData.patient.first_name} ${patientData.patient.last_name}`);
+        }
+
+        // Load templates
         const response = await fetch(`/api/visit-templates?pathology=${pathology}`);
         if (response.ok) {
           const data = await response.json();
           setVisitTemplates(data.templates);
         }
       } catch (err) {
-        console.error("Failed to load visit templates", err);
+        console.error("Failed to load data", err);
       } finally {
         setLoading(false);
       }
     }
-    loadTemplates();
-  }, [pathology]);
+    loadData();
+  }, [pathology, patientId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,96 +102,156 @@ export default function NewVisitPage() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <div className="mb-6">
+    <div className="max-w-3xl mx-auto mt-6">
+      {/* Breadcrumbs */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 text-sm text-slate-400 font-medium mb-3">
+          <Link href={`/professional/${pathology}`} className="hover:text-brand transition">
+            Patients
+          </Link>
+          <ChevronRight className="w-4 h-4" />
+          <Link href={`/professional/${pathology}/patients/${patientId}`} className="hover:text-brand transition">
+            {patientName || "Patient"}
+          </Link>
+          <ChevronRight className="w-4 h-4" />
+          <span className="text-slate-800">Planification</span>
+        </div>
         <h2 className="text-3xl font-bold text-slate-900">Planifier une visite</h2>
-        <p className="text-slate-600">Planifier une nouvelle visite pour ce patient</p>
+        <p className="text-slate-500 mt-1">Planifier une nouvelle visite de suivi ou d'évaluation pour ce patient.</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Détails de la visite</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="visitType">Type de visite *</Label>
-              <Select
-                value={formData.visitType}
-                onValueChange={(value) => {
-                  const template = visitTemplates.find((t) => t.visit_type === value);
-                  setFormData({
-                    ...formData,
-                    visitType: value,
-                    visitTemplateId: template?.id || "",
-                  });
-                }}
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner le type de visite" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(VISIT_TYPE_NAMES).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+      {/* Form Card */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-lg shadow-slate-200/50 overflow-hidden">
+        <form onSubmit={handleSubmit}>
+          <div className="p-8 space-y-8">
+            {/* Details Section */}
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <ClipboardList className="w-5 h-5 text-brand" />
+                Détails de la visite
+              </h3>
+
+              <div className="space-y-6">
+                {/* Visit Type */}
+                <div>
+                  <Label htmlFor="visitType" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Type de visite <span className="text-brand">*</span>
+                  </Label>
+                  <Select
+                    value={formData.visitType}
+                    onValueChange={(value) => {
+                      const template = visitTemplates.find((t) => t.visit_type === value);
+                      setFormData({
+                        ...formData,
+                        visitType: value,
+                        visitTemplateId: template?.id || "",
+                      });
+                    }}
+                    required
+                  >
+                    <SelectTrigger className="bg-slate-50 border-slate-200 rounded-xl px-4 py-3 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand shadow-sm">
+                      <SelectValue placeholder="Sélectionner le type de visite" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(VISIT_TYPE_NAMES).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Scheduled Date */}
+                <div>
+                  <Label htmlFor="scheduledDate" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Date planifiée <span className="text-brand">*</span>
+                  </Label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <CalendarIcon className="w-5 h-5 text-slate-400" />
+                    </div>
+                    <Input
+                      id="scheduledDate"
+                      type="datetime-local"
+                      value={formData.scheduledDate}
+                      onChange={(e) =>
+                        setFormData({ ...formData, scheduledDate: e.target.value })
+                      }
+                      required
+                      className="bg-slate-50 border-slate-200 rounded-xl pl-10 pr-4 py-3 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand shadow-sm"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="scheduledDate">Date planifiée *</Label>
-              <Input
-                id="scheduledDate"
-                type="datetime-local"
-                value={formData.scheduledDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, scheduledDate: e.target.value })
-                }
-                required
-              />
+            <hr className="border-slate-100" />
+
+            {/* Notes Section */}
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-brand" />
+                Notes
+              </h3>
+              <div>
+                <Label htmlFor="notes" className="block text-sm font-semibold text-slate-700 mb-2">
+                  Notes additionnelles
+                </Label>
+                <textarea
+                  id="notes"
+                  value={formData.notes}
+                  onChange={(e) =>
+                    setFormData({ ...formData, notes: e.target.value })
+                  }
+                  rows={4}
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition shadow-sm hover:bg-white resize-none"
+                  placeholder="Notes ou instructions supplémentaires pour cette visite..."
+                />
+                <p className="text-xs text-slate-400 mt-2 text-right">
+                  Visible uniquement par l'équipe médicale
+                </p>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
-              <textarea
-                id="notes"
-                value={formData.notes}
-                onChange={(e) =>
-                  setFormData({ ...formData, notes: e.target.value })
-                }
-                className="w-full min-h-[100px] px-3 py-2 text-sm rounded-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-950"
-                placeholder="Notes ou instructions supplémentaires pour cette visite..."
-              />
-            </div>
+            {error && (
+              <div className="pt-4">
+                <AlertBanner type="error" message={error} />
+              </div>
+            )}
+          </div>
 
-            {error && <AlertBanner type="error" message={error} />}
-
-            <div className="flex justify-end gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.back()}
-                disabled={isSubmitting}
-              >
-                Annuler
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Planification...
-                  </>
-                ) : (
-                  "Planifier"
-                )}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+          {/* Footer Actions */}
+          <div className="px-8 py-5 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.back()}
+              disabled={isSubmitting}
+              className="px-6 py-2.5 bg-white border border-slate-300 text-slate-700 font-medium rounded-xl hover:bg-slate-100 transition shadow-sm"
+            >
+              Annuler
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-8 py-2.5 bg-brand hover:bg-brand-dark text-white font-bold rounded-xl transition shadow-lg shadow-brand/20 flex items-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Planification...
+                </>
+              ) : (
+                <>
+                  Planifier
+                  <Plus className="w-4 h-4" />
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
