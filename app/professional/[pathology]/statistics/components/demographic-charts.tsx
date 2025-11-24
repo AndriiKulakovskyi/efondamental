@@ -3,6 +3,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PatientDemographics } from "@/lib/services/patient.service";
+import { Users, Calendar } from "lucide-react";
 
 interface DemographicChartsProps {
   demographics: PatientDemographics;
@@ -26,12 +27,17 @@ export function DemographicCharts({ demographics }: DemographicChartsProps) {
     { name: '70+', value: demographics.age['70+'], fill: '#EF4444' },
   ];
 
+  const totalPatients = genderData.reduce((sum, item) => sum + item.value, 0);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Gender Distribution Card */}
-      <Card>
+      <Card className="border-slate-200 shadow-sm rounded-2xl">
         <CardHeader>
-          <CardTitle>Distribution par sexe</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="w-5 h-5 text-brand" />
+            Distribution par sexe
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-80 flex flex-col items-center justify-center">
@@ -51,32 +57,45 @@ export function DemographicCharts({ demographics }: DemographicChartsProps) {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip />
-                <Legend verticalAlign="bottom" height={36} />
+                <Tooltip 
+                  contentStyle={{ 
+                    fontSize: '14px',
+                    backgroundColor: 'white',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            {genderData.map((item, index) => (
-              <div key={index} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                <div
-                  className="w-4 h-4 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: item.color }}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-900">{item.name}</p>
-                  <p className="text-xs text-slate-600">{item.value} patients</p>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            {genderData.map((item, index) => {
+              const percentage = totalPatients > 0 ? ((item.value / totalPatients) * 100).toFixed(0) : 0;
+              return (
+                <div key={index} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">
+                  <div
+                    className="w-4 h-4 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-900">{item.name}</p>
+                    <p className="text-xs text-slate-600">{item.value} ({percentage}%)</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </CardContent>
       </Card>
 
       {/* Age Distribution Card */}
-      <Card>
+      <Card className="border-slate-200 shadow-sm rounded-2xl">
         <CardHeader>
-          <CardTitle>Distribution par âge</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-brand" />
+            Distribution par âge
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-80">
@@ -113,7 +132,7 @@ export function DemographicCharts({ demographics }: DemographicChartsProps) {
           </div>
           <div className="mt-4 flex justify-center gap-4 flex-wrap">
             {ageData.map((item, index) => (
-              <div key={index} className="flex items-center gap-2">
+              <div key={index} className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-lg">
                 <div
                   className="w-3 h-3 rounded"
                   style={{ backgroundColor: item.fill }}
@@ -129,4 +148,5 @@ export function DemographicCharts({ demographics }: DemographicChartsProps) {
     </div>
   );
 }
+
 

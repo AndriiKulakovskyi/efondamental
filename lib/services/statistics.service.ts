@@ -17,6 +17,63 @@ export interface ProfessionalStats {
   visitCompletionRate: number;
 }
 
+export interface DailyActivity {
+  date: string;
+  count: number;
+}
+
+export async function getDailyVisitActivity(
+  centerId: string,
+  professionalId: string,
+  days: number = 14
+): Promise<DailyActivity[]> {
+  const supabase = await createClient();
+  
+  // Calculate date range
+  const endDate = new Date();
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - (days - 1));
+  
+  // Format dates for query
+  const startDateStr = startDate.toISOString().split('T')[0];
+  const endDateStr = endDate.toISOString().split('T')[0];
+  
+  // Get visits for the last N days
+  const { data: visits, error } = await supabase
+    .from('visits')
+    .select('scheduled_date')
+    .eq('conducted_by', professionalId)
+    .gte('scheduled_date', startDateStr)
+    .lte('scheduled_date', `${endDateStr} 23:59:59`)
+    .order('scheduled_date', { ascending: true });
+  
+  if (error) {
+    console.error('Error fetching daily activity:', error);
+    return [];
+  }
+  
+  // Create a map for all days in the range
+  const activityMap = new Map<string, number>();
+  for (let i = 0; i < days; i++) {
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + i);
+    const dateStr = date.toISOString().split('T')[0];
+    activityMap.set(dateStr, 0);
+  }
+  
+  // Count visits per day
+  visits?.forEach(visit => {
+    const dateStr = visit.scheduled_date.split('T')[0];
+    activityMap.set(dateStr, (activityMap.get(dateStr) || 0) + 1);
+  });
+  
+  // Convert to array
+  return Array.from(activityMap.entries()).map(([date, count]) => ({
+    date,
+    count,
+  }));
+}
+
 export async function getProfessionalStatistics(
   professionalId: string,
   centerId: string,
