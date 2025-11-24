@@ -82,7 +82,8 @@ export const ASRM_DEFINITION: QuestionnaireDefinition = {
   code: 'ASRM_FR',
   title: 'Auto-Questionnaire Altman (ASRM)',
   description: "Échelle d'Auto-Évaluation de la Manie - Période de référence: 7 derniers jours",
-  questions: ASRM_QUESTIONS
+  questions: ASRM_QUESTIONS,
+  metadata: { singleColumn: true }
 };
 
 export const QIDS_QUESTIONS: Question[] = [
@@ -189,7 +190,8 @@ export const QIDS_DEFINITION: QuestionnaireDefinition = {
   code: 'QIDS_SR16_FR',
   title: 'QIDS-SR16',
   description: 'Auto-questionnaire court sur les symptômes de la dépression - Période de référence: 7 derniers jours',
-  questions: QIDS_QUESTIONS
+  questions: QIDS_QUESTIONS,
+  metadata: { singleColumn: true }
 };
 
 export const MDQ_QUESTIONS: Question[] = [
@@ -222,7 +224,8 @@ export const MDQ_DEFINITION: QuestionnaireDefinition = {
   code: 'MDQ_FR',
   title: 'MDQ - Questionnaire des Troubles de l\'Humeur',
   description: 'Outil de dépistage du trouble bipolaire - Période de référence: au cours de votre vie',
-  questions: MDQ_QUESTIONS
+  questions: MDQ_QUESTIONS,
+  metadata: { singleColumn: true }
 };
 
 // Diagnostic - Main diagnostic form for medical evaluation

@@ -66,3 +66,29 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Questionnaire section animations */
+@keyframes sweep {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+details[open] > :not(summary) {
+  animation: sweep 0.3s ease-in-out;
+}
+
+/* Hide default details marker */
+details > summary {
+  list-style: none;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+

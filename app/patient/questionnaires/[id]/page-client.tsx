@@ -1,14 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { QuestionnaireRenderer } from "@/components/clinical/questionnaire-renderer";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { QuestionnaireProgressHeader } from "@/components/clinical/questionnaire-progress-header";
+import { AlertBanner } from "@/components/ui/alert-banner";
 import { QuestionnaireDefinition } from "@/lib/constants/questionnaires";
 import { submitQuestionnaireAction } from "../actions";
-import { AlertBanner } from "@/components/ui/alert-banner";
 
 interface QuestionnairePageClientProps {
   questionnaire: QuestionnaireDefinition;
@@ -23,6 +21,20 @@ export function QuestionnairePageClient({
 }: QuestionnairePageClientProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [responses, setResponses] = useState<Record<string, any>>({});
+
+  // Calculate progress based on responses
+  const progress = useMemo(() => {
+    const totalQuestions = questionnaire.questions.filter(q => q.type !== 'section').length;
+    if (totalQuestions === 0) return 0;
+    
+    const filledQuestions = Object.keys(responses).filter(key => {
+      const value = responses[key];
+      return value !== undefined && value !== null && value !== '';
+    }).length;
+    
+    return Math.round((filledQuestions / totalQuestions) * 100);
+  }, [responses, questionnaire.questions]);
 
   const handleSubmit = async (responses: Record<string, any>) => {
     setError(null);
@@ -45,44 +57,42 @@ export function QuestionnairePageClient({
     }
   };
 
+  const handleBack = () => {
+    router.push("/patient/questionnaires");
+  };
+
   return (
-    <div className="max-w-3xl">
-      <Button
-        variant="ghost"
-        onClick={() => router.push("/patient/questionnaires")}
-        className="mb-4"
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Retour aux questionnaires
-      </Button>
+    <div className="min-h-screen bg-[#FDFBFA]">
+      <QuestionnaireProgressHeader
+        title={questionnaire.title}
+        progress={progress}
+        onBack={handleBack}
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{questionnaire.title}</CardTitle>
-          <CardDescription>
+      <div className="max-w-4xl mx-auto px-8 py-10 pb-32">
+        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-sm text-blue-900">
+            Vos réponses seront partagées avec votre équipe soignante pour aider à suivre vos progrès et ajuster votre traitement.
+          </p>
+        </div>
+
+        {questionnaire.description && (
+          <p className="text-slate-500 mb-8 max-w-2xl">
             {questionnaire.description}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {error && (
-            <div className="mb-6">
-              <AlertBanner type="error" message={error} />
-            </div>
-          )}
-          
-          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-900">
-              Vos réponses seront partagées avec votre équipe soignante pour aider à suivre vos progrès et ajuster votre traitement.
-            </p>
-          </div>
+          </p>
+        )}
 
-          <QuestionnaireRenderer
-            questionnaire={questionnaire}
-            onSubmit={handleSubmit}
-            // We don't support intermediate saves for now, just submit
-          />
-        </CardContent>
-      </Card>
+        {error && (
+          <div className="mb-6">
+            <AlertBanner type="error" message={error} />
+          </div>
+        )}
+        
+        <QuestionnaireRenderer
+          questionnaire={questionnaire}
+          onSubmit={handleSubmit}
+        />
+      </div>
     </div>
   );
 }

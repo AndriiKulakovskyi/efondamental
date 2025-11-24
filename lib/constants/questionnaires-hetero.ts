@@ -178,6 +178,7 @@ export const MADRS_DEFINITION: QuestionnaireDefinition = {
   description: 'Échelle clinique pour évaluer la sévérité des symptômes dépressifs. 10 items cotés 0-6.',
   questions: MADRS_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
@@ -344,6 +345,7 @@ export const YMRS_DEFINITION: QuestionnaireDefinition = {
   description: 'Echelle d\'évaluation de la manie hétéro-administrée comportant 11 items. Version française (Favre, Aubry, McQuillan, Bertschy, 2003).',
   questions: YMRS_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional',
     version: 'French Version (Favre, Aubry, McQuillan, Bertschy, 2003)',
@@ -439,6 +441,7 @@ export const CGI_DEFINITION: QuestionnaireDefinition = {
   description: 'Échelle brève pour évaluer la gravité, l\'amélioration et l\'efficacité thérapeutique.',
   questions: CGI_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
@@ -482,6 +485,7 @@ export const EGF_DEFINITION: QuestionnaireDefinition = {
   description: 'Évaluation du fonctionnement psychologique, social et professionnel sur un continuum hypothétique allant de la santé mentale à la maladie.',
   questions: EGF_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional',
     version: 'Standard',
@@ -627,6 +631,7 @@ export const ALDA_DEFINITION: QuestionnaireDefinition = {
   description: 'Échelle d\'évaluation rétrospective de la réponse prophylactique au lithium, incluant un dépistage et des critères spécifiques de cotation.',
   questions: ALDA_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional',
     version: 'French Version (User Provided Text)',
@@ -981,6 +986,7 @@ export const ETAT_PATIENT_DEFINITION: QuestionnaireDefinition = {
   description: 'Liste de contrôle des symptômes dépressifs et maniaques selon le DSM-IV, à remplir quel que soit l\'état thymique du patient.',
   questions: ETAT_PATIENT_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional',
     version: '1.0',
@@ -1338,6 +1344,7 @@ export const FAST_DEFINITION: QuestionnaireDefinition = {
   description: 'Questionnaire évaluant le degré de difficulté rencontré par le patient dans différents aspects de son fonctionnement (Autonomie, Travail, Cognition, Finances, Relations, Loisirs).',
   questions: FAST_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional',
     version: 'French',
@@ -1598,6 +1605,7 @@ export const DIVA_DEFINITION: QuestionnaireDefinition = {
   description: 'Évaluation clinique structurée des critères du TDAH (DSM-IV) à l\'âge adulte et dans l\'enfance.',
   questions: DIVA_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
@@ -2153,6 +2161,7 @@ export const FAMILY_HISTORY_DEFINITION: QuestionnaireDefinition = {
   description: 'Évaluation systématique des antécédents psychiatriques et cardiovasculaires chez les ascendants, descendants et collatéraux.',
   questions: FAMILY_HISTORY_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
@@ -2344,6 +2353,7 @@ export const CSSRS_DEFINITION: QuestionnaireDefinition = {
   description: 'Évaluation standardisée de l\'idéation et du comportement suicidaire (depuis la semaine dernière).',
   questions: CSSRS_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
@@ -2489,6 +2499,7 @@ export const ISA_DEFINITION: QuestionnaireDefinition = {
   description: 'Échelle évaluant les pensées, désirs et tentatives de suicide, ainsi que leur temporalité récente ou passée.',
   questions: ISA_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
@@ -2674,6 +2685,7 @@ export const CSSRS_HISTORY_DEFINITION: QuestionnaireDefinition = {
   description: 'Recueil détaillé de l\'historique des tentatives de suicide, incluant la violence, la gravité médicale (létalité) et les comportements interrompus/avortés.',
   questions: CSSRS_HISTORY_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
@@ -2858,6 +2870,7 @@ export const SIS_DEFINITION: QuestionnaireDefinition = {
   description: 'Évaluation de l\'intentionnalité suicidaire basée sur les circonstances du geste et la conception du sujet lors de la tentative la plus récente (Beck).',
   questions: SIS_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { QuestionnaireRenderer } from "@/components/clinical/questionnaire-renderer";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { QuestionnaireProgressHeader } from "@/components/clinical/questionnaire-progress-header";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { QuestionnaireDefinition } from "@/lib/constants/questionnaires";
 import { submitProfessionalQuestionnaireAction } from "@/app/professional/questionnaires/actions";
 import { AlertBanner } from "@/components/ui/alert-banner";
@@ -16,6 +17,8 @@ interface QuestionnairePageClientProps {
   visitId: string;
   patientId: string;
   pathology: string;
+  patientName?: string;
+  visitType?: string;
   initialResponses?: Record<string, any>;
   existingData?: any;
 }
@@ -25,19 +28,34 @@ export function QuestionnairePageClient({
   visitId,
   patientId,
   pathology,
+  patientName,
+  visitType,
   initialResponses = {},
   existingData
 }: QuestionnairePageClientProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [submittedData, setSubmittedData] = useState<any>(existingData);
-  
-  // If existingData exists and has scoring info, we might want to show score?
-  // Or if it's completed, show score.
-  // For now, if we enter this page, we assume we want to edit/fill unless we explicitly show a read-only view.
-  // But if we just submitted, we show the score.
+  const [responses, setResponses] = useState<Record<string, any>>(initialResponses);
   
   const [justSubmitted, setJustSubmitted] = useState(false);
+
+  // Calculate progress based on responses
+  const progress = useMemo(() => {
+    const totalQuestions = questionnaire.questions.filter(q => q.type !== 'section').length;
+    if (totalQuestions === 0) return 0;
+    
+    const filledQuestions = Object.keys(responses).filter(key => {
+      const value = responses[key];
+      return value !== undefined && value !== null && value !== '';
+    }).length;
+    
+    return Math.round((filledQuestions / totalQuestions) * 100);
+  }, [responses, questionnaire.questions]);
+
+  const handleResponsesChange = (newResponses: Record<string, any>) => {
+    setResponses(newResponses);
+  };
 
   const handleSubmit = async (responses: Record<string, any>) => {
     setError(null);
@@ -86,73 +104,72 @@ export function QuestionnairePageClient({
 
   if (justSubmitted && submittedData) {
     return (
-      <div className="max-w-3xl space-y-6">
-        <Card>
-          <CardHeader className="bg-green-50">
-            <div className="flex items-center gap-3">
-              <CheckCircle2 className="h-8 w-8 text-green-600" />
-              <div>
-                <CardTitle className="text-green-900">Questionnaire complété</CardTitle>
-                <p className="text-sm text-green-700 mt-1">
-                  Le questionnaire a été soumis avec succès
-                </p>
+      <div className="min-h-screen bg-[#FDFBFA]">
+        <QuestionnaireProgressHeader
+          title={questionnaire.title}
+          subtitle={patientName && visitType ? `${patientName} • ${visitType}` : undefined}
+          progress={100}
+          onBack={handleReturn}
+        />
+        <div className="max-w-4xl mx-auto px-8 py-10">
+          <Card>
+            <CardHeader className="bg-green-50">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="h-8 w-8 text-green-600" />
+                <div>
+                  <CardTitle className="text-green-900">Questionnaire complété</CardTitle>
+                  <p className="text-sm text-green-700 mt-1">
+                    Le questionnaire a été soumis avec succès
+                  </p>
+                </div>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6 space-y-6">
-            <ScoreDisplay 
-              code={questionnaire.code} 
-              data={submittedData} 
-            />
-            
-            <div className="flex justify-end pt-4 border-t">
-              <Button onClick={handleReturn}>
-                Retour à la visite
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-6">
+              <ScoreDisplay 
+                code={questionnaire.code} 
+                data={submittedData} 
+              />
+              
+              <div className="flex justify-end pt-4 border-t">
+                <Button onClick={handleReturn}>
+                  Retour à la visite
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl">
-      <Button
-        variant="ghost"
-        onClick={handleReturn}
-        className="mb-4"
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Retour à la visite
-      </Button>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{questionnaire.title}</CardTitle>
-          {questionnaire.description && (
-            <CardDescription>
-              {questionnaire.description}
-            </CardDescription>
-          )}
-        </CardHeader>
-        <CardContent>
-          {error && (
-            <div className="mb-6">
-              <AlertBanner type="error" message={error} />
-            </div>
-          )}
-          
-          <QuestionnaireRenderer
-            questionnaire={questionnaire}
-            initialResponses={initialResponses}
-            onSubmit={handleSubmit}
-            // We could implement onSave for draft saving if we have 'status' column (we don't have explicit draft status in new tables except null completed_at, but strict constraints might prevent partial save if columns are NOT NULL)
-            // Most columns are NOT NULL in my migration. So partial save is not supported unless we relax constraints or use default values.
-            // So no onSave for now.
-          />
-        </CardContent>
-      </Card>
+    <div className="min-h-screen bg-[#FDFBFA]">
+      <QuestionnaireProgressHeader
+        title={questionnaire.title}
+        subtitle={patientName && visitType ? `${patientName} • ${visitType}` : undefined}
+        progress={progress}
+        onBack={handleReturn}
+      />
+      
+      <div className="max-w-4xl mx-auto px-8 py-10 pb-32">
+        {questionnaire.description && (
+          <p className="text-slate-500 mb-8 max-w-2xl">
+            {questionnaire.description}
+          </p>
+        )}
+        
+        {error && (
+          <div className="mb-6">
+            <AlertBanner type="error" message={error} />
+          </div>
+        )}
+        
+        <QuestionnaireRenderer
+          questionnaire={questionnaire}
+          initialResponses={initialResponses}
+          onSubmit={handleSubmit}
+        />
+      </div>
     </div>
   );
 }

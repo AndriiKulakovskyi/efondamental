@@ -231,6 +231,7 @@ export const SOCIAL_DEFINITION: QuestionnaireDefinition = {
   description: 'Évaluation de la situation sociale et professionnelle du patient',
   questions: SOCIAL_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }

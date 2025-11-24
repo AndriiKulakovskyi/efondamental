@@ -18,7 +18,7 @@ import {
   evaluateConditionalLogic,
   validateQuestionnaireResponse,
 } from "@/lib/utils/questionnaire-logic";
-import { Loader2, ChevronDown, ChevronRight } from "lucide-react";
+import { Loader2, ChevronDown, Info } from "lucide-react";
 
 interface QuestionnaireRendererProps {
   questionnaire: QuestionnaireDefinition;
@@ -287,50 +287,54 @@ export function QuestionnaireRenderer({
     });
   };
 
-  const renderSection = (question: Question, questions: Question[]) => {
+  const renderSection = (question: Question, questions: Question[], sectionNumber: number) => {
     const isExpanded = expandedSections.has(question.id);
     const completion = getSectionCompletion(question.id, questions);
     const hasHelp = !!question.help;
     
     return (
-      <div key={question.id} className="border-b border-slate-200 pb-4 mb-6">
-        <button
-          type="button"
-          onClick={() => toggleSection(question.id)}
-          className="w-full flex items-center justify-between text-left group"
+      <details 
+        key={question.id} 
+        open={isExpanded}
+        className={`group bg-white border rounded-2xl shadow-sm mb-6 overflow-hidden transition-all duration-300 ${
+          isExpanded ? 'border-brand/30 shadow-lg shadow-brand/5' : 'border-slate-200'
+        }`}
+      >
+        <summary 
+          className="flex items-center justify-between p-6 cursor-pointer bg-white hover:bg-slate-50 transition select-none list-none"
+          onClick={(e) => {
+            e.preventDefault();
+            toggleSection(question.id);
+          }}
         >
           <div className="flex items-center gap-3">
-            {isExpanded ? (
-              <ChevronDown className="h-5 w-5 text-slate-500 group-hover:text-slate-700 transition-colors" />
-            ) : (
-              <ChevronRight className="h-5 w-5 text-slate-500 group-hover:text-slate-700 transition-colors" />
-            )}
-            <div>
-              <h3 className="text-lg font-semibold text-slate-900">{question.text}</h3>
-              {hasHelp && (
-                <p className="text-sm text-slate-500 mt-1">{question.help}</p>
-              )}
+            <div className="w-8 h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center font-bold text-sm">
+              {sectionNumber}
             </div>
+            <h3 className={`text-lg font-bold transition-colors ${isExpanded ? 'text-brand' : 'text-slate-900'}`}>
+              {question.text}
+            </h3>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {completion > 0 && (
               <div className="flex items-center gap-2">
-                <div className="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
                   <div 
                     className={`h-full transition-all ${
-                      completion === 100 ? 'bg-green-500' : 'bg-blue-500'
+                      completion === 100 ? 'bg-brand' : 'bg-brand'
                     }`}
                     style={{ width: `${completion}%` }}
                   />
                 </div>
-                <span className="text-xs text-slate-500 font-medium min-w-[3rem] text-right">
+                <span className="text-sm font-bold text-brand min-w-[3rem] text-right">
                   {completion}%
                 </span>
               </div>
             )}
+            <ChevronDown className={`w-5 h-5 text-slate-400 transform transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
           </div>
-        </button>
-      </div>
+        </summary>
+      </details>
     );
   };
 
@@ -375,18 +379,29 @@ export function QuestionnaireRenderer({
 
     return (
       <div key={question.id} className={`space-y-3 ${isUnitField ? 'col-span-1' : ''}`}>
-        <Label htmlFor={question.id} className="text-sm font-medium">
+        <Label htmlFor={question.id} className="text-base font-semibold text-slate-800">
           {question.text}
-          {isRequired && <span className="text-red-500 ml-1">*</span>}
+          {isRequired && <span className="text-brand ml-1">*</span>}
         </Label>
         
         {question.help && (
-          <div className="text-sm text-muted-foreground space-y-1">
-            {question.help.split('\n').map((line, index) => (
-              <p key={index} className={line.trim() === '' ? 'h-2' : ''}>
-                {line || '\u00A0'}
-              </p>
-            ))}
+          <div className="text-sm text-slate-500 space-y-1">
+            {/* Check if help text contains exclusion criteria or important info */}
+            {question.help.toLowerCase().includes('critère') || question.help.toLowerCase().includes('exclusion') ? (
+              <div className="bg-blue-50/50 border border-blue-100 rounded-lg p-3 flex items-start gap-3">
+                <Info className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+                <p className="text-xs text-blue-700 leading-relaxed">
+                  <strong>{question.help.includes(':') ? question.help.split(':')[0] + ':' : ''}</strong>
+                  {question.help.includes(':') ? question.help.split(':').slice(1).join(':') : question.help}
+                </p>
+              </div>
+            ) : (
+              question.help.split('\n').map((line, index) => (
+                <p key={index} className={line.trim() === '' ? 'h-2' : 'leading-relaxed'}>
+                  {line || '\u00A0'}
+                </p>
+              ))
+            )}
           </div>
         )}
 
@@ -398,7 +413,9 @@ export function QuestionnaireRenderer({
             onChange={(e) => handleResponseChange(question.id, e.target.value)}
             disabled={readonly || question.readonly}
             required={isRequired}
-            className={question.readonly ? "bg-slate-50 text-slate-700" : ""}
+            className={`bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand ${
+              question.readonly ? "bg-slate-50 text-slate-700" : ""
+            }`}
           />
         )}
 
@@ -412,7 +429,9 @@ export function QuestionnaireRenderer({
             max={question.max}
             disabled={readonly || question.readonly}
             required={isRequired}
-            className={question.readonly ? "bg-slate-50 text-slate-700" : ""}
+            className={`bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand ${
+              question.readonly ? "bg-slate-50 text-slate-700" : ""
+            }`}
           />
         )}
 
@@ -451,7 +470,7 @@ export function QuestionnaireRenderer({
             disabled={readonly}
             required={isRequired}
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand">
               <SelectValue placeholder="Sélectionnez une option" />
             </SelectTrigger>
             <SelectContent>
@@ -529,6 +548,7 @@ export function QuestionnaireRenderer({
             onChange={(e) => handleResponseChange(question.id, e.target.value)}
             disabled={readonly}
             required={isRequired}
+            className="bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand"
           />
         )}
       </div>
@@ -586,13 +606,14 @@ export function QuestionnaireRenderer({
           </div>
         )}
         {!readonly && (
-          <div className="flex justify-end gap-3 pt-4 border-t">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-slate-200">
             {onSave && (
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleSave}
                 disabled={isSaving || isSubmitting}
+                className="w-full sm:w-auto"
               >
                 {isSaving ? (
                   <>
@@ -604,7 +625,11 @@ export function QuestionnaireRenderer({
                 )}
               </Button>
             )}
-            <Button type="submit" disabled={isSubmitting || isSaving}>
+            <Button 
+              type="submit" 
+              disabled={isSubmitting || isSaving}
+              className="w-full sm:w-auto bg-brand hover:bg-brand-dark shadow-md shadow-brand/20"
+            >
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -621,7 +646,7 @@ export function QuestionnaireRenderer({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {questionGroups.map((group, groupIndex) => {
         const isSectionExpanded = !group.section || expandedSections.has(group.section.id);
         const visibleGroupQuestions = group.questions.filter(q => visibleQuestions.includes(q.id));
@@ -631,56 +656,50 @@ export function QuestionnaireRenderer({
         }
 
         return (
-          <div key={group.section?.id || `group-${groupIndex}`} className="space-y-4">
-            {group.section && renderSection(group.section, questionnaire.questions)}
+          <div key={group.section?.id || `group-${groupIndex}`}>
+            {group.section && renderSection(group.section, questionnaire.questions, groupIndex + 1)}
             
             {isSectionExpanded && visibleGroupQuestions.length > 0 && (
-              <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
-                <div className={`grid gap-6 ${questionnaire.metadata?.singleColumn ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
-                  {(() => {
-                    const rendered = new Set<string>();
-                    return visibleGroupQuestions.map((question, qIndex) => {
-                      // Skip if already rendered as part of a grouped pair
-                      if (rendered.has(question.id)) {
-                        return null;
-                      }
-                      
-                      const isUnitField = question.id.endsWith('_unit');
-                      
-                      // Skip unit fields - they're rendered with their base field
-                      if (isUnitField) {
-                        return null;
-                      }
-                      
-                      // Check if next question is the unit field for this question
-                      const nextQuestion = qIndex < visibleGroupQuestions.length - 1 ? visibleGroupQuestions[qIndex + 1] : null;
-                      const isNextQuestionUnit = nextQuestion?.id === `${question.id}_unit`;
-                      
-                      // If next question is the unit field, render them together
-                      if (isNextQuestionUnit && nextQuestion) {
-                        rendered.add(question.id);
-                        rendered.add(nextQuestion.id);
-                        return (
-                          <div key={`grouped-${question.id}`} className={questionnaire.metadata?.singleColumn ? 'col-span-1 grid grid-cols-3 gap-4' : 'col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4'}>
-                            <div className={questionnaire.metadata?.singleColumn ? 'col-span-2' : 'md:col-span-2'}>
-                              {renderQuestion(question, true)}
-                            </div>
-                            <div>
-                              {renderQuestion(nextQuestion, true)}
-                            </div>
-                          </div>
-                        );
-                      }
-                      
+              <div className="p-6 pt-2 border-t border-slate-100 space-y-8">
+                {(() => {
+                  const rendered = new Set<string>();
+                  return visibleGroupQuestions.map((question, qIndex) => {
+                    // Skip if already rendered as part of a grouped pair
+                    if (rendered.has(question.id)) {
+                      return null;
+                    }
+                    
+                    const isUnitField = question.id.endsWith('_unit');
+                    
+                    // Skip unit fields - they're rendered with their base field
+                    if (isUnitField) {
+                      return null;
+                    }
+                    
+                    // Check if next question is the unit field for this question
+                    const nextQuestion = qIndex < visibleGroupQuestions.length - 1 ? visibleGroupQuestions[qIndex + 1] : null;
+                    const isNextQuestionUnit = nextQuestion?.id === `${question.id}_unit`;
+                    
+                    // If next question is the unit field, render them together
+                    if (isNextQuestionUnit && nextQuestion) {
                       rendered.add(question.id);
+                      rendered.add(nextQuestion.id);
                       return (
-                        <div key={question.id} className={!questionnaire.metadata?.singleColumn && question.type === 'date' ? 'md:col-span-2' : ''}>
-                          {renderQuestion(question, true)}
+                        <div key={`grouped-${question.id}`} className="grid grid-cols-3 gap-4">
+                          <div className="col-span-2">
+                            {renderQuestion(question, true)}
+                          </div>
+                          <div>
+                            {renderQuestion(nextQuestion, true)}
+                          </div>
                         </div>
                       );
-                    });
-                  })()}
-                </div>
+                    }
+                    
+                    rendered.add(question.id);
+                    return renderQuestion(question, true);
+                  });
+                })()}
               </div>
             )}
           </div>
@@ -701,13 +720,14 @@ export function QuestionnaireRenderer({
       )}
 
       {!readonly && (
-        <div className="flex justify-end gap-3 pt-4 border-t">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-slate-200">
           {onSave && (
             <Button
               type="button"
               variant="outline"
               onClick={handleSave}
               disabled={isSaving || isSubmitting}
+              className="w-full sm:w-auto"
             >
               {isSaving ? (
                 <>
@@ -719,7 +739,11 @@ export function QuestionnaireRenderer({
               )}
             </Button>
           )}
-          <Button type="submit" disabled={isSubmitting || isSaving}>
+          <Button 
+            type="submit" 
+            disabled={isSubmitting || isSaving}
+            className="w-full sm:w-auto bg-brand hover:bg-brand-dark shadow-md shadow-brand/20"
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -1032,7 +1032,8 @@ export const DSM5_PSYCHOTIC_DEFINITION: QuestionnaireDefinition = {
   code: 'DSM5_PSYCHOTIC_FR',
   title: 'DSM5 - Trouble Psychotique',
   description: 'Diagnostic DSM5 des troubles psychotiques pour l\'évaluation initiale du trouble bipolaire',
-  questions: DSM5_PSYCHOTIC_QUESTIONS
+  questions: DSM5_PSYCHOTIC_QUESTIONS,
+  metadata: { singleColumn: true }
 };
 
 // ============================================================================

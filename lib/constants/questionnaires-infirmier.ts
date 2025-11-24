@@ -156,6 +156,7 @@ export const TOBACCO_DEFINITION: QuestionnaireDefinition = {
   description: 'Évaluation du statut tabagique et de la consommation',
   questions: TOBACCO_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
@@ -237,6 +238,7 @@ export const FAGERSTROM_DEFINITION: QuestionnaireDefinition = {
   description: 'Test de dépendance à la nicotine. 6 items, score total 0-10.',
   questions: FAGERSTROM_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
@@ -280,6 +282,7 @@ export const PHYSICAL_PARAMS_DEFINITION: QuestionnaireDefinition = {
   description: 'Mesures physiques: taille, poids, périmètre abdominal. IMC calculé automatiquement.',
   questions: PHYSICAL_PARAMS_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
@@ -364,6 +367,7 @@ export const BLOOD_PRESSURE_DEFINITION: QuestionnaireDefinition = {
   description: 'Mesures de la pression artérielle et de la fréquence cardiaque (couché et debout)',
   questions: BLOOD_PRESSURE_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
@@ -524,6 +528,7 @@ export const SLEEP_APNEA_DEFINITION: QuestionnaireDefinition = {
   description: 'Dépistage des apnées du sommeil avec score STOP-Bang',
   questions: SLEEP_APNEA_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
@@ -1358,6 +1363,7 @@ export const BIOLOGICAL_ASSESSMENT_DEFINITION: QuestionnaireDefinition = {
   description: 'Évaluation biologique complète incluant biochimie, bilan lipidique, hépatique, thyroïdien, NFS, HCG, prolactine, dosages psychotropes, vitamine D et sérologie toxoplasmose',
   questions: BIOLOGICAL_ASSESSMENT_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
@@ -1511,6 +1517,7 @@ export const ECG_DEFINITION: QuestionnaireDefinition = {
   description: 'Formulaire de saisie des paramètres électrocardiographiques avec calcul du QTc et critères de gravité',
   questions: ECG_QUESTIONS,
   metadata: {
+    singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
