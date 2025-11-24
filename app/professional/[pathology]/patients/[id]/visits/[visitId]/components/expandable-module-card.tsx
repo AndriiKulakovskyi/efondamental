@@ -42,7 +42,7 @@ export function ExpandableModuleCard({
           "w-10 h-10 rounded-full flex items-center justify-center z-10 relative",
           isCompleted && "bg-teal-500 border-4 border-white shadow-lg",
           isInProgress && "bg-brand border-4 border-white shadow-lg",
-          isPending && "bg-slate-300 border-4 border-white shadow-sm"
+          isPending && "bg-slate-400 border-4 border-white shadow-md hover:bg-slate-500 transition-colors"
     )}>
           {isCompleted ? (
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,10 +65,10 @@ export function ExpandableModuleCard({
 
       {/* Module Card */}
       <div className={cn(
-        "flex-1 bg-white rounded-2xl border p-7 shadow-sm transition-all overflow-hidden",
-        isCompleted && "hover:shadow-md cursor-pointer",
+        "flex-1 bg-white rounded-2xl border p-7 shadow-sm transition-all overflow-hidden hover:shadow-md cursor-pointer",
+        isCompleted && "border-teal-200 bg-teal-50/30",
         isInProgress && "border-2 border-brand/30 shadow-lg shadow-brand/10 relative hover:border-brand",
-        isPending && "border-dashed opacity-60 grayscale hover:grayscale-0 transition-all duration-300"
+        isPending && "border-slate-200 hover:border-slate-300"
       )}>
         {/* Left accent bar for in-progress */}
         {isInProgress && (
@@ -80,9 +80,9 @@ export function ExpandableModuleCard({
             <div className="flex items-center gap-3 mb-3">
               <h4 className={cn(
                 "text-base font-bold",
-                isCompleted && "text-slate-900 group-hover:text-teal-600 transition",
+                isCompleted && "text-teal-900 group-hover:text-teal-600 transition",
                 isInProgress && "text-brand text-xl",
-                isPending && "text-slate-700"
+                isPending && "text-slate-900"
               )}>
                   {module.name}
               </h4>
@@ -94,6 +94,11 @@ export function ExpandableModuleCard({
               {isInProgress && (
                 <span className="px-2.5 py-0.5 rounded bg-red-50 text-brand text-[10px] font-bold uppercase tracking-wide border border-red-100 animate-pulse">
                   En cours
+                </span>
+              )}
+              {isPending && (
+                <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-bold uppercase tracking-wide border border-slate-200">
+                  À faire
                 </span>
                 )}
             </div>
@@ -116,8 +121,20 @@ export function ExpandableModuleCard({
               </div>
             )}
 
-            {/* Expand button for other states */}
-            {!isInProgress && (
+            {/* Action button for pending module */}
+            {isPending && (
+              <div className="mt-5">
+                <button 
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="text-sm bg-slate-700 hover:bg-slate-800 text-white px-5 py-2.5 rounded-lg transition font-bold shadow-sm"
+                >
+                  {isExpanded ? 'Masquer les détails' : 'Commencer l\'évaluation'}
+                </button>
+              </div>
+            )}
+
+            {/* Expand button for completed state */}
+            {isCompleted && (
               <button 
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="text-sm text-slate-600 hover:text-slate-900 font-medium flex items-center gap-2"
