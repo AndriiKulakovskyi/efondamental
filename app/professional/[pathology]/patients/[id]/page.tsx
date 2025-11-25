@@ -1,18 +1,11 @@
-import { getPatientById, getPatientStats, getPatientRiskLevel, getPatientInvitationStatus } from "@/lib/services/patient.service";
-import { getVisitsByPatient, getBulkVisitCompletionStatus } from "@/lib/services/visit.service";
-import { 
-  getEvaluationsByPatient, 
-  getMoodTrend, 
-  getRiskHistory, 
-  getMedicationAdherenceTrend 
-} from "@/lib/services/evaluation.service";
+import { getPatientProfileData } from "@/lib/services/patient-profile.service";
+import { recordPatientAccess } from "@/lib/services/patient.service";
 import { getUserContext } from "@/lib/rbac/middleware";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertTriangle, MoreVertical, Filter, Calendar } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { notFound, redirect } from "next/navigation";
 import { formatRiskLevel } from "@/lib/utils/formatting";
-import { recordPatientAccess } from "@/lib/services/patient.service";
 import { AnalyticsCharts } from "./components/analytics-charts";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { InvitationStatus } from "./components/invitation-status";
@@ -22,7 +15,6 @@ import { VisitCards } from "./components/visit-cards";
 import { EvaluationsDisplay } from "./components/evaluations-display";
 import { AnalyticsSummary } from "./components/analytics-summary";
 import { QuickActionsMenu } from "./components/quick-actions-menu";
-import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 
 export default async function PatientDetailPage({
@@ -37,47 +29,34 @@ export default async function PatientDetailPage({
     redirect("/auth/login");
   }
 
-  const patient = await getPatientById(id);
-
-  if (!patient) {
-    notFound();
-  }
-
   // Record access for "recently viewed" feature
   await recordPatientAccess(context.user.id, id);
-
-  // Fetch all doctors from the same center for reassignment
-  const supabase = await createClient();
-  const { data: doctors } = await supabase
-    .from('user_profiles')
-    .select('id, first_name, last_name')
-    .eq('center_id', context.profile.center_id)
-    .eq('role', 'healthcare_professional')
-    .order('last_name, first_name');
 
   // Calculate date for last 12 months
   const twelveMonthsAgo = new Date();
   twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
   const fromDate = twelveMonthsAgo.toISOString();
 
-  const [stats, visits, riskLevel, evaluations, moodTrend, riskHistory, adherenceTrend, invitationStatus] = await Promise.all([
-    getPatientStats(id),
-    getVisitsByPatient(id),
-    getPatientRiskLevel(id),
-    getEvaluationsByPatient(id),
-    getMoodTrend(id, fromDate),
-    getRiskHistory(id, fromDate),
-    getMedicationAdherenceTrend(id, fromDate),
-    getPatientInvitationStatus(id),
-  ]);
+  // Fetch all patient profile data in a single optimized RPC call
+  const {
+    patient,
+    stats,
+    visits,
+    riskLevel,
+    evaluations,
+    moodTrend,
+    riskHistory,
+    adherenceTrend,
+    invitationStatus,
+    availableDoctors: doctors
+  } = await getPatientProfileData(id, context.profile.center_id, fromDate);
 
-  // Get completion percentage for all visits at once using bulk function
-  const visitCompletions = await getBulkVisitCompletionStatus(visits.map(v => v.id));
-  
-  const visitsWithCompletion = visits.map(visit => ({
-    ...visit,
-    completionPercentage: visitCompletions.get(visit.id)?.completionPercentage || 0,
-  }));
+  if (!patient) {
+    notFound();
+  }
+
+  // Map visits to include completion percentage for display
+  const visitsWithCompletion = visits;
 
   const risk = formatRiskLevel(riskLevel);
 

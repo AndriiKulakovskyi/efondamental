@@ -1,4 +1,5 @@
-import { getVisitById, getVisitCompletionStatus, VirtualModule } from "@/lib/services/visit.service";
+import { getVisitDetailData } from "@/lib/services/visit-detail.service";
+import { getVisitModules, VirtualModule } from "@/lib/services/visit.service";
 import { getUserContext } from "@/lib/rbac/middleware";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDateTime } from "@/lib/utils/date";
@@ -10,65 +11,11 @@ import { VisitQuickStats } from "./components/visit-quick-stats";
 import { CircularProgress } from "./components/circular-progress";
 import { cn } from "@/lib/utils";
 import { 
-  getAsrmResponse, 
-  getQidsResponse, 
-  getMdqResponse, 
-  getDiagnosticResponse, 
-  getOrientationResponse,
-  // Initial Evaluation - ETAT
-  getEq5d5lResponse,
-  getPriseMResponse,
-  getStaiYaResponse,
-  getMarsResponse,
-  getMathysResponse,
-  getPsqiResponse,
-  getEpworthResponse,
-  // Initial Evaluation - TRAITS
-  getAsrsResponse,
-  getCtqResponse,
-  getBis10Response,
-  getAls18Response,
-  getAimResponse,
-  getWurs25Response,
-  getAq12Response,
-  getCsmResponse,
-  getCtiResponse
-} from "@/lib/services/questionnaire.service";
-import {
-  // Hetero questionnaires
-  getMadrsResponse,
-  getYmrsResponse,
-  getCgiResponse,
-  getEgfResponse,
-  getAldaResponse,
-  getEtatPatientResponse,
-  getFastResponse,
-  getDivaResponse,
-  getFamilyHistoryResponse,
-  getCssrsResponse,
-  getIsaResponse,
-  getCssrsHistoryResponse,
-  getSisResponse
-} from "@/lib/services/questionnaire-hetero.service";
-import {
-  getSocialResponse
-} from "@/lib/services/questionnaire-social.service";
-import {
-  getTobaccoResponse,
-  getFagerstromResponse,
-  getPhysicalParamsResponse,
-  getBloodPressureResponse,
-  getSleepApneaResponse,
-  getBiologicalAssessmentResponse,
-  getEcgResponse
-} from "@/lib/services/questionnaire-infirmier.service";
-import { 
   ASRM_DEFINITION, 
   QIDS_DEFINITION, 
   MDQ_DEFINITION, 
   DIAGNOSTIC_DEFINITION, 
   ORIENTATION_DEFINITION,
-  // Initial Evaluation - ETAT
   EQ5D5L_DEFINITION,
   PRISE_M_DEFINITION,
   STAI_YA_DEFINITION,
@@ -76,7 +23,6 @@ import {
   MATHYS_DEFINITION,
   PSQI_DEFINITION,
   EPWORTH_DEFINITION,
-  // Initial Evaluation - TRAITS
   ASRS_DEFINITION,
   CTQ_DEFINITION,
   BIS10_DEFINITION,
@@ -88,7 +34,6 @@ import {
   CTI_DEFINITION
 } from "@/lib/constants/questionnaires";
 import {
-  // Hetero questionnaires
   MADRS_DEFINITION,
   YMRS_DEFINITION,
   CGI_DEFINITION,
@@ -120,11 +65,6 @@ import {
   DSM5_PSYCHOTIC_DEFINITION,
   DSM5_COMORBID_DEFINITION
 } from "@/lib/constants/questionnaires-dsm5";
-import {
-  getDsm5HumeurResponse,
-  getDsm5PsychoticResponse,
-  getDsm5ComorbidResponse
-} from "@/lib/services/questionnaire-dsm5.service";
 
 export default async function VisitDetailPage({
   params,
@@ -138,555 +78,407 @@ export default async function VisitDetailPage({
     redirect("/auth/login");
   }
 
-  const visit = await getVisitById(visitId);
+  // Fetch all visit data with questionnaire statuses in a single RPC call
+  const { visit, questionnaireStatuses, completionStatus } = await getVisitDetailData(visitId);
 
   if (!visit) {
     notFound();
   }
 
-  // Construct modules and check status based on visit type
+  // Build modules with questionnaires based on visit type and RPC data
   let modulesWithQuestionnaires: VirtualModule[] = [];
-  let completionStatus = {
-    completedQuestionnaires: 0,
-    totalQuestionnaires: 0,
-    completionPercentage: 0
-  };
 
   if (visit.visit_type === 'screening') {
-    // Module 1: Autoquestionnaires
-    const asrmResponse = await getAsrmResponse(visitId);
-    const qidsResponse = await getQidsResponse(visitId);
-    const mdqResponse = await getMdqResponse(visitId);
-
-    const autoModule = {
-      id: 'mod_auto',
-      name: 'Autoquestionnaires',
-      description: 'Questionnaires à remplir par le patient',
-      questionnaires: [
-        {
-          ...ASRM_DEFINITION,
-          id: ASRM_DEFINITION.code, // Use code as ID for routing
-          target_role: 'patient',
-          completed: !!asrmResponse,
-          completedAt: asrmResponse?.completed_at,
-        },
-        {
-          ...QIDS_DEFINITION,
-          id: QIDS_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!qidsResponse,
-          completedAt: qidsResponse?.completed_at,
-        },
-        {
-          ...MDQ_DEFINITION,
-          id: MDQ_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!mdqResponse,
-          completedAt: mdqResponse?.completed_at,
-        }
-      ]
-    };
-
-    // Module 2: Partie Médicale
-    const diagResponse = await getDiagnosticResponse(visitId);
-    const orientResponse = await getOrientationResponse(visitId);
-
-    const medicalModule = {
-      id: 'mod_medical',
-      name: 'Partie médicale',
-      description: 'Évaluation clinique par le professionnel de santé',
-      questionnaires: [
-        {
-          ...DIAGNOSTIC_DEFINITION,
-          id: DIAGNOSTIC_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!diagResponse,
-          completedAt: diagResponse?.completed_at,
-          completedBy: diagResponse?.completed_by
-        },
-        {
-          ...ORIENTATION_DEFINITION,
-          id: ORIENTATION_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!orientResponse,
-          completedAt: orientResponse?.completed_at,
-          completedBy: orientResponse?.completed_by
-        }
-      ]
-    };
-
-    modulesWithQuestionnaires = [autoModule, medicalModule];
-
-    // Calculate stats
-    const total = autoModule.questionnaires.length + medicalModule.questionnaires.length;
-    const completed = 
-      autoModule.questionnaires.filter(q => q.completed).length + 
-      medicalModule.questionnaires.filter(q => q.completed).length;
-    
-    completionStatus = {
-      totalQuestionnaires: total,
-      completedQuestionnaires: completed,
-      completionPercentage: total > 0 ? (completed / total) * 100 : 0
-    };
-  } else if (visit.visit_type === 'initial_evaluation') {
-    // Fetch all questionnaire responses for initial evaluation
-    const [
-      // ETAT responses
-      eq5d5lResponse, priseMResponse, staiYaResponse, marsResponse, mathysResponse,
-      asrmResponse, qidsResponse, psqiResponse, epworthResponse,
-      // TRAITS responses
-      asrsResponse, ctqResponse, bis10Response, als18Response, aimResponse,
-      wurs25Response, aq12Response, csmResponse, ctiResponse,
-      // HETERO responses
-      madrsResponse, ymrsResponse, cgiResponse, egfResponse, aldaResponse,
-      etatPatientResponse, fastResponse,
-      // SOCIAL response
-      socialResponse,
-      // INFIRMIER responses
-      tobaccoResponse, fagerstromResponse, physicalParamsResponse, bloodPressureResponse, sleepApneaResponse, biologicalAssessmentResponse, ecgResponse,
-      // DSM5 responses
-      dsm5HumeurResponse, dsm5PsychoticResponse, dsm5ComorbidResponse,
-      // DIVA response
-      divaResponse,
-      // Family History response
-      familyHistoryResponse,
-      // C-SSRS response
-      cssrsResponse,
-      // ISA response
-      isaResponse,
-      // C-SSRS History response
-      cssrsHistoryResponse,
-      // SIS response
-      sisResponse
-    ] = await Promise.all([
-      // ETAT
-      getEq5d5lResponse(visitId),
-      getPriseMResponse(visitId),
-      getStaiYaResponse(visitId),
-      getMarsResponse(visitId),
-      getMathysResponse(visitId),
-      getAsrmResponse(visitId),
-      getQidsResponse(visitId),
-      getPsqiResponse(visitId),
-      getEpworthResponse(visitId),
-      // TRAITS
-      getAsrsResponse(visitId),
-      getCtqResponse(visitId),
-      getBis10Response(visitId),
-      getAls18Response(visitId),
-      getAimResponse(visitId),
-      getWurs25Response(visitId),
-      getAq12Response(visitId),
-      getCsmResponse(visitId),
-      getCtiResponse(visitId),
-      // HETERO
-      getMadrsResponse(visitId),
-      getYmrsResponse(visitId),
-      getCgiResponse(visitId),
-      getEgfResponse(visitId),
-      getAldaResponse(visitId),
-      getEtatPatientResponse(visitId),
-      getFastResponse(visitId),
-      // SOCIAL
-      getSocialResponse(visitId),
-      // INFIRMIER
-      getTobaccoResponse(visitId),
-      getFagerstromResponse(visitId),
-      getPhysicalParamsResponse(visitId),
-      getBloodPressureResponse(visitId),
-      getSleepApneaResponse(visitId),
-      getBiologicalAssessmentResponse(visitId),
-      getEcgResponse(visitId),
-      // DSM5
-      getDsm5HumeurResponse(visitId),
-      getDsm5PsychoticResponse(visitId),
-      getDsm5ComorbidResponse(visitId),
-      // DIVA
-      getDivaResponse(visitId),
-      // Family History
-      getFamilyHistoryResponse(visitId),
-      // C-SSRS
-      getCssrsResponse(visitId),
-      // ISA
-      getIsaResponse(visitId),
-      // C-SSRS History
-      getCssrsHistoryResponse(visitId),
-      // SIS
-      getSisResponse(visitId)
-    ]);
-
-    // Module 1: Infirmier
-    const nurseModule = {
-      id: 'mod_nurse',
-      name: 'Infirmier',
-      description: 'Évaluation par l\'infirmier',
-      questionnaires: [
-        {
-          ...TOBACCO_DEFINITION,
-          id: TOBACCO_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!tobaccoResponse,
-          completedAt: tobaccoResponse?.completed_at,
-        },
-        {
-          ...FAGERSTROM_DEFINITION,
-          id: FAGERSTROM_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!fagerstromResponse,
-          completedAt: fagerstromResponse?.completed_at,
-        },
-        {
-          ...PHYSICAL_PARAMS_DEFINITION,
-          id: PHYSICAL_PARAMS_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!physicalParamsResponse,
-          completedAt: physicalParamsResponse?.completed_at,
-        },
-        {
-          ...BLOOD_PRESSURE_DEFINITION,
-          id: BLOOD_PRESSURE_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!bloodPressureResponse,
-          completedAt: bloodPressureResponse?.completed_at,
-        },
-        {
-          ...ECG_DEFINITION,
-          id: ECG_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!ecgResponse,
-          completedAt: ecgResponse?.completed_at,
-        },
-        {
-          ...SLEEP_APNEA_DEFINITION,
-          id: SLEEP_APNEA_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!sleepApneaResponse,
-          completedAt: sleepApneaResponse?.completed_at,
-        },
-        {
-          ...BIOLOGICAL_ASSESSMENT_DEFINITION,
-          id: BIOLOGICAL_ASSESSMENT_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!biologicalAssessmentResponse,
-          completedAt: biologicalAssessmentResponse?.completed_at,
-        }
-      ]
-    };
-
-    // Module 2: Evaluation état thymique et fonctionnement
-    const thymicModule = {
-      id: 'mod_thymic_eval',
-      name: 'Evaluation état thymique et fonctionnement',
-      description: 'Évaluation de l\'état thymique et du fonctionnement',
-      questionnaires: [
-        {
-          ...MADRS_DEFINITION,
-          id: MADRS_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!madrsResponse,
-          completedAt: madrsResponse?.completed_at,
-        },
-        {
-          ...YMRS_DEFINITION,
-          id: YMRS_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!ymrsResponse,
-          completedAt: ymrsResponse?.completed_at,
-        },
-        {
-          ...CGI_DEFINITION,
-          id: CGI_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!cgiResponse,
-          completedAt: cgiResponse?.completed_at,
-        },
-        {
-          ...EGF_DEFINITION,
-          id: EGF_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!egfResponse,
-          completedAt: egfResponse?.completed_at,
-        },
-        {
-          ...ALDA_DEFINITION,
-          id: ALDA_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!aldaResponse,
-          completedAt: aldaResponse?.completed_at,
-        },
-        {
-          ...ETAT_PATIENT_DEFINITION,
-          id: ETAT_PATIENT_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!etatPatientResponse,
-          completedAt: etatPatientResponse?.completed_at,
-        },
-        {
-          ...FAST_DEFINITION,
-          id: FAST_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!fastResponse,
-          completedAt: fastResponse?.completed_at,
-        }
-      ]
-    };
-
-    // Module 3: Evaluation Médicale
-    const medicalEvalModule = {
-      id: 'mod_medical_eval',
-      name: 'Evaluation Médicale',
-      description: 'Évaluation médicale complète',
-      questionnaires: [
-        {
-          ...DSM5_HUMEUR_DEFINITION,
-          id: DSM5_HUMEUR_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!dsm5HumeurResponse,
-          completedAt: dsm5HumeurResponse?.completed_at,
-        },
-        {
-          ...DSM5_PSYCHOTIC_DEFINITION,
-          id: DSM5_PSYCHOTIC_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!dsm5PsychoticResponse,
-          completedAt: dsm5PsychoticResponse?.completed_at,
-        },
-        {
-          ...DSM5_COMORBID_DEFINITION,
-          id: DSM5_COMORBID_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!dsm5ComorbidResponse,
-          completedAt: dsm5ComorbidResponse?.completed_at,
-        },
-        {
-          ...DIVA_DEFINITION,
-          id: DIVA_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!divaResponse,
-          completedAt: divaResponse?.completed_at,
-        },
-        {
-          ...FAMILY_HISTORY_DEFINITION,
-          id: FAMILY_HISTORY_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!familyHistoryResponse,
-          completedAt: familyHistoryResponse?.completed_at,
-        },
-        {
-          ...CSSRS_DEFINITION,
-          id: CSSRS_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!cssrsResponse,
-          completedAt: cssrsResponse?.completed_at,
-        },
-        {
-          ...ISA_DEFINITION,
-          id: ISA_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!isaResponse,
-          completedAt: isaResponse?.completed_at,
-        },
-        {
-          ...CSSRS_HISTORY_DEFINITION,
-          id: CSSRS_HISTORY_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!cssrsHistoryResponse,
-          completedAt: cssrsHistoryResponse?.completed_at,
-        },
-        {
-          ...SIS_DEFINITION,
-          id: SIS_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!sisResponse,
-          completedAt: sisResponse?.completed_at,
-        }
-      ]
-    };
-
-    // Module 4: Autoquestionnaires - ETAT
-    const etatModule = {
-      id: 'mod_auto_etat',
-      name: 'Autoquestionnaires - ETAT',
-      description: 'Questionnaires sur l\'état actuel du patient',
-      questionnaires: [
-        {
-          ...EQ5D5L_DEFINITION,
-          id: EQ5D5L_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!eq5d5lResponse,
-          completedAt: eq5d5lResponse?.completed_at,
-        },
-        {
-          ...PRISE_M_DEFINITION,
-          id: PRISE_M_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!priseMResponse,
-          completedAt: priseMResponse?.completed_at,
-        },
-        {
-          ...STAI_YA_DEFINITION,
-          id: STAI_YA_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!staiYaResponse,
-          completedAt: staiYaResponse?.completed_at,
-        },
-        {
-          ...MARS_DEFINITION,
-          id: MARS_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!marsResponse,
-          completedAt: marsResponse?.completed_at,
-        },
-        {
-          ...MATHYS_DEFINITION,
-          id: MATHYS_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!mathysResponse,
-          completedAt: mathysResponse?.completed_at,
-        },
-        {
-          ...ASRM_DEFINITION,
-          id: ASRM_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!asrmResponse,
-          completedAt: asrmResponse?.completed_at,
-        },
-        {
-          ...QIDS_DEFINITION,
-          id: QIDS_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!qidsResponse,
-          completedAt: qidsResponse?.completed_at,
-        },
-        {
-          ...PSQI_DEFINITION,
-          id: PSQI_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!psqiResponse,
-          completedAt: psqiResponse?.completed_at,
-        },
-        {
-          ...EPWORTH_DEFINITION,
-          id: EPWORTH_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!epworthResponse,
-          completedAt: epworthResponse?.completed_at,
-        }
-      ]
-    };
-
-    // Module 5: Social
-    const socialModule = {
-      id: 'mod_social',
-      name: 'Social',
-      description: 'Évaluation sociale',
-      questionnaires: [
-        {
-          ...SOCIAL_DEFINITION,
-          id: SOCIAL_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: !!socialResponse,
-          completedAt: socialResponse?.completed_at,
-        }
-      ]
-    };
-
-    // Module 6: Autoquestionnaires - TRAITS
-    const traitsModule = {
-      id: 'mod_auto_traits',
-      name: 'Autoquestionnaires - TRAITS',
-      description: 'Questionnaires sur les traits du patient',
-      questionnaires: [
-        {
-          ...ASRS_DEFINITION,
-          id: ASRS_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!asrsResponse,
-          completedAt: asrsResponse?.completed_at,
-        },
-        {
-          ...CTQ_DEFINITION,
-          id: CTQ_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!ctqResponse,
-          completedAt: ctqResponse?.completed_at,
-        },
-        {
-          ...BIS10_DEFINITION,
-          id: BIS10_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!bis10Response,
-          completedAt: bis10Response?.completed_at,
-        },
-        {
-          ...ALS18_DEFINITION,
-          id: ALS18_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!als18Response,
-          completedAt: als18Response?.completed_at,
-        },
-        {
-          ...AIM_DEFINITION,
-          id: AIM_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!aimResponse,
-          completedAt: aimResponse?.completed_at,
-        },
-        {
-          ...WURS25_DEFINITION,
-          id: WURS25_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!wurs25Response,
-          completedAt: wurs25Response?.completed_at,
-        },
-        {
-          ...AQ12_DEFINITION,
-          id: AQ12_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!aq12Response,
-          completedAt: aq12Response?.completed_at,
-        },
-        {
-          ...CSM_DEFINITION,
-          id: CSM_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!csmResponse,
-          completedAt: csmResponse?.completed_at,
-        },
-        {
-          ...CTI_DEFINITION,
-          id: CTI_DEFINITION.code,
-          target_role: 'patient',
-          completed: !!ctiResponse,
-          completedAt: ctiResponse?.completed_at,
-        }
-      ]
-    };
-
     modulesWithQuestionnaires = [
-      nurseModule,
-      thymicModule,
-      medicalEvalModule,
-      etatModule,
-      socialModule,
-      traitsModule
+      {
+        id: 'mod_auto',
+        name: 'Autoquestionnaires',
+        description: 'Questionnaires à remplir par le patient',
+        questionnaires: [
+          {
+            ...ASRM_DEFINITION,
+            id: ASRM_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['ASRM_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ASRM_FR']?.completed_at,
+          },
+          {
+            ...QIDS_DEFINITION,
+            id: QIDS_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['QIDS_SR16_FR']?.completed || false,
+            completedAt: questionnaireStatuses['QIDS_SR16_FR']?.completed_at,
+          },
+          {
+            ...MDQ_DEFINITION,
+            id: MDQ_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['MDQ_FR']?.completed || false,
+            completedAt: questionnaireStatuses['MDQ_FR']?.completed_at,
+          }
+        ]
+      },
+      {
+        id: 'mod_medical',
+        name: 'Partie médicale',
+        description: 'Évaluation clinique par le professionnel de santé',
+        questionnaires: [
+          {
+            ...DIAGNOSTIC_DEFINITION,
+            id: DIAGNOSTIC_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['MEDICAL_DIAGNOSTIC_FR']?.completed || false,
+            completedAt: questionnaireStatuses['MEDICAL_DIAGNOSTIC_FR']?.completed_at,
+          },
+          {
+            ...ORIENTATION_DEFINITION,
+            id: ORIENTATION_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['BIPOLAR_ORIENTATION_FR']?.completed || false,
+            completedAt: questionnaireStatuses['BIPOLAR_ORIENTATION_FR']?.completed_at,
+          }
+        ]
+      }
     ];
-
-    // Calculate stats
-    const total = nurseModule.questionnaires.length + thymicModule.questionnaires.length + medicalEvalModule.questionnaires.length + etatModule.questionnaires.length + socialModule.questionnaires.length + traitsModule.questionnaires.length;
-    const completed = 
-      nurseModule.questionnaires.filter(q => q.completed).length +
-      thymicModule.questionnaires.filter(q => q.completed).length +
-      medicalEvalModule.questionnaires.filter(q => q.completed).length +
-      etatModule.questionnaires.filter(q => q.completed).length + 
-      socialModule.questionnaires.filter(q => q.completed).length +
-      traitsModule.questionnaires.filter(q => q.completed).length;
-    
-    completionStatus = {
-      totalQuestionnaires: total,
-      completedQuestionnaires: completed,
-      completionPercentage: total > 0 ? (completed / total) * 100 : 0
-    };
+  } else if (visit.visit_type === 'initial_evaluation') {
+    modulesWithQuestionnaires = [
+      {
+        id: 'mod_nurse',
+        name: 'Infirmier',
+        description: 'Évaluation par l\'infirmier',
+        questionnaires: [
+          {
+            ...TOBACCO_DEFINITION,
+            id: TOBACCO_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['TOBACCO_FR']?.completed || false,
+            completedAt: questionnaireStatuses['TOBACCO_FR']?.completed_at,
+          },
+          {
+            ...FAGERSTROM_DEFINITION,
+            id: FAGERSTROM_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['FAGERSTROM_FR']?.completed || false,
+            completedAt: questionnaireStatuses['FAGERSTROM_FR']?.completed_at,
+          },
+          {
+            ...PHYSICAL_PARAMS_DEFINITION,
+            id: PHYSICAL_PARAMS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['PHYSICAL_PARAMS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['PHYSICAL_PARAMS_FR']?.completed_at,
+          },
+          {
+            ...BLOOD_PRESSURE_DEFINITION,
+            id: BLOOD_PRESSURE_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['BLOOD_PRESSURE_FR']?.completed || false,
+            completedAt: questionnaireStatuses['BLOOD_PRESSURE_FR']?.completed_at,
+          },
+          {
+            ...ECG_DEFINITION,
+            id: ECG_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ECG_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ECG_FR']?.completed_at,
+          },
+          {
+            ...SLEEP_APNEA_DEFINITION,
+            id: SLEEP_APNEA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['SLEEP_APNEA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['SLEEP_APNEA_FR']?.completed_at,
+          },
+          {
+            ...BIOLOGICAL_ASSESSMENT_DEFINITION,
+            id: BIOLOGICAL_ASSESSMENT_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['BIOLOGICAL_ASSESSMENT_FR']?.completed || false,
+            completedAt: questionnaireStatuses['BIOLOGICAL_ASSESSMENT_FR']?.completed_at,
+          }
+        ]
+      },
+      {
+        id: 'mod_thymic_eval',
+        name: 'Evaluation état thymique et fonctionnement',
+        description: 'Évaluation de l\'état thymique et du fonctionnement',
+        questionnaires: [
+          {
+            ...MADRS_DEFINITION,
+            id: MADRS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['MADRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['MADRS_FR']?.completed_at,
+          },
+          {
+            ...YMRS_DEFINITION,
+            id: YMRS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['YMRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['YMRS_FR']?.completed_at,
+          },
+          {
+            ...CGI_DEFINITION,
+            id: CGI_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['CGI_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CGI_FR']?.completed_at,
+          },
+          {
+            ...EGF_DEFINITION,
+            id: EGF_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['EGF_FR']?.completed || false,
+            completedAt: questionnaireStatuses['EGF_FR']?.completed_at,
+          },
+          {
+            ...ALDA_DEFINITION,
+            id: ALDA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ALDA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ALDA_FR']?.completed_at,
+          },
+          {
+            ...ETAT_PATIENT_DEFINITION,
+            id: ETAT_PATIENT_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ETAT_PATIENT_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ETAT_PATIENT_FR']?.completed_at,
+          },
+          {
+            ...FAST_DEFINITION,
+            id: FAST_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['FAST_FR']?.completed || false,
+            completedAt: questionnaireStatuses['FAST_FR']?.completed_at,
+          }
+        ]
+      },
+      {
+        id: 'mod_medical_eval',
+        name: 'Evaluation Médicale',
+        description: 'Évaluation médicale complète',
+        questionnaires: [
+          {
+            ...DSM5_HUMEUR_DEFINITION,
+            id: DSM5_HUMEUR_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['DSM5_HUMEUR_FR']?.completed || false,
+            completedAt: questionnaireStatuses['DSM5_HUMEUR_FR']?.completed_at,
+          },
+          {
+            ...DSM5_PSYCHOTIC_DEFINITION,
+            id: DSM5_PSYCHOTIC_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['DSM5_PSYCHOTIC_FR']?.completed || false,
+            completedAt: questionnaireStatuses['DSM5_PSYCHOTIC_FR']?.completed_at,
+          },
+          {
+            ...DSM5_COMORBID_DEFINITION,
+            id: DSM5_COMORBID_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['DSM5_COMORBID_FR']?.completed || false,
+            completedAt: questionnaireStatuses['DSM5_COMORBID_FR']?.completed_at,
+          },
+          {
+            ...DIVA_DEFINITION,
+            id: DIVA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['DIVA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['DIVA_FR']?.completed_at,
+          },
+          {
+            ...FAMILY_HISTORY_DEFINITION,
+            id: FAMILY_HISTORY_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['FAMILY_HISTORY_FR']?.completed || false,
+            completedAt: questionnaireStatuses['FAMILY_HISTORY_FR']?.completed_at,
+          },
+          {
+            ...CSSRS_DEFINITION,
+            id: CSSRS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['CSSRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CSSRS_FR']?.completed_at,
+          },
+          {
+            ...ISA_DEFINITION,
+            id: ISA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ISA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ISA_FR']?.completed_at,
+          },
+          {
+            ...CSSRS_HISTORY_DEFINITION,
+            id: CSSRS_HISTORY_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['CSSRS_HISTORY_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CSSRS_HISTORY_FR']?.completed_at,
+          },
+          {
+            ...SIS_DEFINITION,
+            id: SIS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['SIS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['SIS_FR']?.completed_at,
+          }
+        ]
+      },
+      {
+        id: 'mod_auto_etat',
+        name: 'Autoquestionnaires - ETAT',
+        description: 'Questionnaires sur l\'état actuel du patient',
+        questionnaires: [
+          {
+            ...EQ5D5L_DEFINITION,
+            id: EQ5D5L_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['EQ5D5L_FR']?.completed || false,
+            completedAt: questionnaireStatuses['EQ5D5L_FR']?.completed_at,
+          },
+          {
+            ...PRISE_M_DEFINITION,
+            id: PRISE_M_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['PRISE_M_FR']?.completed || false,
+            completedAt: questionnaireStatuses['PRISE_M_FR']?.completed_at,
+          },
+          {
+            ...STAI_YA_DEFINITION,
+            id: STAI_YA_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['STAI_YA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['STAI_YA_FR']?.completed_at,
+          },
+          {
+            ...MARS_DEFINITION,
+            id: MARS_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['MARS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['MARS_FR']?.completed_at,
+          },
+          {
+            ...MATHYS_DEFINITION,
+            id: MATHYS_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['MATHYS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['MATHYS_FR']?.completed_at,
+          },
+          {
+            ...ASRM_DEFINITION,
+            id: ASRM_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['ASRM_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ASRM_FR']?.completed_at,
+          },
+          {
+            ...QIDS_DEFINITION,
+            id: QIDS_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['QIDS_SR16_FR']?.completed || false,
+            completedAt: questionnaireStatuses['QIDS_SR16_FR']?.completed_at,
+          },
+          {
+            ...PSQI_DEFINITION,
+            id: PSQI_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['PSQI_FR']?.completed || false,
+            completedAt: questionnaireStatuses['PSQI_FR']?.completed_at,
+          },
+          {
+            ...EPWORTH_DEFINITION,
+            id: EPWORTH_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['EPWORTH_FR']?.completed || false,
+            completedAt: questionnaireStatuses['EPWORTH_FR']?.completed_at,
+          }
+        ]
+      },
+      {
+        id: 'mod_social',
+        name: 'Social',
+        description: 'Évaluation sociale',
+        questionnaires: [
+          {
+            ...SOCIAL_DEFINITION,
+            id: SOCIAL_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['SOCIAL_FR']?.completed || false,
+            completedAt: questionnaireStatuses['SOCIAL_FR']?.completed_at,
+          }
+        ]
+      },
+      {
+        id: 'mod_auto_traits',
+        name: 'Autoquestionnaires - TRAITS',
+        description: 'Questionnaires sur les traits du patient',
+        questionnaires: [
+          {
+            ...ASRS_DEFINITION,
+            id: ASRS_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['ASRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ASRS_FR']?.completed_at,
+          },
+          {
+            ...CTQ_DEFINITION,
+            id: CTQ_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['CTQ_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CTQ_FR']?.completed_at,
+          },
+          {
+            ...BIS10_DEFINITION,
+            id: BIS10_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['BIS10_FR']?.completed || false,
+            completedAt: questionnaireStatuses['BIS10_FR']?.completed_at,
+          },
+          {
+            ...ALS18_DEFINITION,
+            id: ALS18_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['ALS18_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ALS18_FR']?.completed_at,
+          },
+          {
+            ...AIM_DEFINITION,
+            id: AIM_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['AIM_FR']?.completed || false,
+            completedAt: questionnaireStatuses['AIM_FR']?.completed_at,
+          },
+          {
+            ...WURS25_DEFINITION,
+            id: WURS25_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['WURS25_FR']?.completed || false,
+            completedAt: questionnaireStatuses['WURS25_FR']?.completed_at,
+          },
+          {
+            ...AQ12_DEFINITION,
+            id: AQ12_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['AQ12_FR']?.completed || false,
+            completedAt: questionnaireStatuses['AQ12_FR']?.completed_at,
+          },
+          {
+            ...CSM_DEFINITION,
+            id: CSM_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['CSM_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CSM_FR']?.completed_at,
+          },
+          {
+            ...CTI_DEFINITION,
+            id: CTI_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['CTI_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CTI_FR']?.completed_at,
+          }
+        ]
+      }
+    ];
   }
 
   return (
@@ -696,7 +488,7 @@ export default async function VisitDetailPage({
         <div className="flex items-start justify-between gap-6">
           <div className="flex items-start gap-6 flex-1">
             {/* Circular Progress */}
-            <CircularProgress percentage={completionStatus.completionPercentage} />
+            <CircularProgress percentage={completionStatus.completion_percentage} />
             
             {/* Visit Info */}
             <div className="flex-1">
@@ -720,15 +512,15 @@ export default async function VisitDetailPage({
                 <div className="flex-1">
                   <div className="flex justify-between text-xs text-slate-600 mb-1">
                     <span>Progression globale</span>
-                    <span>{completionStatus.completedQuestionnaires}/{completionStatus.totalQuestionnaires} formulaires</span>
+                    <span>{completionStatus.completed_questionnaires}/{completionStatus.total_questionnaires} formulaires</span>
                   </div>
                   <div className="w-full bg-slate-200 rounded-full h-2.5">
                     <div
                       className={cn(
                         "h-2.5 rounded-full transition-all duration-500",
-                        completionStatus.completionPercentage === 100 ? "bg-emerald-600" : "bg-brand"
+                        completionStatus.completion_percentage === 100 ? "bg-emerald-600" : "bg-brand"
                       )}
-                      style={{ width: `${completionStatus.completionPercentage}%` }}
+                      style={{ width: `${completionStatus.completion_percentage}%` }}
                     />
                   </div>
                 </div>
@@ -750,9 +542,9 @@ export default async function VisitDetailPage({
       {/* Quick Stats */}
       <VisitQuickStats
         totalModules={modulesWithQuestionnaires.length}
-        totalQuestionnaires={completionStatus.totalQuestionnaires}
-        completedQuestionnaires={completionStatus.completedQuestionnaires}
-        completionPercentage={completionStatus.completionPercentage}
+        totalQuestionnaires={completionStatus.total_questionnaires}
+        completedQuestionnaires={completionStatus.completed_questionnaires}
+        completionPercentage={completionStatus.completion_percentage}
       />
 
       {/* Clinical Modules */}
