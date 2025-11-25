@@ -79,11 +79,18 @@ export default async function VisitDetailPage({
   }
 
   // Fetch all visit data with questionnaire statuses in a single RPC call
-  const { visit, questionnaireStatuses, completionStatus } = await getVisitDetailData(visitId);
+  const { visit, questionnaireStatuses, completionStatus: rawCompletionStatus } = await getVisitDetailData(visitId);
 
   if (!visit) {
     notFound();
   }
+
+  // Transform completion status to match component expectations (snake_case -> camelCase)
+  const completionStatus = {
+    totalQuestionnaires: rawCompletionStatus.total_questionnaires,
+    completedQuestionnaires: rawCompletionStatus.completed_questionnaires,
+    completionPercentage: rawCompletionStatus.completion_percentage,
+  };
 
   // Build modules with questionnaires based on visit type and RPC data
   let modulesWithQuestionnaires: VirtualModule[] = [];
@@ -488,7 +495,7 @@ export default async function VisitDetailPage({
         <div className="flex items-start justify-between gap-6">
           <div className="flex items-start gap-6 flex-1">
             {/* Circular Progress */}
-            <CircularProgress percentage={completionStatus.completion_percentage} />
+            <CircularProgress percentage={completionStatus.completionPercentage} />
             
             {/* Visit Info */}
             <div className="flex-1">
@@ -512,15 +519,15 @@ export default async function VisitDetailPage({
                 <div className="flex-1">
                   <div className="flex justify-between text-xs text-slate-600 mb-1">
                     <span>Progression globale</span>
-                    <span>{completionStatus.completed_questionnaires}/{completionStatus.total_questionnaires} formulaires</span>
+                    <span>{completionStatus.completedQuestionnaires}/{completionStatus.totalQuestionnaires} formulaires</span>
                   </div>
                   <div className="w-full bg-slate-200 rounded-full h-2.5">
                     <div
                       className={cn(
                         "h-2.5 rounded-full transition-all duration-500",
-                        completionStatus.completion_percentage === 100 ? "bg-emerald-600" : "bg-brand"
+                        completionStatus.completionPercentage === 100 ? "bg-emerald-600" : "bg-brand"
                       )}
-                      style={{ width: `${completionStatus.completion_percentage}%` }}
+                      style={{ width: `${completionStatus.completionPercentage}%` }}
                     />
                   </div>
                 </div>
@@ -542,9 +549,9 @@ export default async function VisitDetailPage({
       {/* Quick Stats */}
       <VisitQuickStats
         totalModules={modulesWithQuestionnaires.length}
-        totalQuestionnaires={completionStatus.total_questionnaires}
-        completedQuestionnaires={completionStatus.completed_questionnaires}
-        completionPercentage={completionStatus.completion_percentage}
+        totalQuestionnaires={completionStatus.totalQuestionnaires}
+        completedQuestionnaires={completionStatus.completedQuestionnaires}
+        completionPercentage={completionStatus.completionPercentage}
       />
 
       {/* Clinical Modules */}

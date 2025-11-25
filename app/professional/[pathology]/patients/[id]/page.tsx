@@ -29,6 +29,10 @@ export default async function PatientDetailPage({
     redirect("/auth/login");
   }
 
+  if (!context.profile.center_id) {
+    redirect("/auth/error?message=No center assigned");
+  }
+
   // Record access for "recently viewed" feature
   await recordPatientAccess(context.user.id, id);
 
@@ -40,7 +44,7 @@ export default async function PatientDetailPage({
   // Fetch all patient profile data in a single optimized RPC call
   const {
     patient,
-    stats,
+    stats: rawStats,
     visits,
     riskLevel,
     evaluations,
@@ -54,6 +58,25 @@ export default async function PatientDetailPage({
   if (!patient) {
     notFound();
   }
+
+  // Transform stats to match component expectations (snake_case -> camelCase)
+  const stats = {
+    totalVisits: rawStats.total_visits,
+    completedVisits: rawStats.completed_visits,
+    upcomingVisits: rawStats.upcoming_visits,
+  };
+
+  // Transform invitation status to match component expectations
+  const transformedInvitationStatus = {
+    hasUserAccount: invitationStatus.hasUserAccount,
+    userId: invitationStatus.userId,
+    pendingInvitation: invitationStatus.pendingInvitation ? {
+      id: invitationStatus.pendingInvitation.id,
+      sentAt: invitationStatus.pendingInvitation.sent_at,
+      expiresAt: invitationStatus.pendingInvitation.expires_at,
+      email: invitationStatus.pendingInvitation.email,
+    } : null
+  };
 
   // Map visits to include completion percentage for display
   const visitsWithCompletion = visits;
@@ -187,8 +210,8 @@ export default async function PatientDetailPage({
               <InvitationStatus
                 patientId={id}
                 patientEmail={patient.email}
-                hasUserAccount={invitationStatus.hasUserAccount}
-                pendingInvitation={invitationStatus.pendingInvitation}
+                hasUserAccount={transformedInvitationStatus.hasUserAccount}
+                pendingInvitation={transformedInvitationStatus.pendingInvitation}
               />
 
               <PatientOverview patient={patient} />
