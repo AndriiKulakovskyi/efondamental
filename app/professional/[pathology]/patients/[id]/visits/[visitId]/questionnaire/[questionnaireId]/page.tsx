@@ -41,7 +41,8 @@ import {
   ISA_DEFINITION,
   CSSRS_HISTORY_DEFINITION,
   SIS_DEFINITION,
-  WAIS4_CRITERIA_DEFINITION
+  WAIS4_CRITERIA_DEFINITION,
+  WAIS4_LEARNING_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -100,7 +101,8 @@ import {
   getIsaResponse,
   getCssrsHistoryResponse,
   getSisResponse,
-  getWais4CriteriaResponse
+  getWais4CriteriaResponse,
+  getWais4LearningResponse
 } from "@/lib/services/questionnaire-hetero.service";
 import {
   getSocialResponse
@@ -175,6 +177,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === CSSRS_HISTORY_DEFINITION.code) questionnaire = CSSRS_HISTORY_DEFINITION;
   else if (code === SIS_DEFINITION.code) questionnaire = SIS_DEFINITION;
   else if (code === WAIS4_CRITERIA_DEFINITION.code) questionnaire = WAIS4_CRITERIA_DEFINITION;
+  else if (code === WAIS4_LEARNING_DEFINITION.code) questionnaire = WAIS4_LEARNING_DEFINITION;
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) questionnaire = SOCIAL_DEFINITION;
   // Infirmier questionnaires
@@ -236,6 +239,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === CSSRS_HISTORY_DEFINITION.code) existingResponse = await getCssrsHistoryResponse(visitId);
   else if (code === SIS_DEFINITION.code) existingResponse = await getSisResponse(visitId);
   else if (code === WAIS4_CRITERIA_DEFINITION.code) existingResponse = await getWais4CriteriaResponse(visitId);
+  else if (code === WAIS4_LEARNING_DEFINITION.code) existingResponse = await getWais4LearningResponse(visitId);
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) existingResponse = await getSocialResponse(visitId);
   // Infirmier questionnaires

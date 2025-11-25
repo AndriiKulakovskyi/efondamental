@@ -3018,3 +3018,143 @@ export const WAIS4_CRITERIA_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// WAIS-IV Learning Disorders (Troubles des acquisitions et des apprentissages)
+// ============================================================================
+
+export const WAIS4_LEARNING_QUESTIONS: Question[] = [
+  {
+    id: 'dyslexia',
+    section: 'Troubles des acquisitions et des apprentissages',
+    text: 'Dyslexie',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sait pas', score: 0 }
+    ]
+  },
+  {
+    id: 'dysorthographia',
+    section: 'Troubles des acquisitions et des apprentissages',
+    text: 'Dysorthographie',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sait pas', score: 0 }
+    ]
+  },
+  {
+    id: 'dyscalculia',
+    section: 'Troubles des acquisitions et des apprentissages',
+    text: 'Dyscalculie',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sait pas', score: 0 }
+    ]
+  },
+  {
+    id: 'dysphasia',
+    section: 'Troubles des acquisitions et des apprentissages',
+    text: 'Dysphasie',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sait pas', score: 0 }
+    ]
+  },
+  {
+    id: 'dyspraxia',
+    section: 'Troubles des acquisitions et des apprentissages',
+    text: 'Dyspraxie',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sait pas', score: 0 }
+    ]
+  },
+  {
+    id: 'speech_delay',
+    section: 'Troubles des acquisitions et des apprentissages',
+    text: 'Retard à l\'acquisition de la parole',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sait pas', score: 0 }
+    ]
+  },
+  {
+    id: 'stuttering',
+    section: 'Troubles des acquisitions et des apprentissages',
+    text: 'Bégaiement',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sait pas', score: 0 }
+    ]
+  },
+  {
+    id: 'walking_delay',
+    section: 'Troubles des acquisitions et des apprentissages',
+    text: 'Retard à l\'acquisition de la marche',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sait pas', score: 0 }
+    ]
+  },
+  {
+    id: 'febrile_seizures',
+    section: 'Troubles des acquisitions et des apprentissages',
+    text: 'Convulsions fébriles dans la petite enfance',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sait pas', score: 0 }
+    ]
+  },
+  {
+    id: 'precocity',
+    section: 'Troubles des acquisitions et des apprentissages',
+    text: 'Précocité',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 },
+      { code: 9, label: 'Ne sait pas', score: 0 }
+    ]
+  }
+];
+
+export const WAIS4_LEARNING_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais4_learning',
+  code: 'WAIS4_LEARNING_FR',
+  title: 'WAIS-IV Troubles des acquisitions et des apprentissages',
+  description: 'Liste de contrôle des antécédents de troubles des acquisitions et des apprentissages.',
+  questions: WAIS4_LEARNING_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

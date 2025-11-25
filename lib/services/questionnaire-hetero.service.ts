@@ -30,7 +30,9 @@ import {
   SisResponse,
   SisResponseInsert,
   Wais4CriteriaResponse,
-  Wais4CriteriaResponseInsert
+  Wais4CriteriaResponseInsert,
+  Wais4LearningResponse,
+  Wais4LearningResponseInsert
 } from '@/lib/types/database.types';
 
 // ============================================================================
@@ -877,6 +879,46 @@ export async function saveWais4CriteriaResponse(
 
   const { data, error } = await supabase
     .from('responses_wais4_criteria')
+    .upsert({
+      ...response,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// WAIS-IV Learning Disorders (Troubles des acquisitions et des apprentissages)
+// ============================================================================
+
+export async function getWais4LearningResponse(
+  visitId: string
+): Promise<Wais4LearningResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_wais4_learning')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveWais4LearningResponse(
+  response: Wais4LearningResponseInsert
+): Promise<Wais4LearningResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from('responses_wais4_learning')
     .upsert({
       ...response,
       completed_by: user.data.user?.id

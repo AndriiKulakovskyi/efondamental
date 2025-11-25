@@ -2184,3 +2184,33 @@ export interface Wais4CriteriaResponse {
 
 export type Wais4CriteriaResponseInsert = Omit<Wais4CriteriaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ============================================================================
+// WAIS-IV Learning Disorders (Troubles des acquisitions et des apprentissages)
+// ============================================================================
+
+export interface Wais4LearningResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Learning and Acquisition Disorders (0 = Non, 1 = Oui, 9 = Ne sait pas)
+  dyslexia: number; // Dyslexie
+  dysorthographia: number; // Dysorthographie
+  dyscalculia: number; // Dyscalculie
+  dysphasia: number; // Dysphasie
+  dyspraxia: number; // Dyspraxie
+  speech_delay: number; // Retard à l'acquisition de la parole
+  stuttering: number; // Bégaiement
+  walking_delay: number; // Retard à l'acquisition de la marche
+  febrile_seizures: number; // Convulsions fébriles dans la petite enfance
+  precocity: number; // Précocité
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Wais4LearningResponseInsert = Omit<Wais4LearningResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
