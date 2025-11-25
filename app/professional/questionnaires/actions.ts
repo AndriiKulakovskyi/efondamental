@@ -39,7 +39,8 @@ import {
   saveCssrsResponse,
   saveIsaResponse,
   saveCssrsHistoryResponse,
-  saveSisResponse
+  saveSisResponse,
+  saveWais4CriteriaResponse
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveSocialResponse
@@ -110,7 +111,8 @@ import {
   EcgResponseInsert,
   Dsm5HumeurResponseInsert,
   Dsm5PsychoticResponseInsert,
-  Dsm5ComorbidResponseInsert
+  Dsm5ComorbidResponseInsert,
+  Wais4CriteriaResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -484,6 +486,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as Dsm5ComorbidResponseInsert);
+        break;
+
+      case 'WAIS4_CRITERIA_FR':
+        result = await saveWais4CriteriaResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Wais4CriteriaResponseInsert);
         break;
         
       default:

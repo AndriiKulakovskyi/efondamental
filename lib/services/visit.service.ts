@@ -47,7 +47,8 @@ import {
   getCssrsResponse,
   getIsaResponse,
   getCssrsHistoryResponse,
-  getSisResponse
+  getSisResponse,
+  getWais4CriteriaResponse
 } from './questionnaire-hetero.service';
 import {
   getSocialResponse
@@ -104,7 +105,8 @@ import {
   CSSRS_DEFINITION,
   ISA_DEFINITION,
   CSSRS_HISTORY_DEFINITION,
-  SIS_DEFINITION
+  SIS_DEFINITION,
+  WAIS4_CRITERIA_DEFINITION
 } from '../constants/questionnaires-hetero';
 import {
   SOCIAL_DEFINITION
@@ -399,7 +401,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_medical_eval',
         name: 'Evaluation Médicale',
         description: 'Évaluation médicale complète',
-        questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION, DIVA_DEFINITION, FAMILY_HISTORY_DEFINITION, CSSRS_DEFINITION, ISA_DEFINITION, CSSRS_HISTORY_DEFINITION, SIS_DEFINITION]
+        questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION, DIVA_DEFINITION, FAMILY_HISTORY_DEFINITION, CSSRS_DEFINITION, ISA_DEFINITION, CSSRS_HISTORY_DEFINITION, SIS_DEFINITION, WAIS4_CRITERIA_DEFINITION]
       },
       {
         id: 'mod_auto_etat',
@@ -472,7 +474,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diag) completed++;
     if (orient) completed++;
   } else if (visit.visit_type === 'initial_evaluation') {
-    total = 38; // 16 auto questionnaires + ASRM + QIDS (reused) + 7 hetero questionnaires + 1 social + 6 infirmier (tobacco + fagerstrom + physical_params + blood_pressure + sleep_apnea + biological_assessment) + 6 DSM5/Medical Eval (dsm5_humeur + dsm5_psychotic + dsm5_comorbid + diva + family_history + cssrs + isa + cssrs_history + sis)
+    total = 41; // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 7 INFIRMIER + 10 Medical (9 DSM5 + 1 WAIS-4)
     totalModules = 6;
 
     const [
@@ -480,7 +482,8 @@ export async function getVisitCompletionStatus(visitId: string) {
       asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti,
       madrs, ymrs, cgi, egf, alda, etatPatient, fast, social,
       tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biologicalAssessment,
-      dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs, isa, cssrsHistory, sis
+      dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs, isa, cssrsHistory, sis,
+      wais4Criteria
     ] = await Promise.all([
       // ETAT questionnaires
       getEq5d5lResponse(visitId),
@@ -534,7 +537,9 @@ export async function getVisitCompletionStatus(visitId: string) {
       // C-SSRS History
       getCssrsHistoryResponse(visitId),
       // SIS
-      getSisResponse(visitId)
+      getSisResponse(visitId),
+      // WAIS-4 Criteria
+      getWais4CriteriaResponse(visitId)
     ]);
 
     if (eq5d5l) completed++;
@@ -578,6 +583,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (isa) completed++;
     if (cssrsHistory) completed++;
     if (sis) completed++;
+    if (wais4Criteria) completed++;
   }
 
   return {

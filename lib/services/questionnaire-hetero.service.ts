@@ -28,7 +28,9 @@ import {
   CssrsHistoryResponse,
   CssrsHistoryResponseInsert,
   SisResponse,
-  SisResponseInsert
+  SisResponseInsert,
+  Wais4CriteriaResponse,
+  Wais4CriteriaResponseInsert
 } from '@/lib/types/database.types';
 
 // ============================================================================
@@ -838,6 +840,46 @@ export async function saveSisResponse(
     .from('responses_sis')
     .upsert({
       ...responseWithoutGeneratedFields
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
+// ============================================================================
+
+export async function getWais4CriteriaResponse(
+  visitId: string
+): Promise<Wais4CriteriaResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_wais4_criteria')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveWais4CriteriaResponse(
+  response: Wais4CriteriaResponseInsert
+): Promise<Wais4CriteriaResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from('responses_wais4_criteria')
+    .upsert({
+      ...response,
+      completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
     .single();

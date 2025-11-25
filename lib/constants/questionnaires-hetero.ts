@@ -2872,3 +2872,149 @@ export const SIS_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
+// ============================================================================
+
+export const WAIS4_CRITERIA_QUESTIONS: Question[] = [
+  {
+    id: 'collection_date',
+    section: 'Informations Générales',
+    text: 'Date de recueil des informations',
+    type: 'date',
+    required: true
+  },
+  {
+    id: 'age',
+    section: 'Informations Générales',
+    text: 'Age du patient',
+    type: 'number',
+    required: true,
+    min: 16,
+    max: 90,
+    help: 'L\'âge doit être compris entre 16 et 90 ans'
+  },
+  {
+    id: 'laterality',
+    section: 'Informations Générales',
+    text: 'Latéralité',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'gaucher', label: 'Gaucher', score: 0 },
+      { code: 'droitier', label: 'Droitier', score: 0 },
+      { code: 'ambidextre', label: 'Ambidextre', score: 0 }
+    ]
+  },
+  {
+    id: 'native_french_speaker',
+    section: 'Informations Générales',
+    text: 'Langue maternelle française',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'time_since_last_eval',
+    section: 'État Clinique',
+    text: 'Temps écoulé depuis la dernière évaluation de l\'état du patient',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'moins_semaine', label: 'Moins d\'une semaine', score: 0 },
+      { code: 'plus_semaine', label: 'Plus d\'une semaine', score: 0 }
+    ]
+  },
+  {
+    id: 'patient_euthymic',
+    section: 'État Clinique',
+    text: 'Patient Normothymique',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'no_episode_3months',
+    section: 'État Clinique',
+    text: 'Absence d\'épisode dans les 3 mois précédents',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'socio_prof_data_present',
+    section: 'Données Socio-démographiques',
+    text: 'Présence des données socio-professionnelles',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'years_of_education',
+    section: 'Données Socio-démographiques',
+    text: 'Nombre d\'années d\'études (depuis les cours préparatoires)',
+    type: 'number',
+    required: true,
+    min: 0,
+    help: 'Nombre total d\'années de scolarité'
+  },
+  {
+    id: 'no_visual_impairment',
+    section: 'Critères d\'Exclusion / Santé',
+    text: 'Absence de daltonisme ou de trouble visuel invalidant',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'no_hearing_impairment',
+    section: 'Critères d\'Exclusion / Santé',
+    text: 'Absence de troubles auditifs non appareillés',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'no_ect_past_year',
+    section: 'Critères d\'Exclusion / Santé',
+    text: 'Pas de traitement par sismothérapie dans l\'année écoulée',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  }
+];
+
+export const WAIS4_CRITERIA_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais4_criteria',
+  code: 'WAIS4_CRITERIA_FR',
+  title: 'WAIS-IV Critères cliniques',
+  description: 'Fiche de recueil des critères cliniques et démographiques pour la passation de la WAIS-IV.',
+  questions: WAIS4_CRITERIA_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

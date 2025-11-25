@@ -46,7 +46,8 @@ import {
   CSSRS_DEFINITION,
   ISA_DEFINITION,
   CSSRS_HISTORY_DEFINITION,
-  SIS_DEFINITION
+  SIS_DEFINITION,
+  WAIS4_CRITERIA_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -328,6 +329,13 @@ export default async function VisitDetailPage({
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['SIS_FR']?.completed || false,
             completedAt: questionnaireStatuses['SIS_FR']?.completed_at,
+          },
+          {
+            ...WAIS4_CRITERIA_DEFINITION,
+            id: WAIS4_CRITERIA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['WAIS4_CRITERIA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['WAIS4_CRITERIA_FR']?.completed_at,
           }
         ]
       },

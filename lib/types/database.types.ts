@@ -2146,3 +2146,41 @@ export interface SisResponse {
 
 export type SisResponseInsert = Omit<SisResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score' | 'circumstances_subscore' | 'conception_subscore'>;
 
+// ============================================================================
+// WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
+// ============================================================================
+
+export interface Wais4CriteriaResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // General Information
+  collection_date: string; // Date field
+  age: number; // 16-90
+  laterality: 'gaucher' | 'droitier' | 'ambidextre';
+  native_french_speaker: number; // 0 or 1
+  
+  // Clinical State
+  time_since_last_eval: 'moins_semaine' | 'plus_semaine';
+  patient_euthymic: number; // 0 or 1
+  no_episode_3months: number; // 0 or 1
+  
+  // Socio-demographic Data
+  socio_prof_data_present: number; // 0 or 1
+  years_of_education: number; // >= 0
+  
+  // Exclusion Criteria / Health
+  no_visual_impairment: number; // 0 or 1
+  no_hearing_impairment: number; // 0 or 1
+  no_ect_past_year: number; // 0 or 1
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Wais4CriteriaResponseInsert = Omit<Wais4CriteriaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
