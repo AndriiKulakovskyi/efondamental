@@ -3158,3 +3158,57 @@ export const WAIS4_LEARNING_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// WAIS-IV Matrices (Raisonnement fluide et intelligence visuo-spatiale)
+// ============================================================================
+
+// Helper function to generate matrix items
+const generateMatrixItems = (): Question[] => {
+  const items: Question[] = [];
+  
+  // Add age question first
+  items.push({
+    id: 'patient_age',
+    section: 'Données Démographiques',
+    text: 'Age du patient (requis pour le calcul de la note standard)',
+    type: 'number',
+    required: true,
+    min: 16,
+    max: 90,
+    help: 'L\'âge est nécessaire pour calculer la note standardisée'
+  });
+  
+  // Generate 26 items
+  for (let i = 1; i <= 26; i++) {
+    const itemNum = String(i).padStart(2, '0');
+    items.push({
+      id: `item_${itemNum}`,
+      section: 'Items Matrices',
+      text: `Note pour l'item ${i}`,
+      type: 'single_choice',
+      required: true,
+      options: [
+        { code: 0, label: '0', score: 0 },
+        { code: 1, label: '1', score: 1 }
+      ]
+    });
+  }
+  
+  return items;
+};
+
+export const WAIS4_MATRICES_QUESTIONS: Question[] = generateMatrixItems();
+
+export const WAIS4_MATRICES_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais4_matrices',
+  code: 'WAIS4_MATRICES_FR',
+  title: 'WAIS-IV - Subtest Matrices',
+  description: 'Évaluation du raisonnement fluide et de l\'intelligence visuo-spatiale (Items 1-26).',
+  questions: WAIS4_MATRICES_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

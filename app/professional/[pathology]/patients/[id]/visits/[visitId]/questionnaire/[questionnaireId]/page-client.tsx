@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { QuestionnaireRenderer } from "@/components/clinical/questionnaire-renderer";
 import { QuestionnaireProgressHeader } from "@/components/clinical/questionnaire-progress-header";
@@ -11,6 +11,7 @@ import { QuestionnaireDefinition } from "@/lib/constants/questionnaires";
 import { submitProfessionalQuestionnaireAction } from "@/app/professional/questionnaires/actions";
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { ScoreDisplay } from "../../components/score-display";
+import { calculateStandardizedScore, calculatePercentileRank } from "@/lib/services/wais4-matrices-scoring";
 
 interface QuestionnairePageClientProps {
   questionnaire: QuestionnaireDefinition;
@@ -36,26 +37,76 @@ export function QuestionnairePageClient({
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [submittedData, setSubmittedData] = useState<any>(existingData);
-  const [responses, setResponses] = useState<Record<string, any>>(initialResponses);
-  
   const [justSubmitted, setJustSubmitted] = useState(false);
+  
+  // Track current responses for live score calculation
+  // This is updated via callback from QuestionnaireRenderer
+  const [currentResponses, setCurrentResponses] = useState<Record<string, any>>(initialResponses);
 
-  // Calculate progress based on responses
+  // Calculate progress based on questionnaire questions only
+  // This counts how many of the defined questions have been answered
   const progress = useMemo(() => {
-    const totalQuestions = questionnaire.questions.filter(q => q.type !== 'section').length;
-    if (totalQuestions === 0) return 0;
+    // Get all non-section questions from the questionnaire definition
+    const questions = questionnaire.questions.filter(q => q.type !== 'section');
+    const total = questions.length;
     
-    const filledQuestions = Object.keys(responses).filter(key => {
-      const value = responses[key];
-      return value !== undefined && value !== null && value !== '';
-    }).length;
+    if (total === 0) return 0;
     
-    return Math.round((filledQuestions / totalQuestions) * 100);
-  }, [responses, questionnaire.questions]);
+    // Count how many questions have a value
+    let answered = 0;
+    for (const q of questions) {
+      const val = currentResponses[q.id];
+      // Consider a question answered if it has any value (including 0)
+      if (val !== undefined && val !== null && val !== '') {
+        answered++;
+      }
+    }
+    
+    // Calculate percentage (can never exceed 100 since answered <= total)
+    const pct = Math.round((answered / total) * 100);
+    return pct;
+  }, [currentResponses, questionnaire.questions]);
 
-  const handleResponsesChange = (newResponses: Record<string, any>) => {
-    setResponses(newResponses);
-  };
+  // Live score calculation for WAIS-IV Matrices
+  const liveScores = useMemo(() => {
+    if (questionnaire.code !== 'WAIS4_MATRICES_FR') return null;
+    
+    // Calculate raw score from item responses
+    let rawScore = 0;
+    let itemCount = 0;
+    for (let i = 1; i <= 26; i++) {
+      const key = `item_${String(i).padStart(2, '0')}`;
+      const value = currentResponses[key];
+      if (typeof value === 'number') {
+        rawScore += value;
+        itemCount++;
+      }
+    }
+    
+    const patientAge = currentResponses.patient_age;
+    
+    // Calculate standardized score if we have age
+    let standardizedScore: number | null = null;
+    let percentileRank: number | null = null;
+    
+    if (patientAge && typeof patientAge === 'number' && patientAge >= 16) {
+      standardizedScore = calculateStandardizedScore(rawScore, patientAge);
+      percentileRank = calculatePercentileRank(standardizedScore);
+    }
+    
+    return {
+      rawScore,
+      itemCount,
+      standardizedScore,
+      percentileRank,
+      hasAge: !!patientAge && typeof patientAge === 'number'
+    };
+  }, [currentResponses, questionnaire.code]);
+
+  // Memoized callback to prevent unnecessary re-renders
+  const handleResponsesChange = useCallback((newResponses: Record<string, any>) => {
+    setCurrentResponses(newResponses);
+  }, []);
 
   const handleSubmit = async (responses: Record<string, any>) => {
     setError(null);
@@ -74,19 +125,17 @@ export function QuestionnairePageClient({
       setSubmittedData(result.data);
       setJustSubmitted(true);
       
-      // If no scoring (Diagnostic/Orientation), redirect?
+      // If no scoring (Diagnostic/Orientation), redirect
       const hasScoring = [
         'ASRM_FR', 'QIDS_SR16_FR', 'MDQ_FR',
-        // Initial Evaluation questionnaires all have scoring
         'EQ5D5L', 'PRISE_M', 'STAI_YA', 'MARS', 'MATHYS', 'PSQI', 'EPWORTH',
         'ASRS', 'CTQ', 'BIS10', 'ALS18', 'AIM', 'WURS25', 'AQ12', 'CSM', 'CTI',
-        // Hetero questionnaires all have scoring
         'MADRS', 'YMRS', 'CGI', 'EGF', 'ALDA', 'ETAT_PATIENT', 'FAST',
-        // Social questionnaire has no scoring but we track completion
+        'WAIS4_MATRICES_FR', 'WAIS4_CRITERIA_FR', 'WAIS4_LEARNING_FR',
         'SOCIAL',
-        // Infirmier questionnaires - Fagerstrom has scoring, Tobacco doesn't
         'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA'
       ].includes(questionnaire.code);
+
       if (!hasScoring) {
          router.back();
          router.refresh();
@@ -117,9 +166,9 @@ export function QuestionnairePageClient({
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="h-8 w-8 text-green-600" />
                 <div>
-                  <CardTitle className="text-green-900">Questionnaire complété</CardTitle>
+                  <CardTitle className="text-green-900">Questionnaire complete</CardTitle>
                   <p className="text-sm text-green-700 mt-1">
-                    Le questionnaire a été soumis avec succès
+                    Le questionnaire a ete soumis avec succes
                   </p>
                 </div>
               </div>
@@ -132,7 +181,7 @@ export function QuestionnairePageClient({
               
               <div className="flex justify-end pt-4 border-t">
                 <Button onClick={handleReturn}>
-                  Retour à la visite
+                  Retour a la visite
                 </Button>
               </div>
             </CardContent>
@@ -141,6 +190,15 @@ export function QuestionnairePageClient({
       </div>
     );
   }
+
+  // Get interpretation text for standardized score
+  const getScoreInterpretation = (score: number | null) => {
+    if (score === null) return null;
+    if (score >= 13) return { text: "Performance superieure a la moyenne", color: "text-green-700", bg: "bg-green-50" };
+    if (score >= 8) return { text: "Performance moyenne", color: "text-blue-700", bg: "bg-blue-50" };
+    if (score >= 5) return { text: "Performance inferieure a la moyenne", color: "text-amber-700", bg: "bg-amber-50" };
+    return { text: "Performance significativement inferieure", color: "text-red-700", bg: "bg-red-50" };
+  };
 
   return (
     <div className="min-h-screen bg-[#FDFBFA]">
@@ -168,9 +226,70 @@ export function QuestionnairePageClient({
           questionnaire={questionnaire}
           initialResponses={initialResponses}
           onSubmit={handleSubmit}
+          onResponseChange={handleResponsesChange}
         />
       </div>
+      
+      {/* Live Score Display for WAIS-IV Matrices */}
+      {liveScores && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg z-50">
+          <div className="max-w-4xl mx-auto px-8 py-4">
+            <div className="flex items-center justify-between gap-6">
+              <div className="flex items-center gap-6">
+                {/* Raw Score */}
+                <div className="text-center">
+                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Note Brute</div>
+                  <div className="text-2xl font-bold text-slate-900">
+                    {liveScores.rawScore}
+                    <span className="text-sm font-normal text-slate-400">/26</span>
+                  </div>
+                  <div className="text-xs text-slate-400">{liveScores.itemCount}/26 items</div>
+                </div>
+                
+                {/* Separator */}
+                <div className="h-12 w-px bg-slate-200"></div>
+                
+                {/* Standardized Score */}
+                <div className="text-center">
+                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Note Standard</div>
+                  {liveScores.hasAge ? (
+                    <div className="text-2xl font-bold text-brand">
+                      {liveScores.standardizedScore}
+                      <span className="text-sm font-normal text-slate-400">/19</span>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-slate-400">Entrez l'age</div>
+                  )}
+                </div>
+                
+                {/* Separator */}
+                <div className="h-12 w-px bg-slate-200"></div>
+                
+                {/* Percentile */}
+                <div className="text-center">
+                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Rang Percentile</div>
+                  {liveScores.percentileRank !== null ? (
+                    <div className="text-2xl font-bold text-slate-700">
+                      {liveScores.percentileRank > 0 ? '+' : ''}{liveScores.percentileRank}%
+                    </div>
+                  ) : (
+                    <div className="text-sm text-slate-400">-</div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Interpretation */}
+              {liveScores.standardizedScore !== null && (
+                <div className={`px-4 py-2 rounded-lg ${getScoreInterpretation(liveScores.standardizedScore)?.bg}`}>
+                  <span className={`text-sm font-medium ${getScoreInterpretation(liveScores.standardizedScore)?.color}`}>
+                    {getScoreInterpretation(liveScores.standardizedScore)?.text}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

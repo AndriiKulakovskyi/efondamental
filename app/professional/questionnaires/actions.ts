@@ -41,7 +41,8 @@ import {
   saveCssrsHistoryResponse,
   saveSisResponse,
   saveWais4CriteriaResponse,
-  saveWais4LearningResponse
+  saveWais4LearningResponse,
+  saveWais4MatricesResponse
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveSocialResponse
@@ -114,7 +115,8 @@ import {
   Dsm5PsychoticResponseInsert,
   Dsm5ComorbidResponseInsert,
   Wais4CriteriaResponseInsert,
-  Wais4LearningResponseInsert
+  Wais4LearningResponseInsert,
+  Wais4MatricesResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -504,6 +506,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as Wais4LearningResponseInsert);
+        break;
+
+      case 'WAIS4_MATRICES_FR':
+        result = await saveWais4MatricesResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Wais4MatricesResponseInsert);
         break;
         
       default:

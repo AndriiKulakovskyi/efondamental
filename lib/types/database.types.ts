@@ -2214,3 +2214,57 @@ export interface Wais4LearningResponse {
 
 export type Wais4LearningResponseInsert = Omit<Wais4LearningResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ============================================================================
+// WAIS-IV Matrices (Raisonnement fluide)
+// ============================================================================
+
+export interface Wais4MatricesResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Demographic data
+  patient_age: number; // 16-90
+  
+  // Items 1-26 (0 or 1 each)
+  item_01: number;
+  item_02: number;
+  item_03: number;
+  item_04: number;
+  item_05: number;
+  item_06: number;
+  item_07: number;
+  item_08: number;
+  item_09: number;
+  item_10: number;
+  item_11: number;
+  item_12: number;
+  item_13: number;
+  item_14: number;
+  item_15: number;
+  item_16: number;
+  item_17: number;
+  item_18: number;
+  item_19: number;
+  item_20: number;
+  item_21: number;
+  item_22: number;
+  item_23: number;
+  item_24: number;
+  item_25: number;
+  item_26: number;
+  
+  // Computed scores
+  raw_score?: number; // Sum of items 1-26 (generated column)
+  standardized_score?: number | null; // 1-19 based on age
+  percentile_rank?: number | null; // Percentile
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Wais4MatricesResponseInsert = Omit<Wais4MatricesResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'raw_score'>;
+

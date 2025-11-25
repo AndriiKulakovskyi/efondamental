@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +25,7 @@ interface QuestionnaireRendererProps {
   initialResponses?: Record<string, any>;
   onSubmit: (responses: Record<string, any>) => Promise<void>;
   onSave?: (responses: Record<string, any>) => Promise<void>;
+  onResponseChange?: (responses: Record<string, any>) => void;
   readonly?: boolean;
 }
 
@@ -33,6 +34,7 @@ export function QuestionnaireRenderer({
   initialResponses = {},
   onSubmit,
   onSave,
+  onResponseChange,
   readonly = false,
 }: QuestionnaireRendererProps) {
   // Initialize responses with defaults for date fields
@@ -192,13 +194,37 @@ export function QuestionnaireRenderer({
     responses
   );
 
+  // Track previous responses to detect actual changes
+  const prevResponsesRef = useRef<Record<string, any>>(initialResponses);
+  const isFirstRender = useRef(true);
+  
   const handleResponseChange = (questionId: string, value: any) => {
-    setResponses((prev) => ({
-      ...prev,
-      [questionId]: value,
-    }));
+    setResponses((prev) => {
+      const updated = {
+        ...prev,
+        [questionId]: value,
+      };
+      return updated;
+    });
     setErrors([]);
   };
+  
+  // Notify parent of response changes via useEffect
+  // This runs after state update is complete, avoiding the React warning
+  useEffect(() => {
+    // Skip the very first render (when responses equals initialResponses)
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      prevResponsesRef.current = responses;
+      return;
+    }
+    
+    // Only notify if responses actually changed
+    if (onResponseChange && responses !== prevResponsesRef.current) {
+      prevResponsesRef.current = responses;
+      onResponseChange(responses);
+    }
+  }, [responses, onResponseChange]);
 
   const handleSave = async () => {
     if (!onSave) return;
