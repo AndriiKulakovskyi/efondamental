@@ -1,18 +1,11 @@
 import { getUserContext } from "@/lib/rbac/middleware";
 import { getPathologyByType } from "@/lib/services/center.service";
-import { 
-  getPatientsByCenterAndPathology, 
-  getPatientsRequiringFollowup, 
-  getPatientsByProfessional,
-  getPatientDemographics
-} from "@/lib/services/patient.service";
-import { getMultiplePatientVisitCompletions } from "@/lib/services/visit.service";
+import { getProfessionalDashboardData } from "@/lib/services/dashboard.service";
 import { PathologyType, PATHOLOGY_NAMES } from "@/lib/types/enums";
 import { redirect } from "next/navigation";
 import { DashboardStatsRedesign } from "./components/dashboard-stats-redesign";
 import { DashboardPatientsTable } from "./components/dashboard-patients-table";
 import { LayoutGrid } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
 
 export default async function PathologyDashboard({
   params,
@@ -29,38 +22,19 @@ export default async function PathologyDashboard({
   const pathologyType = pathology as PathologyType;
   const pathologyData = await getPathologyByType(pathologyType);
 
-  // Fetch all required data
-  const [
-    centerPatients, 
-    myPatients, 
+  // Fetch all dashboard data in a single optimized RPC call
+  const {
+    myPatients,
+    centerPatients,
     patientsRequiringFollowup,
-    demographics
-  ] = await Promise.all([
-    getPatientsByCenterAndPathology(context.profile.center_id, pathologyType),
-    getPatientsByProfessional(context.user.id, pathologyType),
-    getPatientsRequiringFollowup(context.profile.center_id, pathologyType),
-    getPatientDemographics(context.profile.center_id, pathologyType),
-  ]);
-
-  // Get visit completions for all patients
-  const allPatientIds = [...new Set([...centerPatients.map(p => p.id), ...myPatients.map(p => p.id)])];
-  const visitCompletions = await getMultiplePatientVisitCompletions(allPatientIds);
-
-  // Count visits this month
-  const supabase = await createClient();
-  const now = new Date();
-  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  
-  // Get visits this month for this center
-  const visitsQuery = supabase
-    .from('visits')
-    .select('id, patient:patients!inner(center_id)', { count: 'exact', head: true })
-    .eq('patient.center_id', context.profile.center_id)
-    .gte('scheduled_date', firstDayOfMonth.toISOString())
-    .lte('scheduled_date', lastDayOfMonth.toISOString());
-  
-  const { count: visitsThisMonth } = await visitsQuery;
+    demographics,
+    visitCompletions,
+    visitsThisMonth
+  } = await getProfessionalDashboardData(
+    context.user.id,
+    context.profile.center_id,
+    pathologyType
+  );
 
   return (
     <main className="flex-1 overflow-y-auto p-8">
@@ -85,7 +59,7 @@ export default async function PathologyDashboard({
           <DashboardStatsRedesign
             totalPatients={centerPatients.length}
             alertsCount={patientsRequiringFollowup.length}
-            visitsThisMonth={visitsThisMonth || 0}
+            visitsThisMonth={visitsThisMonth}
             demographics={demographics}
           />
 
