@@ -131,7 +131,7 @@ export function QuestionnairePageClient({
         'EQ5D5L', 'PRISE_M', 'STAI_YA', 'MARS', 'MATHYS', 'PSQI', 'EPWORTH',
         'ASRS', 'CTQ', 'BIS10', 'ALS18', 'AIM', 'WURS25', 'AQ12', 'CSM', 'CTI',
         'MADRS', 'YMRS', 'CGI', 'EGF', 'ALDA', 'ETAT_PATIENT', 'FAST',
-        'WAIS4_MATRICES_FR', 'WAIS4_CRITERIA_FR', 'WAIS4_LEARNING_FR',
+        'WAIS4_MATRICES_FR', 'WAIS4_CRITERIA_FR', 'WAIS4_LEARNING_FR', 'CVLT_FR',
         'SOCIAL',
         'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA'
       ].includes(questionnaire.code);

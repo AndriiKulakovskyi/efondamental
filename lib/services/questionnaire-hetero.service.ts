@@ -992,3 +992,76 @@ export async function saveWais4MatricesResponse(
   if (error) throw error;
   return data;
 }
+
+// ============================================================================
+// CVLT (California Verbal Learning Test)
+// ============================================================================
+
+import { CvltResponse, CvltResponseInsert } from '@/lib/types/database.types';
+import { calculateCvltScores } from './cvlt-scoring';
+
+export async function getCvltResponse(visitId: string): Promise<CvltResponse | null> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('responses_cvlt')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No rows
+    throw error;
+  }
+  return data;
+}
+
+export async function saveCvltResponse(
+  response: CvltResponseInsert
+): Promise<CvltResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Calculate all standard scores
+  const scores = calculateCvltScores({
+    patient_age: response.patient_age,
+    years_of_education: response.years_of_education,
+    patient_sex: response.patient_sex,
+    trial_1: response.trial_1,
+    trial_2: response.trial_2,
+    trial_3: response.trial_3,
+    trial_4: response.trial_4,
+    trial_5: response.trial_5,
+    list_b: response.list_b,
+    sdfr: response.sdfr,
+    sdcr: response.sdcr,
+    ldfr: response.ldfr,
+    ldcr: response.ldcr,
+    semantic_clustering: response.semantic_clustering,
+    serial_clustering: response.serial_clustering,
+    perseverations: response.perseverations,
+    intrusions: response.intrusions,
+    recognition_hits: response.recognition_hits,
+    false_positives: response.false_positives,
+    discriminability: response.discriminability,
+    primacy: response.primacy,
+    recency: response.recency,
+    response_bias: response.response_bias
+  });
+
+  // Remove total_1_5 if present (it's a generated column)
+  const { total_1_5, ...responseWithoutGenerated } = response as any;
+
+  const { data, error } = await supabase
+    .from('responses_cvlt')
+    .upsert({
+      ...responseWithoutGenerated,
+      ...scores,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}

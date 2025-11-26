@@ -42,7 +42,8 @@ import {
   saveSisResponse,
   saveWais4CriteriaResponse,
   saveWais4LearningResponse,
-  saveWais4MatricesResponse
+  saveWais4MatricesResponse,
+  saveCvltResponse
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveSocialResponse
@@ -116,7 +117,8 @@ import {
   Dsm5ComorbidResponseInsert,
   Wais4CriteriaResponseInsert,
   Wais4LearningResponseInsert,
-  Wais4MatricesResponseInsert
+  Wais4MatricesResponseInsert,
+  CvltResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -514,6 +516,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as Wais4MatricesResponseInsert);
+        break;
+
+      case 'CVLT_FR':
+        result = await saveCvltResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as CvltResponseInsert);
         break;
         
       default:

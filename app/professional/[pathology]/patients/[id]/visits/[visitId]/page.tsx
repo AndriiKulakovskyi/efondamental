@@ -49,7 +49,8 @@ import {
   SIS_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
-  WAIS4_MATRICES_DEFINITION
+  WAIS4_MATRICES_DEFINITION,
+  CVLT_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -352,6 +353,13 @@ export default async function VisitDetailPage({
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['WAIS4_MATRICES_FR']?.completed || false,
             completedAt: questionnaireStatuses['WAIS4_MATRICES_FR']?.completed_at,
+          },
+          {
+            ...CVLT_DEFINITION,
+            id: CVLT_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['CVLT_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CVLT_FR']?.completed_at,
           }
         ]
       },

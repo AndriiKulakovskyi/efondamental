@@ -2268,3 +2268,87 @@ export interface Wais4MatricesResponse {
 
 export type Wais4MatricesResponseInsert = Omit<Wais4MatricesResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'raw_score'>;
 
+// ============================================================================
+// CVLT (California Verbal Learning Test) - French Adaptation
+// ============================================================================
+
+export interface CvltResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Demographic data (required for scoring)
+  patient_age: number; // 16-100
+  years_of_education: number; // 0-30
+  patient_sex: 'F' | 'M';
+  
+  // Liste A (Lundi) - Apprentissage (Trials 1-5)
+  trial_1: number; // 0-16
+  trial_2: number; // 0-16
+  trial_3: number; // 0-16
+  trial_4: number; // 0-16
+  trial_5: number; // 0-16
+  
+  // Total Trials 1-5 (computed)
+  total_1_5?: number;
+  
+  // Liste B (Mardi) - Interference
+  list_b: number; // 0-16
+  
+  // Rappel a Court Terme (Short-term recall)
+  sdfr: number; // Short Delay Free Recall (0-16)
+  sdcr: number; // Short Delay Cued Recall (0-16)
+  
+  // Rappel a Long Terme (Long-term recall, 20 min)
+  ldfr: number; // Long Delay Free Recall (0-16)
+  ldcr: number; // Long Delay Cued Recall (0-16)
+  
+  // Indices de Strategie (optional)
+  semantic_clustering?: number | null;
+  serial_clustering?: number | null;
+  
+  // Erreurs (optional)
+  perseverations?: number | null;
+  intrusions?: number | null;
+  
+  // Recognition (optional)
+  recognition_hits?: number | null;
+  false_positives?: number | null;
+  discriminability?: number | null;
+  
+  // Region Effects (optional)
+  primacy?: number | null;
+  recency?: number | null;
+  
+  // Response Bias (optional)
+  response_bias?: number | null;
+  
+  // Computed Standard Scores
+  trial_1_std?: number | null;
+  trial_5_std?: string | null; // Can be numeric or centile range
+  total_1_5_std?: number | null;
+  list_b_std?: number | null;
+  sdfr_std?: string | null;
+  sdcr_std?: string | null;
+  ldfr_std?: string | null;
+  ldcr_std?: string | null;
+  semantic_std?: string | null;
+  serial_std?: string | null;
+  persev_std?: string | null;
+  intru_std?: string | null;
+  recog_std?: string | null;
+  false_recog_std?: string | null;
+  discrim_std?: string | null;
+  primacy_std?: number | null;
+  recency_std?: number | null;
+  bias_std?: number | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type CvltResponseInsert = Omit<CvltResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_1_5'>;
+

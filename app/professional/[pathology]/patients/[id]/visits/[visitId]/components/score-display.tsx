@@ -62,6 +62,15 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
+    if (code === 'CVLT_FR') {
+      // CVLT: Use Total 1-5 standard score for severity
+      const score = data.total_1_5_std;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 0) return 'success';
+      if (score >= -1) return 'info';
+      return 'warning';
+    }
+    
     return 'info';
   };
 
@@ -149,6 +158,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'MDQ_FR' && 'Résultat MDQ'}
               {code === 'ALDA' && 'Score Alda'}
               {code === 'WAIS4_MATRICES_FR' && 'Résultats WAIS-IV Matrices'}
+              {code === 'CVLT_FR' && 'Résultats CVLT'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -160,11 +170,14 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
                 : code === 'WAIS4_MATRICES_FR'
                 ? (data.standardized_score !== undefined ? data.standardized_score : '-')
+                : code === 'CVLT_FR'
+                ? (data.total_1_5 !== undefined ? data.total_1_5 : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM_FR' && '/20'}
               {code === 'QIDS_SR16_FR' && '/27'}
               {code === 'ALDA' && '/10'}
               {code === 'WAIS4_MATRICES_FR' && '/19'}
+              {code === 'CVLT_FR' && '/80'}
             </span>
           </div>
         </div>
@@ -228,6 +241,106 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <span className="text-gray-600 font-medium">Rang Percentile:</span>
               <span className="font-bold text-lg">{data.percentile_rank !== null && data.percentile_rank !== undefined ? data.percentile_rank : '-'}</span>
             </div>
+          </div>
+        )}
+
+        {/* CVLT Details */}
+        {code === 'CVLT_FR' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            {/* Demographics */}
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Age:</span>
+                <span className="font-medium">{data.patient_age ?? '-'} ans</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Education:</span>
+                <span className="font-medium">{data.years_of_education ?? '-'} ans</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Sexe:</span>
+                <span className="font-medium">{data.patient_sex === 'F' ? 'Femme' : 'Homme'}</span>
+              </div>
+            </div>
+
+            {/* Learning Scores */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Apprentissage</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Essai 1 (brut/std):</span>
+                  <span className="font-medium">{data.trial_1 ?? '-'} / {data.trial_1_std ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Essai 5 (brut/std):</span>
+                  <span className="font-medium">{data.trial_5 ?? '-'} / {data.trial_5_std ?? '-'}</span>
+                </div>
+                <div className="flex justify-between col-span-2">
+                  <span className="text-gray-500">Total 1-5 (brut/std):</span>
+                  <span className="font-semibold">{data.total_1_5 ?? '-'} / {data.total_1_5_std ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Liste B (brut/std):</span>
+                  <span className="font-medium">{data.list_b ?? '-'} / {data.list_b_std ?? '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Recall Scores */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Rappel</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">SDFR (brut/std):</span>
+                  <span className="font-medium">{data.sdfr ?? '-'} / {data.sdfr_std ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">SDCR (brut/std):</span>
+                  <span className="font-medium">{data.sdcr ?? '-'} / {data.sdcr_std ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">LDFR (brut/std):</span>
+                  <span className="font-medium">{data.ldfr ?? '-'} / {data.ldfr_std ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">LDCR (brut/std):</span>
+                  <span className="font-medium">{data.ldcr ?? '-'} / {data.ldcr_std ?? '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Strategy & Errors (only show if present) */}
+            {(data.semantic_std || data.serial_std || data.persev_std || data.intru_std) && (
+              <div className="pt-2 border-t">
+                <h5 className="font-semibold text-gray-700 mb-2">Strategie et Erreurs</h5>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {data.semantic_std && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Semantique (std):</span>
+                      <span className="font-medium">{data.semantic_std}</span>
+                    </div>
+                  )}
+                  {data.serial_std && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Seriel (std):</span>
+                      <span className="font-medium">{data.serial_std}</span>
+                    </div>
+                  )}
+                  {data.persev_std && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Perseverations (std):</span>
+                      <span className="font-medium">{data.persev_std}</span>
+                    </div>
+                  )}
+                  {data.intru_std && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Intrusions (std):</span>
+                      <span className="font-medium">{data.intru_std}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

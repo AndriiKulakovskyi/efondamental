@@ -3212,3 +3212,319 @@ export const WAIS4_MATRICES_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// CVLT - California Verbal Learning Test (French Adaptation)
+// ============================================================================
+
+export const CVLT_QUESTIONS: Question[] = [
+  // Section: Donnees Demographiques
+  {
+    id: 'section_demo',
+    text: 'Donnees Demographiques',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'patient_age',
+    section: 'Donnees Demographiques',
+    text: 'Age du patient (requis pour le calcul des normes)',
+    type: 'number',
+    required: true,
+    min: 16,
+    max: 100,
+    help: 'L\'age est necessaire pour calculer les notes standardisees'
+  },
+  {
+    id: 'years_of_education',
+    section: 'Donnees Demographiques',
+    text: 'Nombre d\'annees d\'etudes (requis pour le calcul des normes)',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 30,
+    help: 'Le niveau d\'education est necessaire pour certains calculs'
+  },
+  {
+    id: 'patient_sex',
+    section: 'Donnees Demographiques',
+    text: 'Sexe du patient',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'F', label: 'Femme', score: 1 },
+      { code: 'M', label: 'Homme', score: 2 }
+    ]
+  },
+  
+  // Section: Liste A (Lundi) - Apprentissage
+  {
+    id: 'section_list_a',
+    text: 'Liste A (Lundi) - Apprentissage',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'trial_1',
+    section: 'Liste A (Lundi) - Apprentissage',
+    text: 'Essai 1 - Note brute (Nombre de mots correctement rappeles)',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 16
+  },
+  {
+    id: 'trial_2',
+    section: 'Liste A (Lundi) - Apprentissage',
+    text: 'Essai 2 - Note brute',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 16
+  },
+  {
+    id: 'trial_3',
+    section: 'Liste A (Lundi) - Apprentissage',
+    text: 'Essai 3 - Note brute',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 16
+  },
+  {
+    id: 'trial_4',
+    section: 'Liste A (Lundi) - Apprentissage',
+    text: 'Essai 4 - Note brute',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 16
+  },
+  {
+    id: 'trial_5',
+    section: 'Liste A (Lundi) - Apprentissage',
+    text: 'Essai 5 - Note brute',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 16
+  },
+  
+  // Section: Liste B (Mardi) - Interference
+  {
+    id: 'section_list_b',
+    text: 'Liste B (Mardi) - Interference',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'list_b',
+    section: 'Liste B (Mardi) - Interference',
+    text: 'Liste B - Note brute (Rappel immediat)',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 16
+  },
+  
+  // Section: Rappel a Court Terme
+  {
+    id: 'section_short_term',
+    text: 'Rappel a Court Terme',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'sdfr',
+    section: 'Rappel a Court Terme',
+    text: 'Rappel Libre a Court Terme (Liste A) - Note brute',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 16,
+    help: 'Short Delay Free Recall'
+  },
+  {
+    id: 'sdcr',
+    section: 'Rappel a Court Terme',
+    text: 'Rappel Indice a Court Terme (Liste A) - Note brute',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 16,
+    help: 'Short Delay Cued Recall'
+  },
+  
+  // Section: Rappel a Long Terme (20 min)
+  {
+    id: 'section_long_term',
+    text: 'Rappel a Long Terme (20 min)',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'ldfr',
+    section: 'Rappel a Long Terme (20 min)',
+    text: 'Rappel Libre a Long Terme (Liste A) - Note brute',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 16,
+    help: 'Long Delay Free Recall'
+  },
+  {
+    id: 'ldcr',
+    section: 'Rappel a Long Terme (20 min)',
+    text: 'Rappel Indice a Long Terme (Liste A) - Note brute',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 16,
+    help: 'Long Delay Cued Recall'
+  },
+  
+  // Section: Indices de Strategie
+  {
+    id: 'section_strategy',
+    text: 'Indices de Strategie',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'semantic_clustering',
+    section: 'Indices de Strategie',
+    text: 'Indice de regroupement semantique',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 10,
+    help: 'Optionnel'
+  },
+  {
+    id: 'serial_clustering',
+    section: 'Indices de Strategie',
+    text: 'Indice de regroupement seriel',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 30,
+    help: 'Optionnel'
+  },
+  
+  // Section: Erreurs
+  {
+    id: 'section_errors',
+    text: 'Erreurs',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'perseverations',
+    section: 'Erreurs',
+    text: 'Total Perseverations',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50,
+    help: 'Optionnel'
+  },
+  {
+    id: 'intrusions',
+    section: 'Erreurs',
+    text: 'Total Intrusions',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50,
+    help: 'Optionnel'
+  },
+  
+  // Section: Reconnaissance (optionnel)
+  {
+    id: 'section_recognition',
+    text: 'Reconnaissance (Optionnel)',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'recognition_hits',
+    section: 'Reconnaissance',
+    text: 'Reconnaissances correctes',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 16,
+    help: 'Optionnel - Nombre de mots correctement reconnus'
+  },
+  {
+    id: 'false_positives',
+    section: 'Reconnaissance',
+    text: 'Fausses reconnaissances',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50,
+    help: 'Optionnel'
+  },
+  {
+    id: 'discriminability',
+    section: 'Reconnaissance',
+    text: 'Discriminabilite (%)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 100,
+    help: 'Optionnel - Capacite a distinguer les cibles des distracteurs'
+  },
+  
+  // Section: Effets de Region (optionnel)
+  {
+    id: 'section_region',
+    text: 'Effets de Region (Optionnel)',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'primacy',
+    section: 'Effets de Region',
+    text: 'Effet de primaute (%)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 100,
+    help: 'Optionnel - Pourcentage de mots rappeles du debut de la liste'
+  },
+  {
+    id: 'recency',
+    section: 'Effets de Region',
+    text: 'Effet de recence (%)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 100,
+    help: 'Optionnel - Pourcentage de mots rappeles de la fin de la liste'
+  },
+  {
+    id: 'response_bias',
+    section: 'Effets de Region',
+    text: 'Biais de reponse',
+    type: 'number',
+    required: false,
+    min: -1,
+    max: 1,
+    help: 'Optionnel - Tendance a repondre oui ou non (-1 a +1)'
+  }
+];
+
+export const CVLT_DEFINITION: QuestionnaireDefinition = {
+  id: 'cvlt',
+  code: 'CVLT_FR',
+  title: 'California Verbal Learning Test (CVLT)',
+  description: 'Test d\'apprentissage verbal evaluant les strategies d\'encodage, de recuperation, et la memoire a court et long terme. Version francaise (Deweer et al., 2008).',
+  questions: CVLT_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
