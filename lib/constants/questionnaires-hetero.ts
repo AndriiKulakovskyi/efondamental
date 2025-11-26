@@ -3203,7 +3203,7 @@ export const WAIS4_MATRICES_QUESTIONS: Question[] = generateMatrixItems();
 export const WAIS4_MATRICES_DEFINITION: QuestionnaireDefinition = {
   id: 'wais4_matrices',
   code: 'WAIS4_MATRICES_FR',
-  title: 'WAIS-IV - Subtest Matrices',
+  title: 'WAIS-IV Subtest Matrices',
   description: 'Évaluation du raisonnement fluide et de l\'intelligence visuo-spatiale (Items 1-26).',
   questions: WAIS4_MATRICES_QUESTIONS,
   metadata: {
@@ -3519,7 +3519,7 @@ export const CVLT_QUESTIONS: Question[] = [
 export const CVLT_DEFINITION: QuestionnaireDefinition = {
   id: 'cvlt',
   code: 'CVLT_FR',
-  title: 'California Verbal Learning Test (CVLT)',
+  title: 'WAIS-IV California Verbal Learning Test (CVLT)',
   description: 'Test d\'apprentissage verbal evaluant les strategies d\'encodage, de recuperation, et la memoire a court et long terme. Version francaise (Deweer et al., 2008).',
   questions: CVLT_QUESTIONS,
   metadata: {
