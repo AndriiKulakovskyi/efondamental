@@ -34,7 +34,9 @@ import {
   Wais4LearningResponse,
   Wais4LearningResponseInsert,
   Wais4MatricesResponse,
-  Wais4MatricesResponseInsert
+  Wais4MatricesResponseInsert,
+  Wais4DigitSpanResponse,
+  Wais4DigitSpanResponseInsert
 } from '@/lib/types/database.types';
 import { calculateStandardizedScore, calculatePercentileRank } from './wais4-matrices-scoring';
 
@@ -1114,6 +1116,111 @@ export async function saveWais4CodeResponse(
       ...responseWithoutRawScore,
       standardized_score: standardizedScore,
       z_score: zScore,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// WAIS-IV Digit Span (Memoire des chiffres)
+// ============================================================================
+
+import { calculateDigitSpanScores } from './wais4-digit-span-scoring';
+
+export async function getWais4DigitSpanResponse(visitId: string): Promise<Wais4DigitSpanResponse | null> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('responses_wais4_digit_span')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No rows
+    throw error;
+  }
+  return data;
+}
+
+export async function saveWais4DigitSpanResponse(
+  response: Wais4DigitSpanResponseInsert
+): Promise<Wais4DigitSpanResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Calculate all scores using the scoring function
+  const scores = calculateDigitSpanScores({
+    patient_age: response.patient_age,
+    // Direct order
+    mcod_1a: response.mcod_1a,
+    mcod_1b: response.mcod_1b,
+    mcod_2a: response.mcod_2a,
+    mcod_2b: response.mcod_2b,
+    mcod_3a: response.mcod_3a,
+    mcod_3b: response.mcod_3b,
+    mcod_4a: response.mcod_4a,
+    mcod_4b: response.mcod_4b,
+    mcod_5a: response.mcod_5a,
+    mcod_5b: response.mcod_5b,
+    mcod_6a: response.mcod_6a,
+    mcod_6b: response.mcod_6b,
+    mcod_7a: response.mcod_7a,
+    mcod_7b: response.mcod_7b,
+    mcod_8a: response.mcod_8a,
+    mcod_8b: response.mcod_8b,
+    // Inverse order
+    mcoi_1a: response.mcoi_1a,
+    mcoi_1b: response.mcoi_1b,
+    mcoi_2a: response.mcoi_2a,
+    mcoi_2b: response.mcoi_2b,
+    mcoi_3a: response.mcoi_3a,
+    mcoi_3b: response.mcoi_3b,
+    mcoi_4a: response.mcoi_4a,
+    mcoi_4b: response.mcoi_4b,
+    mcoi_5a: response.mcoi_5a,
+    mcoi_5b: response.mcoi_5b,
+    mcoi_6a: response.mcoi_6a,
+    mcoi_6b: response.mcoi_6b,
+    mcoi_7a: response.mcoi_7a,
+    mcoi_7b: response.mcoi_7b,
+    mcoi_8a: response.mcoi_8a,
+    mcoi_8b: response.mcoi_8b,
+    // Sequencing order
+    mcoc_1a: response.mcoc_1a,
+    mcoc_1b: response.mcoc_1b,
+    mcoc_2a: response.mcoc_2a,
+    mcoc_2b: response.mcoc_2b,
+    mcoc_3a: response.mcoc_3a,
+    mcoc_3b: response.mcoc_3b,
+    mcoc_4a: response.mcoc_4a,
+    mcoc_4b: response.mcoc_4b,
+    mcoc_5a: response.mcoc_5a,
+    mcoc_5b: response.mcoc_5b,
+    mcoc_6a: response.mcoc_6a,
+    mcoc_6b: response.mcoc_6b,
+    mcoc_7a: response.mcoc_7a,
+    mcoc_7b: response.mcoc_7b,
+    mcoc_8a: response.mcoc_8a,
+    mcoc_8b: response.mcoc_8b
+  });
+
+  const { data, error } = await supabase
+    .from('responses_wais4_digit_span')
+    .upsert({
+      ...response,
+      mcod_total: scores.mcod_total,
+      mcoi_total: scores.mcoi_total,
+      mcoc_total: scores.mcoc_total,
+      raw_score: scores.raw_score,
+      standardized_score: scores.standardized_score,
+      empan_direct: scores.empan_direct,
+      empan_inverse: scores.empan_inverse,
+      empan_croissant: scores.empan_croissant,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

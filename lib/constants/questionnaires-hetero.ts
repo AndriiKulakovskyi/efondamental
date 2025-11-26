@@ -3591,3 +3591,599 @@ export const WAIS4_CODE_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// WAIS-IV - Subtest Memoire des Chiffres (Digit Span)
+// ============================================================================
+
+export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
+  // Demographic section
+  {
+    id: 'section_demo',
+    text: 'Donnees Demographiques',
+    type: 'section',
+    required: false,
+    section: 'Donnees Demographiques'
+  },
+  {
+    id: 'patient_age',
+    section: 'Donnees Demographiques',
+    text: 'Age du patient (annees)',
+    type: 'number',
+    required: true,
+    min: 16,
+    max: 90,
+    help: 'Requis pour le calcul de la note standard'
+  },
+  
+  // Section: Ordre Direct (Forward)
+  {
+    id: 'section_direct',
+    text: 'Memoire des chiffres - Ordre Direct',
+    type: 'section',
+    required: false,
+    section: 'Ordre Direct',
+    help: 'Repetition de sequences de chiffres dans le meme ordre.'
+  },
+  {
+    id: 'mcod_1a',
+    section: 'Ordre Direct',
+    text: 'Item 1 - Essai 1',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_1b',
+    section: 'Ordre Direct',
+    text: 'Item 1 - Essai 2',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_2a',
+    section: 'Ordre Direct',
+    text: 'Item 2 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_2b',
+    section: 'Ordre Direct',
+    text: 'Item 2 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_3a',
+    section: 'Ordre Direct',
+    text: 'Item 3 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_3b',
+    section: 'Ordre Direct',
+    text: 'Item 3 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_4a',
+    section: 'Ordre Direct',
+    text: 'Item 4 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_4b',
+    section: 'Ordre Direct',
+    text: 'Item 4 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_5a',
+    section: 'Ordre Direct',
+    text: 'Item 5 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_5b',
+    section: 'Ordre Direct',
+    text: 'Item 5 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_6a',
+    section: 'Ordre Direct',
+    text: 'Item 6 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_6b',
+    section: 'Ordre Direct',
+    text: 'Item 6 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_7a',
+    section: 'Ordre Direct',
+    text: 'Item 7 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_7b',
+    section: 'Ordre Direct',
+    text: 'Item 7 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_8a',
+    section: 'Ordre Direct',
+    text: 'Item 8 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_8b',
+    section: 'Ordre Direct',
+    text: 'Item 8 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  
+  // Section: Ordre Inverse (Backward)
+  {
+    id: 'section_inverse',
+    text: 'Memoire des chiffres - Ordre Inverse',
+    type: 'section',
+    required: false,
+    section: 'Ordre Inverse',
+    help: 'Repetition de sequences de chiffres dans l\'ordre inverse.'
+  },
+  {
+    id: 'mcoi_1a',
+    section: 'Ordre Inverse',
+    text: 'Item 1 - Essai 1',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_1b',
+    section: 'Ordre Inverse',
+    text: 'Item 1 - Essai 2',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_2a',
+    section: 'Ordre Inverse',
+    text: 'Item 2 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_2b',
+    section: 'Ordre Inverse',
+    text: 'Item 2 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_3a',
+    section: 'Ordre Inverse',
+    text: 'Item 3 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_3b',
+    section: 'Ordre Inverse',
+    text: 'Item 3 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_4a',
+    section: 'Ordre Inverse',
+    text: 'Item 4 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_4b',
+    section: 'Ordre Inverse',
+    text: 'Item 4 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_5a',
+    section: 'Ordre Inverse',
+    text: 'Item 5 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_5b',
+    section: 'Ordre Inverse',
+    text: 'Item 5 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_6a',
+    section: 'Ordre Inverse',
+    text: 'Item 6 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_6b',
+    section: 'Ordre Inverse',
+    text: 'Item 6 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_7a',
+    section: 'Ordre Inverse',
+    text: 'Item 7 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_7b',
+    section: 'Ordre Inverse',
+    text: 'Item 7 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_8a',
+    section: 'Ordre Inverse',
+    text: 'Item 8 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_8b',
+    section: 'Ordre Inverse',
+    text: 'Item 8 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  
+  // Section: Ordre Croissant (Sequencing)
+  {
+    id: 'section_croissant',
+    text: 'Memoire des chiffres - Ordre Croissant',
+    type: 'section',
+    required: false,
+    section: 'Ordre Croissant',
+    help: 'Repetition de sequences de chiffres dans l\'ordre croissant.'
+  },
+  {
+    id: 'mcoc_1a',
+    section: 'Ordre Croissant',
+    text: 'Item 1 - Essai 1',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_1b',
+    section: 'Ordre Croissant',
+    text: 'Item 1 - Essai 2',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_2a',
+    section: 'Ordre Croissant',
+    text: 'Item 2 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_2b',
+    section: 'Ordre Croissant',
+    text: 'Item 2 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_3a',
+    section: 'Ordre Croissant',
+    text: 'Item 3 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_3b',
+    section: 'Ordre Croissant',
+    text: 'Item 3 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_4a',
+    section: 'Ordre Croissant',
+    text: 'Item 4 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_4b',
+    section: 'Ordre Croissant',
+    text: 'Item 4 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_5a',
+    section: 'Ordre Croissant',
+    text: 'Item 5 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_5b',
+    section: 'Ordre Croissant',
+    text: 'Item 5 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_6a',
+    section: 'Ordre Croissant',
+    text: 'Item 6 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_6b',
+    section: 'Ordre Croissant',
+    text: 'Item 6 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_7a',
+    section: 'Ordre Croissant',
+    text: 'Item 7 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_7b',
+    section: 'Ordre Croissant',
+    text: 'Item 7 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_8a',
+    section: 'Ordre Croissant',
+    text: 'Item 8 - Essai 1',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoc_8b',
+    section: 'Ordre Croissant',
+    text: 'Item 8 - Essai 2',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Incorrect', score: 0 },
+      { code: 1, label: 'Correct', score: 1 }
+    ]
+  }
+];
+
+export const WAIS4_DIGIT_SPAN_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais4_digit_span',
+  code: 'WAIS4_DIGIT_SPAN_FR',
+  title: 'WAIS-IV Subtest Memoire des chiffres (Digit Span)',
+  description: 'Subtest evaluant la memoire de travail auditive via trois taches : ordre direct, ordre inverse et ordre croissant.',
+  questions: WAIS4_DIGIT_SPAN_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

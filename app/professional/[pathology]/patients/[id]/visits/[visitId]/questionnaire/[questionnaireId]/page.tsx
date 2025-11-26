@@ -45,7 +45,8 @@ import {
   WAIS4_LEARNING_DEFINITION,
   WAIS4_MATRICES_DEFINITION,
   CVLT_DEFINITION,
-  WAIS4_CODE_DEFINITION
+  WAIS4_CODE_DEFINITION,
+  WAIS4_DIGIT_SPAN_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -108,7 +109,8 @@ import {
   getWais4LearningResponse,
   getWais4MatricesResponse,
   getCvltResponse,
-  getWais4CodeResponse
+  getWais4CodeResponse,
+  getWais4DigitSpanResponse
 } from "@/lib/services/questionnaire-hetero.service";
 import {
   getSocialResponse
@@ -187,6 +189,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS4_MATRICES_DEFINITION.code) questionnaire = WAIS4_MATRICES_DEFINITION;
   else if (code === CVLT_DEFINITION.code) questionnaire = CVLT_DEFINITION;
   else if (code === WAIS4_CODE_DEFINITION.code) questionnaire = WAIS4_CODE_DEFINITION;
+  else if (code === WAIS4_DIGIT_SPAN_DEFINITION.code) questionnaire = WAIS4_DIGIT_SPAN_DEFINITION;
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) questionnaire = SOCIAL_DEFINITION;
   // Infirmier questionnaires
@@ -252,6 +255,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS4_MATRICES_DEFINITION.code) existingResponse = await getWais4MatricesResponse(visitId);
   else if (code === CVLT_DEFINITION.code) existingResponse = await getCvltResponse(visitId);
   else if (code === WAIS4_CODE_DEFINITION.code) existingResponse = await getWais4CodeResponse(visitId);
+  else if (code === WAIS4_DIGIT_SPAN_DEFINITION.code) existingResponse = await getWais4DigitSpanResponse(visitId);
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) existingResponse = await getSocialResponse(visitId);
   // Infirmier questionnaires

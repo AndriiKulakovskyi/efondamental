@@ -2382,3 +2382,90 @@ export interface Wais4CodeResponse {
 
 export type Wais4CodeResponseInsert = Omit<Wais4CodeResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'raw_score'>;
 
+// ============================================================================
+// WAIS-IV Digit Span (Memoire des chiffres)
+// ============================================================================
+
+export interface Wais4DigitSpanResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Demographic data
+  patient_age: number; // 16-90
+  
+  // Ordre Direct (Forward) - 8 items x 2 trials
+  mcod_1a: number;
+  mcod_1b: number;
+  mcod_2a?: number | null;
+  mcod_2b?: number | null;
+  mcod_3a?: number | null;
+  mcod_3b?: number | null;
+  mcod_4a?: number | null;
+  mcod_4b?: number | null;
+  mcod_5a?: number | null;
+  mcod_5b?: number | null;
+  mcod_6a?: number | null;
+  mcod_6b?: number | null;
+  mcod_7a?: number | null;
+  mcod_7b?: number | null;
+  mcod_8a?: number | null;
+  mcod_8b?: number | null;
+  
+  // Ordre Inverse (Backward) - 8 items x 2 trials
+  mcoi_1a: number;
+  mcoi_1b: number;
+  mcoi_2a?: number | null;
+  mcoi_2b?: number | null;
+  mcoi_3a?: number | null;
+  mcoi_3b?: number | null;
+  mcoi_4a?: number | null;
+  mcoi_4b?: number | null;
+  mcoi_5a?: number | null;
+  mcoi_5b?: number | null;
+  mcoi_6a?: number | null;
+  mcoi_6b?: number | null;
+  mcoi_7a?: number | null;
+  mcoi_7b?: number | null;
+  mcoi_8a?: number | null;
+  mcoi_8b?: number | null;
+  
+  // Ordre Croissant (Sequencing) - 8 items x 2 trials
+  mcoc_1a: number;
+  mcoc_1b: number;
+  mcoc_2a?: number | null;
+  mcoc_2b?: number | null;
+  mcoc_3a?: number | null;
+  mcoc_3b?: number | null;
+  mcoc_4a?: number | null;
+  mcoc_4b?: number | null;
+  mcoc_5a?: number | null;
+  mcoc_5b?: number | null;
+  mcoc_6a?: number | null;
+  mcoc_6b?: number | null;
+  mcoc_7a?: number | null;
+  mcoc_7b?: number | null;
+  mcoc_8a?: number | null;
+  mcoc_8b?: number | null;
+  
+  // Computed scores
+  mcod_total?: number | null; // Score total Ordre Direct (0-16)
+  mcoi_total?: number | null; // Score total Ordre Inverse (0-16)
+  mcoc_total?: number | null; // Score total Ordre Croissant (0-16)
+  raw_score?: number | null; // Note Brute Totale (0-48)
+  standardized_score?: number | null; // Note Standard (1-19)
+  
+  // Process scores (empan)
+  empan_direct?: number | null; // Max span Direct
+  empan_inverse?: number | null; // Max span Inverse
+  empan_croissant?: number | null; // Max span Croissant
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Wais4DigitSpanResponseInsert = Omit<Wais4DigitSpanResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'mcod_total' | 'mcoi_total' | 'mcoc_total' | 'raw_score' | 'standardized_score' | 'empan_direct' | 'empan_inverse' | 'empan_croissant'>;
+
