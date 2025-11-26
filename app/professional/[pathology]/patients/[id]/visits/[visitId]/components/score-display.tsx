@@ -71,6 +71,13 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
+    if (code === 'WAIS4_CODE_FR') {
+      // WAIS-IV Code: Standardized score 8-12 is average
+      if (data.standardized_score >= 13) return 'success';
+      if (data.standardized_score >= 8) return 'info';
+      return 'warning';
+    }
+    
     return 'info';
   };
 
@@ -159,6 +166,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'ALDA' && 'Score Alda'}
               {code === 'WAIS4_MATRICES_FR' && 'Résultats WAIS-IV Matrices'}
               {code === 'CVLT_FR' && 'Résultats CVLT'}
+              {code === 'WAIS4_CODE_FR' && 'Résultats WAIS-IV Code'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -172,12 +180,15 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.standardized_score !== undefined ? data.standardized_score : '-')
                 : code === 'CVLT_FR'
                 ? (data.total_1_5 !== undefined ? data.total_1_5 : '-')
+                : code === 'WAIS4_CODE_FR'
+                ? (data.standardized_score !== undefined ? data.standardized_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM_FR' && '/20'}
               {code === 'QIDS_SR16_FR' && '/27'}
               {code === 'ALDA' && '/10'}
               {code === 'WAIS4_MATRICES_FR' && '/19'}
               {code === 'CVLT_FR' && '/80'}
+              {code === 'WAIS4_CODE_FR' && '/19'}
             </span>
           </div>
         </div>
@@ -341,6 +352,40 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* WAIS-IV Code Details */}
+        {code === 'WAIS4_CODE_FR' && (
+          <div className="text-sm space-y-2 mt-2 pt-2 border-t">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Reponses correctes:</span>
+                <span className="font-semibold">{data.total_correct ?? '-'}/135</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Erreurs:</span>
+                <span className="font-semibold">{data.total_errors ?? '-'}</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Note Brute:</span>
+                <span className="font-semibold">{data.raw_score ?? data.total_correct ?? '-'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Note Standard:</span>
+                <span className="font-semibold">{data.standardized_score ?? '-'}/19</span>
+              </div>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600">Age du patient:</span>
+              <span className="font-semibold">{data.patient_age ?? '-'} ans</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600 font-medium">Z-Score (Valeur CR):</span>
+              <span className="font-bold text-lg">{data.z_score !== null && data.z_score !== undefined ? data.z_score : '-'}</span>
+            </div>
           </div>
         )}
 

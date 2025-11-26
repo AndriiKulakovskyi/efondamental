@@ -3528,3 +3528,66 @@ export const CVLT_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// WAIS-IV - Subtest Code (Processing Speed)
+// ============================================================================
+
+export const WAIS4_CODE_QUESTIONS: Question[] = [
+  // Section: Donnees Demographiques
+  {
+    id: 'section_demo',
+    text: 'Donnees Demographiques',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'patient_age',
+    section: 'Donnees Demographiques',
+    text: 'Age du patient (requis pour le calcul de la note standard)',
+    type: 'number',
+    required: true,
+    min: 16,
+    max: 90,
+    help: 'L\'age est necessaire pour calculer la note standardisee'
+  },
+  
+  // Section: Cotation
+  {
+    id: 'section_cotation',
+    text: 'Cotation',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'total_correct',
+    section: 'Cotation',
+    text: 'Nombre total de cases remplies de facon correctes',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 135
+  },
+  {
+    id: 'total_errors',
+    section: 'Cotation',
+    text: 'Nombre de cases remplies de facon incorrecte',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 135
+  }
+];
+
+export const WAIS4_CODE_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais4_code',
+  code: 'WAIS4_CODE_FR',
+  title: 'WAIS-IV Subtest Code',
+  description: 'Subtest Code de l\'echelle d\'intelligence de Wechsler pour adultes (WAIS-IV). Evalue la vitesse de traitement graphique.',
+  questions: WAIS4_CODE_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

@@ -1065,3 +1065,60 @@ export async function saveCvltResponse(
   if (error) throw error;
   return data;
 }
+
+// ============================================================================
+// WAIS-IV Subtest Code (Processing Speed)
+// ============================================================================
+
+import { Wais4CodeResponse, Wais4CodeResponseInsert } from '@/lib/types/database.types';
+import { 
+  calculateStandardizedScore as calculateCodeStandardizedScore, 
+  calculateZScore as calculateCodeZScore 
+} from './wais4-code-scoring';
+
+export async function getWais4CodeResponse(visitId: string): Promise<Wais4CodeResponse | null> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('responses_wais4_code')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No rows
+    throw error;
+  }
+  return data;
+}
+
+export async function saveWais4CodeResponse(
+  response: Wais4CodeResponseInsert
+): Promise<Wais4CodeResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Calculate standardized score based on raw score and age
+  const rawScore = response.total_correct;
+  const standardizedScore = calculateCodeStandardizedScore(rawScore, response.patient_age);
+  
+  // Calculate Z-score from standardized score
+  const zScore = calculateCodeZScore(standardizedScore);
+
+  // Remove raw_score if present (it's a generated column)
+  const { raw_score, ...responseWithoutRawScore } = response as any;
+
+  const { data, error } = await supabase
+    .from('responses_wais4_code')
+    .upsert({
+      ...responseWithoutRawScore,
+      standardized_score: standardizedScore,
+      z_score: zScore,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}

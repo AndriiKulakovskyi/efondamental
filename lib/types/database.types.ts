@@ -2352,3 +2352,33 @@ export interface CvltResponse {
 
 export type CvltResponseInsert = Omit<CvltResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_1_5'>;
 
+// ============================================================================
+// WAIS-IV Subtest Code (Processing Speed)
+// ============================================================================
+
+export interface Wais4CodeResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Demographic data
+  patient_age: number; // 16-90
+  
+  // Cotation inputs
+  total_correct: number; // 0-135
+  total_errors: number; // 0-135
+  
+  // Computed scores
+  raw_score?: number; // = total_correct (generated column)
+  standardized_score?: number | null; // 1-19
+  z_score?: number | null; // (standardized_score - 10) / 3
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Wais4CodeResponseInsert = Omit<Wais4CodeResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'raw_score'>;
+
