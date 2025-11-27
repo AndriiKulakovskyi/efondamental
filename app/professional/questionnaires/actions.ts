@@ -47,7 +47,9 @@ import {
   saveWais4CodeResponse,
   saveWais4DigitSpanResponse,
   saveTmtResponse,
-  saveStroopResponse
+  saveStroopResponse,
+  saveFluencesVerbalesResponse,
+  saveCobraResponse
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveSocialResponse
@@ -126,7 +128,9 @@ import {
   Wais4CodeResponseInsert,
   Wais4DigitSpanResponseInsert,
   TmtResponseInsert,
-  StroopResponseInsert
+  StroopResponseInsert,
+  FluencesVerbalesResponseInsert,
+  CobraResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -564,6 +568,22 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as StroopResponseInsert);
+        break;
+
+      case 'FLUENCES_VERBALES_FR':
+        result = await saveFluencesVerbalesResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as FluencesVerbalesResponseInsert);
+        break;
+
+      case 'COBRA_FR':
+        result = await saveCobraResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as CobraResponseInsert);
         break;
         
       default:

@@ -54,7 +54,9 @@ import {
   WAIS4_CODE_DEFINITION,
   WAIS4_DIGIT_SPAN_DEFINITION,
   TMT_DEFINITION,
-  STROOP_DEFINITION
+  STROOP_DEFINITION,
+  FLUENCES_VERBALES_DEFINITION,
+  COBRA_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -399,6 +401,20 @@ export default async function VisitDetailPage({
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['STROOP_FR']?.completed || false,
             completedAt: questionnaireStatuses['STROOP_FR']?.completed_at,
+          },
+          {
+            ...FLUENCES_VERBALES_DEFINITION,
+            id: FLUENCES_VERBALES_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['FLUENCES_VERBALES_FR']?.completed || false,
+            completedAt: questionnaireStatuses['FLUENCES_VERBALES_FR']?.completed_at,
+          },
+          {
+            ...COBRA_DEFINITION,
+            id: COBRA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['COBRA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['COBRA_FR']?.completed_at,
           }
         ]
       },

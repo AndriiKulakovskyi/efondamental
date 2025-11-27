@@ -371,6 +371,133 @@ export function QuestionnaireRenderer({
         }
       }
 
+      // Compute COBRA total score (sum of q1-q16)
+      const cobraFields = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9', 'q10', 'q11', 'q12', 'q13', 'q14', 'q15', 'q16'];
+      const cobraValues = cobraFields.map(f => prev[f]).filter(v => v !== undefined && v !== '' && !isNaN(Number(v)));
+      if (cobraValues.length > 0) {
+        const cobraTotal = cobraValues.reduce((sum, v) => sum + Number(v), 0);
+        if (updated.total_score !== cobraTotal) {
+          updated.total_score = cobraTotal;
+          hasChanges = true;
+        }
+      }
+
+      // Compute Fluences Verbales scores progressively as fields are entered
+      const fvAge = Number(prev.patient_age);
+      const fvEdu = Number(prev.years_of_education);
+      const fvP = Number(prev.fv_p_tot_correct);
+      const fvAnim = Number(prev.fv_anim_tot_correct);
+      
+      // Fluences Verbales norm tables
+      const TAB_FLUENCE_P: Record<string, Record<string, number[]>> = {
+        age_0: {
+          edu_0: [5.9, 9, 14, 16.5, 22.75, 25.7, 28.35, 17.3, 6.4],
+          edu_1: [10.8, 12, 14, 19, 24, 27.2, 31.2, 19.5, 6.3],
+          edu_2: [13, 14, 19, 25, 28.75, 32.3, 34, 24, 6.6]
+        },
+        age_1: {
+          edu_0: [8.2, 11, 15.5, 20, 25, 27.8, 31.8, 19.9, 6.9],
+          edu_1: [10.1, 13.2, 16, 21, 25, 28.8, 30, 20.9, 5.9],
+          edu_2: [15.5, 18, 22, 25, 30, 34, 37.5, 25.7, 6.3]
+        },
+        age_2: {
+          edu_0: [6.5, 8, 12, 16, 20, 22, 25, 15.7, 5.6],
+          edu_1: [9.75, 12, 14.75, 19, 24, 30, 32.25, 19.7, 6.7],
+          edu_2: [12.25, 15.5, 19, 22, 26, 30, 31.25, 22.4, 5.5]
+        }
+      };
+      
+      const TAB_FLUENCE_ANIM: Record<string, Record<string, number[]>> = {
+        age_0: {
+          edu_0: [19, 21, 24.25, 31, 34, 38, 38.7, 29.5, 6],
+          edu_1: [18.4, 19.8, 24, 29, 36, 40, 44.2, 29.9, 7.9],
+          edu_2: [21, 24, 28, 34, 40, 45, 48.2, 34.2, 8.2]
+        },
+        age_1: {
+          edu_0: [16, 20.4, 23, 26, 32, 42.6, 45.9, 28.2, 7.9],
+          edu_1: [18.2, 21.4, 27, 32, 35, 40, 42.9, 31.3, 6.8],
+          edu_2: [24.5, 27, 31.5, 36, 40, 47, 52.5, 36.8, 8.7]
+        },
+        age_2: {
+          edu_0: [16, 17, 20, 24, 29.75, 33, 37, 24.7, 6.3],
+          edu_1: [14.75, 17, 22, 26, 32, 37, 41, 26.8, 7.4],
+          edu_2: [15.25, 21, 23.75, 30, 35.5, 39.5, 43.25, 29.7, 8.8]
+        }
+      };
+      
+      const getFvAgeCategory = (age: number) => age < 40 ? 'age_0' : (age < 60 ? 'age_1' : 'age_2');
+      const getFvEduLevel = (years: number) => years < 6 ? 'edu_0' : (years < 12 ? 'edu_1' : 'edu_2');
+      
+      const calcFvZScore = (value: number, mean: number, stdDev: number) => 
+        stdDev === 0 ? 0 : Number(((value - mean) / stdDev).toFixed(2));
+      
+      const calcFvPercentile = (value: number, norms: number[]) => {
+        const [p5, p10, p25, p50, p75, p90, p95] = norms;
+        if (value >= p95) return 95;
+        if (value >= p90) return 90;
+        if (value >= p75) return 75;
+        if (value >= p50) return 50;
+        if (value >= p25) return 25;
+        if (value >= p10) return 10;
+        if (value >= p5) return 5;
+        return 1;
+      };
+      
+      if (!isNaN(fvAge) && fvAge > 0 && !isNaN(fvEdu) && fvEdu >= 0) {
+        const ageCat = getFvAgeCategory(fvAge);
+        const eduLvl = getFvEduLevel(fvEdu);
+        
+        // Calculate rule violations for Lettre P
+        const pDeriv = Number(prev.fv_p_deriv) || 0;
+        const pIntrus = Number(prev.fv_p_intrus) || 0;
+        const pPropres = Number(prev.fv_p_propres) || 0;
+        const pRupregle = pDeriv + pIntrus + pPropres;
+        if (updated.fv_p_tot_rupregle !== pRupregle) {
+          updated.fv_p_tot_rupregle = pRupregle;
+          hasChanges = true;
+        }
+        
+        // Calculate rule violations for Animaux
+        const animDeriv = Number(prev.fv_anim_deriv) || 0;
+        const animIntrus = Number(prev.fv_anim_intrus) || 0;
+        const animPropres = Number(prev.fv_anim_propres) || 0;
+        const animRupregle = animDeriv + animIntrus + animPropres;
+        if (updated.fv_anim_tot_rupregle !== animRupregle) {
+          updated.fv_anim_tot_rupregle = animRupregle;
+          hasChanges = true;
+        }
+        
+        // Calculate Lettre P scores if available
+        if (!isNaN(fvP) && fvP >= 0) {
+          const normsP = TAB_FLUENCE_P[ageCat][eduLvl];
+          const pZ = calcFvZScore(fvP, normsP[7], normsP[8]);
+          if (updated.fv_p_tot_correct_z !== pZ) {
+            updated.fv_p_tot_correct_z = pZ;
+            hasChanges = true;
+          }
+          const pPc = calcFvPercentile(fvP, normsP);
+          if (updated.fv_p_tot_correct_pc !== pPc) {
+            updated.fv_p_tot_correct_pc = pPc;
+            hasChanges = true;
+          }
+        }
+        
+        // Calculate Animaux scores if available
+        if (!isNaN(fvAnim) && fvAnim >= 0) {
+          const normsAnim = TAB_FLUENCE_ANIM[ageCat][eduLvl];
+          const animZ = calcFvZScore(fvAnim, normsAnim[7], normsAnim[8]);
+          if (updated.fv_anim_tot_correct_z !== animZ) {
+            updated.fv_anim_tot_correct_z = animZ;
+            hasChanges = true;
+          }
+          const animPc = calcFvPercentile(fvAnim, normsAnim);
+          if (updated.fv_anim_tot_correct_pc !== animPc) {
+            updated.fv_anim_tot_correct_pc = animPc;
+            hasChanges = true;
+          }
+        }
+      }
+
       return hasChanges ? updated : prev;
     });
   }, [
@@ -398,7 +525,33 @@ export function QuestionnaireRenderer({
     // Stroop fields
     responses.stroop_w_tot,
     responses.stroop_c_tot,
-    responses.stroop_cw_tot
+    responses.stroop_cw_tot,
+    // Fluences Verbales fields
+    responses.fv_p_tot_correct,
+    responses.fv_p_deriv,
+    responses.fv_p_intrus,
+    responses.fv_p_propres,
+    responses.fv_anim_tot_correct,
+    responses.fv_anim_deriv,
+    responses.fv_anim_intrus,
+    responses.fv_anim_propres,
+    // COBRA fields
+    responses.q1,
+    responses.q2,
+    responses.q3,
+    responses.q4,
+    responses.q5,
+    responses.q6,
+    responses.q7,
+    responses.q8,
+    responses.q9,
+    responses.q10,
+    responses.q11,
+    responses.q12,
+    responses.q13,
+    responses.q14,
+    responses.q15,
+    responses.q16
   ]);
 
   const { visibleQuestions, requiredQuestions } = evaluateConditionalLogic(

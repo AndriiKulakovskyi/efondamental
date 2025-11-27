@@ -2569,3 +2569,82 @@ export interface StroopResponse {
 
 export type StroopResponseInsert = Omit<StroopResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'stroop_w_tot_c' | 'stroop_c_tot_c' | 'stroop_cw_tot_c' | 'stroop_interf' | 'stroop_w_note_t' | 'stroop_c_note_t' | 'stroop_cw_note_t' | 'stroop_interf_note_t' | 'stroop_w_note_t_corrigee' | 'stroop_c_note_t_corrigee' | 'stroop_cw_note_t_corrigee' | 'stroop_interf_note_tz'>;
 
+// ============================================================================
+// Fluences Verbales (Cardebat et al., 1990)
+// ============================================================================
+
+export interface FluencesVerbalesResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Demographic data
+  patient_age: number;
+  years_of_education: number;
+  
+  // Lettre P (Phonemic)
+  fv_p_tot_correct: number;
+  fv_p_deriv?: number | null;
+  fv_p_intrus?: number | null;
+  fv_p_propres?: number | null;
+  fv_p_tot_rupregle?: number | null; // Total rule violations
+  fv_p_tot_correct_z?: number | null; // Z-score
+  fv_p_tot_correct_pc?: number | null; // Percentile
+  
+  // Categorie Animaux (Semantic)
+  fv_anim_tot_correct: number;
+  fv_anim_deriv?: number | null;
+  fv_anim_intrus?: number | null;
+  fv_anim_propres?: number | null;
+  fv_anim_tot_rupregle?: number | null; // Total rule violations
+  fv_anim_tot_correct_z?: number | null; // Z-score
+  fv_anim_tot_correct_pc?: number | null; // Percentile
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type FluencesVerbalesResponseInsert = Omit<FluencesVerbalesResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'fv_p_tot_rupregle' | 'fv_p_tot_correct_z' | 'fv_p_tot_correct_pc' | 'fv_anim_tot_rupregle' | 'fv_anim_tot_correct_z' | 'fv_anim_tot_correct_pc'>;
+
+// ============================================================================
+// COBRA - Cognitive Complaints in Bipolar Disorder Rating Assessment
+// ============================================================================
+
+export interface CobraResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Questions 1-16 (each 0-3)
+  q1: number;
+  q2: number;
+  q3: number;
+  q4: number;
+  q5: number;
+  q6: number;
+  q7: number;
+  q8: number;
+  q9: number;
+  q10: number;
+  q11: number;
+  q12: number;
+  q13: number;
+  q14: number;
+  q15: number;
+  q16: number;
+  
+  // Computed score
+  total_score?: number | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type CobraResponseInsert = Omit<CobraResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score'>;
+

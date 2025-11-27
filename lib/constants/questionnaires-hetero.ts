@@ -4619,3 +4619,317 @@ export const STROOP_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// Fluences Verbales (Cardebat et al., 1990)
+// ============================================================================
+
+export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
+  // Section: Informations demographiques
+  {
+    id: 'section_demo',
+    text: 'Informations demographiques',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'patient_age',
+    text: 'Age du patient (en annees)',
+    type: 'number',
+    required: true,
+    min: 16,
+    max: 100
+  },
+  {
+    id: 'years_of_education',
+    text: 'Annees de scolarisation',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 30
+  },
+  // Section: Lettre P (Phonemique)
+  {
+    id: 'section_lettre_p',
+    text: 'Lettre P (Phonemique)',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'fv_p_tot_correct',
+    text: 'Nombre total de mots corrects lettre P',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 100
+  },
+  {
+    id: 'fv_p_deriv',
+    text: 'Mots derives lettre P (MD)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'fv_p_intrus',
+    text: 'Intrusions lettre P (I)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'fv_p_propres',
+    text: 'Noms propres lettre P (NP)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'fv_p_tot_rupregle',
+    text: 'Total ruptures de regle (MD + I + NP)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'fv_p_tot_correct_z',
+    text: 'Z-score lettre P',
+    help: 'Score Z normalise selon age et education',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'fv_p_tot_correct_pc',
+    text: 'Percentile lettre P',
+    help: 'Rang percentile selon age et education',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  // Section: Categorie Animaux (Semantique)
+  {
+    id: 'section_animaux',
+    text: 'Categorie Animaux (Semantique)',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'fv_anim_tot_correct',
+    text: 'Nombre total de mots corrects categorie animaux',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 100
+  },
+  {
+    id: 'fv_anim_deriv',
+    text: 'Mots derives categorie animaux (MD)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'fv_anim_intrus',
+    text: 'Intrusions categorie animaux (I)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'fv_anim_propres',
+    text: 'Noms propres categorie animaux (NP)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'fv_anim_tot_rupregle',
+    text: 'Total ruptures de regle (MD + I + NP)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'fv_anim_tot_correct_z',
+    text: 'Z-score categorie animaux',
+    help: 'Score Z normalise selon age et education',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'fv_anim_tot_correct_pc',
+    text: 'Percentile categorie animaux',
+    help: 'Rang percentile selon age et education',
+    type: 'number',
+    required: false,
+    readonly: true
+  }
+];
+
+export const FLUENCES_VERBALES_DEFINITION: QuestionnaireDefinition = {
+  id: 'fluences_verbales',
+  code: 'FLUENCES_VERBALES_FR',
+  title: 'Fluences verbales (Cardebat et al., 1990)',
+  description: 'Test neuropsychologique evaluant la fluence verbale (phonemique et semantique).',
+  questions: FLUENCES_VERBALES_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
+// COBRA - Cognitive Complaints in Bipolar Disorder Rating Assessment
+// ============================================================================
+
+const COBRA_OPTIONS = [
+  { code: 0, label: "Jamais", score: 0 },
+  { code: 1, label: "Parfois", score: 1 },
+  { code: 2, label: "Frequemment", score: 2 },
+  { code: 3, label: "Toujours", score: 3 }
+];
+
+export const COBRA_QUESTIONS: Question[] = [
+  {
+    id: 'q1',
+    text: '1. Vous est-il difficile de vous souvenir de nom de personnes ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q2',
+    text: '2. Vous est-il difficile de retrouver des objets du quotidien (cles, lunettes, montre, ...) ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q3',
+    text: '3. Eprouvez-vous des difficultes a vous souvenir d\'evenements qui ont ete importants pour vous ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q4',
+    text: '4. Vous est-il difficile de situer dans le temps ces memes evenements ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q5',
+    text: '5. Faites-vous un effort pour vous concentrer en lisant un livre, un journal, ... ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q6',
+    text: '6. Vous est-il difficile de vous souvenir de ce que vous avez lu ou ce qu\'on vous a dit recemment ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q7',
+    text: '7. Avez-vous le sentiment de ne pas terminer ce que vous commencez ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q8',
+    text: '8. Avez-vous besoin de plus de temps pour realiser les taches quotidiennes ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q9',
+    text: '9. Vous est-il arrive d\'etre desoriente dans la rue ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q10',
+    text: '10. Lorsque l\'on vous rappelle une conversation ou une remarque, avez-vous l\'impression que c\'est la premiere fois que vous entendez cette information ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q11',
+    text: '11. Vous est-il difficile de trouver les mots adequats pour exprimer vos idees ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q12',
+    text: '12. Vous deconcentrez-vous facilement ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q13',
+    text: '13. Les calculs mentaux simples vous semblent-ils compliques ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q14',
+    text: '14. Avez-vous l\'impression de perdre le fil de la conversation ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q15',
+    text: '15. Avez-vous remarque s\'il vous est difficile d\'apprendre de nouvelles informations ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'q16',
+    text: '16. Vous est-il difficile de maintenir votre attention sur une tache de longue duree ?',
+    type: 'single_choice',
+    required: true,
+    options: COBRA_OPTIONS
+  },
+  {
+    id: 'total_score',
+    text: 'Score COBRA Total',
+    help: 'Score total (0-48). Score eleve = plaintes cognitives importantes.',
+    type: 'number',
+    required: false,
+    readonly: true
+  }
+];
+
+export const COBRA_DEFINITION: QuestionnaireDefinition = {
+  id: 'cobra',
+  code: 'COBRA_FR',
+  title: 'COBRA - Cognitive Complaints in Bipolar Disorder Rating Assessment',
+  description: 'Auto-questionnaire evaluant les plaintes cognitives dans le trouble bipolaire.',
+  questions: COBRA_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

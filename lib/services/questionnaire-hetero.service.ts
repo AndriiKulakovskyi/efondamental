@@ -40,11 +40,16 @@ import {
   TmtResponse,
   TmtResponseInsert,
   StroopResponse,
-  StroopResponseInsert
+  StroopResponseInsert,
+  FluencesVerbalesResponse,
+  FluencesVerbalesResponseInsert,
+  CobraResponse,
+  CobraResponseInsert
 } from '@/lib/types/database.types';
 import { calculateStandardizedScore, calculatePercentileRank } from './wais4-matrices-scoring';
 import { calculateTmtScores } from './tmt-scoring';
 import { calculateStroopScores } from './stroop-scoring';
+import { calculateFluencesVerbalesScores } from './fluences-verbales-scoring';
 
 // ============================================================================
 // MADRS (Montgomery-Åsberg Depression Rating Scale)
@@ -1389,6 +1394,149 @@ export async function saveStroopResponse(
       stroop_c_note_t_corrigee: scores.stroop_c_note_t_corrigee,
       stroop_cw_note_t_corrigee: scores.stroop_cw_note_t_corrigee,
       stroop_interf_note_tz: scores.stroop_interf_note_tz,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Fluences Verbales (Cardebat et al., 1990)
+// ============================================================================
+
+export async function getFluencesVerbalesResponse(
+  visitId: string
+): Promise<FluencesVerbalesResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_fluences_verbales')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No data found
+    if (error.code === 'PGRST205') {
+      console.log(`No Fluences Verbales found for visit: ${visitId}`);
+      return null;
+    }
+    console.error('Error fetching Fluences Verbales response:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function saveFluencesVerbalesResponse(
+  response: FluencesVerbalesResponseInsert
+): Promise<FluencesVerbalesResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Calculate all scores using the scoring function
+  const scores = calculateFluencesVerbalesScores({
+    patient_age: response.patient_age,
+    years_of_education: response.years_of_education,
+    fv_p_tot_correct: response.fv_p_tot_correct,
+    fv_p_deriv: response.fv_p_deriv,
+    fv_p_intrus: response.fv_p_intrus,
+    fv_p_propres: response.fv_p_propres,
+    fv_anim_tot_correct: response.fv_anim_tot_correct,
+    fv_anim_deriv: response.fv_anim_deriv,
+    fv_anim_intrus: response.fv_anim_intrus,
+    fv_anim_propres: response.fv_anim_propres
+  });
+
+  const { data, error } = await supabase
+    .from('responses_fluences_verbales')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      patient_age: response.patient_age,
+      years_of_education: response.years_of_education,
+      // Lettre P
+      fv_p_tot_correct: response.fv_p_tot_correct,
+      fv_p_deriv: response.fv_p_deriv,
+      fv_p_intrus: response.fv_p_intrus,
+      fv_p_propres: response.fv_p_propres,
+      fv_p_tot_rupregle: scores.fv_p_tot_rupregle,
+      fv_p_tot_correct_z: scores.fv_p_tot_correct_z,
+      fv_p_tot_correct_pc: scores.fv_p_tot_correct_pc,
+      // Animaux
+      fv_anim_tot_correct: response.fv_anim_tot_correct,
+      fv_anim_deriv: response.fv_anim_deriv,
+      fv_anim_intrus: response.fv_anim_intrus,
+      fv_anim_propres: response.fv_anim_propres,
+      fv_anim_tot_rupregle: scores.fv_anim_tot_rupregle,
+      fv_anim_tot_correct_z: scores.fv_anim_tot_correct_z,
+      fv_anim_tot_correct_pc: scores.fv_anim_tot_correct_pc,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// COBRA - Cognitive Complaints in Bipolar Disorder Rating Assessment
+// ============================================================================
+
+export async function getCobraResponse(
+  visitId: string
+): Promise<CobraResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_cobra')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No data found
+    if (error.code === 'PGRST205') {
+      console.log(`No COBRA found for visit: ${visitId}`);
+      return null;
+    }
+    console.error('Error fetching COBRA response:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function saveCobraResponse(
+  response: CobraResponseInsert
+): Promise<CobraResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Total score is computed by the database (GENERATED ALWAYS AS)
+  const { data, error } = await supabase
+    .from('responses_cobra')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      q1: response.q1,
+      q2: response.q2,
+      q3: response.q3,
+      q4: response.q4,
+      q5: response.q5,
+      q6: response.q6,
+      q7: response.q7,
+      q8: response.q8,
+      q9: response.q9,
+      q10: response.q10,
+      q11: response.q11,
+      q12: response.q12,
+      q13: response.q13,
+      q14: response.q14,
+      q15: response.q15,
+      q16: response.q16,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

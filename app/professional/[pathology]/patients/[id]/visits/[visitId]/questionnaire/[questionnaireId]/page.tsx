@@ -48,7 +48,9 @@ import {
   WAIS4_CODE_DEFINITION,
   WAIS4_DIGIT_SPAN_DEFINITION,
   TMT_DEFINITION,
-  STROOP_DEFINITION
+  STROOP_DEFINITION,
+  FLUENCES_VERBALES_DEFINITION,
+  COBRA_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -114,7 +116,9 @@ import {
   getWais4CodeResponse,
   getWais4DigitSpanResponse,
   getTmtResponse,
-  getStroopResponse
+  getStroopResponse,
+  getFluencesVerbalesResponse,
+  getCobraResponse
 } from "@/lib/services/questionnaire-hetero.service";
 import {
   getSocialResponse
@@ -196,6 +200,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS4_DIGIT_SPAN_DEFINITION.code) questionnaire = WAIS4_DIGIT_SPAN_DEFINITION;
   else if (code === TMT_DEFINITION.code) questionnaire = TMT_DEFINITION;
   else if (code === STROOP_DEFINITION.code) questionnaire = STROOP_DEFINITION;
+  else if (code === FLUENCES_VERBALES_DEFINITION.code) questionnaire = FLUENCES_VERBALES_DEFINITION;
+  else if (code === COBRA_DEFINITION.code) questionnaire = COBRA_DEFINITION;
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) questionnaire = SOCIAL_DEFINITION;
   // Infirmier questionnaires
@@ -264,6 +270,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS4_DIGIT_SPAN_DEFINITION.code) existingResponse = await getWais4DigitSpanResponse(visitId);
   else if (code === TMT_DEFINITION.code) existingResponse = await getTmtResponse(visitId);
   else if (code === STROOP_DEFINITION.code) existingResponse = await getStroopResponse(visitId);
+  else if (code === FLUENCES_VERBALES_DEFINITION.code) existingResponse = await getFluencesVerbalesResponse(visitId);
+  else if (code === COBRA_DEFINITION.code) existingResponse = await getCobraResponse(visitId);
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) existingResponse = await getSocialResponse(visitId);
   // Infirmier questionnaires
