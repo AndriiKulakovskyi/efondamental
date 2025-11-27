@@ -2648,3 +2648,45 @@ export interface CobraResponse {
 
 export type CobraResponseInsert = Omit<CobraResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score'>;
 
+// ============================================================================
+// CPT-III - Conners' Continuous Performance Test III
+// ============================================================================
+
+export interface Cpt3Response {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Detectability
+  d_prime?: number | null;
+  d_prime_interp?: string | null;
+  
+  // Errors
+  omissions?: number | null;
+  omissions_interp?: string | null;
+  commissions?: number | null;
+  commissions_interp?: string | null;
+  perseverations?: number | null;
+  perseverations_interp?: string | null;
+  
+  // Reaction Time Statistics
+  hrt?: number | null;
+  hrt_interp?: string | null;
+  hrt_sd?: number | null;
+  hrt_sd_interp?: string | null;
+  variability?: number | null;
+  variability_interp?: string | null;
+  hrt_block_change?: number | null;
+  hrt_block_change_interp?: string | null;
+  hrt_isi_change?: number | null;
+  hrt_isi_change_interp?: string | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Cpt3ResponseInsert = Omit<Cpt3Response, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+

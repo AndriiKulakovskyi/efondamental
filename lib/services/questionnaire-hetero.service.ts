@@ -44,7 +44,9 @@ import {
   FluencesVerbalesResponse,
   FluencesVerbalesResponseInsert,
   CobraResponse,
-  CobraResponseInsert
+  CobraResponseInsert,
+  Cpt3Response,
+  Cpt3ResponseInsert
 } from '@/lib/types/database.types';
 import { calculateStandardizedScore, calculatePercentileRank } from './wais4-matrices-scoring';
 import { calculateTmtScores } from './tmt-scoring';
@@ -1537,6 +1539,74 @@ export async function saveCobraResponse(
       q14: response.q14,
       q15: response.q15,
       q16: response.q16,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// CPT-III - Conners' Continuous Performance Test III
+// ============================================================================
+
+export async function getCpt3Response(
+  visitId: string
+): Promise<Cpt3Response | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_cpt3')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No data found
+    if (error.code === 'PGRST205') {
+      console.log(`No CPT-III found for visit: ${visitId}`);
+      return null;
+    }
+    console.error('Error fetching CPT-III response:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function saveCpt3Response(
+  response: Cpt3ResponseInsert
+): Promise<Cpt3Response> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from('responses_cpt3')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      // Detectability
+      d_prime: response.d_prime,
+      d_prime_interp: response.d_prime_interp,
+      // Errors
+      omissions: response.omissions,
+      omissions_interp: response.omissions_interp,
+      commissions: response.commissions,
+      commissions_interp: response.commissions_interp,
+      perseverations: response.perseverations,
+      perseverations_interp: response.perseverations_interp,
+      // Reaction Time Statistics
+      hrt: response.hrt,
+      hrt_interp: response.hrt_interp,
+      hrt_sd: response.hrt_sd,
+      hrt_sd_interp: response.hrt_sd_interp,
+      variability: response.variability,
+      variability_interp: response.variability_interp,
+      hrt_block_change: response.hrt_block_change,
+      hrt_block_change_interp: response.hrt_block_change_interp,
+      hrt_isi_change: response.hrt_isi_change,
+      hrt_isi_change_interp: response.hrt_isi_change_interp,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

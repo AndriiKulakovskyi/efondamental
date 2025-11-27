@@ -50,7 +50,8 @@ import {
   TMT_DEFINITION,
   STROOP_DEFINITION,
   FLUENCES_VERBALES_DEFINITION,
-  COBRA_DEFINITION
+  COBRA_DEFINITION,
+  CPT3_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -118,7 +119,8 @@ import {
   getTmtResponse,
   getStroopResponse,
   getFluencesVerbalesResponse,
-  getCobraResponse
+  getCobraResponse,
+  getCpt3Response
 } from "@/lib/services/questionnaire-hetero.service";
 import {
   getSocialResponse
@@ -202,6 +204,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === STROOP_DEFINITION.code) questionnaire = STROOP_DEFINITION;
   else if (code === FLUENCES_VERBALES_DEFINITION.code) questionnaire = FLUENCES_VERBALES_DEFINITION;
   else if (code === COBRA_DEFINITION.code) questionnaire = COBRA_DEFINITION;
+  else if (code === CPT3_DEFINITION.code) questionnaire = CPT3_DEFINITION;
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) questionnaire = SOCIAL_DEFINITION;
   // Infirmier questionnaires
@@ -272,6 +275,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === STROOP_DEFINITION.code) existingResponse = await getStroopResponse(visitId);
   else if (code === FLUENCES_VERBALES_DEFINITION.code) existingResponse = await getFluencesVerbalesResponse(visitId);
   else if (code === COBRA_DEFINITION.code) existingResponse = await getCobraResponse(visitId);
+  else if (code === CPT3_DEFINITION.code) existingResponse = await getCpt3Response(visitId);
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) existingResponse = await getSocialResponse(visitId);
   // Infirmier questionnaires

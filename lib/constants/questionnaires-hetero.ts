@@ -4933,3 +4933,178 @@ export const COBRA_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// CPT-III - Conners' Continuous Performance Test III
+// ============================================================================
+
+const CPT3_DETECTABILITY_INTERP_OPTIONS = [
+  { code: 'Very elevated', label: "Very elevated" },
+  { code: 'Elevated', label: "Elevated" },
+  { code: 'High average', label: "High average" },
+  { code: 'Average', label: "Average" },
+  { code: 'Low', label: "Low" }
+];
+
+const CPT3_REACTION_TIME_INTERP_OPTIONS = [
+  { code: 'Atypically slow', label: "Atypically slow" },
+  { code: 'A little slow', label: "A little slow" },
+  { code: 'Slow', label: "Slow" },
+  { code: 'Average', label: "Average" },
+  { code: 'A little fast', label: "A little fast" },
+  { code: 'Fast', label: "Fast" }
+];
+
+export const CPT3_QUESTIONS: Question[] = [
+  // Section: Detectability
+  {
+    id: 'section_detectability',
+    text: 'Detectability',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'd_prime',
+    text: "d' (Detectabilite)",
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'd_prime_interp',
+    text: "d' (Interpretation)",
+    type: 'single_choice',
+    required: false,
+    options: CPT3_DETECTABILITY_INTERP_OPTIONS
+  },
+  // Section: Errors
+  {
+    id: 'section_errors',
+    text: 'Erreurs',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'omissions',
+    text: 'Omissions',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'omissions_interp',
+    text: 'Omissions (Interpretation)',
+    type: 'single_choice',
+    required: false,
+    options: CPT3_DETECTABILITY_INTERP_OPTIONS
+  },
+  {
+    id: 'commissions',
+    text: 'Commissions',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'commissions_interp',
+    text: 'Commissions (Interpretation)',
+    type: 'single_choice',
+    required: false,
+    options: CPT3_DETECTABILITY_INTERP_OPTIONS
+  },
+  {
+    id: 'perseverations',
+    text: 'Perseverations',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'perseverations_interp',
+    text: 'Perseverations (Interpretation)',
+    type: 'single_choice',
+    required: false,
+    options: CPT3_DETECTABILITY_INTERP_OPTIONS
+  },
+  // Section: Reaction Time Statistics
+  {
+    id: 'section_reaction_time',
+    text: 'Statistiques de temps de reaction',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'hrt',
+    text: 'HRT (Hit Reaction Time)',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'hrt_interp',
+    text: 'HRT (Interpretation)',
+    type: 'single_choice',
+    required: false,
+    options: CPT3_REACTION_TIME_INTERP_OPTIONS
+  },
+  {
+    id: 'hrt_sd',
+    text: 'HRT SD (Ecart-type)',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'hrt_sd_interp',
+    text: 'HRT SD (Interpretation)',
+    type: 'single_choice',
+    required: false,
+    options: CPT3_REACTION_TIME_INTERP_OPTIONS
+  },
+  {
+    id: 'variability',
+    text: 'Variabilite',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'variability_interp',
+    text: 'Variabilite (Interpretation)',
+    type: 'single_choice',
+    required: false,
+    options: CPT3_REACTION_TIME_INTERP_OPTIONS
+  },
+  {
+    id: 'hrt_block_change',
+    text: 'HRT Block Change',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'hrt_block_change_interp',
+    text: 'HRT Block Change (Interpretation)',
+    type: 'single_choice',
+    required: false,
+    options: CPT3_REACTION_TIME_INTERP_OPTIONS
+  },
+  {
+    id: 'hrt_isi_change',
+    text: 'HRT ISI Change',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'hrt_isi_change_interp',
+    text: 'HRT ISI Change (Interpretation)',
+    type: 'single_choice',
+    required: false,
+    options: CPT3_REACTION_TIME_INTERP_OPTIONS
+  }
+];
+
+export const CPT3_DEFINITION: QuestionnaireDefinition = {
+  id: 'cpt3',
+  code: 'CPT3_FR',
+  title: 'CPT-III - Conners\' Continuous Performance Test III',
+  description: 'Evaluation informatisee des problemes d\'attention. Les resultats sont saisis depuis le rapport du logiciel.',
+  questions: CPT3_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

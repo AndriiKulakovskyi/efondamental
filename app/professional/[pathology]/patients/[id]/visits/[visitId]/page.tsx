@@ -56,7 +56,8 @@ import {
   TMT_DEFINITION,
   STROOP_DEFINITION,
   FLUENCES_VERBALES_DEFINITION,
-  COBRA_DEFINITION
+  COBRA_DEFINITION,
+  CPT3_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -415,6 +416,13 @@ export default async function VisitDetailPage({
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['COBRA_FR']?.completed || false,
             completedAt: questionnaireStatuses['COBRA_FR']?.completed_at,
+          },
+          {
+            ...CPT3_DEFINITION,
+            id: CPT3_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['CPT3_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CPT3_FR']?.completed_at,
           }
         ]
       },
