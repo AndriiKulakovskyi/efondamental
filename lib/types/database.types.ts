@@ -2469,3 +2469,53 @@ export interface Wais4DigitSpanResponse {
 
 export type Wais4DigitSpanResponseInsert = Omit<Wais4DigitSpanResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'mcod_total' | 'mcoi_total' | 'mcoc_total' | 'raw_score' | 'standardized_score' | 'empan_direct' | 'empan_inverse' | 'empan_croissant'>;
 
+// ============================================================================
+// Trail Making Test (TMT) - Reitan 1955
+// ============================================================================
+
+export interface TmtResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Demographic data
+  patient_age: number; // 16-100
+  years_of_education: number;
+  
+  // Partie A
+  tmta_tps: number; // Time in seconds
+  tmta_err: number; // Uncorrected errors
+  tmta_cor?: number | null; // Corrected errors
+  
+  // Partie B
+  tmtb_tps: number; // Time in seconds
+  tmtb_err: number; // Uncorrected errors
+  tmtb_cor?: number | null; // Corrected errors
+  tmtb_err_persev: number; // Perseverative errors
+  
+  // Computed scores - Part A
+  tmta_errtot?: number | null; // Total errors
+  tmta_tps_z?: number | null; // Z-score for time
+  tmta_tps_pc?: number | null; // Percentile for time
+  tmta_errtot_z?: number | null; // Z-score for errors
+  
+  // Computed scores - Part B
+  tmtb_errtot?: number | null; // Total errors
+  tmtb_tps_z?: number | null; // Z-score for time
+  tmtb_tps_pc?: number | null; // Percentile for time
+  tmtb_errtot_z?: number | null; // Z-score for errors
+  tmtb_err_persev_z?: number | null; // Z-score for perseverative errors
+  
+  // Computed scores - Difference (B - A)
+  tmt_b_a_tps?: number | null; // Time difference B - A
+  tmt_b_a_tps_z?: number | null; // Z-score for time difference
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type TmtResponseInsert = Omit<TmtResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'tmta_errtot' | 'tmta_tps_z' | 'tmta_tps_pc' | 'tmta_errtot_z' | 'tmtb_errtot' | 'tmtb_tps_z' | 'tmtb_tps_pc' | 'tmtb_errtot_z' | 'tmtb_err_persev_z' | 'tmt_b_a_tps' | 'tmt_b_a_tps_z'>;
+

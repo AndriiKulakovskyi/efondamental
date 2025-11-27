@@ -52,7 +52,8 @@ import {
   WAIS4_MATRICES_DEFINITION,
   CVLT_DEFINITION,
   WAIS4_CODE_DEFINITION,
-  WAIS4_DIGIT_SPAN_DEFINITION
+  WAIS4_DIGIT_SPAN_DEFINITION,
+  TMT_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -383,6 +384,13 @@ export default async function VisitDetailPage({
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['WAIS4_DIGIT_SPAN_FR']?.completed || false,
             completedAt: questionnaireStatuses['WAIS4_DIGIT_SPAN_FR']?.completed_at,
+          },
+          {
+            ...TMT_DEFINITION,
+            id: TMT_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['TMT_FR']?.completed || false,
+            completedAt: questionnaireStatuses['TMT_FR']?.completed_at,
           }
         ]
       },

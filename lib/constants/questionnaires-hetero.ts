@@ -4187,3 +4187,214 @@ export const WAIS4_DIGIT_SPAN_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// Trail Making Test (TMT) - Reitan 1955
+// ============================================================================
+
+export const TMT_QUESTIONS: Question[] = [
+  // Section: Informations demographiques
+  {
+    id: 'section_demo',
+    text: 'Informations demographiques',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'patient_age',
+    text: 'Age du patient (en annees)',
+    type: 'number',
+    required: true,
+    min: 16,
+    max: 100
+  },
+  {
+    id: 'years_of_education',
+    text: 'Annees de scolarisation',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 30
+  },
+  // Section: Partie A
+  {
+    id: 'section_partie_a',
+    text: 'Partie A',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'tmta_tps',
+    text: 'Temps de realisation (en secondes)',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 600
+  },
+  {
+    id: 'tmta_err',
+    text: "Nombre d'erreurs non corrigees a la partie A du TMT",
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'tmta_cor',
+    text: "Nombre d'erreurs corrigees a la partie A du TMT",
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  // Section: Partie B
+  {
+    id: 'section_partie_b',
+    text: 'Partie B',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'tmtb_tps',
+    text: 'Temps pour effectuer la partie B en secondes',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 600
+  },
+  {
+    id: 'tmtb_err',
+    text: "Nombre d'erreurs non corrigees a la partie B du TMT",
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'tmtb_cor',
+    text: "Nombre d'erreurs corrigees a la partie B du TMT",
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'tmtb_err_persev',
+    text: "Nombre d'erreurs perseveratives",
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 50
+  },
+  // Section: Scores calcules
+  {
+    id: 'section_scores',
+    text: 'Scores calcules',
+    type: 'section',
+    required: false
+  },
+  // Part A scores
+  {
+    id: 'tmta_errtot',
+    text: 'Partie A - Nombre total d\'erreurs',
+    help: 'Somme des erreurs non corrigees et corrigees',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'tmta_tps_z',
+    text: 'Partie A - Z-score Temps',
+    help: 'Score Z normalise pour le temps de realisation (norme selon age et education)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'tmta_tps_pc',
+    text: 'Partie A - Percentile Temps',
+    help: 'Rang percentile pour le temps de realisation',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'tmta_errtot_z',
+    text: 'Partie A - Z-score Erreurs',
+    help: 'Score Z normalise pour le nombre total d\'erreurs',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  // Part B scores
+  {
+    id: 'tmtb_errtot',
+    text: 'Partie B - Nombre total d\'erreurs',
+    help: 'Somme des erreurs non corrigees et corrigees',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'tmtb_tps_z',
+    text: 'Partie B - Z-score Temps',
+    help: 'Score Z normalise pour le temps de realisation (norme selon age et education)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'tmtb_tps_pc',
+    text: 'Partie B - Percentile Temps',
+    help: 'Rang percentile pour le temps de realisation',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'tmtb_errtot_z',
+    text: 'Partie B - Z-score Erreurs',
+    help: 'Score Z normalise pour le nombre total d\'erreurs',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'tmtb_err_persev_z',
+    text: 'Partie B - Z-score Erreurs perseveratives',
+    help: 'Score Z normalise pour le nombre d\'erreurs perseveratives',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  // B-A difference scores
+  {
+    id: 'tmt_b_a_tps',
+    text: 'Difference B-A - Temps (secondes)',
+    help: 'Difference de temps entre Partie B et Partie A',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'tmt_b_a_tps_z',
+    text: 'Difference B-A - Z-score Temps',
+    help: 'Score Z normalise pour la difference de temps B-A',
+    type: 'number',
+    required: false,
+    readonly: true
+  }
+];
+
+export const TMT_DEFINITION: QuestionnaireDefinition = {
+  id: 'tmt',
+  code: 'TMT_FR',
+  title: 'Trail Making Test (Reitan, 1955)',
+  description: 'Test neuropsychologique evaluant l\'attention visuelle et la flexibilite cognitive.',
+  questions: TMT_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

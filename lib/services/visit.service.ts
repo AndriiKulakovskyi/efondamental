@@ -114,7 +114,8 @@ import {
   WAIS4_MATRICES_DEFINITION,
   CVLT_DEFINITION,
   WAIS4_CODE_DEFINITION,
-  WAIS4_DIGIT_SPAN_DEFINITION
+  WAIS4_DIGIT_SPAN_DEFINITION,
+  TMT_DEFINITION
 } from '../constants/questionnaires-hetero';
 import {
   SOCIAL_DEFINITION
@@ -414,8 +415,8 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
       {
         id: 'mod_neuropsy',
         name: 'Evaluation Neuropsychologique',
-        description: 'Évaluation neuropsychologique (WAIS-IV)',
-        questionnaires: [WAIS4_CRITERIA_DEFINITION, WAIS4_LEARNING_DEFINITION, WAIS4_MATRICES_DEFINITION, CVLT_DEFINITION, WAIS4_CODE_DEFINITION, WAIS4_DIGIT_SPAN_DEFINITION]
+        description: 'Évaluation neuropsychologique (WAIS-IV, TMT)',
+        questionnaires: [WAIS4_CRITERIA_DEFINITION, WAIS4_LEARNING_DEFINITION, WAIS4_MATRICES_DEFINITION, CVLT_DEFINITION, WAIS4_CODE_DEFINITION, WAIS4_DIGIT_SPAN_DEFINITION, TMT_DEFINITION]
       },
       {
         id: 'mod_auto_etat',
@@ -488,7 +489,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diag) completed++;
     if (orient) completed++;
   } else if (visit.visit_type === 'initial_evaluation') {
-    total = 46; // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 7 INFIRMIER + 9 Medical + 6 Neuropsy
+    total = 47; // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 7 INFIRMIER + 9 Medical + 7 Neuropsy (6 WAIS + TMT)
     totalModules = 7;
 
     const [

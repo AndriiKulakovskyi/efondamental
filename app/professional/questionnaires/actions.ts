@@ -45,7 +45,8 @@ import {
   saveWais4MatricesResponse,
   saveCvltResponse,
   saveWais4CodeResponse,
-  saveWais4DigitSpanResponse
+  saveWais4DigitSpanResponse,
+  saveTmtResponse
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveSocialResponse
@@ -122,7 +123,8 @@ import {
   Wais4MatricesResponseInsert,
   CvltResponseInsert,
   Wais4CodeResponseInsert,
-  Wais4DigitSpanResponseInsert
+  Wais4DigitSpanResponseInsert,
+  TmtResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -544,6 +546,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as Wais4DigitSpanResponseInsert);
+        break;
+
+      case 'TMT_FR':
+        result = await saveTmtResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as TmtResponseInsert);
         break;
         
       default:

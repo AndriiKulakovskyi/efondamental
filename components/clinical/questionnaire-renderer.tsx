@@ -18,6 +18,7 @@ import {
   evaluateConditionalLogic,
   validateQuestionnaireResponse,
 } from "@/lib/utils/questionnaire-logic";
+import { calculateTmtScores } from "@/lib/services/tmt-scoring";
 import { Loader2, ChevronDown, Info } from "lucide-react";
 
 interface QuestionnaireRendererProps {
@@ -172,6 +173,74 @@ export function QuestionnaireRenderer({
         // Don't clear it
       }
 
+      // Compute TMT scores if all required fields are available
+      if (prev.patient_age && prev.years_of_education !== undefined && 
+          prev.tmta_tps !== undefined && prev.tmta_err !== undefined &&
+          prev.tmtb_tps !== undefined && prev.tmtb_err !== undefined &&
+          prev.tmtb_err_persev !== undefined) {
+        try {
+          const tmtScores = calculateTmtScores({
+            patient_age: Number(prev.patient_age),
+            years_of_education: Number(prev.years_of_education),
+            tmta_tps: Number(prev.tmta_tps),
+            tmta_err: Number(prev.tmta_err),
+            tmta_cor: prev.tmta_cor ? Number(prev.tmta_cor) : null,
+            tmtb_tps: Number(prev.tmtb_tps),
+            tmtb_err: Number(prev.tmtb_err),
+            tmtb_cor: prev.tmtb_cor ? Number(prev.tmtb_cor) : null,
+            tmtb_err_persev: Number(prev.tmtb_err_persev)
+          });
+
+          // Update computed scores
+          if (updated.tmta_errtot !== tmtScores.tmta_errtot) {
+            updated.tmta_errtot = tmtScores.tmta_errtot;
+            hasChanges = true;
+          }
+          if (updated.tmta_tps_z !== tmtScores.tmta_tps_z) {
+            updated.tmta_tps_z = tmtScores.tmta_tps_z;
+            hasChanges = true;
+          }
+          if (updated.tmta_tps_pc !== tmtScores.tmta_tps_pc) {
+            updated.tmta_tps_pc = tmtScores.tmta_tps_pc;
+            hasChanges = true;
+          }
+          if (updated.tmta_errtot_z !== tmtScores.tmta_errtot_z) {
+            updated.tmta_errtot_z = tmtScores.tmta_errtot_z;
+            hasChanges = true;
+          }
+          if (updated.tmtb_errtot !== tmtScores.tmtb_errtot) {
+            updated.tmtb_errtot = tmtScores.tmtb_errtot;
+            hasChanges = true;
+          }
+          if (updated.tmtb_tps_z !== tmtScores.tmtb_tps_z) {
+            updated.tmtb_tps_z = tmtScores.tmtb_tps_z;
+            hasChanges = true;
+          }
+          if (updated.tmtb_tps_pc !== tmtScores.tmtb_tps_pc) {
+            updated.tmtb_tps_pc = tmtScores.tmtb_tps_pc;
+            hasChanges = true;
+          }
+          if (updated.tmtb_errtot_z !== tmtScores.tmtb_errtot_z) {
+            updated.tmtb_errtot_z = tmtScores.tmtb_errtot_z;
+            hasChanges = true;
+          }
+          if (updated.tmtb_err_persev_z !== tmtScores.tmtb_err_persev_z) {
+            updated.tmtb_err_persev_z = tmtScores.tmtb_err_persev_z;
+            hasChanges = true;
+          }
+          if (updated.tmt_b_a_tps !== tmtScores.tmt_b_a_tps) {
+            updated.tmt_b_a_tps = tmtScores.tmt_b_a_tps;
+            hasChanges = true;
+          }
+          if (updated.tmt_b_a_tps_z !== tmtScores.tmt_b_a_tps_z) {
+            updated.tmt_b_a_tps_z = tmtScores.tmt_b_a_tps_z;
+            hasChanges = true;
+          }
+        } catch (e) {
+          // Ignore calculation errors (e.g., invalid values)
+        }
+      }
+
       return hasChanges ? updated : prev;
     });
   }, [
@@ -186,7 +255,16 @@ export function QuestionnaireRenderer({
     responses.creatinine,
     responses.patient_age,
     responses.patient_gender,
-    responses.clairance_creatinine
+    responses.clairance_creatinine,
+    // TMT fields
+    responses.years_of_education,
+    responses.tmta_tps,
+    responses.tmta_err,
+    responses.tmta_cor,
+    responses.tmtb_tps,
+    responses.tmtb_err,
+    responses.tmtb_cor,
+    responses.tmtb_err_persev
   ]);
 
   const { visibleQuestions, requiredQuestions } = evaluateConditionalLogic(

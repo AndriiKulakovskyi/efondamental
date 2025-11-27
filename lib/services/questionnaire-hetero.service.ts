@@ -36,9 +36,12 @@ import {
   Wais4MatricesResponse,
   Wais4MatricesResponseInsert,
   Wais4DigitSpanResponse,
-  Wais4DigitSpanResponseInsert
+  Wais4DigitSpanResponseInsert,
+  TmtResponse,
+  TmtResponseInsert
 } from '@/lib/types/database.types';
 import { calculateStandardizedScore, calculatePercentileRank } from './wais4-matrices-scoring';
+import { calculateTmtScores } from './tmt-scoring';
 
 // ============================================================================
 // MADRS (Montgomery-Åsberg Depression Rating Scale)
@@ -1221,6 +1224,87 @@ export async function saveWais4DigitSpanResponse(
       empan_direct: scores.empan_direct,
       empan_inverse: scores.empan_inverse,
       empan_croissant: scores.empan_croissant,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Trail Making Test (TMT) - Reitan 1955
+// ============================================================================
+
+export async function getTmtResponse(
+  visitId: string
+): Promise<TmtResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_tmt')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No data found
+    if (error.code === 'PGRST205') {
+      console.log(`No TMT found for visit: ${visitId}`);
+      return null;
+    }
+    console.error('Error fetching TMT response:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function saveTmtResponse(
+  response: TmtResponseInsert
+): Promise<TmtResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Calculate all scores using the scoring function
+  const scores = calculateTmtScores({
+    patient_age: response.patient_age,
+    years_of_education: response.years_of_education,
+    tmta_tps: response.tmta_tps,
+    tmta_err: response.tmta_err,
+    tmta_cor: response.tmta_cor,
+    tmtb_tps: response.tmtb_tps,
+    tmtb_err: response.tmtb_err,
+    tmtb_cor: response.tmtb_cor,
+    tmtb_err_persev: response.tmtb_err_persev
+  });
+
+  const { data, error } = await supabase
+    .from('responses_tmt')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      patient_age: response.patient_age,
+      years_of_education: response.years_of_education,
+      tmta_tps: response.tmta_tps,
+      tmta_err: response.tmta_err,
+      tmta_cor: response.tmta_cor,
+      tmtb_tps: response.tmtb_tps,
+      tmtb_err: response.tmtb_err,
+      tmtb_cor: response.tmtb_cor,
+      tmtb_err_persev: response.tmtb_err_persev,
+      // Computed scores
+      tmta_errtot: scores.tmta_errtot,
+      tmta_tps_z: scores.tmta_tps_z,
+      tmta_tps_pc: scores.tmta_tps_pc,
+      tmta_errtot_z: scores.tmta_errtot_z,
+      tmtb_errtot: scores.tmtb_errtot,
+      tmtb_tps_z: scores.tmtb_tps_z,
+      tmtb_tps_pc: scores.tmtb_tps_pc,
+      tmtb_errtot_z: scores.tmtb_errtot_z,
+      tmtb_err_persev_z: scores.tmtb_err_persev_z,
+      tmt_b_a_tps: scores.tmt_b_a_tps,
+      tmt_b_a_tps_z: scores.tmt_b_a_tps_z,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
