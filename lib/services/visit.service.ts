@@ -409,7 +409,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_medical_eval',
         name: 'Evaluation Médicale',
         description: 'Évaluation médicale complète',
-        questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION, DIVA_DEFINITION, FAMILY_HISTORY_DEFINITION, CSSRS_DEFINITION, ISA_DEFINITION, CSSRS_HISTORY_DEFINITION, SIS_DEFINITION, WAIS4_CRITERIA_DEFINITION, WAIS4_LEARNING_DEFINITION, WAIS4_MATRICES_DEFINITION, CVLT_DEFINITION, WAIS4_CODE_DEFINITION, WAIS4_DIGIT_SPAN_DEFINITION]
+        questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION, DIVA_DEFINITION, FAMILY_HISTORY_DEFINITION, CSSRS_DEFINITION, ISA_DEFINITION, CSSRS_HISTORY_DEFINITION, SIS_DEFINITION]
+      },
+      {
+        id: 'mod_neuropsy',
+        name: 'Evaluation Neuropsychologique',
+        description: 'Évaluation neuropsychologique (WAIS-IV)',
+        questionnaires: [WAIS4_CRITERIA_DEFINITION, WAIS4_LEARNING_DEFINITION, WAIS4_MATRICES_DEFINITION, CVLT_DEFINITION, WAIS4_CODE_DEFINITION, WAIS4_DIGIT_SPAN_DEFINITION]
       },
       {
         id: 'mod_auto_etat',
@@ -482,8 +488,8 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diag) completed++;
     if (orient) completed++;
   } else if (visit.visit_type === 'initial_evaluation') {
-    total = 46; // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 7 INFIRMIER + 15 Medical (9 DSM5 + 4 WAIS-4 + 1 CVLT + 1 WAIS-4 Code)
-    totalModules = 6;
+    total = 46; // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 7 INFIRMIER + 9 Medical + 6 Neuropsy
+    totalModules = 7;
 
     const [
       eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,

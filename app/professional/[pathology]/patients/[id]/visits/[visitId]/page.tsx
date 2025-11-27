@@ -335,6 +335,13 @@ export default async function VisitDetailPage({
             completed: questionnaireStatuses['SIS_FR']?.completed || false,
             completedAt: questionnaireStatuses['SIS_FR']?.completed_at,
           },
+        ]
+      },
+      {
+        id: 'mod_neuropsy',
+        name: 'Evaluation Neuropsychologique',
+        description: 'Évaluation neuropsychologique (WAIS-IV)',
+        questionnaires: [
           {
             ...WAIS4_CRITERIA_DEFINITION,
             id: WAIS4_CRITERIA_DEFINITION.code,
