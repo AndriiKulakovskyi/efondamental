@@ -2531,30 +2531,34 @@ export interface StroopResponse {
   // Demographic data
   patient_age: number;
   
-  // Raw scores (items in 45 seconds)
-  stroop_w_tot: number; // Words read
-  stroop_c_tot: number; // Colors named
-  stroop_cw_tot: number; // Color-words named
+  // Planche A - Mots (Words)
+  stroop_w_tot: number; // Words read in 45s
+  stroop_w_cor?: number | null; // Corrected errors
+  stroop_w_err?: number | null; // Uncorrected errors
+  stroop_w_tot_c?: number | null; // Age-corrected score
+  stroop_w_note_t?: number | null; // T-score
+  stroop_w_note_t_corrigee?: number | null; // Z-score
   
-  // Age-corrected scores
-  stroop_w_tot_c?: number | null;
-  stroop_c_tot_c?: number | null;
-  stroop_cw_tot_c?: number | null;
+  // Planche B - Couleurs (Colors)
+  stroop_c_tot: number; // Colors named in 45s
+  stroop_c_cor?: number | null; // Corrected errors
+  stroop_c_err?: number | null; // Uncorrected errors
+  stroop_c_tot_c?: number | null; // Age-corrected score
+  stroop_c_note_t?: number | null; // T-score
+  stroop_c_note_t_corrigee?: number | null; // Z-score
   
-  // Interference score
-  stroop_interf?: number | null;
+  // Planche C - Mots/Couleurs (Color-Words)
+  stroop_cw_tot: number; // Color-words named in 45s
+  stroop_cw_cor?: number | null; // Corrected errors
+  stroop_cw_err?: number | null; // Uncorrected errors
+  stroop_cw_tot_c?: number | null; // Age-corrected score
+  stroop_cw_note_t?: number | null; // T-score
+  stroop_cw_note_t_corrigee?: number | null; // Z-score
   
-  // T-scores
-  stroop_w_note_t?: number | null;
-  stroop_c_note_t?: number | null;
-  stroop_cw_note_t?: number | null;
-  stroop_interf_note_t?: number | null;
-  
-  // Z-scores
-  stroop_w_note_t_corrigee?: number | null;
-  stroop_c_note_t_corrigee?: number | null;
-  stroop_cw_note_t_corrigee?: number | null;
-  stroop_interf_note_tz?: number | null;
+  // Interference
+  stroop_interf?: number | null; // Interference score
+  stroop_interf_note_t?: number | null; // T-score
+  stroop_interf_note_tz?: number | null; // Z-score
   
   // Metadata
   completed_by?: string | null;

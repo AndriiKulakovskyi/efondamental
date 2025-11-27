@@ -175,21 +175,32 @@ export function QuestionnaireRenderer({
       }
 
       // Compute TMT scores if all required fields are available
-      if (prev.patient_age && prev.years_of_education !== undefined && 
-          prev.tmta_tps !== undefined && prev.tmta_err !== undefined &&
-          prev.tmtb_tps !== undefined && prev.tmtb_err !== undefined &&
-          prev.tmtb_err_persev !== undefined) {
+      const tmtAge = Number(prev.patient_age);
+      const tmtEdu = Number(prev.years_of_education);
+      const tmtATps = Number(prev.tmta_tps);
+      const tmtAErr = Number(prev.tmta_err);
+      const tmtBTps = Number(prev.tmtb_tps);
+      const tmtBErr = Number(prev.tmtb_err);
+      const tmtBPersev = Number(prev.tmtb_err_persev);
+      
+      if (!isNaN(tmtAge) && tmtAge > 0 && 
+          !isNaN(tmtEdu) && tmtEdu >= 0 && 
+          !isNaN(tmtATps) && tmtATps >= 0 && 
+          !isNaN(tmtAErr) && tmtAErr >= 0 &&
+          !isNaN(tmtBTps) && tmtBTps >= 0 && 
+          !isNaN(tmtBErr) && tmtBErr >= 0 &&
+          !isNaN(tmtBPersev) && tmtBPersev >= 0) {
         try {
           const tmtScores = calculateTmtScores({
-            patient_age: Number(prev.patient_age),
-            years_of_education: Number(prev.years_of_education),
-            tmta_tps: Number(prev.tmta_tps),
-            tmta_err: Number(prev.tmta_err),
+            patient_age: tmtAge,
+            years_of_education: tmtEdu,
+            tmta_tps: tmtATps,
+            tmta_err: tmtAErr,
             tmta_cor: prev.tmta_cor ? Number(prev.tmta_cor) : null,
-            tmtb_tps: Number(prev.tmtb_tps),
-            tmtb_err: Number(prev.tmtb_err),
+            tmtb_tps: tmtBTps,
+            tmtb_err: tmtBErr,
             tmtb_cor: prev.tmtb_cor ? Number(prev.tmtb_cor) : null,
-            tmtb_err_persev: Number(prev.tmtb_err_persev)
+            tmtb_err_persev: tmtBPersev
           });
 
           // Update computed scores
@@ -242,70 +253,121 @@ export function QuestionnaireRenderer({
         }
       }
 
-      // Compute Stroop scores if all required fields are available
-      if (prev.patient_age && 
-          prev.stroop_w_tot !== undefined && 
-          prev.stroop_c_tot !== undefined &&
-          prev.stroop_cw_tot !== undefined) {
-        try {
-          const stroopScores = calculateStroopScores({
-            patient_age: Number(prev.patient_age),
-            stroop_w_tot: Number(prev.stroop_w_tot),
-            stroop_c_tot: Number(prev.stroop_c_tot),
-            stroop_cw_tot: Number(prev.stroop_cw_tot)
-          });
-
-          // Update computed scores
-          if (updated.stroop_w_tot_c !== stroopScores.stroop_w_tot_c) {
-            updated.stroop_w_tot_c = stroopScores.stroop_w_tot_c;
+      // Compute Stroop scores progressively as fields are entered
+      const stroopAge = Number(prev.patient_age);
+      const stroopW = Number(prev.stroop_w_tot);
+      const stroopC = Number(prev.stroop_c_tot);
+      const stroopCW = Number(prev.stroop_cw_tot);
+      
+      // Helper to get age correction factor for Words
+      const getWordCorrection = (age: number) => age < 45 ? 0 : (age < 65 ? 8 : 14);
+      // Helper to get age correction factor for Colors
+      const getColorCorrection = (age: number) => age < 45 ? 0 : (age < 65 ? 4 : 11);
+      // Helper to get age correction factor for Color-Words
+      const getColorWordCorrection = (age: number) => age < 45 ? 0 : (age < 65 ? 5 : 15);
+      
+      // T-score lookup tables
+      const NOTET_MOTS = [48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168];
+      const NOTET_COULEUR = [35, 38, 41, 44, 47, 50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 98, 101, 104, 107, 110, 113, 116, 119, 122, 125];
+      const NOTET_COULEURMOT = [15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75];
+      const NOTET_INTERF = [-30, -28, -26, -24, -22, -20, -18, -16, -14, -12, -10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30];
+      const NOTET_SCORET = [20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80];
+      
+      const lookupTScore = (rawScore: number, values: number[]) => {
+        if (rawScore <= values[0]) return NOTET_SCORET[0];
+        if (rawScore >= values[values.length - 1]) return NOTET_SCORET[NOTET_SCORET.length - 1];
+        for (let i = 0; i < values.length - 1; i++) {
+          if (rawScore >= values[i] && rawScore <= values[i + 1]) {
+            const ratio = (rawScore - values[i]) / (values[i + 1] - values[i]);
+            return Math.round(NOTET_SCORET[i] + ratio * (NOTET_SCORET[i + 1] - NOTET_SCORET[i]));
+          }
+        }
+        return 50;
+      };
+      
+      const tToZ = (t: number) => Number(((t - 50) / 10).toFixed(2));
+      
+      if (!isNaN(stroopAge) && stroopAge > 0) {
+        // Compute Words scores if available
+        if (!isNaN(stroopW) && stroopW >= 0) {
+          const wCorrected = stroopW + getWordCorrection(stroopAge);
+          if (updated.stroop_w_tot_c !== wCorrected) {
+            updated.stroop_w_tot_c = wCorrected;
             hasChanges = true;
           }
-          if (updated.stroop_c_tot_c !== stroopScores.stroop_c_tot_c) {
-            updated.stroop_c_tot_c = stroopScores.stroop_c_tot_c;
+          const wT = lookupTScore(wCorrected, NOTET_MOTS);
+          if (updated.stroop_w_note_t !== wT) {
+            updated.stroop_w_note_t = wT;
             hasChanges = true;
           }
-          if (updated.stroop_cw_tot_c !== stroopScores.stroop_cw_tot_c) {
-            updated.stroop_cw_tot_c = stroopScores.stroop_cw_tot_c;
+          const wZ = tToZ(wT);
+          if (updated.stroop_w_note_t_corrigee !== wZ) {
+            updated.stroop_w_note_t_corrigee = wZ;
             hasChanges = true;
           }
-          if (updated.stroop_interf !== stroopScores.stroop_interf) {
-            updated.stroop_interf = stroopScores.stroop_interf;
+        }
+        
+        // Compute Colors scores if available
+        if (!isNaN(stroopC) && stroopC >= 0) {
+          const cCorrected = stroopC + getColorCorrection(stroopAge);
+          if (updated.stroop_c_tot_c !== cCorrected) {
+            updated.stroop_c_tot_c = cCorrected;
             hasChanges = true;
           }
-          if (updated.stroop_w_note_t !== stroopScores.stroop_w_note_t) {
-            updated.stroop_w_note_t = stroopScores.stroop_w_note_t;
+          const cT = lookupTScore(cCorrected, NOTET_COULEUR);
+          if (updated.stroop_c_note_t !== cT) {
+            updated.stroop_c_note_t = cT;
             hasChanges = true;
           }
-          if (updated.stroop_c_note_t !== stroopScores.stroop_c_note_t) {
-            updated.stroop_c_note_t = stroopScores.stroop_c_note_t;
+          const cZ = tToZ(cT);
+          if (updated.stroop_c_note_t_corrigee !== cZ) {
+            updated.stroop_c_note_t_corrigee = cZ;
             hasChanges = true;
           }
-          if (updated.stroop_cw_note_t !== stroopScores.stroop_cw_note_t) {
-            updated.stroop_cw_note_t = stroopScores.stroop_cw_note_t;
+        }
+        
+        // Compute Color-Words scores if available
+        if (!isNaN(stroopCW) && stroopCW >= 0) {
+          const cwCorrected = stroopCW + getColorWordCorrection(stroopAge);
+          if (updated.stroop_cw_tot_c !== cwCorrected) {
+            updated.stroop_cw_tot_c = cwCorrected;
             hasChanges = true;
           }
-          if (updated.stroop_interf_note_t !== stroopScores.stroop_interf_note_t) {
-            updated.stroop_interf_note_t = stroopScores.stroop_interf_note_t;
+          const cwT = lookupTScore(cwCorrected, NOTET_COULEURMOT);
+          if (updated.stroop_cw_note_t !== cwT) {
+            updated.stroop_cw_note_t = cwT;
             hasChanges = true;
           }
-          if (updated.stroop_w_note_t_corrigee !== stroopScores.stroop_w_note_t_corrigee) {
-            updated.stroop_w_note_t_corrigee = stroopScores.stroop_w_note_t_corrigee;
+          const cwZ = tToZ(cwT);
+          if (updated.stroop_cw_note_t_corrigee !== cwZ) {
+            updated.stroop_cw_note_t_corrigee = cwZ;
             hasChanges = true;
           }
-          if (updated.stroop_c_note_t_corrigee !== stroopScores.stroop_c_note_t_corrigee) {
-            updated.stroop_c_note_t_corrigee = stroopScores.stroop_c_note_t_corrigee;
+        }
+        
+        // Compute Interference only when all three corrected scores are available
+        if (!isNaN(stroopW) && stroopW >= 0 && 
+            !isNaN(stroopC) && stroopC >= 0 && 
+            !isNaN(stroopCW) && stroopCW >= 0) {
+          const wC = stroopW + getWordCorrection(stroopAge);
+          const cC = stroopC + getColorCorrection(stroopAge);
+          const cwC = stroopCW + getColorWordCorrection(stroopAge);
+          const predicted = (cC * wC) / (cC + wC);
+          const interf = Number((cwC - predicted).toFixed(2));
+          if (updated.stroop_interf !== interf) {
+            updated.stroop_interf = interf;
             hasChanges = true;
           }
-          if (updated.stroop_cw_note_t_corrigee !== stroopScores.stroop_cw_note_t_corrigee) {
-            updated.stroop_cw_note_t_corrigee = stroopScores.stroop_cw_note_t_corrigee;
+          const interfT = lookupTScore(interf, NOTET_INTERF);
+          if (updated.stroop_interf_note_t !== interfT) {
+            updated.stroop_interf_note_t = interfT;
             hasChanges = true;
           }
-          if (updated.stroop_interf_note_tz !== stroopScores.stroop_interf_note_tz) {
-            updated.stroop_interf_note_tz = stroopScores.stroop_interf_note_tz;
+          const interfZ = tToZ(interfT);
+          if (updated.stroop_interf_note_tz !== interfZ) {
+            updated.stroop_interf_note_tz = interfZ;
             hasChanges = true;
           }
-        } catch (e) {
-          // Ignore calculation errors (e.g., invalid values)
         }
       }
 

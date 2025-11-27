@@ -1364,9 +1364,18 @@ export async function saveStroopResponse(
       visit_id: response.visit_id,
       patient_id: response.patient_id,
       patient_age: response.patient_age,
+      // Planche A - Mots
       stroop_w_tot: response.stroop_w_tot,
+      stroop_w_cor: response.stroop_w_cor,
+      stroop_w_err: response.stroop_w_err,
+      // Planche B - Couleurs
       stroop_c_tot: response.stroop_c_tot,
+      stroop_c_cor: response.stroop_c_cor,
+      stroop_c_err: response.stroop_c_err,
+      // Planche C - Mots/Couleurs
       stroop_cw_tot: response.stroop_cw_tot,
+      stroop_cw_cor: response.stroop_cw_cor,
+      stroop_cw_err: response.stroop_cw_err,
       // Computed scores
       stroop_w_tot_c: scores.stroop_w_tot_c,
       stroop_c_tot_c: scores.stroop_c_tot_c,

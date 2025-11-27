@@ -4434,6 +4434,43 @@ export const STROOP_QUESTIONS: Question[] = [
     min: 0,
     max: 200
   },
+  {
+    id: 'stroop_w_tot_c',
+    text: 'Valeur corrigee suivant l\'age',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'stroop_w_cor',
+    text: 'Nombre d\'erreurs corrigees',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'stroop_w_err',
+    text: 'Nombre d\'erreurs non corrigees',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'stroop_w_note_t',
+    text: 'Note T',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'stroop_w_note_t_corrigee',
+    text: 'Note Z',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
   // Section: Planche B - Couleurs
   {
     id: 'section_planche_b',
@@ -4448,6 +4485,43 @@ export const STROOP_QUESTIONS: Question[] = [
     required: true,
     min: 0,
     max: 150
+  },
+  {
+    id: 'stroop_c_tot_c',
+    text: 'Valeur corrigee suivant l\'age',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'stroop_c_cor',
+    text: 'Nombre d\'erreurs corrigees',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'stroop_c_err',
+    text: 'Nombre d\'erreurs non corrigees',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'stroop_c_note_t',
+    text: 'Note T',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'stroop_c_note_t_corrigee',
+    text: 'Note Z',
+    type: 'number',
+    required: false,
+    readonly: true
   },
   // Section: Planche C - Mots/Couleurs
   {
@@ -4465,109 +4539,68 @@ export const STROOP_QUESTIONS: Question[] = [
     min: 0,
     max: 100
   },
-  // Section: Scores calcules
-  {
-    id: 'section_scores',
-    text: 'Scores calcules',
-    type: 'section',
-    required: false
-  },
-  // Age-corrected scores
-  {
-    id: 'stroop_w_tot_c',
-    text: 'Score Mots corrige pour l\'age',
-    help: 'Score brut + correction selon l\'age',
-    type: 'number',
-    required: false,
-    readonly: true
-  },
-  {
-    id: 'stroop_c_tot_c',
-    text: 'Score Couleurs corrige pour l\'age',
-    help: 'Score brut + correction selon l\'age',
-    type: 'number',
-    required: false,
-    readonly: true
-  },
   {
     id: 'stroop_cw_tot_c',
-    text: 'Score Mots/Couleurs corrige pour l\'age',
-    help: 'Score brut + correction selon l\'age',
-    type: 'number',
-    required: false,
-    readonly: true
-  },
-  // Interference
-  {
-    id: 'stroop_interf',
-    text: 'Score d\'Interference',
-    help: 'Mesure la capacite d\'inhibition cognitive',
-    type: 'number',
-    required: false,
-    readonly: true
-  },
-  // T-scores
-  {
-    id: 'stroop_w_note_t',
-    text: 'Note T - Mots',
-    help: 'Score T normalise (moyenne=50, ecart-type=10)',
+    text: 'Valeur corrigee suivant l\'age',
     type: 'number',
     required: false,
     readonly: true
   },
   {
-    id: 'stroop_c_note_t',
-    text: 'Note T - Couleurs',
-    help: 'Score T normalise (moyenne=50, ecart-type=10)',
+    id: 'stroop_cw_cor',
+    text: 'Nombre d\'erreurs corrigees',
     type: 'number',
     required: false,
-    readonly: true
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'stroop_cw_err',
+    text: 'Nombre d\'erreurs non corrigees',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
   },
   {
     id: 'stroop_cw_note_t',
-    text: 'Note T - Mots/Couleurs',
-    help: 'Score T normalise (moyenne=50, ecart-type=10)',
-    type: 'number',
-    required: false,
-    readonly: true
-  },
-  {
-    id: 'stroop_interf_note_t',
-    text: 'Note T - Interference',
-    help: 'Score T normalise (moyenne=50, ecart-type=10)',
-    type: 'number',
-    required: false,
-    readonly: true
-  },
-  // Z-scores
-  {
-    id: 'stroop_w_note_t_corrigee',
-    text: 'Z-score - Mots',
-    help: 'Score Z derive du score T: (T-50)/10',
-    type: 'number',
-    required: false,
-    readonly: true
-  },
-  {
-    id: 'stroop_c_note_t_corrigee',
-    text: 'Z-score - Couleurs',
-    help: 'Score Z derive du score T: (T-50)/10',
+    text: 'Note T',
     type: 'number',
     required: false,
     readonly: true
   },
   {
     id: 'stroop_cw_note_t_corrigee',
-    text: 'Z-score - Mots/Couleurs',
-    help: 'Score Z derive du score T: (T-50)/10',
+    text: 'Note Z',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  // Section: Interference
+  {
+    id: 'section_interf',
+    text: 'Interference',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'stroop_interf',
+    text: 'Interference',
+    help: 'Mesure la capacite d\'inhibition cognitive',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'stroop_interf_note_t',
+    text: 'Note T',
     type: 'number',
     required: false,
     readonly: true
   },
   {
     id: 'stroop_interf_note_tz',
-    text: 'Z-score - Interference',
-    help: 'Score Z derive du score T: (T-50)/10',
+    text: 'Note Z',
     type: 'number',
     required: false,
     readonly: true
