@@ -2519,3 +2519,49 @@ export interface TmtResponse {
 
 export type TmtResponseInsert = Omit<TmtResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'tmta_errtot' | 'tmta_tps_z' | 'tmta_tps_pc' | 'tmta_errtot_z' | 'tmtb_errtot' | 'tmtb_tps_z' | 'tmtb_tps_pc' | 'tmtb_errtot_z' | 'tmtb_err_persev_z' | 'tmt_b_a_tps' | 'tmt_b_a_tps_z'>;
 
+// ============================================================================
+// Stroop Test (Golden 1978)
+// ============================================================================
+
+export interface StroopResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Demographic data
+  patient_age: number;
+  
+  // Raw scores (items in 45 seconds)
+  stroop_w_tot: number; // Words read
+  stroop_c_tot: number; // Colors named
+  stroop_cw_tot: number; // Color-words named
+  
+  // Age-corrected scores
+  stroop_w_tot_c?: number | null;
+  stroop_c_tot_c?: number | null;
+  stroop_cw_tot_c?: number | null;
+  
+  // Interference score
+  stroop_interf?: number | null;
+  
+  // T-scores
+  stroop_w_note_t?: number | null;
+  stroop_c_note_t?: number | null;
+  stroop_cw_note_t?: number | null;
+  stroop_interf_note_t?: number | null;
+  
+  // Z-scores
+  stroop_w_note_t_corrigee?: number | null;
+  stroop_c_note_t_corrigee?: number | null;
+  stroop_cw_note_t_corrigee?: number | null;
+  stroop_interf_note_tz?: number | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type StroopResponseInsert = Omit<StroopResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'stroop_w_tot_c' | 'stroop_c_tot_c' | 'stroop_cw_tot_c' | 'stroop_interf' | 'stroop_w_note_t' | 'stroop_c_note_t' | 'stroop_cw_note_t' | 'stroop_interf_note_t' | 'stroop_w_note_t_corrigee' | 'stroop_c_note_t_corrigee' | 'stroop_cw_note_t_corrigee' | 'stroop_interf_note_tz'>;
+

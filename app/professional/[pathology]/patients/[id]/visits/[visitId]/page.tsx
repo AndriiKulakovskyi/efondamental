@@ -53,7 +53,8 @@ import {
   CVLT_DEFINITION,
   WAIS4_CODE_DEFINITION,
   WAIS4_DIGIT_SPAN_DEFINITION,
-  TMT_DEFINITION
+  TMT_DEFINITION,
+  STROOP_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -391,6 +392,13 @@ export default async function VisitDetailPage({
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['TMT_FR']?.completed || false,
             completedAt: questionnaireStatuses['TMT_FR']?.completed_at,
+          },
+          {
+            ...STROOP_DEFINITION,
+            id: STROOP_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['STROOP_FR']?.completed || false,
+            completedAt: questionnaireStatuses['STROOP_FR']?.completed_at,
           }
         ]
       },

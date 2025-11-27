@@ -38,10 +38,13 @@ import {
   Wais4DigitSpanResponse,
   Wais4DigitSpanResponseInsert,
   TmtResponse,
-  TmtResponseInsert
+  TmtResponseInsert,
+  StroopResponse,
+  StroopResponseInsert
 } from '@/lib/types/database.types';
 import { calculateStandardizedScore, calculatePercentileRank } from './wais4-matrices-scoring';
 import { calculateTmtScores } from './tmt-scoring';
+import { calculateStroopScores } from './stroop-scoring';
 
 // ============================================================================
 // MADRS (Montgomery-Åsberg Depression Rating Scale)
@@ -1305,6 +1308,78 @@ export async function saveTmtResponse(
       tmtb_err_persev_z: scores.tmtb_err_persev_z,
       tmt_b_a_tps: scores.tmt_b_a_tps,
       tmt_b_a_tps_z: scores.tmt_b_a_tps_z,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Stroop Test (Golden 1978)
+// ============================================================================
+
+export async function getStroopResponse(
+  visitId: string
+): Promise<StroopResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_stroop')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No data found
+    if (error.code === 'PGRST205') {
+      console.log(`No Stroop found for visit: ${visitId}`);
+      return null;
+    }
+    console.error('Error fetching Stroop response:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function saveStroopResponse(
+  response: StroopResponseInsert
+): Promise<StroopResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Calculate all scores using the scoring function
+  const scores = calculateStroopScores({
+    patient_age: response.patient_age,
+    stroop_w_tot: response.stroop_w_tot,
+    stroop_c_tot: response.stroop_c_tot,
+    stroop_cw_tot: response.stroop_cw_tot
+  });
+
+  const { data, error } = await supabase
+    .from('responses_stroop')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      patient_age: response.patient_age,
+      stroop_w_tot: response.stroop_w_tot,
+      stroop_c_tot: response.stroop_c_tot,
+      stroop_cw_tot: response.stroop_cw_tot,
+      // Computed scores
+      stroop_w_tot_c: scores.stroop_w_tot_c,
+      stroop_c_tot_c: scores.stroop_c_tot_c,
+      stroop_cw_tot_c: scores.stroop_cw_tot_c,
+      stroop_interf: scores.stroop_interf,
+      stroop_w_note_t: scores.stroop_w_note_t,
+      stroop_c_note_t: scores.stroop_c_note_t,
+      stroop_cw_note_t: scores.stroop_cw_note_t,
+      stroop_interf_note_t: scores.stroop_interf_note_t,
+      stroop_w_note_t_corrigee: scores.stroop_w_note_t_corrigee,
+      stroop_c_note_t_corrigee: scores.stroop_c_note_t_corrigee,
+      stroop_cw_note_t_corrigee: scores.stroop_cw_note_t_corrigee,
+      stroop_interf_note_tz: scores.stroop_interf_note_tz,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

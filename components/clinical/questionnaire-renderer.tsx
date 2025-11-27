@@ -19,6 +19,7 @@ import {
   validateQuestionnaireResponse,
 } from "@/lib/utils/questionnaire-logic";
 import { calculateTmtScores } from "@/lib/services/tmt-scoring";
+import { calculateStroopScores } from "@/lib/services/stroop-scoring";
 import { Loader2, ChevronDown, Info } from "lucide-react";
 
 interface QuestionnaireRendererProps {
@@ -241,6 +242,73 @@ export function QuestionnaireRenderer({
         }
       }
 
+      // Compute Stroop scores if all required fields are available
+      if (prev.patient_age && 
+          prev.stroop_w_tot !== undefined && 
+          prev.stroop_c_tot !== undefined &&
+          prev.stroop_cw_tot !== undefined) {
+        try {
+          const stroopScores = calculateStroopScores({
+            patient_age: Number(prev.patient_age),
+            stroop_w_tot: Number(prev.stroop_w_tot),
+            stroop_c_tot: Number(prev.stroop_c_tot),
+            stroop_cw_tot: Number(prev.stroop_cw_tot)
+          });
+
+          // Update computed scores
+          if (updated.stroop_w_tot_c !== stroopScores.stroop_w_tot_c) {
+            updated.stroop_w_tot_c = stroopScores.stroop_w_tot_c;
+            hasChanges = true;
+          }
+          if (updated.stroop_c_tot_c !== stroopScores.stroop_c_tot_c) {
+            updated.stroop_c_tot_c = stroopScores.stroop_c_tot_c;
+            hasChanges = true;
+          }
+          if (updated.stroop_cw_tot_c !== stroopScores.stroop_cw_tot_c) {
+            updated.stroop_cw_tot_c = stroopScores.stroop_cw_tot_c;
+            hasChanges = true;
+          }
+          if (updated.stroop_interf !== stroopScores.stroop_interf) {
+            updated.stroop_interf = stroopScores.stroop_interf;
+            hasChanges = true;
+          }
+          if (updated.stroop_w_note_t !== stroopScores.stroop_w_note_t) {
+            updated.stroop_w_note_t = stroopScores.stroop_w_note_t;
+            hasChanges = true;
+          }
+          if (updated.stroop_c_note_t !== stroopScores.stroop_c_note_t) {
+            updated.stroop_c_note_t = stroopScores.stroop_c_note_t;
+            hasChanges = true;
+          }
+          if (updated.stroop_cw_note_t !== stroopScores.stroop_cw_note_t) {
+            updated.stroop_cw_note_t = stroopScores.stroop_cw_note_t;
+            hasChanges = true;
+          }
+          if (updated.stroop_interf_note_t !== stroopScores.stroop_interf_note_t) {
+            updated.stroop_interf_note_t = stroopScores.stroop_interf_note_t;
+            hasChanges = true;
+          }
+          if (updated.stroop_w_note_t_corrigee !== stroopScores.stroop_w_note_t_corrigee) {
+            updated.stroop_w_note_t_corrigee = stroopScores.stroop_w_note_t_corrigee;
+            hasChanges = true;
+          }
+          if (updated.stroop_c_note_t_corrigee !== stroopScores.stroop_c_note_t_corrigee) {
+            updated.stroop_c_note_t_corrigee = stroopScores.stroop_c_note_t_corrigee;
+            hasChanges = true;
+          }
+          if (updated.stroop_cw_note_t_corrigee !== stroopScores.stroop_cw_note_t_corrigee) {
+            updated.stroop_cw_note_t_corrigee = stroopScores.stroop_cw_note_t_corrigee;
+            hasChanges = true;
+          }
+          if (updated.stroop_interf_note_tz !== stroopScores.stroop_interf_note_tz) {
+            updated.stroop_interf_note_tz = stroopScores.stroop_interf_note_tz;
+            hasChanges = true;
+          }
+        } catch (e) {
+          // Ignore calculation errors (e.g., invalid values)
+        }
+      }
+
       return hasChanges ? updated : prev;
     });
   }, [
@@ -264,7 +332,11 @@ export function QuestionnaireRenderer({
     responses.tmtb_tps,
     responses.tmtb_err,
     responses.tmtb_cor,
-    responses.tmtb_err_persev
+    responses.tmtb_err_persev,
+    // Stroop fields
+    responses.stroop_w_tot,
+    responses.stroop_c_tot,
+    responses.stroop_cw_tot
   ]);
 
   const { visibleQuestions, requiredQuestions } = evaluateConditionalLogic(

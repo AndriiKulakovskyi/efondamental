@@ -46,7 +46,8 @@ import {
   saveCvltResponse,
   saveWais4CodeResponse,
   saveWais4DigitSpanResponse,
-  saveTmtResponse
+  saveTmtResponse,
+  saveStroopResponse
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveSocialResponse
@@ -124,7 +125,8 @@ import {
   CvltResponseInsert,
   Wais4CodeResponseInsert,
   Wais4DigitSpanResponseInsert,
-  TmtResponseInsert
+  TmtResponseInsert,
+  StroopResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -554,6 +556,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as TmtResponseInsert);
+        break;
+
+      case 'STROOP_FR':
+        result = await saveStroopResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as StroopResponseInsert);
         break;
         
       default:

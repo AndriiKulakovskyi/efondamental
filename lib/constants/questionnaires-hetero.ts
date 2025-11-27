@@ -4398,3 +4398,191 @@ export const TMT_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// Stroop Test (Golden 1978)
+// ============================================================================
+
+export const STROOP_QUESTIONS: Question[] = [
+  // Section: Informations demographiques
+  {
+    id: 'section_demo',
+    text: 'Informations demographiques',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'patient_age',
+    text: 'Age du patient (en annees)',
+    type: 'number',
+    required: true,
+    min: 16,
+    max: 100
+  },
+  // Section: Planche A - Mots
+  {
+    id: 'section_planche_a',
+    text: 'Planche A - Mots',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'stroop_w_tot',
+    text: 'Nombre total de mots lus en 45 secondes',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 200
+  },
+  // Section: Planche B - Couleurs
+  {
+    id: 'section_planche_b',
+    text: 'Planche B - Couleurs',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'stroop_c_tot',
+    text: 'Nombre total de couleurs nommees en 45 secondes',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 150
+  },
+  // Section: Planche C - Mots/Couleurs
+  {
+    id: 'section_planche_c',
+    text: 'Planche C - Mots/Couleurs',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'stroop_cw_tot',
+    text: 'Nombre total de couleur de l\'encre nommee en 45 secondes',
+    help: 'Le sujet doit nommer la couleur de l\'encre et non lire le mot',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 100
+  },
+  // Section: Scores calcules
+  {
+    id: 'section_scores',
+    text: 'Scores calcules',
+    type: 'section',
+    required: false
+  },
+  // Age-corrected scores
+  {
+    id: 'stroop_w_tot_c',
+    text: 'Score Mots corrige pour l\'age',
+    help: 'Score brut + correction selon l\'age',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'stroop_c_tot_c',
+    text: 'Score Couleurs corrige pour l\'age',
+    help: 'Score brut + correction selon l\'age',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'stroop_cw_tot_c',
+    text: 'Score Mots/Couleurs corrige pour l\'age',
+    help: 'Score brut + correction selon l\'age',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  // Interference
+  {
+    id: 'stroop_interf',
+    text: 'Score d\'Interference',
+    help: 'Mesure la capacite d\'inhibition cognitive',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  // T-scores
+  {
+    id: 'stroop_w_note_t',
+    text: 'Note T - Mots',
+    help: 'Score T normalise (moyenne=50, ecart-type=10)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'stroop_c_note_t',
+    text: 'Note T - Couleurs',
+    help: 'Score T normalise (moyenne=50, ecart-type=10)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'stroop_cw_note_t',
+    text: 'Note T - Mots/Couleurs',
+    help: 'Score T normalise (moyenne=50, ecart-type=10)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'stroop_interf_note_t',
+    text: 'Note T - Interference',
+    help: 'Score T normalise (moyenne=50, ecart-type=10)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  // Z-scores
+  {
+    id: 'stroop_w_note_t_corrigee',
+    text: 'Z-score - Mots',
+    help: 'Score Z derive du score T: (T-50)/10',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'stroop_c_note_t_corrigee',
+    text: 'Z-score - Couleurs',
+    help: 'Score Z derive du score T: (T-50)/10',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'stroop_cw_note_t_corrigee',
+    text: 'Z-score - Mots/Couleurs',
+    help: 'Score Z derive du score T: (T-50)/10',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'stroop_interf_note_tz',
+    text: 'Z-score - Interference',
+    help: 'Score Z derive du score T: (T-50)/10',
+    type: 'number',
+    required: false,
+    readonly: true
+  }
+];
+
+export const STROOP_DEFINITION: QuestionnaireDefinition = {
+  id: 'stroop',
+  code: 'STROOP_FR',
+  title: 'Test de Stroop (version Golden, 1978)',
+  description: 'Test neuropsychologique evaluant les fonctions executives et l\'inhibition.',
+  questions: STROOP_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
