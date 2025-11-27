@@ -2690,3 +2690,49 @@ export interface Cpt3Response {
 
 export type Cpt3ResponseInsert = Omit<Cpt3Response, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ============================================================================
+// WAIS-IV Similitudes
+// ============================================================================
+
+export interface Wais4SimilitudesResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Patient age for scoring
+  patient_age: number;
+  
+  // Items 1-18 (each 0-2)
+  item1: number;
+  item2: number;
+  item3: number;
+  item4: number;
+  item5: number;
+  item6: number;
+  item7: number;
+  item8: number;
+  item9: number;
+  item10: number;
+  item11: number;
+  item12: number;
+  item13: number;
+  item14: number;
+  item15: number;
+  item16: number;
+  item17: number;
+  item18: number;
+  
+  // Computed scores
+  total_raw_score?: number | null;
+  standard_score?: number | null;
+  standardized_value?: number | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Wais4SimilitudesResponseInsert = Omit<Wais4SimilitudesResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_raw_score' | 'standard_score' | 'standardized_value'>;
+

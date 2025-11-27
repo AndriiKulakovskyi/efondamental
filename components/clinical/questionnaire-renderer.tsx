@@ -382,6 +382,85 @@ export function QuestionnaireRenderer({
         }
       }
 
+      // Compute WAIS4 Similitudes scores
+      const simiAge = Number(prev.patient_age);
+      const simiItems = ['item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'item7', 'item8', 'item9',
+                         'item10', 'item11', 'item12', 'item13', 'item14', 'item15', 'item16', 'item17', 'item18'];
+      const simiValues = simiItems.map(f => prev[f]).filter(v => v !== undefined && v !== '' && !isNaN(Number(v)));
+      
+      if (simiValues.length > 0) {
+        const simiRawTotal = simiValues.reduce((sum, v) => sum + Number(v), 0);
+        if (updated.total_raw_score !== simiRawTotal) {
+          updated.total_raw_score = simiRawTotal;
+          hasChanges = true;
+        }
+        
+        // If we have age, calculate standard score and standardized value
+        if (!isNaN(simiAge) && simiAge >= 16 && simiAge <= 90) {
+          // Age-based norm tables for Similitudes
+          const SIMI_TAB: Record<string, string[]> = {
+            age_16: ["0-4", "5-6", "7-8", "9-10", "11-12", "13-14", "15-16", "17", "18-19", "20-21", "22", "23", "24-25", "26", "27", "28-29", "30-31", "32-33", "34-36"],
+            age_18: ["0-4", "5-6", "7-8", "9-10", "11-12", "13-14", "15-16", "17", "18-19", "20-21", "22", "23", "24-25", "26", "27", "28-29", "30-31", "32-33", "34-36"],
+            age_20: ["0-9", "10-11", "12", "13", "14", "15-16", "17", "18-19", "20-21", "22", "23", "24-25", "26", "27-28", "29-30", "31-32", "33", "34-35", "36"],
+            age_25: ["0-8", "9", "10", "11", "12", "13-15", "16-17", "18", "19-20", "21-22", "23", "24-25", "26", "27-28", "29-30", "31-32", "33", "34-35", "36"],
+            age_30: ["0-8", "9", "10", "11", "12", "13-15", "16-17", "18", "19-20", "21-22", "23", "24-25", "26", "27", "28", "29-30", "31-32", "33", "34-36"],
+            age_35: ["0-8", "9", "10", "11", "12", "13-15", "16-17", "18", "19-20", "21-22", "23", "24-25", "26", "27", "28", "29-30", "31-32", "33", "34-36"],
+            age_45: ["0-1", "2-3", "4-6", "7-9", "10-11", "12-13", "14-15", "16-17", "18-19", "20", "21-22", "23-24", "25", "26", "27", "28", "29-30", "31-32", "33-36"],
+            age_55: ["0-1", "2-3", "4-6", "7-9", "10-11", "12-13", "14-15", "16-17", "18-19", "20", "21-22", "23-24", "25", "26", "27", "28", "29-30", "31-32", "33-36"],
+            age_65: ["0-1", "2-3", "4-6", "7-9", "10", "11-12", "13-14", "15", "16-17", "18-19", "20-21", "22", "23-24", "25-26", "27", "28", "29-30", "31", "32-36"],
+            age_70: ["0-1", "2-3", "4-6", "7-9", "10", "11-12", "13-14", "15", "16-17", "18-19", "20-21", "22", "23", "24", "25", "26-27", "28", "29", "30-36"],
+            age_75: ["0", "1", "2", "3", "4-6", "7-9", "10-12", "13-15", "16-17", "18-19", "20", "21", "22", "23-24", "25", "26-27", "28", "29", "30-36"]
+          };
+          
+          const getSimiAgeCategory = (age: number) => {
+            if (age >= 16 && age <= 17) return 'age_16';
+            if (age >= 18 && age <= 19) return 'age_18';
+            if (age >= 20 && age <= 24) return 'age_20';
+            if (age >= 25 && age <= 29) return 'age_25';
+            if (age >= 30 && age <= 34) return 'age_30';
+            if (age >= 35 && age <= 44) return 'age_35';
+            if (age >= 45 && age <= 54) return 'age_45';
+            if (age >= 55 && age <= 64) return 'age_55';
+            if (age >= 65 && age <= 69) return 'age_65';
+            if (age >= 70 && age <= 74) return 'age_70';
+            return 'age_75';
+          };
+          
+          const isInRange = (rawScore: number, rangeStr: string): boolean => {
+            if (rangeStr.includes('-')) {
+              const [min, max] = rangeStr.split('-').map(Number);
+              return rawScore >= min && rawScore <= max;
+            }
+            return rawScore === Number(rangeStr);
+          };
+          
+          const ageCat = getSimiAgeCategory(simiAge);
+          const normTable = SIMI_TAB[ageCat];
+          
+          if (normTable) {
+            let stdScore = 1;
+            for (let i = 0; i < normTable.length; i++) {
+              if (isInRange(simiRawTotal, normTable[i])) {
+                stdScore = i + 1;
+                break;
+              }
+            }
+            if (simiRawTotal > 36) stdScore = 19;
+            
+            if (updated.standard_score !== stdScore) {
+              updated.standard_score = stdScore;
+              hasChanges = true;
+            }
+            
+            const stdValue = Number(((stdScore - 10) / 3).toFixed(2));
+            if (updated.standardized_value !== stdValue) {
+              updated.standardized_value = stdValue;
+              hasChanges = true;
+            }
+          }
+        }
+      }
+
       // Compute Fluences Verbales scores progressively as fields are entered
       const fvAge = Number(prev.patient_age);
       const fvEdu = Number(prev.years_of_education);
@@ -551,7 +630,26 @@ export function QuestionnaireRenderer({
     responses.q13,
     responses.q14,
     responses.q15,
-    responses.q16
+    responses.q16,
+    // WAIS4 Similitudes fields
+    responses.item1,
+    responses.item2,
+    responses.item3,
+    responses.item4,
+    responses.item5,
+    responses.item6,
+    responses.item7,
+    responses.item8,
+    responses.item9,
+    responses.item10,
+    responses.item11,
+    responses.item12,
+    responses.item13,
+    responses.item14,
+    responses.item15,
+    responses.item16,
+    responses.item17,
+    responses.item18
   ]);
 
   const { visibleQuestions, requiredQuestions } = evaluateConditionalLogic(

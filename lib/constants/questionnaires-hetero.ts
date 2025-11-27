@@ -5108,3 +5108,208 @@ export const CPT3_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// WAIS-IV Similitudes
+// ============================================================================
+
+const WAIS4_SIMI_OPTIONS = [
+  { code: 0, label: "0", score: 0 },
+  { code: 1, label: "1", score: 1 },
+  { code: 2, label: "2", score: 2 }
+];
+
+export const WAIS4_SIMILITUDES_QUESTIONS: Question[] = [
+  // Patient age for scoring
+  {
+    id: 'section_info',
+    text: 'Informations',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'patient_age',
+    text: 'Age du patient (en annees)',
+    type: 'number',
+    required: true,
+    min: 16,
+    max: 90
+  },
+  // Items section
+  {
+    id: 'section_items',
+    text: 'Items',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'item1',
+    text: '1. Framboise-Groseille',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item2',
+    text: '2. Cheval-Tigre',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item3',
+    text: '3. Carottes-Epinards',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item4',
+    text: '4. Jaune-Bleu',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item5',
+    text: '5. Piano-Tambour',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item6',
+    text: '6. Poeme-Statue',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item7',
+    text: '7. Bourgeon-Bebe',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item8',
+    text: '8. Miel-Lait',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item9',
+    text: '9. Nourriture-Carburant',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item10',
+    text: '10. Cube-Cylindre',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item11',
+    text: '11. Nez-Langue',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item12',
+    text: '12. Soie-Laine',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item13',
+    text: '13. Eolienne-Barrage',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item14',
+    text: '14. Ephemere-Permanent',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item15',
+    text: '15. Inondation-Secheresse',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item16',
+    text: '16. Sedentaire-Nomade',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item17',
+    text: '17. Autoriser-Interdire',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  {
+    id: 'item18',
+    text: '18. Realite-Reve',
+    type: 'single_choice',
+    required: true,
+    options: WAIS4_SIMI_OPTIONS
+  },
+  // Scores section
+  {
+    id: 'section_scores',
+    text: 'Scores',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'total_raw_score',
+    text: 'Total - Note brute',
+    help: 'Somme des 18 items (0-36)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'standard_score',
+    text: 'Note standard',
+    help: 'Score standard selon l\'age (1-19)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'standardized_value',
+    text: 'Valeur standardisee',
+    help: '(Note standard - 10) / 3',
+    type: 'number',
+    required: false,
+    readonly: true
+  }
+];
+
+export const WAIS4_SIMILITUDES_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais4_similitudes',
+  code: 'WAIS4_SIMILITUDES_FR',
+  title: 'Similitudes (WAIS-IV)',
+  description: 'Sous-test de la WAIS-IV evaluant le raisonnement verbal et la formation de concepts.',
+  questions: WAIS4_SIMILITUDES_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

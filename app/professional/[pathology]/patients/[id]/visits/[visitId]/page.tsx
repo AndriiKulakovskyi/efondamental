@@ -57,7 +57,8 @@ import {
   STROOP_DEFINITION,
   FLUENCES_VERBALES_DEFINITION,
   COBRA_DEFINITION,
-  CPT3_DEFINITION
+  CPT3_DEFINITION,
+  WAIS4_SIMILITUDES_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -388,6 +389,13 @@ export default async function VisitDetailPage({
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['WAIS4_DIGIT_SPAN_FR']?.completed || false,
             completedAt: questionnaireStatuses['WAIS4_DIGIT_SPAN_FR']?.completed_at,
+          },
+          {
+            ...WAIS4_SIMILITUDES_DEFINITION,
+            id: WAIS4_SIMILITUDES_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['WAIS4_SIMILITUDES_FR']?.completed || false,
+            completedAt: questionnaireStatuses['WAIS4_SIMILITUDES_FR']?.completed_at,
           },
           {
             ...TMT_DEFINITION,

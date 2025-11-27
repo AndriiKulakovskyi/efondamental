@@ -46,12 +46,15 @@ import {
   CobraResponse,
   CobraResponseInsert,
   Cpt3Response,
-  Cpt3ResponseInsert
+  Cpt3ResponseInsert,
+  Wais4SimilitudesResponse,
+  Wais4SimilitudesResponseInsert
 } from '@/lib/types/database.types';
 import { calculateStandardizedScore, calculatePercentileRank } from './wais4-matrices-scoring';
 import { calculateTmtScores } from './tmt-scoring';
 import { calculateStroopScores } from './stroop-scoring';
 import { calculateFluencesVerbalesScores } from './fluences-verbales-scoring';
+import { calculateWais4SimilitudesScores } from './wais4-similitudes-scoring';
 
 // ============================================================================
 // MADRS (Montgomery-Åsberg Depression Rating Scale)
@@ -1607,6 +1610,98 @@ export async function saveCpt3Response(
       hrt_block_change_interp: response.hrt_block_change_interp,
       hrt_isi_change: response.hrt_isi_change,
       hrt_isi_change_interp: response.hrt_isi_change_interp,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// WAIS-IV Similitudes
+// ============================================================================
+
+export async function getWais4SimilitudesResponse(
+  visitId: string
+): Promise<Wais4SimilitudesResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_wais4_similitudes')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No data found
+    if (error.code === 'PGRST205') {
+      console.log(`No WAIS-IV Similitudes found for visit: ${visitId}`);
+      return null;
+    }
+    console.error('Error fetching WAIS-IV Similitudes response:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function saveWais4SimilitudesResponse(
+  response: Wais4SimilitudesResponseInsert
+): Promise<Wais4SimilitudesResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Calculate scores using the scoring function
+  const scores = calculateWais4SimilitudesScores({
+    patient_age: response.patient_age,
+    item1: response.item1,
+    item2: response.item2,
+    item3: response.item3,
+    item4: response.item4,
+    item5: response.item5,
+    item6: response.item6,
+    item7: response.item7,
+    item8: response.item8,
+    item9: response.item9,
+    item10: response.item10,
+    item11: response.item11,
+    item12: response.item12,
+    item13: response.item13,
+    item14: response.item14,
+    item15: response.item15,
+    item16: response.item16,
+    item17: response.item17,
+    item18: response.item18
+  });
+
+  const { data, error } = await supabase
+    .from('responses_wais4_similitudes')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      patient_age: response.patient_age,
+      item1: response.item1,
+      item2: response.item2,
+      item3: response.item3,
+      item4: response.item4,
+      item5: response.item5,
+      item6: response.item6,
+      item7: response.item7,
+      item8: response.item8,
+      item9: response.item9,
+      item10: response.item10,
+      item11: response.item11,
+      item12: response.item12,
+      item13: response.item13,
+      item14: response.item14,
+      item15: response.item15,
+      item16: response.item16,
+      item17: response.item17,
+      item18: response.item18,
+      total_raw_score: scores.total_raw_score,
+      standard_score: scores.standard_score,
+      standardized_value: scores.standardized_value,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
