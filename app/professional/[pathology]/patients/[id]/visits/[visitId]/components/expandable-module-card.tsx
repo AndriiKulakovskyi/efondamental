@@ -16,6 +16,32 @@ interface ExpandableModuleCardProps {
   totalModules: number;
 }
 
+// Helper function to get all questionnaires from a module (flat or sectioned)
+function getAllQuestionnaires(module: any): any[] {
+  try {
+    if (!module) return [];
+    
+    if (module.sections && Array.isArray(module.sections)) {
+      const result: any[] = [];
+      for (const section of module.sections) {
+        if (section && Array.isArray(section.questionnaires)) {
+          result.push(...section.questionnaires);
+        }
+      }
+      return result;
+    }
+    
+    if (Array.isArray(module.questionnaires)) {
+      return module.questionnaires;
+    }
+    
+    return [];
+  } catch (e) {
+    console.error('Error in getAllQuestionnaires:', e);
+    return [];
+  }
+}
+
 export function ExpandableModuleCard({ 
   module, 
   index, 
@@ -26,8 +52,9 @@ export function ExpandableModuleCard({
 }: ExpandableModuleCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   
-  const completedCount = module.questionnaires.filter((q: any) => q.completed).length;
-  const totalCount = module.questionnaires.length;
+  const allQuestionnaires = getAllQuestionnaires(module);
+  const completedCount = Array.isArray(allQuestionnaires) ? allQuestionnaires.filter((q: any) => q?.completed).length : 0;
+  const totalCount = Array.isArray(allQuestionnaires) ? allQuestionnaires.length : 0;
   const completionPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
   
   const isCompleted = completionPercentage === 100;
@@ -186,63 +213,177 @@ export function ExpandableModuleCard({
       >
         <div style={{ overflow: 'hidden' }}>
             <div className="space-y-3 mt-5">
-              {module.questionnaires.map((questionnaire: any) => (
-            <div
-              key={questionnaire.id}
-              className={cn(
-                    "flex items-center justify-between p-5 border border-slate-200 rounded-xl transition-all duration-200",
-                questionnaire.completed 
-                      ? "bg-teal-50 border-teal-200" 
-                  : "bg-white hover:shadow-md hover:border-slate-300"
+              {/* Render sections if present */}
+              {module.sections ? (
+                module.sections.map((section: any) => (
+                  <CollapsibleSection
+                    key={section.id}
+                    section={section}
+                    pathology={pathology}
+                    patientId={patientId}
+                    visitId={visitId}
+                  />
+                ))
+              ) : (
+                /* Render flat questionnaires list */
+                module.questionnaires?.map((questionnaire: any) => (
+                  <QuestionnaireItem 
+                    key={questionnaire.id}
+                    questionnaire={questionnaire}
+                    pathology={pathology}
+                    patientId={patientId}
+                    visitId={visitId}
+                  />
+                ))
               )}
-            >
-                  <div className="flex items-center gap-4 flex-1">
-                {questionnaire.completed ? (
-                      <CheckCircle className="h-6 w-6 text-teal-600 flex-shrink-0" />
-                ) : (
-                      <Circle className="h-6 w-6 text-slate-300 flex-shrink-0" />
-                )}
-                <div className="flex-1">
-                  <p className={cn(
-                        "font-medium text-base",
-                        questionnaire.completed ? "text-teal-900" : "text-slate-900"
-                  )}>
-                    {questionnaire.title}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <p className="text-xs text-slate-500 capitalize">
-                          Pour: {questionnaire.target_role?.replace(/_/g, " ")}
-                    </p>
-                    {questionnaire.completed && questionnaire.completedAt && (
-                      <>
-                        <span className="text-xs text-slate-400">•</span>
-                        <p className="text-xs text-slate-500">
-                              Complété le {formatShortDate(questionnaire.completedAt)}
-                        </p>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 flex-shrink-0 ml-4">
-                    <Link
-                      href={`/professional/${pathology}/patients/${patientId}/visits/${visitId}/questionnaire/${questionnaire.id}`}
-                    >
-                      <Button 
-                        size="sm" 
-                        variant={questionnaire.completed ? "outline" : "default"}
-                        className="gap-2"
-                      >
-                        <FileText className="h-4 w-4" />
-                        {questionnaire.completed ? 'Voir' : 'Remplir'}
-                      </Button>
-                    </Link>
-                  </div>
-              </div>
-              ))}
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Collapsible section component for nested sections (WAIS-III, WAIS-IV)
+function CollapsibleSection({
+  section,
+  pathology,
+  patientId,
+  visitId
+}: {
+  section: any;
+  pathology: string;
+  patientId: string;
+  visitId: string;
+}) {
+  const [isSectionExpanded, setIsSectionExpanded] = useState(true);
+  
+  const questionnaires = Array.isArray(section?.questionnaires) ? section.questionnaires : [];
+  const completedCount = questionnaires.filter((q: any) => q?.completed).length;
+  const totalCount = questionnaires.length;
+  const hasQuestionnaires = totalCount > 0;
+  
+  return (
+    <div className="space-y-3 pt-4 first:pt-0">
+      {/* Section header - clickable */}
+      <button
+        onClick={() => setIsSectionExpanded(!isSectionExpanded)}
+        className="flex items-center gap-3 w-full text-left group hover:bg-slate-50 -mx-2 px-2 py-2 rounded-lg transition-colors"
+      >
+        <ChevronDown 
+          className={cn(
+            "h-4 w-4 text-slate-400 transition-transform duration-200",
+            !isSectionExpanded && "-rotate-90"
+          )}
+        />
+        <h5 className="text-sm font-bold text-slate-700 uppercase tracking-wide group-hover:text-slate-900 transition-colors">
+          {section.name}
+        </h5>
+        <div className="h-px flex-1 bg-slate-200"></div>
+        <span className={cn(
+          "text-xs px-2 py-0.5 rounded-full",
+          completedCount === totalCount && totalCount > 0 
+            ? "bg-teal-100 text-teal-700" 
+            : "bg-slate-100 text-slate-500"
+        )}>
+          {completedCount}/{totalCount}
+        </span>
+      </button>
+      
+      {/* Collapsible content */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateRows: isSectionExpanded ? '1fr' : '0fr',
+          transition: 'grid-template-rows 200ms ease-out'
+        }}
+      >
+        <div style={{ overflow: 'hidden' }}>
+          <div className="space-y-3 pl-7">
+            {hasQuestionnaires ? (
+              questionnaires.map((questionnaire: any) => (
+                <QuestionnaireItem 
+                  key={questionnaire.id}
+                  questionnaire={questionnaire}
+                  pathology={pathology}
+                  patientId={patientId}
+                  visitId={visitId}
+                />
+              ))
+            ) : (
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                <p className="text-sm text-slate-500 italic">Aucun questionnaire dans cette section</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Extracted QuestionnaireItem component for reuse
+function QuestionnaireItem({ 
+  questionnaire, 
+  pathology, 
+  patientId, 
+  visitId 
+}: { 
+  questionnaire: any; 
+  pathology: string; 
+  patientId: string; 
+  visitId: string; 
+}) {
+  return (
+    <div
+      className={cn(
+        "flex items-center justify-between p-5 border border-slate-200 rounded-xl transition-all duration-200",
+        questionnaire.completed 
+          ? "bg-teal-50 border-teal-200" 
+          : "bg-white hover:shadow-md hover:border-slate-300"
+      )}
+    >
+      <div className="flex items-center gap-4 flex-1">
+        {questionnaire.completed ? (
+          <CheckCircle className="h-6 w-6 text-teal-600 flex-shrink-0" />
+        ) : (
+          <Circle className="h-6 w-6 text-slate-300 flex-shrink-0" />
+        )}
+        <div className="flex-1">
+          <p className={cn(
+            "font-medium text-base",
+            questionnaire.completed ? "text-teal-900" : "text-slate-900"
+          )}>
+            {questionnaire.title}
+          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-xs text-slate-500 capitalize">
+              Pour: {questionnaire.target_role?.replace(/_/g, " ")}
+            </p>
+            {questionnaire.completed && questionnaire.completedAt && (
+              <>
+                <span className="text-xs text-slate-400">-</span>
+                <p className="text-xs text-slate-500">
+                  Complété le {formatShortDate(questionnaire.completedAt)}
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+        <Link
+          href={`/professional/${pathology}/patients/${patientId}/visits/${visitId}/questionnaire/${questionnaire.id}`}
+        >
+          <Button 
+            size="sm" 
+            variant={questionnaire.completed ? "outline" : "default"}
+            className="gap-2"
+          >
+            <FileText className="h-4 w-4" />
+            {questionnaire.completed ? 'Voir' : 'Remplir'}
+          </Button>
+        </Link>
       </div>
     </div>
   );

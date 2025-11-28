@@ -362,11 +362,18 @@ export async function getUpcomingVisitsByCenter(
 // VISIT MODULES & COMPLETION (Refactored)
 // ============================================================================
 
+export type VirtualModuleSection = {
+  id: string;
+  name: string;
+  questionnaires: any[];
+};
+
 export type VirtualModule = {
   id: string;
   name: string;
   description: string;
-  questionnaires: any[];
+  questionnaires?: any[];
+  sections?: VirtualModuleSection[];
 };
 
 export async function getVisitModules(visitId: string): Promise<VirtualModule[]> {
@@ -422,8 +429,19 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
       {
         id: 'mod_neuropsy',
         name: 'Evaluation Neuropsychologique',
-        description: 'Évaluation neuropsychologique (WAIS-IV, TMT, Stroop, Fluences, COBRA, CPT-III, Test des Commissions, SCIP)',
-        questionnaires: [WAIS4_CRITERIA_DEFINITION, WAIS4_LEARNING_DEFINITION, WAIS4_MATRICES_DEFINITION, CVLT_DEFINITION, WAIS4_CODE_DEFINITION, WAIS4_DIGIT_SPAN_DEFINITION, WAIS4_SIMILITUDES_DEFINITION, TMT_DEFINITION, STROOP_DEFINITION, FLUENCES_VERBALES_DEFINITION, COBRA_DEFINITION, CPT3_DEFINITION, TEST_COMMISSIONS_DEFINITION, SCIP_DEFINITION]
+        description: 'Évaluation neuropsychologique (WAIS-III, WAIS-IV)',
+        sections: [
+          {
+            id: 'wais3',
+            name: 'WAIS-III',
+            questionnaires: []
+          },
+          {
+            id: 'wais4',
+            name: 'WAIS-IV',
+            questionnaires: [WAIS4_CRITERIA_DEFINITION, WAIS4_LEARNING_DEFINITION, WAIS4_MATRICES_DEFINITION, CVLT_DEFINITION, WAIS4_CODE_DEFINITION, WAIS4_DIGIT_SPAN_DEFINITION, WAIS4_SIMILITUDES_DEFINITION, TMT_DEFINITION, STROOP_DEFINITION, FLUENCES_VERBALES_DEFINITION, COBRA_DEFINITION, CPT3_DEFINITION, TEST_COMMISSIONS_DEFINITION, SCIP_DEFINITION]
+          }
+        ]
       },
       {
         id: 'mod_auto_etat',
