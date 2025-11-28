@@ -267,7 +267,11 @@ function CollapsibleSection({
     <div className="space-y-3 pt-4 first:pt-0">
       {/* Section header - clickable */}
       <button
-        onClick={() => setIsSectionExpanded(!isSectionExpanded)}
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsSectionExpanded(!isSectionExpanded);
+        }}
         className="flex items-center gap-3 w-full text-left group hover:bg-slate-50 -mx-2 px-2 py-2 rounded-lg transition-colors"
       >
         <ChevronDown 

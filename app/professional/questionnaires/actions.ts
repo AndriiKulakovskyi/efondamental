@@ -53,7 +53,12 @@ import {
   saveCpt3Response,
   saveWais4SimilitudesResponse,
   saveTestCommissionsResponse,
-  saveScipResponse
+  saveScipResponse,
+  // WAIS-III questionnaires
+  saveWais3CvltResponse,
+  saveWais3TmtResponse,
+  saveWais3StroopResponse,
+  saveWais3FluencesVerbalesResponse
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveSocialResponse
@@ -138,7 +143,12 @@ import {
   Cpt3ResponseInsert,
   Wais4SimilitudesResponseInsert,
   TestCommissionsResponseInsert,
-  ScipResponseInsert
+  ScipResponseInsert,
+  // WAIS-III types
+  Wais3CvltResponseInsert,
+  Wais3TmtResponseInsert,
+  Wais3StroopResponseInsert,
+  Wais3FluencesVerbalesResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -624,6 +634,39 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as ScipResponseInsert);
+        break;
+
+      // WAIS-III Questionnaires
+      case 'WAIS3_CVLT_FR':
+        result = await saveWais3CvltResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Wais3CvltResponseInsert);
+        break;
+
+      case 'WAIS3_TMT_FR':
+        result = await saveWais3TmtResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Wais3TmtResponseInsert);
+        break;
+
+      case 'WAIS3_STROOP_FR':
+        result = await saveWais3StroopResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Wais3StroopResponseInsert);
+        break;
+
+      case 'WAIS3_FLUENCES_VERBALES_FR':
+        result = await saveWais3FluencesVerbalesResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Wais3FluencesVerbalesResponseInsert);
         break;
         
       default:

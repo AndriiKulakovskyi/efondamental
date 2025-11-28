@@ -122,7 +122,12 @@ import {
   CPT3_DEFINITION,
   WAIS4_SIMILITUDES_DEFINITION,
   TEST_COMMISSIONS_DEFINITION,
-  SCIP_DEFINITION
+  SCIP_DEFINITION,
+  // WAIS-III definitions
+  WAIS3_CVLT_DEFINITION,
+  WAIS3_TMT_DEFINITION,
+  WAIS3_STROOP_DEFINITION,
+  WAIS3_FLUENCES_VERBALES_DEFINITION
 } from '../constants/questionnaires-hetero';
 import {
   SOCIAL_DEFINITION
@@ -434,7 +439,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           {
             id: 'wais3',
             name: 'WAIS-III',
-            questionnaires: []
+            questionnaires: [WAIS3_CVLT_DEFINITION, WAIS3_TMT_DEFINITION, WAIS3_STROOP_DEFINITION, WAIS3_FLUENCES_VERBALES_DEFINITION]
           },
           {
             id: 'wais4',
@@ -514,7 +519,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diag) completed++;
     if (orient) completed++;
   } else if (visit.visit_type === 'initial_evaluation') {
-    total = 54; // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 7 INFIRMIER + 9 Medical + 14 Neuropsy (7 WAIS + TMT + Stroop + Fluences + COBRA + CPT3 + Commissions + SCIP)
+    total = 58; // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 7 INFIRMIER + 9 Medical + 18 Neuropsy (14 WAIS-IV + 4 WAIS-III)
     totalModules = 7;
 
     const [

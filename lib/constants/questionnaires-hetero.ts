@@ -5632,3 +5632,59 @@ export const SCIP_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// WAIS-III Questionnaires (Separate storage from WAIS-IV, same questions)
+// ============================================================================
+
+export const WAIS3_CVLT_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais3_cvlt',
+  code: 'WAIS3_CVLT_FR',
+  title: 'WAIS-III - California Verbal Learning Test (CVLT)',
+  description: 'Test d\'apprentissage verbal - Version WAIS-III',
+  questions: CVLT_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+export const WAIS3_TMT_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais3_tmt',
+  code: 'WAIS3_TMT_FR',
+  title: 'WAIS-III - Trail Making Test (TMT)',
+  description: 'Test de piste - Version WAIS-III',
+  questions: TMT_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+export const WAIS3_STROOP_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais3_stroop',
+  code: 'WAIS3_STROOP_FR',
+  title: 'WAIS-III - Test de Stroop',
+  description: 'Test d\'interference couleur-mot - Version WAIS-III',
+  questions: STROOP_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+export const WAIS3_FLUENCES_VERBALES_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais3_fluences_verbales',
+  code: 'WAIS3_FLUENCES_VERBALES_FR',
+  title: 'WAIS-III - Fluences Verbales',
+  description: 'Fluences verbales phonemique et semantique - Version WAIS-III',
+  questions: FLUENCES_VERBALES_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

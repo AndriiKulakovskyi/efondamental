@@ -52,7 +52,16 @@ import {
   TestCommissionsResponse,
   TestCommissionsResponseInsert,
   ScipResponse,
-  ScipResponseInsert
+  ScipResponseInsert,
+  // WAIS-III types
+  Wais3CvltResponse,
+  Wais3CvltResponseInsert,
+  Wais3TmtResponse,
+  Wais3TmtResponseInsert,
+  Wais3StroopResponse,
+  Wais3StroopResponseInsert,
+  Wais3FluencesVerbalesResponse,
+  Wais3FluencesVerbalesResponseInsert
 } from '@/lib/types/database.types';
 import { calculateStandardizedScore, calculatePercentileRank } from './wais4-matrices-scoring';
 import { calculateTmtScores } from './tmt-scoring';
@@ -1849,6 +1858,298 @@ export async function saveScipResponse(
       scipv03b: scores.scipv03b,
       scipv04b: scores.scipv04b,
       scipv05b: scores.scipv05b,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// WAIS-III CVLT (California Verbal Learning Test)
+// ============================================================================
+
+export async function getWais3CvltResponse(
+  visitId: string
+): Promise<Wais3CvltResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_wais3_cvlt')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    if (error.code === 'PGRST205') {
+      console.warn('Table responses_wais3_cvlt not found. Please run migrations.');
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveWais3CvltResponse(
+  response: Wais3CvltResponseInsert
+): Promise<Wais3CvltResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Calculate all standard scores (same as WAIS-IV CVLT)
+  const scores = calculateCvltScores({
+    patient_age: response.patient_age,
+    years_of_education: response.years_of_education,
+    patient_sex: response.patient_sex,
+    trial_1: response.trial_1,
+    trial_2: response.trial_2,
+    trial_3: response.trial_3,
+    trial_4: response.trial_4,
+    trial_5: response.trial_5,
+    list_b: response.list_b,
+    sdfr: response.sdfr,
+    sdcr: response.sdcr,
+    ldfr: response.ldfr,
+    ldcr: response.ldcr,
+    semantic_clustering: response.semantic_clustering,
+    serial_clustering: response.serial_clustering,
+    perseverations: response.perseverations,
+    intrusions: response.intrusions,
+    recognition_hits: response.recognition_hits,
+    false_positives: response.false_positives,
+    discriminability: response.discriminability,
+    primacy: response.primacy,
+    recency: response.recency,
+    response_bias: response.response_bias
+  });
+
+  const { data, error } = await supabase
+    .from('responses_wais3_cvlt')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      patient_age: response.patient_age,
+      years_of_education: response.years_of_education,
+      patient_sex: response.patient_sex,
+      trial_1: response.trial_1,
+      trial_2: response.trial_2,
+      trial_3: response.trial_3,
+      trial_4: response.trial_4,
+      trial_5: response.trial_5,
+      list_b: response.list_b,
+      sdfr: response.sdfr,
+      sdcr: response.sdcr,
+      ldfr: response.ldfr,
+      ldcr: response.ldcr,
+      semantic_clustering: response.semantic_clustering,
+      serial_clustering: response.serial_clustering,
+      perseverations: response.perseverations,
+      intrusions: response.intrusions,
+      recognition_hits: response.recognition_hits,
+      false_positives: response.false_positives,
+      discriminability: response.discriminability,
+      primacy: response.primacy,
+      recency: response.recency,
+      response_bias: response.response_bias,
+      ...scores,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// WAIS-III TMT (Trail Making Test)
+// ============================================================================
+
+export async function getWais3TmtResponse(
+  visitId: string
+): Promise<Wais3TmtResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_wais3_tmt')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    if (error.code === 'PGRST205') {
+      console.warn('Table responses_wais3_tmt not found. Please run migrations.');
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveWais3TmtResponse(
+  response: Wais3TmtResponseInsert
+): Promise<Wais3TmtResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Reuse existing TMT scoring logic
+  const scores = calculateTmtScores({
+    patient_age: response.patient_age,
+    years_of_education: response.years_of_education,
+    tmta_tps: response.tmta_tps,
+    tmta_err: response.tmta_err,
+    tmta_cor: response.tmta_cor || 0,
+    tmtb_tps: response.tmtb_tps,
+    tmtb_err: response.tmtb_err,
+    tmtb_cor: response.tmtb_cor || 0,
+    tmtb_err_persev: response.tmtb_err_persev
+  });
+
+  const { data, error } = await supabase
+    .from('responses_wais3_tmt')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      patient_age: response.patient_age,
+      years_of_education: response.years_of_education,
+      tmta_tps: response.tmta_tps,
+      tmta_err: response.tmta_err,
+      tmta_cor: response.tmta_cor,
+      tmtb_tps: response.tmtb_tps,
+      tmtb_err: response.tmtb_err,
+      tmtb_cor: response.tmtb_cor,
+      tmtb_err_persev: response.tmtb_err_persev,
+      ...scores,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// WAIS-III Stroop Test
+// ============================================================================
+
+export async function getWais3StroopResponse(
+  visitId: string
+): Promise<Wais3StroopResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_wais3_stroop')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    if (error.code === 'PGRST205') {
+      console.warn('Table responses_wais3_stroop not found. Please run migrations.');
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveWais3StroopResponse(
+  response: Wais3StroopResponseInsert
+): Promise<Wais3StroopResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Reuse existing Stroop scoring logic
+  const scores = calculateStroopScores({
+    patient_age: response.patient_age,
+    stroop_w_tot: response.stroop_w_tot,
+    stroop_c_tot: response.stroop_c_tot,
+    stroop_cw_tot: response.stroop_cw_tot
+  });
+
+  const { data, error } = await supabase
+    .from('responses_wais3_stroop')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      patient_age: response.patient_age,
+      stroop_w_tot: response.stroop_w_tot,
+      stroop_c_tot: response.stroop_c_tot,
+      stroop_cw_tot: response.stroop_cw_tot,
+      ...scores,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// WAIS-III Fluences Verbales
+// ============================================================================
+
+export async function getWais3FluencesVerbalesResponse(
+  visitId: string
+): Promise<Wais3FluencesVerbalesResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_wais3_fluences_verbales')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    if (error.code === 'PGRST205') {
+      console.warn('Table responses_wais3_fluences_verbales not found. Please run migrations.');
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveWais3FluencesVerbalesResponse(
+  response: Wais3FluencesVerbalesResponseInsert
+): Promise<Wais3FluencesVerbalesResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Reuse existing Fluences Verbales scoring logic
+  const scores = calculateFluencesVerbalesScores({
+    patient_age: response.patient_age,
+    years_of_education: response.years_of_education,
+    fv_p_tot_correct: response.fv_p_tot_correct,
+    fv_p_deriv: response.fv_p_deriv || 0,
+    fv_p_intrus: response.fv_p_intrus || 0,
+    fv_p_propres: response.fv_p_propres || 0,
+    fv_anim_tot_correct: response.fv_anim_tot_correct,
+    fv_anim_deriv: response.fv_anim_deriv || 0,
+    fv_anim_intrus: response.fv_anim_intrus || 0,
+    fv_anim_propres: response.fv_anim_propres || 0
+  });
+
+  const { data, error } = await supabase
+    .from('responses_wais3_fluences_verbales')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      patient_age: response.patient_age,
+      years_of_education: response.years_of_education,
+      fv_p_tot_correct: response.fv_p_tot_correct,
+      fv_p_deriv: response.fv_p_deriv,
+      fv_p_intrus: response.fv_p_intrus,
+      fv_p_propres: response.fv_p_propres,
+      fv_anim_tot_correct: response.fv_anim_tot_correct,
+      fv_anim_deriv: response.fv_anim_deriv,
+      fv_anim_intrus: response.fv_anim_intrus,
+      fv_anim_propres: response.fv_anim_propres,
+      ...scores,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

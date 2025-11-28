@@ -54,7 +54,12 @@ import {
   CPT3_DEFINITION,
   WAIS4_SIMILITUDES_DEFINITION,
   TEST_COMMISSIONS_DEFINITION,
-  SCIP_DEFINITION
+  SCIP_DEFINITION,
+  // WAIS-III definitions
+  WAIS3_CVLT_DEFINITION,
+  WAIS3_TMT_DEFINITION,
+  WAIS3_STROOP_DEFINITION,
+  WAIS3_FLUENCES_VERBALES_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -126,7 +131,12 @@ import {
   getCpt3Response,
   getWais4SimilitudesResponse,
   getTestCommissionsResponse,
-  getScipResponse
+  getScipResponse,
+  // WAIS-III service functions
+  getWais3CvltResponse,
+  getWais3TmtResponse,
+  getWais3StroopResponse,
+  getWais3FluencesVerbalesResponse
 } from "@/lib/services/questionnaire-hetero.service";
 import {
   getSocialResponse
@@ -214,6 +224,11 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS4_SIMILITUDES_DEFINITION.code) questionnaire = WAIS4_SIMILITUDES_DEFINITION;
   else if (code === TEST_COMMISSIONS_DEFINITION.code) questionnaire = TEST_COMMISSIONS_DEFINITION;
   else if (code === SCIP_DEFINITION.code) questionnaire = SCIP_DEFINITION;
+  // WAIS-III questionnaires
+  else if (code === WAIS3_CVLT_DEFINITION.code) questionnaire = WAIS3_CVLT_DEFINITION;
+  else if (code === WAIS3_TMT_DEFINITION.code) questionnaire = WAIS3_TMT_DEFINITION;
+  else if (code === WAIS3_STROOP_DEFINITION.code) questionnaire = WAIS3_STROOP_DEFINITION;
+  else if (code === WAIS3_FLUENCES_VERBALES_DEFINITION.code) questionnaire = WAIS3_FLUENCES_VERBALES_DEFINITION;
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) questionnaire = SOCIAL_DEFINITION;
   // Infirmier questionnaires
@@ -288,6 +303,11 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS4_SIMILITUDES_DEFINITION.code) existingResponse = await getWais4SimilitudesResponse(visitId);
   else if (code === TEST_COMMISSIONS_DEFINITION.code) existingResponse = await getTestCommissionsResponse(visitId);
   else if (code === SCIP_DEFINITION.code) existingResponse = await getScipResponse(visitId);
+  // WAIS-III questionnaires
+  else if (code === WAIS3_CVLT_DEFINITION.code) existingResponse = await getWais3CvltResponse(visitId);
+  else if (code === WAIS3_TMT_DEFINITION.code) existingResponse = await getWais3TmtResponse(visitId);
+  else if (code === WAIS3_STROOP_DEFINITION.code) existingResponse = await getWais3StroopResponse(visitId);
+  else if (code === WAIS3_FLUENCES_VERBALES_DEFINITION.code) existingResponse = await getWais3FluencesVerbalesResponse(visitId);
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) existingResponse = await getSocialResponse(visitId);
   // Infirmier questionnaires

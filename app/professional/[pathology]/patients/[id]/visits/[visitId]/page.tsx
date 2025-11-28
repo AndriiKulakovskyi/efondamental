@@ -60,7 +60,12 @@ import {
   CPT3_DEFINITION,
   WAIS4_SIMILITUDES_DEFINITION,
   TEST_COMMISSIONS_DEFINITION,
-  SCIP_DEFINITION
+  SCIP_DEFINITION,
+  // WAIS-III definitions
+  WAIS3_CVLT_DEFINITION,
+  WAIS3_TMT_DEFINITION,
+  WAIS3_STROOP_DEFINITION,
+  WAIS3_FLUENCES_VERBALES_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -353,7 +358,36 @@ export default async function VisitDetailPage({
           {
             id: 'wais3',
             name: 'WAIS-III',
-            questionnaires: []
+            questionnaires: [
+              {
+                ...WAIS3_CVLT_DEFINITION,
+                id: WAIS3_CVLT_DEFINITION.code,
+                target_role: 'healthcare_professional',
+                completed: questionnaireStatuses['WAIS3_CVLT_FR']?.completed || false,
+                completedAt: questionnaireStatuses['WAIS3_CVLT_FR']?.completed_at,
+              },
+              {
+                ...WAIS3_TMT_DEFINITION,
+                id: WAIS3_TMT_DEFINITION.code,
+                target_role: 'healthcare_professional',
+                completed: questionnaireStatuses['WAIS3_TMT_FR']?.completed || false,
+                completedAt: questionnaireStatuses['WAIS3_TMT_FR']?.completed_at,
+              },
+              {
+                ...WAIS3_STROOP_DEFINITION,
+                id: WAIS3_STROOP_DEFINITION.code,
+                target_role: 'healthcare_professional',
+                completed: questionnaireStatuses['WAIS3_STROOP_FR']?.completed || false,
+                completedAt: questionnaireStatuses['WAIS3_STROOP_FR']?.completed_at,
+              },
+              {
+                ...WAIS3_FLUENCES_VERBALES_DEFINITION,
+                id: WAIS3_FLUENCES_VERBALES_DEFINITION.code,
+                target_role: 'healthcare_professional',
+                completed: questionnaireStatuses['WAIS3_FLUENCES_VERBALES_FR']?.completed || false,
+                completedAt: questionnaireStatuses['WAIS3_FLUENCES_VERBALES_FR']?.completed_at,
+              }
+            ]
           },
           {
             id: 'wais4',
