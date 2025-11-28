@@ -2736,3 +2736,79 @@ export interface Wais4SimilitudesResponse {
 
 export type Wais4SimilitudesResponseInsert = Omit<Wais4SimilitudesResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_raw_score' | 'standard_score' | 'standardized_value'>;
 
+// ============================================================================
+// Test des Commissions
+// ============================================================================
+
+export interface TestCommissionsResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Patient age for scoring
+  patient_age: number;
+  
+  // NSC - Niveau etude (0: < baccalaureat, 1: >= baccalaureat)
+  nsc: number;
+  
+  // Raw scores (inputs)
+  com01: number; // Time in minutes
+  com02: number; // Number of unnecessary detours
+  com03: number; // Number of schedule violations
+  com04: number; // Number of logical errors
+  com05?: string | null; // Sequence of commissions
+  
+  // Computed scores
+  com01s1?: string | null; // Percentile for time
+  com01s2?: number | null; // Z-score for time
+  com02s1?: string | null; // Percentile for detours
+  com02s2?: number | null; // Z-score for detours
+  com03s1?: string | null; // Percentile for schedule violations
+  com03s2?: number | null; // Z-score for schedule violations
+  com04s1?: string | null; // Percentile for logical errors
+  com04s2?: number | null; // Z-score for logical errors
+  com04s3?: number | null; // Total errors
+  com04s4?: string | null; // Percentile for total errors
+  com04s5?: number | null; // Z-score for total errors
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type TestCommissionsResponseInsert = Omit<TestCommissionsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'com01s1' | 'com01s2' | 'com02s1' | 'com02s2' | 'com03s1' | 'com03s2' | 'com04s1' | 'com04s2' | 'com04s3' | 'com04s4' | 'com04s5'>;
+
+// ============================================================================
+// SCIP - Screening Assessment for Cognitive Impairment in Psychiatry
+// ============================================================================
+
+export interface ScipResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Raw scores (inputs)
+  scipv01a: number; // Apprentissage Verbal Immediat
+  scipv02a: number; // Memoire de Travail
+  scipv03a: number; // Fluence Verbale
+  scipv04a: number; // Rappel Verbal Differe
+  scipv05a: number; // Capacites Visuomotrices
+  
+  // Computed Z-scores
+  scipv01b?: number | null;
+  scipv02b?: number | null;
+  scipv03b?: number | null;
+  scipv04b?: number | null;
+  scipv05b?: number | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type ScipResponseInsert = Omit<ScipResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'scipv01b' | 'scipv02b' | 'scipv03b' | 'scipv04b' | 'scipv05b'>;
+

@@ -52,7 +52,9 @@ import {
   FLUENCES_VERBALES_DEFINITION,
   COBRA_DEFINITION,
   CPT3_DEFINITION,
-  WAIS4_SIMILITUDES_DEFINITION
+  WAIS4_SIMILITUDES_DEFINITION,
+  TEST_COMMISSIONS_DEFINITION,
+  SCIP_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -122,7 +124,9 @@ import {
   getFluencesVerbalesResponse,
   getCobraResponse,
   getCpt3Response,
-  getWais4SimilitudesResponse
+  getWais4SimilitudesResponse,
+  getTestCommissionsResponse,
+  getScipResponse
 } from "@/lib/services/questionnaire-hetero.service";
 import {
   getSocialResponse
@@ -208,6 +212,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === COBRA_DEFINITION.code) questionnaire = COBRA_DEFINITION;
   else if (code === CPT3_DEFINITION.code) questionnaire = CPT3_DEFINITION;
   else if (code === WAIS4_SIMILITUDES_DEFINITION.code) questionnaire = WAIS4_SIMILITUDES_DEFINITION;
+  else if (code === TEST_COMMISSIONS_DEFINITION.code) questionnaire = TEST_COMMISSIONS_DEFINITION;
+  else if (code === SCIP_DEFINITION.code) questionnaire = SCIP_DEFINITION;
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) questionnaire = SOCIAL_DEFINITION;
   // Infirmier questionnaires
@@ -280,6 +286,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === COBRA_DEFINITION.code) existingResponse = await getCobraResponse(visitId);
   else if (code === CPT3_DEFINITION.code) existingResponse = await getCpt3Response(visitId);
   else if (code === WAIS4_SIMILITUDES_DEFINITION.code) existingResponse = await getWais4SimilitudesResponse(visitId);
+  else if (code === TEST_COMMISSIONS_DEFINITION.code) existingResponse = await getTestCommissionsResponse(visitId);
+  else if (code === SCIP_DEFINITION.code) existingResponse = await getScipResponse(visitId);
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) existingResponse = await getSocialResponse(visitId);
   // Infirmier questionnaires

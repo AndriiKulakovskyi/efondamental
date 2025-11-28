@@ -5313,3 +5313,322 @@ export const WAIS4_SIMILITUDES_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// Test des Commissions
+// ============================================================================
+
+export const TEST_COMMISSIONS_QUESTIONS: Question[] = [
+  // Clinical Criteria Section
+  {
+    id: 'section_criteria',
+    text: 'Criteres cliniques',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'patient_age',
+    text: 'Age du patient (en annees)',
+    type: 'number',
+    required: true,
+    min: 20,
+    max: 60
+  },
+  {
+    id: 'nsc',
+    text: 'Niveau etude',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: "< baccalaureat", score: 0 },
+      { code: 1, label: ">= baccalaureat", score: 1 }
+    ]
+  },
+  // Time Section
+  {
+    id: 'section_temps',
+    text: 'Temps',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'com01',
+    text: 'Temps de realisation (en minutes)',
+    type: 'number',
+    required: true,
+    min: 0
+  },
+  {
+    id: 'com01s1',
+    text: 'Temps de realisation (Percentile)',
+    type: 'text',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'com01s2',
+    text: 'Temps de realisation (Note z)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  // Errors Section
+  {
+    id: 'section_erreurs',
+    text: 'Erreurs',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'com02',
+    text: 'Nombre de detours inutiles',
+    type: 'number',
+    required: true,
+    min: 0
+  },
+  {
+    id: 'com02s1',
+    text: 'Nombre de detours inutiles (Percentile)',
+    type: 'text',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'com02s2',
+    text: 'Nombre de detours inutiles (Note z)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'com03',
+    text: 'Nombre de trajets avec non respect des horaires',
+    type: 'number',
+    required: true,
+    min: 0
+  },
+  {
+    id: 'com03s1',
+    text: 'Nombre de trajets avec non respect des horaires (Percentile)',
+    type: 'text',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'com03s2',
+    text: 'Nombre de trajets avec non respect des horaires (Note z)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'com04',
+    text: 'Nombre d\'erreurs logiques',
+    type: 'number',
+    required: true,
+    min: 0
+  },
+  {
+    id: 'com04s1',
+    text: 'Nombre d\'erreurs logiques (Percentile)',
+    type: 'text',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'com04s2',
+    text: 'Nombre d\'erreurs logiques (Note z)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  // Total Section
+  {
+    id: 'section_total',
+    text: 'Total',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'com04s3',
+    text: 'Nombre d\'erreurs total',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'com04s4',
+    text: 'Nombre d\'erreurs total (Percentile)',
+    type: 'text',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'com04s5',
+    text: 'Nombre d\'erreurs total (Note z)',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  // Sequence Section
+  {
+    id: 'section_sequence',
+    text: 'Sequence',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'com05',
+    text: 'Sequence des commissions realisees par le patient',
+    type: 'text',
+    required: false
+  }
+];
+
+export const TEST_COMMISSIONS_DEFINITION: QuestionnaireDefinition = {
+  id: 'test_commissions',
+  code: 'TEST_COMMISSIONS_FR',
+  title: 'Test des Commissions',
+  description: 'Test neuropsychologique evaluant les fonctions executives et la memoire.',
+  questions: TEST_COMMISSIONS_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
+// SCIP - Screening Assessment for Cognitive Impairment in Psychiatry
+// ============================================================================
+
+export const SCIP_QUESTIONS: Question[] = [
+  // Apprentissage Verbal Immediat
+  {
+    id: 'section_scipv01',
+    text: 'Apprentissage Verbal Immediat',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'scipv01a',
+    text: 'Score saisi (sum/24)',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 24
+  },
+  {
+    id: 'scipv01b',
+    text: 'Score Z',
+    help: '(score - 23.59) / 2.87',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  // Memoire de Travail
+  {
+    id: 'section_scipv02',
+    text: 'Memoire de Travail',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'scipv02a',
+    text: 'Score saisi (sum/24)',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 24
+  },
+  {
+    id: 'scipv02b',
+    text: 'Score Z',
+    help: '(score - 20.66) / 2.45',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  // Fluence Verbale
+  {
+    id: 'section_scipv03',
+    text: 'Fluence Verbale',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'scipv03a',
+    text: 'Score saisi (sum/24)',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 24
+  },
+  {
+    id: 'scipv03b',
+    text: 'Score Z',
+    help: '(score - 17.44) / 4.74',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  // Rappel Verbal Differe
+  {
+    id: 'section_scipv04',
+    text: 'Rappel Verbal Differe',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'scipv04a',
+    text: 'Score saisi (sum/24)',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 24
+  },
+  {
+    id: 'scipv04b',
+    text: 'Score Z',
+    help: '(score - 7.65) / 1.90',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  // Capacites Visuomotrices
+  {
+    id: 'section_scipv05',
+    text: 'Capacites Visuomotrices',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'scipv05a',
+    text: 'Score saisi (sum/24)',
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 24
+  },
+  {
+    id: 'scipv05b',
+    text: 'Score Z',
+    help: '(score - 14.26) / 2.25',
+    type: 'number',
+    required: false,
+    readonly: true
+  }
+];
+
+export const SCIP_DEFINITION: QuestionnaireDefinition = {
+  id: 'scip',
+  code: 'SCIP_FR',
+  title: 'SCIP - Screening Assessment for Cognitive Impairment in Psychiatry',
+  description: 'Outil de depistage rapide des troubles cognitifs en psychiatrie.',
+  questions: SCIP_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

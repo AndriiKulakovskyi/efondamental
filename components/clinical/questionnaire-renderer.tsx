@@ -461,6 +461,229 @@ export function QuestionnaireRenderer({
         }
       }
 
+      // Compute SCIP Z-scores
+      // Simple formula: Z = (raw_score - mean) / std for each subscale
+      const SCIP_NORMS = {
+        scipv01: { mean: 23.59, std: 2.87 },
+        scipv02: { mean: 20.66, std: 2.45 },
+        scipv03: { mean: 17.44, std: 4.74 },
+        scipv04: { mean: 7.65, std: 1.90 },
+        scipv05: { mean: 14.26, std: 2.25 }
+      };
+      
+      const scipv01a = Number(prev.scipv01a);
+      const scipv02a = Number(prev.scipv02a);
+      const scipv03a = Number(prev.scipv03a);
+      const scipv04a = Number(prev.scipv04a);
+      const scipv05a = Number(prev.scipv05a);
+      
+      if (prev.scipv01a !== undefined && prev.scipv01a !== '' && !isNaN(scipv01a) && scipv01a >= 0) {
+        const scipv01b = Number(((scipv01a - SCIP_NORMS.scipv01.mean) / SCIP_NORMS.scipv01.std).toFixed(2));
+        if (updated.scipv01b !== scipv01b) {
+          updated.scipv01b = scipv01b;
+          hasChanges = true;
+        }
+      }
+      
+      if (prev.scipv02a !== undefined && prev.scipv02a !== '' && !isNaN(scipv02a) && scipv02a >= 0) {
+        const scipv02b = Number(((scipv02a - SCIP_NORMS.scipv02.mean) / SCIP_NORMS.scipv02.std).toFixed(2));
+        if (updated.scipv02b !== scipv02b) {
+          updated.scipv02b = scipv02b;
+          hasChanges = true;
+        }
+      }
+      
+      if (prev.scipv03a !== undefined && prev.scipv03a !== '' && !isNaN(scipv03a) && scipv03a >= 0) {
+        const scipv03b = Number(((scipv03a - SCIP_NORMS.scipv03.mean) / SCIP_NORMS.scipv03.std).toFixed(2));
+        if (updated.scipv03b !== scipv03b) {
+          updated.scipv03b = scipv03b;
+          hasChanges = true;
+        }
+      }
+      
+      if (prev.scipv04a !== undefined && prev.scipv04a !== '' && !isNaN(scipv04a) && scipv04a >= 0) {
+        const scipv04b = Number(((scipv04a - SCIP_NORMS.scipv04.mean) / SCIP_NORMS.scipv04.std).toFixed(2));
+        if (updated.scipv04b !== scipv04b) {
+          updated.scipv04b = scipv04b;
+          hasChanges = true;
+        }
+      }
+      
+      if (prev.scipv05a !== undefined && prev.scipv05a !== '' && !isNaN(scipv05a) && scipv05a >= 0) {
+        const scipv05b = Number(((scipv05a - SCIP_NORMS.scipv05.mean) / SCIP_NORMS.scipv05.std).toFixed(2));
+        if (updated.scipv05b !== scipv05b) {
+          updated.scipv05b = scipv05b;
+          hasChanges = true;
+        }
+      }
+
+      // Compute Test des Commissions scores
+      // NSC = Niveau etude (0: < baccalaureat, 1: >= baccalaureat)
+      // COM01 = Time in minutes (lower is better)
+      // COM02 = Detours, COM03 = Schedule violations, COM04 = Logical errors (all lower is better)
+      const commAge = Number(prev.patient_age);
+      const commNsc = Number(prev.nsc);
+      const commCom01 = Number(prev.com01);
+      const commCom02 = Number(prev.com02);
+      const commCom03 = Number(prev.com03);
+      const commCom04 = Number(prev.com04);
+      
+      // Check if we have valid inputs for Test des Commissions
+      const hasCommNsc = prev.nsc !== undefined && prev.nsc !== '' && !isNaN(commNsc);
+      const hasCommAge = !isNaN(commAge) && commAge >= 20 && commAge <= 60;
+      const hasCommCom01 = prev.com01 !== undefined && prev.com01 !== '' && !isNaN(commCom01) && commCom01 >= 0;
+      const hasCommCom02 = prev.com02 !== undefined && prev.com02 !== '' && !isNaN(commCom02) && commCom02 >= 0;
+      const hasCommCom03 = prev.com03 !== undefined && prev.com03 !== '' && !isNaN(commCom03) && commCom03 >= 0;
+      const hasCommCom04 = prev.com04 !== undefined && prev.com04 !== '' && !isNaN(commCom04) && commCom04 >= 0;
+      
+      if (hasCommNsc) {
+        // Percentile lookup tables
+        const TAB_PERCENTILE_NSC = [95, 90, 80, 75, 50, 25, 20, 10, 5];
+        const TABCALCUL: Record<number, number[][]> = {
+          0: [
+            [3, 3, 4, 5, 7, 9, 9, 10, 12],   // Time cutoffs
+            [0, 0, 0, 1, 1, 2, 2, 2, 3],     // Detours cutoffs
+            [0, 0, 0, 0, 1, 1, 1, 1, 2],     // Schedule violations cutoffs
+            [0, 0, 0, 0, 1, 1, 1, 2, 2],     // Logical errors cutoffs
+            [0, 1, 1, 1, 3, 3, 4, 5, 5]      // Total errors cutoffs
+          ],
+          1: [
+            [1, 2, 3, 4, 6, 8, 8, 9, 10],    // Time cutoffs
+            [0, 0, 0, 0, 1, 1, 1, 2, 2],     // Detours cutoffs
+            [0, 0, 0, 0, 1, 1, 1, 1, 2],     // Schedule violations cutoffs
+            [0, 0, 0, 0, 0, 1, 1, 1, 1],     // Logical errors cutoffs
+            [0, 0, 0, 1, 2, 3, 3, 4, 4]      // Total errors cutoffs
+          ]
+        };
+        
+        // Mean and std tables for Z-scores [age_cat][nsc][metric]
+        const FINALMOY: Record<number, number[][]> = {
+          0: [[6.37, 1.12, 0.62, 0.87, 2.02], [5.05, 0.86, 0.52, 0.62, 2.00]],
+          1: [[6.89, 1.21, 0.58, 0.79, 2.58], [7.00, 0.33, 0.50, 0.08, 0.92]]
+        };
+        const FINALETYP: Record<number, number[][]> = {
+          0: [[3.02, 0.83, 0.74, 0.64, 1.51], [2.04, 0.96, 0.60, 0.67, 1.13]],
+          1: [[2.90, 0.79, 0.69, 0.63, 1.61], [3.38, 0.65, 0.79, 0.29, 1.08]]
+        };
+        
+        const getCommAgeCategory = (age: number) => (age >= 20 && age < 41) ? 0 : 1;
+        
+        // For time and errors, lower is better - find lowest cutoff where score <= cutoff
+        const lookupPercentile = (score: number, nsc: number, metricIndex: number): string => {
+          const cutoffs = TABCALCUL[nsc][metricIndex];
+          for (let i = 0; i < cutoffs.length; i++) {
+            if (score <= cutoffs[i]) return `>= ${TAB_PERCENTILE_NSC[i]}`;
+          }
+          return `< ${TAB_PERCENTILE_NSC[TAB_PERCENTILE_NSC.length - 1]}`;
+        };
+        
+        // COM01 (Time) percentile - lower is better
+        if (hasCommCom01) {
+          const com01s1 = lookupPercentile(commCom01, commNsc, 0);
+          if (updated.com01s1 !== com01s1) {
+            updated.com01s1 = com01s1;
+            hasChanges = true;
+          }
+          
+          if (hasCommAge) {
+            const ageCat = getCommAgeCategory(commAge);
+            const mean = FINALMOY[ageCat][commNsc][0];
+            const std = FINALETYP[ageCat][commNsc][0];
+            const com01s2 = std !== 0 ? Number(((mean - commCom01) / std).toFixed(2)) : 0;
+            if (updated.com01s2 !== com01s2) {
+              updated.com01s2 = com01s2;
+              hasChanges = true;
+            }
+          }
+        }
+        
+        // COM02 (Detours) percentile - lower is better
+        if (hasCommCom02) {
+          const com02s1 = lookupPercentile(commCom02, commNsc, 1);
+          if (updated.com02s1 !== com02s1) {
+            updated.com02s1 = com02s1;
+            hasChanges = true;
+          }
+          
+          if (hasCommAge) {
+            const ageCat = getCommAgeCategory(commAge);
+            const mean = FINALMOY[ageCat][commNsc][1];
+            const std = FINALETYP[ageCat][commNsc][1];
+            const com02s2 = std !== 0 ? Number(((mean - commCom02) / std).toFixed(2)) : 0;
+            if (updated.com02s2 !== com02s2) {
+              updated.com02s2 = com02s2;
+              hasChanges = true;
+            }
+          }
+        }
+        
+        // COM03 (Schedule violations) percentile - lower is better
+        if (hasCommCom03) {
+          const com03s1 = lookupPercentile(commCom03, commNsc, 2);
+          if (updated.com03s1 !== com03s1) {
+            updated.com03s1 = com03s1;
+            hasChanges = true;
+          }
+          
+          if (hasCommAge) {
+            const ageCat = getCommAgeCategory(commAge);
+            const mean = FINALMOY[ageCat][commNsc][2];
+            const std = FINALETYP[ageCat][commNsc][2];
+            const com03s2 = std !== 0 ? Number(((mean - commCom03) / std).toFixed(2)) : 0;
+            if (updated.com03s2 !== com03s2) {
+              updated.com03s2 = com03s2;
+              hasChanges = true;
+            }
+          }
+        }
+        
+        // COM04 (Logical errors) percentile - lower is better
+        if (hasCommCom04) {
+          const com04s1 = lookupPercentile(commCom04, commNsc, 3);
+          if (updated.com04s1 !== com04s1) {
+            updated.com04s1 = com04s1;
+            hasChanges = true;
+          }
+          
+          if (hasCommAge) {
+            const ageCat = getCommAgeCategory(commAge);
+            const mean = FINALMOY[ageCat][commNsc][3];
+            const std = FINALETYP[ageCat][commNsc][3];
+            const com04s2 = std !== 0 ? Number(((mean - commCom04) / std).toFixed(2)) : 0;
+            if (updated.com04s2 !== com04s2) {
+              updated.com04s2 = com04s2;
+              hasChanges = true;
+            }
+          }
+        }
+        
+        // Total errors (COM02 + COM03 + COM04)
+        if (hasCommCom02 && hasCommCom03 && hasCommCom04) {
+          const com04s3 = commCom02 + commCom03 + commCom04;
+          if (updated.com04s3 !== com04s3) {
+            updated.com04s3 = com04s3;
+            hasChanges = true;
+          }
+          
+          const com04s4 = lookupPercentile(com04s3, commNsc, 4);
+          if (updated.com04s4 !== com04s4) {
+            updated.com04s4 = com04s4;
+            hasChanges = true;
+          }
+          
+          if (hasCommAge) {
+            const ageCat = getCommAgeCategory(commAge);
+            const mean = FINALMOY[ageCat][commNsc][4];
+            const std = FINALETYP[ageCat][commNsc][4];
+            const com04s5 = std !== 0 ? Number(((mean - com04s3) / std).toFixed(2)) : 0;
+            if (updated.com04s5 !== com04s5) {
+              updated.com04s5 = com04s5;
+              hasChanges = true;
+            }
+          }
+        }
+      }
+
       // Compute Fluences Verbales scores progressively as fields are entered
       const fvAge = Number(prev.patient_age);
       const fvEdu = Number(prev.years_of_education);
@@ -649,7 +872,19 @@ export function QuestionnaireRenderer({
     responses.item15,
     responses.item16,
     responses.item17,
-    responses.item18
+    responses.item18,
+    // Test des Commissions fields
+    responses.nsc,
+    responses.com01,
+    responses.com02,
+    responses.com03,
+    responses.com04,
+    // SCIP fields
+    responses.scipv01a,
+    responses.scipv02a,
+    responses.scipv03a,
+    responses.scipv04a,
+    responses.scipv05a
   ]);
 
   const { visibleQuestions, requiredQuestions } = evaluateConditionalLogic(

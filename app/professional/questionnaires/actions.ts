@@ -51,7 +51,9 @@ import {
   saveFluencesVerbalesResponse,
   saveCobraResponse,
   saveCpt3Response,
-  saveWais4SimilitudesResponse
+  saveWais4SimilitudesResponse,
+  saveTestCommissionsResponse,
+  saveScipResponse
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveSocialResponse
@@ -134,7 +136,9 @@ import {
   FluencesVerbalesResponseInsert,
   CobraResponseInsert,
   Cpt3ResponseInsert,
-  Wais4SimilitudesResponseInsert
+  Wais4SimilitudesResponseInsert,
+  TestCommissionsResponseInsert,
+  ScipResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -604,6 +608,22 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as Wais4SimilitudesResponseInsert);
+        break;
+
+      case 'TEST_COMMISSIONS_FR':
+        result = await saveTestCommissionsResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as TestCommissionsResponseInsert);
+        break;
+
+      case 'SCIP_FR':
+        result = await saveScipResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as ScipResponseInsert);
         break;
         
       default:

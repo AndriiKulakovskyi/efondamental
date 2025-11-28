@@ -58,7 +58,9 @@ import {
   FLUENCES_VERBALES_DEFINITION,
   COBRA_DEFINITION,
   CPT3_DEFINITION,
-  WAIS4_SIMILITUDES_DEFINITION
+  WAIS4_SIMILITUDES_DEFINITION,
+  TEST_COMMISSIONS_DEFINITION,
+  SCIP_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -431,6 +433,20 @@ export default async function VisitDetailPage({
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['CPT3_FR']?.completed || false,
             completedAt: questionnaireStatuses['CPT3_FR']?.completed_at,
+          },
+          {
+            ...TEST_COMMISSIONS_DEFINITION,
+            id: TEST_COMMISSIONS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['TEST_COMMISSIONS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['TEST_COMMISSIONS_FR']?.completed_at,
+          },
+          {
+            ...SCIP_DEFINITION,
+            id: SCIP_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['SCIP_FR']?.completed || false,
+            completedAt: questionnaireStatuses['SCIP_FR']?.completed_at,
           }
         ]
       },

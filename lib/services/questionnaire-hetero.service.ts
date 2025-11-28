@@ -48,13 +48,19 @@ import {
   Cpt3Response,
   Cpt3ResponseInsert,
   Wais4SimilitudesResponse,
-  Wais4SimilitudesResponseInsert
+  Wais4SimilitudesResponseInsert,
+  TestCommissionsResponse,
+  TestCommissionsResponseInsert,
+  ScipResponse,
+  ScipResponseInsert
 } from '@/lib/types/database.types';
 import { calculateStandardizedScore, calculatePercentileRank } from './wais4-matrices-scoring';
 import { calculateTmtScores } from './tmt-scoring';
 import { calculateStroopScores } from './stroop-scoring';
 import { calculateFluencesVerbalesScores } from './fluences-verbales-scoring';
 import { calculateWais4SimilitudesScores } from './wais4-similitudes-scoring';
+import { calculateTestCommissionsScores } from './test-commissions-scoring';
+import { calculateScipScores } from './scip-scoring';
 
 // ============================================================================
 // MADRS (Montgomery-Åsberg Depression Rating Scale)
@@ -1702,6 +1708,147 @@ export async function saveWais4SimilitudesResponse(
       total_raw_score: scores.total_raw_score,
       standard_score: scores.standard_score,
       standardized_value: scores.standardized_value,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Test des Commissions
+// ============================================================================
+
+export async function getTestCommissionsResponse(
+  visitId: string
+): Promise<TestCommissionsResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_test_commissions')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No data found
+    if (error.code === 'PGRST205') {
+      console.log(`No Test des Commissions found for visit: ${visitId}`);
+      return null;
+    }
+    console.error('Error fetching Test des Commissions response:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function saveTestCommissionsResponse(
+  response: TestCommissionsResponseInsert
+): Promise<TestCommissionsResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Calculate scores using the scoring function
+  const scores = calculateTestCommissionsScores({
+    patient_age: response.patient_age,
+    nsc: response.nsc,
+    com01: response.com01,
+    com02: response.com02,
+    com03: response.com03,
+    com04: response.com04
+  });
+
+  const { data, error } = await supabase
+    .from('responses_test_commissions')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      patient_age: response.patient_age,
+      nsc: response.nsc,
+      com01: response.com01,
+      com02: response.com02,
+      com03: response.com03,
+      com04: response.com04,
+      com05: response.com05,
+      com01s1: scores.com01s1,
+      com01s2: scores.com01s2,
+      com02s1: scores.com02s1,
+      com02s2: scores.com02s2,
+      com03s1: scores.com03s1,
+      com03s2: scores.com03s2,
+      com04s1: scores.com04s1,
+      com04s2: scores.com04s2,
+      com04s3: scores.com04s3,
+      com04s4: scores.com04s4,
+      com04s5: scores.com04s5,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// SCIP - Screening Assessment for Cognitive Impairment in Psychiatry
+// ============================================================================
+
+export async function getScipResponse(
+  visitId: string
+): Promise<ScipResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_scip')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No data found
+    if (error.code === 'PGRST205') {
+      console.log(`No SCIP found for visit: ${visitId}`);
+      return null;
+    }
+    console.error('Error fetching SCIP response:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function saveScipResponse(
+  response: ScipResponseInsert
+): Promise<ScipResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Calculate Z-scores using the scoring function
+  const scores = calculateScipScores({
+    scipv01a: response.scipv01a,
+    scipv02a: response.scipv02a,
+    scipv03a: response.scipv03a,
+    scipv04a: response.scipv04a,
+    scipv05a: response.scipv05a
+  });
+
+  const { data, error } = await supabase
+    .from('responses_scip')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      scipv01a: response.scipv01a,
+      scipv02a: response.scipv02a,
+      scipv03a: response.scipv03a,
+      scipv04a: response.scipv04a,
+      scipv05a: response.scipv05a,
+      scipv01b: scores.scipv01b,
+      scipv02b: scores.scipv02b,
+      scipv03b: scores.scipv03b,
+      scipv04b: scores.scipv04b,
+      scipv05b: scores.scipv05b,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

@@ -120,7 +120,9 @@ import {
   FLUENCES_VERBALES_DEFINITION,
   COBRA_DEFINITION,
   CPT3_DEFINITION,
-  WAIS4_SIMILITUDES_DEFINITION
+  WAIS4_SIMILITUDES_DEFINITION,
+  TEST_COMMISSIONS_DEFINITION,
+  SCIP_DEFINITION
 } from '../constants/questionnaires-hetero';
 import {
   SOCIAL_DEFINITION
@@ -420,8 +422,8 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
       {
         id: 'mod_neuropsy',
         name: 'Evaluation Neuropsychologique',
-        description: 'Évaluation neuropsychologique (WAIS-IV, TMT, Stroop, Fluences, COBRA, CPT-III)',
-        questionnaires: [WAIS4_CRITERIA_DEFINITION, WAIS4_LEARNING_DEFINITION, WAIS4_MATRICES_DEFINITION, CVLT_DEFINITION, WAIS4_CODE_DEFINITION, WAIS4_DIGIT_SPAN_DEFINITION, WAIS4_SIMILITUDES_DEFINITION, TMT_DEFINITION, STROOP_DEFINITION, FLUENCES_VERBALES_DEFINITION, COBRA_DEFINITION, CPT3_DEFINITION]
+        description: 'Évaluation neuropsychologique (WAIS-IV, TMT, Stroop, Fluences, COBRA, CPT-III, Test des Commissions, SCIP)',
+        questionnaires: [WAIS4_CRITERIA_DEFINITION, WAIS4_LEARNING_DEFINITION, WAIS4_MATRICES_DEFINITION, CVLT_DEFINITION, WAIS4_CODE_DEFINITION, WAIS4_DIGIT_SPAN_DEFINITION, WAIS4_SIMILITUDES_DEFINITION, TMT_DEFINITION, STROOP_DEFINITION, FLUENCES_VERBALES_DEFINITION, COBRA_DEFINITION, CPT3_DEFINITION, TEST_COMMISSIONS_DEFINITION, SCIP_DEFINITION]
       },
       {
         id: 'mod_auto_etat',
@@ -494,7 +496,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diag) completed++;
     if (orient) completed++;
   } else if (visit.visit_type === 'initial_evaluation') {
-    total = 52; // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 7 INFIRMIER + 9 Medical + 12 Neuropsy (7 WAIS + TMT + Stroop + Fluences + COBRA + CPT3)
+    total = 54; // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 7 INFIRMIER + 9 Medical + 14 Neuropsy (7 WAIS + TMT + Stroop + Fluences + COBRA + CPT3 + Commissions + SCIP)
     totalModules = 7;
 
     const [
