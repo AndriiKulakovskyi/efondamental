@@ -1,7 +1,7 @@
 // eFondaMental Platform - Hetero Questionnaire Definitions
 // Clinician-rated questionnaires for bipolar disorder evaluation
 
-import { Question } from '@/lib/types/database.types';
+import { Question, QuestionOption } from '@/lib/types/database.types';
 import { QuestionnaireDefinition } from './questionnaires';
 
 // ============================================================================
@@ -5727,7 +5727,7 @@ export const WAIS3_LEARNING_DEFINITION: QuestionnaireDefinition = {
 // WAIS-III Vocabulaire (Wechsler, 1997)
 // ============================================================================
 
-const WAIS3_VOCABULAIRE_OPTIONS: Option[] = [
+const WAIS3_VOCABULAIRE_OPTIONS: QuestionOption[] = [
   { code: 0, label: '0 - Réponse incorrecte', score: 0 },
   { code: 1, label: '1 - Réponse partielle', score: 1 },
   { code: 2, label: '2 - Réponse correcte', score: 2 }
@@ -5779,7 +5779,7 @@ export const WAIS3_VOCABULAIRE_QUESTIONS: Question[] = [
     text: 'Note brute totale (0-66)',
     type: 'number',
     required: false,
-    read_only: true,
+    readonly: true,
     help: 'Somme des scores des 33 items (calculé automatiquement)'
   }
 ];
@@ -6054,7 +6054,7 @@ export const WAIS3_MATRICES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Scores calculés',
-    read_only: true,
+    readonly: true,
     help: 'Somme des notes des 26 items (calculée automatiquement)'
   },
   {
@@ -6063,7 +6063,7 @@ export const WAIS3_MATRICES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Scores calculés',
-    read_only: true,
+    readonly: true,
     help: 'Note standard selon les normes WAIS-III (calculée automatiquement)'
   },
   {
@@ -6072,7 +6072,7 @@ export const WAIS3_MATRICES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Scores calculés',
-    read_only: true,
+    readonly: true,
     help: 'Valeur Z-score équivalente (calculée automatiquement)'
   }
 ];
@@ -6128,7 +6128,7 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Subtest Code - Scores calculés',
-    read_only: true,
+    readonly: true,
     help: 'Note brute = Nombre total de cases correctement remplies (les erreurs sont ignorées dans cette implémentation)'
   },
   {
@@ -6137,7 +6137,7 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Subtest Code - Scores calculés',
-    read_only: true,
+    readonly: true,
     help: 'Note standard selon les normes WAIS-III basée sur l\'âge'
   },
   {
@@ -6146,7 +6146,7 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Subtest Code - Scores calculés',
-    read_only: true,
+    readonly: true,
     help: 'Valeur standardisée par rapport à une moyenne de 10 et un écart type de 3'
   },
   // Symboles Subtest section
@@ -6172,7 +6172,7 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Subtest Symboles - Scores calculés',
-    read_only: true,
+    readonly: true,
     help: 'Note brute = Total correct - Nombre incorrect'
   },
   {
@@ -6181,7 +6181,7 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Subtest Symboles - Scores calculés',
-    read_only: true,
+    readonly: true,
     help: 'Note standard selon les normes WAIS-III basée sur l\'âge'
   },
   {
@@ -6190,7 +6190,7 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Subtest Symboles - Scores calculés',
-    read_only: true,
+    readonly: true,
     help: 'Valeur standardisée par rapport à une moyenne de 10 et un écart type de 3'
   },
   // IVT section
@@ -6200,7 +6200,7 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'IVT - Indice de Vitesse de Traitement',
-    read_only: true,
+    readonly: true,
     help: 'Note standard Code + Note standard Symboles'
   },
   {
@@ -6209,7 +6209,7 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'IVT - Indice de Vitesse de Traitement',
-    read_only: true,
+    readonly: true,
     help: 'Indice composite dérivé de la table de conversion'
   },
   {
@@ -6218,7 +6218,7 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     section: 'IVT - Indice de Vitesse de Traitement',
-    read_only: true,
+    readonly: true,
     help: 'Rang percentile de l\'Indice de Vitesse de Traitement'
   },
   {
@@ -6227,7 +6227,7 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     section: 'IVT - Indice de Vitesse de Traitement',
-    read_only: true,
+    readonly: true,
     help: 'Intervalle de confiance à 95% de l\'IVT'
   }
 ];
@@ -6461,7 +6461,7 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Scores - Ordre Direct',
-    read_only: true,
+    readonly: true,
     help: 'Somme de tous les essais en ordre direct'
   },
   {
@@ -6470,7 +6470,7 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Scores - Ordre Direct',
-    read_only: true
+    readonly: true
   },
   {
     id: 'wais_mc_end_z',
@@ -6478,7 +6478,7 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Scores - Ordre Direct',
-    read_only: true,
+    readonly: true,
     help: 'Z-score basé sur l\'âge et le niveau d\'études'
   },
   
@@ -6645,7 +6645,7 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Scores - Ordre Inverse',
-    read_only: true,
+    readonly: true,
     help: 'Somme de tous les essais en ordre inverse'
   },
   {
@@ -6654,7 +6654,7 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Scores - Ordre Inverse',
-    read_only: true
+    readonly: true
   },
   {
     id: 'wais_mc_env_z',
@@ -6662,7 +6662,7 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Scores - Ordre Inverse',
-    read_only: true,
+    readonly: true,
     help: 'Z-score basé sur l\'âge et le niveau d\'études'
   },
   
@@ -6673,7 +6673,7 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Scores totaux',
-    read_only: true,
+    readonly: true,
     help: 'Somme des notes brutes Ordre Direct et Ordre Inverse'
   },
   {
@@ -6682,7 +6682,7 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Scores totaux',
-    read_only: true
+    readonly: true
   },
   {
     id: 'wais_mc_std',
@@ -6690,7 +6690,7 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Scores totaux',
-    read_only: true,
+    readonly: true,
     help: 'Note standard basée sur l\'âge selon les normes WAIS-III'
   },
   {
@@ -6699,7 +6699,7 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     section: 'Scores totaux',
-    read_only: true,
+    readonly: true,
     help: '(Note standard - 10) / 3'
   }
 ];
