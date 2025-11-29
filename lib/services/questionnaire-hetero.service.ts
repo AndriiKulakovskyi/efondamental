@@ -71,6 +71,7 @@ import { calculateWais4SimilitudesScores } from './wais4-similitudes-scoring';
 import { calculateTestCommissionsScores } from './test-commissions-scoring';
 import { calculateScipScores } from './scip-scoring';
 import { calculateWais3MatricesScores } from './wais3-matrices-scoring';
+import { calculateWais3CodeSymbolesScores } from './wais3-code-symboles-scoring';
 
 // ============================================================================
 // MADRS (Montgomery-Åsberg Depression Rating Scale)
@@ -2452,6 +2453,74 @@ export async function saveWais3MatricesResponse(
       item_26: response.item_26,
       standard_score: scores.standard_score,
       standardized_value: scores.standardized_value,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// WAIS-III Code, Symboles & IVT
+// ============================================================================
+
+import { Wais3CodeSymbolesResponse, Wais3CodeSymbolesResponseInsert } from '@/lib/types/database.types';
+
+export async function getWais3CodeSymbolesResponse(
+  visitId: string
+): Promise<Wais3CodeSymbolesResponse | null> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_wais3_code_symboles')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveWais3CodeSymbolesResponse(
+  response: Wais3CodeSymbolesResponseInsert
+): Promise<Wais3CodeSymbolesResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Calculate scores using WAIS-III norms
+  const scores = calculateWais3CodeSymbolesScores({
+    patient_age: response.patient_age,
+    wais_cod_tot: response.wais_cod_tot,
+    wais_cod_err: response.wais_cod_err,
+    wais_symb_tot: response.wais_symb_tot,
+    wais_symb_err: response.wais_symb_err
+  });
+
+  const { data, error } = await supabase
+    .from('responses_wais3_code_symboles')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      patient_age: response.patient_age,
+      wais_cod_tot: response.wais_cod_tot,
+      wais_cod_err: response.wais_cod_err,
+      wais_symb_tot: response.wais_symb_tot,
+      wais_symb_err: response.wais_symb_err,
+      wais_cod_brut: scores.wais_cod_brut,
+      wais_cod_std: scores.wais_cod_std,
+      wais_cod_cr: scores.wais_cod_cr,
+      wais_symb_brut: scores.wais_symb_brut,
+      wais_symb_std: scores.wais_symb_std,
+      wais_symb_cr: scores.wais_symb_cr,
+      wais_somme_ivt: scores.wais_somme_ivt,
+      wais_ivt: scores.wais_ivt,
+      wais_ivt_rang: scores.wais_ivt_rang,
+      wais_ivt_95: scores.wais_ivt_95,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

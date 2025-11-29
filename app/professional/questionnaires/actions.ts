@@ -62,7 +62,8 @@ import {
   saveWais3CriteriaResponse,
   saveWais3LearningResponse,
   saveWais3VocabulaireResponse,
-  saveWais3MatricesResponse
+  saveWais3MatricesResponse,
+  saveWais3CodeSymbolesResponse
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveSocialResponse
@@ -156,7 +157,8 @@ import {
   Wais3CriteriaResponseInsert,
   Wais3LearningResponseInsert,
   Wais3VocabulaireResponseInsert,
-  Wais3MatricesResponseInsert
+  Wais3MatricesResponseInsert,
+  Wais3CodeSymbolesResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -733,6 +735,18 @@ export async function submitProfessionalQuestionnaireAction(
           item_25: responses.item_25,
           item_26: responses.item_26
         } as Wais3MatricesResponseInsert);
+        break;
+
+      case 'WAIS3_CODE_SYMBOLES_FR':
+        result = await saveWais3CodeSymbolesResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          patient_age: responses.patient_age,
+          wais_cod_tot: responses.wais_cod_tot,
+          wais_cod_err: responses.wais_cod_err,
+          wais_symb_tot: responses.wais_symb_tot,
+          wais_symb_err: responses.wais_symb_err
+        } as Wais3CodeSymbolesResponseInsert);
         break;
         
       default:

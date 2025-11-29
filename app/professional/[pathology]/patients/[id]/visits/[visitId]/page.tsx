@@ -69,7 +69,8 @@ import {
   WAIS3_CRITERIA_DEFINITION,
   WAIS3_LEARNING_DEFINITION,
   WAIS3_VOCABULAIRE_DEFINITION,
-  WAIS3_MATRICES_DEFINITION
+  WAIS3_MATRICES_DEFINITION,
+  WAIS3_CODE_SYMBOLES_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -390,6 +391,13 @@ export default async function VisitDetailPage({
                 target_role: 'healthcare_professional',
                 completed: questionnaireStatuses['WAIS3_MATRICES_FR']?.completed || false,
                 completedAt: questionnaireStatuses['WAIS3_MATRICES_FR']?.completed_at,
+              },
+              {
+                ...WAIS3_CODE_SYMBOLES_DEFINITION,
+                id: WAIS3_CODE_SYMBOLES_DEFINITION.code,
+                target_role: 'healthcare_professional',
+                completed: questionnaireStatuses['WAIS3_CODE_SYMBOLES_FR']?.completed || false,
+                completedAt: questionnaireStatuses['WAIS3_CODE_SYMBOLES_FR']?.completed_at,
               },
               {
                 ...WAIS3_CVLT_DEFINITION,

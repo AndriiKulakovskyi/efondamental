@@ -6089,3 +6089,158 @@ export const WAIS3_MATRICES_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// WAIS-III - Code, Symboles & IVT (Indice de Vitesse de Traitement)
+// ============================================================================
+export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
+  // Demographics section
+  {
+    id: 'patient_age',
+    text: 'Âge du patient (en années)',
+    type: 'number',
+    required: true,
+    section: 'Données démographiques',
+    min: 16,
+    max: 90,
+    help: 'Âge utilisé pour la conversion en notes standard selon les normes WAIS-III'
+  },
+  // Code Subtest section
+  {
+    id: 'wais_cod_tot',
+    text: 'Nombre total de cases remplies de façon correcte',
+    type: 'number',
+    required: true,
+    section: 'Subtest Code',
+    min: 0
+  },
+  {
+    id: 'wais_cod_err',
+    text: 'Nombre de cases remplies de façon incorrecte',
+    type: 'number',
+    required: true,
+    section: 'Subtest Code',
+    min: 0
+  },
+  {
+    id: 'wais_cod_brut',
+    text: 'Note brute totale',
+    type: 'number',
+    required: false,
+    section: 'Subtest Code - Scores calculés',
+    read_only: true,
+    help: 'Note brute = Nombre total de cases correctement remplies (les erreurs sont ignorées dans cette implémentation)'
+  },
+  {
+    id: 'wais_cod_std',
+    text: 'Note standard - Code',
+    type: 'number',
+    required: false,
+    section: 'Subtest Code - Scores calculés',
+    read_only: true,
+    help: 'Note standard selon les normes WAIS-III basée sur l\'âge'
+  },
+  {
+    id: 'wais_cod_cr',
+    text: 'Valeur standardisée (Code)',
+    type: 'number',
+    required: false,
+    section: 'Subtest Code - Scores calculés',
+    read_only: true,
+    help: 'Valeur standardisée par rapport à une moyenne de 10 et un écart type de 3'
+  },
+  // Symboles Subtest section
+  {
+    id: 'wais_symb_tot',
+    text: 'Nombre total de cases remplies de façon correcte',
+    type: 'number',
+    required: true,
+    section: 'Subtest Symboles',
+    min: 0
+  },
+  {
+    id: 'wais_symb_err',
+    text: 'Nombre de cases remplies de façon incorrecte',
+    type: 'number',
+    required: true,
+    section: 'Subtest Symboles',
+    min: 0
+  },
+  {
+    id: 'wais_symb_brut',
+    text: 'Note brute totale',
+    type: 'number',
+    required: false,
+    section: 'Subtest Symboles - Scores calculés',
+    read_only: true,
+    help: 'Note brute = Total correct - Nombre incorrect'
+  },
+  {
+    id: 'wais_symb_std',
+    text: 'Note standard - Symboles',
+    type: 'number',
+    required: false,
+    section: 'Subtest Symboles - Scores calculés',
+    read_only: true,
+    help: 'Note standard selon les normes WAIS-III basée sur l\'âge'
+  },
+  {
+    id: 'wais_symb_cr',
+    text: 'Valeur standardisée (Symboles)',
+    type: 'number',
+    required: false,
+    section: 'Subtest Symboles - Scores calculés',
+    read_only: true,
+    help: 'Valeur standardisée par rapport à une moyenne de 10 et un écart type de 3'
+  },
+  // IVT section
+  {
+    id: 'wais_somme_ivt',
+    text: 'Somme des notes standard',
+    type: 'number',
+    required: false,
+    section: 'IVT - Indice de Vitesse de Traitement',
+    read_only: true,
+    help: 'Note standard Code + Note standard Symboles'
+  },
+  {
+    id: 'wais_ivt',
+    text: 'Indice de Vitesse de Traitement (IVT)',
+    type: 'number',
+    required: false,
+    section: 'IVT - Indice de Vitesse de Traitement',
+    read_only: true,
+    help: 'Indice composite dérivé de la table de conversion'
+  },
+  {
+    id: 'wais_ivt_rang',
+    text: 'Rang percentile de l\'IVT',
+    type: 'text',
+    required: false,
+    section: 'IVT - Indice de Vitesse de Traitement',
+    read_only: true,
+    help: 'Rang percentile de l\'Indice de Vitesse de Traitement'
+  },
+  {
+    id: 'wais_ivt_95',
+    text: 'Intervalle de confiance à 95%',
+    type: 'text',
+    required: false,
+    section: 'IVT - Indice de Vitesse de Traitement',
+    read_only: true,
+    help: 'Intervalle de confiance à 95% de l\'IVT'
+  }
+];
+
+export const WAIS3_CODE_SYMBOLES_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais3_code_symboles',
+  code: 'WAIS3_CODE_SYMBOLES_FR',
+  title: 'WAIS-III - Code, Symboles & IVT',
+  description: 'Subtests Code et Symboles de la WAIS-III (Wechsler, 1997) avec l\'Indice de Vitesse de Traitement (IVT). ATTENTION: Cette version utilise les normes WAIS-III. Une version plus récente avec les normes WAIS-IV est disponible dans la section WAIS-IV.',
+  questions: WAIS3_CODE_SYMBOLES_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

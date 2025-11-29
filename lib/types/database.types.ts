@@ -3137,3 +3137,50 @@ export interface Wais3MatricesResponse {
 
 export type Wais3MatricesResponseInsert = Omit<Wais3MatricesResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_raw_score' | 'standard_score' | 'standardized_value'>;
 
+// WAIS-III Code, Symboles & IVT
+export interface Wais3CodeSymbolesResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Patient age for norm lookup
+  patient_age: number;
+  
+  // Code subtest inputs
+  wais_cod_tot: number;  // Total correct boxes
+  wais_cod_err: number;  // Incorrect boxes
+  
+  // Symboles subtest inputs
+  wais_symb_tot: number;  // Total correct
+  wais_symb_err: number;  // Incorrect
+  
+  // Code calculated scores
+  wais_cod_brut?: number;   // Raw score
+  wais_cod_std?: number;    // Standard score
+  wais_cod_cr?: number;     // Standardized value
+  
+  // Symboles calculated scores
+  wais_symb_brut?: number;  // Raw score
+  wais_symb_std?: number;   // Standard score
+  wais_symb_cr?: number;    // Standardized value
+  
+  // IVT calculated scores
+  wais_somme_ivt?: number;  // Sum of standard scores
+  wais_ivt?: number;        // IVT Index
+  wais_ivt_rang?: string;   // Percentile rank
+  wais_ivt_95?: string;     // 95% confidence interval
+  
+  // Metadata
+  completed_by?: string;
+  completed_at: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type Wais3CodeSymbolesResponseInsert = Omit<Wais3CodeSymbolesResponse, 
+  'id' | 'created_at' | 'updated_at' | 'completed_at' | 
+  'wais_cod_brut' | 'wais_cod_std' | 'wais_cod_cr' |
+  'wais_symb_brut' | 'wais_symb_std' | 'wais_symb_cr' |
+  'wais_somme_ivt' | 'wais_ivt' | 'wais_ivt_rang' | 'wais_ivt_95'
+>;
+
