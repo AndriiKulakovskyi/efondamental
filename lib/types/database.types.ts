@@ -3184,3 +3184,61 @@ export type Wais3CodeSymbolesResponseInsert = Omit<Wais3CodeSymbolesResponse,
   'wais_somme_ivt' | 'wais_ivt' | 'wais_ivt_rang' | 'wais_ivt_95'
 >;
 
+// ============================================================================
+// WAIS-III Digit Span (Mémoire des chiffres) Response
+// ============================================================================
+
+export interface Wais3DigitSpanResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Demographic data
+  patient_age: number;
+  education_level?: number;
+  
+  // Forward (Ordre Direct) items
+  mcod_1a: number; mcod_1b: number;
+  mcod_2a: number; mcod_2b: number;
+  mcod_3a: number; mcod_3b: number;
+  mcod_4a: number; mcod_4b: number;
+  mcod_5a: number; mcod_5b: number;
+  mcod_6a: number; mcod_6b: number;
+  mcod_7a: number; mcod_7b: number;
+  mcod_8a: number; mcod_8b: number;
+  
+  // Backward (Ordre Inverse) items
+  mcoi_1a: number; mcoi_1b: number;
+  mcoi_2a: number; mcoi_2b: number;
+  mcoi_3a: number; mcoi_3b: number;
+  mcoi_4a: number; mcoi_4b: number;
+  mcoi_5a: number; mcoi_5b: number;
+  mcoi_6a: number; mcoi_6b: number;
+  mcoi_7a: number; mcoi_7b: number;
+  
+  // Computed scores
+  wais_mcod_tot?: number;
+  wais_mcoi_tot?: number;
+  wais_mc_tot?: number;
+  wais_mc_end?: number;
+  wais_mc_env?: number;
+  wais_mc_emp?: number;
+  wais_mc_std?: number;
+  wais_mc_cr?: number;
+  wais_mc_end_z?: number;
+  wais_mc_env_z?: number;
+  
+  // Metadata
+  completed_by?: string;
+  completed_at: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type Wais3DigitSpanResponseInsert = Omit<Wais3DigitSpanResponse, 
+  'id' | 'created_at' | 'updated_at' | 'completed_at' | 
+  'wais_mcod_tot' | 'wais_mcoi_tot' | 'wais_mc_tot' | 
+  'wais_mc_end' | 'wais_mc_env' | 'wais_mc_emp' | 
+  'wais_mc_std' | 'wais_mc_cr' | 'wais_mc_end_z' | 'wais_mc_env_z'
+>;
+

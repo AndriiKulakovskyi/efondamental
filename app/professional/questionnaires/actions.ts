@@ -63,7 +63,8 @@ import {
   saveWais3LearningResponse,
   saveWais3VocabulaireResponse,
   saveWais3MatricesResponse,
-  saveWais3CodeSymbolesResponse
+  saveWais3CodeSymbolesResponse,
+  saveWais3DigitSpanResponse
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveSocialResponse
@@ -158,7 +159,8 @@ import {
   Wais3LearningResponseInsert,
   Wais3VocabulaireResponseInsert,
   Wais3MatricesResponseInsert,
-  Wais3CodeSymbolesResponseInsert
+  Wais3CodeSymbolesResponseInsert,
+  Wais3DigitSpanResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -747,6 +749,30 @@ export async function submitProfessionalQuestionnaireAction(
           wais_symb_tot: responses.wais_symb_tot,
           wais_symb_err: responses.wais_symb_err
         } as Wais3CodeSymbolesResponseInsert);
+        break;
+
+      case 'WAIS3_DIGIT_SPAN_FR':
+        result = await saveWais3DigitSpanResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          patient_age: responses.patient_age,
+          education_level: responses.education_level,
+          mcod_1a: responses.mcod_1a, mcod_1b: responses.mcod_1b,
+          mcod_2a: responses.mcod_2a, mcod_2b: responses.mcod_2b,
+          mcod_3a: responses.mcod_3a, mcod_3b: responses.mcod_3b,
+          mcod_4a: responses.mcod_4a, mcod_4b: responses.mcod_4b,
+          mcod_5a: responses.mcod_5a, mcod_5b: responses.mcod_5b,
+          mcod_6a: responses.mcod_6a, mcod_6b: responses.mcod_6b,
+          mcod_7a: responses.mcod_7a, mcod_7b: responses.mcod_7b,
+          mcod_8a: responses.mcod_8a, mcod_8b: responses.mcod_8b,
+          mcoi_1a: responses.mcoi_1a, mcoi_1b: responses.mcoi_1b,
+          mcoi_2a: responses.mcoi_2a, mcoi_2b: responses.mcoi_2b,
+          mcoi_3a: responses.mcoi_3a, mcoi_3b: responses.mcoi_3b,
+          mcoi_4a: responses.mcoi_4a, mcoi_4b: responses.mcoi_4b,
+          mcoi_5a: responses.mcoi_5a, mcoi_5b: responses.mcoi_5b,
+          mcoi_6a: responses.mcoi_6a, mcoi_6b: responses.mcoi_6b,
+          mcoi_7a: responses.mcoi_7a, mcoi_7b: responses.mcoi_7b
+        } as Wais3DigitSpanResponseInsert);
         break;
         
       default:

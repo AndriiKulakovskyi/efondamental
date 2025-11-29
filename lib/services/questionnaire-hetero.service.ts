@@ -2529,3 +2529,92 @@ export async function saveWais3CodeSymbolesResponse(
   if (error) throw error;
   return data;
 }
+
+// ============================================================================
+// WAIS-III Digit Span (Mémoire des chiffres)
+// ============================================================================
+
+import { Wais3DigitSpanResponse, Wais3DigitSpanResponseInsert } from '@/lib/types/database.types';
+import { calculateWais3DigitSpanScores } from './wais3-digit-span-scoring';
+
+export async function getWais3DigitSpanResponse(
+  visitId: string
+): Promise<Wais3DigitSpanResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_wais3_digit_span')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error && error.code !== 'PGRST116') throw error;
+  return data;
+}
+
+export async function saveWais3DigitSpanResponse(
+  response: Wais3DigitSpanResponseInsert
+): Promise<Wais3DigitSpanResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Calculate scores using WAIS-III norms
+  const scores = calculateWais3DigitSpanScores({
+    patient_age: response.patient_age,
+    education_level: response.education_level,
+    mcod_1a: response.mcod_1a, mcod_1b: response.mcod_1b,
+    mcod_2a: response.mcod_2a, mcod_2b: response.mcod_2b,
+    mcod_3a: response.mcod_3a, mcod_3b: response.mcod_3b,
+    mcod_4a: response.mcod_4a, mcod_4b: response.mcod_4b,
+    mcod_5a: response.mcod_5a, mcod_5b: response.mcod_5b,
+    mcod_6a: response.mcod_6a, mcod_6b: response.mcod_6b,
+    mcod_7a: response.mcod_7a, mcod_7b: response.mcod_7b,
+    mcod_8a: response.mcod_8a, mcod_8b: response.mcod_8b,
+    mcoi_1a: response.mcoi_1a, mcoi_1b: response.mcoi_1b,
+    mcoi_2a: response.mcoi_2a, mcoi_2b: response.mcoi_2b,
+    mcoi_3a: response.mcoi_3a, mcoi_3b: response.mcoi_3b,
+    mcoi_4a: response.mcoi_4a, mcoi_4b: response.mcoi_4b,
+    mcoi_5a: response.mcoi_5a, mcoi_5b: response.mcoi_5b,
+    mcoi_6a: response.mcoi_6a, mcoi_6b: response.mcoi_6b,
+    mcoi_7a: response.mcoi_7a, mcoi_7b: response.mcoi_7b
+  });
+
+  const { data, error } = await supabase
+    .from('responses_wais3_digit_span')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      patient_age: response.patient_age,
+      education_level: response.education_level,
+      mcod_1a: response.mcod_1a, mcod_1b: response.mcod_1b,
+      mcod_2a: response.mcod_2a, mcod_2b: response.mcod_2b,
+      mcod_3a: response.mcod_3a, mcod_3b: response.mcod_3b,
+      mcod_4a: response.mcod_4a, mcod_4b: response.mcod_4b,
+      mcod_5a: response.mcod_5a, mcod_5b: response.mcod_5b,
+      mcod_6a: response.mcod_6a, mcod_6b: response.mcod_6b,
+      mcod_7a: response.mcod_7a, mcod_7b: response.mcod_7b,
+      mcod_8a: response.mcod_8a, mcod_8b: response.mcod_8b,
+      mcoi_1a: response.mcoi_1a, mcoi_1b: response.mcoi_1b,
+      mcoi_2a: response.mcoi_2a, mcoi_2b: response.mcoi_2b,
+      mcoi_3a: response.mcoi_3a, mcoi_3b: response.mcoi_3b,
+      mcoi_4a: response.mcoi_4a, mcoi_4b: response.mcoi_4b,
+      mcoi_5a: response.mcoi_5a, mcoi_5b: response.mcoi_5b,
+      mcoi_6a: response.mcoi_6a, mcoi_6b: response.mcoi_6b,
+      mcoi_7a: response.mcoi_7a, mcoi_7b: response.mcoi_7b,
+      wais_mcod_tot: scores.wais_mcod_tot,
+      wais_mcoi_tot: scores.wais_mcoi_tot,
+      wais_mc_tot: scores.wais_mc_tot,
+      wais_mc_end: scores.wais_mc_end,
+      wais_mc_env: scores.wais_mc_env,
+      wais_mc_emp: scores.wais_mc_emp,
+      wais_mc_std: scores.wais_mc_std,
+      wais_mc_cr: scores.wais_mc_cr,
+      wais_mc_end_z: scores.wais_mc_end_z,
+      wais_mc_env_z: scores.wais_mc_env_z,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}

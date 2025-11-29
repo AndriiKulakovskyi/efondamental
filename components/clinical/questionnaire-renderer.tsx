@@ -1035,6 +1035,117 @@ export function QuestionnaireRenderer({
         }
       }
 
+      // Compute WAIS-III Digit Span scores
+      const hasDigitSpanFields = prev.mcod_1a !== undefined || prev.mcoi_1a !== undefined;
+      
+      if (hasDigitSpanFields) {
+        const dsAge = Number(prev.patient_age);
+        const hasValidAge = !isNaN(dsAge) && dsAge >= 16 && dsAge <= 90;
+        
+        // Calculate forward raw score
+        const forwardItems = [
+          prev.mcod_1a, prev.mcod_1b, prev.mcod_2a, prev.mcod_2b,
+          prev.mcod_3a, prev.mcod_3b, prev.mcod_4a, prev.mcod_4b,
+          prev.mcod_5a, prev.mcod_5b, prev.mcod_6a, prev.mcod_6b,
+          prev.mcod_7a, prev.mcod_7b, prev.mcod_8a, prev.mcod_8b
+        ];
+        
+        const backwardItems = [
+          prev.mcoi_1a, prev.mcoi_1b, prev.mcoi_2a, prev.mcoi_2b,
+          prev.mcoi_3a, prev.mcoi_3b, prev.mcoi_4a, prev.mcoi_4b,
+          prev.mcoi_5a, prev.mcoi_5b, prev.mcoi_6a, prev.mcoi_6b,
+          prev.mcoi_7a, prev.mcoi_7b
+        ];
+        
+        const forwardValid = forwardItems.some(v => v !== undefined && v !== '');
+        const backwardValid = backwardItems.some(v => v !== undefined && v !== '');
+        
+        if (forwardValid || backwardValid) {
+          // Calculate forward raw score
+          const wais_mcod_tot = forwardItems.reduce((sum, v) => sum + (Number(v) || 0), 0);
+          updated.wais_mcod_tot = wais_mcod_tot;
+          
+          // Calculate forward span
+          let wais_mc_end = 0;
+          if (Number(prev.mcod_1a) === 1 || Number(prev.mcod_1b) === 1) wais_mc_end = 2;
+          if (Number(prev.mcod_2a) === 1 || Number(prev.mcod_2b) === 1) wais_mc_end = 3;
+          if (Number(prev.mcod_3a) === 1 || Number(prev.mcod_3b) === 1) wais_mc_end = 4;
+          if (Number(prev.mcod_4a) === 1 || Number(prev.mcod_4b) === 1) wais_mc_end = 5;
+          if (Number(prev.mcod_5a) === 1 || Number(prev.mcod_5b) === 1) wais_mc_end = 6;
+          if (Number(prev.mcod_6a) === 1 || Number(prev.mcod_6b) === 1) wais_mc_end = 7;
+          if (Number(prev.mcod_7a) === 1 || Number(prev.mcod_7b) === 1) wais_mc_end = 8;
+          if (Number(prev.mcod_8a) === 1 || Number(prev.mcod_8b) === 1) wais_mc_end = 9;
+          updated.wais_mc_end = wais_mc_end;
+          
+          // Calculate backward raw score
+          const wais_mcoi_tot = backwardItems.reduce((sum, v) => sum + (Number(v) || 0), 0);
+          updated.wais_mcoi_tot = wais_mcoi_tot;
+          
+          // Calculate backward span
+          let wais_mc_env = 0;
+          if (Number(prev.mcoi_1a) === 1 || Number(prev.mcoi_1b) === 1) wais_mc_env = 2;
+          if (Number(prev.mcoi_2a) === 1 || Number(prev.mcoi_2b) === 1) wais_mc_env = 3;
+          if (Number(prev.mcoi_3a) === 1 || Number(prev.mcoi_3b) === 1) wais_mc_env = 4;
+          if (Number(prev.mcoi_4a) === 1 || Number(prev.mcoi_4b) === 1) wais_mc_env = 5;
+          if (Number(prev.mcoi_5a) === 1 || Number(prev.mcoi_5b) === 1) wais_mc_env = 6;
+          if (Number(prev.mcoi_6a) === 1 || Number(prev.mcoi_6b) === 1) wais_mc_env = 7;
+          if (Number(prev.mcoi_7a) === 1 || Number(prev.mcoi_7b) === 1) wais_mc_env = 8;
+          updated.wais_mc_env = wais_mc_env;
+          
+          // Calculate total and span difference
+          const wais_mc_tot = wais_mcod_tot + wais_mcoi_tot;
+          updated.wais_mc_tot = wais_mc_tot;
+          updated.wais_mc_emp = wais_mc_end - wais_mc_env;
+          
+          hasChanges = true;
+          
+          // Calculate standard score if age is valid
+          if (hasValidAge) {
+            const WAIS3_DS_NORMS: Record<string, number[]> = {
+              '16-17': [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 22, 24, 25, 26, 27, 30],
+              '18-19': [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 21, 22, 23, 24, 25, 27, 28, 30],
+              '20-24': [9, 10, 11, 11, 12, 13, 14, 15, 17, 19, 20, 21, 22, 24, 25, 26, 28, 29, 30],
+              '25-29': [7, 8, 9, 10, 11, 12, 14, 15, 16, 18, 19, 20, 22, 24, 25, 26, 28, 29, 30],
+              '30-34': [7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 20, 22, 24, 25, 26, 28, 29, 30],
+              '35-44': [7, 8, 9, 9, 10, 11, 13, 14, 15, 16, 18, 20, 22, 23, 24, 25, 26, 28, 30],
+              '45-54': [7, 8, 9, 9, 10, 11, 12, 13, 15, 16, 18, 20, 22, 24, 25, 26, 27, 28, 30],
+              '55-64': [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 25, 26, 27, 30],
+              '65-69': [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 21, 22, 24, 26, 27, 30],
+              '70-74': [5, 6, 7, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 22, 24, 26, 30],
+              '75-79': [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 30],
+              '80+': [4, 5, 6, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 19, 20, 21, 22, 30]
+            };
+            
+            const getAgeGroup = (age: number): string => {
+              if (age >= 16 && age <= 17) return '16-17';
+              if (age >= 18 && age <= 19) return '18-19';
+              if (age >= 20 && age <= 24) return '20-24';
+              if (age >= 25 && age <= 29) return '25-29';
+              if (age >= 30 && age <= 34) return '30-34';
+              if (age >= 35 && age <= 44) return '35-44';
+              if (age >= 45 && age <= 54) return '45-54';
+              if (age >= 55 && age <= 64) return '55-64';
+              if (age >= 65 && age <= 69) return '65-69';
+              if (age >= 70 && age <= 74) return '70-74';
+              if (age >= 75 && age <= 79) return '75-79';
+              return '80+';
+            };
+            
+            const findStdScore = (rawScore: number, norms: number[]): number => {
+              for (let i = 0; i < norms.length; i++) {
+                if (rawScore <= norms[i]) return i + 1;
+              }
+              return 19;
+            };
+            
+            const ageGroup = getAgeGroup(dsAge);
+            const wais_mc_std = findStdScore(wais_mc_tot, WAIS3_DS_NORMS[ageGroup]);
+            updated.wais_mc_std = wais_mc_std;
+            updated.wais_mc_cr = Number(((wais_mc_std - 10) / 3).toFixed(2));
+          }
+        }
+      }
+
       return hasChanges ? updated : prev;
     });
   }, [
@@ -1151,7 +1262,16 @@ export function QuestionnaireRenderer({
     responses.wais_cod_tot,
     responses.wais_cod_err,
     responses.wais_symb_tot,
-    responses.wais_symb_err
+    responses.wais_symb_err,
+    // WAIS-III Digit Span fields
+    responses.mcod_1a, responses.mcod_1b, responses.mcod_2a, responses.mcod_2b,
+    responses.mcod_3a, responses.mcod_3b, responses.mcod_4a, responses.mcod_4b,
+    responses.mcod_5a, responses.mcod_5b, responses.mcod_6a, responses.mcod_6b,
+    responses.mcod_7a, responses.mcod_7b, responses.mcod_8a, responses.mcod_8b,
+    responses.mcoi_1a, responses.mcoi_1b, responses.mcoi_2a, responses.mcoi_2b,
+    responses.mcoi_3a, responses.mcoi_3b, responses.mcoi_4a, responses.mcoi_4b,
+    responses.mcoi_5a, responses.mcoi_5b, responses.mcoi_6a, responses.mcoi_6b,
+    responses.mcoi_7a, responses.mcoi_7b
   ]);
 
   const { visibleQuestions, requiredQuestions } = evaluateConditionalLogic(

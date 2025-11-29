@@ -6244,3 +6244,475 @@ export const WAIS3_CODE_SYMBOLES_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// WAIS-III - Mémoire des chiffres (Digit Span)
+// ============================================================================
+export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
+  // Demographics section
+  {
+    id: 'patient_age',
+    text: 'Âge du patient (en années)',
+    type: 'number',
+    required: true,
+    section: 'Données démographiques',
+    min: 16,
+    max: 90,
+    help: 'Âge utilisé pour la conversion en notes standard selon les normes WAIS-III'
+  },
+  {
+    id: 'education_level',
+    text: 'Niveau d\'études',
+    type: 'single_choice',
+    required: false,
+    section: 'Données démographiques',
+    options: [
+      { code: 0, label: '< 2 ans', score: 0 },
+      { code: 1, label: '2-11 ans', score: 1 },
+      { code: 2, label: '12 ans', score: 2 },
+      { code: 3, label: '13-14 ans', score: 3 },
+      { code: 4, label: '>= 15 ans', score: 4 }
+    ],
+    help: 'Niveau d\'études pour le calcul des z-scores d\'empan'
+  },
+  
+  // Forward (Ordre Direct) items
+  {
+    id: 'mcod_1a',
+    text: 'ITEM 1 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (2 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_1b',
+    text: 'ITEM 1 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (2 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_2a',
+    text: 'ITEM 2 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (3 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_2b',
+    text: 'ITEM 2 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (3 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_3a',
+    text: 'ITEM 3 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (4 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_3b',
+    text: 'ITEM 3 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (4 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_4a',
+    text: 'ITEM 4 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (5 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_4b',
+    text: 'ITEM 4 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (5 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_5a',
+    text: 'ITEM 5 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (6 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_5b',
+    text: 'ITEM 5 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (6 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_6a',
+    text: 'ITEM 6 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (7 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_6b',
+    text: 'ITEM 6 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (7 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_7a',
+    text: 'ITEM 7 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (8 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_7b',
+    text: 'ITEM 7 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (8 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_8a',
+    text: 'ITEM 8 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (9 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcod_8b',
+    text: 'ITEM 8 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Direct (9 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  
+  // Forward computed score
+  {
+    id: 'wais_mcod_tot',
+    text: 'Note brute - Ordre Direct',
+    type: 'number',
+    required: false,
+    section: 'Scores - Ordre Direct',
+    read_only: true,
+    help: 'Somme de tous les essais en ordre direct'
+  },
+  {
+    id: 'wais_mc_end',
+    text: 'Empan endroit (nombre maximum de chiffres rappelés)',
+    type: 'number',
+    required: false,
+    section: 'Scores - Ordre Direct',
+    read_only: true
+  },
+  {
+    id: 'wais_mc_end_z',
+    text: 'Z-score empan endroit',
+    type: 'number',
+    required: false,
+    section: 'Scores - Ordre Direct',
+    read_only: true,
+    help: 'Z-score basé sur l\'âge et le niveau d\'études'
+  },
+  
+  // Backward (Ordre Inverse) items
+  {
+    id: 'mcoi_1a',
+    text: 'ITEM 1 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Inverse (2 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_1b',
+    text: 'ITEM 1 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Inverse (2 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_2a',
+    text: 'ITEM 2 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Inverse (3 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_2b',
+    text: 'ITEM 2 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Inverse (3 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_3a',
+    text: 'ITEM 3 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Inverse (4 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_3b',
+    text: 'ITEM 3 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Inverse (4 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_4a',
+    text: 'ITEM 4 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Inverse (5 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_4b',
+    text: 'ITEM 4 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Inverse (5 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_5a',
+    text: 'ITEM 5 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Inverse (6 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_5b',
+    text: 'ITEM 5 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Inverse (6 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_6a',
+    text: 'ITEM 6 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Inverse (7 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_6b',
+    text: 'ITEM 6 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Inverse (7 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_7a',
+    text: 'ITEM 7 - Note à l\'essai 1',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Inverse (8 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  {
+    id: 'mcoi_7b',
+    text: 'ITEM 7 - Note à l\'essai 2',
+    type: 'single_choice',
+    required: true,
+    section: 'Ordre Inverse (8 chiffres)',
+    options: [
+      { code: 0, label: 'Échec (0)', score: 0 },
+      { code: 1, label: 'Réussite (1)', score: 1 }
+    ]
+  },
+  
+  // Backward computed scores
+  {
+    id: 'wais_mcoi_tot',
+    text: 'Note brute - Ordre Inverse',
+    type: 'number',
+    required: false,
+    section: 'Scores - Ordre Inverse',
+    read_only: true,
+    help: 'Somme de tous les essais en ordre inverse'
+  },
+  {
+    id: 'wais_mc_env',
+    text: 'Empan envers (nombre maximum de chiffres rappelés)',
+    type: 'number',
+    required: false,
+    section: 'Scores - Ordre Inverse',
+    read_only: true
+  },
+  {
+    id: 'wais_mc_env_z',
+    text: 'Z-score empan envers',
+    type: 'number',
+    required: false,
+    section: 'Scores - Ordre Inverse',
+    read_only: true,
+    help: 'Z-score basé sur l\'âge et le niveau d\'études'
+  },
+  
+  // Total scores
+  {
+    id: 'wais_mc_tot',
+    text: 'Note brute totale - Mémoire des chiffres',
+    type: 'number',
+    required: false,
+    section: 'Scores totaux',
+    read_only: true,
+    help: 'Somme des notes brutes Ordre Direct et Ordre Inverse'
+  },
+  {
+    id: 'wais_mc_emp',
+    text: 'Différence empan endroit - empan envers',
+    type: 'number',
+    required: false,
+    section: 'Scores totaux',
+    read_only: true
+  },
+  {
+    id: 'wais_mc_std',
+    text: 'Note standard - Mémoire des chiffres',
+    type: 'number',
+    required: false,
+    section: 'Scores totaux',
+    read_only: true,
+    help: 'Note standard basée sur l\'âge selon les normes WAIS-III'
+  },
+  {
+    id: 'wais_mc_cr',
+    text: 'Valeur standardisée (moyenne=10, écart-type=3)',
+    type: 'number',
+    required: false,
+    section: 'Scores totaux',
+    read_only: true,
+    help: '(Note standard - 10) / 3'
+  }
+];
+
+export const WAIS3_DIGIT_SPAN_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais3_digit_span',
+  code: 'WAIS3_DIGIT_SPAN_FR',
+  title: 'WAIS-III - Mémoire des chiffres',
+  description: 'Subtest Mémoire des chiffres de la WAIS-III (Wechsler, 1997) incluant l\'Ordre Direct et l\'Ordre Inverse. ATTENTION: Cette version utilise les normes WAIS-III. Une version plus récente avec les normes WAIS-IV est disponible dans la section WAIS-IV.',
+  questions: WAIS3_DIGIT_SPAN_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
