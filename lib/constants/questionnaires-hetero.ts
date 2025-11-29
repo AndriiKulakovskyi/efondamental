@@ -6716,3 +6716,414 @@ export const WAIS3_DIGIT_SPAN_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// WAIS-III - CPT II V.5 (Conners' Continuous Performance Test II)
+// ============================================================================
+export const WAIS3_CPT2_QUESTIONS: Question[] = [
+  // Omissions
+  {
+    id: 'cpt2_omissions_value',
+    text: 'Omissions - Value',
+    type: 'number',
+    required: false,
+    section: 'Omissions',
+    help: 'Missed targets'
+  },
+  {
+    id: 'cpt2_omissions_pourcentage',
+    text: 'Omissions - Pourcentage',
+    type: 'number',
+    required: false,
+    section: 'Omissions'
+  },
+  {
+    id: 'cpt2_omissions_tscore',
+    text: 'Omissions - T-score',
+    type: 'number',
+    required: false,
+    section: 'Omissions'
+  },
+  {
+    id: 'cpt2_omissions_percentile',
+    text: 'Omissions - Percentile',
+    type: 'number',
+    required: false,
+    section: 'Omissions'
+  },
+  {
+    id: 'cpt2_omissions_guideline',
+    text: 'Omissions - Guideline',
+    type: 'text',
+    required: false,
+    section: 'Omissions'
+  },
+  
+  // Commissions
+  {
+    id: 'cpt2_comissions_value',
+    text: 'Commissions - Value',
+    type: 'number',
+    required: false,
+    section: 'Commissions',
+    help: 'Incorrect responses to non-targets'
+  },
+  {
+    id: 'cpt2_comissions_pourcentage',
+    text: 'Commissions - Pourcentage',
+    type: 'number',
+    required: false,
+    section: 'Commissions'
+  },
+  {
+    id: 'cpt2_comissions_tscore',
+    text: 'Commissions - T-score',
+    type: 'number',
+    required: false,
+    section: 'Commissions'
+  },
+  {
+    id: 'cpt2_comissions_percentile',
+    text: 'Commissions - Percentile',
+    type: 'number',
+    required: false,
+    section: 'Commissions'
+  },
+  {
+    id: 'cpt2_comissions_guideline',
+    text: 'Commissions - Guideline',
+    type: 'text',
+    required: false,
+    section: 'Commissions'
+  },
+  
+  // Hit RT
+  {
+    id: 'cpt2_hitrt_value',
+    text: 'Hit RT - Value',
+    type: 'number',
+    required: false,
+    section: 'Hit RT',
+    help: 'Reaction time for correct responses'
+  },
+  {
+    id: 'cpt2_hitrt_tscore',
+    text: 'Hit RT - T-score',
+    type: 'number',
+    required: false,
+    section: 'Hit RT'
+  },
+  {
+    id: 'cpt2_hitrt_percentile',
+    text: 'Hit RT - Percentile',
+    type: 'number',
+    required: false,
+    section: 'Hit RT'
+  },
+  {
+    id: 'cpt2_hitrt_guideline',
+    text: 'Hit RT - Guideline',
+    type: 'text',
+    required: false,
+    section: 'Hit RT'
+  },
+  
+  // Hit RT Std. Error
+  {
+    id: 'cpt2_hitrtstder_value',
+    text: 'Hit RT Std. Error - Value',
+    type: 'number',
+    required: false,
+    section: 'Hit RT Std. Error',
+    help: 'Standard error of reaction time'
+  },
+  {
+    id: 'cpt2_hitrtstder_tscore',
+    text: 'Hit RT Std. Error - T-score',
+    type: 'number',
+    required: false,
+    section: 'Hit RT Std. Error'
+  },
+  {
+    id: 'cpt2_hitrtstder_percentile',
+    text: 'Hit RT Std. Error - Percentile',
+    type: 'number',
+    required: false,
+    section: 'Hit RT Std. Error'
+  },
+  {
+    id: 'cpt2_hitrtstder_guideline',
+    text: 'Hit RT Std. Error - Guideline',
+    type: 'text',
+    required: false,
+    section: 'Hit RT Std. Error'
+  },
+  
+  // Variability
+  {
+    id: 'cpt2_variability_value',
+    text: 'Variability - Value',
+    type: 'number',
+    required: false,
+    section: 'Variability',
+    help: 'Variability of reaction time'
+  },
+  {
+    id: 'cpt2_variability_tscore',
+    text: 'Variability - T-score',
+    type: 'number',
+    required: false,
+    section: 'Variability'
+  },
+  {
+    id: 'cpt2_variability_percentile',
+    text: 'Variability - Percentile',
+    type: 'number',
+    required: false,
+    section: 'Variability'
+  },
+  {
+    id: 'cpt2_variability_guideline',
+    text: 'Variability - Guideline',
+    type: 'text',
+    required: false,
+    section: 'Variability'
+  },
+  
+  // Detectability (d')
+  {
+    id: 'cpt2_detectability_value',
+    text: 'Detectability (d\') - Value',
+    type: 'number',
+    required: false,
+    section: 'Detectability (d\')',
+    help: 'Ability to discriminate targets from non-targets'
+  },
+  {
+    id: 'cpt2_detectability_tscore',
+    text: 'Detectability (d\') - T-score',
+    type: 'number',
+    required: false,
+    section: 'Detectability (d\')'
+  },
+  {
+    id: 'cpt2_detectability_percentile',
+    text: 'Detectability (d\') - Percentile',
+    type: 'number',
+    required: false,
+    section: 'Detectability (d\')'
+  },
+  {
+    id: 'cpt2_detectability_guideline',
+    text: 'Detectability (d\') - Guideline',
+    type: 'text',
+    required: false,
+    section: 'Detectability (d\')'
+  },
+  
+  // Response Style (Beta)
+  {
+    id: 'cpt2_responsestyle_value',
+    text: 'Response Style (Beta) - Value',
+    type: 'number',
+    required: false,
+    section: 'Response Style (Beta)',
+    help: 'Response bias (conservative vs. risky)'
+  },
+  {
+    id: 'cpt2_responsestyle_tscore',
+    text: 'Response Style (Beta) - T-score',
+    type: 'number',
+    required: false,
+    section: 'Response Style (Beta)'
+  },
+  {
+    id: 'cpt2_responsestyle_percentile',
+    text: 'Response Style (Beta) - Percentile',
+    type: 'number',
+    required: false,
+    section: 'Response Style (Beta)'
+  },
+  {
+    id: 'cpt2_responsestyle_guideline',
+    text: 'Response Style (Beta) - Guideline',
+    type: 'text',
+    required: false,
+    section: 'Response Style (Beta)'
+  },
+  
+  // Perseverations
+  {
+    id: 'cpt2_perseverations_value',
+    text: 'Perseverations - Value',
+    type: 'number',
+    required: false,
+    section: 'Perseverations',
+    help: 'Repetitive responding'
+  },
+  {
+    id: 'cpt2_perseverations_pourcentage',
+    text: 'Perseverations - Pourcentage',
+    type: 'number',
+    required: false,
+    section: 'Perseverations'
+  },
+  {
+    id: 'cpt2_perseverations_tscore',
+    text: 'Perseverations - T-score',
+    type: 'number',
+    required: false,
+    section: 'Perseverations'
+  },
+  {
+    id: 'cpt2_perseverations_percentile',
+    text: 'Perseverations - Percentile',
+    type: 'number',
+    required: false,
+    section: 'Perseverations'
+  },
+  {
+    id: 'cpt2_perseverations_guideline',
+    text: 'Perseverations - Guideline',
+    type: 'text',
+    required: false,
+    section: 'Perseverations'
+  },
+  
+  // Hit RT Block Change
+  {
+    id: 'cpt2_hitrtblockchange_value',
+    text: 'Hit RT Block Change - Value',
+    type: 'number',
+    required: false,
+    section: 'Hit RT Block Change',
+    help: 'Change in reaction time over blocks'
+  },
+  {
+    id: 'cpt2_hitrtblockchange_tscore',
+    text: 'Hit RT Block Change - T-score',
+    type: 'number',
+    required: false,
+    section: 'Hit RT Block Change'
+  },
+  {
+    id: 'cpt2_hitrtblockchange_percentile',
+    text: 'Hit RT Block Change - Percentile',
+    type: 'number',
+    required: false,
+    section: 'Hit RT Block Change'
+  },
+  {
+    id: 'cpt2_hitrtblockchange_guideline',
+    text: 'Hit RT Block Change - Guideline',
+    type: 'text',
+    required: false,
+    section: 'Hit RT Block Change'
+  },
+  
+  // Hit SE Block Change
+  {
+    id: 'cpt2_hitseblockchange_value',
+    text: 'Hit SE Block Change - Value',
+    type: 'number',
+    required: false,
+    section: 'Hit SE Block Change',
+    help: 'Change in standard error over blocks'
+  },
+  {
+    id: 'cpt2_hitseblockchange_tscore',
+    text: 'Hit SE Block Change - T-score',
+    type: 'number',
+    required: false,
+    section: 'Hit SE Block Change'
+  },
+  {
+    id: 'cpt2_hitseblockchange_percentile',
+    text: 'Hit SE Block Change - Percentile',
+    type: 'number',
+    required: false,
+    section: 'Hit SE Block Change'
+  },
+  {
+    id: 'cpt2_hitseblockchange_guideline',
+    text: 'Hit SE Block Change - Guideline',
+    type: 'text',
+    required: false,
+    section: 'Hit SE Block Change'
+  },
+  
+  // Hit RT ISI Change
+  {
+    id: 'cpt2_hitrtisichange_value',
+    text: 'Hit RT ISI Change - Value',
+    type: 'number',
+    required: false,
+    section: 'Hit RT ISI Change',
+    help: 'Change in reaction time over Inter-Stimulus Intervals'
+  },
+  {
+    id: 'cpt2_hitrtisichange_tscore',
+    text: 'Hit RT ISI Change - T-score',
+    type: 'number',
+    required: false,
+    section: 'Hit RT ISI Change'
+  },
+  {
+    id: 'cpt2_hitrtisichange_percentile',
+    text: 'Hit RT ISI Change - Percentile',
+    type: 'number',
+    required: false,
+    section: 'Hit RT ISI Change'
+  },
+  {
+    id: 'cpt2_hitrtisichange_guideline',
+    text: 'Hit RT ISI Change - Guideline',
+    type: 'text',
+    required: false,
+    section: 'Hit RT ISI Change'
+  },
+  
+  // Hit SE ISI Change
+  {
+    id: 'cpt2_hitseisichange_value',
+    text: 'Hit SE ISI Change - Value',
+    type: 'number',
+    required: false,
+    section: 'Hit SE ISI Change',
+    help: 'Change in standard error over Inter-Stimulus Intervals'
+  },
+  {
+    id: 'cpt2_hitseisichange_tscore',
+    text: 'Hit SE ISI Change - T-score',
+    type: 'number',
+    required: false,
+    section: 'Hit SE ISI Change'
+  },
+  {
+    id: 'cpt2_hitseisichange_percentile',
+    text: 'Hit SE ISI Change - Percentile',
+    type: 'number',
+    required: false,
+    section: 'Hit SE ISI Change'
+  },
+  {
+    id: 'cpt2_hitseisichange_guideline',
+    text: 'Hit SE ISI Change - Guideline',
+    type: 'text',
+    required: false,
+    section: 'Hit SE ISI Change'
+  }
+];
+
+export const WAIS3_CPT2_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais3_cpt2',
+  code: 'WAIS3_CPT2_FR',
+  title: 'WAIS-III - CPT II V.5',
+  description: 'Conners\' Continuous Performance Test II (CPT II V.5) by C. Keith Conners, Ph.D. and MHS Staff. Ce formulaire permet la saisie des resultats calcules par le logiciel CPT II externe. Instructions: Appuyez sur la barre d\'espace ou sur le bouton gauche de la souris pour toutes les lettres EXCEPTE pour le X.',
+  questions: WAIS3_CPT2_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

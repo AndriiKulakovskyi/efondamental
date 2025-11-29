@@ -3242,3 +3242,96 @@ export type Wais3DigitSpanResponseInsert = Omit<Wais3DigitSpanResponse,
   'wais_mc_std' | 'wais_mc_cr' | 'wais_mc_end_z' | 'wais_mc_env_z'
 >;
 
+// ============================================================================
+// WAIS-III CPT II V.5 (Conners' Continuous Performance Test II) Response
+// ============================================================================
+
+export interface Wais3Cpt2Response {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Omissions
+  cpt2_omissions_value?: number;
+  cpt2_omissions_pourcentage?: number;
+  cpt2_omissions_tscore?: number;
+  cpt2_omissions_percentile?: number;
+  cpt2_omissions_guideline?: string;
+  
+  // Commissions
+  cpt2_comissions_value?: number;
+  cpt2_comissions_pourcentage?: number;
+  cpt2_comissions_tscore?: number;
+  cpt2_comissions_percentile?: number;
+  cpt2_comissions_guideline?: string;
+  
+  // Hit RT
+  cpt2_hitrt_value?: number;
+  cpt2_hitrt_tscore?: number;
+  cpt2_hitrt_percentile?: number;
+  cpt2_hitrt_guideline?: string;
+  
+  // Hit RT Std. Error
+  cpt2_hitrtstder_value?: number;
+  cpt2_hitrtstder_tscore?: number;
+  cpt2_hitrtstder_percentile?: number;
+  cpt2_hitrtstder_guideline?: string;
+  
+  // Variability
+  cpt2_variability_value?: number;
+  cpt2_variability_tscore?: number;
+  cpt2_variability_percentile?: number;
+  cpt2_variability_guideline?: string;
+  
+  // Detectability (d')
+  cpt2_detectability_value?: number;
+  cpt2_detectability_tscore?: number;
+  cpt2_detectability_percentile?: number;
+  cpt2_detectability_guideline?: string;
+  
+  // Response Style (Beta)
+  cpt2_responsestyle_value?: number;
+  cpt2_responsestyle_tscore?: number;
+  cpt2_responsestyle_percentile?: number;
+  cpt2_responsestyle_guideline?: string;
+  
+  // Perseverations
+  cpt2_perseverations_value?: number;
+  cpt2_perseverations_pourcentage?: number;
+  cpt2_perseverations_tscore?: number;
+  cpt2_perseverations_percentile?: number;
+  cpt2_perseverations_guideline?: string;
+  
+  // Hit RT Block Change
+  cpt2_hitrtblockchange_value?: number;
+  cpt2_hitrtblockchange_tscore?: number;
+  cpt2_hitrtblockchange_percentile?: number;
+  cpt2_hitrtblockchange_guideline?: string;
+  
+  // Hit SE Block Change
+  cpt2_hitseblockchange_value?: number;
+  cpt2_hitseblockchange_tscore?: number;
+  cpt2_hitseblockchange_percentile?: number;
+  cpt2_hitseblockchange_guideline?: string;
+  
+  // Hit RT ISI Change
+  cpt2_hitrtisichange_value?: number;
+  cpt2_hitrtisichange_tscore?: number;
+  cpt2_hitrtisichange_percentile?: number;
+  cpt2_hitrtisichange_guideline?: string;
+  
+  // Hit SE ISI Change
+  cpt2_hitseisichange_value?: number;
+  cpt2_hitseisichange_tscore?: number;
+  cpt2_hitseisichange_percentile?: number;
+  cpt2_hitseisichange_guideline?: string;
+  
+  // Metadata
+  completed_by?: string;
+  completed_at: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type Wais3Cpt2ResponseInsert = Omit<Wais3Cpt2Response, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+

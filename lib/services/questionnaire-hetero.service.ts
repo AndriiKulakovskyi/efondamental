@@ -2618,3 +2618,107 @@ export async function saveWais3DigitSpanResponse(
   if (error) throw error;
   return data;
 }
+
+// ============================================================================
+// WAIS-III CPT II V.5 (Conners' Continuous Performance Test II)
+// ============================================================================
+
+import { Wais3Cpt2Response, Wais3Cpt2ResponseInsert } from '@/lib/types/database.types';
+
+export async function getWais3Cpt2Response(
+  visitId: string
+): Promise<Wais3Cpt2Response | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_wais3_cpt2')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error && error.code !== 'PGRST116') throw error;
+  return data;
+}
+
+export async function saveWais3Cpt2Response(
+  response: Wais3Cpt2ResponseInsert
+): Promise<Wais3Cpt2Response> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // No internal scoring - values come from external CPT II software
+  const { data, error } = await supabase
+    .from('responses_wais3_cpt2')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      // Omissions
+      cpt2_omissions_value: response.cpt2_omissions_value,
+      cpt2_omissions_pourcentage: response.cpt2_omissions_pourcentage,
+      cpt2_omissions_tscore: response.cpt2_omissions_tscore,
+      cpt2_omissions_percentile: response.cpt2_omissions_percentile,
+      cpt2_omissions_guideline: response.cpt2_omissions_guideline,
+      // Commissions
+      cpt2_comissions_value: response.cpt2_comissions_value,
+      cpt2_comissions_pourcentage: response.cpt2_comissions_pourcentage,
+      cpt2_comissions_tscore: response.cpt2_comissions_tscore,
+      cpt2_comissions_percentile: response.cpt2_comissions_percentile,
+      cpt2_comissions_guideline: response.cpt2_comissions_guideline,
+      // Hit RT
+      cpt2_hitrt_value: response.cpt2_hitrt_value,
+      cpt2_hitrt_tscore: response.cpt2_hitrt_tscore,
+      cpt2_hitrt_percentile: response.cpt2_hitrt_percentile,
+      cpt2_hitrt_guideline: response.cpt2_hitrt_guideline,
+      // Hit RT Std. Error
+      cpt2_hitrtstder_value: response.cpt2_hitrtstder_value,
+      cpt2_hitrtstder_tscore: response.cpt2_hitrtstder_tscore,
+      cpt2_hitrtstder_percentile: response.cpt2_hitrtstder_percentile,
+      cpt2_hitrtstder_guideline: response.cpt2_hitrtstder_guideline,
+      // Variability
+      cpt2_variability_value: response.cpt2_variability_value,
+      cpt2_variability_tscore: response.cpt2_variability_tscore,
+      cpt2_variability_percentile: response.cpt2_variability_percentile,
+      cpt2_variability_guideline: response.cpt2_variability_guideline,
+      // Detectability
+      cpt2_detectability_value: response.cpt2_detectability_value,
+      cpt2_detectability_tscore: response.cpt2_detectability_tscore,
+      cpt2_detectability_percentile: response.cpt2_detectability_percentile,
+      cpt2_detectability_guideline: response.cpt2_detectability_guideline,
+      // Response Style
+      cpt2_responsestyle_value: response.cpt2_responsestyle_value,
+      cpt2_responsestyle_tscore: response.cpt2_responsestyle_tscore,
+      cpt2_responsestyle_percentile: response.cpt2_responsestyle_percentile,
+      cpt2_responsestyle_guideline: response.cpt2_responsestyle_guideline,
+      // Perseverations
+      cpt2_perseverations_value: response.cpt2_perseverations_value,
+      cpt2_perseverations_pourcentage: response.cpt2_perseverations_pourcentage,
+      cpt2_perseverations_tscore: response.cpt2_perseverations_tscore,
+      cpt2_perseverations_percentile: response.cpt2_perseverations_percentile,
+      cpt2_perseverations_guideline: response.cpt2_perseverations_guideline,
+      // Hit RT Block Change
+      cpt2_hitrtblockchange_value: response.cpt2_hitrtblockchange_value,
+      cpt2_hitrtblockchange_tscore: response.cpt2_hitrtblockchange_tscore,
+      cpt2_hitrtblockchange_percentile: response.cpt2_hitrtblockchange_percentile,
+      cpt2_hitrtblockchange_guideline: response.cpt2_hitrtblockchange_guideline,
+      // Hit SE Block Change
+      cpt2_hitseblockchange_value: response.cpt2_hitseblockchange_value,
+      cpt2_hitseblockchange_tscore: response.cpt2_hitseblockchange_tscore,
+      cpt2_hitseblockchange_percentile: response.cpt2_hitseblockchange_percentile,
+      cpt2_hitseblockchange_guideline: response.cpt2_hitseblockchange_guideline,
+      // Hit RT ISI Change
+      cpt2_hitrtisichange_value: response.cpt2_hitrtisichange_value,
+      cpt2_hitrtisichange_tscore: response.cpt2_hitrtisichange_tscore,
+      cpt2_hitrtisichange_percentile: response.cpt2_hitrtisichange_percentile,
+      cpt2_hitrtisichange_guideline: response.cpt2_hitrtisichange_guideline,
+      // Hit SE ISI Change
+      cpt2_hitseisichange_value: response.cpt2_hitseisichange_value,
+      cpt2_hitseisichange_tscore: response.cpt2_hitseisichange_tscore,
+      cpt2_hitseisichange_percentile: response.cpt2_hitseisichange_percentile,
+      cpt2_hitseisichange_guideline: response.cpt2_hitseisichange_guideline,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
