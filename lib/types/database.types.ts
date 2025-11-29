@@ -3335,3 +3335,53 @@ export interface Wais3Cpt2Response {
 
 export type Wais3Cpt2ResponseInsert = Omit<Wais3Cpt2Response, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ============================================================================
+// MEM-III Spatial Span Response
+// ============================================================================
+
+export interface Wais3Mem3SpatialResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  patient_age: number;
+  
+  // Forward (Ordre Direct) items
+  odirect_1a: number; odirect_1b: number;
+  odirect_2a: number; odirect_2b: number;
+  odirect_3a: number; odirect_3b: number;
+  odirect_4a: number; odirect_4b: number;
+  odirect_5a: number; odirect_5b: number;
+  odirect_6a: number; odirect_6b: number;
+  odirect_7a: number; odirect_7b: number;
+  odirect_8a: number; odirect_8b: number;
+  
+  // Backward (Ordre Inverse) items
+  inverse_1a: number; inverse_1b: number;
+  inverse_2a: number; inverse_2b: number;
+  inverse_3a: number; inverse_3b: number;
+  inverse_4a: number; inverse_4b: number;
+  inverse_5a: number; inverse_5b: number;
+  inverse_6a: number; inverse_6b: number;
+  inverse_7a: number; inverse_7b: number;
+  inverse_8a: number; inverse_8b: number;
+  
+  // Computed scores
+  mspatiale_odirect_tot?: number;
+  mspatiale_odirect_std?: number;
+  mspatiale_odirect_cr?: number;
+  mspatiale_inverse_tot?: number;
+  mspatiale_inverse_std?: number;
+  mspatiale_inverse_cr?: number;
+  mspatiale_total_brut?: number;
+  mspatiale_total_std?: number;
+  mspatiale_total_cr?: number;
+  
+  // Metadata
+  completed_by?: string;
+  completed_at: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type Wais3Mem3SpatialResponseInsert = Omit<Wais3Mem3SpatialResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'mspatiale_odirect_tot' | 'mspatiale_odirect_std' | 'mspatiale_odirect_cr' | 'mspatiale_inverse_tot' | 'mspatiale_inverse_std' | 'mspatiale_inverse_cr' | 'mspatiale_total_brut' | 'mspatiale_total_std' | 'mspatiale_total_cr'>;
+

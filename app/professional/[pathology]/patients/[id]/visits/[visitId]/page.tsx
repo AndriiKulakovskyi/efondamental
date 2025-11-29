@@ -72,7 +72,8 @@ import {
   WAIS3_MATRICES_DEFINITION,
   WAIS3_CODE_SYMBOLES_DEFINITION,
   WAIS3_DIGIT_SPAN_DEFINITION,
-  WAIS3_CPT2_DEFINITION
+  WAIS3_CPT2_DEFINITION,
+  WAIS3_MEM3_SPATIAL_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -414,6 +415,13 @@ export default async function VisitDetailPage({
                 target_role: 'healthcare_professional',
                 completed: questionnaireStatuses['WAIS3_CPT2_FR']?.completed || false,
                 completedAt: questionnaireStatuses['WAIS3_CPT2_FR']?.completed_at,
+              },
+              {
+                ...WAIS3_MEM3_SPATIAL_DEFINITION,
+                id: WAIS3_MEM3_SPATIAL_DEFINITION.code,
+                target_role: 'healthcare_professional',
+                completed: questionnaireStatuses['WAIS3_MEM3_SPATIAL_FR']?.completed || false,
+                completedAt: questionnaireStatuses['WAIS3_MEM3_SPATIAL_FR']?.completed_at,
               },
               {
                 ...WAIS3_CVLT_DEFINITION,

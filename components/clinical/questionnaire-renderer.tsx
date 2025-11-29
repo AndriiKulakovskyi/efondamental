@@ -1146,6 +1146,135 @@ export function QuestionnaireRenderer({
         }
       }
 
+      // Compute MEM-III Spatial Span scores
+      const hasSpatialFields = prev.odirect_1a !== undefined || prev.inverse_1a !== undefined;
+      
+      if (hasSpatialFields) {
+        const spatialAge = Number(prev.patient_age);
+        const hasValidAge = !isNaN(spatialAge) && spatialAge >= 16 && spatialAge <= 90;
+        
+        // Calculate forward raw score
+        const forwardItems = [
+          prev.odirect_1a, prev.odirect_1b, prev.odirect_2a, prev.odirect_2b,
+          prev.odirect_3a, prev.odirect_3b, prev.odirect_4a, prev.odirect_4b,
+          prev.odirect_5a, prev.odirect_5b, prev.odirect_6a, prev.odirect_6b,
+          prev.odirect_7a, prev.odirect_7b, prev.odirect_8a, prev.odirect_8b
+        ];
+        const forwardSum = forwardItems.reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
+        const allForwardValid = forwardItems.every((v) => v !== undefined && !isNaN(Number(v)));
+        
+        // Calculate backward raw score
+        const backwardItems = [
+          prev.inverse_1a, prev.inverse_1b, prev.inverse_2a, prev.inverse_2b,
+          prev.inverse_3a, prev.inverse_3b, prev.inverse_4a, prev.inverse_4b,
+          prev.inverse_5a, prev.inverse_5b, prev.inverse_6a, prev.inverse_6b,
+          prev.inverse_7a, prev.inverse_7b, prev.inverse_8a, prev.inverse_8b
+        ];
+        const backwardSum = backwardItems.reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
+        const allBackwardValid = backwardItems.every((v) => v !== undefined && !isNaN(Number(v)));
+        
+        if (allForwardValid || allBackwardValid) {
+          hasChanges = true;
+          
+          if (allForwardValid) {
+            updated.mspatiale_odirect_tot = forwardSum;
+          }
+          if (allBackwardValid) {
+            updated.mspatiale_inverse_tot = backwardSum;
+          }
+          if (allForwardValid && allBackwardValid) {
+            const totalBrut = forwardSum + backwardSum;
+            updated.mspatiale_total_brut = totalBrut;
+            
+            // Calculate standard scores if age is valid
+            if (hasValidAge) {
+              const MEM3_ODIRECT_NORMS: Record<string, number[]> = {
+                '16-17': [3, 4, 5, 6, 0, 7, 0, 8, 0, 9, 0, 10, 0, 11, 12, 13, 14, 15, 16],
+                '18-19': [2, 3, 4, 5, 6, 0, 7, 8, 0, 9, 0, 10, 11, 0, 12, 13, 14, 15, 16],
+                '20-24': [1, 2, 3, 4, 5, 6, 7, 8, 0, 9, 0, 10, 11, 0, 12, 13, 14, 15, 16],
+                '25-29': [1, 2, 3, 4, 5, 6, 7, 8, 0, 9, 10, 11, 0, 12, 13, 14, 15, 0, 16],
+                '30-34': [1, 2, 3, 4, 5, 6, 7, 0, 8, 9, 0, 10, 11, 12, 13, 14, 0, 15, 16],
+                '35-44': [1, 2, 3, 4, 5, 6, 7, 0, 8, 9, 0, 10, 11, 12, 13, 14, 0, 15, 16],
+                '45-54': [1, 2, 3, 4, 0, 5, 6, 0, 7, 8, 9, 0, 10, 11, 12, 13, 14, 15, 16],
+                '55-64': [1, 2, 3, 4, 0, 5, 6, 0, 7, 8, 9, 0, 10, 0, 11, 12, 13, 14, 16],
+                '65-69': [1, 2, 3, 0, 4, 5, 0, 6, 0, 7, 0, 8, 9, 0, 10, 11, 12, 13, 16],
+                '70-74': [1, 2, 3, 0, 4, 5, 0, 6, 0, 7, 0, 8, 9, 0, 10, 11, 12, 13, 16],
+                '75-79': [0, 1, 2, 3, 0, 4, 5, 0, 6, 7, 0, 8, 0, 9, 10, 0, 11, 12, 16],
+                '80+': [0, 1, 2, 3, 0, 4, 5, 0, 6, 7, 0, 8, 0, 9, 10, 0, 11, 12, 16]
+              };
+              
+              const MEM3_INVERSE_NORMS: Record<string, number[]> = {
+                '16-17': [1, 2, 3, 4, 5, 6, 0, 7, 0, 8, 0, 9, 0, 10, 11, 12, 14, 15, 16],
+                '18-19': [1, 2, 3, 4, 5, 6, 0, 7, 0, 8, 9, 0, 10, 0, 11, 12, 14, 15, 16],
+                '20-24': [1, 2, 3, 0, 4, 5, 6, 7, 0, 8, 9, 0, 10, 11, 0, 12, 13, 14, 16],
+                '25-29': [1, 2, 3, 0, 4, 5, 6, 7, 0, 8, 9, 10, 0, 11, 0, 12, 13, 14, 16],
+                '30-34': [1, 2, 3, 0, 4, 5, 6, 7, 0, 8, 9, 10, 0, 11, 0, 12, 13, 14, 16],
+                '35-44': [1, 2, 3, 0, 4, 5, 6, 7, 0, 8, 9, 10, 0, 11, 12, 13, 14, 15, 16],
+                '45-54': [0, 1, 2, 3, 0, 4, 5, 6, 7, 0, 8, 9, 0, 10, 11, 12, 13, 14, 16],
+                '55-64': [0, 1, 2, 3, 0, 4, 5, 0, 6, 0, 7, 8, 9, 0, 10, 12, 13, 14, 16],
+                '65-69': [0, 0, 1, 2, 0, 3, 4, 5, 0, 6, 7, 8, 0, 9, 10, 11, 12, 13, 16],
+                '70-74': [0, 0, 0, 1, 2, 3, 4, 5, 0, 6, 7, 8, 0, 9, 10, 11, 12, 13, 16],
+                '75-79': [0, 0, 0, 0, 1, 2, 3, 0, 4, 5, 6, 7, 8, 0, 9, 10, 11, 12, 16],
+                '80+': [0, 0, 0, 0, 1, 2, 3, 0, 4, 5, 6, 7, 0, 8, 0, 9, 10, 11, 16]
+              };
+              
+              const MEM3_TOTAL_NORMS: Record<string, number[]> = {
+                '16-17': [9, 10, 11, 12, 0, 13, 14, 15, 16, 17, 18, 19, 0, 20, 22, 23, 24, 26, 32],
+                '18-19': [8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 0, 20, 21, 23, 24, 25, 26, 32],
+                '20-24': [7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 19, 0, 20, 22, 24, 25, 26, 27, 32],
+                '25-29': [7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 19, 20, 21, 23, 25, 26, 27, 28, 32],
+                '30-34': [6, 7, 8, 10, 11, 12, 13, 15, 16, 17, 18, 20, 21, 23, 25, 26, 27, 28, 32],
+                '35-44': [6, 7, 8, 10, 11, 12, 13, 15, 16, 17, 18, 20, 21, 23, 25, 26, 28, 0, 32],
+                '45-54': [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 21, 23, 24, 26, 27, 32],
+                '55-64': [6, 7, 8, 9, 10, 11, 12, 0, 13, 14, 15, 17, 18, 20, 21, 23, 24, 25, 32],
+                '65-69': [4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 22, 23, 24, 32],
+                '70-74': [2, 3, 4, 6, 7, 9, 10, 11, 12, 13, 14, 16, 17, 19, 20, 21, 22, 24, 32],
+                '75-79': [2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15, 16, 18, 19, 20, 21, 23, 32],
+                '80+': [2, 3, 4, 5, 6, 0, 8, 9, 10, 12, 13, 15, 16, 17, 18, 20, 21, 22, 32]
+              };
+              
+              const getAgeGroup = (age: number): string => {
+                if (age >= 16 && age <= 17) return '16-17';
+                if (age >= 18 && age <= 19) return '18-19';
+                if (age >= 20 && age <= 24) return '20-24';
+                if (age >= 25 && age <= 29) return '25-29';
+                if (age >= 30 && age <= 34) return '30-34';
+                if (age >= 35 && age <= 44) return '35-44';
+                if (age >= 45 && age <= 54) return '45-54';
+                if (age >= 55 && age <= 64) return '55-64';
+                if (age >= 65 && age <= 69) return '65-69';
+                if (age >= 70 && age <= 74) return '70-74';
+                if (age >= 75 && age <= 79) return '75-79';
+                return '80+';
+              };
+              
+              const findStdScore = (rawScore: number, norms: number[]): number => {
+                for (let i = 0; i < norms.length; i++) {
+                  const maxRaw = norms[i];
+                  if (maxRaw === 0) continue;
+                  if (rawScore <= maxRaw) return i + 1;
+                }
+                return 19;
+              };
+              
+              const ageGroup = getAgeGroup(spatialAge);
+              
+              const odirectStd = findStdScore(forwardSum, MEM3_ODIRECT_NORMS[ageGroup]);
+              updated.mspatiale_odirect_std = odirectStd;
+              updated.mspatiale_odirect_cr = Number(((odirectStd - 10) / 3).toFixed(2));
+              
+              const inverseStd = findStdScore(backwardSum, MEM3_INVERSE_NORMS[ageGroup]);
+              updated.mspatiale_inverse_std = inverseStd;
+              updated.mspatiale_inverse_cr = Number(((inverseStd - 10) / 3).toFixed(2));
+              
+              const totalStd = findStdScore(totalBrut, MEM3_TOTAL_NORMS[ageGroup]);
+              updated.mspatiale_total_std = totalStd;
+              updated.mspatiale_total_cr = Number(((totalStd - 10) / 3).toFixed(2));
+            }
+          }
+        }
+      }
+
       return hasChanges ? updated : prev;
     });
   }, [
@@ -1271,7 +1400,16 @@ export function QuestionnaireRenderer({
     responses.mcoi_1a, responses.mcoi_1b, responses.mcoi_2a, responses.mcoi_2b,
     responses.mcoi_3a, responses.mcoi_3b, responses.mcoi_4a, responses.mcoi_4b,
     responses.mcoi_5a, responses.mcoi_5b, responses.mcoi_6a, responses.mcoi_6b,
-    responses.mcoi_7a, responses.mcoi_7b
+    responses.mcoi_7a, responses.mcoi_7b,
+    // MEM-III Spatial Span fields
+    responses.odirect_1a, responses.odirect_1b, responses.odirect_2a, responses.odirect_2b,
+    responses.odirect_3a, responses.odirect_3b, responses.odirect_4a, responses.odirect_4b,
+    responses.odirect_5a, responses.odirect_5b, responses.odirect_6a, responses.odirect_6b,
+    responses.odirect_7a, responses.odirect_7b, responses.odirect_8a, responses.odirect_8b,
+    responses.inverse_1a, responses.inverse_1b, responses.inverse_2a, responses.inverse_2b,
+    responses.inverse_3a, responses.inverse_3b, responses.inverse_4a, responses.inverse_4b,
+    responses.inverse_5a, responses.inverse_5b, responses.inverse_6a, responses.inverse_6b,
+    responses.inverse_7a, responses.inverse_7b, responses.inverse_8a, responses.inverse_8b
   ]);
 
   const { visibleQuestions, requiredQuestions } = evaluateConditionalLogic(

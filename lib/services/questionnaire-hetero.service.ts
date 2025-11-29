@@ -2722,3 +2722,115 @@ export async function saveWais3Cpt2Response(
   if (error) throw error;
   return data;
 }
+
+// ============================================================================
+// MEM-III Spatial Span (Memoire Spatiale)
+// ============================================================================
+
+import { calculateMem3SpatialScores, Mem3SpatialInput } from './mem3-spatial-scoring';
+import type { Wais3Mem3SpatialResponse, Wais3Mem3SpatialResponseInsert } from '@/lib/types/database.types';
+
+export async function getWais3Mem3SpatialResponse(visitId: string): Promise<Wais3Mem3SpatialResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_wais3_mem3_spatial')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error && error.code !== 'PGRST116') throw error;
+  return data;
+}
+
+export async function saveWais3Mem3SpatialResponse(
+  response: Wais3Mem3SpatialResponseInsert
+): Promise<Wais3Mem3SpatialResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Calculate scores using the scoring module
+  const input: Mem3SpatialInput = {
+    patient_age: response.patient_age,
+    odirect_1a: response.odirect_1a,
+    odirect_1b: response.odirect_1b,
+    odirect_2a: response.odirect_2a,
+    odirect_2b: response.odirect_2b,
+    odirect_3a: response.odirect_3a,
+    odirect_3b: response.odirect_3b,
+    odirect_4a: response.odirect_4a,
+    odirect_4b: response.odirect_4b,
+    odirect_5a: response.odirect_5a,
+    odirect_5b: response.odirect_5b,
+    odirect_6a: response.odirect_6a,
+    odirect_6b: response.odirect_6b,
+    odirect_7a: response.odirect_7a,
+    odirect_7b: response.odirect_7b,
+    odirect_8a: response.odirect_8a,
+    odirect_8b: response.odirect_8b,
+    inverse_1a: response.inverse_1a,
+    inverse_1b: response.inverse_1b,
+    inverse_2a: response.inverse_2a,
+    inverse_2b: response.inverse_2b,
+    inverse_3a: response.inverse_3a,
+    inverse_3b: response.inverse_3b,
+    inverse_4a: response.inverse_4a,
+    inverse_4b: response.inverse_4b,
+    inverse_5a: response.inverse_5a,
+    inverse_5b: response.inverse_5b,
+    inverse_6a: response.inverse_6a,
+    inverse_6b: response.inverse_6b,
+    inverse_7a: response.inverse_7a,
+    inverse_7b: response.inverse_7b,
+    inverse_8a: response.inverse_8a,
+    inverse_8b: response.inverse_8b
+  };
+
+  const scores = calculateMem3SpatialScores(input);
+
+  const { data, error } = await supabase
+    .from('responses_wais3_mem3_spatial')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      patient_age: response.patient_age,
+      odirect_1a: response.odirect_1a,
+      odirect_1b: response.odirect_1b,
+      odirect_2a: response.odirect_2a,
+      odirect_2b: response.odirect_2b,
+      odirect_3a: response.odirect_3a,
+      odirect_3b: response.odirect_3b,
+      odirect_4a: response.odirect_4a,
+      odirect_4b: response.odirect_4b,
+      odirect_5a: response.odirect_5a,
+      odirect_5b: response.odirect_5b,
+      odirect_6a: response.odirect_6a,
+      odirect_6b: response.odirect_6b,
+      odirect_7a: response.odirect_7a,
+      odirect_7b: response.odirect_7b,
+      odirect_8a: response.odirect_8a,
+      odirect_8b: response.odirect_8b,
+      inverse_1a: response.inverse_1a,
+      inverse_1b: response.inverse_1b,
+      inverse_2a: response.inverse_2a,
+      inverse_2b: response.inverse_2b,
+      inverse_3a: response.inverse_3a,
+      inverse_3b: response.inverse_3b,
+      inverse_4a: response.inverse_4a,
+      inverse_4b: response.inverse_4b,
+      inverse_5a: response.inverse_5a,
+      inverse_5b: response.inverse_5b,
+      inverse_6a: response.inverse_6a,
+      inverse_6b: response.inverse_6b,
+      inverse_7a: response.inverse_7a,
+      inverse_7b: response.inverse_7b,
+      inverse_8a: response.inverse_8a,
+      inverse_8b: response.inverse_8b,
+      ...scores,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}

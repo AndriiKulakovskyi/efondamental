@@ -7127,3 +7127,102 @@ export const WAIS3_CPT2_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// MEM-III (Wechsler, 2001) - Memoire Spatiale
+// ============================================================================
+
+export const MEM3_SPATIAL_QUESTIONS: Question[] = [
+  // Patient age
+  {
+    id: 'patient_age',
+    text: 'Age du patient (en annees)',
+    type: 'number',
+    required: true,
+    section: 'Informations generales',
+    min: 16,
+    max: 90
+  },
+  
+  // Forward (Ordre Direct) items
+  {
+    id: 'section_odirect',
+    text: 'Ordre Direct (Forward)',
+    type: 'section',
+    required: false
+  },
+  { id: 'odirect_1a', text: 'ITEM 1 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_1b', text: 'ITEM 1 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_2a', text: 'ITEM 2 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_2b', text: 'ITEM 2 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_3a', text: 'ITEM 3 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_3b', text: 'ITEM 3 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_4a', text: 'ITEM 4 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_4b', text: 'ITEM 4 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_5a', text: 'ITEM 5 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_5b', text: 'ITEM 5 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_6a', text: 'ITEM 6 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_6b', text: 'ITEM 6 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_7a', text: 'ITEM 7 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_7b', text: 'ITEM 7 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_8a', text: 'ITEM 8 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_8b', text: 'ITEM 8 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  
+  // Forward computed scores
+  { id: 'mspatiale_odirect_tot', text: 'Note brute - Ordre Direct (0-16)', type: 'number', required: false, section: 'Ordre Direct', readonly: true, help: 'Somme des scores Ordre Direct (calcule automatiquement)' },
+  { id: 'mspatiale_odirect_std', text: 'Note standard - Ordre Direct', type: 'number', required: false, section: 'Ordre Direct', readonly: true, help: 'Score standard selon l\'age' },
+  { id: 'mspatiale_odirect_cr', text: 'Deviation standard - Ordre Direct', type: 'number', required: false, section: 'Ordre Direct', readonly: true, help: '(Note standard - 10) / 3' },
+  
+  // Backward (Ordre Inverse) items
+  {
+    id: 'section_inverse',
+    text: 'Ordre Inverse (Backward)',
+    type: 'section',
+    required: false
+  },
+  { id: 'inverse_1a', text: 'ITEM 1 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_1b', text: 'ITEM 1 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_2a', text: 'ITEM 2 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_2b', text: 'ITEM 2 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_3a', text: 'ITEM 3 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_3b', text: 'ITEM 3 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_4a', text: 'ITEM 4 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_4b', text: 'ITEM 4 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_5a', text: 'ITEM 5 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_5b', text: 'ITEM 5 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_6a', text: 'ITEM 6 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_6b', text: 'ITEM 6 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_7a', text: 'ITEM 7 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_7b', text: 'ITEM 7 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_8a', text: 'ITEM 8 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_8b', text: 'ITEM 8 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  
+  // Backward computed scores
+  { id: 'mspatiale_inverse_tot', text: 'Note brute - Ordre Inverse (0-16)', type: 'number', required: false, section: 'Ordre Inverse', readonly: true, help: 'Somme des scores Ordre Inverse (calcule automatiquement)' },
+  { id: 'mspatiale_inverse_std', text: 'Note standard - Ordre Inverse', type: 'number', required: false, section: 'Ordre Inverse', readonly: true, help: 'Score standard selon l\'age' },
+  { id: 'mspatiale_inverse_cr', text: 'Deviation standard - Ordre Inverse', type: 'number', required: false, section: 'Ordre Inverse', readonly: true, help: '(Note standard - 10) / 3' },
+  
+  // Total scores
+  {
+    id: 'section_total',
+    text: 'Scores Totaux',
+    type: 'section',
+    required: false
+  },
+  { id: 'mspatiale_total_brut', text: 'Note totale brute (0-32)', type: 'number', required: false, section: 'Scores Totaux', readonly: true, help: 'Ordre Direct + Ordre Inverse' },
+  { id: 'mspatiale_total_std', text: 'Note standard totale', type: 'number', required: false, section: 'Scores Totaux', readonly: true, help: 'Score standard selon l\'age' },
+  { id: 'mspatiale_total_cr', text: 'Deviation standard - Total', type: 'number', required: false, section: 'Scores Totaux', readonly: true, help: '(Note standard - 10) / 3' }
+];
+
+export const WAIS3_MEM3_SPATIAL_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais3_mem3_spatial',
+  code: 'WAIS3_MEM3_SPATIAL_FR',
+  title: 'MEM-III - Memoire Spatiale',
+  description: 'MEM-III (Wechsler Memory Scale - 3rd Edition) - Subtest Memoire Spatiale (Spatial Span). Adaptation francaise: Gregoire, J., Penhouet C. (2001). Ce subtest comprend les composantes Ordre Direct (Forward) et Ordre Inverse (Backward). Version WAIS-III avec les normes correspondantes.',
+  questions: MEM3_SPATIAL_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

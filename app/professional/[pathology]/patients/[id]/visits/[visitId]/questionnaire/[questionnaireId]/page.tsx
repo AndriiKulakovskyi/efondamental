@@ -66,7 +66,8 @@ import {
   WAIS3_MATRICES_DEFINITION,
   WAIS3_CODE_SYMBOLES_DEFINITION,
   WAIS3_DIGIT_SPAN_DEFINITION,
-  WAIS3_CPT2_DEFINITION
+  WAIS3_CPT2_DEFINITION,
+  WAIS3_MEM3_SPATIAL_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -150,7 +151,8 @@ import {
   getWais3MatricesResponse,
   getWais3CodeSymbolesResponse,
   getWais3DigitSpanResponse,
-  getWais3Cpt2Response
+  getWais3Cpt2Response,
+  getWais3Mem3SpatialResponse
 } from "@/lib/services/questionnaire-hetero.service";
 import {
   getSocialResponse
@@ -250,6 +252,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS3_CODE_SYMBOLES_DEFINITION.code) questionnaire = WAIS3_CODE_SYMBOLES_DEFINITION;
   else if (code === WAIS3_DIGIT_SPAN_DEFINITION.code) questionnaire = WAIS3_DIGIT_SPAN_DEFINITION;
   else if (code === WAIS3_CPT2_DEFINITION.code) questionnaire = WAIS3_CPT2_DEFINITION;
+  else if (code === WAIS3_MEM3_SPATIAL_DEFINITION.code) questionnaire = WAIS3_MEM3_SPATIAL_DEFINITION;
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) questionnaire = SOCIAL_DEFINITION;
   // Infirmier questionnaires
@@ -336,6 +339,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS3_CODE_SYMBOLES_DEFINITION.code) existingResponse = await getWais3CodeSymbolesResponse(visitId);
   else if (code === WAIS3_DIGIT_SPAN_DEFINITION.code) existingResponse = await getWais3DigitSpanResponse(visitId);
   else if (code === WAIS3_CPT2_DEFINITION.code) existingResponse = await getWais3Cpt2Response(visitId);
+  else if (code === WAIS3_MEM3_SPATIAL_DEFINITION.code) existingResponse = await getWais3Mem3SpatialResponse(visitId);
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) existingResponse = await getSocialResponse(visitId);
   // Infirmier questionnaires
