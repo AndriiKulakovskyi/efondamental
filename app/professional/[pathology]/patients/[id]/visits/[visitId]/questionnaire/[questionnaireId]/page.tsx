@@ -59,7 +59,9 @@ import {
   WAIS3_CVLT_DEFINITION,
   WAIS3_TMT_DEFINITION,
   WAIS3_STROOP_DEFINITION,
-  WAIS3_FLUENCES_VERBALES_DEFINITION
+  WAIS3_FLUENCES_VERBALES_DEFINITION,
+  WAIS3_CRITERIA_DEFINITION,
+  WAIS3_LEARNING_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -136,7 +138,9 @@ import {
   getWais3CvltResponse,
   getWais3TmtResponse,
   getWais3StroopResponse,
-  getWais3FluencesVerbalesResponse
+  getWais3FluencesVerbalesResponse,
+  getWais3CriteriaResponse,
+  getWais3LearningResponse
 } from "@/lib/services/questionnaire-hetero.service";
 import {
   getSocialResponse
@@ -229,6 +233,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS3_TMT_DEFINITION.code) questionnaire = WAIS3_TMT_DEFINITION;
   else if (code === WAIS3_STROOP_DEFINITION.code) questionnaire = WAIS3_STROOP_DEFINITION;
   else if (code === WAIS3_FLUENCES_VERBALES_DEFINITION.code) questionnaire = WAIS3_FLUENCES_VERBALES_DEFINITION;
+  else if (code === WAIS3_CRITERIA_DEFINITION.code) questionnaire = WAIS3_CRITERIA_DEFINITION;
+  else if (code === WAIS3_LEARNING_DEFINITION.code) questionnaire = WAIS3_LEARNING_DEFINITION;
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) questionnaire = SOCIAL_DEFINITION;
   // Infirmier questionnaires
@@ -308,6 +314,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS3_TMT_DEFINITION.code) existingResponse = await getWais3TmtResponse(visitId);
   else if (code === WAIS3_STROOP_DEFINITION.code) existingResponse = await getWais3StroopResponse(visitId);
   else if (code === WAIS3_FLUENCES_VERBALES_DEFINITION.code) existingResponse = await getWais3FluencesVerbalesResponse(visitId);
+  else if (code === WAIS3_CRITERIA_DEFINITION.code) existingResponse = await getWais3CriteriaResponse(visitId);
+  else if (code === WAIS3_LEARNING_DEFINITION.code) existingResponse = await getWais3LearningResponse(visitId);
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) existingResponse = await getSocialResponse(visitId);
   // Infirmier questionnaires

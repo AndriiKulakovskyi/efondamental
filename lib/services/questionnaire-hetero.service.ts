@@ -2158,3 +2158,119 @@ export async function saveWais3FluencesVerbalesResponse(
   if (error) throw error;
   return data;
 }
+
+// ============================================================================
+// WAIS-III Clinical Criteria (Critères cliniques)
+// ============================================================================
+
+import { Wais3CriteriaResponse, Wais3CriteriaResponseInsert } from '@/lib/types/database.types';
+
+export async function getWais3CriteriaResponse(
+  visitId: string
+): Promise<Wais3CriteriaResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_wais3_criteria')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    if (error.code === 'PGRST205') {
+      console.warn('Table responses_wais3_criteria not found. Please run migrations.');
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveWais3CriteriaResponse(
+  response: Wais3CriteriaResponseInsert
+): Promise<Wais3CriteriaResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from('responses_wais3_criteria')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      collection_date: response.collection_date,
+      age: response.age,
+      laterality: response.laterality,
+      native_french_speaker: response.native_french_speaker,
+      time_since_last_eval: response.time_since_last_eval,
+      patient_euthymic: response.patient_euthymic,
+      no_episode_3months: response.no_episode_3months,
+      socio_prof_data_present: response.socio_prof_data_present,
+      years_of_education: response.years_of_education,
+      no_visual_impairment: response.no_visual_impairment,
+      no_hearing_impairment: response.no_hearing_impairment,
+      no_ect_past_year: response.no_ect_past_year,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// WAIS-III Learning Disorders (Troubles des acquisitions et des apprentissages)
+// ============================================================================
+
+import { Wais3LearningResponse, Wais3LearningResponseInsert } from '@/lib/types/database.types';
+
+export async function getWais3LearningResponse(
+  visitId: string
+): Promise<Wais3LearningResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_wais3_learning')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    if (error.code === 'PGRST205') {
+      console.warn('Table responses_wais3_learning not found. Please run migrations.');
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveWais3LearningResponse(
+  response: Wais3LearningResponseInsert
+): Promise<Wais3LearningResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  const { data, error } = await supabase
+    .from('responses_wais3_learning')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      dyslexia: response.dyslexia,
+      dysorthographia: response.dysorthographia,
+      dyscalculia: response.dyscalculia,
+      dysphasia: response.dysphasia,
+      dyspraxia: response.dyspraxia,
+      speech_delay: response.speech_delay,
+      stuttering: response.stuttering,
+      walking_delay: response.walking_delay,
+      febrile_seizures: response.febrile_seizures,
+      precocity: response.precocity,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}

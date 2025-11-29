@@ -58,7 +58,9 @@ import {
   saveWais3CvltResponse,
   saveWais3TmtResponse,
   saveWais3StroopResponse,
-  saveWais3FluencesVerbalesResponse
+  saveWais3FluencesVerbalesResponse,
+  saveWais3CriteriaResponse,
+  saveWais3LearningResponse
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveSocialResponse
@@ -148,7 +150,9 @@ import {
   Wais3CvltResponseInsert,
   Wais3TmtResponseInsert,
   Wais3StroopResponseInsert,
-  Wais3FluencesVerbalesResponseInsert
+  Wais3FluencesVerbalesResponseInsert,
+  Wais3CriteriaResponseInsert,
+  Wais3LearningResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -667,6 +671,22 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as Wais3FluencesVerbalesResponseInsert);
+        break;
+
+      case 'WAIS3_CRITERIA_FR':
+        result = await saveWais3CriteriaResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Wais3CriteriaResponseInsert);
+        break;
+
+      case 'WAIS3_LEARNING_FR':
+        result = await saveWais3LearningResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as Wais3LearningResponseInsert);
         break;
         
       default:

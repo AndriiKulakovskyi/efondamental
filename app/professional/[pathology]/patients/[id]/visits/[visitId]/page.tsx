@@ -65,7 +65,9 @@ import {
   WAIS3_CVLT_DEFINITION,
   WAIS3_TMT_DEFINITION,
   WAIS3_STROOP_DEFINITION,
-  WAIS3_FLUENCES_VERBALES_DEFINITION
+  WAIS3_FLUENCES_VERBALES_DEFINITION,
+  WAIS3_CRITERIA_DEFINITION,
+  WAIS3_LEARNING_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -359,6 +361,20 @@ export default async function VisitDetailPage({
             id: 'wais3',
             name: 'WAIS-III',
             questionnaires: [
+              {
+                ...WAIS3_CRITERIA_DEFINITION,
+                id: WAIS3_CRITERIA_DEFINITION.code,
+                target_role: 'healthcare_professional',
+                completed: questionnaireStatuses['WAIS3_CRITERIA_FR']?.completed || false,
+                completedAt: questionnaireStatuses['WAIS3_CRITERIA_FR']?.completed_at,
+              },
+              {
+                ...WAIS3_LEARNING_DEFINITION,
+                id: WAIS3_LEARNING_DEFINITION.code,
+                target_role: 'healthcare_professional',
+                completed: questionnaireStatuses['WAIS3_LEARNING_FR']?.completed || false,
+                completedAt: questionnaireStatuses['WAIS3_LEARNING_FR']?.completed_at,
+              },
               {
                 ...WAIS3_CVLT_DEFINITION,
                 id: WAIS3_CVLT_DEFINITION.code,
@@ -726,16 +742,18 @@ export default async function VisitDetailPage({
         </h3>
 
         <div className="relative space-y-6 pl-2">
-        {modulesWithQuestionnaires.map((module, index) => (
-          <ExpandableModuleCard
-            key={module.id}
-            module={module}
-            index={index}
-            pathology={pathology}
-            patientId={patientId}
-            visitId={visitId}
+        {modulesWithQuestionnaires.filter(Boolean).map((module, index) => (
+          module && (
+            <ExpandableModuleCard
+              key={module.id}
+              module={module}
+              index={index}
+              pathology={pathology}
+              patientId={patientId}
+              visitId={visitId}
               totalModules={modulesWithQuestionnaires.length}
-          />
+            />
+          )
         ))}
         </div>
       </div>

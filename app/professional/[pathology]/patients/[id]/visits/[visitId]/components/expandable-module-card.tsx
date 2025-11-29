@@ -52,6 +52,11 @@ export function ExpandableModuleCard({
 }: ExpandableModuleCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   
+  // Early return if module is undefined
+  if (!module) {
+    return null;
+  }
+  
   const allQuestionnaires = getAllQuestionnaires(module);
   const completedCount = Array.isArray(allQuestionnaires) ? allQuestionnaires.filter((q: any) => q?.completed).length : 0;
   const totalCount = Array.isArray(allQuestionnaires) ? allQuestionnaires.length : 0;

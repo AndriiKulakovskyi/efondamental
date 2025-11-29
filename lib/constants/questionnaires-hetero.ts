@@ -5688,3 +5688,37 @@ export const WAIS3_FLUENCES_VERBALES_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// WAIS-III Clinical Criteria (Critères cliniques) - Reuses WAIS-IV questions
+// ============================================================================
+
+export const WAIS3_CRITERIA_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais3_criteria',
+  code: 'WAIS3_CRITERIA_FR',
+  title: 'WAIS-III - Critères cliniques',
+  description: 'Fiche de recueil des critères cliniques et démographiques pour la passation de la WAIS-III.',
+  questions: WAIS4_CRITERIA_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
+// WAIS-III Learning Disorders - Reuses WAIS-IV questions
+// ============================================================================
+
+export const WAIS3_LEARNING_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais3_learning',
+  code: 'WAIS3_LEARNING_FR',
+  title: 'WAIS-III - Troubles des acquisitions et des apprentissages',
+  description: 'Liste de contrôle des antécédents de troubles des acquisitions et des apprentissages.',
+  questions: WAIS4_LEARNING_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

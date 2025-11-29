@@ -2962,3 +2962,71 @@ export interface Wais3FluencesVerbalesResponse {
 
 export type Wais3FluencesVerbalesResponseInsert = Omit<Wais3FluencesVerbalesResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'fv_p_tot_rupregle' | 'fv_p_tot_correct_z' | 'fv_p_tot_correct_pc' | 'fv_anim_tot_rupregle' | 'fv_anim_tot_correct_z' | 'fv_anim_tot_correct_pc'>;
 
+// ============================================================================
+// WAIS-III Clinical Criteria (Critères cliniques)
+// ============================================================================
+
+export interface Wais3CriteriaResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // General Information
+  collection_date: string; // Date field
+  age: number; // 16-90
+  laterality: 'gaucher' | 'droitier' | 'ambidextre';
+  native_french_speaker: number; // 0 or 1
+  
+  // Clinical State
+  time_since_last_eval: 'moins_semaine' | 'plus_semaine';
+  patient_euthymic: number; // 0 or 1
+  no_episode_3months: number; // 0 or 1
+  
+  // Socio-demographic Data
+  socio_prof_data_present: number; // 0 or 1
+  years_of_education: number; // >= 0
+  
+  // Exclusion Criteria / Health
+  no_visual_impairment: number; // 0 or 1
+  no_hearing_impairment: number; // 0 or 1
+  no_ect_past_year: number; // 0 or 1
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Wais3CriteriaResponseInsert = Omit<Wais3CriteriaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
+// WAIS-III Learning Disorders (Troubles des acquisitions et des apprentissages)
+// ============================================================================
+
+export interface Wais3LearningResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Learning and Acquisition Disorders (0 = Non, 1 = Oui, 9 = Ne sait pas)
+  dyslexia: number; // Dyslexie
+  dysorthographia: number; // Dysorthographie
+  dyscalculia: number; // Dyscalculie
+  dysphasia: number; // Dysphasie
+  dyspraxia: number; // Dyspraxie
+  speech_delay: number; // Retard à l'acquisition de la parole
+  stuttering: number; // Bégaiement
+  walking_delay: number; // Retard à l'acquisition de la marche
+  febrile_seizures: number; // Convulsions fébriles dans la petite enfance
+  precocity: number; // Précocité
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Wais3LearningResponseInsert = Omit<Wais3LearningResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
