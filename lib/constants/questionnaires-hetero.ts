@@ -5796,3 +5796,296 @@ export const WAIS3_VOCABULAIRE_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// WAIS-III - Subtest Matrices
+// ============================================================================
+export const WAIS3_MATRICES_QUESTIONS: Question[] = [
+  // Demographics section
+  {
+    id: 'patient_age',
+    text: 'Âge du patient (en années)',
+    type: 'number',
+    required: true,
+    section: 'Données démographiques',
+    min: 16,
+    max: 90,
+    help: 'Âge utilisé pour la conversion en note standard selon les normes WAIS-III'
+  },
+  // Item scores section
+  {
+    id: 'item_01',
+    text: 'Note pour l\'item 1',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_02',
+    text: 'Note pour l\'item 2',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_03',
+    text: 'Note pour l\'item 3',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_04',
+    text: 'Note pour l\'item 4',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_05',
+    text: 'Note pour l\'item 5',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_06',
+    text: 'Note pour l\'item 6',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_07',
+    text: 'Note pour l\'item 7',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_08',
+    text: 'Note pour l\'item 8',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_09',
+    text: 'Note pour l\'item 9',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_10',
+    text: 'Note pour l\'item 10',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_11',
+    text: 'Note pour l\'item 11',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_12',
+    text: 'Note pour l\'item 12',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_13',
+    text: 'Note pour l\'item 13',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_14',
+    text: 'Note pour l\'item 14',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_15',
+    text: 'Note pour l\'item 15',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_16',
+    text: 'Note pour l\'item 16',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_17',
+    text: 'Note pour l\'item 17',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_18',
+    text: 'Note pour l\'item 18',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_19',
+    text: 'Note pour l\'item 19',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_20',
+    text: 'Note pour l\'item 20',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_21',
+    text: 'Note pour l\'item 21',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_22',
+    text: 'Note pour l\'item 22',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_23',
+    text: 'Note pour l\'item 23',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_24',
+    text: 'Note pour l\'item 24',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_25',
+    text: 'Note pour l\'item 25',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  {
+    id: 'item_26',
+    text: 'Note pour l\'item 26',
+    type: 'number',
+    required: true,
+    section: 'Notes par item (0 ou 1)',
+    min: 0,
+    max: 1
+  },
+  // Computed scores section
+  {
+    id: 'total_raw_score',
+    text: 'Note brute totale',
+    type: 'number',
+    required: false,
+    section: 'Scores calculés',
+    read_only: true,
+    help: 'Somme des notes des 26 items (calculée automatiquement)'
+  },
+  {
+    id: 'standard_score',
+    text: 'Note standard',
+    type: 'number',
+    required: false,
+    section: 'Scores calculés',
+    read_only: true,
+    help: 'Note standard selon les normes WAIS-III (calculée automatiquement)'
+  },
+  {
+    id: 'standardized_value',
+    text: 'Valeur standardisée',
+    type: 'number',
+    required: false,
+    section: 'Scores calculés',
+    read_only: true,
+    help: 'Valeur Z-score équivalente (calculée automatiquement)'
+  }
+];
+
+export const WAIS3_MATRICES_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais3_matrices',
+  code: 'WAIS3_MATRICES_FR',
+  title: 'WAIS-III - Subtest Matrices',
+  description: 'Subtest Matrices de la WAIS-III (Wechsler, 1997) - Évaluation du raisonnement perceptif. Utilise les tables de normes WAIS-III.',
+  questions: WAIS3_MATRICES_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

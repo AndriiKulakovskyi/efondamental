@@ -3086,3 +3086,54 @@ export interface Wais3VocabulaireResponse {
 
 export type Wais3VocabulaireResponseInsert = Omit<Wais3VocabulaireResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_raw_score'>;
 
+// WAIS-III Matrices
+export interface Wais3MatricesResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Patient age for norm lookup
+  patient_age: number;
+  
+  // Item scores (0 or 1 for each item)
+  item_01: number;
+  item_02: number;
+  item_03: number;
+  item_04: number;
+  item_05: number;
+  item_06: number;
+  item_07: number;
+  item_08: number;
+  item_09: number;
+  item_10: number;
+  item_11: number;
+  item_12: number;
+  item_13: number;
+  item_14: number;
+  item_15: number;
+  item_16: number;
+  item_17: number;
+  item_18: number;
+  item_19: number;
+  item_20: number;
+  item_21: number;
+  item_22: number;
+  item_23: number;
+  item_24: number;
+  item_25: number;
+  item_26: number;
+  
+  // Computed scores
+  total_raw_score?: number;
+  standard_score?: number;
+  standardized_value?: number;
+  
+  // Metadata
+  completed_by?: string;
+  completed_at: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type Wais3MatricesResponseInsert = Omit<Wais3MatricesResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_raw_score' | 'standard_score' | 'standardized_value'>;
+

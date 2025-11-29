@@ -817,6 +817,82 @@ export function QuestionnaireRenderer({
         }
       }
 
+      // Compute WAIS-III Matrices scores (for questionnaire with item_01 to item_26)
+      const matricesAge = Number(prev.patient_age);
+      const matricesItems = [
+        'item_01', 'item_02', 'item_03', 'item_04', 'item_05', 'item_06', 'item_07', 'item_08', 'item_09', 'item_10',
+        'item_11', 'item_12', 'item_13', 'item_14', 'item_15', 'item_16', 'item_17', 'item_18', 'item_19', 'item_20',
+        'item_21', 'item_22', 'item_23', 'item_24', 'item_25', 'item_26'
+      ];
+      const matricesValues = matricesItems.map(f => prev[f]).filter(v => v !== undefined && v !== '' && !isNaN(Number(v)));
+      
+      // Only process if all 26 items are filled in
+      if (matricesValues.length === 26 && !isNaN(matricesAge) && matricesAge >= 16) {
+        const matricesRawTotal = matricesValues.reduce((sum, v) => sum + Number(v), 0);
+        if (updated.total_raw_score !== matricesRawTotal) {
+          updated.total_raw_score = matricesRawTotal;
+          hasChanges = true;
+        }
+        
+        // WAIS-III Matrices norm table (different from WAIS-IV)
+        const WAIS3_MATRICES_NORMS: Record<string, number[]> = {
+          '16-17': [7, 9, 10, 11, 13, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 0, 26, 0, 0],
+          '18-19': [7, 9, 11, 13, 15, 17, 18, 19, 20, 21, 22, 23, 24, 0, 25, 0, 26, 0, 0],
+          '20-24': [7, 8, 10, 12, 14, 16, 18, 20, 21, 22, 23, 0, 24, 0, 25, 0, 26, 0, 0],
+          '25-29': [7, 9, 10, 12, 13, 15, 17, 19, 20, 21, 22, 23, 24, 0, 25, 0, 26, 0, 0],
+          '30-34': [7, 9, 10, 12, 13, 14, 16, 18, 19, 20, 21, 22, 23, 24, 25, 0, 26, 0, 0],
+          '35-44': [5, 6, 7, 9, 12, 14, 16, 18, 19, 20, 21, 22, 23, 24, 0, 25, 26, 0, 0],
+          '45-54': [2, 4, 5, 6, 7, 9, 13, 15, 17, 19, 20, 21, 23, 24, 25, 0, 26, 0, 0],
+          '55-64': [2, 3, 4, 5, 6, 8, 11, 14, 16, 17, 19, 21, 22, 0, 23, 24, 25, 26, 0],
+          '65-69': [1, 2, 3, 4, 5, 6, 7, 11, 13, 16, 19, 20, 21, 22, 23, 24, 25, 26, 0],
+          '70-74': [1, 2, 3, 4, 5, 6, 7, 9, 11, 13, 15, 17, 18, 19, 20, 21, 23, 24, 26],
+          '75-79': [1, 2, 3, 4, 0, 5, 6, 7, 8, 10, 12, 14, 16, 17, 19, 20, 21, 22, 26],
+          '80+': [0, 1, 2, 0, 3, 4, 0, 5, 6, 8, 10, 12, 14, 16, 19, 20, 21, 22, 26]
+        };
+        
+        const getMatricesAgeGroup = (age: number): string => {
+          if (age >= 16 && age <= 17) return '16-17';
+          if (age >= 18 && age <= 19) return '18-19';
+          if (age >= 20 && age <= 24) return '20-24';
+          if (age >= 25 && age <= 29) return '25-29';
+          if (age >= 30 && age <= 34) return '30-34';
+          if (age >= 35 && age <= 44) return '35-44';
+          if (age >= 45 && age <= 54) return '45-54';
+          if (age >= 55 && age <= 64) return '55-64';
+          if (age >= 65 && age <= 69) return '65-69';
+          if (age >= 70 && age <= 74) return '70-74';
+          if (age >= 75 && age <= 79) return '75-79';
+          return '80+';
+        };
+        
+        const findMatricesStandardScore = (rawScore: number, ageGroup: string): number => {
+          const norms = WAIS3_MATRICES_NORMS[ageGroup];
+          if (!norms) return 10;
+          
+          for (let i = 0; i < norms.length; i++) {
+            const maxRaw = norms[i];
+            const ss = i + 1; // Standard scores 1-19
+            if (maxRaw === 0) continue; // Skip invalid entries
+            if (rawScore <= maxRaw) return ss;
+          }
+          return 19; // If exceeded all thresholds
+        };
+        
+        const matAgeGroup = getMatricesAgeGroup(matricesAge);
+        const matStdScore = findMatricesStandardScore(matricesRawTotal, matAgeGroup);
+        
+        if (updated.standard_score !== matStdScore) {
+          updated.standard_score = matStdScore;
+          hasChanges = true;
+        }
+        
+        const matStdValue = Number(((matStdScore - 10) / 3).toFixed(2));
+        if (updated.standardized_value !== matStdValue) {
+          updated.standardized_value = matStdValue;
+          hasChanges = true;
+        }
+      }
+
       return hasChanges ? updated : prev;
     });
   }, [
@@ -901,7 +977,34 @@ export function QuestionnaireRenderer({
     responses.scipv02a,
     responses.scipv03a,
     responses.scipv04a,
-    responses.scipv05a
+    responses.scipv05a,
+    // WAIS-III Matrices fields
+    responses.item_01,
+    responses.item_02,
+    responses.item_03,
+    responses.item_04,
+    responses.item_05,
+    responses.item_06,
+    responses.item_07,
+    responses.item_08,
+    responses.item_09,
+    responses.item_10,
+    responses.item_11,
+    responses.item_12,
+    responses.item_13,
+    responses.item_14,
+    responses.item_15,
+    responses.item_16,
+    responses.item_17,
+    responses.item_18,
+    responses.item_19,
+    responses.item_20,
+    responses.item_21,
+    responses.item_22,
+    responses.item_23,
+    responses.item_24,
+    responses.item_25,
+    responses.item_26
   ]);
 
   const { visibleQuestions, requiredQuestions } = evaluateConditionalLogic(

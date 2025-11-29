@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, CheckCircle, Circle, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -16,30 +16,46 @@ interface ExpandableModuleCardProps {
   totalModules: number;
 }
 
-// Helper function to get all questionnaires from a module (flat or sectioned)
-function getAllQuestionnaires(module: any): any[] {
-  try {
-    if (!module) return [];
-    
-    if (module.sections && Array.isArray(module.sections)) {
-      const result: any[] = [];
-      for (const section of module.sections) {
-        if (section && Array.isArray(section.questionnaires)) {
-          result.push(...section.questionnaires);
-        }
-      }
-      return result;
-    }
-    
-    if (Array.isArray(module.questionnaires)) {
-      return module.questionnaires;
-    }
-    
-    return [];
-  } catch (e) {
-    console.error('Error in getAllQuestionnaires:', e);
+// Safe helper to get all questionnaires from a module
+function safeGetQuestionnaires(mod: unknown): any[] {
+  // Validate input is an object
+  if (!mod || typeof mod !== 'object') {
     return [];
   }
+  
+  const moduleObj = mod as Record<string, unknown>;
+  
+  // Handle sectioned modules
+  if ('sections' in moduleObj && moduleObj.sections) {
+    const sections = moduleObj.sections;
+    if (!Array.isArray(sections)) {
+      return [];
+    }
+    
+    const allQuests: any[] = [];
+    for (let i = 0; i < sections.length; i++) {
+      const section = sections[i];
+      if (section && typeof section === 'object' && 'questionnaires' in section) {
+        const quests = (section as Record<string, unknown>).questionnaires;
+        if (Array.isArray(quests)) {
+          for (let j = 0; j < quests.length; j++) {
+            allQuests.push(quests[j]);
+          }
+        }
+      }
+    }
+    return allQuests;
+  }
+  
+  // Handle flat questionnaires
+  if ('questionnaires' in moduleObj && moduleObj.questionnaires) {
+    const quests = moduleObj.questionnaires;
+    if (Array.isArray(quests)) {
+      return quests;
+    }
+  }
+  
+  return [];
 }
 
 export function ExpandableModuleCard({ 
@@ -52,24 +68,28 @@ export function ExpandableModuleCard({
 }: ExpandableModuleCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   
+  // Use useMemo to safely compute questionnaire stats
+  const { allQuestionnaires, completedCount, totalCount, completionPercentage } = useMemo(() => {
+    if (!module || typeof module !== 'object') {
+      return { allQuestionnaires: [], completedCount: 0, totalCount: 0, completionPercentage: 0 };
+    }
+    
+    const quests = safeGetQuestionnaires(module);
+    const completed = quests.reduce((count, q) => count + (q && q.completed ? 1 : 0), 0);
+    const total = quests.length;
+    const percentage = total > 0 ? (completed / total) * 100 : 0;
+    
+    return { 
+      allQuestionnaires: quests, 
+      completedCount: completed, 
+      totalCount: total, 
+      completionPercentage: percentage 
+    };
+  }, [module]);
+  
   // Early return if module is undefined or invalid
   if (!module || typeof module !== 'object') {
-    console.warn('ExpandableModuleCard received invalid module:', module);
     return null;
-  }
-  
-  let allQuestionnaires: any[] = [];
-  let completedCount = 0;
-  let totalCount = 0;
-  let completionPercentage = 0;
-  
-  try {
-    allQuestionnaires = getAllQuestionnaires(module);
-    completedCount = Array.isArray(allQuestionnaires) ? allQuestionnaires.filter((q: any) => q?.completed).length : 0;
-    totalCount = Array.isArray(allQuestionnaires) ? allQuestionnaires.length : 0;
-    completionPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
-  } catch (e) {
-    console.error('Error calculating questionnaire stats:', e);
   }
   
   const isCompleted = completionPercentage === 100;
@@ -273,8 +293,17 @@ function CollapsibleSection({
 }) {
   const [isSectionExpanded, setIsSectionExpanded] = useState(true);
   
-  const questionnaires = Array.isArray(section?.questionnaires) ? section.questionnaires : [];
-  const completedCount = questionnaires.filter((q: any) => q?.completed).length;
+  // Safely extract questionnaires
+  const questionnaires = useMemo(() => {
+    if (!section || typeof section !== 'object') return [];
+    const q = section.questionnaires;
+    return Array.isArray(q) ? q : [];
+  }, [section]);
+  
+  const completedCount = useMemo(() => {
+    return questionnaires.reduce((count: number, q: any) => count + (q && q.completed ? 1 : 0), 0);
+  }, [questionnaires]);
+  
   const totalCount = questionnaires.length;
   const hasQuestionnaires = totalCount > 0;
   

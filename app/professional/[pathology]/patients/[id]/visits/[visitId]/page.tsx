@@ -68,7 +68,8 @@ import {
   WAIS3_FLUENCES_VERBALES_DEFINITION,
   WAIS3_CRITERIA_DEFINITION,
   WAIS3_LEARNING_DEFINITION,
-  WAIS3_VOCABULAIRE_DEFINITION
+  WAIS3_VOCABULAIRE_DEFINITION,
+  WAIS3_MATRICES_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -382,6 +383,13 @@ export default async function VisitDetailPage({
                 target_role: 'healthcare_professional',
                 completed: questionnaireStatuses['WAIS3_VOCABULAIRE_FR']?.completed || false,
                 completedAt: questionnaireStatuses['WAIS3_VOCABULAIRE_FR']?.completed_at,
+              },
+              {
+                ...WAIS3_MATRICES_DEFINITION,
+                id: WAIS3_MATRICES_DEFINITION.code,
+                target_role: 'healthcare_professional',
+                completed: questionnaireStatuses['WAIS3_MATRICES_FR']?.completed || false,
+                completedAt: questionnaireStatuses['WAIS3_MATRICES_FR']?.completed_at,
               },
               {
                 ...WAIS3_CVLT_DEFINITION,
@@ -750,7 +758,7 @@ export default async function VisitDetailPage({
         </h3>
 
         <div className="relative space-y-6 pl-2">
-        {modulesWithQuestionnaires
+        {(Array.isArray(modulesWithQuestionnaires) ? modulesWithQuestionnaires : [])
           .filter((m): m is NonNullable<typeof m> => m != null && typeof m === 'object' && 'id' in m)
           .map((module, index) => (
             <ExpandableModuleCard
@@ -760,7 +768,7 @@ export default async function VisitDetailPage({
               pathology={pathology}
               patientId={patientId}
               visitId={visitId}
-              totalModules={modulesWithQuestionnaires.length}
+              totalModules={(Array.isArray(modulesWithQuestionnaires) ? modulesWithQuestionnaires : []).length}
             />
           ))}
         </div>

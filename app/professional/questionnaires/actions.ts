@@ -61,7 +61,8 @@ import {
   saveWais3FluencesVerbalesResponse,
   saveWais3CriteriaResponse,
   saveWais3LearningResponse,
-  saveWais3VocabulaireResponse
+  saveWais3VocabulaireResponse,
+  saveWais3MatricesResponse
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveSocialResponse
@@ -154,7 +155,8 @@ import {
   Wais3FluencesVerbalesResponseInsert,
   Wais3CriteriaResponseInsert,
   Wais3LearningResponseInsert,
-  Wais3VocabulaireResponseInsert
+  Wais3VocabulaireResponseInsert,
+  Wais3MatricesResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 
@@ -697,6 +699,40 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as Wais3VocabulaireResponseInsert);
+        break;
+
+      case 'WAIS3_MATRICES_FR':
+        result = await saveWais3MatricesResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          patient_age: responses.patient_age,
+          item_01: responses.item_01,
+          item_02: responses.item_02,
+          item_03: responses.item_03,
+          item_04: responses.item_04,
+          item_05: responses.item_05,
+          item_06: responses.item_06,
+          item_07: responses.item_07,
+          item_08: responses.item_08,
+          item_09: responses.item_09,
+          item_10: responses.item_10,
+          item_11: responses.item_11,
+          item_12: responses.item_12,
+          item_13: responses.item_13,
+          item_14: responses.item_14,
+          item_15: responses.item_15,
+          item_16: responses.item_16,
+          item_17: responses.item_17,
+          item_18: responses.item_18,
+          item_19: responses.item_19,
+          item_20: responses.item_20,
+          item_21: responses.item_21,
+          item_22: responses.item_22,
+          item_23: responses.item_23,
+          item_24: responses.item_24,
+          item_25: responses.item_25,
+          item_26: responses.item_26
+        } as Wais3MatricesResponseInsert);
         break;
         
       default:

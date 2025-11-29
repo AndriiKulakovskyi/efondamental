@@ -62,7 +62,8 @@ import {
   WAIS3_FLUENCES_VERBALES_DEFINITION,
   WAIS3_CRITERIA_DEFINITION,
   WAIS3_LEARNING_DEFINITION,
-  WAIS3_VOCABULAIRE_DEFINITION
+  WAIS3_VOCABULAIRE_DEFINITION,
+  WAIS3_MATRICES_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -142,7 +143,8 @@ import {
   getWais3FluencesVerbalesResponse,
   getWais3CriteriaResponse,
   getWais3LearningResponse,
-  getWais3VocabulaireResponse
+  getWais3VocabulaireResponse,
+  getWais3MatricesResponse
 } from "@/lib/services/questionnaire-hetero.service";
 import {
   getSocialResponse
@@ -238,6 +240,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS3_CRITERIA_DEFINITION.code) questionnaire = WAIS3_CRITERIA_DEFINITION;
   else if (code === WAIS3_LEARNING_DEFINITION.code) questionnaire = WAIS3_LEARNING_DEFINITION;
   else if (code === WAIS3_VOCABULAIRE_DEFINITION.code) questionnaire = WAIS3_VOCABULAIRE_DEFINITION;
+  else if (code === WAIS3_MATRICES_DEFINITION.code) questionnaire = WAIS3_MATRICES_DEFINITION;
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) questionnaire = SOCIAL_DEFINITION;
   // Infirmier questionnaires
@@ -320,6 +323,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS3_CRITERIA_DEFINITION.code) existingResponse = await getWais3CriteriaResponse(visitId);
   else if (code === WAIS3_LEARNING_DEFINITION.code) existingResponse = await getWais3LearningResponse(visitId);
   else if (code === WAIS3_VOCABULAIRE_DEFINITION.code) existingResponse = await getWais3VocabulaireResponse(visitId);
+  else if (code === WAIS3_MATRICES_DEFINITION.code) existingResponse = await getWais3MatricesResponse(visitId);
   // Social questionnaire
   else if (code === SOCIAL_DEFINITION.code) existingResponse = await getSocialResponse(visitId);
   // Infirmier questionnaires

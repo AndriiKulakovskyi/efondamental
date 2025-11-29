@@ -70,6 +70,7 @@ import { calculateFluencesVerbalesScores } from './fluences-verbales-scoring';
 import { calculateWais4SimilitudesScores } from './wais4-similitudes-scoring';
 import { calculateTestCommissionsScores } from './test-commissions-scoring';
 import { calculateScipScores } from './scip-scoring';
+import { calculateWais3MatricesScores } from './wais3-matrices-scoring';
 
 // ============================================================================
 // MADRS (Montgomery-Åsberg Depression Rating Scale)
@@ -2347,6 +2348,110 @@ export async function saveWais3VocabulaireResponse(
       item31: response.item31,
       item32: response.item32,
       item33: response.item33,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// WAIS-III Matrices
+// ============================================================================
+
+import { Wais3MatricesResponse, Wais3MatricesResponseInsert } from '@/lib/types/database.types';
+
+export async function getWais3MatricesResponse(
+  visitId: string
+): Promise<Wais3MatricesResponse | null> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_wais3_matrices')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveWais3MatricesResponse(
+  response: Wais3MatricesResponseInsert
+): Promise<Wais3MatricesResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Calculate scores using WAIS-III norms
+  const scores = calculateWais3MatricesScores({
+    patient_age: response.patient_age,
+    item_01: response.item_01,
+    item_02: response.item_02,
+    item_03: response.item_03,
+    item_04: response.item_04,
+    item_05: response.item_05,
+    item_06: response.item_06,
+    item_07: response.item_07,
+    item_08: response.item_08,
+    item_09: response.item_09,
+    item_10: response.item_10,
+    item_11: response.item_11,
+    item_12: response.item_12,
+    item_13: response.item_13,
+    item_14: response.item_14,
+    item_15: response.item_15,
+    item_16: response.item_16,
+    item_17: response.item_17,
+    item_18: response.item_18,
+    item_19: response.item_19,
+    item_20: response.item_20,
+    item_21: response.item_21,
+    item_22: response.item_22,
+    item_23: response.item_23,
+    item_24: response.item_24,
+    item_25: response.item_25,
+    item_26: response.item_26
+  });
+
+  const { data, error } = await supabase
+    .from('responses_wais3_matrices')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      patient_age: response.patient_age,
+      item_01: response.item_01,
+      item_02: response.item_02,
+      item_03: response.item_03,
+      item_04: response.item_04,
+      item_05: response.item_05,
+      item_06: response.item_06,
+      item_07: response.item_07,
+      item_08: response.item_08,
+      item_09: response.item_09,
+      item_10: response.item_10,
+      item_11: response.item_11,
+      item_12: response.item_12,
+      item_13: response.item_13,
+      item_14: response.item_14,
+      item_15: response.item_15,
+      item_16: response.item_16,
+      item_17: response.item_17,
+      item_18: response.item_18,
+      item_19: response.item_19,
+      item_20: response.item_20,
+      item_21: response.item_21,
+      item_22: response.item_22,
+      item_23: response.item_23,
+      item_24: response.item_24,
+      item_25: response.item_25,
+      item_26: response.item_26,
+      standard_score: scores.standard_score,
+      standardized_value: scores.standardized_value,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
