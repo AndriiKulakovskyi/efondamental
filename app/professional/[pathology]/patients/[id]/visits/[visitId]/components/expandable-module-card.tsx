@@ -52,15 +52,25 @@ export function ExpandableModuleCard({
 }: ExpandableModuleCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   
-  // Early return if module is undefined
-  if (!module) {
+  // Early return if module is undefined or invalid
+  if (!module || typeof module !== 'object') {
+    console.warn('ExpandableModuleCard received invalid module:', module);
     return null;
   }
   
-  const allQuestionnaires = getAllQuestionnaires(module);
-  const completedCount = Array.isArray(allQuestionnaires) ? allQuestionnaires.filter((q: any) => q?.completed).length : 0;
-  const totalCount = Array.isArray(allQuestionnaires) ? allQuestionnaires.length : 0;
-  const completionPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+  let allQuestionnaires: any[] = [];
+  let completedCount = 0;
+  let totalCount = 0;
+  let completionPercentage = 0;
+  
+  try {
+    allQuestionnaires = getAllQuestionnaires(module);
+    completedCount = Array.isArray(allQuestionnaires) ? allQuestionnaires.filter((q: any) => q?.completed).length : 0;
+    totalCount = Array.isArray(allQuestionnaires) ? allQuestionnaires.length : 0;
+    completionPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+  } catch (e) {
+    console.error('Error calculating questionnaire stats:', e);
+  }
   
   const isCompleted = completionPercentage === 100;
   const isInProgress = completionPercentage > 0 && completionPercentage < 100;

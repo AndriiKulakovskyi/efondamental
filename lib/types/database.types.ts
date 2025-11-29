@@ -3030,3 +3030,59 @@ export interface Wais3LearningResponse {
 
 export type Wais3LearningResponseInsert = Omit<Wais3LearningResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ============================================================================
+// WAIS-III Vocabulaire (Wechsler, 1997)
+// ============================================================================
+
+export interface Wais3VocabulaireResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Item scores (0-2 for each item)
+  item1: number;  // Bateau
+  item2: number;  // Fauteuil
+  item3: number;  // Bol
+  item4: number;  // Instruire
+  item5: number;  // Hier
+  item6: number;  // Arracher
+  item7: number;  // Sanction
+  item8: number;  // Refuge
+  item9: number;  // Calendrier
+  item10: number; // Baleine
+  item11: number; // Mime
+  item12: number; // Persévérer
+  item13: number; // Sauvage
+  item14: number; // Héréditaire
+  item15: number; // Connivence
+  item16: number; // Grandiose
+  item17: number; // Confier
+  item18: number; // Vigoureux
+  item19: number; // Contracter
+  item20: number; // Initiative
+  item21: number; // Esquisse
+  item22: number; // Irritable
+  item23: number; // Invectiver
+  item24: number; // Hétérogène
+  item25: number; // Assimiler
+  item26: number; // Concertation
+  item27: number; // Emulation
+  item28: number; // Pittoresque
+  item29: number; // Evasif
+  item30: number; // Elaborer
+  item31: number; // Prosaïque
+  item32: number; // Apologie
+  item33: number; // Conjecture
+  
+  // Total raw score (computed)
+  total_raw_score?: number | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Wais3VocabulaireResponseInsert = Omit<Wais3VocabulaireResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_raw_score'>;
+

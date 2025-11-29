@@ -5722,3 +5722,77 @@ export const WAIS3_LEARNING_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// WAIS-III Vocabulaire (Wechsler, 1997)
+// ============================================================================
+
+const WAIS3_VOCABULAIRE_OPTIONS: Option[] = [
+  { code: 0, label: '0 - Réponse incorrecte', score: 0 },
+  { code: 1, label: '1 - Réponse partielle', score: 1 },
+  { code: 2, label: '2 - Réponse correcte', score: 2 }
+];
+
+export const WAIS3_VOCABULAIRE_QUESTIONS: Question[] = [
+  { id: 'item1', text: '1. Bateau', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item2', text: '2. Fauteuil', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item3', text: '3. Bol', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item4', text: '4. Instruire', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item5', text: '5. Hier', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item6', text: '6. Arracher', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item7', text: '7. Sanction', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item8', text: '8. Refuge', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item9', text: '9. Calendrier', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item10', text: '10. Baleine', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item11', text: '11. Mime', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item12', text: '12. Persévérer', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item13', text: '13. Sauvage', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item14', text: '14. Héréditaire', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item15', text: '15. Connivence', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item16', text: '16. Grandiose', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item17', text: '17. Confier', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item18', text: '18. Vigoureux', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item19', text: '19. Contracter', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item20', text: '20. Initiative', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item21', text: '21. Esquisse', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item22', text: '22. Irritable', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item23', text: '23. Invectiver', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item24', text: '24. Hétérogène', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item25', text: '25. Assimiler', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item26', text: '26. Concertation', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item27', text: '27. Emulation', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item28', text: '28. Pittoresque', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item29', text: '29. Evasif', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item30', text: '30. Elaborer', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item31', text: '31. Prosaïque', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item32', text: '32. Apologie', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item33', text: '33. Conjecture', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  // Score section
+  {
+    id: 'section_scores',
+    text: 'Score',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'total_raw_score',
+    text: 'Note brute totale (0-66)',
+    type: 'number',
+    required: false,
+    read_only: true,
+    help: 'Somme des scores des 33 items (calculé automatiquement)'
+  }
+];
+
+export const WAIS3_VOCABULAIRE_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais3_vocabulaire',
+  code: 'WAIS3_VOCABULAIRE_FR',
+  title: 'WAIS-III - Subtest Vocabulaire',
+  description: 'Subtest Vocabulaire de la WAIS-III (Wechsler, 1997) - Évaluation des connaissances lexicales.',
+  questions: WAIS3_VOCABULAIRE_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};

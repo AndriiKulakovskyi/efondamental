@@ -800,6 +800,23 @@ export function QuestionnaireRenderer({
         }
       }
 
+      // Compute WAIS-III Vocabulaire total score (sum of item1 to item33)
+      const vocabItems = [
+        'item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'item7', 'item8', 'item9', 'item10',
+        'item11', 'item12', 'item13', 'item14', 'item15', 'item16', 'item17', 'item18', 'item19', 'item20',
+        'item21', 'item22', 'item23', 'item24', 'item25', 'item26', 'item27', 'item28', 'item29', 'item30',
+        'item31', 'item32', 'item33'
+      ];
+      const vocabValues = vocabItems.map(f => prev[f]).filter(v => v !== undefined && v !== '' && !isNaN(Number(v)));
+      
+      if (vocabValues.length > 0) {
+        const vocabRawTotal = vocabValues.reduce((sum, v) => sum + Number(v), 0);
+        if (updated.total_raw_score !== vocabRawTotal) {
+          updated.total_raw_score = vocabRawTotal;
+          hasChanges = true;
+        }
+      }
+
       return hasChanges ? updated : prev;
     });
   }, [

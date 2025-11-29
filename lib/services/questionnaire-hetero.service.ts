@@ -2274,3 +2274,84 @@ export async function saveWais3LearningResponse(
   if (error) throw error;
   return data;
 }
+
+// ============================================================================
+// WAIS-III Vocabulaire (Wechsler, 1997)
+// ============================================================================
+
+import { Wais3VocabulaireResponse, Wais3VocabulaireResponseInsert } from '@/lib/types/database.types';
+
+export async function getWais3VocabulaireResponse(
+  visitId: string
+): Promise<Wais3VocabulaireResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_wais3_vocabulaire')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    if (error.code === 'PGRST205') {
+      console.warn('Table responses_wais3_vocabulaire not found. Please run migrations.');
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveWais3VocabulaireResponse(
+  response: Wais3VocabulaireResponseInsert
+): Promise<Wais3VocabulaireResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Total raw score is computed by the database (GENERATED ALWAYS AS)
+  const { data, error } = await supabase
+    .from('responses_wais3_vocabulaire')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      item1: response.item1,
+      item2: response.item2,
+      item3: response.item3,
+      item4: response.item4,
+      item5: response.item5,
+      item6: response.item6,
+      item7: response.item7,
+      item8: response.item8,
+      item9: response.item9,
+      item10: response.item10,
+      item11: response.item11,
+      item12: response.item12,
+      item13: response.item13,
+      item14: response.item14,
+      item15: response.item15,
+      item16: response.item16,
+      item17: response.item17,
+      item18: response.item18,
+      item19: response.item19,
+      item20: response.item20,
+      item21: response.item21,
+      item22: response.item22,
+      item23: response.item23,
+      item24: response.item24,
+      item25: response.item25,
+      item26: response.item26,
+      item27: response.item27,
+      item28: response.item28,
+      item29: response.item29,
+      item30: response.item30,
+      item31: response.item31,
+      item32: response.item32,
+      item33: response.item33,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
