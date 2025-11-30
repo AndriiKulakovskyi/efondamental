@@ -150,13 +150,6 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <Link href={`/professional/${pathology}/patients/${patientId}/visits/new`}>
-          <Button className="gap-2">
-            <Calendar className="h-4 w-4" />
-            Planifier une visite
-          </Button>
-        </Link>
       </div>
 
       {/* Visit Cards Grid */}

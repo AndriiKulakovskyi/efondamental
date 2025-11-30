@@ -2,7 +2,7 @@ import { getPatientProfileData } from "@/lib/services/patient-profile.service";
 import { recordPatientAccess } from "@/lib/services/patient.service";
 import { getUserContext } from "@/lib/rbac/middleware";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, MoreVertical, Filter, Calendar } from "lucide-react";
+import { AlertTriangle, Calendar } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { notFound, redirect } from "next/navigation";
 import { formatRiskLevel } from "@/lib/utils/formatting";
@@ -118,10 +118,17 @@ export default async function PatientDetailPage({
               </div>
             </div>
           </div>
-          <button className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg transition shadow-sm flex items-center gap-2">
-            <MoreVertical className="w-4 h-4" />
-            Actions rapides
-          </button>
+          <QuickActionsMenu
+            patientId={id}
+            patientFirstName={patient.first_name}
+            patientLastName={patient.last_name}
+            currentEmail={patient.email}
+            currentAssignedTo={patient.assigned_to}
+            createdBy={patient.created_by}
+            currentUserId={context.user.id}
+            doctors={doctors}
+            pathology={pathology}
+          />
           </div>
 
           {/* Risk Alert */}
@@ -185,12 +192,8 @@ export default async function PatientDetailPage({
             </div>
 
             <div className="flex items-center gap-3">
-              <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition shadow-sm">
-                <Filter className="w-4 h-4" />
-                Filtrer
-              </button>
               <Link href={`/professional/${pathology}/patients/${id}/visits/new`}>
-                <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition shadow-md">
+                <button className="flex items-center gap-2 px-4 py-2 bg-brand hover:bg-brand-dark text-white text-sm font-bold rounded-lg transition shadow-sm">
                   <Calendar className="w-4 h-4" />
                   Planifier une visite
                 </button>
