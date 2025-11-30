@@ -133,7 +133,11 @@ export default function VisitActions({
         <div className="flex gap-2">
           {status === "scheduled" && (
             <>
-              <Button onClick={handleStartVisit} disabled={isLoading}>
+              <Button 
+                onClick={handleStartVisit} 
+                disabled={isLoading}
+                className="bg-brand hover:bg-brand-dark text-white shadow-sm"
+              >
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
