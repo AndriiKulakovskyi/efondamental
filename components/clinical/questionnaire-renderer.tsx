@@ -31,24 +31,30 @@ interface QuestionnaireRendererProps {
   readonly?: boolean;
 }
 
+// Stable empty object to use as default for initialResponses
+const EMPTY_RESPONSES: Record<string, any> = {};
+
 export function QuestionnaireRenderer({
   questionnaire,
-  initialResponses = {},
+  initialResponses,
   onSubmit,
   onSave,
   onResponseChange,
   readonly = false,
 }: QuestionnaireRendererProps) {
+  // Use stable empty object as default
+  const stableInitialResponses = initialResponses ?? EMPTY_RESPONSES;
+  
   // Initialize responses with defaults for date fields
   const initializeResponses = useCallback(() => {
-    const initialized = { ...initialResponses };
+    const initialized = { ...stableInitialResponses };
     questionnaire.questions.forEach((q) => {
       if (q.type === 'date' && q.metadata?.default === 'today' && !initialized[q.id]) {
         initialized[q.id] = new Date().toISOString().split('T')[0];
       }
     });
     return initialized;
-  }, [initialResponses, questionnaire.questions]);
+  }, [stableInitialResponses, questionnaire.questions]);
 
   const [responses, setResponses] = useState<Record<string, any>>(initializeResponses);
   const [errors, setErrors] = useState<string[]>([]);
@@ -58,6 +64,9 @@ export function QuestionnaireRenderer({
   // Track expanded sections (for collapsible sections)
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   
+  // Track if initial mount has happened
+  const isInitialMount = useRef(true);
+  
   // Initialize all sections as expanded by default
   useEffect(() => {
     const sectionIds = questionnaire.questions
@@ -66,8 +75,12 @@ export function QuestionnaireRenderer({
     setExpandedSections(new Set(sectionIds));
   }, [questionnaire.questions]);
 
-  // Update responses when initialResponses changes
+  // Update responses when initialResponses changes (skip initial mount since useState handles it)
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     setResponses(initializeResponses());
   }, [initializeResponses]);
 
@@ -1418,8 +1431,14 @@ export function QuestionnaireRenderer({
   );
 
   // Track previous responses to detect actual changes
-  const prevResponsesRef = useRef<Record<string, any>>(initialResponses);
+  const prevResponsesRef = useRef<Record<string, any>>(stableInitialResponses);
   const isFirstRender = useRef(true);
+  
+  // Store onResponseChange in a ref to avoid it being a dependency
+  const onResponseChangeRef = useRef(onResponseChange);
+  useEffect(() => {
+    onResponseChangeRef.current = onResponseChange;
+  }, [onResponseChange]);
   
   const handleResponseChange = (questionId: string, value: any) => {
     setResponses((prev) => {
@@ -1433,7 +1452,7 @@ export function QuestionnaireRenderer({
   };
   
   // Notify parent of response changes via useEffect
-  // This runs after state update is complete, avoiding the React warning
+  // Uses a ref for the callback to prevent it from triggering re-runs
   useEffect(() => {
     // Skip the very first render (when responses equals initialResponses)
     if (isFirstRender.current) {
@@ -1442,12 +1461,12 @@ export function QuestionnaireRenderer({
       return;
     }
     
-    // Only notify if responses actually changed
-    if (onResponseChange && responses !== prevResponsesRef.current) {
+    // Only notify if responses actually changed (reference comparison)
+    if (onResponseChangeRef.current && responses !== prevResponsesRef.current) {
       prevResponsesRef.current = responses;
-      onResponseChange(responses);
+      onResponseChangeRef.current(responses);
     }
-  }, [responses, onResponseChange]);
+  }, [responses]); // onResponseChange is now accessed via ref, not a dependency
 
   const handleSave = async () => {
     if (!onSave) return;

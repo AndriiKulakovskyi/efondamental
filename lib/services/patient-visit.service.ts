@@ -52,6 +52,15 @@ import {
 // TYPES
 // ============================================================================
 
+export type CompletedByRole = 'patient' | 'professional' | null;
+
+export interface QuestionnaireCompletionInfo {
+  isCompleted: boolean;
+  completedBy: string | null;
+  completedByRole: CompletedByRole;
+  isLockedByProfessional: boolean;
+}
+
 export interface PatientQuestionnaire {
   id: string;
   code: string;
@@ -59,6 +68,8 @@ export interface PatientQuestionnaire {
   description: string;
   estimatedTime: number;
   isCompleted: boolean;
+  completedByRole: CompletedByRole;
+  isLockedByProfessional: boolean;
   category: 'etat' | 'traits' | 'screening';
 }
 
@@ -114,39 +125,119 @@ const INITIAL_EVAL_TRAITS_QUESTIONNAIRES = [
 type QuestionnaireGetter = (visitId: string) => Promise<any>;
 
 const QUESTIONNAIRE_GETTERS: Record<string, QuestionnaireGetter> = {
+  // Screening questionnaires
   'ASRM_FR': getAsrmResponse,
   'QIDS_SR16_FR': getQidsResponse,
   'MDQ_FR': getMdqResponse,
-  'EQ5D5L_FR': getEq5d5lResponse,
-  'PRISE_M_FR': getPriseMResponse,
-  'STAI_YA_FR': getStaiYaResponse,
-  'MARS_FR': getMarsResponse,
-  'MATHYS_FR': getMathysResponse,
-  'PSQI_FR': getPsqiResponse,
-  'EPWORTH_FR': getEpworthResponse,
-  'ASRS_FR': getAsrsResponse,
-  'CTQ_FR': getCtqResponse,
-  'BIS10_FR': getBis10Response,
-  'ALS18_FR': getAls18Response,
-  'AIM_FR': getAimResponse,
-  'WURS25_FR': getWurs25Response,
-  'AQ12_FR': getAq12Response,
-  'CSM_FR': getCsmResponse,
-  'CTI_FR': getCtiResponse
+  // Initial Evaluation - ETAT questionnaires (codes without _FR suffix)
+  'EQ5D5L': getEq5d5lResponse,
+  'PRISE_M': getPriseMResponse,
+  'STAI_YA': getStaiYaResponse,
+  'MARS': getMarsResponse,
+  'MATHYS': getMathysResponse,
+  'PSQI': getPsqiResponse,
+  'EPWORTH': getEpworthResponse,
+  // Initial Evaluation - TRAITS questionnaires (codes without _FR suffix)
+  'ASRS': getAsrsResponse,
+  'CTQ': getCtqResponse,
+  'BIS10': getBis10Response,
+  'ALS18': getAls18Response,
+  'AIM': getAimResponse,
+  'WURS25': getWurs25Response,
+  'AQ12': getAq12Response,
+  'CSM': getCsmResponse,
+  'CTI': getCtiResponse
 };
 
-async function checkQuestionnaireCompletion(
+// Professional roles that lock questionnaires for patients
+const PROFESSIONAL_ROLES = ['healthcare_professional', 'manager', 'administrator'];
+
+/**
+ * Check questionnaire completion and determine who completed it
+ */
+async function checkQuestionnaireCompletionWithRole(
   visitId: string,
-  code: string
-): Promise<boolean> {
+  code: string,
+  patientUserId: string
+): Promise<QuestionnaireCompletionInfo> {
   const getter = QUESTIONNAIRE_GETTERS[code];
-  if (!getter) return false;
+  if (!getter) {
+    console.warn(`[Patient Visit Service] No getter found for questionnaire code: ${code}`);
+    return {
+      isCompleted: false,
+      completedBy: null,
+      completedByRole: null,
+      isLockedByProfessional: false
+    };
+  }
   
   try {
     const response = await getter(visitId);
-    return response !== null;
-  } catch {
-    return false;
+    
+    console.log(`[Patient Visit Service] Checking ${code} for visit ${visitId}: response=${response ? 'found' : 'null'}`);
+    
+    if (!response) {
+      return {
+        isCompleted: false,
+        completedBy: null,
+        completedByRole: null,
+        isLockedByProfessional: false
+      };
+    }
+    
+    // Response exists - check who completed it
+    const completedBy = response.completed_by || null;
+    
+    console.log(`[Patient Visit Service] ${code} completed_by: ${completedBy || 'null'}`);
+    
+    // If no completed_by field, assume it was completed (legacy data)
+    // We can't determine who completed it, so default to patient (unlocked)
+    if (!completedBy) {
+      return {
+        isCompleted: true,
+        completedBy: null,
+        completedByRole: 'patient',
+        isLockedByProfessional: false
+      };
+    }
+    
+    // Check the role of the person who completed it
+    const supabase = await createClient();
+    const { data: userProfile } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', completedBy)
+      .single();
+    
+    const isProfessional = userProfile && PROFESSIONAL_ROLES.includes(userProfile.role);
+    
+    // Check if this is the patient themselves
+    const isPatient = completedBy === patientUserId;
+    
+    let completedByRole: CompletedByRole = null;
+    if (isPatient) {
+      completedByRole = 'patient';
+    } else if (isProfessional) {
+      completedByRole = 'professional';
+    } else {
+      // Default to patient if we can't determine (e.g., completed via patient form)
+      completedByRole = 'patient';
+    }
+    
+    return {
+      isCompleted: true,
+      completedBy,
+      completedByRole,
+      isLockedByProfessional: completedByRole === 'professional'
+    };
+  } catch (error) {
+    console.error(`[Patient Visit Service] Error checking ${code} for visit ${visitId}:`, error);
+    return {
+      isCompleted: false,
+      completedBy: null,
+      completedByRole: null,
+      isLockedByProfessional: false
+    };
   }
 }
 
@@ -174,24 +265,28 @@ export function getVisitAutoQuestionnaires(
 }
 
 /**
- * Get completion status for all auto-questionnaires in a visit
+ * Get completion status for all auto-questionnaires in a visit with role info
  */
 export async function getQuestionnaireCompletionForVisit(
   visitId: string,
-  visitType: string
-): Promise<Map<string, boolean>> {
+  visitType: string,
+  patientUserId: string
+): Promise<Map<string, QuestionnaireCompletionInfo>> {
   const questionnaires = getVisitAutoQuestionnaires(visitType);
-  const completionMap = new Map<string, boolean>();
+  const completionMap = new Map<string, QuestionnaireCompletionInfo>();
+  
+  console.log(`[Patient Visit Service] Checking completion for visit ${visitId} (type: ${visitType}), ${questionnaires.length} questionnaires`);
   
   const completionChecks = await Promise.all(
     questionnaires.map(async (q) => ({
       code: q.definition.code,
-      isCompleted: await checkQuestionnaireCompletion(visitId, q.definition.code)
+      info: await checkQuestionnaireCompletionWithRole(visitId, q.definition.code, patientUserId)
     }))
   );
   
-  completionChecks.forEach(({ code, isCompleted }) => {
-    completionMap.set(code, isCompleted);
+  completionChecks.forEach(({ code, info }) => {
+    completionMap.set(code, info);
+    console.log(`[Patient Visit Service] ${code}: isCompleted=${info.isCompleted}, isLocked=${info.isLockedByProfessional}`);
   });
   
   return completionMap;
@@ -205,12 +300,23 @@ export async function getPatientVisitsWithQuestionnaires(
 ): Promise<PatientVisitWithQuestionnaires[]> {
   const supabase = await createClient();
   
-  // Fetch visits that are scheduled or in progress
+  // Get the patient's user_id for role checking
+  const { data: patient } = await supabase
+    .from('patients')
+    .select('user_id')
+    .eq('id', patientId)
+    .single();
+  
+  const patientUserId = patient?.user_id || '';
+  
+  // Fetch all active visits (scheduled, in_progress, or completed)
+  // Patients should be able to see and review all their visits
   const { data: visits, error } = await supabase
     .from('v_visits_full')
     .select('*')
     .eq('patient_id', patientId)
-    .in('status', [VisitStatus.SCHEDULED, VisitStatus.IN_PROGRESS])
+    .in('status', [VisitStatus.SCHEDULED, VisitStatus.IN_PROGRESS, VisitStatus.COMPLETED])
+    .neq('status', VisitStatus.CANCELLED)
     .order('scheduled_date', { ascending: true });
   
   if (error) {
@@ -218,8 +324,14 @@ export async function getPatientVisitsWithQuestionnaires(
   }
   
   if (!visits || visits.length === 0) {
+    console.log(`[Patient Visit Service] No scheduled/in_progress visits found for patient ${patientId}`);
     return [];
   }
+  
+  console.log(`[Patient Visit Service] Found ${visits.length} visits for patient ${patientId}:`);
+  visits.forEach(v => {
+    console.log(`  - Visit ${v.id}: type=${v.visit_type}, status=${v.status}, date=${v.scheduled_date}`);
+  });
   
   // Process each visit to include questionnaire details
   const visitsWithQuestionnaires = await Promise.all(
@@ -227,18 +339,30 @@ export async function getPatientVisitsWithQuestionnaires(
       const autoQuestionnaires = getVisitAutoQuestionnaires(visit.visit_type);
       const completionMap = await getQuestionnaireCompletionForVisit(
         visit.id,
-        visit.visit_type
+        visit.visit_type,
+        patientUserId
       );
       
-      const questionnaires: PatientQuestionnaire[] = autoQuestionnaires.map((q) => ({
-        id: `${visit.id}_${q.definition.code}`,
-        code: q.definition.code,
-        title: q.definition.title,
-        description: q.definition.description,
-        estimatedTime: q.estimatedTime,
-        isCompleted: completionMap.get(q.definition.code) || false,
-        category: q.category
-      }));
+      const questionnaires: PatientQuestionnaire[] = autoQuestionnaires.map((q) => {
+        const completionInfo = completionMap.get(q.definition.code) || {
+          isCompleted: false,
+          completedBy: null,
+          completedByRole: null,
+          isLockedByProfessional: false
+        };
+        
+        return {
+          id: `${visit.id}_${q.definition.code}`,
+          code: q.definition.code,
+          title: q.definition.title,
+          description: q.definition.description,
+          estimatedTime: q.estimatedTime,
+          isCompleted: completionInfo.isCompleted,
+          completedByRole: completionInfo.completedByRole,
+          isLockedByProfessional: completionInfo.isLockedByProfessional,
+          category: q.category
+        };
+      });
       
       const completedCount = questionnaires.filter((q) => q.isCompleted).length;
       const totalCount = questionnaires.length;
@@ -257,13 +381,18 @@ export async function getPatientVisitsWithQuestionnaires(
         }
       }
       
+      // requiresAction only if there are incomplete questionnaires that are NOT locked
+      const incompleteAndUnlocked = questionnaires.filter(
+        (q) => !q.isCompleted && !q.isLockedByProfessional
+      );
+      
       return {
         visit: visit as VisitFull,
         questionnaires,
         completedCount,
         totalCount,
         completionPercentage: totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0,
-        requiresAction: completedCount < totalCount,
+        requiresAction: incompleteAndUnlocked.length > 0,
         conductedByName
       };
     })
@@ -282,10 +411,10 @@ export async function getPatientDashboardStats(patientId: string): Promise<{
 }> {
   const supabase = await createClient();
   
-  // Get pending questionnaires count
+  // Get pending questionnaires count (only those not locked by professionals)
   const visitsWithQuestionnaires = await getPatientVisitsWithQuestionnaires(patientId);
   const pendingQuestionnaires = visitsWithQuestionnaires.reduce(
-    (sum, v) => sum + (v.totalCount - v.completedCount),
+    (sum, v) => sum + v.questionnaires.filter(q => !q.isCompleted && !q.isLockedByProfessional).length,
     0
   );
   
@@ -354,3 +483,32 @@ export async function getPatientAllVisits(patientId: string): Promise<{
   return { upcoming, past };
 }
 
+/**
+ * Check if a specific questionnaire is locked by a professional
+ */
+export async function isQuestionnaireLockedByProfessional(
+  visitId: string,
+  questionnaireCode: string,
+  patientUserId: string
+): Promise<boolean> {
+  const info = await checkQuestionnaireCompletionWithRole(visitId, questionnaireCode, patientUserId);
+  return info.isLockedByProfessional;
+}
+
+/**
+ * Get questionnaire response data for read-only view
+ */
+export async function getQuestionnaireResponseForView(
+  visitId: string,
+  questionnaireCode: string
+): Promise<Record<string, any> | null> {
+  const getter = QUESTIONNAIRE_GETTERS[questionnaireCode];
+  if (!getter) return null;
+  
+  try {
+    const response = await getter(visitId);
+    return response;
+  } catch {
+    return null;
+  }
+}

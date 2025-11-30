@@ -107,7 +107,7 @@ export default async function AppointmentsPage() {
       </div>
 
       {/* Center Info */}
-      {centerInfo && (
+                          {centerInfo && (
         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 flex items-start gap-4">
           <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
             <svg
@@ -129,14 +129,14 @@ export default async function AppointmentsPage() {
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-          </div>
+                            </div>
           <div>
             <p className="font-semibold text-blue-900">{centerInfo.name}</p>
             {centerInfo.address && (
               <p className="text-sm text-blue-700">{centerInfo.address}</p>
-            )}
-          </div>
-        </div>
+                        )}
+                      </div>
+                    </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

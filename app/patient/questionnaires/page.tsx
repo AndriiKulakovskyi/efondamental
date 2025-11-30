@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   getPatientVisitsWithQuestionnaires,
   PatientVisitWithQuestionnaires,
+  PatientQuestionnaire,
 } from "@/lib/services/patient-visit.service";
 
 // Format date for display
@@ -25,6 +26,52 @@ function getVisitTypeLabel(visitType: string): string {
     crisis: "Visite de Crise",
   };
   return labels[visitType] || visitType;
+}
+
+// Get status info for questionnaire display
+function getQuestionnaireStatusInfo(questionnaire: PatientQuestionnaire): {
+  statusText: string;
+  statusClass: string;
+  iconBgClass: string;
+  iconColorClass: string;
+  buttonText: string;
+  buttonClass: string;
+  canStart: boolean;
+} {
+  if (questionnaire.isLockedByProfessional) {
+    // Completed by professional - locked
+    return {
+      statusText: "Complete par l'equipe",
+      statusClass: "text-blue-600",
+      iconBgClass: "bg-blue-100",
+      iconColorClass: "text-blue-600",
+      buttonText: "Voir",
+      buttonClass: "px-4 py-2 bg-blue-100 text-blue-700 text-xs font-bold rounded-lg hover:bg-blue-200 transition",
+      canStart: false,
+    };
+  } else if (questionnaire.isCompleted) {
+    // Completed by patient
+    return {
+      statusText: "Termine",
+      statusClass: "text-emerald-600",
+      iconBgClass: "bg-emerald-100",
+      iconColorClass: "text-emerald-600",
+      buttonText: "Voir",
+      buttonClass: "px-4 py-2 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-lg hover:bg-emerald-200 transition",
+      canStart: false,
+    };
+  } else {
+    // Not started
+    return {
+      statusText: "Non commence",
+      statusClass: "text-brand",
+      iconBgClass: "bg-slate-100 group-hover:bg-brand",
+      iconColorClass: "text-slate-400 group-hover:text-white",
+      buttonText: "Commencer",
+      buttonClass: "px-4 py-2 bg-brand text-white text-xs font-bold rounded-lg hover:bg-brand-dark transition shadow-sm",
+      canStart: true,
+    };
+  }
 }
 
 export default async function QuestionnairesPage() {
@@ -60,9 +107,9 @@ export default async function QuestionnairesPage() {
     patient.id
   );
 
-  // Calculate totals
+  // Calculate totals - only count questionnaires that patient can fill
   const totalPending = visitsWithQuestionnaires.reduce(
-    (sum, v) => sum + (v.totalCount - v.completedCount),
+    (sum, v) => sum + v.questionnaires.filter(q => !q.isCompleted && !q.isLockedByProfessional).length,
     0
   );
   const totalCompleted = visitsWithQuestionnaires.reduce(
@@ -171,7 +218,7 @@ function VisitQuestionnaireCard({
 }: {
   visitData: PatientVisitWithQuestionnaires;
 }) {
-  const hasPending = visitData.completedCount < visitData.totalCount;
+  const hasPending = visitData.requiresAction;
 
   return (
     <div
@@ -211,7 +258,7 @@ function VisitQuestionnaireCard({
                 cy="24"
                 r="20"
                 fill="none"
-                stroke={hasPending ? "#FF4A3F" : "#10b981"} // brand color
+                stroke={hasPending ? "#FF4A3F" : "#10b981"}
                 strokeWidth="4"
                 strokeLinecap="round"
                 strokeDasharray={`${(visitData.completionPercentage / 100) * 125.6} 125.6`}
@@ -263,46 +310,56 @@ function VisitQuestionnaireCard({
 function QuestionnaireItem({
   questionnaire,
 }: {
-  questionnaire: {
-    id: string;
-    code: string;
-    title: string;
-    description: string;
-    estimatedTime: number;
-    isCompleted: boolean;
-  };
+  questionnaire: PatientQuestionnaire;
 }) {
+  const statusInfo = getQuestionnaireStatusInfo(questionnaire);
+  
   return (
     <div
       className={`flex items-center justify-between p-3 rounded-xl transition ${
-        questionnaire.isCompleted
-          ? "bg-slate-50 opacity-75"
+        questionnaire.isCompleted || questionnaire.isLockedByProfessional
+          ? "bg-slate-50"
           : "bg-white border border-slate-200 hover:border-brand/50 hover:shadow-md group"
       }`}
     >
       <div className="flex items-center gap-3">
         <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center transition ${
-            questionnaire.isCompleted
-              ? "bg-emerald-100 text-emerald-600"
-              : "bg-slate-100 text-slate-400 group-hover:bg-brand group-hover:text-white"
-          }`}
+          className={`w-8 h-8 rounded-full flex items-center justify-center transition ${statusInfo.iconBgClass} ${statusInfo.iconColorClass}`}
         >
-          {questionnaire.isCompleted ? (
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
+          {questionnaire.isCompleted || questionnaire.isLockedByProfessional ? (
+            questionnaire.isLockedByProfessional ? (
+              // Lock icon for professional-completed
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+            ) : (
+              // Checkmark for patient-completed
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            )
           ) : (
+            // Document icon for not started
             <svg
               className="w-4 h-4"
               fill="none"
@@ -320,24 +377,23 @@ function QuestionnaireItem({
         </div>
         <div>
           <p className="font-medium text-slate-800 text-sm">{questionnaire.title}</p>
-          <p className="text-xs text-slate-400">
-            ~{questionnaire.estimatedTime} min
-          </p>
+          <div className="flex items-center gap-2">
+            <p className={`text-xs font-medium ${statusInfo.statusClass}`}>
+              {statusInfo.statusText}
+            </p>
+            <span className="text-xs text-slate-400">
+              ~{questionnaire.estimatedTime} min
+            </span>
+          </div>
         </div>
       </div>
 
-      {questionnaire.isCompleted ? (
-        <span className="px-3 py-1.5 text-emerald-700 text-xs font-bold">
-          Termine
-        </span>
-      ) : (
-        <Link
-          href={`/patient/questionnaires/${questionnaire.id}`}
-          className="px-4 py-2 bg-brand text-white text-xs font-bold rounded-lg hover:bg-brand-dark transition shadow-sm"
-        >
-          Commencer
-        </Link>
-      )}
+      <Link
+        href={`/patient/questionnaires/${questionnaire.id}`}
+        className={statusInfo.buttonClass}
+      >
+        {statusInfo.buttonText}
+      </Link>
     </div>
   );
 }

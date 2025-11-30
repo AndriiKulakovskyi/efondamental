@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   getPatientVisitsWithQuestionnaires,
   getPatientDashboardStats,
+  PatientQuestionnaire,
 } from "@/lib/services/patient-visit.service";
 
 // Format date for display
@@ -37,6 +38,52 @@ function getVisitTypeLabel(visitType: string): string {
     crisis: "Visite de Crise",
   };
   return labels[visitType] || visitType;
+}
+
+// Get status info for questionnaire display
+function getQuestionnaireStatusInfo(questionnaire: PatientQuestionnaire): {
+  statusText: string;
+  statusClass: string;
+  iconBgClass: string;
+  iconColorClass: string;
+  buttonText: string;
+  buttonClass: string;
+  canStart: boolean;
+} {
+  if (questionnaire.isLockedByProfessional) {
+    // Completed by professional - locked
+    return {
+      statusText: "Complete par l'equipe",
+      statusClass: "text-blue-600",
+      iconBgClass: "bg-blue-100",
+      iconColorClass: "text-blue-600",
+      buttonText: "Voir",
+      buttonClass: "px-4 py-2 bg-blue-100 text-blue-700 text-xs font-bold rounded-lg hover:bg-blue-200 transition",
+      canStart: false,
+    };
+  } else if (questionnaire.isCompleted) {
+    // Completed by patient
+    return {
+      statusText: "Termine",
+      statusClass: "text-emerald-600",
+      iconBgClass: "bg-emerald-100",
+      iconColorClass: "text-emerald-600",
+      buttonText: "Voir",
+      buttonClass: "px-4 py-2 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-lg hover:bg-emerald-200 transition",
+      canStart: false,
+    };
+  } else {
+    // Not started
+    return {
+      statusText: "Non commence",
+      statusClass: "text-brand",
+      iconBgClass: "bg-slate-100 group-hover:bg-brand",
+      iconColorClass: "text-slate-400 group-hover:text-white",
+      buttonText: "Commencer",
+      buttonClass: "px-4 py-2 bg-brand text-white text-xs font-bold rounded-lg hover:bg-brand-dark transition shadow-sm",
+      canStart: true,
+    };
+  }
 }
 
 export default async function PatientDashboard() {
@@ -272,84 +319,89 @@ export default async function PatientDashboard() {
                     Questionnaires Assignes ({visitData.completedCount}/{visitData.totalCount})
                   </p>
 
-                  {visitData.questionnaires.map((questionnaire) => (
-                    <div
-                      key={questionnaire.id}
-                      className={`flex items-center justify-between p-4 bg-white border rounded-xl transition ${
-                        questionnaire.isCompleted
-                          ? "border-slate-200 opacity-75"
-                          : "border-slate-200 hover:border-brand/50 hover:shadow-md cursor-pointer group"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center transition ${
-                            questionnaire.isCompleted
-                              ? "bg-emerald-100 text-emerald-600"
-                              : "bg-slate-100 text-slate-400 group-hover:bg-brand group-hover:text-white"
-                          }`}
-                        >
-                          {questionnaire.isCompleted ? (
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
-                          ) : (
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                              />
-                            </svg>
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-bold text-slate-800 text-sm">
-                            {questionnaire.title}
-                          </p>
-                          <p
-                            className={`text-xs font-medium ${
-                              questionnaire.isCompleted
-                                ? "text-emerald-600"
-                                : "text-brand"
-                            }`}
+                  {visitData.questionnaires.map((questionnaire) => {
+                    const statusInfo = getQuestionnaireStatusInfo(questionnaire);
+                    
+                    return (
+                      <div
+                        key={questionnaire.id}
+                        className={`flex items-center justify-between p-4 bg-white border rounded-xl transition ${
+                          questionnaire.isCompleted || questionnaire.isLockedByProfessional
+                            ? "border-slate-200"
+                            : "border-slate-200 hover:border-brand/50 hover:shadow-md cursor-pointer group"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center transition ${statusInfo.iconBgClass} ${statusInfo.iconColorClass}`}
                           >
-                            {questionnaire.isCompleted
-                              ? "Termine"
-                              : "Non commence"}
-                          </p>
+                            {questionnaire.isCompleted || questionnaire.isLockedByProfessional ? (
+                              questionnaire.isLockedByProfessional ? (
+                                // Lock icon for professional-completed
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                  />
+                                </svg>
+                              ) : (
+                                // Checkmark for patient-completed
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              )
+                            ) : (
+                              // Pencil icon for not started
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                />
+                              </svg>
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-bold text-slate-800 text-sm">
+                              {questionnaire.title}
+                            </p>
+                            <p className={`text-xs font-medium ${statusInfo.statusClass}`}>
+                              {statusInfo.statusText}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      {questionnaire.isCompleted ? (
-                        <span className="px-4 py-2 text-emerald-700 text-xs font-bold">
-                          Fait
-                        </span>
-                      ) : (
                         <Link
                           href={`/patient/questionnaires/${questionnaire.id}`}
-                          className="px-4 py-2 bg-brand text-white text-xs font-bold rounded-lg hover:bg-brand-dark transition shadow-sm"
+                          className={statusInfo.buttonClass}
                         >
-                          Commencer
+                          {statusInfo.buttonText}
                         </Link>
-                      )}
-                    </div>
-                  ))}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );

@@ -167,6 +167,7 @@ import {
   Wais3Mem3SpatialResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
+import { requireUserContext } from '@/lib/rbac/middleware';
 
 export async function submitProfessionalQuestionnaireAction(
   questionnaireCode: string,
@@ -175,12 +176,17 @@ export async function submitProfessionalQuestionnaireAction(
   responses: Record<string, any>
 ) {
   try {
+    // Get the current user to track who completed the questionnaire
+    const context = await requireUserContext();
+    const completedBy = context.user.id;
+    
     let result;
     switch (questionnaireCode) {
       case 'ASRM_FR':
         result = await saveAsrmResponse({
           visit_id: visitId,
           patient_id: patientId,
+          completed_by: completedBy,
           ...responses as any
         } as AsrmResponseInsert);
         break;
@@ -189,6 +195,7 @@ export async function submitProfessionalQuestionnaireAction(
         result = await saveQidsResponse({
           visit_id: visitId,
           patient_id: patientId,
+          completed_by: completedBy,
           ...responses as any
         } as QidsResponseInsert);
         break;
@@ -197,6 +204,7 @@ export async function submitProfessionalQuestionnaireAction(
         result = await saveMdqResponse({
           visit_id: visitId,
           patient_id: patientId,
+          completed_by: completedBy,
           ...responses as any
         } as MdqResponseInsert);
         break;

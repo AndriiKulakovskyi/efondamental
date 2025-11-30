@@ -193,12 +193,15 @@ export interface AsrmResponse {
   q5: number;
   total_score?: number;
   interpretation?: string | null;
+  completed_by?: string | null;
   completed_at: string;
   created_at: string;
   updated_at: string;
 }
 
-export type AsrmResponseInsert = Omit<AsrmResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score' | 'interpretation'>;
+export type AsrmResponseInsert = Omit<AsrmResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score' | 'interpretation'> & {
+  completed_by?: string | null;
+};
 
 // ============================================================================
 // QIDS-SR16 (Quick Inventory of Depressive Symptomatology)
@@ -226,12 +229,15 @@ export interface QidsResponse {
   q16: number;
   total_score?: number;
   interpretation?: string | null;
+  completed_by?: string | null;
   completed_at: string;
   created_at: string;
   updated_at: string;
 }
 
-export type QidsResponseInsert = Omit<QidsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score' | 'interpretation'>;
+export type QidsResponseInsert = Omit<QidsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score' | 'interpretation'> & {
+  completed_by?: string | null;
+};
 
 // ============================================================================
 // MDQ (Mood Disorder Questionnaire)
@@ -258,12 +264,15 @@ export interface MdqResponse {
   q2: number | null;
   q3: number | null;
   interpretation?: string | null;
+  completed_by?: string | null;
   completed_at: string;
   created_at: string;
   updated_at: string;
 }
 
-export type MdqResponseInsert = Omit<MdqResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'q1_score' | 'interpretation'>;
+export type MdqResponseInsert = Omit<MdqResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'q1_score' | 'interpretation'> & {
+  completed_by?: string | null;
+};
 
 // ============================================================================
 // Bipolar Diagnostic (EBIP_SCR_DIAG) - New Medical Diagnostic Form
