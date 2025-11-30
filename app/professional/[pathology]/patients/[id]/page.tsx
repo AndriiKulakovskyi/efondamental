@@ -157,6 +157,7 @@ export default async function PatientDetailPage({
           stats={stats}
           visits={visitsWithCompletion}
           pathology={pathology}
+          patientId={id}
         />
 
         {/* Tabs with Actions */}
