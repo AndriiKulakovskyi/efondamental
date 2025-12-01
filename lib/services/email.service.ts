@@ -101,65 +101,86 @@ export function getPatientInvitationEmailHtml(params: {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bienvenue sur eFondaMental</title>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #334155; max-width: 600px; margin: 0 auto; padding: 20px;">
-  
-  <div style="background-color: #1e293b; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
-    <h1 style="margin: 0; font-size: 24px;">eFondaMental</h1>
-    <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Expert Center for Psychiatric Disorders</p>
-  </div>
-  
-  <div style="background-color: #f8fafc; padding: 30px; border-radius: 0 0 8px 8px;">
-    <h2 style="color: #1e293b; margin-top: 0;">Welcome to Your Patient Portal</h2>
-    
-    <p>Hello <strong>${params.firstName} ${params.lastName}</strong>,</p>
-    
-    <p>Your healthcare team has invited you to join the eFondaMental Patient Portal - a secure platform to support your care.</p>
-    
-    <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
-      <h3 style="margin-top: 0; color: #1e293b;">What You Can Do:</h3>
-      <ul style="margin: 10px 0; padding-left: 20px;">
-        <li>View your scheduled appointments</li>
-        <li>Complete self-assessment questionnaires</li>
-        <li>Track your progress over time</li>
-        <li>Communicate securely with your care team</li>
-      </ul>
-    </div>
-    
-    <div style="text-align: center; margin: 30px 0;">
-      <a href="${params.invitationUrl}" 
-         style="background-color: #1e293b; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; font-size: 16px;">
-        Accept Invitation & Create Account
-      </a>
-    </div>
-    
-    <p style="font-size: 14px; color: #64748b;">
-      Or copy and paste this link into your browser:<br>
-      <span style="word-break: break-all;">${params.invitationUrl}</span>
-    </p>
-    
-    <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px;">
-      <p style="margin: 0; font-size: 14px; color: #92400e;">
-        <strong>Important:</strong> This invitation will expire in 7 days. Please create your account before then.
-      </p>
-    </div>
-    
-    <h3 style="color: #1e293b;">Need Help?</h3>
-    <p style="font-size: 14px;">
-      If you have any questions or didn't expect this invitation, please contact your Expert Center.
-    </p>
-    
-    <p style="margin-top: 30px;">
-      Best regards,<br>
-      <strong>Your eFondaMental Care Team</strong>
-    </p>
-  </div>
-  
-  <div style="text-align: center; padding: 20px; font-size: 12px; color: #94a3b8;">
-    <p>This is an automated email from eFondaMental. Please do not reply to this email.</p>
-    <p style="margin-top: 5px;">This invitation will expire in 7 days.</p>
-  </div>
-  
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f5f9;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); overflow: hidden;">
+          
+          <!-- Header -->
+          <tr>
+            <td style="padding: 32px 40px; text-align: center; border-bottom: 1px solid #e2e8f0;">
+              <div style="font-size: 24px; font-weight: 700; color: #1e293b;">
+                Fondation <span style="color: #FF4A3F;">FondaMental</span>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Icon -->
+          <tr>
+            <td style="padding: 40px 40px 20px 40px; text-align: center;">
+              <img src="https://cdn-icons-png.flaticon.com/512/2913/2913564.png" width="80" height="80" alt="Bienvenue" style="display: inline-block; border: 0; opacity: 0.9;">
+            </td>
+          </tr>
+          
+          <!-- Main Content -->
+          <tr>
+            <td style="padding: 0 40px 40px 40px;">
+              <h1 style="margin: 0 0 24px 0; font-size: 28px; font-weight: 700; color: #1e293b; text-align: center;">
+                Bienvenue, votre compte est pret !
+              </h1>
+              
+              <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.6; color: #475569;">
+                Bonjour <strong>${params.firstName} ${params.lastName}</strong>,
+              </p>
+              
+              <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.6; color: #475569;">
+                Votre equipe soignante vient de creer votre espace patient sur <strong>eFondaMental</strong>.
+              </p>
+              
+              <p style="margin: 0 0 32px 0; font-size: 16px; line-height: 1.6; color: #475569;">
+                Vous pouvez des maintenant acceder a votre tableau de bord pour consulter vos prochains rendez-vous et completer vos questionnaires de suivi medical.
+              </p>
+              
+              <!-- CTA Button -->
+              <div style="text-align: center; margin: 32px 0;">
+                <a href="${params.invitationUrl}" style="background-color: #FF4A3F; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; padding: 14px 32px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 6px rgba(255, 74, 63, 0.25);">
+                  Activer mon compte
+                </a>
+              </div>
+              
+              <p style="margin: 24px 0 0 0; font-size: 14px; line-height: 1.6; color: #64748b; text-align: center;">
+                Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :<br>
+                <a href="${params.invitationUrl}" style="color: #FF4A3F; text-decoration: none; word-break: break-all;">${params.invitationUrl}</a>
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Divider -->
+          <tr>
+            <td style="padding: 0 40px;">
+              <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 0;">
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 24px 40px; text-align: center;">
+              <p style="margin: 0 0 8px 0; font-size: 12px; color: #94a3b8;">
+                2025 Fondation FondaMental - Reseau de Centres Experts
+              </p>
+              <p style="margin: 0; font-size: 12px; color: #94a3b8;">
+                Vous recevez cet email car vous etes inscrit dans un parcours de soin eFondaMental.
+              </p>
+            </td>
+          </tr>
+          
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
   `.trim();
@@ -197,7 +218,7 @@ export async function sendPatientInvitation(params: {
         email: params.email
       },
       email: {
-        subject: 'Invitation to join eFondaMental Patient Portal',
+        subject: 'Bienvenue sur eFondaMental - Activez votre compte patient',
         html: html
       }
     });
