@@ -1,7 +1,9 @@
 import { requirePatient } from "@/lib/rbac/middleware";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LogoutButton } from "@/components/logout-button";
+import { createClient } from "@/lib/supabase/server";
+import { PatientUserMenu } from "./components/patient-user-menu";
+import { MobileBottomNav } from "./components/mobile-bottom-nav";
 
 export default async function PatientLayout({
   children,
@@ -14,7 +16,19 @@ export default async function PatientLayout({
     redirect("/auth/login");
   }
 
-  const initials = `${(profile.first_name || "P")[0]}${(profile.last_name || "")[0] || ""}`.toUpperCase();
+  // Fetch the patient's real name from the patients table
+  const supabase = await createClient();
+  const { data: patient } = await supabase
+    .from("patients")
+    .select("first_name, last_name")
+    .eq("user_id", profile.id)
+    .single();
+
+  // Use patient name if available, fallback to profile name
+  const firstName = patient?.first_name || profile.first_name || "Patient";
+  const lastName = patient?.last_name || profile.last_name || "";
+  
+  const initials = `${firstName[0]}${lastName[0] || ""}`.toUpperCase();
 
   return (
     <div className="bg-[#FDFBFA] text-slate-800 h-screen flex flex-col overflow-hidden">
@@ -50,18 +64,12 @@ export default async function PatientLayout({
 
           <div className="h-6 w-px bg-slate-200" />
 
-          {/* User Profile */}
-          <div className="flex items-center gap-3 pl-2">
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium text-slate-900">
-                {profile.first_name} {profile.last_name}
-              </p>
-              <p className="text-xs text-slate-500">Patient</p>
-            </div>
-            <div className="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-bold shadow-sm">
-              {initials}
-            </div>
-          </div>
+          {/* User Profile Menu */}
+          <PatientUserMenu 
+            firstName={firstName}
+            lastName={lastName}
+            initials={initials}
+          />
         </div>
       </header>
 
@@ -137,11 +145,6 @@ export default async function PatientLayout({
                 Contacter le support
               </Link>
             </div>
-
-            {/* Logout */}
-            <div className="mt-4">
-              <LogoutButton />
-            </div>
           </div>
           </aside>
 
@@ -150,51 +153,7 @@ export default async function PatientLayout({
       </div>
 
       {/* MOBILE BOTTOM NAV */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-2 py-2 flex justify-around z-30">
-        <MobileNavLink href="/patient" label="Accueil">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-            />
-          </svg>
-        </MobileNavLink>
-
-        <MobileNavLink href="/patient/appointments" label="RDV">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-        </MobileNavLink>
-
-        <MobileNavLink href="/patient/questionnaires" label="Tests">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-        </MobileNavLink>
-
-        <MobileNavLink href="/patient/messages" label="Msg">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-            />
-          </svg>
-        </MobileNavLink>
-      </nav>
+      <MobileBottomNav initials={initials} firstName={firstName} lastName={lastName} />
     </div>
   );
 }
@@ -224,23 +183,3 @@ function NavLink({
   );
 }
 
-// Mobile Navigation Link Component
-function MobileNavLink({
-  href,
-  label,
-  children,
-}: {
-  href: string;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className="flex flex-col items-center gap-1 px-3 py-1 text-slate-500 hover:text-brand transition"
-    >
-      {children}
-      <span className="text-[10px] font-medium">{label}</span>
-    </Link>
-  );
-}
