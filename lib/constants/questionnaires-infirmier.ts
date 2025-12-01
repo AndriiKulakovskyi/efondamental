@@ -726,7 +726,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   },
   {
     id: 'hdl',
-    text: 'HDL',
+    text: 'Cholestérol HDL',
     type: 'number',
     required: false
   },
@@ -745,7 +745,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   },
   {
     id: 'ldl',
-    text: 'LDL',
+    text: 'Cholestérol LDL',
     type: 'number',
     required: false
   },
