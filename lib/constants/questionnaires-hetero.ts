@@ -2888,12 +2888,13 @@ export const WAIS4_CRITERIA_QUESTIONS: Question[] = [
   {
     id: 'age',
     section: 'Informations Générales',
-    text: 'Age du patient',
+    text: 'Age du patient (calculé automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     min: 16,
     max: 90,
-    help: 'L\'âge doit être compris entre 16 et 90 ans'
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
   {
     id: 'laterality',
@@ -3171,12 +3172,13 @@ const generateMatrixItems = (): Question[] => {
   items.push({
     id: 'patient_age',
     section: 'Données Démographiques',
-    text: 'Age du patient (requis pour le calcul de la note standard)',
+    text: 'Age du patient (calculé automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     min: 16,
     max: 90,
-    help: 'L\'âge est nécessaire pour calculer la note standardisée'
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   });
   
   // Generate 26 items
@@ -3228,12 +3230,13 @@ export const CVLT_QUESTIONS: Question[] = [
   {
     id: 'patient_age',
     section: 'Donnees Demographiques',
-    text: 'Age du patient (requis pour le calcul des normes)',
+    text: 'Age du patient (calcule automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     min: 16,
     max: 100,
-    help: 'L\'age est necessaire pour calculer les notes standardisees'
+    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
   },
   {
     id: 'years_of_education',
@@ -3248,13 +3251,15 @@ export const CVLT_QUESTIONS: Question[] = [
   {
     id: 'patient_sex',
     section: 'Donnees Demographiques',
-    text: 'Sexe du patient',
+    text: 'Sexe du patient (renseigne automatiquement)',
     type: 'single_choice',
     required: true,
+    readonly: true,
     options: [
       { code: 'F', label: 'Femme', score: 1 },
       { code: 'M', label: 'Homme', score: 2 }
-    ]
+    ],
+    help: 'Renseigne automatiquement depuis le profil du patient'
   },
   
   // Section: Liste A (Lundi) - Apprentissage
@@ -3544,12 +3549,13 @@ export const WAIS4_CODE_QUESTIONS: Question[] = [
   {
     id: 'patient_age',
     section: 'Donnees Demographiques',
-    text: 'Age du patient (requis pour le calcul de la note standard)',
+    text: 'Age du patient (calcule automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     min: 16,
     max: 90,
-    help: 'L\'age est necessaire pour calculer la note standardisee'
+    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
   },
   
   // Section: Cotation
@@ -3608,12 +3614,13 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
   {
     id: 'patient_age',
     section: 'Donnees Demographiques',
-    text: 'Age du patient (annees)',
+    text: 'Age du patient (calcule automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     min: 16,
     max: 90,
-    help: 'Requis pour le calcul de la note standard'
+    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
   },
   
   // Section: Ordre Direct (Forward)
@@ -4202,11 +4209,13 @@ export const TMT_QUESTIONS: Question[] = [
   },
   {
     id: 'patient_age',
-    text: 'Age du patient (en annees)',
+    text: 'Age du patient (calcule automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     min: 16,
-    max: 100
+    max: 100,
+    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
   },
   {
     id: 'years_of_education',
@@ -4413,11 +4422,13 @@ export const STROOP_QUESTIONS: Question[] = [
   },
   {
     id: 'patient_age',
-    text: 'Age du patient (en annees)',
+    text: 'Age du patient (calcule automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     min: 16,
-    max: 100
+    max: 100,
+    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
   },
   // Section: Planche A - Mots
   {
@@ -4634,11 +4645,13 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
   },
   {
     id: 'patient_age',
-    text: 'Age du patient (en annees)',
+    text: 'Age du patient (calcule automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     min: 16,
-    max: 100
+    max: 100,
+    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
   },
   {
     id: 'years_of_education',
@@ -5129,11 +5142,13 @@ export const WAIS4_SIMILITUDES_QUESTIONS: Question[] = [
   },
   {
     id: 'patient_age',
-    text: 'Age du patient (en annees)',
+    text: 'Age du patient (calcule automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     min: 16,
-    max: 90
+    max: 90,
+    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
   },
   // Items section
   {
@@ -5328,11 +5343,13 @@ export const TEST_COMMISSIONS_QUESTIONS: Question[] = [
   },
   {
     id: 'patient_age',
-    text: 'Age du patient (en annees)',
+    text: 'Age du patient (calcule automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     min: 20,
-    max: 60
+    max: 60,
+    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
   },
   {
     id: 'nsc',
@@ -5804,13 +5821,14 @@ export const WAIS3_MATRICES_QUESTIONS: Question[] = [
   // Demographics section
   {
     id: 'patient_age',
-    text: 'Âge du patient (en années)',
+    text: 'Âge du patient (calculé automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     section: 'Données démographiques',
     min: 16,
     max: 90,
-    help: 'Âge utilisé pour la conversion en note standard selon les normes WAIS-III'
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
   // Item scores section
   {
@@ -6097,13 +6115,14 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
   // Demographics section
   {
     id: 'patient_age',
-    text: 'Âge du patient (en années)',
+    text: 'Âge du patient (calculé automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     section: 'Données démographiques',
     min: 16,
     max: 90,
-    help: 'Âge utilisé pour la conversion en notes standard selon les normes WAIS-III'
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
   // Code Subtest section
   {
@@ -6252,13 +6271,14 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
   // Demographics section
   {
     id: 'patient_age',
-    text: 'Âge du patient (en années)',
+    text: 'Âge du patient (calculé automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     section: 'Données démographiques',
     min: 16,
     max: 90,
-    help: 'Âge utilisé pour la conversion en notes standard selon les normes WAIS-III'
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
   {
     id: 'education_level',
@@ -7136,12 +7156,14 @@ export const MEM3_SPATIAL_QUESTIONS: Question[] = [
   // Patient age
   {
     id: 'patient_age',
-    text: 'Age du patient (en annees)',
+    text: 'Age du patient (calcule automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     section: 'Informations generales',
     min: 16,
-    max: 90
+    max: 90,
+    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
   },
   
   // Forward (Ordre Direct) items

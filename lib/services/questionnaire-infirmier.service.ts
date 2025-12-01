@@ -6,6 +6,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { TobaccoResponse, TobaccoResponseInsert, FagerstromResponse, FagerstromResponseInsert, PhysicalParamsResponse, PhysicalParamsResponseInsert, BloodPressureResponse, BloodPressureResponseInsert, SleepApneaResponse, SleepApneaResponseInsert, BiologicalAssessmentResponse, BiologicalAssessmentResponseInsert, EcgResponse, EcgResponseInsert } from '@/lib/types/database.types';
 import { getPatientById } from '@/lib/services/patient.service';
+import { getVisitById } from '@/lib/services/visit.service';
+import { calculateAgeAtDate, normalizeGender } from '@/lib/utils/patient-demographics';
 
 // ===== TOBACCO ASSESSMENT =====
 
@@ -417,8 +419,12 @@ export async function saveBiologicalAssessmentResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Fetch patient profile for age and gender
-  const patient = await getPatientById(response.patient_id);
+  // Fetch patient profile for age and gender, visit for scheduled date
+  const [patient, visit] = await Promise.all([
+    getPatientById(response.patient_id),
+    getVisitById(response.visit_id)
+  ]);
+  
   if (!patient) {
     throw new Error('Patient not found');
   }
@@ -494,17 +500,14 @@ export async function saveBiologicalAssessmentResponse(
     const creatinine = parseFloat(normalizedResponse.creatinine);
     const weight = parseFloat(physicalParams.weight_kg.toString());
     
-    // Calculate age from date_of_birth
-    const birthDate = new Date(patient.date_of_birth);
-    const today = new Date();
-    const age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    const adjustedAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
+    // Calculate age at visit date (use scheduled_date, fallback to current date)
+    const referenceDate = visit?.scheduled_date || new Date().toISOString();
+    const adjustedAge = calculateAgeAtDate(patient.date_of_birth, referenceDate);
 
     if (creatinine > 0 && weight > 0 && adjustedAge > 0) {
-      // Determine gender
-      const gender = patient.gender?.toLowerCase();
-      const isMale = gender === 'male' || gender === 'm' || gender === 'homme';
+      // Determine gender using normalized helper
+      const normalizedGender = normalizeGender(patient.gender);
+      const isMale = normalizedGender === 'M';
 
       // Calculate clearance: Male: 1.23 × weight × (140 - age) / creatinine, Female: 1.04 × weight × (140 - age) / creatinine
       const multiplier = isMale ? 1.23 : 1.04;

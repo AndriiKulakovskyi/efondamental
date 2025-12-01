@@ -172,7 +172,15 @@ import {
   getDsm5ComorbidResponse
 } from "@/lib/services/questionnaire-dsm5.service";
 import { getPatientById } from "@/lib/services/patient.service";
+import { getVisitById } from "@/lib/services/visit.service";
 import { QuestionnairePageClient } from "./page-client";
+import {
+  calculateAgeAtDate,
+  normalizeGender,
+  questionnaireRequiresDemographics,
+  questionnaireUsesPatientSex,
+  questionnaireUsesAgeField
+} from "@/lib/utils/patient-demographics";
 
 export default async function ProfessionalQuestionnairePage({
   params,
@@ -360,35 +368,66 @@ export default async function ProfessionalQuestionnairePage({
   // For Diagnostic/Orientation, keys match columns.
   // So we can just pass the object, filtering out metadata.
   
-  let initialResponses = {};
+  let initialResponses: Record<string, any> = {};
   if (existingResponse) {
     // Destructure to remove metadata if needed, but passing everything is usually fine as extra keys are ignored by Renderer if not in questions list.
     initialResponses = { ...existingResponse };
   }
 
-  // For biological assessment, fetch patient data and physical params for creatinine clearance computation
-  if (code === BIOLOGICAL_ASSESSMENT_DEFINITION.code) {
-    const [patient, physicalParams] = await Promise.all([
+  // Inject patient demographics (age at visit date, gender) for questionnaires that require them
+  const requiresDemographics = questionnaireRequiresDemographics(code);
+  console.log('[Demographics Debug] Code:', code, '| Requires demographics:', requiresDemographics);
+  
+  if (requiresDemographics) {
+    // Fetch patient and visit data to calculate age at visit date
+    const [patient, visit] = await Promise.all([
       getPatientById(patientId),
-      getPhysicalParamsResponse(visitId)
+      getVisitById(visitId)
     ]);
 
+    console.log('[Demographics Debug] Patient:', patient ? { id: patient.id, dob: patient.date_of_birth, gender: patient.gender } : 'NOT FOUND');
+    console.log('[Demographics Debug] Visit:', visit ? { id: visit.id, scheduled_date: visit.scheduled_date } : 'NOT FOUND');
+
     if (patient) {
-      // Calculate age from date_of_birth
+      // Calculate age at visit date (use scheduled_date, fallback to current date)
       if (patient.date_of_birth) {
-        const birthDate = new Date(patient.date_of_birth);
-        const today = new Date();
-        const age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        const adjustedAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) ? age - 1 : age;
-        initialResponses = { ...initialResponses, patient_age: adjustedAge };
+        const referenceDate = visit?.scheduled_date || new Date().toISOString();
+        const calculatedAge = calculateAgeAtDate(patient.date_of_birth, referenceDate);
+        console.log('[Demographics Debug] Calculated age:', calculatedAge, 'from DOB:', patient.date_of_birth, 'ref date:', referenceDate);
+        
+        // Most questionnaires use patient_age
+        initialResponses = { ...initialResponses, patient_age: calculatedAge };
+        
+        // Some questionnaires (WAIS Criteria) use 'age' field instead
+        if (questionnaireUsesAgeField(code)) {
+          initialResponses = { ...initialResponses, age: calculatedAge };
+          console.log('[Demographics Debug] Also injecting into "age" field for criteria questionnaire');
+        }
+      } else {
+        console.log('[Demographics Debug] Patient has no date_of_birth!');
       }
       
+      // Normalize and inject gender
       if (patient.gender) {
-        initialResponses = { ...initialResponses, patient_gender: patient.gender };
+        const normalizedGender = normalizeGender(patient.gender);
+        console.log('[Demographics Debug] Gender:', patient.gender, '-> normalized:', normalizedGender);
+        initialResponses = { ...initialResponses, patient_gender: normalizedGender || patient.gender };
+        
+        // For questionnaires using patient_sex field (e.g., CVLT)
+        if (questionnaireUsesPatientSex(code)) {
+          initialResponses = { ...initialResponses, patient_sex: normalizedGender };
+        }
+      } else {
+        console.log('[Demographics Debug] Patient has no gender!');
       }
     }
+    
+    console.log('[Demographics Debug] Final initialResponses keys:', Object.keys(initialResponses));
+  }
 
+  // For biological assessment, also fetch physical params for creatinine clearance computation
+  if (code === BIOLOGICAL_ASSESSMENT_DEFINITION.code) {
+    const physicalParams = await getPhysicalParamsResponse(visitId);
     if (physicalParams?.weight_kg) {
       initialResponses = { ...initialResponses, weight_kg: physicalParams.weight_kg };
     }
