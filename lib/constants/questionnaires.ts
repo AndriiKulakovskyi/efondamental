@@ -1,12 +1,30 @@
 import { Question } from '@/lib/types/database.types';
 
+// Conditional display configuration for questionnaires that depend on other questionnaire responses
+export interface ConditionalDisplay {
+  questionnaire_code: string;  // Code of the questionnaire this depends on (e.g., 'TOBACCO')
+  field: string;               // Field name to check (e.g., 'smoking_status')
+  values: string[];            // Values that make this questionnaire visible (e.g., ['current_smoker', 'ex_smoker'])
+}
+
+export interface QuestionnaireMetadata {
+  singleColumn?: boolean;
+  pathologies?: string[];
+  target_role?: 'patient' | 'healthcare_professional';
+  version?: string;
+  language?: string;
+  // Conditional display - makes this questionnaire visible only when the specified condition is met
+  conditional_on?: ConditionalDisplay;
+  [key: string]: any; // Allow additional properties for flexibility
+}
+
 export type QuestionnaireDefinition = {
   id: string;
   code: string;
   title: string;
   description: string;
   questions: Question[];
-  metadata?: Record<string, any>;
+  metadata?: QuestionnaireMetadata;
 };
 
 export const ASRM_QUESTIONS: Question[] = [

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, CheckCircle, Circle, FileText } from "lucide-react";
+import { ChevronDown, CheckCircle, Circle, FileText, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatShortDate } from "@/lib/utils/date";
 import Link from "next/link";
@@ -69,14 +69,27 @@ export function ExpandableModuleCard({
   const [isExpanded, setIsExpanded] = useState(false);
   
   // Use useMemo to safely compute questionnaire stats
+  // Conditional questionnaires where condition is not met are excluded from counts
   const { allQuestionnaires, completedCount, totalCount, completionPercentage } = useMemo(() => {
     if (!module || typeof module !== 'object') {
       return { allQuestionnaires: [], completedCount: 0, totalCount: 0, completionPercentage: 0 };
     }
     
     const quests = safeGetQuestionnaires(module);
-    const completed = quests.reduce((count, q) => count + (q && q.completed ? 1 : 0), 0);
-    const total = quests.length;
+    
+    // Filter questionnaires for counting:
+    // - Include non-conditional questionnaires
+    // - Include conditional questionnaires only if condition is met
+    const countableQuests = quests.filter(q => {
+      if (!q) return false;
+      // If not conditional, always count
+      if (!q.isConditional) return true;
+      // If conditional, only count if condition is met
+      return q.conditionMet === true;
+    });
+    
+    const completed = countableQuests.reduce((count, q) => count + (q && q.completed ? 1 : 0), 0);
+    const total = countableQuests.length;
     const percentage = total > 0 ? (completed / total) * 100 : 0;
     
     return { 
@@ -382,6 +395,43 @@ function QuestionnaireItem({
   patientId: string; 
   visitId: string; 
 }) {
+  // Check if this is a conditional questionnaire with unmet condition
+  const isConditionalLocked = questionnaire.isConditional && !questionnaire.conditionMet;
+  
+  // If conditional and condition not met, show locked state
+  if (isConditionalLocked) {
+    return (
+      <div
+        className="flex items-center justify-between p-5 border border-slate-200 rounded-xl bg-slate-50 opacity-70"
+      >
+        <div className="flex items-center gap-4 flex-1">
+          <Lock className="h-6 w-6 text-slate-400 flex-shrink-0" />
+          <div className="flex-1">
+            <p className="font-medium text-base text-slate-500">
+              {questionnaire.title}
+            </p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-xs text-slate-400 italic">
+                {questionnaire.conditionMessage || 'Conditionnel'}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+          <Button 
+            size="sm" 
+            variant="outline"
+            disabled
+            className="gap-2 opacity-50"
+          >
+            <FileText className="h-4 w-4" />
+            En attente
+          </Button>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div
       className={cn(

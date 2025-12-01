@@ -1,5 +1,6 @@
 import { getVisitDetailData } from "@/lib/services/visit-detail.service";
 import { getVisitModules, VirtualModule } from "@/lib/services/visit.service";
+import { getTobaccoResponse } from "@/lib/services/questionnaire-infirmier.service";
 import { getUserContext } from "@/lib/rbac/middleware";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDateTime } from "@/lib/utils/date";
@@ -112,12 +113,35 @@ export default async function VisitDetailPage({
     notFound();
   }
 
+  // Fetch tobacco response to determine if Fagerstrom should be shown
+  const tobaccoResponse = await getTobaccoResponse(visitId);
+  
+  // Determine Fagerstrom visibility based on tobacco smoking_status
+  // Show Fagerstrom only if patient is current_smoker or ex_smoker
+  const tobaccoAnswered = !!tobaccoResponse;
+  const smokingStatus = tobaccoResponse?.smoking_status;
+  const isFagerstromRequired = smokingStatus === 'current_smoker' || smokingStatus === 'ex_smoker';
+  
+  // Adjust total questionnaires based on whether Fagerstrom is required
+  // If tobacco not answered yet, exclude Fagerstrom from total (will be dynamic)
+  // If tobacco answered with non-smoker/unknown, exclude Fagerstrom
+  // If tobacco answered with smoker/ex-smoker, include Fagerstrom
+  const fagerstromAdjustment = (!tobaccoAnswered || !isFagerstromRequired) ? 1 : 0;
+  
   // Transform completion status to match component expectations (snake_case -> camelCase)
+  // Adjust totals to exclude Fagerstrom when not applicable
   const completionStatus = {
-    totalQuestionnaires: rawCompletionStatus.total_questionnaires,
-    completedQuestionnaires: rawCompletionStatus.completed_questionnaires,
-    completionPercentage: rawCompletionStatus.completion_percentage,
+    totalQuestionnaires: rawCompletionStatus.total_questionnaires - fagerstromAdjustment,
+    completedQuestionnaires: isFagerstromRequired 
+      ? rawCompletionStatus.completed_questionnaires 
+      : rawCompletionStatus.completed_questionnaires - (questionnaireStatuses['FAGERSTROM_FR']?.completed ? 1 : 0),
+    completionPercentage: 0, // Will recalculate below
   };
+  
+  // Recalculate completion percentage with adjusted totals
+  completionStatus.completionPercentage = completionStatus.totalQuestionnaires > 0 
+    ? Math.round((completionStatus.completedQuestionnaires / completionStatus.totalQuestionnaires) * 100) 
+    : 0;
 
   // Build modules with questionnaires based on visit type and RPC data
   let modulesWithQuestionnaires: VirtualModule[] = [];
@@ -175,62 +199,92 @@ export default async function VisitDetailPage({
       }
     ];
   } else if (visit.visit_type === 'initial_evaluation') {
+    // Build nurse module questionnaires with conditional Fagerstrom
+    const nurseQuestionnaires: any[] = [
+      {
+        ...TOBACCO_DEFINITION,
+        id: TOBACCO_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['TOBACCO_FR']?.completed || false,
+        completedAt: questionnaireStatuses['TOBACCO_FR']?.completed_at,
+      },
+    ];
+    
+    // Add Fagerstrom with conditional display properties
+    // - If tobacco not answered: show as locked/conditional (waiting for tobacco)
+    // - If tobacco answered with smoker/ex-smoker: show normally
+    // - If tobacco answered with non-smoker/unknown: hide completely
+    if (!tobaccoAnswered) {
+      // Tobacco not yet completed - show Fagerstrom as conditional/locked
+      nurseQuestionnaires.push({
+        ...FAGERSTROM_DEFINITION,
+        id: FAGERSTROM_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: false,
+        completedAt: null,
+        isConditional: true,
+        conditionMet: false,
+        conditionMessage: 'Complétez d\'abord l\'évaluation du tabagisme',
+      });
+    } else if (isFagerstromRequired) {
+      // Tobacco answered with smoker/ex-smoker - show Fagerstrom normally
+      nurseQuestionnaires.push({
+        ...FAGERSTROM_DEFINITION,
+        id: FAGERSTROM_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['FAGERSTROM_FR']?.completed || false,
+        completedAt: questionnaireStatuses['FAGERSTROM_FR']?.completed_at,
+        isConditional: true,
+        conditionMet: true,
+      });
+    }
+    // If tobacco answered with non_smoker or unknown, Fagerstrom is not added at all
+    
+    // Add remaining nurse questionnaires
+    nurseQuestionnaires.push(
+      {
+        ...PHYSICAL_PARAMS_DEFINITION,
+        id: PHYSICAL_PARAMS_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['PHYSICAL_PARAMS_FR']?.completed || false,
+        completedAt: questionnaireStatuses['PHYSICAL_PARAMS_FR']?.completed_at,
+      },
+      {
+        ...BLOOD_PRESSURE_DEFINITION,
+        id: BLOOD_PRESSURE_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['BLOOD_PRESSURE_FR']?.completed || false,
+        completedAt: questionnaireStatuses['BLOOD_PRESSURE_FR']?.completed_at,
+      },
+      {
+        ...ECG_DEFINITION,
+        id: ECG_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['ECG_FR']?.completed || false,
+        completedAt: questionnaireStatuses['ECG_FR']?.completed_at,
+      },
+      {
+        ...SLEEP_APNEA_DEFINITION,
+        id: SLEEP_APNEA_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['SLEEP_APNEA_FR']?.completed || false,
+        completedAt: questionnaireStatuses['SLEEP_APNEA_FR']?.completed_at,
+      },
+      {
+        ...BIOLOGICAL_ASSESSMENT_DEFINITION,
+        id: BIOLOGICAL_ASSESSMENT_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['BIOLOGICAL_ASSESSMENT_FR']?.completed || false,
+        completedAt: questionnaireStatuses['BIOLOGICAL_ASSESSMENT_FR']?.completed_at,
+      }
+    );
+
     modulesWithQuestionnaires = [
       {
         id: 'mod_nurse',
         name: 'Infirmier',
         description: 'Évaluation par l\'infirmier',
-        questionnaires: [
-          {
-            ...TOBACCO_DEFINITION,
-            id: TOBACCO_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['TOBACCO_FR']?.completed || false,
-            completedAt: questionnaireStatuses['TOBACCO_FR']?.completed_at,
-          },
-          {
-            ...FAGERSTROM_DEFINITION,
-            id: FAGERSTROM_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['FAGERSTROM_FR']?.completed || false,
-            completedAt: questionnaireStatuses['FAGERSTROM_FR']?.completed_at,
-          },
-          {
-            ...PHYSICAL_PARAMS_DEFINITION,
-            id: PHYSICAL_PARAMS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['PHYSICAL_PARAMS_FR']?.completed || false,
-            completedAt: questionnaireStatuses['PHYSICAL_PARAMS_FR']?.completed_at,
-          },
-          {
-            ...BLOOD_PRESSURE_DEFINITION,
-            id: BLOOD_PRESSURE_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['BLOOD_PRESSURE_FR']?.completed || false,
-            completedAt: questionnaireStatuses['BLOOD_PRESSURE_FR']?.completed_at,
-          },
-          {
-            ...ECG_DEFINITION,
-            id: ECG_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ECG_FR']?.completed || false,
-            completedAt: questionnaireStatuses['ECG_FR']?.completed_at,
-          },
-          {
-            ...SLEEP_APNEA_DEFINITION,
-            id: SLEEP_APNEA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['SLEEP_APNEA_FR']?.completed || false,
-            completedAt: questionnaireStatuses['SLEEP_APNEA_FR']?.completed_at,
-          },
-          {
-            ...BIOLOGICAL_ASSESSMENT_DEFINITION,
-            id: BIOLOGICAL_ASSESSMENT_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['BIOLOGICAL_ASSESSMENT_FR']?.completed || false,
-            completedAt: questionnaireStatuses['BIOLOGICAL_ASSESSMENT_FR']?.completed_at,
-          }
-        ]
+        questionnaires: nurseQuestionnaires
       },
       {
         id: 'mod_thymic_eval',
