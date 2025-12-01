@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireProfessional, getUserContext } from "@/lib/rbac/middleware";
-import { createVisit } from "@/lib/services/visit.service";
+import { createVisit, DuplicateVisitError } from "@/lib/services/visit.service";
 import { VisitType, VisitStatus } from "@/lib/types/enums";
 import { logVisitCreation } from "@/lib/services/audit.service";
 
@@ -43,6 +43,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ visit }, { status: 201 });
   } catch (error) {
     console.error("Failed to create visit:", error);
+    
+    // Handle duplicate visit error with 409 Conflict
+    if (error instanceof DuplicateVisitError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 409 }
+      );
+    }
+    
     return NextResponse.json(
       { error: "Failed to create visit" },
       { status: 500 }

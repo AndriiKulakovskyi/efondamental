@@ -175,8 +175,66 @@ export async function getVisitById(visitId: string): Promise<VisitFull | null> {
   return data;
 }
 
+/**
+ * Visit types that can only exist once per patient (non-repeatable).
+ * A patient can only have one active (non-cancelled) visit of these types.
+ */
+const UNIQUE_VISIT_TYPES: VisitType[] = [
+  VisitType.SCREENING,
+  VisitType.INITIAL_EVALUATION,
+];
+
+/**
+ * Custom error class for duplicate visit attempts.
+ */
+export class DuplicateVisitError extends Error {
+  constructor(visitType: string) {
+    super(`A ${visitType} visit already exists for this patient. Only one ${visitType} visit is allowed per patient.`);
+    this.name = 'DuplicateVisitError';
+  }
+}
+
+/**
+ * Check if a unique visit type already exists for a patient.
+ * Only checks for non-cancelled visits.
+ */
+async function checkDuplicateVisit(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  patientId: string,
+  visitType: VisitType
+): Promise<boolean> {
+  // Only check for unique visit types
+  if (!UNIQUE_VISIT_TYPES.includes(visitType)) {
+    return false;
+  }
+
+  const { data, error } = await supabase
+    .from('visits')
+    .select('id')
+    .eq('patient_id', patientId)
+    .eq('visit_type', visitType)
+    .neq('status', VisitStatus.CANCELLED)
+    .limit(1);
+
+  if (error) {
+    console.error('Error checking for duplicate visit:', error);
+    return false; // Don't block on error, let the insert handle it
+  }
+
+  return data && data.length > 0;
+}
+
 export async function createVisit(visit: VisitInsert): Promise<Visit> {
   const supabase = await createClient();
+
+  // Check for duplicate unique visit types
+  const visitType = visit.visit_type as VisitType;
+  const isDuplicate = await checkDuplicateVisit(supabase, visit.patient_id, visitType);
+  
+  if (isDuplicate) {
+    const visitTypeName = visitType === VisitType.SCREENING ? 'screening' : 'initial evaluation';
+    throw new DuplicateVisitError(visitTypeName);
+  }
 
   // If conducted_by not specified, use patient's assigned_to
   if (!visit.conducted_by) {
