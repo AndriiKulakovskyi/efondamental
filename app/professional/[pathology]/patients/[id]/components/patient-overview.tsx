@@ -1,20 +1,37 @@
 "use client";
 
-import { User, Calendar, Mail, Phone, MapPin, Users, Heart } from "lucide-react";
+import { useState } from "react";
+import { User, Calendar, Mail, Phone, MapPin, Users, Heart, Pencil } from "lucide-react";
 import { formatShortDate, calculateAge } from "@/lib/utils/date";
+import { Button } from "@/components/ui/button";
+import { EditPatientModal } from "./edit-patient-modal";
 
 interface PatientOverviewProps {
   patient: any;
 }
 
 export function PatientOverview({ patient }: PatientOverviewProps) {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   return (
+    <>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Patient Information Card */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <User className="h-5 w-5 text-slate-700" />
-          <h3 className="text-lg font-semibold text-slate-900">Informations patient</h3>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <User className="h-5 w-5 text-slate-700" />
+            <h3 className="text-lg font-semibold text-slate-900">Informations patient</h3>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsEditModalOpen(true)}
+            className="text-slate-500 hover:text-brand"
+          >
+            <Pencil className="h-4 w-4 mr-1" />
+            Modifier
+          </Button>
         </div>
         <dl className="space-y-4">
           <div className="flex items-start gap-3">
@@ -120,7 +137,7 @@ export function PatientOverview({ patient }: PatientOverviewProps) {
             <div className="flex items-start gap-3">
               <Phone className="h-4 w-4 text-slate-400 mt-0.5" />
               <div className="flex-1">
-                <dt className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Téléphone</dt>
+                <dt className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Telephone</dt>
                 <dd className="text-sm text-slate-900 font-medium mt-0.5">
                   {patient.emergency_contact.phone}
                 </dd>
@@ -140,5 +157,13 @@ export function PatientOverview({ patient }: PatientOverviewProps) {
         </div>
       )}
     </div>
+
+    {/* Edit Patient Modal */}
+    <EditPatientModal
+      patient={patient}
+      isOpen={isEditModalOpen}
+      onClose={() => setIsEditModalOpen(false)}
+    />
+    </>
   );
 }

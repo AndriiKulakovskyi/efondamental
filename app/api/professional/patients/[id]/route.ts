@@ -22,7 +22,17 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const { email, sendInvitation } = body;
+    const { 
+      first_name,
+      last_name,
+      date_of_birth,
+      gender,
+      email, 
+      phone,
+      address,
+      emergency_contact,
+      sendInvitation 
+    } = body;
 
     // Get patient to verify center access
     const patient = await getPatientById(id);
@@ -42,28 +52,81 @@ export async function PATCH(
       );
     }
 
-    // Update patient email
-    const updatedPatient = await updatePatient(id, { email });
+    // Build update object with only provided fields
+    const updates: Record<string, any> = {};
+    const changes: Record<string, any> = {};
 
-    // Log audit event
-    await logAuditEvent({
-      userId: context.user.id,
-      action: AuditAction.UPDATE,
-      entityType: "patient",
-      entityId: id,
-      centerId: context.profile.center_id,
-      changes: { oldEmail: patient.email, newEmail: email }
-    });
+    if (first_name !== undefined) {
+      updates.first_name = first_name;
+      if (patient.first_name !== first_name) {
+        changes.first_name = { old: patient.first_name, new: first_name };
+      }
+    }
+    if (last_name !== undefined) {
+      updates.last_name = last_name;
+      if (patient.last_name !== last_name) {
+        changes.last_name = { old: patient.last_name, new: last_name };
+      }
+    }
+    if (date_of_birth !== undefined) {
+      updates.date_of_birth = date_of_birth;
+      if (patient.date_of_birth !== date_of_birth) {
+        changes.date_of_birth = { old: patient.date_of_birth, new: date_of_birth };
+      }
+    }
+    if (gender !== undefined) {
+      updates.gender = gender;
+      if (patient.gender !== gender) {
+        changes.gender = { old: patient.gender, new: gender };
+      }
+    }
+    if (email !== undefined) {
+      updates.email = email;
+      if (patient.email !== email) {
+        changes.email = { old: patient.email, new: email };
+      }
+    }
+    if (phone !== undefined) {
+      updates.phone = phone;
+      if (patient.phone !== phone) {
+        changes.phone = { old: patient.phone, new: phone };
+      }
+    }
+    if (address !== undefined) {
+      updates.address = address;
+      if (patient.address !== address) {
+        changes.address = { old: patient.address, new: address };
+      }
+    }
+    if (emergency_contact !== undefined) {
+      updates.emergency_contact = emergency_contact;
+      changes.emergency_contact = { old: patient.emergency_contact, new: emergency_contact };
+    }
 
-    // Send invitation if requested
+    // Update patient with all provided fields
+    const updatedPatient = await updatePatient(id, updates);
+
+    // Log audit event only if there are changes
+    if (Object.keys(changes).length > 0) {
+      await logAuditEvent({
+        userId: context.user.id,
+        action: AuditAction.UPDATE,
+        entityType: "patient",
+        entityId: id,
+        centerId: context.profile.center_id,
+        changes
+      });
+    }
+
+    // Send invitation if requested and email was updated
     let invitationResult = null;
     if (sendInvitation && email) {
       try {
         invitationResult = await invitePatient({
           patientId: id,
           email,
-          firstName: patient.first_name,
-          lastName: patient.last_name,
+          firstName: updatedPatient.first_name,
+          lastName: updatedPatient.last_name,
           centerId: context.profile.center_id,
           invitedBy: context.user.id,
         });
