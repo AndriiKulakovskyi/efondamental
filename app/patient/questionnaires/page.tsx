@@ -63,7 +63,7 @@ function getQuestionnaireStatusInfo(questionnaire: PatientQuestionnaire): {
   } else {
     // Not started
     return {
-      statusText: "Non commence",
+      statusText: "Non commencé",
       statusClass: "text-brand",
       iconBgClass: "bg-slate-100 group-hover:bg-brand",
       iconColorClass: "text-slate-400 group-hover:text-white",

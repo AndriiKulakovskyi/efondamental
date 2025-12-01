@@ -136,7 +136,7 @@ export default function VisitActions({
               <Button 
                 onClick={handleStartVisit} 
                 disabled={isLoading}
-                className="bg-brand hover:bg-brand-dark text-white shadow-sm"
+                variant="brand"
               >
                 {isLoading ? (
                   <>
