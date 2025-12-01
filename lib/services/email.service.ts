@@ -1,64 +1,83 @@
 // eFondaMental Platform - Email Service
-// Handles email sending via Resend API
+// Handles email sending via NotificationAPI
 
-import { Resend } from 'resend';
+import notificationapi from 'notificationapi-node-server-sdk';
+
+// Initialize NotificationAPI
+const clientId = process.env.NOTIFICATIONAPI_CLIENT_ID;
+const clientSecret = process.env.NOTIFICATIONAPI_CLIENT_SECRET;
+
+let isInitialized = false;
+
+function initNotificationApi() {
+  if (isInitialized) return true;
+  
+  if (!clientId || !clientSecret) {
+    console.error(`
+      NOTIFICATIONAPI credentials not configured
+      
+      To fix:
+      1. Add to .env.local:
+         NOTIFICATIONAPI_CLIENT_ID=your_client_id
+         NOTIFICATIONAPI_CLIENT_SECRET=your_client_secret
+      2. Restart server: npm run dev
+    `);
+    return false;
+  }
+
+  notificationapi.init(clientId, clientSecret, {
+    baseURL: 'https://api.eu.notificationapi.com'
+  });
+  
+  isInitialized = true;
+  return true;
+}
 
 interface SendEmailParams {
   to: string;
   subject: string;
   html: string;
-  from?: string;
+  notificationType?: string;
 }
 
 export async function sendEmail(params: SendEmailParams): Promise<boolean> {
-  const resendApiKey = process.env.RESEND_API_KEY;
-
   console.log('[EMAIL SERVICE] Starting email send process...');
   console.log('[EMAIL SERVICE] To:', params.to);
   console.log('[EMAIL SERVICE] Subject:', params.subject);
-  console.log('[EMAIL SERVICE] API Key configured:', resendApiKey ? 'YES ✓' : 'NO ✗');
+  console.log('[EMAIL SERVICE] NotificationAPI configured:', clientId ? 'YES' : 'NO');
 
-  if (!resendApiKey) {
+  if (!initNotificationApi()) {
     console.error(`
-      ❌ RESEND_API_KEY not configured in environment variables
-      
-      To fix:
-      1. Add to .env.local:
-         RESEND_API_KEY=re_your_key_from_resend_dashboard
-      2. Restart server: npm run dev
-      
+      NotificationAPI not configured properly
       Email would be sent to: ${params.to}
     `);
     return false;
   }
 
   try {
-    console.log('[EMAIL SERVICE] Initializing Resend client...');
-    const resend = new Resend(resendApiKey);
-
-    console.log('[EMAIL SERVICE] Sending email via Resend API...');
-    const { data, error } = await resend.emails.send({
-      from: params.from || 'eFondaMental <onboarding@resend.dev>',
-      to: params.to,
-      subject: params.subject,
-      html: params.html,
+    console.log('[EMAIL SERVICE] Sending email via NotificationAPI...');
+    
+    const response = await notificationapi.send({
+      type: params.notificationType || 'efondamental_user_created',
+      to: {
+        id: params.to,
+        email: params.to
+      },
+      email: {
+        subject: params.subject,
+        html: params.html
+      }
     });
 
-    if (error) {
-      console.error('[EMAIL SERVICE] ❌ Resend API error:', error);
-      console.error('[EMAIL SERVICE] Error details:', JSON.stringify(error, null, 2));
-      return false;
-    }
-
     console.log(`
-      ✅ EMAIL SENT SUCCESSFULLY!
-      Email ID: ${data?.id}
+      EMAIL SENT SUCCESSFULLY!
       To: ${params.to}
       Subject: ${params.subject}
+      Response: ${JSON.stringify(response)}
     `);
     return true;
   } catch (error) {
-    console.error('[EMAIL SERVICE] ❌ Exception while sending email:', error);
+    console.error('[EMAIL SERVICE] Exception while sending email:', error);
     if (error instanceof Error) {
       console.error('[EMAIL SERVICE] Error message:', error.message);
       console.error('[EMAIL SERVICE] Error stack:', error.stack);
@@ -152,12 +171,60 @@ export async function sendPatientInvitation(params: {
   lastName: string;
   invitationUrl: string;
 }): Promise<boolean> {
-  const html = getPatientInvitationEmailHtml(params);
-  
-  return await sendEmail({
-    to: params.email,
-    subject: 'Invitation to join eFondaMental Patient Portal',
-    html,
-  });
-}
+  console.log('[EMAIL SERVICE] Sending patient invitation...');
+  console.log('[EMAIL SERVICE] To:', params.email);
+  console.log('[EMAIL SERVICE] Client ID:', clientId ? clientId.substring(0, 10) + '...' : 'NOT SET');
 
+  if (!initNotificationApi()) {
+    console.error(`
+      NotificationAPI not configured properly
+      Email would be sent to: ${params.email}
+      Invitation URL: ${params.invitationUrl}
+    `);
+    return false;
+  }
+
+  try {
+    const html = getPatientInvitationEmailHtml(params);
+    
+    console.log('[EMAIL SERVICE] Calling notificationapi.send with type: efondamental_user_created');
+    
+    // NotificationAPI send returns a promise that resolves when email is queued
+    await notificationapi.send({
+      type: 'efondamental_user_created',
+      to: {
+        id: params.email,
+        email: params.email
+      },
+      email: {
+        subject: 'Invitation to join eFondaMental Patient Portal',
+        html: html
+      }
+    });
+
+    console.log(`
+      PATIENT INVITATION EMAIL SENT SUCCESSFULLY!
+      To: ${params.email}
+      Name: ${params.firstName} ${params.lastName}
+    `);
+    return true;
+  } catch (error: unknown) {
+    console.error('[EMAIL SERVICE] Exception while sending patient invitation:', error);
+    
+    // Handle specific NotificationAPI errors
+    if (error && typeof error === 'object') {
+      const err = error as Record<string, unknown>;
+      if (err.response) {
+        console.error('[EMAIL SERVICE] API Response error:', err.response);
+      }
+      if (err.message) {
+        console.error('[EMAIL SERVICE] Error message:', err.message);
+      }
+      if (err.status) {
+        console.error('[EMAIL SERVICE] Status code:', err.status);
+      }
+    }
+    
+    return false;
+  }
+}

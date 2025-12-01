@@ -20,7 +20,17 @@ export async function POST(
     }
 
     const { id } = await params;
-    const body = await request.json();
+    
+    // Handle empty body (when sending new invitation, not resending)
+    let body: { resend?: boolean } = {};
+    try {
+      const text = await request.text();
+      if (text) {
+        body = JSON.parse(text);
+      }
+    } catch {
+      // Empty body is fine for new invitations
+    }
     const { resend } = body;
 
     // Get patient details

@@ -46,6 +46,7 @@ export function InvitationStatus({
       const response = await fetch(`/api/professional/patients/${patientId}/invite`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
       });
 
       const data = await response.json();

@@ -664,7 +664,7 @@ async function sendPatientInvitationEmail(
     // Import email service
     const { sendPatientInvitation } = await import('./email.service');
     
-    // Send email using Resend
+    // Send email using NotificationAPI
     const sent = await sendPatientInvitation({
       email: data.email,
       firstName: data.firstName,
@@ -674,15 +674,15 @@ async function sendPatientInvitationEmail(
 
     if (!sent) {
       console.warn(`
-        ⚠️  Email not sent - RESEND_API_KEY not configured
+        Email not sent - NotificationAPI not configured
         
         To enable email sending:
-        1. Sign up at https://resend.com (free tier: 3,000 emails/month)
-        2. Get your API key from the dashboard
-        3. Add to .env.local:
-           RESEND_API_KEY=re_your_key_here
+        1. Get your credentials from NotificationAPI dashboard
+        2. Add to .env.local:
+           NOTIFICATIONAPI_CLIENT_ID=your_client_id
+           NOTIFICATIONAPI_CLIENT_SECRET=your_client_secret
            NEXT_PUBLIC_SITE_URL=http://localhost:3000
-        4. Restart dev server: npm run dev
+        3. Restart dev server: npm run dev
         
         For now, patient can access this invitation URL:
         ${invitationUrl}
