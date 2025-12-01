@@ -53,7 +53,7 @@ function getQuestionnaireStatusInfo(questionnaire: PatientQuestionnaire): {
   if (questionnaire.isLockedByProfessional) {
     // Completed by professional - locked
     return {
-      statusText: "Complete par l'equipe",
+      statusText: "Completé par mon médecin",
       statusClass: "text-blue-600",
       iconBgClass: "bg-blue-100",
       iconColorClass: "text-blue-600",

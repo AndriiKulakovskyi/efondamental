@@ -26,9 +26,9 @@ export default async function NewPatientPage({
 
   return (
     <div className="max-w-4xl">
-      <div className="mb-6">
-        <h2 className="text-3xl font-bold text-slate-900">New Patient</h2>
-        <p className="text-slate-600">Create a new patient profile</p>
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-slate-900">New Patient</h2>
+        <p className="text-slate-500 mt-1">Create a new patient profile for this center</p>
       </div>
 
       <PatientForm
