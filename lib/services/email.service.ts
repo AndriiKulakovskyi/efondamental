@@ -57,7 +57,9 @@ export async function sendEmail(params: SendEmailParams): Promise<boolean> {
   try {
     console.log('[EMAIL SERVICE] Sending email via NotificationAPI...');
     
-    const response = await notificationapi.send({
+    // Using type assertion because SDK types don't match the actual API
+    // The API accepts 'type', 'to', 'email' as shown in NotificationAPI documentation
+    const response = await (notificationapi.send as any)({
       type: params.notificationType || 'efondamental_user_created',
       to: {
         id: params.to,
@@ -210,8 +212,9 @@ export async function sendPatientInvitation(params: {
     
     console.log('[EMAIL SERVICE] Calling notificationapi.send with type: efondamental_user_created');
     
-    // NotificationAPI send returns a promise that resolves when email is queued
-    await notificationapi.send({
+    // Using type assertion because SDK types don't match the actual API
+    // The API accepts 'type', 'to', 'email' as shown in NotificationAPI documentation
+    await (notificationapi.send as any)({
       type: 'efondamental_user_created',
       to: {
         id: params.email,
