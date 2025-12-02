@@ -716,6 +716,58 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     min: 1.50,
     max: 2.75
   },
+  {
+    id: 'crp',
+    text: 'CRP (mg/L)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'glycemie_a_jeun',
+    text: 'Glycémie à jeûn',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50
+  },
+  {
+    id: 'glycemie_a_jeun_unit',
+    text: 'Unité',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'mmol_L', label: 'mmol/L' },
+      { code: 'g_L', label: 'g/L' }
+    ]
+  },
+  {
+    id: 'hemoglobine_glyquee',
+    text: 'Hémoglobine glyquée (%)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50,
+    display_if: {
+      'or': [
+        {
+          'and': [
+            { '>': [{ var: 'glycemie_a_jeun' }, 0] },
+            { '==': [{ var: 'glycemie_a_jeun_unit' }, 'mmol_L'] },
+            { '>': [{ var: 'glycemie_a_jeun' }, 7] }
+          ]
+        },
+        {
+          'and': [
+            { '>': [{ var: 'glycemie_a_jeun' }, 0] },
+            { '==': [{ var: 'glycemie_a_jeun_unit' }, 'g_L'] },
+            { '>': [{ var: 'glycemie_a_jeun' }, 1.26] }
+          ]
+        }
+      ]
+    }
+  },
   
   // ===== BILAN LIPIDIQUE =====
   {
@@ -778,6 +830,14 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     min: 0.2,
     max: 20
   },
+  {
+    id: 'rapport_total_hdl',
+    text: 'Rapport Total / HDL',
+    help: 'Calculé automatiquement: Cholestérol total / Cholestérol HDL',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
   
   // ===== BILAN HÉPATIQUE =====
   {
@@ -811,32 +871,29 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     max: 500
   },
   {
-    id: 'bilirubine_totale',
-    text: 'Bilirubine totale',
-    type: 'number',
-    required: false
-  },
-  {
-    id: 'bilirubine_unit',
-    text: 'Unité Bilirubine',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'umol_L', label: 'µmol/L' },
-      { code: 'mmol_L', label: 'mmol/L' },
-      { code: 'mg_L', label: 'mg/L' }
-    ],
-    display_if: {
-      '!=': [{ var: 'bilirubine_totale' }, null]
-    }
-  },
-  {
     id: 'ggt',
     text: 'Gamma-GT (UI/L)',
     type: 'number',
     required: false,
     min: 5,
     max: 1500
+  },
+  {
+    id: 'bilirubine_totale',
+    text: 'Bilirubine totale',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'bilirubine_totale_unit',
+    text: 'Unité',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'umol_L', label: 'µmol/L' },
+      { code: 'mmol_L', label: 'mmol/L' },
+      { code: 'mg_L', label: 'mg/L' }
+    ]
   },
   
   // ===== BILAN THYROÏDIEN =====

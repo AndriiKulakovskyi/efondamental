@@ -1280,6 +1280,10 @@ export interface BiologicalAssessmentResponse {
   fer?: number | null;
   ferritine?: number | null;
   calcemie?: number | null;
+  crp?: number | null; // mg/L (0-50)
+  glycemie_a_jeun?: number | null; // 0-50
+  glycemie_a_jeun_unit?: 'mmol_L' | 'g_L' | null;
+  hemoglobine_glyquee?: number | null; // % (0-50)
   
   // Bilan Lipidique
   hdl?: number | null;
@@ -1288,13 +1292,14 @@ export interface BiologicalAssessmentResponse {
   ldl_unit?: 'mmol_L' | 'g_L' | null;
   cholesterol_total?: number | null;
   triglycerides?: number | null;
+  rapport_total_hdl?: number | null; // Computed: cholesterol_total / hdl
   
   // Bilan Hépatique
   pal?: number | null;
   asat?: number | null;
   alat?: number | null;
   bilirubine_totale?: number | null;
-  bilirubine_unit?: 'umol_L' | 'mmol_L' | 'mg_L' | null;
+  bilirubine_totale_unit?: 'umol_L' | 'mmol_L' | 'mg_L' | null;
   ggt?: number | null;
   
   // Bilan Thyroïdien

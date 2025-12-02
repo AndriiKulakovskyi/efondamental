@@ -407,19 +407,23 @@ Ce document recense l'ensemble des questionnaires implementes pour l'evaluation 
 - Fer (umol/L)
 - Ferritine (ug/L)
 - Calcemie (mmol/L)
+- CRP (mg/L) - range: 0-50
+- Glycemie a jeun (mmol/L or g/L) - range: 0-50, unit selector appears when value is entered
+- Hemoglobine glyquee (%) - range: 0-50 (conditional: shown when Glycemie a jeun > 7 mmol/L or > 1.26 g/L)
 
 **BILAN LIPIDIQUE:**
 - HDL (mmol/L ou g/L)
 - LDL (mmol/L ou g/L)
 - Cholesterol total (mmol/L)
 - Triglycerides (mmol/L)
+- Rapport Total / HDL (computed automatically: Cholesterol total / HDL)
 
 **BILAN HEPATIQUE:**
 - PAL (UI/L)
 - ASAT / TGO (UI/L)
 - ALAT / TGP (UI/L)
-- Bilirubine totale
 - Gamma-GT (UI/L)
+- Bilirubine totale (µmol/L, mmol/L, or mg/L)
 
 **BILAN THYROIDIEN:**
 - TSH ultrasensible

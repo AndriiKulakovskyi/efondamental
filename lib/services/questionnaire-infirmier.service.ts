@@ -475,9 +475,9 @@ export async function saveBiologicalAssessmentResponse(
   // Copy all other fields
   const fieldsToCopy = [
     'sodium', 'potassium', 'chlore', 'bicarbonates', 'protidemie', 'albumine', 'uree', 'acide_urique', 'creatinine',
-    'phosphore', 'fer', 'ferritine', 'calcemie',
-    'hdl', 'hdl_unit', 'ldl', 'ldl_unit', 'cholesterol_total', 'triglycerides',
-    'pal', 'asat', 'alat', 'bilirubine_totale', 'bilirubine_unit', 'ggt',
+    'phosphore', 'fer', 'ferritine', 'calcemie', 'crp', 'glycemie_a_jeun', 'glycemie_a_jeun_unit', 'hemoglobine_glyquee',
+    'hdl', 'hdl_unit', 'ldl', 'ldl_unit', 'cholesterol_total', 'triglycerides', 'rapport_total_hdl',
+    'pal', 'asat', 'alat', 'ggt', 'bilirubine_totale', 'bilirubine_totale_unit',
     'tsh', 'tsh_unit', 't3_libre', 't4_libre',
     'leucocytes', 'hematies', 'hemoglobine', 'hemoglobine_unit', 'hematocrite', 'hematocrite_unit',
     'neutrophiles', 'basophiles', 'eosinophiles', 'lymphocytes', 'monocytes', 'vgm',

@@ -1425,6 +1425,27 @@ export function QuestionnaireRenderer({
     responses.inverse_7a, responses.inverse_7b, responses.inverse_8a, responses.inverse_8b
   ]);
 
+  // Separate useEffect for Rapport Total / HDL calculation (lipid profile)
+  // Kept separate to avoid changing the size of the main useEffect dependency array
+  useEffect(() => {
+    setResponses((prev) => {
+      const cholesterolTotal = prev.cholesterol_total ? parseFloat(prev.cholesterol_total) : 0;
+      const hdl = prev.hdl ? parseFloat(prev.hdl) : 0;
+      
+      if (cholesterolTotal > 0 && hdl > 0) {
+        const ratio = cholesterolTotal / hdl;
+        const ratioRounded = Math.round(ratio * 100) / 100;
+        if (prev.rapport_total_hdl !== ratioRounded) {
+          return { ...prev, rapport_total_hdl: ratioRounded };
+        }
+      } else if (prev.rapport_total_hdl) {
+        const { rapport_total_hdl, ...rest } = prev;
+        return rest;
+      }
+      return prev;
+    });
+  }, [responses.cholesterol_total, responses.hdl]);
+
   const { visibleQuestions, requiredQuestions } = evaluateConditionalLogic(
     questionnaire,
     responses
