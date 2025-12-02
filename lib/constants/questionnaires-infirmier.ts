@@ -1119,13 +1119,20 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     }
   },
   
-  // ===== PROLACTINE =====
+  // ===== bHCG =====
   {
-    id: 'section_prolactine',
-    text: 'Prolactine',
-    help: 'Pour les patients traités par neuroleptiques/antipsychotiques',
+    id: 'section_bhcg',
+    text: 'bHCG',
     type: 'section',
     required: false
+  },
+  {
+    id: 'dosage_bhcg',
+    text: 'Dosage des bHCG (UI)',
+    help: 'Remplir pour les femmes en âge de procréer seulement',
+    type: 'number',
+    required: false,
+    min: 0
   },
   {
     id: 'prolactine',
@@ -1136,7 +1143,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   },
   {
     id: 'prolactine_unit',
-    text: 'Unité Prolactine',
+    text: 'Unité',
     type: 'single_choice',
     required: false,
     options: [
@@ -1144,10 +1151,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
       { code: 'uIU_mL', label: 'µIU/mL' },
       { code: 'ng_mL', label: 'ng/mL' },
       { code: 'ug_L', label: 'µg/L' }
-    ],
-    display_if: {
-      '!=': [{ var: 'prolactine' }, null]
-    }
+    ]
   },
   
   // ===== DOSAGE PSYCHOTROPES =====

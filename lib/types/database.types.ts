@@ -1327,8 +1327,9 @@ export interface BiologicalAssessmentResponse {
   ccmh_unit?: 'percent' | 'g_dL' | 'g_L' | null;
   plaquettes?: number | null;
   
-  // HCG & Prolactine
+  // bHCG & Prolactine
   beta_hcg?: number | null;
+  dosage_bhcg?: number | null;
   prolactine?: number | null;
   prolactine_unit?: 'mg_L' | 'uIU_mL' | 'ng_mL' | 'ug_L' | null;
   

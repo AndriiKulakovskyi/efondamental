@@ -482,7 +482,7 @@ export async function saveBiologicalAssessmentResponse(
     'leucocytes', 'hematies', 'hemoglobine', 'hemoglobine_unit', 'hematocrite', 'hematocrite_unit',
     'neutrophiles', 'basophiles', 'eosinophiles', 'lymphocytes', 'monocytes', 'vgm',
     'tcmh', 'tcmh_unit', 'ccmh', 'ccmh_unit', 'plaquettes',
-    'beta_hcg', 'prolactine', 'prolactine_unit',
+    'beta_hcg', 'dosage_bhcg', 'prolactine', 'prolactine_unit',
     'clozapine', 'teralithe_type', 'lithium_plasma', 'lithium_erythrocyte',
     'valproic_acid', 'carbamazepine', 'oxcarbazepine', 'lamotrigine',
     'vitamin_d_level', 'outdoor_time', 'skin_phototype',
