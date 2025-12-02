@@ -1349,6 +1349,10 @@ export interface BiologicalAssessmentResponse {
   outdoor_time?: 'less_than_1h_per_week' | 'less_than_1h_per_day_several_hours_per_week' | 'at_least_1h_per_day' | 'more_than_4h_per_day' | null;
   skin_phototype?: 'I' | 'II' | 'III' | 'IV' | 'V' | 'VI' | null;
   vitamin_d_supplementation?: boolean | null;
+  vitamin_d_product_name?: 'sterogyl' | 'dedrogyl' | 'uvedose' | 'zymaduo' | 'uvesterol' | 'zymad' | 'autre' | null;
+  vitamin_d_supplementation_date?: string | null;
+  vitamin_d_supplementation_mode?: 'ampoule' | 'gouttes' | null;
+  vitamin_d_supplementation_dose?: string | null;
   
   // Sérologie Toxoplasmose
   toxo_serology_done?: boolean | null;

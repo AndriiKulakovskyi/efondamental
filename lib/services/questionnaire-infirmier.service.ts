@@ -486,6 +486,7 @@ export async function saveBiologicalAssessmentResponse(
     'clozapine', 'teralithe_type', 'lithium_plasma', 'lithium_erythrocyte',
     'valproic_acid', 'carbamazepine', 'oxcarbazepine', 'lamotrigine',
     'vitamin_d_level', 'outdoor_time', 'skin_phototype',
+    'vitamin_d_product_name', 'vitamin_d_supplementation_date', 'vitamin_d_supplementation_mode', 'vitamin_d_supplementation_dose',
     'toxo_igg_value'
   ];
 

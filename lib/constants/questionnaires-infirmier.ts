@@ -1330,6 +1330,55 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
       { code: 'no', label: 'Non' }
     ]
   },
+  {
+    id: 'vitamin_d_product_name',
+    text: 'Nom du produit',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'sterogyl', label: 'Stérogyl' },
+      { code: 'dedrogyl', label: 'Dédrogyl' },
+      { code: 'uvedose', label: 'Uvédose' },
+      { code: 'zymaduo', label: 'Zymaduo' },
+      { code: 'uvesterol', label: 'Uvestérol' },
+      { code: 'zymad', label: 'Zymad' },
+      { code: 'autre', label: 'Autre' }
+    ],
+    display_if: {
+      '==': [{ var: 'vitamin_d_supplementation' }, 'yes']
+    }
+  },
+  {
+    id: 'vitamin_d_supplementation_date',
+    text: 'Date',
+    type: 'date',
+    required: false,
+    display_if: {
+      '==': [{ var: 'vitamin_d_supplementation' }, 'yes']
+    }
+  },
+  {
+    id: 'vitamin_d_supplementation_mode',
+    text: 'Mode de supplémentation',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'ampoule', label: 'Ampoule' },
+      { code: 'gouttes', label: 'Gouttes' }
+    ],
+    display_if: {
+      '==': [{ var: 'vitamin_d_supplementation' }, 'yes']
+    }
+  },
+  {
+    id: 'vitamin_d_supplementation_dose',
+    text: 'Dose',
+    type: 'text',
+    required: false,
+    display_if: {
+      '==': [{ var: 'vitamin_d_supplementation' }, 'yes']
+    }
+  },
   
   // ===== SÉROLOGIE TOXOPLASMOSE =====
   {
