@@ -215,6 +215,15 @@ export function QuestionnairePageClient({
             {questionnaire.description}
           </p>
         )}
+
+        {questionnaire.metadata?.instructions && (
+          <div className="mb-8 bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <p className="font-semibold text-amber-900 mb-2">Consignes</p>
+            <p className="text-sm text-amber-800 whitespace-pre-line">
+              {questionnaire.metadata.instructions.replace('Consignes : ', '')}
+            </p>
+          </div>
+        )}
         
         {error && (
           <div className="mb-6">

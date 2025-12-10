@@ -136,6 +136,15 @@ export function QuestionnairePageClient({
             </p>
           )}
 
+          {questionnaire.metadata?.instructions && (
+            <div className="mb-8 bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <p className="font-semibold text-amber-900 mb-2">Consignes</p>
+              <p className="text-sm text-amber-800 whitespace-pre-line">
+                {questionnaire.metadata.instructions.replace('Consignes : ', '')}
+              </p>
+            </div>
+          )}
+
           {/* Read-only responses */}
           <div className="space-y-6">
             {questionnaire.questions.map((question, index) => (
@@ -216,6 +225,15 @@ export function QuestionnairePageClient({
           <p className="text-slate-500 mb-8 max-w-2xl">
             {questionnaire.description}
           </p>
+        )}
+
+        {questionnaire.metadata?.instructions && (
+          <div className="mb-8 bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <p className="font-semibold text-amber-900 mb-2">Consignes</p>
+            <p className="text-sm text-amber-800 whitespace-pre-line">
+              {questionnaire.metadata.instructions.replace('Consignes : ', '')}
+            </p>
+          </div>
         )}
 
         {error && (

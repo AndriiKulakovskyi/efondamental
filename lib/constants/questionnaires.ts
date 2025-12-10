@@ -101,7 +101,10 @@ export const ASRM_DEFINITION: QuestionnaireDefinition = {
   title: 'Auto-Questionnaire Altman (ASRM)',
   description: "Échelle d'Auto-Évaluation de la Manie - Période de référence: 7 derniers jours",
   questions: ASRM_QUESTIONS,
-  metadata: { singleColumn: true }
+  metadata: { 
+    singleColumn: true,
+    instructions: "Consignes : Choisir la proposition dans chaque groupe qui correspond le mieux à la manière dont vous vous êtes senti(e) la semaine dernière.\n\nVeuillez noter : « parfois » utilisé ici signifie une ou deux fois, « souvent » signifie plusieurs, « fréquemment » signifie la plupart du temps."
+  }
 };
 
 export const QIDS_QUESTIONS: Question[] = [
