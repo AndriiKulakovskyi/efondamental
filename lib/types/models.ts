@@ -92,7 +92,8 @@ export interface PatientSummary {
   lastName: string;
   dateOfBirth: string;
   age: number;
-  gender: string | null;
+  gender: 'M' | 'F' | null;
+  placeOfBirth: string | null;
   pathology: PathologyInfo;
   lastVisitDate: string | null;
   nextVisitDate: string | null;
@@ -125,7 +126,8 @@ export interface CreatePatientRequest {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
-  gender?: string;
+  gender?: 'M' | 'F';
+  placeOfBirth?: string;
   email?: string;
   phone?: string;
   address?: string;

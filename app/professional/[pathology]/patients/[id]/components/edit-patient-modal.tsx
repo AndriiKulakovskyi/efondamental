@@ -26,7 +26,8 @@ interface PatientData {
   first_name: string;
   last_name: string;
   date_of_birth: string;
-  gender: string | null;
+  gender: 'M' | 'F' | string | null;
+  place_of_birth: string | null;
   email: string | null;
   phone: string | null;
   address: string | null;
@@ -44,11 +45,21 @@ export function EditPatientModal({ patient, isOpen, onClose }: EditPatientModalP
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Normalize existing gender to M/F format
+  const normalizeGender = (g: string | null): string => {
+    if (!g) return "";
+    const lower = g.toLowerCase();
+    if (lower === 'm' || lower === 'male' || lower === 'homme') return 'M';
+    if (lower === 'f' || lower === 'female' || lower === 'femme') return 'F';
+    return g;
+  };
+
   // Form state
   const [firstName, setFirstName] = useState(patient.first_name);
   const [lastName, setLastName] = useState(patient.last_name);
   const [dateOfBirth, setDateOfBirth] = useState(patient.date_of_birth);
-  const [gender, setGender] = useState(patient.gender || "");
+  const [gender, setGender] = useState(normalizeGender(patient.gender));
+  const [placeOfBirth, setPlaceOfBirth] = useState(patient.place_of_birth || "");
   const [email, setEmail] = useState(patient.email || "");
   const [phone, setPhone] = useState(patient.phone || "");
   const [address, setAddress] = useState(patient.address || "");
@@ -57,6 +68,25 @@ export function EditPatientModal({ patient, isOpen, onClose }: EditPatientModalP
   const [emergencyName, setEmergencyName] = useState(patient.emergency_contact?.name || "");
   const [emergencyPhone, setEmergencyPhone] = useState(patient.emergency_contact?.phone || "");
   const [emergencyRelationship, setEmergencyRelationship] = useState(patient.emergency_contact?.relationship || "");
+
+  // Calculate max date for date of birth (must be at least 15 years old)
+  const getMaxDateOfBirth = () => {
+    const today = new Date();
+    today.setFullYear(today.getFullYear() - 15);
+    return today.toISOString().split('T')[0];
+  };
+
+  const validateAge = (dob: string): boolean => {
+    if (!dob) return false;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age >= 15;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +103,14 @@ export function EditPatientModal({ patient, isOpen, onClose }: EditPatientModalP
     }
     if (!dateOfBirth) {
       setError("La date de naissance est requise");
+      return;
+    }
+    if (!validateAge(dateOfBirth)) {
+      setError("Le patient doit avoir au moins 15 ans");
+      return;
+    }
+    if (!gender) {
+      setError("Le sexe à la naissance est requis");
       return;
     }
 
@@ -97,6 +135,7 @@ export function EditPatientModal({ patient, isOpen, onClose }: EditPatientModalP
           last_name: lastName.trim(),
           date_of_birth: dateOfBirth,
           gender: gender || null,
+          place_of_birth: placeOfBirth.trim() || null,
           email: email.trim() || null,
           phone: phone.trim() || null,
           address: address.trim() || null,
@@ -178,24 +217,40 @@ export function EditPatientModal({ patient, isOpen, onClose }: EditPatientModalP
                   id="dateOfBirth"
                   type="date"
                   value={dateOfBirth}
+                  max={getMaxDateOfBirth()}
                   onChange={(e) => setDateOfBirth(e.target.value)}
                   required
                 />
+                <p className="text-xs text-slate-500">Le patient doit avoir au moins 15 ans</p>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="gender">Genre</Label>
+                <Label htmlFor="gender">Sexe a la naissance *</Label>
                 <select
                   id="gender"
                   value={gender}
                   onChange={(e) => setGender(e.target.value)}
                   className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  required
                 >
-                  <option value="">Non specifie</option>
-                  <option value="male">Homme</option>
-                  <option value="female">Femme</option>
-                  <option value="other">Autre</option>
+                  <option value="">Selectionner</option>
+                  <option value="M">Homme</option>
+                  <option value="F">Femme</option>
                 </select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="placeOfBirth">Lieu de naissance</Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  id="placeOfBirth"
+                  value={placeOfBirth}
+                  onChange={(e) => setPlaceOfBirth(e.target.value)}
+                  placeholder="Lieu de naissance"
+                  className="pl-10"
+                />
               </div>
             </div>
           </div>

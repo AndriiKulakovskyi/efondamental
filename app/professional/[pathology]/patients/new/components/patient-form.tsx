@@ -2,19 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { AlertBanner } from "@/components/ui/alert-banner";
-import { Loader2, User, Calendar, Mail, Phone, MapPin, UserPlus, Stethoscope, Hash } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface Doctor {
   id: string;
@@ -37,6 +26,7 @@ export function PatientForm({ pathology, doctors, currentUserId }: PatientFormPr
     dateOfBirth: "",
     medicalRecordNumber: "",
     gender: "",
+    placeOfBirth: "",
     email: "",
     phone: "",
     address: "",
@@ -48,9 +38,41 @@ export function PatientForm({ pathology, doctors, currentUserId }: PatientFormPr
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Calculate max date for date of birth (must be at least 15 years old)
+  const getMaxDateOfBirth = () => {
+    const today = new Date();
+    today.setFullYear(today.getFullYear() - 15);
+    return today.toISOString().split('T')[0];
+  };
+
+  const validateAge = (dateOfBirth: string): boolean => {
+    if (!dateOfBirth) return false;
+    const birthDate = new Date(dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age >= 15;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    // Validate age >= 15
+    if (!validateAge(formData.dateOfBirth)) {
+      setError("Le patient doit avoir au moins 15 ans");
+      return;
+    }
+
+    // Validate sex at birth is required
+    if (!formData.gender) {
+      setError("Le sexe a la naissance est requis");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -65,312 +87,337 @@ export function PatientForm({ pathology, doctors, currentUserId }: PatientFormPr
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to create patient");
+        throw new Error(data.error || "Echec de la creation du patient");
       }
 
       const { patient } = await response.json();
       router.push(`/professional/${pathology}/patients/${patient.id}`);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const inputClassName = "h-11 pl-11 border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:border-slate-400 focus:ring-slate-400/20";
-  const selectTriggerClassName = "h-11 border-slate-200 rounded-lg text-sm focus:border-slate-400 focus:ring-slate-400/20";
+  const inputClassName = "w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition shadow-sm placeholder-slate-400";
+  const inputWithIconClassName = "w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition shadow-sm placeholder-slate-400";
+  const selectClassName = "w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition shadow-sm cursor-pointer appearance-none bg-[url('data:image/svg+xml,%3csvg%20xmlns%3d%27http%3a%2f%2fwww.w3.org%2f2000%2fsvg%27%20fill%3d%27none%27%20viewBox%3d%270%200%2020%2020%27%3e%3cpath%20stroke%3d%27%236b7280%27%20stroke-linecap%3d%27round%27%20stroke-linejoin%3d%27round%27%20stroke-width%3d%271.5%27%20d%3d%27M6%208l4%204%204-4%27%2f%3e%3c%2fsvg%3e')] bg-[length:1.5em_1.5em] bg-[right_1rem_center] bg-no-repeat";
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="space-y-6">
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold text-slate-900">Patient Information</CardTitle>
-            <CardDescription className="text-sm text-slate-500">Basic details about the patient</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <div className="grid grid-cols-2 gap-5">
-              <div className="space-y-2">
-                <Label htmlFor="firstName" className="text-sm font-medium text-slate-700">First Name *</Label>
-                <div className="relative">
-                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, firstName: e.target.value })
-                    }
-                    placeholder="Enter first name"
-                    className={inputClassName}
-                    required
-                  />
-                </div>
+      <div className="max-w-4xl mx-auto space-y-6">
+        
+        {/* FORM SECTION 1: Informations Patient */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+          <h3 className="text-lg font-bold text-slate-900 mb-1">Informations Patient</h3>
+          <p className="text-sm text-slate-400 mb-6">Informations de base sur le patient</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Prenom */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Prenom <span className="text-brand">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  value={formData.firstName}
+                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                  placeholder="Entrez le prenom"
+                  className={inputWithIconClassName}
+                  required
+                />
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="lastName" className="text-sm font-medium text-slate-700">Last Name *</Label>
-                <div className="relative">
-                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, lastName: e.target.value })
-                    }
-                    placeholder="Enter last name"
-                    className={inputClassName}
-                    required
-                  />
-                </div>
+            </div>
+            
+            {/* Nom */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Nom <span className="text-brand">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  value={formData.lastName}
+                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                  placeholder="Entrez le nom"
+                  className={inputWithIconClassName}
+                  required
+                />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-5">
-              <div className="space-y-2">
-                <Label htmlFor="dateOfBirth" className="text-sm font-medium text-slate-700">Date of Birth *</Label>
-                <div className="relative">
-                  <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    id="dateOfBirth"
-                    type="date"
-                    value={formData.dateOfBirth}
-                    onChange={(e) =>
-                      setFormData({ ...formData, dateOfBirth: e.target.value })
-                    }
-                    className={inputClassName}
-                    required
-                  />
-                </div>
-              </div>
+            {/* Date de naissance */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Date de naissance <span className="text-brand">*</span>
+              </label>
+              <input
+                type="date"
+                value={formData.dateOfBirth}
+                max={getMaxDateOfBirth()}
+                onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                className={inputClassName}
+                required
+              />
+              <p className="text-[10px] text-slate-400 mt-1.5 ml-1">Le patient doit avoir au moins 15 ans</p>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="medicalRecordNumber" className="text-sm font-medium text-slate-700">Medical Record Number *</Label>
-                <div className="relative">
-                  <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    id="medicalRecordNumber"
-                    value={formData.medicalRecordNumber}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        medicalRecordNumber: e.target.value.toUpperCase(),
-                      })
-                    }
-                    placeholder="Enter record number"
-                    className={`${inputClassName} font-mono`}
-                    required
-                  />
-                </div>
+            {/* Numero de dossier medical */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Numero de dossier medical <span className="text-brand">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-sm font-bold">#</span>
+                <input
+                  type="text"
+                  value={formData.medicalRecordNumber}
+                  onChange={(e) => setFormData({ ...formData, medicalRecordNumber: e.target.value.toUpperCase() })}
+                  placeholder="Entrez le numero de dossier"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl pl-8 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition shadow-sm font-mono"
+                  required
+                />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-5">
-              <div className="space-y-2">
-                <Label htmlFor="gender" className="text-sm font-medium text-slate-700">Gender</Label>
-                <Select
-                  value={formData.gender}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, gender: value })
-                  }
-                >
-                  <SelectTrigger className={selectTriggerClassName}>
-                    <SelectValue placeholder="Select gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Male">Male</SelectItem>
-                    <SelectItem value="Female">Female</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                    <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Sexe a la naissance */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Sexe a la naissance <span className="text-brand">*</span>
+              </label>
+              <select
+                value={formData.gender}
+                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                className={selectClassName}
+                required
+              >
+                <option value="" disabled>Selectionner le sexe à la naissance</option>
+                <option value="M">Homme</option>
+                <option value="F">Femme</option>
+              </select>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="assignedTo" className="text-sm font-medium text-slate-700">Assigned Doctor *</Label>
-                <Select
+            {/* Lieu de naissance */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Lieu de naissance</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  value={formData.placeOfBirth}
+                  onChange={(e) => setFormData({ ...formData, placeOfBirth: e.target.value })}
+                  placeholder="Entrez le lieu de naissance"
+                  className={inputWithIconClassName}
+                />
+              </div>
+            </div>
+
+            {/* Medecin assigne (Full width) */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Medecin assigne <span className="text-brand">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </span>
+                <select
                   value={formData.assignedTo}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, assignedTo: value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl pl-10 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand transition shadow-sm cursor-pointer appearance-none bg-[url('data:image/svg+xml,%3csvg%20xmlns%3d%27http%3a%2f%2fwww.w3.org%2f2000%2fsvg%27%20fill%3d%27none%27%20viewBox%3d%270%200%2020%2020%27%3e%3cpath%20stroke%3d%27%236b7280%27%20stroke-linecap%3d%27round%27%20stroke-linejoin%3d%27round%27%20stroke-width%3d%271.5%27%20d%3d%27M6%208l4%204%204-4%27%2f%3e%3c%2fsvg%3e')] bg-[length:1.5em_1.5em] bg-[right_1rem_center] bg-no-repeat"
+                  required
                 >
-                  <SelectTrigger className={selectTriggerClassName}>
-                    <div className="flex items-center gap-2">
-                      <Stethoscope className="h-4 w-4 text-slate-400" />
-                      <SelectValue placeholder="Select doctor" />
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {doctors.map((doctor) => (
-                      <SelectItem key={doctor.id} value={doctor.id}>
-                        Dr. {doctor.first_name} {doctor.last_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <option value="" disabled>Selectionner un medecin</option>
+                  {doctors.map((doctor) => (
+                    <option key={doctor.id} value={doctor.id}>
+                      Dr. {doctor.first_name} {doctor.last_name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold text-slate-900">Contact Information</CardTitle>
-            <CardDescription className="text-sm text-slate-500">How to reach the patient</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <div className="grid grid-cols-2 gap-5">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-slate-700">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    placeholder="patient@example.com"
-                    className={inputClassName}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-sm font-medium text-slate-700">Phone</Label>
-                <div className="relative">
-                  <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                    placeholder="+33 1 23 45 67 89"
-                    className={inputClassName}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="address" className="text-sm font-medium text-slate-700">Address</Label>
+        {/* FORM SECTION 2: Coordonnees */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+          <h3 className="text-lg font-bold text-slate-900 mb-1">Coordonnees</h3>
+          <p className="text-sm text-slate-400 mb-6">Comment contacter le patient</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
               <div className="relative">
-                <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <Input
-                  id="address"
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </span>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="patient@exemple.com"
+                  className={inputWithIconClassName}
+                />
+              </div>
+            </div>
+            
+            {/* Telephone */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Telephone</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                </span>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="+33 1 23 45 67 89"
+                  className={inputWithIconClassName}
+                />
+              </div>
+            </div>
+
+            {/* Adresse (Full width) */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Adresse</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </span>
+                <input
+                  type="text"
                   value={formData.address}
-                  onChange={(e) =>
-                    setFormData({ ...formData, address: e.target.value })
-                  }
-                  placeholder="Enter full address"
-                  className={inputClassName}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  placeholder="Entrez l'adresse complete"
+                  className={inputWithIconClassName}
                 />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold text-slate-900">Emergency Contact</CardTitle>
-            <CardDescription className="text-sm text-slate-500">Person to contact in case of emergency</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="emergencyContactName" className="text-sm font-medium text-slate-700">Contact Name</Label>
+        {/* FORM SECTION 3: Contact d'urgence */}
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+          <h3 className="text-lg font-bold text-slate-900 mb-1">Contact d&apos;urgence</h3>
+          <p className="text-sm text-slate-400 mb-6">Personne a contacter en cas d&apos;urgence</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Nom du contact (Full width) */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Nom du contact</label>
               <div className="relative">
-                <UserPlus className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <Input
-                  id="emergencyContactName"
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </span>
+                <input
+                  type="text"
                   value={formData.emergencyContactName}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      emergencyContactName: e.target.value,
-                    })
-                  }
-                  placeholder="Enter contact name"
-                  className={inputClassName}
+                  onChange={(e) => setFormData({ ...formData, emergencyContactName: e.target.value })}
+                  placeholder="Entrez le nom du contact"
+                  className={inputWithIconClassName}
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-5">
-              <div className="space-y-2">
-                <Label htmlFor="emergencyContactPhone" className="text-sm font-medium text-slate-700">Contact Phone</Label>
-                <div className="relative">
-                  <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    id="emergencyContactPhone"
-                    type="tel"
-                    value={formData.emergencyContactPhone}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        emergencyContactPhone: e.target.value,
-                      })
-                    }
-                    placeholder="+33 1 23 45 67 89"
-                    className={inputClassName}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="emergencyContactRelationship" className="text-sm font-medium text-slate-700">Relationship</Label>
-                <Select
-                  value={formData.emergencyContactRelationship}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, emergencyContactRelationship: value })
-                  }
-                >
-                  <SelectTrigger className={selectTriggerClassName}>
-                    <SelectValue placeholder="Select relationship" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Spouse">Spouse</SelectItem>
-                    <SelectItem value="Parent">Parent</SelectItem>
-                    <SelectItem value="Sibling">Sibling</SelectItem>
-                    <SelectItem value="Child">Child</SelectItem>
-                    <SelectItem value="Friend">Friend</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+            {/* Telephone du contact */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Telephone du contact</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                </span>
+                <input
+                  type="tel"
+                  value={formData.emergencyContactPhone}
+                  onChange={(e) => setFormData({ ...formData, emergencyContactPhone: e.target.value })}
+                  placeholder="+33 1 23 45 67 89"
+                  className={inputWithIconClassName}
+                />
               </div>
             </div>
-          </CardContent>
-        </Card>
 
+            {/* Lien de parente */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Lien de parente</label>
+              <select
+                value={formData.emergencyContactRelationship}
+                onChange={(e) => setFormData({ ...formData, emergencyContactRelationship: e.target.value })}
+                className={selectClassName}
+              >
+                <option value="" disabled>Selectionner le lien</option>
+                <option value="Conjoint">Conjoint(e)</option>
+                <option value="Parent">Parent/Tuteur</option>
+                <option value="Enfant">Enfant</option>
+                <option value="Ami">Ami(e)</option>
+                <option value="Autre">Autre</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Error message */}
         {error && <AlertBanner type="error" message={error} />}
 
-        <div className="flex justify-end gap-3 pt-2">
-          <Button
+        {/* Action Buttons */}
+        <div className="flex justify-end items-center gap-4 pt-2">
+          <button
             type="button"
-            variant="outline"
             onClick={() => router.back()}
             disabled={isSubmitting}
-            className="h-11 px-6 border-slate-200 text-slate-700 hover:bg-slate-50"
+            className="px-6 py-2.5 bg-white border border-slate-300 text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition shadow-sm disabled:opacity-50"
           >
-            Cancel
-          </Button>
-          <Button 
-            type="submit" 
+            Annuler
+          </button>
+          <button
+            type="submit"
             disabled={isSubmitting}
-            className="h-11 px-6 bg-slate-900 hover:bg-slate-800 text-white"
+            className="px-8 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition shadow-lg flex items-center gap-2 disabled:opacity-50"
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating...
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Creation...
               </>
             ) : (
-              "Create Patient"
+              "Creer le patient"
             )}
-          </Button>
+          </button>
         </div>
+
+        {/* Footer spacer */}
+        <div className="h-16"></div>
       </div>
     </form>
   );

@@ -4,6 +4,414 @@ Ce document recense l'ensemble des questionnaires implementes pour l'evaluation 
 
 ---
 
+## Tableau Recapitulatif des Questionnaires
+
+| # | Questionnaire | Code | Type | Nombre d'items | Score total | Module/Visite |
+|---|---------------|------|------|---------------|-------------|---------------|
+| **VISITE DE SCREENING** |
+| 1 | ASRM - Auto-Questionnaire Altman | `ASRM_FR` | Auto | 5 | 0-20 | Autoquestionnaires Patient |
+| 2 | QIDS-SR16 - Inventaire de Depression | `QIDS_SR16_FR` | Auto | 16 | 0-27 | Autoquestionnaires Patient |
+| 3 | MDQ - Questionnaire des Troubles de l'Humeur | `MDQ_FR` | Auto | 13 + 2 | - | Autoquestionnaires Patient |
+| 4 | DIAGNOSTIC - Evaluation diagnostique | `EBIP_SCR_DIAG` | Hetero | - | - | Partie Medicale |
+| 5 | ORIENTATION - Orientation Centre Expert | `EBIP_SCR_ORIENT` | Hetero | 5 | - | Partie Medicale |
+| **VISITE D'EVALUATION INITIALE - Module 1: Infirmier** |
+| 6 | TOBACCO - Evaluation du Tabagisme | `TOBACCO` | Hetero | - | - | Module 1: Infirmier |
+| 7 | FAGERSTROM - Echelle de dependance tabagique | `FAGERSTROM` | Hetero | 6 | 0-10 | Module 1: Infirmier |
+| 8 | PHYSICAL_PARAMS - Parametres Physiques | `PHYSICAL_PARAMS` | Hetero | - | - | Module 1: Infirmier |
+| 9 | BLOOD_PRESSURE - Pression arterielle et Frequence cardiaque | `BLOOD_PRESSURE` | Hetero | - | - | Module 1: Infirmier |
+| 10 | SLEEP_APNEA - Apnees du sommeil (STOP-BANG) | `SLEEP_APNEA` | Hetero | 10 | 0-8 | Module 1: Infirmier |
+| 11 | BIOLOGICAL_ASSESSMENT - Bilan biologique | `BIOLOGICAL_ASSESSMENT` | Hetero | - | - | Module 1: Infirmier |
+| 12 | ECG - Electrocardiogramme | `ECG` | Hetero | - | - | Module 1: Infirmier |
+| **VISITE D'EVALUATION INITIALE - Module 2: Etat Thymique et Fonctionnement** |
+| 13 | MADRS - Echelle de Depression de Montgomery-Asberg | `MADRS` | Hetero | 10 | 0-60 | Module 2: Etat Thymique |
+| 14 | YMRS - Young Mania Rating Scale | `YMRS` | Hetero | 11 | 0-60 | Module 2: Etat Thymique |
+| 15 | CGI - Impressions Cliniques Globales | `CGI` | Hetero | - | - | Module 2: Etat Thymique |
+| 16 | EGF - Echelle Globale de Fonctionnement | `EGF` | Hetero | 1 | 1-100 | Module 2: Etat Thymique |
+| 17 | ALDA - Echelle de reponse au Lithium | `ALDA` | Hetero | 6 | 0-10 | Module 2: Etat Thymique |
+| 18 | ETAT_PATIENT - Symptomes DSM-IV | `ETAT_PATIENT` | Hetero | 18 | - | Module 2: Etat Thymique |
+| 19 | FAST - Echelle Breve d'evaluation du Fonctionnement | `FAST` | Hetero | 24 | 0-72 | Module 2: Etat Thymique |
+| **VISITE D'EVALUATION INITIALE - Module 5: Autoquestionnaires ETAT** |
+| 20 | EQ-5D-5L - Qualite de vie | `EQ5D5L` | Auto | 5 + EVA | - | Module 5: Autoquestionnaires ETAT |
+| 21 | STAI-YA - Inventaire d'Anxiete Etat | `STAI_YA` | Auto | 20 | 20-80 | Module 5: Autoquestionnaires ETAT |
+| 22 | MARS - Medication Adherence Rating Scale | `MARS` | Auto | 10 | 0-10 | Module 5: Autoquestionnaires ETAT |
+| 23 | MAThyS - Evaluation Multidimensionnelle des etats thymiques | `MATHYS` | Auto | 20 | 0-10 (par item) | Module 5: Autoquestionnaires ETAT |
+| 24 | EPWORTH - Echelle de Somnolence | `EPWORTH` | Auto | 8 | 0-24 | Module 5: Autoquestionnaires ETAT |
+| **VISITE D'EVALUATION INITIALE - Module 7: Autoquestionnaires TRAITS** |
+| 25 | ASRS v1.1 - Echelle d'autoevaluation du TDAH | `ASRS` | Auto | 18 | - | Module 7: Autoquestionnaires TRAITS |
+| 26 | CTQ - Childhood Trauma Questionnaire | `CTQ` | Auto | 28 | - | Module 7: Autoquestionnaires TRAITS |
+| 27 | BIS-10 - Barratt Impulsiveness Scale | `BIS10` | Auto | 12 | - | Module 7: Autoquestionnaires TRAITS |
+| 28 | WURS-25 - Wender Utah Rating Scale | `WURS25` | Auto | 25 | 0-100 | Module 7: Autoquestionnaires TRAITS |
+| **Tests Neuropsychologiques** |
+| 29 | WAIS-III / WAIS-IV | - | Hetero | - | - | Module 4: Evaluation Neuropsychologique |
+| 30 | TMT - Trail Making Test | - | Hetero | - | - | Module 4: Evaluation Neuropsychologique |
+| 31 | Stroop | - | Hetero | - | - | Module 4: Evaluation Neuropsychologique |
+| 32 | Fluences Verbales | - | Hetero | - | - | Module 4: Evaluation Neuropsychologique |
+| 33 | CVLT - California Verbal Learning Test | - | Hetero | - | - | Module 4: Evaluation Neuropsychologique |
+| 34 | COBRA | - | Hetero | - | - | Module 4: Evaluation Neuropsychologique |
+| 35 | CPT-III - Continuous Performance Test | - | Hetero | - | - | Module 4: Evaluation Neuropsychologique |
+| 36 | SCIP - Screen for Cognitive Impairment in Psychiatry | - | Hetero | - | - | Module 4: Evaluation Neuropsychologique |
+| 37 | Test des Commissions | - | Hetero | - | - | Module 4: Evaluation Neuropsychologique |
+
+**Legende:**
+- **Auto**: Autoquestionnaire (rempli par le patient)
+- **Hetero**: Questionnaire hetero-administre (rempli par un professionnel)
+- **EVA**: Echelle Visuelle Analogique
+
+---
+
+## Variables Collectees par Questionnaire
+
+| Code Questionnaire | Variable | Type/Unite | Signification |
+|-------------------|----------|------------|---------------|
+| **ASRM_FR** |
+| | q1 | Integer (0-4) | Humeur (Bonheur/Joie) - Score de 0 (pas plus heureux) a 4 (tout le temps) |
+| | q2 | Integer (0-4) | Confiance en soi - Score de 0 (pas plus sur) a 4 (extremement sur) |
+| | q3 | Integer (0-4) | Besoin de sommeil - Score de 0 (pas besoin de moins) a 4 (peut passer jour et nuit sans dormir) |
+| | q4 | Integer (0-4) | Discours (Loquacite) - Score de 0 (pas plus) a 4 (sans arret) |
+| | q5 | Integer (0-4) | Niveau d'activite - Score de 0 (pas plus actif) a 4 (constamment actif) |
+| | total_score | Integer (0-20) | Score total calcule (somme q1-q5) |
+| **QIDS_SR16_FR** |
+| | q1 | Integer (0-3) | Endormissement - Score de 0 (jamais >30min) a 3 (>1h plus d'une fois sur deux) |
+| | q2 | Integer (0-3) | Sommeil pendant la nuit - Score de 0 (pas de reveil) a 3 (reveils multiples) |
+| | q3 | Integer (0-3) | Reveil avant l'heure prevue - Score de 0 (30min ou moins) a 3 (>1h sans rendormissement) |
+| | q4 | Integer (0-3) | Sommeil excessif - Score de 0 (7-8h) a 3 (>12h) |
+| | q5 | Integer (0-3) | Tristesse - Score de 0 (pas triste) a 3 (presque tout le temps) |
+| | q6 | Integer (0-3) | Diminution de l'appetit - Score de 0 (meme appetit) a 3 (rarement mange) |
+| | q7 | Integer (0-3) | Augmentation de l'appetit - Score de 0 (meme appetit) a 3 (grand besoin) |
+| | q8 | Integer (0-3) | Perte de poids (15 derniers jours) - Score de 0 (pas change) a 3 (>2kg) |
+| | q9 | Integer (0-3) | Prise de poids (15 derniers jours) - Score de 0 (pas change) a 3 (>2kg) |
+| | q10 | Integer (0-3) | Concentration/Prise de decisions - Score de 0 (aucun changement) a 3 (incapable) |
+| | q11 | Integer (0-3) | Opinion de moi-meme - Score de 0 (autant de valeur) a 3 (defauts tout le temps) |
+| | q12 | Integer (0-3) | Idees de mort ou de suicide - Score de 0 (pas de pensees) a 3 (tentative precise) |
+| | q13 | Integer (0-3) | Enthousiasme general - Score de 0 (aucun changement) a 3 (plus d'interet) |
+| | q14 | Integer (0-3) | Energie - Score de 0 (autant d'energie) a 3 (plus d'energie) |
+| | q15 | Integer (0-3) | Impression de ralentissement - Score de 0 (aussi vite) a 3 (incapable de repondre) |
+| | q16 | Integer (0-3) | Impression d'agitation - Score de 0 (pas agite) a 3 (faire les cent pas) |
+| | total_score | Integer (0-27) | Score total calcule (formule speciale avec MAX pour sommeil, appetit, poids, psychomoteur) |
+| **MDQ_FR** |
+| | q1_1 a q1_13 | Boolean (0/1) | 13 items de depistage symptomes maniaques/hypomaniaques (Oui=1, Non=0) |
+| | q2 | Boolean (0/1) | Cooccurrence des symptomes (Oui=1, Non=0) |
+| | q3 | Integer (0-3) | Impact sur fonctionnement: 0=pas de probleme, 1=mineur, 2=moyen, 3=serieux |
+| | score_q1 | Integer (0-13) | Nombre de reponses "Oui" aux questions q1_1 a q1_13 |
+| **EBIP_SCR_DIAG** |
+| | date_recueil | Date | Date de recueil des informations |
+| | diag_prealable | Categorical | Diagnostic de trouble bipolaire pose prealablement (Oui/Non/Je ne sais pas) |
+| | diag_evoque | Categorical | Diagnostic evoque au terme du screening (Oui/Non/Differe) |
+| | bilan_programme | Boolean | Bilan programme (Oui/Non) |
+| | bilan_programme_precision | Categorical | Raison si bilan non programme (Diagnostic refuse/Etat clinique non compatible/etc.) |
+| | diag_recuse_precision | Categorical | Diagnostic le plus probable si recuse (EDM/Unipolaire/Schizo-affectif/etc.) |
+| | lettre_information | Boolean | Lettre d'information remise au patient (Oui/Non) |
+| **EBIP_SCR_ORIENT** |
+| | trouble_bipolaire_ou_suspicion | Boolean | Patient souffrant d'un trouble bipolaire ou suspicion (Oui/Non) |
+| | etat_thymique_compatible | Boolean | Etat thymique compatible avec l'evaluation (Oui/Non) |
+| | prise_en_charge_100_ou_accord | Boolean | Prise en charge a 100% ou accord patient pour frais (Oui/Non) |
+| | accord_evaluation_centre_expert | Boolean | Accord patient pour evaluation centre expert (Oui/Non) |
+| | accord_transmission_cr | Boolean | Accord patient pour transmission CR a psychiatre referent (Oui/Non) |
+| **TOBACCO** |
+| | smoking_status | Categorical | Statut tabagique (Non fumeur/Fumeur actuel/Ex-fumeur/Statut inconnu) |
+| | pack_years | Numeric | Nombre de paquet-annee (unite: paquet-annee) |
+| | smoking_start_age | Integer | Age de debut du tabagisme (5 a 89+) |
+| | smoking_end_age | Integer | Age de fin du tabac pour ex-fumeur (liste d'ages) |
+| | has_substitution | Boolean | Substitution (Oui/Non) |
+| | substitution_methods | Categorical (multiple) | Methodes de substitution (Cigarette electronique/Champix/Patch/Nicorette) |
+| **FAGERSTROM** |
+| | q1 | Integer (0-3) | Temps apres reveil premiere cigarette: 0=apres 60min, 1=31-60min, 2=6-30min, 3=dans 5min |
+| | q2 | Integer (0-1) | Difficulte abstention endroits interdits: 0=Non, 1=Oui |
+| | q3 | Integer (0-1) | Cigarette la plus difficile a renoncer: 0=autre, 1=premiere |
+| | q4 | Integer (0-3) | Nombre cigarettes/jour: 0=10 ou moins, 1=11-20, 2=21-30, 3=31 ou plus |
+| | q5 | Integer (0-1) | Rythme plus soutenu le matin: 0=Non, 1=Oui |
+| | q6 | Integer (0-1) | Fumer quand malade au lit: 0=Non, 1=Oui |
+| | total_score | Integer (0-10) | Score total de dependance (somme q1-q6) |
+| **PHYSICAL_PARAMS** |
+| | height_cm | Numeric | Taille en centimetres (cm) |
+| | weight_kg | Numeric | Poids en kilogrammes (kg) |
+| | bmi | Numeric | Indice de Masse Corporelle (kg/m²) - calcule automatiquement |
+| | abdominal_circumference_cm | Numeric | Perimetre abdominal en centimetres (cm) |
+| **BLOOD_PRESSURE** |
+| | bp_lying_systolic | Numeric | Pression arterielle systolique couche (mmHg) |
+| | bp_lying_diastolic | Numeric | Pression arterielle diastolique couche (mmHg) |
+| | heart_rate_lying | Numeric | Frequence cardiaque couche (bpm) |
+| | bp_standing_systolic | Numeric | Pression arterielle systolique debout (mmHg) |
+| | bp_standing_diastolic | Numeric | Pression arterielle diastolique debout (mmHg) |
+| | heart_rate_standing | Numeric | Frequence cardiaque debout (bpm) |
+| **SLEEP_APNEA** |
+| | diagnosed_sleep_apnea | Categorical | Diagnostic d'apnees du sommeil (Oui/Non/NSP) |
+| | has_cpap_device | Boolean | Appareillage CPAP si diagnostic positif (Oui/Non) |
+| | snoring | Boolean | Ronflement fort (Oui/Non) |
+| | tiredness | Boolean | Fatigue/somnolence diurne (Oui/Non) |
+| | observed_apnea | Boolean | Apnees observees pendant sommeil (Oui/Non) |
+| | hypertension | Boolean | Hypertension arterielle (Oui/Non) |
+| | bmi_over_35 | Boolean | IMC > 35 kg/m² (Oui/Non) |
+| | age_over_50 | Boolean | Age > 50 ans (Oui/Non) |
+| | large_neck | Boolean | Tour de cou important (Hommes >=43cm, Femmes >=41cm) (Oui/Non) |
+| | male_gender | Boolean | Sexe masculin (Oui/Non) |
+| | stop_bang_score | Integer (0-8) | Score STOP-Bang calcule (somme des items positifs) |
+| **BIOLOGICAL_ASSESSMENT** |
+| | sodium | Numeric | Sodium (mmol/L) |
+| | potassium | Numeric | Potassium (mmol/L) |
+| | chloride | Numeric | Chlore (mmol/L) |
+| | bicarbonates | Numeric | Bicarbonates (mmol/L) |
+| | proteidemie | Numeric | Proteidemie (g/L) |
+| | albumine | Numeric | Albumine (g/L) |
+| | uree | Numeric | Uree (mmol/L) |
+| | acide_urique | Numeric | Acide urique (umol/L) |
+| | creatinine | Numeric | Creatinine (umol/L) |
+| | clairance_creatinine | Numeric | Clairance de la creatinine (ml/min) |
+| | phosphore | Numeric | Phosphore (mmol/L) |
+| | fer | Numeric | Fer (umol/L) |
+| | ferritine | Numeric | Ferritine (ug/L) |
+| | calcemie | Numeric | Calcemie (mmol/L) |
+| | crp | Numeric | CRP (mg/L), range 0-50 |
+| | glycemie_jeun | Numeric | Glycemie a jeun (mmol/L ou g/L), range 0-50 |
+| | hemoglobine_glyquee | Numeric | Hemoglobine glyquee (%), range 0-50, conditionnel si glycemie >7mmol/L ou >1.26g/L |
+| | hdl | Numeric | HDL (mmol/L ou g/L) |
+| | ldl | Numeric | LDL (mmol/L ou g/L) |
+| | cholesterol_total | Numeric | Cholesterol total (mmol/L) |
+| | triglycerides | Numeric | Triglycerides (mmol/L) |
+| | rapport_total_hdl | Numeric | Rapport Total/HDL (calcule automatiquement) |
+| | pal | Numeric | PAL (UI/L) |
+| | asat_tgo | Numeric | ASAT/TGO (UI/L) |
+| | alat_tgp | Numeric | ALAT/TGP (UI/L) |
+| | gamma_gt | Numeric | Gamma-GT (UI/L) |
+| | bilirubine_totale | Numeric | Bilirubine totale (µmol/L, mmol/L, ou mg/L) |
+| | tsh | Numeric | TSH ultrasensible |
+| | t3_libre | Numeric | T3 libre (pmol/L) |
+| | t4_libre | Numeric | T4 libre (pmol/L) |
+| | leucocytes | Numeric | Leucocytes (G/L) |
+| | hematies | Numeric | Hematies (T/L) |
+| | hemoglobine | Numeric | Hemoglobine |
+| | hematocrite | Numeric | Hematocrite |
+| | neutrophiles | Numeric | Neutrophiles (G/L) |
+| | basophiles | Numeric | Basophiles (G/L) |
+| | eosinophiles | Numeric | Eosinophiles (G/L) |
+| | lymphocytes | Numeric | Lymphocytes (G/L) |
+| | monocytes | Numeric | Monocytes (G/L) |
+| | vgm | Numeric | VGM (fL) |
+| | tcmh | Numeric | TCMH |
+| | ccmh | Numeric | CCMH |
+| | plaquettes | Numeric | Plaquettes (G/L) |
+| | clozapine | Numeric | Clozapine (mmol/L) |
+| | lithium_plasmatique | Numeric | Lithium plasmatique (mmol/L) |
+| | lithium_intra_erythrocytaire | Numeric | Lithium intra-erythrocytaire (mmol/L) |
+| | acide_valproique | Numeric | Acide valproique (mg/L) |
+| | carbamazepine | Numeric | Carbamazepine (mg/L) |
+| | oxcarbazepine | Numeric | Oxcarbazepine (ug/ml) |
+| | lamotrigine | Numeric | Lamotrigine |
+| **ECG** |
+| | ecg_performed | Boolean | Electrocardiogramme effectue (Oui/Non) |
+| | heart_rate | Numeric | Frequence cardiaque (bpm) |
+| | qt_measured | Numeric | Mesure du QT en seconde (s, ex: 0.400) |
+| | rr_measured | Numeric | Mesure du RR en seconde (s, ex: 0.850) |
+| | qtc_calculated | Numeric | QT calcule (QTc) en seconde (s) - calcule automatiquement (formule Bazett) |
+| **MADRS** |
+| | q1 | Integer (0-6) | Tristesse apparente - Score de 0 (pas de tristesse) a 6 (extremement decourage) |
+| | q2 | Integer (0-6) | Tristesse exprimee - Score de 0 (occasionnelle) a 6 (permanente) |
+| | q3 | Integer (0-6) | Tension interieure - Score de 0 (calme) a 6 (panique envahissante) |
+| | q4 | Integer (0-6) | Reduction du sommeil - Score de 0 (comme d'habitude) a 6 (<2-3h) |
+| | q5 | Integer (0-6) | Reduction de l'appetit - Score de 0 (normal ou augmente) a 6 (ne mange que si persuade) |
+| | q6 | Integer (0-6) | Difficultes de concentration - Score de 0 (pas de difficultes) a 6 (incapable) |
+| | q7 | Integer (0-6) | Lassitude - Score de 0 (pas de difficultes) a 6 (incapable sans aide) |
+| | q8 | Integer (0-6) | Incapacite a ressentir - Score de 0 (interet normal) a 6 (paralyse emotionnelle) |
+| | q9 | Integer (0-6) | Pensees pessimistes - Score de 0 (pas de pensees) a 6 (idees delirantes) |
+| | q10 | Integer (0-6) | Idees de suicide - Score de 0 (jouit de la vie) a 6 (preparatifs suicide) |
+| | total_score | Integer (0-60) | Score total calcule (somme q1-q10) |
+| **YMRS** |
+| | q1 | Integer (0-4) | Elevation de l'humeur - Score de 0 (absente) a 4 (euphorique) |
+| | q2 | Integer (0-4) | Activite motrice et energie augmentees - Score de 0 (absentes) a 4 (hyperactivite continuelle) |
+| | q3 | Integer (0-4) | Interet sexuel - Score de 0 (normal) a 4 (agissements manifestes) |
+| | q4 | Integer (0-4) | Sommeil - Score de 0 (pas de diminution) a 4 (nie le besoin) |
+| | q5 | Integer (0-8) | Irritabilite - Score de 0 (absente) a 8 (hostile, non cooperatif) |
+| | q6 | Integer (0-8) | Discours (debit et quantite) - Score de 0 (pas augmente) a 8 (sous pression, continu) |
+| | q7 | Integer (0-4) | Langage - troubles de la pensee - Score de 0 (absent) a 4 (incoherent) |
+| | q8 | Integer (0-8) | Contenu - Score de 0 (normal) a 8 (delires, hallucinations) |
+| | q9 | Integer (0-8) | Comportement agressif et perturbateur - Score de 0 (cooperatif) a 8 (agressif physiquement) |
+| | q10 | Integer (0-4) | Apparence - Score de 0 (soignee) a 4 (completement negligee) |
+| | q11 | Integer (0-4) | Introspection - Score de 0 (admet etre malade) a 4 (nie tout changement) |
+| | total_score | Integer (0-60) | Score total calcule (somme q1-q11) |
+| **CGI** |
+| | visit_type | Categorical | Type de visite (Visite initiale baseline / Visite de suivi) |
+| | cgi_s | Integer (0-7) | CGI-S: Gravite de la maladie - 0=Non evalue, 1=Pas malade, 7=Parmi les plus malades |
+| | cgi_i | Integer (0-7) | CGI-I: Amelioration globale (suivi uniquement) - 0=Non evalue, 1=Tres fortement ameliore, 7=Tres fortement aggrave |
+| | therapeutic_effect | Integer (0-4) | Index therapeutique - Effet therapeutique - 0=Non evalue, 1=Important, 4=Nul ou aggravation |
+| | side_effects | Integer (0-4) | Index therapeutique - Effets secondaires - 0=Non evalue, 1=Aucun, 4=Depassent l'effet therapeutique |
+| | therapeutic_index | Integer (1-16) | Index therapeutique calcule (matrice effet x effets secondaires) |
+| **EGF** |
+| | egf_score | Integer (1-100) | Score a l'echelle EGF - Evaluation du fonctionnement psychologique, social et professionnel |
+| **ALDA** |
+| | q0 | Boolean | Le patient est-il actuellement traite par lithium ? (Oui/Non) |
+| | qa | Integer (0-10) | Critere A: Degre d'amelioration clinique globale sous traitement - 0=Aucun changement, 10=Reponse complete |
+| | qb1 | Integer (0-2) | B1: Nombre d'episodes avant traitement - 0=4 ou plus, 1=2-3, 2=1 |
+| | qb2 | Integer (0-2) | B2: Frequence episodes avant traitement - 0=Moyenne a elevee, 1=Faible, 2=1 seul episode |
+| | qb3 | Integer (0-2) | B3: Duree du traitement - 0=2 ans ou plus, 1=1-2 ans, 2=moins d'un an |
+| | qb4 | Integer (0-2) | B4: Compliance durant stabilite - 0=Excellente, 1=Bonne, 2=Pauvre |
+| | qb5 | Integer (0-2) | B5: Usage medication additionnelle - 0=Aucun, 1=Antidepresseurs/antipsychotiques faible dose, 2=Usage prolonge |
+| | score_b_total | Integer (0-10) | Score B total (somme qb1-qb5) |
+| | total_score | Integer (0-10) | Score ALDA total calcule (MAX(0, Score A - Score B) si Score A >= 7, sinon 0) |
+| **ETAT_PATIENT** |
+| | q1 | Categorical | Humeur depressive la majeure partie de la journee (Oui/Non/Ne sais pas) |
+| | q1a | Categorical | Impression subjective d'hyper-reactivite emotionnelle si q1=Oui (Oui/Non/Ne sais pas) |
+| | q1b | Categorical | Impression subjective d'hypo-reactivite ou d'anesthesie si q1=Oui (Oui/Non/Ne sais pas) |
+| | q2 | Categorical | Diminution marquee d'interet ou de plaisir (Oui/Non/Ne sais pas) |
+| | q3 | Categorical | Perte ou gain de poids significatif, ou diminution ou augmentation de l'appetit (Oui/Non/Ne sais pas) |
+| | q4 | Categorical | Insomnie ou hypersomnie (Oui/Non/Ne sais pas) |
+| | q5 | Categorical | Agitation ou ralentissement psychomoteur (Oui/Non/Ne sais pas) |
+| | q6 | Categorical | Fatigue ou perte d'energie (Oui/Non/Ne sais pas) |
+| | q7 | Categorical | Sentiment de devalorisation ou de culpabilite excessive (Oui/Non/Ne sais pas) |
+| | q8 | Categorical | Diminution de l'aptitude a penser ou se concentrer (Oui/Non/Ne sais pas) |
+| | q9 | Categorical | Pensees recurrentes de mort, ideation suicidaire (Oui/Non/Ne sais pas) |
+| | q10 | Categorical | Humeur elevee, expansive (Oui/Non/Ne sais pas) |
+| | q11 | Categorical | Humeur irritable (Oui/Non/Ne sais pas) |
+| | q12 | Categorical | Augmentation de l'estime de soi ou idees de grandeur (Oui/Non/Ne sais pas) |
+| | q13 | Categorical | Reduction du besoin de sommeil (Oui/Non/Ne sais pas) |
+| | q14 | Categorical | Plus grande communicabilite que d'habitude (Oui/Non/Ne sais pas) |
+| | q15 | Categorical | Fuite des idees ou sensation subjective que les pensees defilent (Oui/Non/Ne sais pas) |
+| | q16 | Categorical | Distractibilite (Oui/Non/Ne sais pas) |
+| | q17 | Categorical | Activite dirigee vers un but: augmentation de l'activite (Oui/Non/Ne sais pas) |
+| | q18 | Categorical | Engagement excessif dans activites a potentiel eleve de consequences dommageables (Oui/Non/Ne sais pas) |
+| | nb_symptomes_depressifs | Integer | Nombre de symptomes depressifs (compte des "Oui" dans q1-q9) |
+| | nb_symptomes_maniaques | Integer | Nombre de symptomes maniaques (compte des "Oui" dans q10-q18) |
+| **FAST** |
+| | q1-q4 | Integer (0-3) | Autonomie (q1=responsabilites maison, q2=vivre seul, q3=courses, q4=soin de soi) - 0=Aucune difficulte, 3=Severe |
+| | q5-q9 | Integer (0-3) | Activite professionnelle (q5=emploi remunere, q6=terminer taches, q7=champ formation, q8=salaire merite, q9=gerer travail) |
+| | q10-q14 | Integer (0-3) | Fonctionnement cognitif (q10=concentration film/livre, q11=calcul mental, q12=resoudre problemes, q13=souvenir noms, q14=apprendre nouvelles infos) |
+| | q15-q16 | Integer (0-3) | Finances (q15=gerer argent, q16=depenser equilibre) |
+| | q17-q22 | Integer (0-3) | Relations interpersonnelles (q17=amities, q18=activites sociales, q19=relations proches, q20=habiter famille, q21=relations sexuelles, q22=defendre interets) |
+| | q23-q24 | Integer (0-3) | Loisirs (q23=exercice/sport, q24=loisirs) |
+| | total_score | Integer (0-72) | Score total calcule (somme q1-q24) |
+| **EQ5D5L** |
+| | mobility | Integer (1-5) | Mobilite - 1=aucun probleme, 5=incapable de se deplacer |
+| | self_care | Integer (1-5) | Autonomie de la personne - 1=aucun probleme, 5=incapable de se laver/s'habiller |
+| | usual_activities | Integer (1-5) | Activites courantes - 1=aucun probleme, 5=incapable d'accomplir |
+| | pain_discomfort | Integer (1-5) | Douleurs, gene - 1=ni douleur ni gene, 5=douleurs/gene extremes |
+| | anxiety_depression | Integer (1-5) | Anxiete, depression - 1=ni anxieux ni deprime, 5=extremement anxieux/deprime |
+| | vas_score | Integer (0-100) | Echelle Visuelle Analogique - 0=pire sante imaginable, 100=meilleure sante imaginable |
+| | health_profile | String | Profil de sante (code a 5 chiffres, ex: 11111) |
+| | utility_index | Numeric | Index d'utilite calcule via table France Crosswalk (valeurs -0.530 a 1.000) |
+| **STAI_YA** |
+| | q1-q20 | Integer (1-4) | 20 items d'anxiete etat - 1=non, 2=plutot non, 3=plutot oui, 4=oui (items inverses: q1,q2,q5,q8,q10,q11,q15,q16,q19,q20) |
+| | total_score | Integer (20-80) | Score total calcule (avec inversion pour items positifs: 5 - score) |
+| **MARS** |
+| | q1 | Boolean (0/1) | Oubli de prendre medicaments (Non=0, Oui=1) |
+| | q2 | Boolean (0/1) | Negligence heure de prise (Non=0, Oui=1) |
+| | q3 | Boolean (0/1) | Interruption traitement quand mieux (Non=0, Oui=1) |
+| | q4 | Boolean (0/1) | Arret traitement car moins bien (Non=0, Oui=1) |
+| | q5 | Boolean (0/1) | Ne prend medicaments que quand malade (Non=0, Oui=1) |
+| | q6 | Boolean (0/1) | Pas naturel d'etre equilibre par medicaments (Non=0, Oui=1) |
+| | q7 | Boolean (0/1) | Idees plus claires avec medicaments (Non=0, Oui=1) - Item positif |
+| | q8 | Boolean (0/1) | Peut eviter rechute en continuant medicaments (Non=0, Oui=1) - Item positif |
+| | q9 | Boolean (0/1) | Se sent bizarre comme "zombie" avec medicaments (Non=0, Oui=1) |
+| | q10 | Boolean (0/1) | Medicaments rendent lourd et fatigue (Non=0, Oui=1) |
+| | total_score | Integer (0-10) | Score total (plus bas = meilleure adherence) |
+| **MATHYS** |
+| | q1-q20 | Integer (0-10) | 20 items d'evaluation multidimensionnelle des etats thymiques - Echelle visuelle bipolaire 0-10 pour chaque item |
+| | q1 | Integer (0-10) | Sensibilite aux couleurs (moins sensible / plus sensible) |
+| | q2 | Integer (0-10) | Tonus (manque de tonus / tension interne importante) |
+| | q3 | Integer (0-10) | Emotions (anesthesie / perte controle emotions) |
+| | q4 | Integer (0-10) | Ouverture au monde (replie sur soi / ouvert au monde) |
+| | q5 | Integer (0-10) | Vitesse pensees (lentement / vite) |
+| | q6 | Integer (0-10) | Vitesse mouvements (lents / rapides) |
+| | q7 | Integer (0-10) | Sensation generale (ralenti / accelere) |
+| | q8 | Integer (0-10) | Facilite a penser (difficultes / facilite) |
+| | q9 | Integer (0-10) | Envie (rien / plein de choses) |
+| | q10 | Integer (0-10) | Interet entourage (pas d'interet / tres interesse) |
+| | q11 | Integer (0-10) | Acuite sens (emousses / aiguises) |
+| | q12 | Integer (0-10) | Energie (peu / beaucoup) |
+| | q13 | Integer (0-10) | Humeur (triste / gai) |
+| | q14 | Integer (0-10) | Agitation (calme / agite) |
+| | q15 | Integer (0-10) | Idees (peu / plein) |
+| | q16 | Integer (0-10) | Reactivite entourage (peu reactif / tres reactif) |
+| | q17 | Integer (0-10) | Initiatives (aucune / beaucoup) |
+| | q18 | Integer (0-10) | Activites (aucune / plein) |
+| | q19 | Integer (0-10) | Impression de vie (ralenti / intensement) |
+| | q20 | Integer (0-10) | Forme physique (fatigue / pleine forme) |
+| **EPWORTH** |
+| | q1-q8 | Integer (0-3) | 8 situations de somnolence - 0=ne somnolerait jamais, 1=faible chance, 2=chance moyenne, 3=forte chance |
+| | q1 | Integer (0-3) | Assis en train de lire |
+| | q2 | Integer (0-3) | En train de regarder la television |
+| | q3 | Integer (0-3) | Assis, inactif, dans un endroit public |
+| | q4 | Integer (0-3) | Comme passager dans une voiture roulant sans arret pendant une heure |
+| | q5 | Integer (0-3) | Allonge l'apres-midi pour se reposer |
+| | q6 | Integer (0-3) | Assis en train de parler a quelqu'un |
+| | q7 | Integer (0-3) | Assis calmement apres un repas sans alcool |
+| | q8 | Integer (0-3) | Dans une auto immobilisee quelques minutes dans un encombrement |
+| | total_score | Integer (0-24) | Score total calcule (somme q1-q8) |
+| **ASRS** |
+| | a1-a6 | Integer (0-4) | Part A: 6 items de depistage TDAH - 0=Jamais, 1=Rarement, 2=Parfois, 3=Souvent, 4=Tres souvent |
+| | a1 | Integer (0-4) | Difficultes a finaliser details d'un projet |
+| | a2 | Integer (0-4) | Difficultes a mettre de l'ordre / organisation |
+| | a3 | Integer (0-4) | Difficultes a se rappeler rendez-vous / obligations |
+| | a4 | Integer (0-4) | Remettre a plus tard taches demandant reflexion |
+| | a5 | Integer (0-4) | Remuer / tortiller mains/pieds quand assis longtemps |
+| | a6 | Integer (0-4) | Se sentir trop actif, "drive par un moteur" |
+| | b7-b18 | Integer (0-4) | Part B: 12 items supplementaires TDAH - Memes options |
+| | b7 | Integer (0-4) | Fautes d'etourderie sur projet/tache demandant attention |
+| | b8 | Integer (0-4) | Difficultes concentration travail ennuyeux/repetitif |
+| | b9 | Integer (0-4) | Difficultes concentration propos interlocuteur |
+| | b10 | Integer (0-4) | Egarer choses / difficultes a les retrouver |
+| | b11 | Integer (0-4) | Etre distrait par activite/bruit autour |
+| | b12 | Integer (0-4) | Quitter siege pendant reunions/situations assis |
+| | b13 | Integer (0-4) | Difficultes a attendre son tour |
+| | b14 | Integer (0-4) | Interrompre gens / empieter sur activites autres |
+| | b15 | Integer (0-4) | Difficultes a se detendre et se reposer |
+| | b16 | Integer (0-4) | Achever la plupart des taches commencees |
+| | b17 | Integer (0-4) | Eviter / mal a commencer taches effort mental soutenu |
+| | b18 | Integer (0-4) | Parler trop, plus que les autres |
+| | screening_positive | Boolean | Depistage positif si >=4 items au-dessus du seuil (a1,a2,a3>=2; a4,a5,a6>=3) |
+| **CTQ** |
+| | q1-q28 | Integer (1-5) | 28 items d'evaluation traumatismes enfant - 1=Jamais vrai, 2=Rarement vrai, 3=Quelquefois vrai, 4=Souvent vrai, 5=Tres souvent vrai |
+| | Abus emotionnel (q3,q8,q14,q18,q25) | Integer (5-25) | Score sous-echelle abus emotionnel (somme des 5 items) |
+| | Abus physique (q9,q11,q12,q15,q17) | Integer (5-25) | Score sous-echelle abus physique (somme des 5 items) |
+| | Abus sexuel (q20,q21,q23,q24,q27) | Integer (5-25) | Score sous-echelle abus sexuel (somme des 5 items) |
+| | Negligence emotionnelle (q5,q7,q13,q19,q28) | Integer (5-25) | Score sous-echelle negligence emotionnelle (items inverses, somme des 5 items) |
+| | Negligence physique (q1,q2,q4,q6,q26) | Integer (5-25) | Score sous-echelle negligence physique (items inverses pour q2,q6, somme des 5 items) |
+| **BIS10** |
+| | q1-q12 | Integer (1-4) | 12 items d'impulsivite - 1=Rarement/Jamais, 2=Occasionnellement, 3=Souvent, 4=Presque toujours/Toujours |
+| | q1 | Integer (1-4) | Prepare soigneusement taches (inverse) |
+| | q2 | Integer (1-4) | Fait choses sans reflechir |
+| | q3 | Integer (1-4) | Decide rapidement |
+| | q4 | Integer (1-4) | Insouciant(e) |
+| | q5 | Integer (1-4) | Ne fait pas attention |
+| | q6 | Integer (1-4) | Quelqu'un qui reflechit (inverse) |
+| | q7 | Integer (1-4) | M'organise bien pour loisirs (inverse) |
+| | q8 | Integer (1-4) | Me controle facilement (inverse) |
+| | q9 | Integer (1-4) | Me concentre facilement (inverse) |
+| | q10 | Integer (1-4) | Agit de facon impulsive |
+| | q11 | Integer (1-4) | Dit choses sans reflechir |
+| | q12 | Integer (1-4) | Agit sur un coup de tete |
+| | Items inverses | - | q1, q6, q7, q8, q9 (score inverse: 5 - score) |
+| **WURS25** |
+| | q1-q25 | Integer (0-4) | 25 items d'evaluation TDAH dans l'enfance - 0=Pas du tout ou tres peu, 1=Un peu, 2=Moyennement, 3=Passablement, 4=Beaucoup |
+| | q1 | Integer (0-4) | Problemes de concentration, facilement distrait(e) |
+| | q2 | Integer (0-4) | Anxieux(se), se faisant du souci |
+| | q3 | Integer (0-4) | Nerveux, ne tenant pas en place |
+| | q4 | Integer (0-4) | Inattentif(ve), reveur(se) |
+| | q5 | Integer (0-4) | Facilement en colere, "soupe au lait" |
+| | q6 | Integer (0-4) | Eclats d'humeur, acces de colere |
+| | q7 | Integer (0-4) | Difficultes a me tenir aux choses, mener projets jusqu'a la fin |
+| | q8 | Integer (0-4) | Tetu(e), obstine(e) |
+| | q9 | Integer (0-4) | Triste ou cafardeux(se), deprime(e), malheureux(se) |
+| | q10 | Integer (0-4) | Desobeissant(e) a parents, rebelle, effronte(e) |
+| | q11 | Integer (0-4) | Faible opinion de moi-meme |
+| | q12 | Integer (0-4) | Irritable |
+| | q13 | Integer (0-4) | Colerique, ayant mauvais caractere |
+| | q14 | Integer (0-4) | Agir sans reflechir, impulsif(ve) |
+| | q15 | Integer (0-4) | Tendance a etre immature |
+| | q16 | Integer (0-4) | Sentiment de culpabilite, de regret |
+| | q17 | Integer (0-4) | Perdre le controle de moi-meme |
+| | q18 | Integer (0-4) | Tendance a etre ou agir de facon irrationnelle |
+| | q19 | Integer (0-4) | Impopulaire avec autres enfants, pas d'amis proches |
+| | q20 | Integer (0-4) | Problemes avec autorites a l'ecole, visites directeur |
+| | q21 | Integer (0-4) | Mauvais resultats scolaires, pas bon(ne) a l'ecole |
+| | q22 | Integer (0-4) | Difficultes a s'arreter et reflechir |
+| | q23 | Integer (0-4) | Problemes avec police, activites illegales |
+| | q24 | Integer (0-4) | Nerveux(se), agite(e) |
+| | q25 | Integer (0-4) | Tendance a rever eveille(e) |
+| | total_score | Integer (0-100) | Score total calcule (somme q1-q25) |
+
+**Note:** Les tests neuropsychologiques (WAIS-III/IV, TMT, Stroop, Fluences Verbales, CVLT, COBRA, CPT-III, SCIP, Test des Commissions) collectent des scores bruts et standardises specifiques a chaque test. Pour les details complets, se referer aux fichiers source mentionnes dans le document.
+
+---
+
 ## Table des Matieres
 
 1. [Visite de Screening](#visite-de-screening)

@@ -66,6 +66,81 @@ export async function updatePatient(
   return data;
 }
 
+// ============================================================================
+// DUPLICATE PATIENT DETECTION
+// ============================================================================
+
+export interface DuplicateCheckResult {
+  isDuplicate: boolean;
+  existingMrn?: string;
+  existingPatientId?: string;
+}
+
+/**
+ * Check if a patient with the same identifying information already exists.
+ * Checks for matching first name, last name, date of birth, and place of birth
+ * within the same center.
+ * 
+ * @param centerId - The center to check within
+ * @param firstName - Patient's first name
+ * @param lastName - Patient's last name
+ * @param dateOfBirth - Patient's date of birth
+ * @param placeOfBirth - Patient's place of birth (optional)
+ * @param excludePatientId - Patient ID to exclude from check (for updates)
+ * @returns DuplicateCheckResult indicating if duplicate exists
+ */
+export async function checkDuplicatePatient(
+  centerId: string,
+  firstName: string,
+  lastName: string,
+  dateOfBirth: string,
+  placeOfBirth: string | null,
+  excludePatientId?: string
+): Promise<DuplicateCheckResult> {
+  const supabase = await createClient();
+
+  // Build query to find matching patients
+  let query = supabase
+    .from('patients')
+    .select('id, medical_record_number')
+    .eq('center_id', centerId)
+    .eq('active', true)
+    .is('deleted_at', null)
+    .ilike('first_name', firstName.trim())
+    .ilike('last_name', lastName.trim())
+    .eq('date_of_birth', dateOfBirth);
+
+  // Handle place of birth matching (null or same value)
+  if (placeOfBirth) {
+    query = query.ilike('place_of_birth', placeOfBirth.trim());
+  } else {
+    query = query.or('place_of_birth.is.null,place_of_birth.eq.');
+  }
+
+  // Exclude specific patient if updating
+  if (excludePatientId) {
+    query = query.neq('id', excludePatientId);
+  }
+
+  const { data, error } = await query.limit(1);
+
+  if (error) {
+    console.error('Error checking for duplicate patient:', error);
+    // Don't block patient creation on check failure
+    return { isDuplicate: false };
+  }
+
+  if (data && data.length > 0) {
+    return {
+      isDuplicate: true,
+      existingMrn: data[0].medical_record_number,
+      existingPatientId: data[0].id,
+    };
+  }
+
+  return { isDuplicate: false };
+}
+
 export async function deactivatePatient(patientId: string): Promise<void> {
   await updatePatient(patientId, { active: false });
 }
