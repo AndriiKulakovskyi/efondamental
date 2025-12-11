@@ -1738,11 +1738,27 @@ export function QuestionnaireRenderer({
         {question.type === "number" && (
           <Input
             id={question.id}
-            type="number"
-            value={value || ""}
-            onChange={(e) => handleResponseChange(question.id, Number(e.target.value))}
-            min={question.min}
-            max={question.max}
+            type="text"
+            inputMode="decimal"
+            value={value ?? ""}
+            onChange={(e) => {
+              const inputValue = e.target.value;
+              // Allow empty, digits, decimal point, and negative sign
+              if (inputValue === "" || /^-?\d*\.?\d*$/.test(inputValue)) {
+                handleResponseChange(question.id, inputValue);
+              }
+            }}
+            onBlur={(e) => {
+              const inputValue = e.target.value;
+              if (inputValue === "" || inputValue === "-" || inputValue === ".") {
+                handleResponseChange(question.id, null);
+                return;
+              }
+              const numValue = Number(inputValue);
+              if (!isNaN(numValue)) {
+                handleResponseChange(question.id, numValue);
+              }
+            }}
             disabled={readonly || question.readonly}
             required={isRequired}
             className={`bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand ${
