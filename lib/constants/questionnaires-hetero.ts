@@ -344,6 +344,7 @@ export const YMRS_DEFINITION: QuestionnaireDefinition = {
   code: 'YMRS',
   title: 'Young Mania Rating Scale (YMRS)',
   description: 'Echelle d\'évaluation de la manie hétéro-administrée comportant 11 items. Version française (Favre, Aubry, McQuillan, Bertschy, 2003).',
+  instructions: "Guide pour attribuer des points aux items : le but de chaque item est d'estimer la sévérité de cette anomalie chez le patient. Lorsque plusieurs descriptions sont données pour un degré particulier de sévérité, une seule description est suffisante pour pouvoir attribuer ce degré. Les descriptions données sont des guides. On peut les ignorer si c'est nécessaire pour évaluer la sévérité, mais ceci doit plutôt être l'exception que la règle.",
   questions: YMRS_QUESTIONS,
   metadata: {
     singleColumn: true,
