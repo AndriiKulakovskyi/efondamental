@@ -1632,6 +1632,24 @@ export function QuestionnaireRenderer({
     );
   };
 
+  const renderInstructions = () => {
+    if (!questionnaire.instructions) return null;
+    
+    return (
+      <div className="bg-blue-50/70 border border-blue-200 rounded-xl p-5 mb-6">
+        <div className="flex items-start gap-3">
+          <Info className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+          <div>
+            <h4 className="text-sm font-semibold text-blue-800 mb-2">Consignes</h4>
+            <p className="text-sm text-blue-700 leading-relaxed">
+              {questionnaire.instructions}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderQuestion = (question: Question, skipSectionCheck = false) => {
     if (!visibleQuestions.includes(question.id)) {
       return null;
@@ -1888,6 +1906,7 @@ export function QuestionnaireRenderer({
   if (!hasSections) {
     return (
       <form onSubmit={handleSubmit} className="space-y-6">
+        {renderInstructions()}
         <div className="space-y-6">
           {questionnaire.questions.map((question) => renderQuestion(question))}
         </div>
@@ -1945,6 +1964,7 @@ export function QuestionnaireRenderer({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {renderInstructions()}
       {questionGroups.map((group, groupIndex) => {
         const isSectionExpanded = !group.section || expandedSections.has(group.section.id);
         const visibleGroupQuestions = group.questions.filter(q => visibleQuestions.includes(q.id));

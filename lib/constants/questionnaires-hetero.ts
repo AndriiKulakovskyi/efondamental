@@ -176,6 +176,7 @@ export const MADRS_DEFINITION: QuestionnaireDefinition = {
   code: 'MADRS',
   title: 'Échelle de Dépression de Montgomery-Åsberg (MADRS)',
   description: 'Échelle clinique pour évaluer la sévérité des symptômes dépressifs. 10 items cotés 0-6.',
+  instructions: "La cotation doit se fonder sur l'entretien clinique allant de questions générales sur les symptômes à des questions plus précises qui permettent une cotation exacte de la sévérité. Le cotateur doit décider si la note est à un point nettement défini de l'échelle (0, 2, 4, 6) ou à un point intermédiaire (1, 3, 5). Il est rare qu'un patient déprimé ne puisse pas être coté sur les items de l'échelle. Si des réponses précises ne peuvent être obtenues du malade, toutes les indications pertinentes et les informations d'autres sources doivent être utilisées comme base de la cotation en accord avec la clinique. Cocher pour chaque item la case qui correspond au chiffre le plus adéquat.",
   questions: MADRS_QUESTIONS,
   metadata: {
     singleColumn: true,

@@ -23,6 +23,7 @@ export type QuestionnaireDefinition = {
   code: string;
   title: string;
   description: string;
+  instructions?: string;
   questions: Question[];
   metadata?: QuestionnaireMetadata;
 };
