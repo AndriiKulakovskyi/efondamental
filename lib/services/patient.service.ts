@@ -114,7 +114,7 @@ export async function checkDuplicatePatient(
   if (placeOfBirth) {
     query = query.ilike('place_of_birth', placeOfBirth.trim());
   } else {
-    query = query.or('place_of_birth.is.null,place_of_birth.eq.');
+    query = query.is('place_of_birth', null);
   }
 
   // Exclude specific patient if updating
