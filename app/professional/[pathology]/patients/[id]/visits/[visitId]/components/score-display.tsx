@@ -45,7 +45,10 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
     }
     
     if (code === 'MDQ_FR') {
-      return data.positive_screen ? 'warning' : 'info';
+      // Check if interpretation contains "Positif" or use q1_score logic
+      const isPositive = data.interpretation?.includes('Positif') || 
+                        (data.q1_score >= 7 && data.q2 === 1 && data.q3 >= 2);
+      return isPositive ? 'warning' : 'info';
     }
     
     if (code === 'ALDA') {
@@ -99,7 +102,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
   }
   
   if (!interpretation) {
-    interpretation = code === 'MDQ_FR' ? (data.positive_screen ? 'Dépistage Positif' : 'Dépistage Négatif') : '';
+    // Use interpretation field if available, otherwise fallback to calculation
+    interpretation = code === 'MDQ_FR' ? (data.interpretation || '') : '';
   }
 
   const getAlertIcon = () => {
@@ -132,12 +136,11 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
   const getMdqDetails = () => {
     if (code !== 'MDQ_FR') return null;
     
-    // Sum Q1
-    const q1Keys = [
-      'q1_1', 'q1_2', 'q1_3', 'q1_4', 'q1_5', 'q1_6', 'q1_7', 
-      'q1_8', 'q1_9', 'q1_10', 'q1_11', 'q1_12', 'q1_13'
-    ];
-    const q1Total = q1Keys.reduce((acc, key) => acc + (data[key] ? 1 : 0), 0);
+    // Use q1_score if available, otherwise sum Q1 items
+    const q1Total = data.q1_score !== undefined ? data.q1_score : 
+      ['q1_1', 'q1_2', 'q1_3', 'q1_4', 'q1_5', 'q1_6', 'q1_7', 
+       'q1_8', 'q1_9', 'q1_10', 'q1_11', 'q1_12', 'q1_13']
+      .reduce((acc, key) => acc + (data[key] || 0), 0);
     
     const impactLabels = [
       "Pas de problème", 
@@ -173,7 +176,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <TrendingUp className="h-4 w-4" />
             <span className="text-xl font-bold">
               {code === 'MDQ_FR' 
-                ? (data.positive_screen ? 'POSITIF' : 'NÉGATIF') 
+                ? (data.interpretation?.includes('Positif') ? 'POSITIF' : 'NÉGATIF') 
                 : code === 'ALDA'
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
                 : code === 'WAIS4_MATRICES_FR'
@@ -222,7 +225,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             </div>
             <div className="flex justify-between">
               <span>Simultanéité (Q2):</span>
-              <span className="font-semibold">{data.q2 ? 'Oui' : 'Non'}</span>
+              <span className="font-semibold">{data.q2 === 1 ? 'Oui' : 'Non'}</span>
             </div>
             <div className="flex justify-between">
               <span>Impact (Q3):</span>

@@ -168,22 +168,27 @@ export async function saveMdqResponse(
 ): Promise<MdqResponse> {
   const supabase = await createClient();
 
-  // Calculate MDQ score
-  const q1Score = (response.q1_1 || 0) + (response.q1_2 || 0) + (response.q1_3 || 0) + 
-    (response.q1_4 || 0) + (response.q1_5 || 0) + (response.q1_6 || 0) + 
-    (response.q1_7 || 0) + (response.q1_8 || 0) + (response.q1_9 || 0) + 
-    (response.q1_10 || 0) + (response.q1_11 || 0) + (response.q1_12 || 0) + 
-    (response.q1_13 || 0);
+  // Remove total_score if present (added by questionnaire-renderer for COBRA, not valid for MDQ)
+  const { total_score, ...responseWithoutTotalScore } = response as any;
 
-  const isPositive = q1Score >= 7 && response.q2 === 1 && (response.q3 !== null && response.q3 >= 2);
+  // Calculate MDQ Q1 score (sum of 13 items, each is 0 or 1)
+  const q1Score = responseWithoutTotalScore.q1_1 + responseWithoutTotalScore.q1_2 + responseWithoutTotalScore.q1_3 + 
+    responseWithoutTotalScore.q1_4 + responseWithoutTotalScore.q1_5 + responseWithoutTotalScore.q1_6 + 
+    responseWithoutTotalScore.q1_7 + responseWithoutTotalScore.q1_8 + responseWithoutTotalScore.q1_9 + 
+    responseWithoutTotalScore.q1_10 + responseWithoutTotalScore.q1_11 + responseWithoutTotalScore.q1_12 + 
+    responseWithoutTotalScore.q1_13;
+
+  // MDQ POSITIVE if: Q1 >= 7 AND Q2 = 1 (Yes) AND Q3 >= 2 ("Problème moyen" or "Problème sérieux")
+  // Otherwise MDQ NEGATIVE
+  const isPositive = q1Score >= 7 && responseWithoutTotalScore.q2 === 1 && (responseWithoutTotalScore.q3 !== null && responseWithoutTotalScore.q3 >= 2);
   const interpretation = isPositive ? 
-    'Dépistage positif pour trouble bipolaire' : 
-    'Dépistage négatif pour trouble bipolaire';
+    'MDQ Positif - Dépistage positif pour trouble bipolaire' : 
+    'MDQ Négatif - Dépistage négatif pour trouble bipolaire';
 
   const { data, error } = await supabase
     .from('responses_mdq')
     .upsert({
-      ...response,
+      ...responseWithoutTotalScore,
       q1_score: q1Score,
       interpretation
     }, { onConflict: 'visit_id' })
