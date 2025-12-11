@@ -239,38 +239,44 @@ export async function saveCgiResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Calculate therapeutic index if applicable
+  // Calculate therapeutic index based on the CGI specification
+  // Formula: IF(therapeutic_effect == 0, 0, (4 * therapeutic_weight) + side_effect_weight)
+  // therapeutic_weight: 1→0, 2→1, 3→2, 4→3
+  // side_effect_weight: 0→1, 1→2, 2→3, 3→4
   let therapeuticIndex: number | null = null;
   let therapeuticIndexLabel: string | null = null;
 
-  if (response.visit_type === 'followup' && 
-      response.therapeutic_effect && response.therapeutic_effect > 0 &&
-      response.side_effects && response.side_effects > 0) {
-    
-    // Therapeutic index matrix (effect × side effects)
-    const matrix = [
-      [1, 2, 3, 4],    // Effect = 1 (Important)
-      [5, 6, 7, 8],    // Effect = 2 (Modéré)
-      [9, 10, 11, 12], // Effect = 3 (Minime)
-      [13, 14, 15, 16] // Effect = 4 (Nul)
-    ];
+  const therapeuticEffect = response.therapeutic_effect;
+  const sideEffects = response.side_effects;
 
-    const effectIndex = response.therapeutic_effect - 1;
-    const sideEffectIndex = response.side_effects - 1;
+  // If therapeutic_effect is 0 (Non évalué), score is 0
+  if (therapeuticEffect === 0) {
+    therapeuticIndex = 0;
+    therapeuticIndexLabel = 'Non évalué';
+  }
+  // Calculate if therapeutic_effect is 1-4 and side_effects is provided (0-3)
+  else if (therapeuticEffect !== undefined && therapeuticEffect !== null && 
+           therapeuticEffect >= 1 && therapeuticEffect <= 4 &&
+           sideEffects !== undefined && sideEffects !== null &&
+           sideEffects >= 0 && sideEffects <= 3) {
     
-    if (effectIndex >= 0 && effectIndex < 4 && sideEffectIndex >= 0 && sideEffectIndex < 4) {
-      therapeuticIndex = matrix[effectIndex][sideEffectIndex];
-      
-      // Determine label based on index value
-      if (therapeuticIndex <= 4) {
-        therapeuticIndexLabel = 'Très bon rapport bénéfice/risque';
-      } else if (therapeuticIndex <= 8) {
-        therapeuticIndexLabel = 'Bon rapport bénéfice/risque';
-      } else if (therapeuticIndex <= 12) {
-        therapeuticIndexLabel = 'Rapport bénéfice/risque modéré';
-      } else {
-        therapeuticIndexLabel = 'Mauvais rapport bénéfice/risque';
-      }
+    // Calculate using weights:
+    // therapeutic_weight = therapeutic_effect - 1 (so 0, 1, 2, 3 for values 1, 2, 3, 4)
+    // side_effect_weight = side_effects + 1 (so 1, 2, 3, 4 for values 0, 1, 2, 3)
+    const therapeuticWeight = therapeuticEffect - 1;
+    const sideEffectWeight = sideEffects + 1;
+    
+    therapeuticIndex = (4 * therapeuticWeight) + sideEffectWeight;
+    
+    // Determine label based on index value (1-16)
+    if (therapeuticIndex <= 4) {
+      therapeuticIndexLabel = 'Très bon rapport bénéfice/risque';
+    } else if (therapeuticIndex <= 8) {
+      therapeuticIndexLabel = 'Bon rapport bénéfice/risque';
+    } else if (therapeuticIndex <= 12) {
+      therapeuticIndexLabel = 'Rapport bénéfice/risque modéré';
+    } else {
+      therapeuticIndexLabel = 'Mauvais rapport bénéfice/risque';
     }
   }
 

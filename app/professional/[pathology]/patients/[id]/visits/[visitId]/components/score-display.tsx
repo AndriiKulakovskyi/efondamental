@@ -58,6 +58,15 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'info';
     }
     
+    if (code === 'CGI') {
+      // CGI: Severity 1-2 = good, 3-4 = moderate, 5-7 = severe
+      const severity = data.cgi_s;
+      if (severity === 0) return 'info'; // Not assessed
+      if (severity <= 2) return 'success';
+      if (severity <= 4) return 'warning';
+      return 'error';
+    }
+    
     if (code === 'WAIS4_MATRICES_FR') {
       // WAIS-IV Matrices: Standardized score 8-12 is average, <8 is below, >12 is above
       if (data.standardized_score >= 13) return 'success';
@@ -167,6 +176,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'QIDS_SR16_FR' && 'Score QIDS-SR16'}
               {code === 'MDQ_FR' && 'Résultat MDQ'}
               {code === 'ALDA' && 'Score Alda'}
+              {code === 'CGI' && 'Résultats CGI'}
               {code === 'WAIS4_MATRICES_FR' && 'Résultats WAIS-IV Matrices'}
               {code === 'CVLT_FR' && 'Résultats CVLT'}
               {code === 'WAIS4_CODE_FR' && 'Résultats WAIS-IV Code'}
@@ -179,6 +189,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.interpretation?.includes('Positif') ? 'POSITIF' : 'NÉGATIF') 
                 : code === 'ALDA'
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
+                : code === 'CGI'
+                ? (data.cgi_s !== undefined ? data.cgi_s : '-')
                 : code === 'WAIS4_MATRICES_FR'
                 ? (data.standardized_score !== undefined ? data.standardized_score : '-')
                 : code === 'CVLT_FR'
@@ -189,6 +201,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'ASRM_FR' && '/20'}
               {code === 'QIDS_SR16_FR' && '/27'}
               {code === 'ALDA' && '/10'}
+              {code === 'CGI' && '/7'}
               {code === 'WAIS4_MATRICES_FR' && '/19'}
               {code === 'CVLT_FR' && '/80'}
               {code === 'WAIS4_CODE_FR' && '/19'}
@@ -213,6 +226,88 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <span className="text-gray-600 font-medium">Score Total (A - B):</span>
               <span className="font-bold text-lg">{data.alda_score ?? '-'}/10</span>
             </div>
+          </div>
+        )}
+
+        {/* CGI Details */}
+        {code === 'CGI' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            {/* CGI-S: Severity */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-1">CGI - 1ère partie : Gravité</h5>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Gravité de la maladie:</span>
+                <span className="font-semibold">
+                  {data.cgi_s === 0 && 'Non évalué'}
+                  {data.cgi_s === 1 && 'Normal, pas du tout malade'}
+                  {data.cgi_s === 2 && 'A la limite'}
+                  {data.cgi_s === 3 && 'Légèrement malade'}
+                  {data.cgi_s === 4 && 'Modérément malade'}
+                  {data.cgi_s === 5 && 'Manifestement malade'}
+                  {data.cgi_s === 6 && 'Gravement malade'}
+                  {data.cgi_s === 7 && 'Parmi les patients les plus malades'}
+                  {data.cgi_s === undefined && '-'}
+                </span>
+              </div>
+            </div>
+
+            {/* CGI-I: Improvement (only show if filled) */}
+            {data.cgi_i !== undefined && data.cgi_i !== null && (
+              <div className="pt-2 border-t">
+                <h5 className="font-semibold text-gray-700 mb-1">CGI - 2ème partie : Amélioration</h5>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Amélioration globale:</span>
+                  <span className="font-semibold">
+                    {data.cgi_i === 0 && 'Non évalué'}
+                    {data.cgi_i === 1 && 'Très fortement amélioré'}
+                    {data.cgi_i === 2 && 'Fortement amélioré'}
+                    {data.cgi_i === 3 && 'Légèrement amélioré'}
+                    {data.cgi_i === 4 && 'Pas de changement'}
+                    {data.cgi_i === 5 && 'Légèrement aggravé'}
+                    {data.cgi_i === 6 && 'Fortement aggravé'}
+                    {data.cgi_i === 7 && 'Très fortement aggravé'}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* CGI - 3ème partie: Therapeutic Index (only show if calculated) */}
+            {data.therapeutic_index !== undefined && data.therapeutic_index !== null && (
+              <div className="pt-2 border-t">
+                <h5 className="font-semibold text-gray-700 mb-1">CGI - 3ème partie : Index thérapeutique</h5>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Effet thérapeutique:</span>
+                    <span className="font-semibold">
+                      {data.therapeutic_effect === 0 && 'Non évalué'}
+                      {data.therapeutic_effect === 1 && 'Important'}
+                      {data.therapeutic_effect === 2 && 'Modéré'}
+                      {data.therapeutic_effect === 3 && 'Minime'}
+                      {data.therapeutic_effect === 4 && 'Nul ou aggravation'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Effets secondaires:</span>
+                    <span className="font-semibold">
+                      {data.side_effects === 0 && 'Aucun'}
+                      {data.side_effects === 1 && "N'interfèrent pas"}
+                      {data.side_effects === 2 && 'Interfèrent'}
+                      {data.side_effects === 3 && 'Dépassent'}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex justify-between pt-2 mt-2 border-t">
+                  <span className="text-gray-600 font-medium">Score Index:</span>
+                  <span className="font-bold text-lg">{data.therapeutic_index}/16</span>
+                </div>
+                {data.therapeutic_index_label && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Interprétation:</span>
+                    <span className="font-semibold">{data.therapeutic_index_label}</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 

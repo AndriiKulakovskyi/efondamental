@@ -360,78 +360,91 @@ export const YMRS_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 
 export const CGI_QUESTIONS: Question[] = [
+  // CGI - 1ère partie
   {
-    id: 'visit_type',
-    text: 'Type de visite',
-    type: 'single_choice',
-    required: true,
-    options: [
-      { code: 'baseline', label: 'Visite initiale (baseline)' },
-      { code: 'followup', label: 'Visite de suivi' }
-    ]
+    id: 'section_cgi_1',
+    text: 'CGI - 1ère partie',
+    help: 'Compléter l\'item (gravité de la maladie) lors de l\'évaluation initiale et des évaluations suivantes. Les items 2 et 3 seront omis lors de l\'évaluation initiale en cochant 0 (non évalué).',
+    type: 'section',
+    required: false
   },
   {
     id: 'cgi_s',
-    text: 'CGI-S : Gravité de la maladie',
+    text: 'Gravité de la maladie',
+    help: 'En fonction de votre expérience clinique totale avec ce type de patient, quel est le niveau de gravité des troubles mentaux actuels du patient',
     type: 'single_choice',
-    required: true,
+    required: false,
     options: [
-      { code: 0, label: '0 - Non évalué', score: 0 },
-      { code: 1, label: '1 - Pas malade', score: 1 },
-      { code: 2, label: '2 - État limite', score: 2 },
-      { code: 3, label: '3 - Légèrement malade', score: 3 },
-      { code: 4, label: '4 - Modérément malade', score: 4 },
-      { code: 5, label: '5 - Manifestement malade', score: 5 },
-      { code: 6, label: '6 - Gravement malade', score: 6 },
-      { code: 7, label: '7 - Parmi les patients les plus malades', score: 7 }
+      { code: 0, label: 'Non évalué', score: 0 },
+      { code: 1, label: 'Normal, pas du tout malade', score: 1 },
+      { code: 2, label: 'A la limite', score: 2 },
+      { code: 3, label: 'Légèrement malade', score: 3 },
+      { code: 4, label: 'Modérément malade', score: 4 },
+      { code: 5, label: 'Manifestement malade', score: 5 },
+      { code: 6, label: 'Gravement malade', score: 6 },
+      { code: 7, label: 'Parmi les patients les plus malades', score: 7 }
     ]
+  },
+  
+  // CGI - 2ème partie
+  {
+    id: 'section_cgi_2',
+    text: 'CGI - 2ème partie',
+    help: 'Partie à ne compléter que dans les visites de suivi',
+    type: 'section',
+    required: false
   },
   {
     id: 'cgi_i',
-    text: 'CGI-I : Amélioration globale',
+    text: 'Amélioration globale',
+    help: 'Évaluer l\'amélioration totale qu\'elle soit ou non, selon votre opinion, due entièrement au traitement médicamenteux. Comparé à son état au début du traitement, de quelle façon le patient a-t-il changé',
     type: 'single_choice',
     required: false,
-    display_if: { "==": [{ "var": "answers.visit_type" }, "followup"] },
-    required_if: { "==": [{ "var": "answers.visit_type" }, "followup"] },
     options: [
-      { code: 0, label: '0 - Non évalué', score: 0 },
-      { code: 1, label: '1 - Très fortement amélioré', score: 1 },
-      { code: 2, label: '2 - Fortement amélioré', score: 2 },
-      { code: 3, label: '3 - Légèrement amélioré', score: 3 },
-      { code: 4, label: '4 - Pas de changement', score: 4 },
-      { code: 5, label: '5 - Légèrement aggravé', score: 5 },
-      { code: 6, label: '6 - Fortement aggravé', score: 6 },
-      { code: 7, label: '7 - Très fortement aggravé', score: 7 }
+      { code: 0, label: 'Non évalué', score: 0 },
+      { code: 1, label: 'Très fortement amélioré', score: 1 },
+      { code: 2, label: 'Fortement amélioré', score: 2 },
+      { code: 3, label: 'Légèrement amélioré', score: 3 },
+      { code: 4, label: 'Pas de changement', score: 4 },
+      { code: 5, label: 'Légèrement aggravé', score: 5 },
+      { code: 6, label: 'Fortement aggravé', score: 6 },
+      { code: 7, label: 'Très fortement aggravé', score: 7 }
     ]
+  },
+  
+  // CGI - 3ème partie (Index thérapeutique)
+  {
+    id: 'section_cgi_3',
+    text: 'CGI - 3ème partie : Index thérapeutique',
+    help: 'Evaluer cet item uniquement en fonction de l\'effet du médicament. Choisissez les termes qui décrivent le mieux les degrés d\'efficacité thérapeutique et d\'effets secondaires.',
+    type: 'section',
+    required: false
   },
   {
     id: 'therapeutic_effect',
-    text: 'Index thérapeutique - Effet thérapeutique',
+    text: 'Effet thérapeutique',
+    help: 'Important = amélioration marquée : disparition complète ou presque complète de tous les symptômes. Modéré = amélioration nette : disparition partielle des symptômes. Minime = très légère amélioration qui ne modifie pas le fonctionnement du patient.',
     type: 'single_choice',
     required: false,
-    display_if: { "==": [{ "var": "answers.visit_type" }, "followup"] },
-    required_if: { "==": [{ "var": "answers.visit_type" }, "followup"] },
     options: [
-      { code: 0, label: '0 - Non évalué', score: 0 },
-      { code: 1, label: '1 - Important', score: 1 },
-      { code: 2, label: '2 - Modéré', score: 2 },
-      { code: 3, label: '3 - Minime', score: 3 },
-      { code: 4, label: '4 - Nul ou aggravation', score: 4 }
+      { code: 0, label: 'Non évalué', score: 0 },
+      { code: 1, label: 'Important', score: 1 },
+      { code: 2, label: 'Modéré', score: 2 },
+      { code: 3, label: 'Minime', score: 3 },
+      { code: 4, label: 'Nul ou aggravation', score: 4 }
     ]
   },
   {
     id: 'side_effects',
-    text: 'Index thérapeutique - Effets secondaires',
+    text: 'Effets secondaires',
     type: 'single_choice',
     required: false,
-    display_if: { "==": [{ "var": "answers.visit_type" }, "followup"] },
-    required_if: { "==": [{ "var": "answers.visit_type" }, "followup"] },
+    display_if: { 'in': [{ 'var': 'therapeutic_effect' }, [1, 2, 3, 4]] },
     options: [
-      { code: 0, label: '0 - Non évalué', score: 0 },
-      { code: 1, label: '1 - Aucun', score: 1 },
-      { code: 2, label: "2 - N'interfèrent pas significativement avec le fonctionnement du patient", score: 2 },
-      { code: 3, label: '3 - Interfèrent significativement avec le fonctionnement du patient', score: 3 },
-      { code: 4, label: "4 - Dépassent l'effet thérapeutique", score: 4 }
+      { code: 0, label: 'Aucun', score: 0 },
+      { code: 1, label: 'N\'interfèrent pas significativement avec le fonctionnement du patient', score: 1 },
+      { code: 2, label: 'Interfèrent significativement avec le fonctionnement du patient', score: 2 },
+      { code: 3, label: 'Dépassent l\'effet thérapeutique', score: 3 }
     ]
   }
 ];
@@ -439,8 +452,8 @@ export const CGI_QUESTIONS: Question[] = [
 export const CGI_DEFINITION: QuestionnaireDefinition = {
   id: 'cgi',
   code: 'CGI',
-  title: 'Impressions Cliniques Globales (CGI)',
-  description: 'Échelle brève pour évaluer la gravité, l\'amélioration et l\'efficacité thérapeutique.',
+  title: 'Clinical Global Impression (CGI)',
+  description: 'Clinical Global Impression - Échelle d\'évaluation de la gravité de la maladie et de l\'amélioration globale.',
   questions: CGI_QUESTIONS,
   metadata: {
     singleColumn: true,
