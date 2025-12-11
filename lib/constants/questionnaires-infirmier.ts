@@ -257,13 +257,17 @@ export const PHYSICAL_PARAMS_QUESTIONS: Question[] = [
     id: 'height_cm',
     text: 'Taille (en cm)',
     type: 'number',
-    required: false
+    required: false,
+    min: 110,
+    max: 210
   },
   {
     id: 'weight_kg',
     text: 'Poids (en kg)',
     type: 'number',
-    required: false
+    required: false,
+    min: 30,
+    max: 200
   },
   {
     id: 'bmi',
@@ -277,7 +281,9 @@ export const PHYSICAL_PARAMS_QUESTIONS: Question[] = [
     id: 'abdominal_circumference_cm',
     text: 'Périmètre abdominal (en cm)',
     type: 'number',
-    required: false
+    required: false,
+    min: 40,
+    max: 160
   }
 ];
 
@@ -607,72 +613,70 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     text: 'Sodium (mmol/L)',
     type: 'number',
     required: false,
-    min: 120,
-    max: 170
+    min: 20,
+    max: 500
   },
   {
     id: 'potassium',
     text: 'Potassium (mmol/L)',
     type: 'number',
     required: false,
-    min: 2.0,
-    max: 7.0
+    min: 1,
+    max: 30
   },
   {
     id: 'chlore',
     text: 'Chlore (Chlorure) (mmol/L)',
     type: 'number',
     required: false,
-    min: 80,
-    max: 130
+    min: 10,
+    max: 1000
   },
   {
     id: 'bicarbonates',
     text: 'Bicarbonates (mmol/L)',
     type: 'number',
     required: false,
-    min: 10,
-    max: 40
+    min: 3,
+    max: 300
   },
   {
     id: 'protidemie',
     text: 'Protidémie (Protéines totales) (g/L)',
     type: 'number',
     required: false,
-    min: 50,
-    max: 90
+    min: 10,
+    max: 600
   },
   {
     id: 'albumine',
     text: 'Albumine (g/L)',
     type: 'number',
     required: false,
-    min: 30,
-    max: 55
+    max: 50
   },
   {
     id: 'uree',
     text: 'Urée (mmol/L)',
     type: 'number',
     required: false,
-    min: 1,
-    max: 20
+    min: 10,
+    max: 1000
   },
   {
     id: 'acide_urique',
     text: 'Acide urique (µmol/L)',
     type: 'number',
     required: false,
-    min: 100,
-    max: 500
+    max: 50
   },
   {
     id: 'creatinine',
     text: 'Créatinine (µmol/L)',
     type: 'number',
     required: false,
-    min: 30,
-    max: 400
+    min: 10,
+    max: 1000
   },
   {
     id: 'clairance_creatinine',
@@ -681,56 +685,50 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     readonly: true,
-    min: 10,
-    max: 200
+    max: 1000
   },
   {
     id: 'phosphore',
     text: 'Phosphore (mmol/L)',
     type: 'number',
     required: false,
-    min: 0.5,
-    max: 2.0
+    max: 10
   },
   {
     id: 'fer',
     text: 'Fer (µmol/L)',
     type: 'number',
     required: false,
-    min: 5,
-    max: 40
+    min: 3,
+    max: 100
   },
   {
     id: 'ferritine',
     text: 'Ferritine (µg/L)',
     type: 'number',
-    required: false,
-    min: 5,
-    max: 1000
+    required: false
   },
   {
     id: 'calcemie',
     text: 'Calcémie (Calcium total) (mmol/L)',
     type: 'number',
     required: false,
-    min: 1.50,
-    max: 2.75
+    min: 1,
+    max: 10
   },
   {
     id: 'crp',
     text: 'CRP (mg/L)',
     type: 'number',
     required: false,
-    min: 0,
-    max: 50
+    max: 100
   },
   {
     id: 'glycemie_a_jeun',
     text: 'Glycémie à jeûn',
     type: 'number',
     required: false,
-    min: 0,
-    max: 50
+    max: 40
   },
   {
     id: 'glycemie_a_jeun_unit',
@@ -747,7 +745,6 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     text: 'Hémoglobine glyquée (%)',
     type: 'number',
     required: false,
-    min: 0,
     max: 50,
     display_if: {
       'or': [
