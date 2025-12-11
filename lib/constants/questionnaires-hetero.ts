@@ -557,14 +557,6 @@ export const ALDA_QUESTIONS: Question[] = [
     display_if: { '==': [{ 'var': 'answers.q0' }, 1] }
   },
   {
-    id: 'qb_intro',
-    text: 'Critère B : Facteurs de confusion. Veuillez répondre aux questions suivantes pour établir le score B.',
-    type: 'text',
-    required: false,
-    readonly: true,
-    display_if: { '==': [{ 'var': 'answers.q0' }, 1] }
-  },
-  {
     id: 'qb1',
     text: 'B1: nombre d\'épisodes avant le traitement',
     type: 'single_choice',
