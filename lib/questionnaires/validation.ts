@@ -166,6 +166,23 @@ export function evaluateCondition(
     return leftValue === rightValue;
   }
 
+  if (condition['!=']) {
+    const [left, right] = condition['!='];
+    const leftValue = evaluateExpression(left, answers);
+    const rightValue = evaluateExpression(right, answers);
+    // Handle null/undefined cases
+    if (leftValue === null || leftValue === undefined) {
+      return !(rightValue === null || rightValue === undefined);
+    }
+    return leftValue !== rightValue;
+  }
+
+  if (condition['in']) {
+    const [value, array] = condition['in'];
+    const evaluatedValue = evaluateExpression(value, answers);
+    return Array.isArray(array) && array.includes(evaluatedValue);
+  }
+
   if (condition['and']) {
     return condition['and'].every((cond: any) => evaluateCondition(cond, answers));
   }

@@ -674,7 +674,12 @@ export const ETAT_PATIENT_QUESTIONS: Question[] = [
     text: 'Impression subjective d\'hyper-réactivité émotionnelle',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ 'var': 'answers.q1' }, 1] },
+    display_if: { 
+      'and': [
+        { '==': [{ 'var': 'answers.q1' }, 1] },
+        { '!=': [{ 'var': 'answers.q1b' }, 1] }
+      ]
+    },
     options: [
       { code: 1, label: 'Oui', score: 1 },
       { code: 0, label: 'Non', score: 0 },
@@ -686,7 +691,12 @@ export const ETAT_PATIENT_QUESTIONS: Question[] = [
     text: 'Impression subjective d\'hypo-réactivité ou d\'anesthésie',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ 'var': 'answers.q1' }, 1] },
+    display_if: { 
+      'and': [
+        { '==': [{ 'var': 'answers.q1' }, 1] },
+        { '!=': [{ 'var': 'answers.q1a' }, 1] }
+      ]
+    },
     options: [
       { code: 1, label: 'Oui', score: 1 },
       { code: 0, label: 'Non', score: 0 },
@@ -720,7 +730,12 @@ export const ETAT_PATIENT_QUESTIONS: Question[] = [
     text: 'Perte de poids',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ 'var': 'answers.q3' }, 1] },
+    display_if: { 
+      'and': [
+        { '==': [{ 'var': 'answers.q3' }, 1] },
+        { '!=': [{ 'var': 'answers.q3b' }, 1] }
+      ]
+    },
     options: [
       { code: 1, label: 'Oui', score: 1 },
       { code: 0, label: 'Non', score: 0 },
@@ -732,7 +747,12 @@ export const ETAT_PATIENT_QUESTIONS: Question[] = [
     text: 'Gain de poids',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ 'var': 'answers.q3' }, 1] },
+    display_if: { 
+      'and': [
+        { '==': [{ 'var': 'answers.q3' }, 1] },
+        { '!=': [{ 'var': 'answers.q3a' }, 1] }
+      ]
+    },
     options: [
       { code: 1, label: 'Oui', score: 1 },
       { code: 0, label: 'Non', score: 0 },
