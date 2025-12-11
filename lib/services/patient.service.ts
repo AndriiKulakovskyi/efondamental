@@ -99,42 +99,86 @@ export async function checkDuplicatePatient(
 ): Promise<DuplicateCheckResult> {
   const supabase = await createClient();
 
-  // Build query to find matching patients
-  let query = supabase
-    .from('patients')
-    .select('id, medical_record_number')
-    .eq('center_id', centerId)
-    .eq('active', true)
-    .is('deleted_at', null)
-    .ilike('first_name', firstName.trim())
-    .ilike('last_name', lastName.trim())
-    .eq('date_of_birth', dateOfBirth);
+  // Database constraint uses COALESCE(TRIM(place_of_birth), '') so null and empty string are equivalent
+  const trimmedPlaceOfBirth = placeOfBirth?.trim() || null;
 
-  // Handle place of birth matching (null or same value)
-  if (placeOfBirth) {
-    query = query.ilike('place_of_birth', placeOfBirth.trim());
-  } else {
-    query = query.is('place_of_birth', null);
-  }
+  // Helper to build base query with common filters
+  const buildBaseQuery = () => {
+    let q = supabase
+      .from('patients')
+      .select('id, medical_record_number')
+      .eq('center_id', centerId)
+      .eq('active', true)
+      .is('deleted_at', null)
+      .ilike('first_name', firstName.trim())
+      .ilike('last_name', lastName.trim())
+      .eq('date_of_birth', dateOfBirth);
 
-  // Exclude specific patient if updating
-  if (excludePatientId) {
-    query = query.neq('id', excludePatientId);
-  }
+    if (excludePatientId) {
+      q = q.neq('id', excludePatientId);
+    }
 
-  const { data, error } = await query.limit(1);
+    return q;
+  };
 
-  if (error) {
-    console.error('Error checking for duplicate patient:', error);
-    // Don't block patient creation on check failure
+  // If place of birth is provided, do a simple ilike match
+  if (trimmedPlaceOfBirth) {
+    const { data, error } = await buildBaseQuery()
+      .ilike('place_of_birth', trimmedPlaceOfBirth)
+      .limit(1);
+
+    if (error) {
+      console.error('Error checking for duplicate patient:', error);
+      return { isDuplicate: false };
+    }
+
+    if (data && data.length > 0) {
+      return {
+        isDuplicate: true,
+        existingMrn: data[0].medical_record_number,
+        existingPatientId: data[0].id,
+      };
+    }
+
     return { isDuplicate: false };
   }
 
-  if (data && data.length > 0) {
+  // If place of birth is null/empty, check for both NULL and empty string values
+  // to align with database constraint behavior (COALESCE treats both as equivalent)
+  
+  // Check for NULL place_of_birth
+  const { data: nullData, error: nullError } = await buildBaseQuery()
+    .is('place_of_birth', null)
+    .limit(1);
+
+  if (nullError) {
+    console.error('Error checking for duplicate patient (null check):', nullError);
+    return { isDuplicate: false };
+  }
+
+  if (nullData && nullData.length > 0) {
     return {
       isDuplicate: true,
-      existingMrn: data[0].medical_record_number,
-      existingPatientId: data[0].id,
+      existingMrn: nullData[0].medical_record_number,
+      existingPatientId: nullData[0].id,
+    };
+  }
+
+  // Check for empty string place_of_birth
+  const { data: emptyData, error: emptyError } = await buildBaseQuery()
+    .eq('place_of_birth', '')
+    .limit(1);
+
+  if (emptyError) {
+    console.error('Error checking for duplicate patient (empty check):', emptyError);
+    return { isDuplicate: false };
+  }
+
+  if (emptyData && emptyData.length > 0) {
+    return {
+      isDuplicate: true,
+      existingMrn: emptyData[0].medical_record_number,
+      existingPatientId: emptyData[0].id,
     };
   }
 
