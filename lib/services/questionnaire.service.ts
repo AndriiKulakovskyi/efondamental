@@ -113,13 +113,12 @@ export async function saveQidsResponse(
   const supabase = await createClient();
 
   // Calculate QIDS score
-  const sleepScore = Math.max(response.q1, response.q2, response.q3);
-  const appetiteScore = Math.max(response.q6, response.q7);
-  const weightScore = Math.max(response.q8, response.q9);
+  const sleepScore = Math.max(response.q1, response.q2, response.q3, response.q4);
+  const appetiteWeightScore = Math.max(response.q6, response.q7, response.q8, response.q9);
   const psychomotorScore = Math.max(response.q15, response.q16);
   
-  const totalScore = sleepScore + response.q4 + response.q5 + appetiteScore + 
-    weightScore + response.q10 + response.q11 + response.q12 + 
+  const totalScore = sleepScore + response.q5 + appetiteWeightScore + 
+    response.q10 + response.q11 + response.q12 + 
     response.q13 + response.q14 + psychomotorScore;
 
   let interpretation = '';
