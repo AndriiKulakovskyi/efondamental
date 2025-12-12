@@ -12,6 +12,7 @@ import { submitProfessionalQuestionnaireAction } from "@/app/professional/questi
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { ScoreDisplay } from "../../components/score-display";
 import { calculateStandardizedScore, calculatePercentileRank } from "@/lib/services/wais4-matrices-scoring";
+import { evaluateConditionalLogic } from "@/lib/utils/questionnaire-logic";
 
 interface QuestionnairePageClientProps {
   questionnaire: QuestionnaireDefinition;
@@ -43,16 +44,21 @@ export function QuestionnairePageClient({
   // This is updated via callback from QuestionnaireRenderer
   const [currentResponses, setCurrentResponses] = useState<Record<string, any>>(initialResponses);
 
-  // Calculate progress based on questionnaire questions only
-  // This counts how many of the defined questions have been answered
+  // Calculate progress based on visible questionnaire questions only
+  // Uses conditional logic to only count questions that are currently visible
   const progress = useMemo(() => {
-    // Get all non-section questions from the questionnaire definition
-    const questions = questionnaire.questions.filter(q => q.type !== 'section');
+    // Evaluate which questions are visible based on current responses
+    const { visibleQuestions } = evaluateConditionalLogic(questionnaire, currentResponses);
+    
+    // Get all non-section questions that are currently visible
+    const questions = questionnaire.questions.filter(
+      q => q.type !== 'section' && visibleQuestions.includes(q.id)
+    );
     const total = questions.length;
     
     if (total === 0) return 0;
     
-    // Count how many questions have a value
+    // Count how many visible questions have a value
     let answered = 0;
     for (const q of questions) {
       const val = currentResponses[q.id];
@@ -65,7 +71,7 @@ export function QuestionnairePageClient({
     // Calculate percentage (can never exceed 100 since answered <= total)
     const pct = Math.round((answered / total) * 100);
     return pct;
-  }, [currentResponses, questionnaire.questions]);
+  }, [currentResponses, questionnaire]);
 
   // Live score calculation for WAIS-IV Matrices
   const liveScores = useMemo(() => {

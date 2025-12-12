@@ -33,16 +33,15 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     required: true,
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] },
     options: [
-      { code: 'bipolaire_type_1', label: 'Bipolaire de Type I' },
-      { code: 'bipolaire_type_2', label: 'Bipolaire de Type II' },
+      { code: 'bipolaire_type_1', label: 'Bipolaire de type 1' },
+      { code: 'bipolaire_type_2', label: 'Bipolaire de type 2' },
       { code: 'bipolaire_non_specifie', label: 'Bipolaire non spécifié' },
-      { code: 'trouble_depressif_majeur_isole', label: 'Trouble Dépressif Majeur Isolé' },
-      { code: 'trouble_depressif_majeur_recurrent', label: 'Trouble Dépressif Majeur Récurrent' },
+      { code: 'trouble_depressif_majeur', label: 'Trouble Dépressif Majeur' },
       { code: 'trouble_dysthymique', label: 'Trouble dysthymique' },
-      { code: 'trouble_cyclothymique', label: 'Trouble Cyclothymique' },
-      { code: 'trouble_depressif_non_specifie', label: 'Trouble dépressif non spécifié' },
       { code: 'trouble_humeur_affection_medicale', label: 'Trouble de l\'humeur dû à une affection médicale générale' },
       { code: 'trouble_humeur_induit_substance', label: 'Trouble de l\'humeur induit par l\'utilisation d\'une substance' },
+      { code: 'trouble_depressif_non_specifie', label: 'Trouble dépressif non spécifié' },
+      { code: 'trouble_cyclothymique', label: 'Trouble Cyclothymique' },
       { code: 'autre', label: 'Autre' }
     ],
     help: 'ATTENTION: Si Dysthymie, Cyclothymie ou Dépressif non spécifié est sélectionné, le patient sort de la cohorte (critère d\'exclusion)'
@@ -55,10 +54,36 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     display_if: { '==': [{ var: 'disorder_type' }, 'autre'] }
   },
   
+  // Major Depressive Disorder subtype
+  {
+    id: 'major_depression_type',
+    text: 'Type du trouble Dépressif Majeur',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'disorder_type' }, 'trouble_depressif_majeur'] },
+    options: [
+      { code: 'isole', label: 'Isolé' },
+      { code: 'recurrent', label: 'Récurrent' }
+    ]
+  },
+  
+  // Dysthymic disorder subtype
+  {
+    id: 'dysthymic_type',
+    text: 'Type du trouble dysthymique',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'disorder_type' }, 'trouble_dysthymique'] },
+    options: [
+      { code: 'precoce', label: 'Précoce' },
+      { code: 'tardif', label: 'Tardif' }
+    ]
+  },
+  
   // Medical condition subsection
   {
     id: 'medical_condition_affection_type',
-    text: 'Si affection médicale générale, préciser le type d\'affection',
+    text: 'Préciser le type d\'affection',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'disorder_type' }, 'trouble_humeur_affection_medicale'] },
@@ -71,34 +96,87 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   },
   {
     id: 'medical_condition_affection_autre',
-    text: 'Autre affection (spécifier)',
+    text: 'Spécifier l\'affection',
     type: 'text',
     required: false,
     display_if: { '==': [{ var: 'medical_condition_affection_type' }, 'autre'] }
   },
+  {
+    id: 'medical_condition_trouble_type',
+    text: 'Préciser le type de trouble',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'disorder_type' }, 'trouble_humeur_affection_medicale'] },
+    options: [
+      { code: 'episode_allure_depression_majeure', label: 'Episode d\'allure de dépression majeure' },
+      { code: 'episode_caracteristiques_depressives', label: 'Episode avec caractéristiques dépressives' },
+      { code: 'episode_caracteristiques_maniaques', label: 'Episode avec caractéristiques maniaques' },
+      { code: 'episode_caracteristiques_mixtes', label: 'Episode avec caractéristiques mixtes' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
   
   // Substance-induced subsection
   {
-    id: 'substance_types',
-    text: 'Si induit par une substance, préciser le type de substance (sélection multiple possible)',
-    type: 'multiple_choice',
+    id: 'substance_type',
+    text: 'Préciser le type de substance',
+    type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'disorder_type' }, 'trouble_humeur_induit_substance'] },
     options: [
-      'Alcool',
-      'Cannabis',
-      'Opiacés',
-      'Cocaïne',
-      'Hallucinogène',
-      'Drogues multiples',
-      'Sédatif ou Hypnotique',
-      'Stimulants',
-      'Anxiolytique',
-      'Antidépresseurs',
-      'Corticoïdes',
-      'Interféron',
-      'Antipaludéen',
-      'Autre'
+      { code: 'alcool', label: 'Alcool' },
+      { code: 'cannabis', label: 'Cannabis' },
+      { code: 'opiaces', label: 'Opiacés' },
+      { code: 'cocaine', label: 'Cocaïne' },
+      { code: 'hallucinogene', label: 'Hallucinogène' },
+      { code: 'drogues_multiples', label: 'Drogues multiples' },
+      { code: 'sedatif_hypnotique', label: 'Sédatif ou Hypnotique' },
+      { code: 'stimulants', label: 'Stimulants' },
+      { code: 'anxiolytique', label: 'Anxiolytique' },
+      { code: 'antidepresseurs', label: 'Antidépresseurs' },
+      { code: 'corticoides', label: 'Corticoïdes' },
+      { code: 'interferon', label: 'Interféron' },
+      { code: 'antipaludeen', label: 'Antipaludéen' },
+      { code: 'autre', label: 'Autre' }
+    ]
+  },
+  {
+    id: 'substance_autre',
+    text: 'Spécifier la substance',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ var: 'substance_type' }, 'autre'] }
+  },
+  {
+    id: 'substance_trouble_type',
+    text: 'Préciser le type de trouble induit par la substance',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'disorder_type' }, 'trouble_humeur_induit_substance'] },
+    options: [
+      { code: 'episode_allure_depression_majeure', label: 'Episode d\'allure de dépression majeure' },
+      { code: 'episode_caracteristiques_depressives', label: 'Episode avec caractéristiques dépressives' },
+      { code: 'episode_caracteristiques_maniaques', label: 'Episode avec caractéristiques maniaques' },
+      { code: 'episode_caracteristiques_mixtes', label: 'Episode avec caractéristiques mixtes' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  // Unspecified depressive disorder subsection
+  {
+    id: 'unspecified_depression_type',
+    text: 'Trouble dépressif non spécifié',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'disorder_type' }, 'trouble_depressif_non_specifie'] },
+    options: [
+      { code: 'post_psychotique_schizophrenie', label: 'Trouble dépressif post psychotique à une schizophrénie' },
+      { code: 'majeur_surajout_psychotique', label: 'Trouble dépressif majeur surajouté à un trouble psychotique' },
+      { code: 'dysphorique_premenstruel', label: 'Trouble dysphorique pré-menstruel' },
+      { code: 'mineur', label: 'Trouble dépressif mineur' },
+      { code: 'bref_recurrent', label: 'Trouble dépressif bref récurrent' },
+      { code: 'autre', label: 'Autre' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
     ]
   },
   
@@ -107,7 +185,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   // ========================================================================
   {
     id: 'section_2',
-    text: '2. Caractéristiques du premier épisode',
+    text: 'CARACTERISTIQUES DU PREMIER EPISODE',
     type: 'section',
     required: false,
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
@@ -135,12 +213,13 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] },
     options: [
       { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' }
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
     ]
   },
   {
     id: 'initial_cyclothymic_period',
-    text: 'Le patient a-t-il présenté une période initiale cyclothymique (période >2ans)',
+    text: 'Le patient a t\'il présenté une période initiale cyclothymique (période >2ans)',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] },
@@ -156,7 +235,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   // ========================================================================
   {
     id: 'section_3',
-    text: '3. Caractéristiques du Trouble Vie Entière',
+    text: 'CARACTERISTIQUES DU TROUBLE VIE ENTIERE',
     type: 'section',
     required: false,
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
@@ -173,7 +252,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   },
   {
     id: 'age_first_edm',
-    text: 'Age du premier EDM',
+    text: 'Age du premier EDM :',
     type: 'number',
     required: false,
     min: 1,
@@ -193,7 +272,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   },
   {
     id: 'num_edm_psychotic',
-    text: 'Nombre d\'EDM avec caractéristiques psychotiques',
+    text: 'Indiquer le nombre',
     type: 'number',
     required: false,
     min: 0,
@@ -213,7 +292,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   },
   {
     id: 'num_edm_mixed',
-    text: 'Nombre d\'EDM avec caractéristiques mixtes',
+    text: 'Indiquer le nombre',
     type: 'number',
     required: false,
     min: 0,
@@ -232,9 +311,8 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   {
     id: 'age_first_hypomanic',
     text: 'Age au premier épisode hypomaniaque',
-    type: 'number',
+    type: 'text',
     required: false,
-    min: 1,
     display_if: { '>': [{ var: 'num_hypomanic' }, 0] }
   },
   
@@ -250,9 +328,8 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   {
     id: 'age_first_manic',
     text: 'Age au premier épisode maniaque',
-    type: 'number',
+    type: 'text',
     required: false,
-    min: 1,
     display_if: { '>': [{ var: 'num_manic' }, 0] }
   },
   {
@@ -269,7 +346,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   },
   {
     id: 'num_manic_psychotic',
-    text: 'Nombre de manies avec caractéristiques psychotiques',
+    text: 'Indiquer le nombre',
     type: 'number',
     required: false,
     min: 0,
@@ -289,7 +366,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   },
   {
     id: 'num_manic_mixed',
-    text: 'Nombre de manies avec caractéristiques mixtes',
+    text: 'Indiquer le nombre',
     type: 'number',
     required: false,
     min: 0,
@@ -297,10 +374,10 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   },
   {
     id: 'induced_episodes',
-    text: 'Présence d\'au moins un épisode induit (virage sous Antidépresseurs ou ECT)?',
+    text: 'Présence d\'au moins un épisode induit (virage sous Antideprésseurs ou ECT)',
     type: 'single_choice',
     required: false,
-    display_if: { '>': [{ var: 'num_manic' }, 0] },
+    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] },
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -309,10 +386,10 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   },
   {
     id: 'num_induced_episodes',
-    text: 'Nombre d\'épisodes induits',
+    text: 'Indiquer le nombre',
     type: 'number',
     required: false,
-    min: 0,
+    min: 1,
     display_if: { '==': [{ var: 'induced_episodes' }, 'oui'] }
   },
   {
@@ -352,25 +429,66 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'seasonal_types',
-    text: 'Si oui, précisez le type et la saison (sélection multiple possible)',
-    type: 'multiple_choice',
+    id: 'seasonal_depression',
+    text: 'Dépression saisonnière',
+    type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'seasonal_pattern' }, 'oui'] },
     options: [
-      'Dépression saisonnière - Printemps',
-      'Dépression saisonnière - Été',
-      'Dépression saisonnière - Automne',
-      'Dépression saisonnière - Hiver',
-      '(Hypo)manie saisonnière - Printemps',
-      '(Hypo)manie saisonnière - Été',
-      '(Hypo)manie saisonnière - Automne',
-      '(Hypo)manie saisonnière - Hiver'
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'seasonal_depression_season',
+    text: 'Saisons',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'seasonal_depression' }, 'oui'] },
+    options: [
+      { code: 'printemps', label: 'Printemps' },
+      { code: 'ete', label: 'Été' },
+      { code: 'automne', label: 'Automne' },
+      { code: 'hiver', label: 'Hiver' }
+    ]
+  },
+  {
+    id: 'seasonal_hypomania',
+    text: '(hypo)manie saisonnière',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'seasonal_pattern' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'seasonal_hypomania_season',
+    text: 'Saisons',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'seasonal_hypomania' }, 'oui'] },
+    options: [
+      { code: 'printemps', label: 'Printemps' },
+      { code: 'ete', label: 'Été' },
+      { code: 'automne', label: 'Automne' },
+      { code: 'hiver', label: 'Hiver' }
     ]
   },
   {
     id: 'age_first_psychotrope',
     text: 'Age du premier traitement psychotrope',
+    type: 'number',
+    required: false,
+    min: 1,
+    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
+  },
+  {
+    id: 'age_first_thymoregulator',
+    text: 'Age du premier traitement thymoregulateur',
     type: 'number',
     required: false,
     min: 1,
@@ -395,16 +513,15 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   {
     id: 'total_hospitalization_duration_months',
     text: 'Durée totale des hospitalisations (en mois)',
-    type: 'number',
+    type: 'text',
     required: false,
-    min: 0,
-    display_if: { '>': [{ var: 'number_of_hospitalizations' }, 0] }
+    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
   },
   
   // 3.4 12-month characteristics
   {
     id: 'section_3_4',
-    text: '3.4 Caractéristique du trouble au cours des 12 derniers mois',
+    text: 'CARACTERISTIQUE DU TROUBLE AU COURS DES 12 DERNIERS MOIS',
     type: 'section',
     required: false,
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
@@ -434,7 +551,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     text: 'Au moins un EDM avec caractéristiques psychotiques',
     type: 'single_choice',
     required: false,
-    display_if: { '>': [{ var: 'past_year_num_edm' }, 0] },
+    display_if: { '==': [{ var: 'past_year_episode' }, 'oui'] },
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -454,7 +571,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     text: 'Au moins un EDM avec caractéristiques mixtes',
     type: 'single_choice',
     required: false,
-    display_if: { '>': [{ var: 'past_year_num_edm' }, 0] },
+    display_if: { '==': [{ var: 'past_year_episode' }, 'oui'] },
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -471,7 +588,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   },
   {
     id: 'past_year_num_hypomanic',
-    text: 'Nombre d\'épisodes hypomaniaques au cours de l\'année',
+    text: 'Nombre d\'épisodes hypomaniaques au cours de l\'année:',
     type: 'number',
     required: false,
     min: 0,
@@ -479,7 +596,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   },
   {
     id: 'past_year_num_manic',
-    text: 'Nombre d\'épisodes maniaques au cours de l\'année',
+    text: 'Nombre d\'épisodes maniaques au cours de l\'année:',
     type: 'number',
     required: false,
     min: 0,
@@ -499,7 +616,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   },
   {
     id: 'past_year_num_manic_psychotic',
-    text: 'Nombre d\'épisodes maniaques avec caractéristiques psychotiques',
+    text: 'Nombre d\'épisode maniaque avec caractéristiques psychotiques',
     type: 'number',
     required: false,
     min: 0,
@@ -519,7 +636,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   },
   {
     id: 'past_year_num_manic_mixed',
-    text: 'Nombre d\'épisodes maniaques avec caractéristiques mixtes',
+    text: 'Nombre d\'épisode maniaque avec caractéristiques mixtes',
     type: 'number',
     required: false,
     min: 0,
@@ -531,21 +648,20 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 0,
-    display_if: { '==': [{ var: 'past_year_episode' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
   },
   {
     id: 'past_year_hospitalization_weeks',
-    text: 'Durée totale des hospitalisations sur l\'année écoulée (en semaines)',
-    type: 'number',
+    text: 'Durée totale des hospitalisations (en semaine) au cours de l\'année écoulée',
+    type: 'text',
     required: false,
-    min: 0,
-    display_if: { '>': [{ var: 'past_year_num_hospitalizations' }, 0] }
+    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
   },
   
   // Work leave subsection
   {
     id: 'past_year_work_leave',
-    text: 'Arrêt de travail au cours de l\'année passée',
+    text: '9. Arrêt de travail au cours de l\'année passée',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] },
@@ -556,12 +672,19 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'past_year_work_leave_weeks',
-    text: 'Durée totale des arrêts de travail sur l\'année écoulée (en semaines)',
+    id: 'past_year_num_work_leaves',
+    text: 'Nombre d\'arrêts de travail sur l\'année écoulée',
     type: 'number',
     required: false,
     min: 0,
-    display_if: { '==': [{ var: 'past_year_work_leave' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
+  },
+  {
+    id: 'past_year_work_leave_weeks',
+    text: 'Durée totale des arrêts de travail sur l\'année écoulée (en semaines)',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
   },
   
   // ========================================================================
@@ -569,7 +692,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   // ========================================================================
   {
     id: 'section_4',
-    text: '4. Caractéristiques de l\'épisode le plus récent',
+    text: 'CARACTERISTIQUES DE L\'EPISODE LE PLUS RECENT',
     type: 'section',
     required: false,
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
@@ -577,20 +700,20 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   {
     id: 'recent_episode_start_date',
     text: 'Date de début de l\'épisode le plus récent',
-    type: 'date',
+    type: 'text',
     required: false,
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
   },
   {
     id: 'recent_episode_end_date',
     text: 'Date de fin de l\'épisode le plus récent',
-    type: 'date',
+    type: 'text',
     required: false,
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
   },
   {
     id: 'recent_episode_type',
-    text: 'Type de l\'épisode le plus récent',
+    text: 'Type d\'épisode le plus récent',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] },
@@ -603,27 +726,57 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     ]
   },
   
+  // Catatonic type - for Manie or Episode non spécifié
+  {
+    id: 'recent_episode_catatonic',
+    text: 'Type d\'épisode Catatonique',
+    type: 'single_choice',
+    required: false,
+    display_if: { 'in': [{ var: 'recent_episode_type' }, ['manie', 'non_specifie']] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  // Mixed type - for Manie only
+  {
+    id: 'recent_manie_mixed',
+    text: 'Type d\'épisode mixte',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'recent_episode_type' }, 'manie'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  
   // EDM recent episode specific fields
   {
     id: 'recent_edm_subtype',
-    text: 'Si l\'épisode le plus récent est un Episode Dépressif Majeur - Préciser le type (sélection multiple possible)',
-    type: 'multiple_choice',
-    required: false,
-    display_if: { '==': [{ var: 'recent_episode_type' }, 'edm'] },
-    options: [
-      'Sans caractéristique mélancolique atypique catatonique ou mixte',
-      'Mélancolique',
-      'Atypique',
-      'Catatonique',
-      'Mixte'
-    ]
-  },
-  {
-    id: 'recent_edm_severity',
-    text: 'Sévérité de l\'épisode le plus récent (EDM)',
+    text: 'Spécifier EDM',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'recent_episode_type' }, 'edm'] },
+    options: [
+      { code: 'sans_caracteristique', label: 'Sans caractéristique mélancolique atypique catatonique ou mixte' },
+      { code: 'melancolique', label: 'Mélancolique' },
+      { code: 'atypique', label: 'Atypique' },
+      { code: 'catatonique', label: 'Catatonique' },
+      { code: 'mixte', label: 'Mixte' }
+    ]
+  },
+  
+  // Severity - for EDM, Manie, or Episode non spécifié
+  {
+    id: 'recent_episode_severity',
+    text: 'Sévérité de l\'épisode le plus récent',
+    type: 'single_choice',
+    required: false,
+    display_if: { 'in': [{ var: 'recent_episode_type' }, ['edm', 'manie', 'non_specifie']] },
     options: [
       { code: 'leger', label: 'Léger' },
       { code: 'modere', label: 'Modéré' },
@@ -632,21 +785,11 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
       { code: 'severe_psychotiques_congruentes', label: 'Sévère avec caractéristiques psychotiques congruentes' }
     ]
   },
+  
+  // Chronicity - for EDM only
   {
     id: 'recent_edm_chronic',
-    text: 'Chronicité de l\'épisode le plus récent (EDM)',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'recent_episode_type' }, 'edm'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'recent_edm_postpartum',
-    text: 'Survenue en post-partum (6 derniers mois) - EDM',
+    text: 'Chronicité de l\'épisode le plus récent',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'recent_episode_type' }, 'edm'] },
@@ -657,105 +800,13 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     ]
   },
   
-  // Hypomanie recent episode specific fields
+  // Postpartum - for EDM, Hypomanie, Manie, or Episode non spécifié
   {
-    id: 'recent_hypomanie_postpartum',
-    text: 'Survenue en post-partum (6 derniers mois) - Hypomanie',
+    id: 'recent_episode_postpartum',
+    text: 'Survenue en post-partum',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'recent_episode_type' }, 'hypomanie'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  
-  // Manie recent episode specific fields
-  {
-    id: 'recent_manie_catatonic',
-    text: 'Type d\'épisode Catatonique (Manie)',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'recent_episode_type' }, 'manie'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'recent_manie_mixed',
-    text: 'Type d\'épisode mixte (Manie)',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'recent_episode_type' }, 'manie'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'recent_manie_severity',
-    text: 'Sévérité de l\'épisode le plus récent (Manie)',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'recent_episode_type' }, 'manie'] },
-    options: [
-      { code: 'leger', label: 'Léger' },
-      { code: 'modere', label: 'Modéré' },
-      { code: 'severe_sans_psychotiques', label: 'Sévère sans caractéristiques psychotiques' },
-      { code: 'severe_psychotiques_non_congruentes', label: 'Sévère avec caractéristiques psychotiques non congruentes' },
-      { code: 'severe_psychotiques_congruentes', label: 'Sévère avec caractéristiques psychotiques congruentes' }
-    ]
-  },
-  {
-    id: 'recent_manie_postpartum',
-    text: 'Survenue en post-partum (6 derniers mois) - Manie',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'recent_episode_type' }, 'manie'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  
-  // Non-specified recent episode fields
-  {
-    id: 'recent_non_specifie_catatonic',
-    text: 'Type d\'épisode Catatonique (Episode non spécifié)',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'recent_episode_type' }, 'non_specifie'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'recent_non_specifie_severity',
-    text: 'Sévérité de l\'épisode le plus récent (Episode non spécifié)',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'recent_episode_type' }, 'non_specifie'] },
-    options: [
-      { code: 'leger', label: 'Léger' },
-      { code: 'modere', label: 'Modéré' },
-      { code: 'severe_sans_psychotiques', label: 'Sévère sans caractéristiques psychotiques' },
-      { code: 'severe_psychotiques_non_congruentes', label: 'Sévère avec caractéristiques psychotiques non congruentes' },
-      { code: 'severe_psychotiques_congruentes', label: 'Sévère avec caractéristiques psychotiques congruentes' }
-    ]
-  },
-  {
-    id: 'recent_non_specifie_postpartum',
-    text: 'Survenue en post-partum (6 derniers mois) - Episode non spécifié',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'recent_episode_type' }, 'non_specifie'] },
+    display_if: { 'in': [{ var: 'recent_episode_type' }, ['edm', 'hypomanie', 'manie', 'non_specifie']] },
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -768,14 +819,14 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   // ========================================================================
   {
     id: 'section_5',
-    text: '5. Trouble de l\'humeur actuel',
+    text: 'CARACTERISTIQUES DU TROUBLE DE L\'HUMEUR ACTUEL',
     type: 'section',
     required: false,
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] }
   },
   {
     id: 'current_episode_present',
-    text: 'Présence d\'un épisode actuel?',
+    text: 'Présence d\'un épisode actuel',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_mood_disorder' }, 'oui'] },
@@ -793,9 +844,9 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     display_if: { '==': [{ var: 'current_episode_present' }, 'oui'] },
     options: [
       { code: 'edm', label: 'Episode Dépressif Majeur' },
-      { code: 'hypomanie', label: 'Hypomanie' },
-      { code: 'manie', label: 'Manie' },
-      { code: 'non_specifie', label: 'Episode non spécifié' },
+      { code: 'hypomanie', label: 'Hypomaniaque' },
+      { code: 'manie', label: 'Maniaque' },
+      { code: 'non_specifie', label: 'Episode Non spécifié' },
       { code: 'ne_sais_pas', label: 'Ne sais pas' }
     ]
   },
@@ -803,50 +854,26 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
   // EDM current episode specific fields
   {
     id: 'current_edm_subtype',
-    text: 'Si l\'épisode actuel est un Episode Dépressif Majeur - Préciser le type (sélection multiple possible)',
-    type: 'multiple_choice',
-    required: false,
-    display_if: { '==': [{ var: 'current_episode_type' }, 'edm'] },
-    options: [
-      'Sans caractéristique mélancolique atypique catatonique ou mixte',
-      'Mélancolique',
-      'Atypique',
-      'Catatonique',
-      'Mixte'
-    ]
-  },
-  {
-    id: 'current_edm_severity',
-    text: 'Sévérité de l\'épisode actuel (EDM)',
+    text: 'Type d\'épisode EDM actuel',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'current_episode_type' }, 'edm'] },
     options: [
-      { code: 'leger', label: 'Léger' },
-      { code: 'modere', label: 'Modéré' },
-      { code: 'severe_sans_psychotiques', label: 'Sévère sans caractéristiques psychotiques' },
-      { code: 'severe_psychotiques_non_congruentes', label: 'Sévère avec caractéristiques psychotiques non congruentes' },
-      { code: 'severe_psychotiques_congruentes', label: 'Sévère avec caractéristiques psychotiques congruentes' }
+      { code: 'sans_caracteristique', label: 'Sans caractéristique mélancolique atypique catatonique ou mixte' },
+      { code: 'melancolique', label: 'Mélancolique' },
+      { code: 'atypique', label: 'Atypique' },
+      { code: 'catatonique', label: 'Catatonique' },
+      { code: 'mixte', label: 'Mixte' }
     ]
   },
+  
+  // Catatonic type - for Manie or Episode Non spécifié
   {
-    id: 'current_edm_chronic',
-    text: 'Chronicité de l\'épisode actuel (EDM)',
+    id: 'current_episode_catatonic',
+    text: 'Type d\'épisode Catatonique',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'current_episode_type' }, 'edm'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'current_edm_postpartum',
-    text: 'Survenue en post-partum (6 derniers mois) - EDM',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'current_episode_type' }, 'edm'] },
+    display_if: { 'in': [{ var: 'current_episode_type' }, ['manie', 'non_specifie']] },
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -854,65 +881,38 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     ]
   },
   
-  // Hypomanie current episode specific fields
-  {
-    id: 'current_hypomanie_postpartum',
-    text: 'Survenue en post-partum (6 derniers mois) - Hypomanie',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'current_episode_type' }, 'hypomanie'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  
-  // Manie current episode specific fields
-  {
-    id: 'current_manie_catatonic',
-    text: 'Type d\'épisode Catatonique (Manie)',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'current_episode_type' }, 'manie'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
+  // Mixed type - for Manie only (text field in JSON)
   {
     id: 'current_manie_mixed',
-    text: 'Type d\'épisode mixte (Manie)',
-    type: 'single_choice',
+    text: 'Type d\'épisode Mixte:',
+    type: 'text',
     required: false,
-    display_if: { '==': [{ var: 'current_episode_type' }, 'manie'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
+    display_if: { '==': [{ var: 'current_episode_type' }, 'manie'] }
   },
+  
+  // Severity - for EDM, Manie, or Episode Non spécifié
   {
-    id: 'current_manie_severity',
-    text: 'Sévérité de l\'épisode actuel (Manie)',
+    id: 'current_episode_severity',
+    text: 'Sévérité de l\'épisode actuel',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'current_episode_type' }, 'manie'] },
+    display_if: { 'in': [{ var: 'current_episode_type' }, ['edm', 'manie', 'non_specifie']] },
     options: [
       { code: 'leger', label: 'Léger' },
       { code: 'modere', label: 'Modéré' },
-      { code: 'severe_sans_psychotiques', label: 'Sévère sans caractéristiques psychotiques' },
+      { code: 'severe_sans_psychotique', label: 'Sévère sans caractéristique psychotique' },
       { code: 'severe_psychotiques_non_congruentes', label: 'Sévère avec caractéristiques psychotiques non congruentes' },
       { code: 'severe_psychotiques_congruentes', label: 'Sévère avec caractéristiques psychotiques congruentes' }
     ]
   },
+  
+  // Chronicity - for EDM only
   {
-    id: 'current_manie_postpartum',
-    text: 'Survenue en post-partum (6 derniers mois) - Manie',
+    id: 'current_edm_chronic',
+    text: 'Chronicité de l\'épisode actuel',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'current_episode_type' }, 'manie'] },
+    display_if: { '==': [{ var: 'current_episode_type' }, 'edm'] },
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -920,39 +920,13 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
     ]
   },
   
-  // Non-specified current episode fields
+  // Postpartum - for EDM, Hypomanie, Manie, or Episode Non spécifié
   {
-    id: 'current_non_specifie_catatonic',
-    text: 'Type d\'épisode Catatonique (Episode non spécifié)',
+    id: 'current_episode_postpartum',
+    text: 'Survenue en post-partum',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'current_episode_type' }, 'non_specifie'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'current_non_specifie_severity',
-    text: 'Sévérité de l\'épisode actuel (Episode non spécifié)',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'current_episode_type' }, 'non_specifie'] },
-    options: [
-      { code: 'leger', label: 'Léger' },
-      { code: 'modere', label: 'Modéré' },
-      { code: 'severe_sans_psychotiques', label: 'Sévère sans caractéristiques psychotiques' },
-      { code: 'severe_psychotiques_non_congruentes', label: 'Sévère avec caractéristiques psychotiques non congruentes' },
-      { code: 'severe_psychotiques_congruentes', label: 'Sévère avec caractéristiques psychotiques congruentes' }
-    ]
-  },
-  {
-    id: 'current_non_specifie_postpartum',
-    text: 'Survenue en post-partum (6 derniers mois) - Episode non spécifié',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'current_episode_type' }, 'non_specifie'] },
+    display_if: { 'in': [{ var: 'current_episode_type' }, ['edm', 'hypomanie', 'manie', 'non_specifie']] },
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },

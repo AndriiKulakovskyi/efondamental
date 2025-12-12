@@ -1416,28 +1416,44 @@ export interface Dsm5HumeurResponse {
   id: string;
   visit_id: string;
   patient_id: string;
-  
+
   // Section 1: Mood Disorder Presence and Type
   has_mood_disorder?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  disorder_type?: 'bipolaire_type_1' | 'bipolaire_type_2' | 'bipolaire_non_specifie' | 
-    'trouble_depressif_majeur_isole' | 'trouble_depressif_majeur_recurrent' | 
+  disorder_type?: 'bipolaire_type_1' | 'bipolaire_type_2' | 'bipolaire_non_specifie' |
+    'trouble_depressif_majeur' | 'trouble_depressif_majeur_isole' | 'trouble_depressif_majeur_recurrent' |
     'trouble_dysthymique' | 'trouble_cyclothymique' | 'trouble_depressif_non_specifie' |
     'trouble_humeur_affection_medicale' | 'trouble_humeur_induit_substance' | 'autre' | null;
   disorder_type_autre?: string | null;
   
+  // Major Depression subtype
+  major_depression_type?: 'isole' | 'recurrent' | null;
+  
+  // Dysthymic subtype
+  dysthymic_type?: 'precoce' | 'tardif' | null;
+
   // Medical condition
   medical_condition_affection_type?: 'endocrinienne' | 'neurologique' | 'cardio_vasculaire' | 'autre' | null;
   medical_condition_affection_autre?: string | null;
-  
+  medical_condition_trouble_type?: 'episode_allure_depression_majeure' | 'episode_caracteristiques_depressives' |
+    'episode_caracteristiques_maniaques' | 'episode_caracteristiques_mixtes' | 'ne_sais_pas' | null;
+
   // Substance-induced
-  substance_types?: string[] | null; // Array of substance types
-  
+  substance_types?: string[] | null; // Array of substance types (legacy)
+  substance_type?: string | null; // Single substance type
+  substance_autre?: string | null;
+  substance_trouble_type?: 'episode_allure_depression_majeure' | 'episode_caracteristiques_depressives' |
+    'episode_caracteristiques_maniaques' | 'episode_caracteristiques_mixtes' | 'ne_sais_pas' | null;
+    
+  // Unspecified depression subtype
+  unspecified_depression_type?: 'post_psychotique_schizophrenie' | 'majeur_surajout_psychotique' |
+    'dysphorique_premenstruel' | 'mineur' | 'bref_recurrent' | 'autre' | 'ne_sais_pas' | null;
+
   // Section 2: First Episode Characteristics
-  first_episode_type?: 'edm_sans_psychotiques' | 'edm_avec_psychotiques' | 'hypomanie' | 
+  first_episode_type?: 'edm_sans_psychotiques' | 'edm_avec_psychotiques' | 'hypomanie' |
     'manie_sans_psychotiques' | 'manie_avec_psychotiques' | 'ne_sais_pas' | null;
-  postpartum_first?: 'oui' | 'non' | null;
+  postpartum_first?: 'oui' | 'non' | 'ne_sais_pas' | null;
   initial_cyclothymic_period?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  
+
   // Section 3: Lifetime Characteristics
   // 3.1 Major depressive episodes
   num_edm?: number | null;
@@ -1446,14 +1462,16 @@ export interface Dsm5HumeurResponse {
   num_edm_psychotic?: number | null;
   edm_with_mixed?: 'oui' | 'non' | 'ne_sais_pas' | null;
   num_edm_mixed?: number | null;
-  
+
   // 3.2 Hypomanic episodes
   num_hypomanic?: number | null;
-  age_first_hypomanic?: number | null;
-  
+  age_first_hypomanic?: number | string | null;
+  age_first_hypomanic_text?: string | null;
+
   // 3.3 Manic episodes
   num_manic?: number | null;
-  age_first_manic?: number | null;
+  age_first_manic?: number | string | null;
+  age_first_manic_text?: string | null;
   manic_with_psychotic?: 'oui' | 'non' | 'ne_sais_pas' | null;
   num_manic_psychotic?: number | null;
   manic_with_mixed?: 'oui' | 'non' | 'ne_sais_pas' | null;
@@ -1463,13 +1481,19 @@ export interface Dsm5HumeurResponse {
   rapid_cycling?: 'oui' | 'non' | 'ne_sais_pas' | null;
   complete_remission?: 'oui' | 'non' | 'ne_sais_pas' | null;
   seasonal_pattern?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  seasonal_types?: string[] | null; // Array of seasonal patterns
-  
+  seasonal_types?: string[] | null; // Array of seasonal patterns (legacy)
+  seasonal_depression?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  seasonal_depression_season?: 'printemps' | 'ete' | 'automne' | 'hiver' | null;
+  seasonal_hypomania?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  seasonal_hypomania_season?: 'printemps' | 'ete' | 'automne' | 'hiver' | null;
+
   age_first_psychotrope?: number | null;
+  age_first_thymoregulator?: number | null;
   age_first_hospitalization?: number | null;
   number_of_hospitalizations?: number | null;
   total_hospitalization_duration_months?: number | null;
-  
+  total_hospitalization_duration_text?: string | null;
+
   // 3.4 12-month characteristics
   past_year_episode?: 'oui' | 'non' | 'ne_sais_pas' | null;
   past_year_num_edm?: number | null;
@@ -1485,26 +1509,38 @@ export interface Dsm5HumeurResponse {
   past_year_num_manic_mixed?: number | null;
   past_year_num_hospitalizations?: number | null;
   past_year_hospitalization_weeks?: number | null;
-  
+  past_year_hospitalization_weeks_text?: string | null;
+
   // Work leave subsection
   past_year_work_leave?: 'oui' | 'non' | 'non_applicable' | null;
+  past_year_num_work_leaves?: number | null;
   past_year_work_leave_weeks?: number | null;
-  
+  past_year_work_leave_weeks_text?: string | null;
+
   // Section 4: Most Recent Episode
   recent_episode_start_date?: string | null;
+  recent_episode_start_date_text?: string | null;
   recent_episode_end_date?: string | null;
+  recent_episode_end_date_text?: string | null;
   recent_episode_type?: 'edm' | 'hypomanie' | 'manie' | 'non_specifie' | 'ne_sais_pas' | null;
-  
+
+  // Unified recent episode fields
+  recent_episode_catatonic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  recent_episode_severity?: 'leger' | 'modere' | 'severe_sans_psychotiques' |
+    'severe_psychotiques_non_congruentes' | 'severe_psychotiques_congruentes' | null;
+  recent_episode_postpartum?: 'oui' | 'non' | 'ne_sais_pas' | null;
+
   // EDM specific
-  recent_edm_subtypes?: string[] | null; // Array of subtypes
-  recent_edm_severity?: 'leger' | 'modere' | 'severe_sans_psychotiques' | 
+  recent_edm_subtypes?: string[] | null; // Array of subtypes (legacy)
+  recent_edm_subtype?: 'sans_caracteristique' | 'melancolique' | 'atypique' | 'catatonique' | 'mixte' | null;
+  recent_edm_severity?: 'leger' | 'modere' | 'severe_sans_psychotiques' |
     'severe_psychotiques_non_congruentes' | 'severe_psychotiques_congruentes' | null;
   recent_edm_chronic?: 'oui' | 'non' | 'ne_sais_pas' | null;
   recent_edm_postpartum?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  
+
   // Hypomanie specific
   recent_hypomanie_postpartum?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  
+
   // Manie specific
   recent_manie_catatonic?: 'oui' | 'non' | 'ne_sais_pas' | null;
   recent_manie_mixed?: 'oui' | 'non' | 'ne_sais_pas' | null;
@@ -1520,10 +1556,17 @@ export interface Dsm5HumeurResponse {
   
   // Section 5: Current Episode
   current_episode_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  current_episode_type?: 'edm' | 'hypomanie' | 'manie' | 'non_specifie' | 'ne_sais_pas' | null;
+  current_episode_type?: 'edm' | 'hypomanie' | 'manie' | 'hypomaniaque' | 'maniaque' | 'non_specifie' | 'ne_sais_pas' | null;
+  
+  // Unified current episode fields
+  current_episode_catatonic?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  current_episode_severity?: 'leger' | 'modere' | 'severe_sans_psychotique' | 'severe_sans_psychotiques' |
+    'severe_psychotiques_non_congruentes' | 'severe_psychotiques_congruentes' | null;
+  current_episode_postpartum?: 'oui' | 'non' | 'ne_sais_pas' | null;
   
   // EDM specific
-  current_edm_subtypes?: string[] | null; // Array of subtypes
+  current_edm_subtypes?: string[] | null; // Array of subtypes (legacy)
+  current_edm_subtype?: 'sans_caracteristique' | 'melancolique' | 'atypique' | 'catatonique' | 'mixte' | null;
   current_edm_severity?: 'leger' | 'modere' | 'severe_sans_psychotiques' | 
     'severe_psychotiques_non_congruentes' | 'severe_psychotiques_congruentes' | null;
   current_edm_chronic?: 'oui' | 'non' | 'ne_sais_pas' | null;
@@ -1535,6 +1578,7 @@ export interface Dsm5HumeurResponse {
   // Manie specific
   current_manie_catatonic?: 'oui' | 'non' | 'ne_sais_pas' | null;
   current_manie_mixed?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  current_manie_mixed_text?: string | null;
   current_manie_severity?: 'leger' | 'modere' | 'severe_sans_psychotiques' | 
     'severe_psychotiques_non_congruentes' | 'severe_psychotiques_congruentes' | null;
   current_manie_postpartum?: 'oui' | 'non' | 'ne_sais_pas' | null;
