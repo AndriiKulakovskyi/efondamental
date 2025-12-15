@@ -234,10 +234,10 @@ export default async function VisitDetailPage({
       },
     ];
     
-    // Add Fagerstrom with conditional display properties
-    // - If tobacco not answered: show as locked/conditional (waiting for tobacco)
-    // - If tobacco answered with smoker/ex-smoker: show normally
-    // - If tobacco answered with non-smoker/unknown: hide completely
+    // Add Fagerstrom with conditional display properties (ALWAYS visible)
+    // - If tobacco not answered: show as locked (waiting for tobacco)
+    // - If tobacco answered with smoker/ex-smoker: show enabled
+    // - If tobacco answered with non-smoker/unknown: show as locked/grayed (not applicable)
     if (!tobaccoAnswered) {
       // Tobacco not yet completed - show Fagerstrom as conditional/locked
       nurseQuestionnaires.push({
@@ -251,7 +251,7 @@ export default async function VisitDetailPage({
         conditionMessage: 'Complétez d\'abord l\'évaluation du tabagisme',
       });
     } else if (isFagerstromRequired) {
-      // Tobacco answered with smoker/ex-smoker - show Fagerstrom normally
+      // Tobacco answered with smoker/ex-smoker - show Fagerstrom enabled
       nurseQuestionnaires.push({
         ...FAGERSTROM_DEFINITION,
         id: FAGERSTROM_DEFINITION.code,
@@ -261,8 +261,19 @@ export default async function VisitDetailPage({
         isConditional: true,
         conditionMet: true,
       });
+    } else {
+      // Tobacco answered with non_smoker or unknown - show Fagerstrom as locked/grayed (not applicable)
+      nurseQuestionnaires.push({
+        ...FAGERSTROM_DEFINITION,
+        id: FAGERSTROM_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: false,
+        completedAt: null,
+        isConditional: true,
+        conditionMet: false,
+        conditionMessage: 'Non applicable - le patient n\'est pas fumeur',
+      });
     }
-    // If tobacco answered with non_smoker or unknown, Fagerstrom is not added at all
     
     // Add remaining nurse questionnaires
     nurseQuestionnaires.push(
@@ -392,10 +403,10 @@ export default async function VisitDetailPage({
           },
         ];
         
-        // Add DIVA with conditional display properties
-        // - If DSM5 Comorbidities not answered: show as locked/conditional (waiting for DSM5)
-        // - If DSM5 answered with "Oui" to diva_evaluated: show DIVA normally
-        // - If DSM5 answered with "Non" or "Ne sais pas": hide completely
+        // Add DIVA with conditional display properties (ALWAYS visible)
+        // - If DSM5 Comorbidities not answered: show as locked (waiting for DSM5)
+        // - If DSM5 answered with "Oui" to diva_evaluated: show DIVA enabled
+        // - If DSM5 answered with "Non" or "Ne sais pas": show as locked/grayed (not applicable)
         if (!dsm5ComorbidAnswered) {
           // DSM5 not yet completed - show DIVA as conditional/locked
           medicalEvalQuestionnaires.push({
@@ -409,7 +420,7 @@ export default async function VisitDetailPage({
             conditionMessage: 'Complétez d\'abord l\'évaluation DSM5 - Troubles comorbides (Section 5)',
           });
         } else if (isDivaRequired) {
-          // DSM5 answered with "Oui" - show DIVA normally
+          // DSM5 answered with "Oui" - show DIVA enabled
           medicalEvalQuestionnaires.push({
             ...DIVA_DEFINITION,
             id: DIVA_DEFINITION.code,
@@ -419,8 +430,19 @@ export default async function VisitDetailPage({
             isConditional: true,
             conditionMet: true,
           });
+        } else {
+          // DSM5 answered with "Non" or "Ne sais pas" - show DIVA as locked/grayed (not applicable)
+          medicalEvalQuestionnaires.push({
+            ...DIVA_DEFINITION,
+            id: DIVA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: false,
+            completedAt: null,
+            isConditional: true,
+            conditionMet: false,
+            conditionMessage: 'Non applicable - le patient n\'a pas été évalué avec la DIVA',
+          });
         }
-        // If diva_evaluated = 'non' or 'ne_sais_pas', DIVA is not added at all
         
         // Add remaining medical evaluation questionnaires
         medicalEvalQuestionnaires.push(
@@ -881,8 +903,9 @@ export default async function VisitDetailPage({
           },
         ];
         
-        // Add DIVA with conditional display properties (same logic as initial_evaluation)
+        // Add DIVA with conditional display properties (ALWAYS visible, same logic as initial_evaluation)
         if (!dsm5ComorbidAnswered) {
+          // DSM5 not yet completed - show DIVA as conditional/locked
           medicalEvalQuestionnaires.push({
             ...DIVA_DEFINITION,
             id: DIVA_DEFINITION.code,
@@ -894,6 +917,7 @@ export default async function VisitDetailPage({
             conditionMessage: 'Complétez d\'abord l\'évaluation DSM5 - Troubles comorbides (Section 5)',
           });
         } else if (isDivaRequired) {
+          // DSM5 answered with "Oui" - show DIVA enabled
           medicalEvalQuestionnaires.push({
             ...DIVA_DEFINITION,
             id: DIVA_DEFINITION.code,
@@ -902,6 +926,18 @@ export default async function VisitDetailPage({
             completedAt: questionnaireStatuses['DIVA_FR']?.completed_at,
             isConditional: true,
             conditionMet: true,
+          });
+        } else {
+          // DSM5 answered with "Non" or "Ne sais pas" - show DIVA as locked/grayed (not applicable)
+          medicalEvalQuestionnaires.push({
+            ...DIVA_DEFINITION,
+            id: DIVA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: false,
+            completedAt: null,
+            isConditional: true,
+            conditionMet: false,
+            conditionMessage: 'Non applicable - le patient n\'a pas été évalué avec la DIVA',
           });
         }
         
