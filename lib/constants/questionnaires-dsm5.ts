@@ -2056,15 +2056,31 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
       { code: 'ne_sais_pas', label: 'Ne sais pas' }
     ]
   },
-  
-  // 3.2.1 Anorexia restrictive
   {
-    id: 'anorexia_restrictive_amenorrhea',
-    text: 'Anorexie type restrictive - Aménorrhée',
+    id: 'eating_disorder_type',
+    text: 'Type du trouble du comportement alimentaire',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
     indentLevel: 1,
+    options: [
+      { code: 'anorexia_restrictive', label: 'Anorexie type restrictive' },
+      { code: 'anorexia_bulimic', label: 'Anorexie type boulimie' },
+      { code: 'bulimia', label: 'Boulimie seule' },
+      { code: 'binge_eating', label: 'Hyperphagie boulimique' },
+      { code: 'eating_unspecified', label: 'Trouble des conduites alimentaires non spécifié' },
+      { code: 'night_eating', label: 'Night eating syndrome' }
+    ]
+  },
+  
+  // 3.2.1 Anorexia restrictive
+  {
+    id: 'anorexia_restrictive_amenorrhea',
+    text: 'Aménorrhée',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'anorexia_restrictive'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2077,8 +2093,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
-    indentLevel: 2
+    display_if: { 
+      'and': [
+        { '==': [{ var: 'eating_disorder_type' }, 'anorexia_restrictive'] },
+        { '==': [{ var: 'anorexia_restrictive_amenorrhea' }, 'oui'] }
+      ]
+    },
+    indentLevel: 3
   },
   {
     id: 'anorexia_restrictive_age_fin',
@@ -2087,16 +2108,26 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
-    indentLevel: 2
+    display_if: { 
+      'and': [
+        { '==': [{ var: 'eating_disorder_type' }, 'anorexia_restrictive'] },
+        { '==': [{ var: 'anorexia_restrictive_amenorrhea' }, 'oui'] }
+      ]
+    },
+    indentLevel: 3
   },
   {
     id: 'anorexia_restrictive_symptoms_past_month',
     text: 'Présence de symptômes le mois écoulé',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
-    indentLevel: 2,
+    display_if: { 
+      'and': [
+        { '==': [{ var: 'eating_disorder_type' }, 'anorexia_restrictive'] },
+        { '==': [{ var: 'anorexia_restrictive_amenorrhea' }, 'oui'] }
+      ]
+    },
+    indentLevel: 3,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -2108,8 +2139,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     text: 'Trouble actuel',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
-    indentLevel: 2,
+    display_if: { 
+      'and': [
+        { '==': [{ var: 'eating_disorder_type' }, 'anorexia_restrictive'] },
+        { '==': [{ var: 'anorexia_restrictive_amenorrhea' }, 'oui'] }
+      ]
+    },
+    indentLevel: 3,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2119,11 +2155,11 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
   // 3.2.2 Anorexia bulimic
   {
     id: 'anorexia_bulimic_amenorrhea',
-    text: 'Anorexie type boulimie - Aménorrhée',
+    text: 'Aménorrhée',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
-    indentLevel: 1,
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'anorexia_bulimic'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2136,8 +2172,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
-    indentLevel: 2
+    display_if: { 
+      'and': [
+        { '==': [{ var: 'eating_disorder_type' }, 'anorexia_bulimic'] },
+        { '==': [{ var: 'anorexia_bulimic_amenorrhea' }, 'oui'] }
+      ]
+    },
+    indentLevel: 3
   },
   {
     id: 'anorexia_bulimic_age_fin',
@@ -2146,16 +2187,26 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
-    indentLevel: 2
+    display_if: { 
+      'and': [
+        { '==': [{ var: 'eating_disorder_type' }, 'anorexia_bulimic'] },
+        { '==': [{ var: 'anorexia_bulimic_amenorrhea' }, 'oui'] }
+      ]
+    },
+    indentLevel: 3
   },
   {
     id: 'anorexia_bulimic_symptoms_past_month',
     text: 'Présence de symptômes le mois écoulé',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
-    indentLevel: 2,
+    display_if: { 
+      'and': [
+        { '==': [{ var: 'eating_disorder_type' }, 'anorexia_bulimic'] },
+        { '==': [{ var: 'anorexia_bulimic_amenorrhea' }, 'oui'] }
+      ]
+    },
+    indentLevel: 3,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -2167,8 +2218,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     text: 'Trouble actuel',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
-    indentLevel: 2,
+    display_if: { 
+      'and': [
+        { '==': [{ var: 'eating_disorder_type' }, 'anorexia_bulimic'] },
+        { '==': [{ var: 'anorexia_bulimic_amenorrhea' }, 'oui'] }
+      ]
+    },
+    indentLevel: 3,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2178,13 +2234,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
   // 3.2.3 Bulimia
   {
     id: 'bulimia_age_debut',
-    text: 'Boulimie seule - Age de début',
+    text: 'Age de début',
     type: 'number',
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
-    indentLevel: 1
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'bulimia'] },
+    indentLevel: 2
   },
   {
     id: 'bulimia_age_fin',
@@ -2193,7 +2249,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'bulimia'] },
     indentLevel: 2
   },
   {
@@ -2201,7 +2257,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     text: 'Présence de symptômes le mois écoulé',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'bulimia'] },
     indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
@@ -2214,7 +2270,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     text: 'Trouble actuel',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'bulimia'] },
     indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
@@ -2225,13 +2281,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
   // 3.2.4 Binge eating
   {
     id: 'binge_eating_age_debut',
-    text: 'Hyperphagie boulimique - Age de début',
+    text: 'Age de début',
     type: 'number',
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
-    indentLevel: 1
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'binge_eating'] },
+    indentLevel: 2
   },
   {
     id: 'binge_eating_age_fin',
@@ -2240,7 +2296,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'binge_eating'] },
     indentLevel: 2
   },
   {
@@ -2248,7 +2304,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     text: 'Présence de symptômes le mois écoulé',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'binge_eating'] },
     indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
@@ -2261,7 +2317,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     text: 'Trouble actuel',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'binge_eating'] },
     indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
@@ -2272,13 +2328,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
   // 3.2.5 Unspecified eating disorder
   {
     id: 'eating_unspecified_age_debut',
-    text: 'Trouble des conduites alimentaires non spécifié - Age de début',
+    text: 'Age de début',
     type: 'number',
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
-    indentLevel: 1
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'eating_unspecified'] },
+    indentLevel: 2
   },
   {
     id: 'eating_unspecified_age_fin',
@@ -2287,7 +2343,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'eating_unspecified'] },
     indentLevel: 2
   },
   {
@@ -2295,7 +2351,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     text: 'Présence de symptômes le mois écoulé',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'eating_unspecified'] },
     indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
@@ -2308,7 +2364,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     text: 'Trouble actuel',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'eating_unspecified'] },
     indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
@@ -2319,13 +2375,13 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
   // 3.2.6 Night eating syndrome
   {
     id: 'night_eating_age_debut',
-    text: 'Night eating syndrome - Age de début',
+    text: 'Age de début',
     type: 'number',
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
-    indentLevel: 1
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'night_eating'] },
+    indentLevel: 2
   },
   {
     id: 'night_eating_age_fin',
@@ -2334,7 +2390,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'night_eating'] },
     indentLevel: 2
   },
   {
@@ -2342,7 +2398,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     text: 'Présence de symptômes le mois écoulé',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'night_eating'] },
     indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
@@ -2355,7 +2411,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     text: 'Trouble actuel',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    display_if: { '==': [{ var: 'eating_disorder_type' }, 'night_eating'] },
     indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
@@ -2388,7 +2444,7 @@ const DSM5_COMORBID_SECTION4_QUESTIONS: Question[] = [
   },
   {
     id: 'somatoform_type',
-    text: 'Type de trouble',
+    text: '1. Type de trouble',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_somatoform_disorder' }, 'oui'] },
@@ -2408,7 +2464,12 @@ const DSM5_COMORBID_SECTION4_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_somatoform_disorder' }, 'oui'] },
+    display_if: { 
+      'and': [
+        { '==': [{ var: 'has_somatoform_disorder' }, 'oui'] },
+        { 'in': [{ var: 'somatoform_type' }, ['trouble_somatisation', 'trouble_douloureux', 'trouble_indifferencie', 'hypocondrie', 'peur_dysmorphie_corporelle']] }
+      ]
+    },
     indentLevel: 2
   },
   {
@@ -2416,7 +2477,12 @@ const DSM5_COMORBID_SECTION4_QUESTIONS: Question[] = [
     text: 'Présence de symptômes le mois écoulé',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'has_somatoform_disorder' }, 'oui'] },
+    display_if: { 
+      'and': [
+        { '==': [{ var: 'has_somatoform_disorder' }, 'oui'] },
+        { 'in': [{ var: 'somatoform_type' }, ['trouble_somatisation', 'trouble_douloureux', 'trouble_indifferencie', 'hypocondrie', 'peur_dysmorphie_corporelle']] }
+      ]
+    },
     indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
