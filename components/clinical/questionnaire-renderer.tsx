@@ -1698,7 +1698,6 @@ export function QuestionnaireRenderer({
         marginLeft: question.indentLevel ? `${question.indentLevel * 2}rem` : undefined
       }}>
         <Label htmlFor={question.id} className="text-base font-semibold text-slate-800">
-          {question.questionNumber && <span className="text-brand mr-2">{question.questionNumber}</span>}
           {question.text}
           {isRequired && <span className="text-brand ml-1">*</span>}
         </Label>

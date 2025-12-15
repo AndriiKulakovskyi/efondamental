@@ -177,6 +177,8 @@ export interface Question {
   display_if?: any; // JSONLogic condition
   required_if?: any; // JSONLogic condition
   metadata?: Record<string, any>;
+  indentLevel?: number; // For visual indentation of branching questions
+  is_label?: boolean; // Custom property to indicate if it's a label rather than an input
 }
 
 // ============================================================================
