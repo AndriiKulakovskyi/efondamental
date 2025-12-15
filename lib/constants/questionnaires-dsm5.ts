@@ -1484,10 +1484,11 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
   // Alcohol
   {
     id: 'alcohol_present',
-    text: 'Alcool',
+    text: '1. Alcool',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_substance_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1500,6 +1501,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'alcohol_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'abus', label: 'Abus' },
       { code: 'dependance', label: 'Dépendance' }
@@ -1512,7 +1514,8 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'alcohol_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'alcohol_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'alcohol_symptoms_past_month',
@@ -1520,6 +1523,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'alcohol_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1533,16 +1537,18 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 2000,
-    display_if: { '==': [{ var: 'alcohol_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'alcohol_present' }, 'oui'] },
+    indentLevel: 2
   },
   
   // Sedatives/Hypnotics/Anxiolytics
   {
     id: 'sedatives_present',
-    text: 'Sédatifs / Hypnotiques / Anxiolytiques',
+    text: '2. Sédatifs / Hypnotiques / Anxiolytiques',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_substance_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1555,6 +1561,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'sedatives_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'abus', label: 'Abus' },
       { code: 'dependance', label: 'Dépendance' }
@@ -1567,7 +1574,8 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'sedatives_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'sedatives_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'sedatives_symptoms_past_month',
@@ -1575,6 +1583,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'sedatives_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1588,16 +1597,18 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 2000,
-    display_if: { '==': [{ var: 'sedatives_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'sedatives_present' }, 'oui'] },
+    indentLevel: 2
   },
   
   // Cannabis
   {
     id: 'cannabis_present',
-    text: 'Cannabis',
+    text: '3. Cannabis',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_substance_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1610,6 +1621,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'cannabis_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'abus', label: 'Abus' },
       { code: 'dependance', label: 'Dépendance' }
@@ -1622,7 +1634,8 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'cannabis_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'cannabis_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'cannabis_symptoms_past_month',
@@ -1630,6 +1643,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'cannabis_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1643,16 +1657,18 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 2000,
-    display_if: { '==': [{ var: 'cannabis_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'cannabis_present' }, 'oui'] },
+    indentLevel: 2
   },
   
   // Stimulants
   {
     id: 'stimulants_present',
-    text: 'Stimulants',
+    text: '4. Stimulants',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_substance_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1665,6 +1681,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'stimulants_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'abus', label: 'Abus' },
       { code: 'dependance', label: 'Dépendance' }
@@ -1677,7 +1694,8 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'stimulants_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'stimulants_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'stimulants_symptoms_past_month',
@@ -1685,6 +1703,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'stimulants_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1698,16 +1717,18 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 2000,
-    display_if: { '==': [{ var: 'stimulants_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'stimulants_present' }, 'oui'] },
+    indentLevel: 2
   },
   
   // Opiates
   {
     id: 'opiates_present',
-    text: 'Opiacés',
+    text: '5. Opiacés',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_substance_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1720,6 +1741,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'opiates_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'abus', label: 'Abus' },
       { code: 'dependance', label: 'Dépendance' }
@@ -1732,7 +1754,8 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'opiates_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'opiates_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'opiates_symptoms_past_month',
@@ -1740,6 +1763,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'opiates_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1753,16 +1777,18 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 2000,
-    display_if: { '==': [{ var: 'opiates_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'opiates_present' }, 'oui'] },
+    indentLevel: 2
   },
   
   // Cocaine
   {
     id: 'cocaine_present',
-    text: 'Cocaïne',
+    text: '6. Cocaïne',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_substance_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1775,6 +1801,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'cocaine_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'abus', label: 'Abus' },
       { code: 'dependance', label: 'Dépendance' }
@@ -1787,7 +1814,8 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'cocaine_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'cocaine_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'cocaine_symptoms_past_month',
@@ -1795,6 +1823,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'cocaine_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1808,16 +1837,18 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 2000,
-    display_if: { '==': [{ var: 'cocaine_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'cocaine_present' }, 'oui'] },
+    indentLevel: 2
   },
   
   // Hallucinogens/PCP
   {
     id: 'hallucinogens_present',
-    text: 'Hallucinogènes / PCP',
+    text: '7. Hallucinogènes / PCP',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_substance_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1830,6 +1861,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'hallucinogens_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'abus', label: 'Abus' },
       { code: 'dependance', label: 'Dépendance' }
@@ -1842,7 +1874,8 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'hallucinogens_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'hallucinogens_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'hallucinogens_symptoms_past_month',
@@ -1850,6 +1883,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'hallucinogens_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1863,16 +1897,18 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 2000,
-    display_if: { '==': [{ var: 'hallucinogens_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'hallucinogens_present' }, 'oui'] },
+    indentLevel: 2
   },
   
   // Other substance
   {
     id: 'other_substance_present',
-    text: 'Autre substance',
+    text: '8. Autre substance',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_substance_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1884,7 +1920,8 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     text: 'Nom de la substance',
     type: 'text',
     required: false,
-    display_if: { '==': [{ var: 'other_substance_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'other_substance_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'other_substance_type',
@@ -1892,6 +1929,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'other_substance_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'abus', label: 'Abus' },
       { code: 'dependance', label: 'Dépendance' }
@@ -1904,7 +1942,8 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'other_substance_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'other_substance_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'other_substance_symptoms_past_month',
@@ -1912,6 +1951,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'other_substance_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1925,15 +1965,18 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 2000,
-    display_if: { '==': [{ var: 'other_substance_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'other_substance_present' }, 'oui'] },
+    indentLevel: 2
   },
   
   // 2.3 Induced disorder without abuse/dependence
   {
     id: 'induced_disorder_present',
-    text: 'En absence d\'abus ou dépendance : existe-t-il un trouble induit par une substance?',
+    text: '9. En absence d\'abus ou dépendance : existe-t-il un trouble induit par une substance?',
     type: 'single_choice',
     required: false,
+    display_if: { '==': [{ var: 'has_substance_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1946,6 +1989,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'multiple_choice',
     required: false,
     display_if: { '==': [{ var: 'induced_disorder_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       'Alcool',
       'Sédatifs Hypnotiques-Anxiolytiques',
@@ -1963,6 +2007,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'induced_disorder_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'delirium', label: 'Délirium' },
       { code: 'demence_persistante', label: 'Démence persistante' },
@@ -1980,6 +2025,7 @@ const DSM5_COMORBID_SECTION2_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'induced_disorder_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -2018,6 +2064,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2030,7 +2077,8 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'anorexia_restrictive_age_fin',
@@ -2039,7 +2087,8 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'anorexia_restrictive_symptoms_past_month',
@@ -2047,6 +2096,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -2059,6 +2109,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2072,6 +2123,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2084,7 +2136,8 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'anorexia_bulimic_age_fin',
@@ -2093,7 +2146,8 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'anorexia_bulimic_symptoms_past_month',
@@ -2101,6 +2155,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -2113,6 +2168,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2127,7 +2183,8 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 1
   },
   {
     id: 'bulimia_age_fin',
@@ -2136,7 +2193,8 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'bulimia_symptoms_past_month',
@@ -2144,6 +2202,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -2156,6 +2215,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2170,7 +2230,8 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 1
   },
   {
     id: 'binge_eating_age_fin',
@@ -2179,7 +2240,8 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'binge_eating_symptoms_past_month',
@@ -2187,6 +2249,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -2199,6 +2262,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2213,7 +2277,8 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 1
   },
   {
     id: 'eating_unspecified_age_fin',
@@ -2222,7 +2287,8 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'eating_unspecified_symptoms_past_month',
@@ -2230,6 +2296,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -2242,6 +2309,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2256,7 +2324,8 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 1
   },
   {
     id: 'night_eating_age_fin',
@@ -2265,7 +2334,8 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'night_eating_symptoms_past_month',
@@ -2273,6 +2343,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -2285,6 +2356,7 @@ const DSM5_COMORBID_SECTION3_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_eating_disorder' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2320,6 +2392,7 @@ const DSM5_COMORBID_SECTION4_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_somatoform_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'trouble_somatisation', label: 'Trouble de somatisation' },
       { code: 'trouble_douloureux', label: 'Trouble douloureux' },
@@ -2335,7 +2408,8 @@ const DSM5_COMORBID_SECTION4_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'has_somatoform_disorder' }, 'oui'] }
+    display_if: { '==': [{ var: 'has_somatoform_disorder' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'somatoform_symptoms_past_month',
@@ -2343,6 +2417,7 @@ const DSM5_COMORBID_SECTION4_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_somatoform_disorder' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -2381,6 +2456,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'section',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1
   },
   {
     id: 'diva_a1a_adult',
@@ -2388,6 +2464,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2399,6 +2476,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2410,6 +2488,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2421,6 +2500,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2432,6 +2512,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2443,6 +2524,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2454,6 +2536,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2465,6 +2548,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2476,6 +2560,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2487,6 +2572,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2498,6 +2584,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2509,6 +2596,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2520,6 +2608,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2531,6 +2620,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2542,6 +2632,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2553,6 +2644,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2564,6 +2656,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2575,6 +2668,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2588,6 +2682,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'section',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1
   },
   {
     id: 'diva_a2a_adult',
@@ -2595,6 +2690,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2606,6 +2702,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2617,6 +2714,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2628,6 +2726,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2639,6 +2738,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2650,6 +2750,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2661,6 +2762,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2672,6 +2774,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2683,6 +2786,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2694,6 +2798,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2705,6 +2810,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2716,6 +2822,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2727,6 +2834,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2738,6 +2846,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2749,6 +2858,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2760,6 +2870,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2771,6 +2882,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2782,6 +2894,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2795,6 +2908,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'section',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1
   },
   {
     id: 'diva_total_inattention_adult',
@@ -2840,6 +2954,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'section',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1
   },
   {
     id: 'diva_criteria_a_inattention_gte6',
@@ -2847,6 +2962,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2858,6 +2974,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2869,6 +2986,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2880,6 +2998,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2891,6 +3010,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2902,6 +3022,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -2922,6 +3043,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'section',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1
   },
   {
     id: 'diva_collateral_parents',
@@ -2977,6 +3099,7 @@ const DSM5_COMORBID_SECTION5_QUESTIONS: Question[] = [
     type: 'section',
     required: false,
     display_if: { '==': [{ var: 'diva_evaluated' }, 'oui'] },
+    indentLevel: 1
   },
   {
     id: 'diva_diagnosis',
