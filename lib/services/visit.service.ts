@@ -555,6 +555,46 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
     ];
   }
 
+  if (visit.visit_type === 'biannual_followup' || visit.visit_type === 'annual_evaluation') {
+    return [
+      {
+        id: 'mod_thymic_eval',
+        name: 'Evaluation état thymique et fonctionnement',
+        description: 'Évaluation de l\'état thymique et du fonctionnement',
+        questionnaires: [
+          MADRS_DEFINITION,
+          YMRS_DEFINITION,
+          CGI_DEFINITION,
+          EGF_DEFINITION,
+          FAST_DEFINITION
+        ]
+      },
+      {
+        id: 'mod_medical_eval',
+        name: 'Evaluation Médicale',
+        description: 'Évaluation médicale complète',
+        questionnaires: [
+          DSM5_COMORBID_DEFINITION,
+          DIVA_DEFINITION,
+          CSSRS_DEFINITION,
+          ISA_DEFINITION
+        ]
+      },
+      {
+        id: 'mod_auto_etat',
+        name: 'Autoquestionnaires - ETAT',
+        description: 'Questionnaires sur l\'état actuel du patient',
+        questionnaires: [
+          EQ5D5L_DEFINITION,
+          ASRM_DEFINITION,
+          QIDS_DEFINITION,
+          PSQI_DEFINITION,
+          EPWORTH_DEFINITION
+        ]
+      }
+    ];
+  }
+
   // Default/Fallback (e.g. other visit types not fully implemented yet)
   return [];
 }
@@ -704,6 +744,55 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (wais4Learning) completed++;
     if (wais4Matrices) completed++;
     if (wais4DigitSpan) completed++;
+  } else if (visit.visit_type === 'biannual_followup' || visit.visit_type === 'annual_evaluation') {
+    // Follow-up visits: 5 thymic + 4 medical (DSM5 Comorbid, DIVA, CSSRS, ISA) + 5 auto etat = 14 total
+    // Note: DIVA is conditionally included based on DSM5 Comorbid response
+    total = 14;
+    totalModules = 3;
+
+    const [
+      madrs, ymrs, cgi, egf, fast,
+      dsm5Comorbid, diva, cssrs, isa,
+      eq5d5l, asrm, qids, psqi, epworth
+    ] = await Promise.all([
+      // Thymic evaluation questionnaires
+      getMadrsResponse(visitId),
+      getYmrsResponse(visitId),
+      getCgiResponse(visitId),
+      getEgfResponse(visitId),
+      getFastResponse(visitId),
+      // Medical evaluation questionnaires
+      getDsm5ComorbidResponse(visitId),
+      getDivaResponse(visitId),
+      getCssrsResponse(visitId),
+      getIsaResponse(visitId),
+      // Auto-questionnaires ETAT
+      getEq5d5lResponse(visitId),
+      getAsrmResponse(visitId),
+      getQidsResponse(visitId),
+      getPsqiResponse(visitId),
+      getEpworthResponse(visitId)
+    ]);
+
+    // Count thymic evaluation
+    if (madrs) completed++;
+    if (ymrs) completed++;
+    if (cgi) completed++;
+    if (egf) completed++;
+    if (fast) completed++;
+    
+    // Count medical evaluation
+    if (dsm5Comorbid) completed++;
+    if (diva) completed++;
+    if (cssrs) completed++;
+    if (isa) completed++;
+    
+    // Count auto-questionnaires
+    if (eq5d5l) completed++;
+    if (asrm) completed++;
+    if (qids) completed++;
+    if (psqi) completed++;
+    if (epworth) completed++;
   }
 
   return {

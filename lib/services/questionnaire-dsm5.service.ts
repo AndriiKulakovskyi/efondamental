@@ -109,9 +109,53 @@ export async function saveDsm5ComorbidResponse(
 ): Promise<Dsm5ComorbidResponse> {
   const supabase = await createClient();
 
+  // Filter out all DIVA-related fields except diva_evaluated
+  // These fields were moved to the separate DIVA questionnaire
+  const divaFieldsToRemove = [
+    // Inattention symptoms
+    'diva_a1a_adult', 'diva_a1a_childhood',
+    'diva_a1b_adult', 'diva_a1b_childhood',
+    'diva_a1c_adult', 'diva_a1c_childhood',
+    'diva_a1d_adult', 'diva_a1d_childhood',
+    'diva_a1e_adult', 'diva_a1e_childhood',
+    'diva_a1f_adult', 'diva_a1f_childhood',
+    'diva_a1g_adult', 'diva_a1g_childhood',
+    'diva_a1h_adult', 'diva_a1h_childhood',
+    'diva_a1i_adult', 'diva_a1i_childhood',
+    // Hyperactivity symptoms
+    'diva_a2a_adult', 'diva_a2a_childhood',
+    'diva_a2b_adult', 'diva_a2b_childhood',
+    'diva_a2c_adult', 'diva_a2c_childhood',
+    'diva_a2d_adult', 'diva_a2d_childhood',
+    'diva_a2e_adult', 'diva_a2e_childhood',
+    'diva_a2f_adult', 'diva_a2f_childhood',
+    'diva_a2g_adult', 'diva_a2g_childhood',
+    'diva_a2h_adult', 'diva_a2h_childhood',
+    'diva_a2i_adult', 'diva_a2i_childhood',
+    // Totals
+    'diva_total_inattention_adult', 'diva_total_inattention_childhood',
+    'diva_total_hyperactivity_adult', 'diva_total_hyperactivity_childhood',
+    // Criteria
+    'diva_criteria_a_inattention_gte6', 'diva_criteria_a_hyperactivity_gte6',
+    'diva_criteria_b_lifetime_persistence',
+    'diva_criteria_cd_impairment_childhood', 'diva_criteria_cd_impairment_adult',
+    'diva_criteria_e_better_explained', 'diva_criteria_e_explanation',
+    // Collateral
+    'diva_collateral_parents', 'diva_collateral_partner',
+    'diva_collateral_school_reports', 'diva_collateral_details',
+    // Diagnosis
+    'diva_diagnosis'
+  ];
+
+  // Create a clean response object without DIVA fields
+  const cleanResponse = { ...response };
+  divaFieldsToRemove.forEach(field => {
+    delete (cleanResponse as any)[field];
+  });
+
   const { data, error } = await supabase
     .from('responses_dsm5_comorbid')
-    .upsert(response, { onConflict: 'visit_id' })
+    .upsert(cleanResponse, { onConflict: 'visit_id' })
     .select()
     .single();
 

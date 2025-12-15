@@ -1,6 +1,7 @@
 import { getVisitDetailData } from "@/lib/services/visit-detail.service";
 import { getVisitModules, VirtualModule } from "@/lib/services/visit.service";
 import { getTobaccoResponse } from "@/lib/services/questionnaire-infirmier.service";
+import { getDsm5ComorbidResponse } from "@/lib/services/questionnaire-dsm5.service";
 import { getUserContext } from "@/lib/rbac/middleware";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDateTime } from "@/lib/utils/date";
@@ -122,19 +123,42 @@ export default async function VisitDetailPage({
   const smokingStatus = tobaccoResponse?.smoking_status;
   const isFagerstromRequired = smokingStatus === 'current_smoker' || smokingStatus === 'ex_smoker';
   
-  // Adjust total questionnaires based on whether Fagerstrom is required
+  // Fetch DSM5 Comorbidities response to determine if DIVA should be shown
+  const dsm5ComorbidResponse = await getDsm5ComorbidResponse(visitId);
+  
+  // Determine DIVA visibility based on diva_evaluated
+  // Show DIVA only if professional answered "Oui" to diva_evaluated question
+  const dsm5ComorbidAnswered = !!dsm5ComorbidResponse;
+  const divaEvaluated = dsm5ComorbidResponse?.diva_evaluated;
+  const isDivaRequired = divaEvaluated === 'oui';
+  
+  // Adjust total questionnaires based on whether Fagerstrom and DIVA are required
   // If tobacco not answered yet, exclude Fagerstrom from total (will be dynamic)
   // If tobacco answered with non-smoker/unknown, exclude Fagerstrom
   // If tobacco answered with smoker/ex-smoker, include Fagerstrom
   const fagerstromAdjustment = (!tobaccoAnswered || !isFagerstromRequired) ? 1 : 0;
   
+  // If DSM5 not answered yet, exclude DIVA from total (will be dynamic)
+  // If DSM5 answered with non/ne_sais_pas, exclude DIVA
+  // If DSM5 answered with oui, include DIVA
+  const divaAdjustment = (!dsm5ComorbidAnswered || !isDivaRequired) ? 1 : 0;
+  
   // Transform completion status to match component expectations (snake_case -> camelCase)
-  // Adjust totals to exclude Fagerstrom when not applicable
+  // Adjust totals to exclude Fagerstrom and DIVA when not applicable
   const completionStatus = {
-    totalQuestionnaires: rawCompletionStatus.total_questionnaires - fagerstromAdjustment,
-    completedQuestionnaires: isFagerstromRequired 
-      ? rawCompletionStatus.completed_questionnaires 
-      : rawCompletionStatus.completed_questionnaires - (questionnaireStatuses['FAGERSTROM_FR']?.completed ? 1 : 0),
+    totalQuestionnaires: rawCompletionStatus.total_questionnaires - fagerstromAdjustment - divaAdjustment,
+    completedQuestionnaires: (() => {
+      let adjusted = rawCompletionStatus.completed_questionnaires;
+      // Subtract Fagerstrom if completed but not required
+      if (!isFagerstromRequired && questionnaireStatuses['FAGERSTROM_FR']?.completed) {
+        adjusted -= 1;
+      }
+      // Subtract DIVA if completed but not required
+      if (!isDivaRequired && questionnaireStatuses['DIVA_FR']?.completed) {
+        adjusted -= 1;
+      }
+      return adjusted;
+    })(),
     completionPercentage: 0, // Will recalculate below
   };
   
@@ -342,11 +366,9 @@ export default async function VisitDetailPage({
           }
         ]
       },
-      {
-        id: 'mod_medical_eval',
-        name: 'Evaluation Médicale',
-        description: 'Évaluation médicale complète',
-        questionnaires: [
+      // Build medical evaluation questionnaires with conditional DIVA
+      (() => {
+        const medicalEvalQuestionnaires: any[] = [
           {
             ...DSM5_HUMEUR_DEFINITION,
             id: DSM5_HUMEUR_DEFINITION.code,
@@ -368,13 +390,40 @@ export default async function VisitDetailPage({
             completed: questionnaireStatuses['DSM5_COMORBID_FR']?.completed || false,
             completedAt: questionnaireStatuses['DSM5_COMORBID_FR']?.completed_at,
           },
-          {
+        ];
+        
+        // Add DIVA with conditional display properties
+        // - If DSM5 Comorbidities not answered: show as locked/conditional (waiting for DSM5)
+        // - If DSM5 answered with "Oui" to diva_evaluated: show DIVA normally
+        // - If DSM5 answered with "Non" or "Ne sais pas": hide completely
+        if (!dsm5ComorbidAnswered) {
+          // DSM5 not yet completed - show DIVA as conditional/locked
+          medicalEvalQuestionnaires.push({
+            ...DIVA_DEFINITION,
+            id: DIVA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: false,
+            completedAt: null,
+            isConditional: true,
+            conditionMet: false,
+            conditionMessage: 'Complétez d\'abord l\'évaluation DSM5 - Troubles comorbides (Section 5)',
+          });
+        } else if (isDivaRequired) {
+          // DSM5 answered with "Oui" - show DIVA normally
+          medicalEvalQuestionnaires.push({
             ...DIVA_DEFINITION,
             id: DIVA_DEFINITION.code,
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['DIVA_FR']?.completed || false,
             completedAt: questionnaireStatuses['DIVA_FR']?.completed_at,
-          },
+            isConditional: true,
+            conditionMet: true,
+          });
+        }
+        // If diva_evaluated = 'non' or 'ne_sais_pas', DIVA is not added at all
+        
+        // Add remaining medical evaluation questionnaires
+        medicalEvalQuestionnaires.push(
           {
             ...FAMILY_HISTORY_DEFINITION,
             id: FAMILY_HISTORY_DEFINITION.code,
@@ -409,9 +458,16 @@ export default async function VisitDetailPage({
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['SIS_FR']?.completed || false,
             completedAt: questionnaireStatuses['SIS_FR']?.completed_at,
-          },
-        ]
-      },
+          }
+        );
+        
+        return {
+          id: 'mod_medical_eval',
+          name: 'Evaluation Médicale',
+          description: 'Évaluation médicale complète',
+          questionnaires: medicalEvalQuestionnaires
+        };
+      })(),
       {
         id: 'mod_neuropsy',
         name: 'Evaluation Neuropsychologique',
@@ -764,6 +820,155 @@ export default async function VisitDetailPage({
             target_role: 'patient',
             completed: questionnaireStatuses['CTI_FR']?.completed || false,
             completedAt: questionnaireStatuses['CTI_FR']?.completed_at,
+          }
+        ]
+      }
+    ];
+  } else if (visit.visit_type === 'biannual_followup' || visit.visit_type === 'annual_evaluation') {
+    // Build follow-up visit modules with conditional DIVA
+    modulesWithQuestionnaires = [
+      {
+        id: 'mod_thymic_eval',
+        name: 'Evaluation état thymique et fonctionnement',
+        description: 'Évaluation de l\'état thymique et du fonctionnement',
+        questionnaires: [
+          {
+            ...MADRS_DEFINITION,
+            id: MADRS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['MADRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['MADRS_FR']?.completed_at,
+          },
+          {
+            ...YMRS_DEFINITION,
+            id: YMRS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['YMRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['YMRS_FR']?.completed_at,
+          },
+          {
+            ...CGI_DEFINITION,
+            id: CGI_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['CGI_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CGI_FR']?.completed_at,
+          },
+          {
+            ...EGF_DEFINITION,
+            id: EGF_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['EGF_FR']?.completed || false,
+            completedAt: questionnaireStatuses['EGF_FR']?.completed_at,
+          },
+          {
+            ...FAST_DEFINITION,
+            id: FAST_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['FAST_FR']?.completed || false,
+            completedAt: questionnaireStatuses['FAST_FR']?.completed_at,
+          }
+        ]
+      },
+      // Build medical evaluation questionnaires with conditional DIVA
+      (() => {
+        const medicalEvalQuestionnaires: any[] = [
+          {
+            ...DSM5_COMORBID_DEFINITION,
+            id: DSM5_COMORBID_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['DSM5_COMORBID_FR']?.completed || false,
+            completedAt: questionnaireStatuses['DSM5_COMORBID_FR']?.completed_at,
+          },
+        ];
+        
+        // Add DIVA with conditional display properties (same logic as initial_evaluation)
+        if (!dsm5ComorbidAnswered) {
+          medicalEvalQuestionnaires.push({
+            ...DIVA_DEFINITION,
+            id: DIVA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: false,
+            completedAt: null,
+            isConditional: true,
+            conditionMet: false,
+            conditionMessage: 'Complétez d\'abord l\'évaluation DSM5 - Troubles comorbides (Section 5)',
+          });
+        } else if (isDivaRequired) {
+          medicalEvalQuestionnaires.push({
+            ...DIVA_DEFINITION,
+            id: DIVA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['DIVA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['DIVA_FR']?.completed_at,
+            isConditional: true,
+            conditionMet: true,
+          });
+        }
+        
+        // Add remaining medical evaluation questionnaires
+        medicalEvalQuestionnaires.push(
+          {
+            ...CSSRS_DEFINITION,
+            id: CSSRS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['CSSRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CSSRS_FR']?.completed_at,
+          },
+          {
+            ...ISA_DEFINITION,
+            id: ISA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ISA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ISA_FR']?.completed_at,
+          }
+        );
+        
+        return {
+          id: 'mod_medical_eval',
+          name: 'Evaluation Médicale',
+          description: 'Évaluation médicale complète',
+          questionnaires: medicalEvalQuestionnaires
+        };
+      })(),
+      {
+        id: 'mod_auto_etat',
+        name: 'Autoquestionnaires - ETAT',
+        description: 'Questionnaires sur l\'état actuel du patient',
+        questionnaires: [
+          {
+            ...EQ5D5L_DEFINITION,
+            id: EQ5D5L_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['EQ5D5L_FR']?.completed || false,
+            completedAt: questionnaireStatuses['EQ5D5L_FR']?.completed_at,
+          },
+          {
+            ...ASRM_DEFINITION,
+            id: ASRM_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['ASRM_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ASRM_FR']?.completed_at,
+          },
+          {
+            ...QIDS_DEFINITION,
+            id: QIDS_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['QIDS_SR16_FR']?.completed || false,
+            completedAt: questionnaireStatuses['QIDS_SR16_FR']?.completed_at,
+          },
+          {
+            ...PSQI_DEFINITION,
+            id: PSQI_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['PSQI_FR']?.completed || false,
+            completedAt: questionnaireStatuses['PSQI_FR']?.completed_at,
+          },
+          {
+            ...EPWORTH_DEFINITION,
+            id: EPWORTH_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['EPWORTH_FR']?.completed || false,
+            completedAt: questionnaireStatuses['EPWORTH_FR']?.completed_at,
           }
         ]
       }
