@@ -1635,12 +1635,10 @@ export interface Dsm5ComorbidResponse {
   
   // Section 1: Anxiety Disorders
   has_anxiety_disorder?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  panic_no_agoraphobia_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  panic_no_agoraphobia_age_debut?: number | null;
-  panic_no_agoraphobia_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  panic_with_agoraphobia_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  panic_with_agoraphobia_age_debut?: number | null;
-  panic_with_agoraphobia_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  panic_disorder_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  panic_disorder_type?: 'sans_agoraphobie' | 'avec_agoraphobie' | null;
+  panic_disorder_age_debut?: number | null;
+  panic_disorder_symptoms_past_month?: 'oui' | 'non' | null;
   agoraphobia_no_panic_present?: 'oui' | 'non' | 'ne_sais_pas' | null;
   agoraphobia_no_panic_age_debut?: number | null;
   agoraphobia_no_panic_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
@@ -1723,6 +1721,7 @@ export interface Dsm5ComorbidResponse {
   
   // Section 3: Eating Disorders
   has_eating_disorder?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  eating_disorder_type?: 'anorexia_restrictive' | 'anorexia_bulimic' | 'bulimia' | 'binge_eating' | 'eating_unspecified' | 'night_eating' | null;
   anorexia_restrictive_amenorrhea?: 'oui' | 'non' | null;
   anorexia_restrictive_age_debut?: number | null;
   anorexia_restrictive_age_fin?: number | null;
@@ -1757,60 +1756,8 @@ export interface Dsm5ComorbidResponse {
   somatoform_age_debut?: number | null;
   somatoform_symptoms_past_month?: 'oui' | 'non' | 'ne_sais_pas' | null;
   
-  // Section 5: ADHD DIVA Assessment
+  // Section 5: ADHD Evaluation (DIVA assessment moved to Medical Evaluation section)
   diva_evaluated?: 'oui' | 'non' | 'ne_sais_pas' | null;
-  diva_a1a_adult?: 'oui' | 'non' | null;
-  diva_a1a_childhood?: 'oui' | 'non' | null;
-  diva_a1b_adult?: 'oui' | 'non' | null;
-  diva_a1b_childhood?: 'oui' | 'non' | null;
-  diva_a1c_adult?: 'oui' | 'non' | null;
-  diva_a1c_childhood?: 'oui' | 'non' | null;
-  diva_a1d_adult?: 'oui' | 'non' | null;
-  diva_a1d_childhood?: 'oui' | 'non' | null;
-  diva_a1e_adult?: 'oui' | 'non' | null;
-  diva_a1e_childhood?: 'oui' | 'non' | null;
-  diva_a1f_adult?: 'oui' | 'non' | null;
-  diva_a1f_childhood?: 'oui' | 'non' | null;
-  diva_a1g_adult?: 'oui' | 'non' | null;
-  diva_a1g_childhood?: 'oui' | 'non' | null;
-  diva_a1h_adult?: 'oui' | 'non' | null;
-  diva_a1h_childhood?: 'oui' | 'non' | null;
-  diva_a1i_adult?: 'oui' | 'non' | null;
-  diva_a1i_childhood?: 'oui' | 'non' | null;
-  diva_a2a_adult?: 'oui' | 'non' | null;
-  diva_a2a_childhood?: 'oui' | 'non' | null;
-  diva_a2b_adult?: 'oui' | 'non' | null;
-  diva_a2b_childhood?: 'oui' | 'non' | null;
-  diva_a2c_adult?: 'oui' | 'non' | null;
-  diva_a2c_childhood?: 'oui' | 'non' | null;
-  diva_a2d_adult?: 'oui' | 'non' | null;
-  diva_a2d_childhood?: 'oui' | 'non' | null;
-  diva_a2e_adult?: 'oui' | 'non' | null;
-  diva_a2e_childhood?: 'oui' | 'non' | null;
-  diva_a2f_adult?: 'oui' | 'non' | null;
-  diva_a2f_childhood?: 'oui' | 'non' | null;
-  diva_a2g_adult?: 'oui' | 'non' | null;
-  diva_a2g_childhood?: 'oui' | 'non' | null;
-  diva_a2h_adult?: 'oui' | 'non' | null;
-  diva_a2h_childhood?: 'oui' | 'non' | null;
-  diva_a2i_adult?: 'oui' | 'non' | null;
-  diva_a2i_childhood?: 'oui' | 'non' | null;
-  diva_total_inattention_adult?: number | null;
-  diva_total_inattention_childhood?: number | null;
-  diva_total_hyperactivity_adult?: number | null;
-  diva_total_hyperactivity_childhood?: number | null;
-  diva_criteria_a_inattention_gte6?: boolean | null;
-  diva_criteria_a_hyperactivity_gte6?: boolean | null;
-  diva_criteria_b_lifetime_persistence?: boolean | null;
-  diva_criteria_cd_impairment_childhood?: boolean | null;
-  diva_criteria_cd_impairment_adult?: boolean | null;
-  diva_criteria_e_better_explained?: boolean | null;
-  diva_criteria_e_explanation?: string | null;
-  diva_collateral_parents?: number | null;
-  diva_collateral_partner?: number | null;
-  diva_collateral_school_reports?: number | null;
-  diva_collateral_details?: string | null;
-  diva_diagnosis?: 'non' | '314_01_combined' | '314_00_inattentive' | '314_01_hyperactive_impulsive' | null;
   
   // Metadata
   completed_by?: string | null;
