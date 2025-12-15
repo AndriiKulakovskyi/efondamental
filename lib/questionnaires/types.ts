@@ -29,6 +29,7 @@ export interface Question {
   max?: number;
   minLabel?: string;
   maxLabel?: string;
+  indentLevel?: number; // For visual indentation of branching questions
 }
 
 export interface Section {

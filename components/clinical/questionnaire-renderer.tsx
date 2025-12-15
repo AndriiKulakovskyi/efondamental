@@ -1694,8 +1694,11 @@ export function QuestionnaireRenderer({
     }
 
     return (
-      <div key={question.id} className={`space-y-3 ${isUnitField ? 'col-span-1' : ''}`}>
+      <div key={question.id} className={`space-y-3 ${isUnitField ? 'col-span-1' : ''}`} style={{
+        marginLeft: question.indentLevel ? `${question.indentLevel * 2}rem` : undefined
+      }}>
         <Label htmlFor={question.id} className="text-base font-semibold text-slate-800">
+          {question.questionNumber && <span className="text-brand mr-2">{question.questionNumber}</span>}
           {question.text}
           {isRequired && <span className="text-brand ml-1">*</span>}
         </Label>

@@ -1034,13 +1034,14 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
     ]
   },
   
-  // 1.2.1 Panic disorder without agoraphobia
+  // 1.1 Panic disorder (parent question)
   {
-    id: 'panic_no_agoraphobia_present',
-    text: 'Trouble panique sans agoraphobie?',
+    id: 'panic_disorder_present',
+    text: '1. Trouble panique',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_anxiety_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1048,69 +1049,64 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'panic_no_agoraphobia_age_debut',
-    text: 'Age de début',
+    id: 'panic_disorder_type',
+    text: '1.1. Type du trouble panique',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'panic_disorder_present' }, 'oui'] },
+    indentLevel: 2,
+    options: [
+      { code: 'sans_agoraphobie', label: 'Sans agoraphobie' },
+      { code: 'avec_agoraphobie', label: 'Avec agoraphobie' }
+    ]
+  },
+  {
+    id: 'panic_disorder_age_debut',
+    text: '1.2. Age de début',
     type: 'number',
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'panic_no_agoraphobia_present' }, 'oui'] }
+    display_if: { 
+      'and': [
+        { '==': [{ var: 'panic_disorder_present' }, 'oui'] },
+        { 'or': [
+          { '==': [{ var: 'panic_disorder_type' }, 'sans_agoraphobie'] },
+          { '==': [{ var: 'panic_disorder_type' }, 'avec_agoraphobie'] }
+        ]}
+      ]
+    },
+    indentLevel: 2
   },
   {
-    id: 'panic_no_agoraphobia_symptoms_past_month',
-    text: 'Présence de symptômes dans le mois écoulé',
+    id: 'panic_disorder_symptoms_past_month',
+    text: '1.3. Présence de symptômes dans le mois écoulé',
     type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'panic_no_agoraphobia_present' }, 'oui'] },
+    display_if: { 
+      'and': [
+        { '==': [{ var: 'panic_disorder_present' }, 'oui'] },
+        { 'or': [
+          { '==': [{ var: 'panic_disorder_type' }, 'sans_agoraphobie'] },
+          { '==': [{ var: 'panic_disorder_type' }, 'avec_agoraphobie'] }
+        ]}
+      ]
+    },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+      { code: 'non', label: 'Non' }
     ]
   },
   
-  // 1.2.2 Panic disorder with agoraphobia
-  {
-    id: 'panic_with_agoraphobia_present',
-    text: 'Trouble panique avec agoraphobie?',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'has_anxiety_disorder' }, 'oui'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'panic_with_agoraphobia_age_debut',
-    text: 'Age de début',
-    type: 'number',
-    required: false,
-    min: 0,
-    max: 120,
-    display_if: { '==': [{ var: 'panic_with_agoraphobia_present' }, 'oui'] }
-  },
-  {
-    id: 'panic_with_agoraphobia_symptoms_past_month',
-    text: 'Présence de symptômes dans le mois écoulé',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'panic_with_agoraphobia_present' }, 'oui'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  
-  // 1.2.3 Agoraphobia without panic
+  // 1.2 Agoraphobia without panic
   {
     id: 'agoraphobia_no_panic_present',
-    text: 'Agoraphobie sans trouble panique?',
+    text: '2. Agoraphobie sans trouble panique',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_anxiety_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1119,19 +1115,21 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
   },
   {
     id: 'agoraphobia_no_panic_age_debut',
-    text: 'Age de début',
+    text: '2.1. Age de début',
     type: 'number',
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'agoraphobia_no_panic_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'agoraphobia_no_panic_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'agoraphobia_no_panic_symptoms_past_month',
-    text: 'Présence de symptômes dans le mois écoulé',
+    text: '2.2. Présence de symptômes dans le mois écoulé',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'agoraphobia_no_panic_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1139,13 +1137,14 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
     ]
   },
   
-  // 1.2.4 Social phobia
+  // 1.3 Social phobia
   {
     id: 'social_phobia_present',
-    text: 'Phobie sociale?',
+    text: '3. Phobie sociale',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_anxiety_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1154,19 +1153,21 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
   },
   {
     id: 'social_phobia_age_debut',
-    text: 'Age de début',
+    text: '3.1. Age de début',
     type: 'number',
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'social_phobia_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'social_phobia_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'social_phobia_symptoms_past_month',
-    text: 'Présence de symptômes dans le mois écoulé',
+    text: '3.2. Présence de symptômes dans le mois écoulé',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'social_phobia_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1174,13 +1175,14 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
     ]
   },
   
-  // 1.2.5 Specific phobia
+  // 1.4 Specific phobia
   {
     id: 'specific_phobia_present',
-    text: 'Phobie spécifique?',
+    text: '4. Phobie spécifique',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_anxiety_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1189,19 +1191,21 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
   },
   {
     id: 'specific_phobia_age_debut',
-    text: 'Age de début',
+    text: '4.1. Age de début',
     type: 'number',
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'specific_phobia_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'specific_phobia_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'specific_phobia_symptoms_past_month',
-    text: 'Présence de symptômes dans le mois écoulé',
+    text: '4.2. Présence de symptômes dans le mois écoulé',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'specific_phobia_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1209,13 +1213,14 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
     ]
   },
   
-  // 1.2.6 OCD
+  // 1.5 OCD
   {
     id: 'ocd_present',
-    text: 'Trouble obsessionnel compulsif?',
+    text: '5. Trouble obsessionnel compulsif',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_anxiety_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1224,19 +1229,21 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
   },
   {
     id: 'ocd_age_debut',
-    text: 'Age de début',
+    text: '5.1. Age de début',
     type: 'number',
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'ocd_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'ocd_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'ocd_symptoms_past_month',
-    text: 'Présence de symptômes dans le mois écoulé',
+    text: '5.2. Présence de symptômes dans le mois écoulé',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'ocd_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1244,13 +1251,14 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
     ]
   },
   
-  // 1.2.7 PTSD
+  // 1.6 PTSD
   {
     id: 'ptsd_present',
-    text: 'Stress post-traumatique?',
+    text: '6. Stress post-traumatique',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_anxiety_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1259,19 +1267,21 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
   },
   {
     id: 'ptsd_age_debut',
-    text: 'Age de début',
+    text: '6.1. Age de début',
     type: 'number',
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'ptsd_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'ptsd_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'ptsd_symptoms_past_month',
-    text: 'Présence de symptômes dans le mois écoulé',
+    text: '6.2. Présence de symptômes dans le mois écoulé',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'ptsd_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1279,13 +1289,14 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
     ]
   },
   
-  // 1.2.8 Generalized anxiety (current episode only)
+  // 1.7 Generalized anxiety (current episode only)
   {
     id: 'gad_present',
-    text: 'Anxiété généralisée (épisode actuel seulement)?',
+    text: '7. Anxiété généralisée (épisode actuel seulement)',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_anxiety_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1294,19 +1305,21 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
   },
   {
     id: 'gad_age_debut',
-    text: 'Age de début',
+    text: '7.1. Age de début',
     type: 'number',
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'gad_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'gad_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'gad_symptoms_past_month',
-    text: 'Présence de symptômes dans le mois écoulé',
+    text: '7.2. Présence de symptômes dans le mois écoulé',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'gad_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1314,13 +1327,14 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
     ]
   },
   
-  // 1.3 Anxiety due to medical condition
+  // 1.8 Anxiety due to medical condition
   {
     id: 'anxiety_medical_condition_present',
-    text: 'Trouble anxieux dû à une affection médicale générale?',
+    text: '8. Trouble anxieux dû à une affection médicale générale',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_anxiety_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1329,26 +1343,29 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
   },
   {
     id: 'anxiety_medical_condition_affection',
-    text: 'Spécifier l\'affection',
+    text: '8.1. Spécifier l\'affection',
     type: 'text',
     required: false,
-    display_if: { '==': [{ var: 'anxiety_medical_condition_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'anxiety_medical_condition_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'anxiety_medical_condition_age_debut',
-    text: 'Age de début',
+    text: '8.2. Age de début',
     type: 'number',
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'anxiety_medical_condition_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'anxiety_medical_condition_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'anxiety_medical_condition_symptoms_past_month',
-    text: 'Présence de symptômes le mois écoulé',
+    text: '8.3. Présence de symptômes le mois écoulé',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'anxiety_medical_condition_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1356,13 +1373,14 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
     ]
   },
   
-  // 1.4 Substance-induced anxiety
+  // 1.9 Substance-induced anxiety
   {
     id: 'anxiety_substance_induced_present',
-    text: 'Trouble anxieux induit par une substance?',
+    text: '9. Trouble anxieux induit par une substance',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_anxiety_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1371,26 +1389,29 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
   },
   {
     id: 'anxiety_substance_induced_substance',
-    text: 'Spécifier la substance',
+    text: '9.1. Spécifier la substance',
     type: 'text',
     required: false,
-    display_if: { '==': [{ var: 'anxiety_substance_induced_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'anxiety_substance_induced_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'anxiety_substance_induced_age_debut',
-    text: 'Age de début',
+    text: '9.2. Age de début',
     type: 'number',
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'anxiety_substance_induced_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'anxiety_substance_induced_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'anxiety_substance_induced_symptoms_past_month',
-    text: 'Présence de symptômes le mois écoulé',
+    text: '9.3. Présence de symptômes le mois écoulé',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'anxiety_substance_induced_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1398,13 +1419,14 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
     ]
   },
   
-  // 1.5 Unspecified anxiety
+  // 1.10 Unspecified anxiety
   {
     id: 'anxiety_unspecified_present',
-    text: 'Trouble anxieux non spécifié?',
+    text: '10. Trouble anxieux non spécifié',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'has_anxiety_disorder' }, 'oui'] },
+    indentLevel: 1,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -1413,19 +1435,21 @@ export const DSM5_COMORBID_SECTION1_QUESTIONS: Question[] = [
   },
   {
     id: 'anxiety_unspecified_age_debut',
-    text: 'Age de début',
+    text: '10.1. Age de début',
     type: 'number',
     required: false,
     min: 0,
     max: 120,
-    display_if: { '==': [{ var: 'anxiety_unspecified_present' }, 'oui'] }
+    display_if: { '==': [{ var: 'anxiety_unspecified_present' }, 'oui'] },
+    indentLevel: 2
   },
   {
     id: 'anxiety_unspecified_symptoms_past_month',
-    text: 'Présence de symptômes le mois écoulé',
+    text: '10.2. Présence de symptômes le mois écoulé',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'anxiety_unspecified_present' }, 'oui'] },
+    indentLevel: 2,
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
