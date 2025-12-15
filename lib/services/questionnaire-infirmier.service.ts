@@ -30,6 +30,19 @@ export async function getTobaccoResponse(
     }
     throw error;
   }
+
+  // Transform boolean values to 'yes'/'no' strings for UI compatibility
+  // This ensures the app works whether migration has been applied or not
+  if (data) {
+    const transformed: any = { ...data };
+    if (transformed.has_substitution === true) {
+      transformed.has_substitution = 'yes';
+    } else if (transformed.has_substitution === false) {
+      transformed.has_substitution = 'no';
+    }
+    return transformed;
+  }
+
   return data;
 }
 
@@ -38,6 +51,14 @@ export async function saveTobaccoResponse(
 ): Promise<TobaccoResponse> {
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
+
+  // Transform 'yes'/'no' strings to boolean for database compatibility
+  // This ensures the app works whether migration has been applied or not
+  const transformToBoolean = (value: any): boolean | null => {
+    if (value === 'yes' || value === true) return true;
+    if (value === 'no' || value === false) return false;
+    return null;
+  };
 
   // Normalize responses based on smoking_status
   // For current_smoker: use pack_years, smoking_start_age, has_substitution, etc.
@@ -52,7 +73,7 @@ export async function saveTobaccoResponse(
   if (response.smoking_status === 'current_smoker') {
     normalizedResponse.pack_years = (response as any).pack_years;
     normalizedResponse.smoking_start_age = (response as any).smoking_start_age;
-    normalizedResponse.has_substitution = (response as any).has_substitution === 'yes';
+    normalizedResponse.has_substitution = transformToBoolean((response as any).has_substitution);
     
     // Handle substitution_methods array
     const substitutionMethods = (response as any).substitution_methods;
@@ -62,7 +83,7 @@ export async function saveTobaccoResponse(
     normalizedResponse.pack_years = (response as any).pack_years_ex;
     normalizedResponse.smoking_start_age = (response as any).smoking_start_age_ex;
     normalizedResponse.smoking_end_age = (response as any).smoking_end_age;
-    normalizedResponse.has_substitution = (response as any).has_substitution_ex === 'yes';
+    normalizedResponse.has_substitution = transformToBoolean((response as any).has_substitution_ex);
     
     // Handle substitution_methods_ex array
     const substitutionMethodsEx = (response as any).substitution_methods_ex;
@@ -76,6 +97,18 @@ export async function saveTobaccoResponse(
     .single();
 
   if (error) throw error;
+
+  // Transform boolean back to 'yes'/'no' for UI consistency
+  if (data) {
+    const transformed: any = { ...data };
+    if (transformed.has_substitution === true) {
+      transformed.has_substitution = 'yes';
+    } else if (transformed.has_substitution === false) {
+      transformed.has_substitution = 'no';
+    }
+    return transformed;
+  }
+
   return data;
 }
 

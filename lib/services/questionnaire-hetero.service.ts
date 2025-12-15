@@ -653,6 +653,42 @@ export async function getDivaResponse(
     if (error.code === 'PGRST116') return null;
     throw error;
   }
+
+  // Transform boolean values to 'oui'/'non' strings for UI compatibility
+  // This ensures the app works whether migration 118 has been applied or not
+  if (data) {
+    const transformedData: any = { ...data };
+    
+    const booleanFields = [
+      // Symptom fields (adult and childhood)
+      'a1a_adult', 'a1a_childhood', 'a1b_adult', 'a1b_childhood',
+      'a1c_adult', 'a1c_childhood', 'a1d_adult', 'a1d_childhood',
+      'a1e_adult', 'a1e_childhood', 'a1f_adult', 'a1f_childhood',
+      'a1g_adult', 'a1g_childhood', 'a1h_adult', 'a1h_childhood',
+      'a1i_adult', 'a1i_childhood',
+      'a2a_adult', 'a2a_childhood', 'a2b_adult', 'a2b_childhood',
+      'a2c_adult', 'a2c_childhood', 'a2d_adult', 'a2d_childhood',
+      'a2e_adult', 'a2e_childhood', 'a2f_adult', 'a2f_childhood',
+      'a2g_adult', 'a2g_childhood', 'a2h_adult', 'a2h_childhood',
+      'a2i_adult', 'a2i_childhood',
+      // Criteria fields
+      'criteria_a_inattention_gte6', 'criteria_a_hyperactivity_gte6',
+      'criteria_b_lifetime_persistence', 'criteria_cd_impairment_childhood',
+      'criteria_cd_impairment_adult', 'criteria_e_better_explained'
+    ];
+
+    for (const field of booleanFields) {
+      if (transformedData[field] === true) {
+        transformedData[field] = 'oui';
+      } else if (transformedData[field] === false) {
+        transformedData[field] = 'non';
+      }
+      // If already string or null, leave as is
+    }
+
+    return transformedData;
+  }
+
   return data;
 }
 
@@ -662,28 +698,60 @@ export async function saveDivaResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Helper to count adult/childhood symptoms from multiple_choice responses
+  // Helper to count adult/childhood symptoms from 'oui'/'non' single-choice responses
   const countSymptoms = (responses: Record<string, any>, period: 'adult' | 'childhood', prefix: string, count: number) => {
     let total = 0;
     for (let i = 1; i <= count; i++) {
       const key = `${prefix}${String.fromCharCode(96 + i)}_${period}`; // a1a_adult, a1b_adult, etc.
-      if (responses[key] === true) {
+      // Support both new format ('oui') and old format (true) for backward compatibility
+      if (responses[key] === 'oui' || responses[key] === true) {
         total++;
       }
     }
     return total;
   };
 
+  // Transform 'oui'/'non' strings to boolean for database compatibility
+  // This ensures the app works whether migration 118 has been applied or not
+  const transformedResponse: any = { ...response };
+  
+  const booleanFields = [
+    // Symptom fields (adult and childhood)
+    'a1a_adult', 'a1a_childhood', 'a1b_adult', 'a1b_childhood',
+    'a1c_adult', 'a1c_childhood', 'a1d_adult', 'a1d_childhood',
+    'a1e_adult', 'a1e_childhood', 'a1f_adult', 'a1f_childhood',
+    'a1g_adult', 'a1g_childhood', 'a1h_adult', 'a1h_childhood',
+    'a1i_adult', 'a1i_childhood',
+    'a2a_adult', 'a2a_childhood', 'a2b_adult', 'a2b_childhood',
+    'a2c_adult', 'a2c_childhood', 'a2d_adult', 'a2d_childhood',
+    'a2e_adult', 'a2e_childhood', 'a2f_adult', 'a2f_childhood',
+    'a2g_adult', 'a2g_childhood', 'a2h_adult', 'a2h_childhood',
+    'a2i_adult', 'a2i_childhood',
+    // Criteria fields
+    'criteria_a_inattention_gte6', 'criteria_a_hyperactivity_gte6',
+    'criteria_b_lifetime_persistence', 'criteria_cd_impairment_childhood',
+    'criteria_cd_impairment_adult', 'criteria_e_better_explained'
+  ];
+
+  for (const field of booleanFields) {
+    if (transformedResponse[field] === 'oui') {
+      transformedResponse[field] = true;
+    } else if (transformedResponse[field] === 'non') {
+      transformedResponse[field] = false;
+    }
+    // If already boolean or null, leave as is
+  }
+
   // Calculate totals
-  const totalInattentionAdult = response.total_inattention_adult ?? countSymptoms(response, 'adult', 'a1', 9);
-  const totalInattentionChildhood = response.total_inattention_childhood ?? countSymptoms(response, 'childhood', 'a1', 9);
-  const totalHyperactivityAdult = response.total_hyperactivity_adult ?? countSymptoms(response, 'adult', 'a2', 9);
-  const totalHyperactivityChildhood = response.total_hyperactivity_childhood ?? countSymptoms(response, 'childhood', 'a2', 9);
+  const totalInattentionAdult = transformedResponse.total_inattention_adult ?? countSymptoms(response, 'adult', 'a1', 9);
+  const totalInattentionChildhood = transformedResponse.total_inattention_childhood ?? countSymptoms(response, 'childhood', 'a1', 9);
+  const totalHyperactivityAdult = transformedResponse.total_hyperactivity_adult ?? countSymptoms(response, 'adult', 'a2', 9);
+  const totalHyperactivityChildhood = transformedResponse.total_hyperactivity_childhood ?? countSymptoms(response, 'childhood', 'a2', 9);
 
   const { data, error } = await supabase
     .from('responses_diva')
     .upsert({
-      ...response,
+      ...transformedResponse,
       total_inattention_adult: totalInattentionAdult,
       total_inattention_childhood: totalInattentionChildhood,
       total_hyperactivity_adult: totalHyperactivityAdult,

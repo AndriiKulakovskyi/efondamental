@@ -1382,30 +1382,32 @@ export const FAST_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 
 // Helper function to create ADHD symptom questions (adult + childhood)
-const createADHDSymptom = (id: string, text: string): Question => ({
-  id,
-  text,
-  type: 'multiple_choice',
-  required: false,
-  options: [
-    'Présent à l\'âge adulte',
-    'Présent dans l\'enfance'
-  ]
-});
-
-export const DIVA_QUESTIONS: Question[] = [
+// Returns TWO questions: main symptom with adult question, then indented childhood question
+const createADHDSymptom = (id: string, text: string): Question[] => [
   {
-    id: 'evaluated',
-    text: 'Le patient a-t-il été évalué avec la DIVA pour le TDAH ?',
+    id: `${id}_adult`,
+    text: `${text}\nPrésent à l'âge adulte`,
     type: 'single_choice',
-    required: true,
+    required: false,
     options: [
       { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+      { code: 'non', label: 'Non' }
     ]
   },
-  
+  {
+    id: `${id}_childhood`,
+    text: 'Présent dans l\'enfance',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  }
+];
+
+export const DIVA_QUESTIONS: Question[] = [
   // Criterion A - Inattention
   {
     id: 'section_inattention',
@@ -1413,15 +1415,15 @@ export const DIVA_QUESTIONS: Question[] = [
     type: 'section',
     required: false
   },
-  createADHDSymptom('a1a', 'A1. Souvent, ne parvient pas à prêter attention aux détails, ou fait des fautes d\'étourderie dans les devoirs scolaires, le travail ou d\'autres activités'),
-  createADHDSymptom('a1b', 'A2. A souvent du mal à soutenir son attention au travail ou dans les jeux'),
-  createADHDSymptom('a1c', 'A3. Semble souvent ne pas écouter quand on lui parle personnellement'),
-  createADHDSymptom('a1d', 'A4. Souvent, ne se conforme pas aux consignes et ne parvient pas à mener à terme ses devoirs scolaires, ses tâches domestiques ou ses obligations professionnelles'),
-  createADHDSymptom('a1e', 'A5. A souvent du mal à organiser ses travaux ou ses activités'),
-  createADHDSymptom('a1f', 'A6. Souvent, évite, a en aversion, ou fait à contrecoeur les tâches qui nécessitent un effort mental soutenu'),
-  createADHDSymptom('a1g', 'A7. Perd souvent les objets nécessaires à son travail ou à ses activités'),
-  createADHDSymptom('a1h', 'A8. Souvent, se laisse facilement distraire par des stimuli externes'),
-  createADHDSymptom('a1i', 'A9. A des oublis fréquents dans la vie quotidienne'),
+  ...createADHDSymptom('a1a', 'A1. Souvent, ne parvient pas à prêter attention aux détails, ou fait des fautes d\'étourderie dans les devoirs scolaires, le travail ou d\'autres activités'),
+  ...createADHDSymptom('a1b', 'A2. A souvent du mal à soutenir son attention au travail ou dans les jeux'),
+  ...createADHDSymptom('a1c', 'A3. Semble souvent ne pas écouter quand on lui parle personnellement'),
+  ...createADHDSymptom('a1d', 'A4. Souvent, ne se conforme pas aux consignes et ne parvient pas à mener à terme ses devoirs scolaires, ses tâches domestiques ou ses obligations professionnelles'),
+  ...createADHDSymptom('a1e', 'A5. A souvent du mal à organiser ses travaux ou ses activités'),
+  ...createADHDSymptom('a1f', 'A6. Souvent, évite, a en aversion, ou fait à contrecoeur les tâches qui nécessitent un effort mental soutenu'),
+  ...createADHDSymptom('a1g', 'A7. Perd souvent les objets nécessaires à son travail ou à ses activités'),
+  ...createADHDSymptom('a1h', 'A8. Souvent, se laisse facilement distraire par des stimuli externes'),
+  ...createADHDSymptom('a1i', 'A9. A des oublis fréquents dans la vie quotidienne'),
   
   {
     id: 'total_inattention_adult',
@@ -1447,15 +1449,15 @@ export const DIVA_QUESTIONS: Question[] = [
     type: 'section',
     required: false
   },
-  createADHDSymptom('a2a', 'H/I 1. Remue souvent les mains ou les pieds, ou se tortille sur son siège'),
-  createADHDSymptom('a2b', 'H/I 2. Se lève souvent en classe ou dans d\'autres situations où il est supposé rester assis'),
-  createADHDSymptom('a2c', 'H/I 3. Souvent, court ou grimpe partout, dans des situations où cela est inapproprié (sentiment subjectif d\'impatience chez l\'adulte)'),
-  createADHDSymptom('a2d', 'H/I 4. A souvent du mal à se tenir tranquille dans les jeux ou les activités de loisir'),
-  createADHDSymptom('a2e', 'H/I 5. Est souvent « sur la brèche » ou agit souvent comme s\'il était « monté sur ressorts »'),
-  createADHDSymptom('a2f', 'H/I 6. Parle souvent trop'),
-  createADHDSymptom('a2g', 'H/I 7. Laisse souvent échapper la réponse à une question qui n\'est pas encore entièrement posée'),
-  createADHDSymptom('a2h', 'H/I 8. A souvent du mal à attendre son tour'),
-  createADHDSymptom('a2i', 'H/I 9. Interrompt souvent les autres ou impose sa présence'),
+  ...createADHDSymptom('a2a', 'H/I 1. Remue souvent les mains ou les pieds, ou se tortille sur son siège'),
+  ...createADHDSymptom('a2b', 'H/I 2. Se lève souvent en classe ou dans d\'autres situations où il est supposé rester assis'),
+  ...createADHDSymptom('a2c', 'H/I 3. Souvent, court ou grimpe partout, dans des situations où cela est inapproprié (sentiment subjectif d\'impatience chez l\'adulte)'),
+  ...createADHDSymptom('a2d', 'H/I 4. A souvent du mal à se tenir tranquille dans les jeux ou les activités de loisir'),
+  ...createADHDSymptom('a2e', 'H/I 5. Est souvent « sur la brèche » ou agit souvent comme s\'il était « monté sur ressorts »'),
+  ...createADHDSymptom('a2f', 'H/I 6. Parle souvent trop'),
+  ...createADHDSymptom('a2g', 'H/I 7. Laisse souvent échapper la réponse à une question qui n\'est pas encore entièrement posée'),
+  ...createADHDSymptom('a2h', 'H/I 8. A souvent du mal à attendre son tour'),
+  ...createADHDSymptom('a2i', 'H/I 9. Interrompt souvent les autres ou impose sa présence'),
   
   {
     id: 'total_hyperactivity_adult',
@@ -1484,14 +1486,22 @@ export const DIVA_QUESTIONS: Question[] = [
   {
     id: 'criteria_a_inattention_child_gte6',
     text: 'Enfance: Le nombre de symptômes du critère A (inattention) est-il >= 6 ?',
-    type: 'boolean',
-    required: false
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'criteria_hi_hyperactivity_child_gte6',
     text: 'Enfance: Le nombre de symptômes du critère H/I (hyperactivité/impulsivité) est-il >= 6 ?',
-    type: 'boolean',
-    required: false
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   
   // Scoring - Adult
@@ -1504,14 +1514,22 @@ export const DIVA_QUESTIONS: Question[] = [
   {
     id: 'criteria_a_inattention_adult_gte6',
     text: 'Age Adulte: Le nombre de symptômes du critère A (inattention) est-il >= 6 (ou >= 4 selon recherches) ?',
-    type: 'boolean',
-    required: false
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'criteria_hi_hyperactivity_adult_gte6',
     text: 'Age Adulte: Le nombre de symptômes du critère H/I (hyperactivité/impulsivité) est-il >= 6 (ou >= 4 selon recherches) ?',
-    type: 'boolean',
-    required: false
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   
   // General Criteria
@@ -1524,20 +1542,32 @@ export const DIVA_QUESTIONS: Question[] = [
   {
     id: 'criteria_b_lifetime_persistence',
     text: 'Critère B: Y a-t-il des indications en faveur de la persistance sur la vie entière d\'un ensemble de symptômes et d\'une altération du fonctionnement ?',
-    type: 'boolean',
-    required: false
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'criteria_cd_impairment_childhood',
     text: 'Critères C et D: Présence de symptômes et d\'une altération du fonctionnement dans au moins deux types différents d\'environnement dans l\'enfance ?',
-    type: 'boolean',
-    required: false
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'criteria_cd_impairment_adult',
     text: 'Critères C et D: Présence de symptômes et d\'une altération du fonctionnement dans au moins deux types différents d\'environnement à l\'âge adulte ?',
-    type: 'boolean',
-    required: false
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
   },
   {
     id: 'criteria_e_better_explained',
