@@ -12,7 +12,7 @@ import { submitProfessionalQuestionnaireAction } from "@/app/professional/questi
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { ScoreDisplay } from "../../components/score-display";
 import { calculateStandardizedScore, calculatePercentileRank } from "@/lib/services/wais4-matrices-scoring";
-import { evaluateConditionalLogic } from "@/lib/utils/questionnaire-logic";
+import { evaluateConditionalLogic, calculateQuestionnaireProgress } from "@/lib/utils/questionnaire-logic";
 
 interface QuestionnairePageClientProps {
   questionnaire: QuestionnaireDefinition;
@@ -47,30 +47,12 @@ export function QuestionnairePageClient({
   // Calculate progress based on visible questionnaire questions only
   // Uses conditional logic to only count questions that are currently visible
   const progress = useMemo(() => {
-    // Evaluate which questions are visible based on current responses
     const { visibleQuestions } = evaluateConditionalLogic(questionnaire, currentResponses);
-    
-    // Get all non-section questions that are currently visible
-    const questions = questionnaire.questions.filter(
-      q => q.type !== 'section' && visibleQuestions.includes(q.id)
+    return calculateQuestionnaireProgress(
+      questionnaire.questions,
+      currentResponses,
+      visibleQuestions
     );
-    const total = questions.length;
-    
-    if (total === 0) return 0;
-    
-    // Count how many visible questions have a value
-    let answered = 0;
-    for (const q of questions) {
-      const val = currentResponses[q.id];
-      // Consider a question answered if it has any value (including 0)
-      if (val !== undefined && val !== null && val !== '') {
-        answered++;
-      }
-    }
-    
-    // Calculate percentage (can never exceed 100 since answered <= total)
-    const pct = Math.round((answered / total) * 100);
-    return pct;
   }, [currentResponses, questionnaire]);
 
   // Live score calculation for WAIS-IV Matrices

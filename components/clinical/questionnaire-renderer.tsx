@@ -17,6 +17,7 @@ import { Question } from "@/lib/types/database.types";
 import {
   evaluateConditionalLogic,
   validateQuestionnaireResponse,
+  calculateQuestionnaireProgress,
 } from "@/lib/utils/questionnaire-logic";
 import { calculateTmtScores } from "@/lib/services/tmt-scoring";
 import { calculateStroopScores } from "@/lib/services/stroop-scoring";
@@ -1529,44 +1530,21 @@ export function QuestionnaireRenderer({
 
   // Helper function to calculate section completion percentage
   const getSectionCompletion = (sectionId: string, questions: Question[]): number => {
-    const sectionQuestions = questions.filter(q => {
-      const sectionIndex = questions.findIndex(sq => sq.id === sectionId);
-      if (sectionIndex === -1) return false;
-      
-      // Find next section or end of array
-      const nextSectionIndex = questions.findIndex((sq, idx) => 
-        idx > sectionIndex && sq.type === 'section'
-      );
-      const endIndex = nextSectionIndex === -1 ? questions.length : nextSectionIndex;
-      
-      // Check if question is between this section and next section
-      const questionIndex = questions.findIndex(qq => qq.id === q.id);
-      return questionIndex > sectionIndex && questionIndex < endIndex && q.type !== 'section';
-    });
+    // Get questions in this section
+    const sectionIndex = questions.findIndex(q => q.id === sectionId);
+    if (sectionIndex === -1) return 100;
     
-    // Filter out unit fields - they're part of their base field
-    const nonUnitQuestions = sectionQuestions.filter(q => !q.id.endsWith('_unit'));
+    const nextSectionIndex = questions.findIndex((q, idx) => 
+      idx > sectionIndex && q.type === 'section'
+    );
+    const endIndex = nextSectionIndex === -1 ? questions.length : nextSectionIndex;
     
-    const visibleSectionQuestions = nonUnitQuestions.filter(q => visibleQuestions.includes(q.id));
-    if (visibleSectionQuestions.length === 0) return 100;
+    const sectionQuestions = questions.filter((q, idx) => 
+      idx > sectionIndex && idx < endIndex
+    );
     
-    const completedQuestions = visibleSectionQuestions.filter(q => {
-      const value = responses[q.id];
-      // For fields with unit selectors, check if base field has value
-      const unitFieldId = `${q.id}_unit`;
-      const hasUnitField = questions.some(sq => sq.id === unitFieldId);
-      
-      if (hasUnitField) {
-        // If it has a unit field, both base and unit must be filled
-        const unitValue = responses[unitFieldId];
-        return value !== undefined && value !== null && value !== '' && 
-               unitValue !== undefined && unitValue !== null && unitValue !== '';
-      }
-      
-      return value !== undefined && value !== null && value !== '';
-    });
-    
-    return Math.round((completedQuestions.length / visibleSectionQuestions.length) * 100);
+    // Use shared calculation logic
+    return calculateQuestionnaireProgress(sectionQuestions, responses, visibleQuestions);
   };
 
   const toggleSection = (sectionId: string) => {

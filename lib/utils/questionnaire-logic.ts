@@ -2,6 +2,7 @@
 // These functions can be used in both client and server components
 
 import { QuestionnaireDefinition } from '@/lib/constants/questionnaires';
+import { Question } from '@/lib/types/database.types';
 import { evaluateCondition as evaluateJSONLogicCondition } from '@/lib/questionnaires/validation';
 
 // ============================================================================
@@ -128,4 +129,59 @@ export function validateQuestionnaireResponse(
     valid: errors.length === 0,
     errors,
   };
+}
+
+// ============================================================================
+// PROGRESS CALCULATION
+// ============================================================================
+
+/**
+ * Calculate questionnaire progress percentage
+ * Handles conditional questions, unit fields, and section visibility
+ * 
+ * @param questions - Array of questions to calculate progress for
+ * @param responses - Current response values
+ * @param visibleQuestions - Array of question IDs that are currently visible
+ * @returns Progress percentage (0-100)
+ */
+export function calculateQuestionnaireProgress(
+  questions: Question[],
+  responses: Record<string, any>,
+  visibleQuestions: string[]
+): number {
+  // Filter to non-section, visible questions only
+  // Exclude unit fields from the count (they're paired with their base field)
+  const relevantQuestions = questions.filter(
+    q => q.type !== 'section' && 
+         visibleQuestions.includes(q.id) &&
+         !q.id.endsWith('_unit')
+  );
+  
+  if (relevantQuestions.length === 0) return 100;
+  
+  // Count completed questions
+  let completed = 0;
+  for (const q of relevantQuestions) {
+    const value = responses[q.id];
+    
+    // Check if this question has a corresponding unit field
+    const unitFieldId = `${q.id}_unit`;
+    const hasUnitField = questions.some(sq => sq.id === unitFieldId);
+    
+    if (hasUnitField) {
+      // Both base and unit must be filled
+      const unitValue = responses[unitFieldId];
+      if (value !== undefined && value !== null && value !== '' &&
+          unitValue !== undefined && unitValue !== null && unitValue !== '') {
+        completed++;
+      }
+    } else {
+      // Regular question - just check if it has a value
+      if (value !== undefined && value !== null && value !== '') {
+        completed++;
+      }
+    }
+  }
+  
+  return Math.round((completed / relevantQuestions.length) * 100);
 }
