@@ -2564,61 +2564,17 @@ export const ISA_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 
 export const CSSRS_HISTORY_QUESTIONS: Question[] = [
+  // Section 1 - Suicidal Ideation
   {
-    id: 'ts_first_date',
-    text: '1. Date de la première Tentative de Suicide (TS)',
-    type: 'text',
-    required: true
+    id: 'section_1_ideation',
+    text: 'Section 1 - Ideation suicidaire',
+    help: 'CONSIGNES: Posez les questions 1 et 2. Si les deux réponses sont négatives, passez à la section « Comportement suicidaire ». Si la réponse à la question 2 est « oui », posez les questions 3, 4 et 5. Si la réponse à la question 1 et/ou 2 est « oui », complétez la section « Intensité de l\'idéation » ci-dessous. Depuis la semaine dernière pour une évaluation initiale ou depuis la dernière visite lors d\'un suivi : moment où il/elle s\'est senti(e) le plus suicidaire.',
+    type: 'section',
+    required: false
   },
   {
-    id: 'ts_total_count',
-    text: '2. Combien de fois avez-vous tenté de vous suicider ?',
-    type: 'number',
-    required: true
-  },
-  {
-    id: 'ts_violent_presence',
-    text: '3. Existe-t-il des TS violentes (arme à feu, immolation, noyade, saut, pendaison, autre) ?',
-    type: 'single_choice',
-    required: true,
-    options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 99, label: 'Ne sais pas', score: 99 }
-    ]
-  },
-  {
-    id: 'ts_violent_count',
-    text: 'Si oui, nombre de TS violentes :',
-    type: 'number',
-    required: false,
-    display_if: {
-      '==': [{ var: 'ts_violent_presence' }, 1]
-    }
-  },
-  {
-    id: 'ts_serious_presence',
-    text: '4. Existe-t-il des TS graves (passage en réanimation) non violentes (médicamenteuses, phlébotomie) ?',
-    type: 'single_choice',
-    required: true,
-    options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 99, label: 'Ne sais pas', score: 99 }
-    ]
-  },
-  {
-    id: 'ts_serious_count',
-    text: 'Si oui, nombre de TS graves :',
-    type: 'number',
-    required: false,
-    display_if: {
-      '==': [{ var: 'ts_serious_presence' }, 1]
-    }
-  },
-  {
-    id: 'ts_interrupted_presence',
-    text: 'Tentative interrompue : Vous est-il arrivé de commencer à faire quelque chose pour mettre fin à vos jours, mais d\'en être empêché(e) par quelqu\'un ou quelque chose ?',
+    id: 's1_q1_wish_death',
+    text: 'Q1. Désir d\'être mort(e). Le sujet souscrit à des pensées concernant le désir de mourir ou de ne plus être en vie, ou le désir de s\'endormir et de ne pas se réveiller.\n\nAvez-vous souhaité être mort(e) ou de vous endormir et de ne jamais vous réveiller ?',
     type: 'single_choice',
     required: true,
     options: [
@@ -2627,17 +2583,8 @@ export const CSSRS_HISTORY_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'ts_interrupted_count',
-    text: 'Nombre total des tentatives interrompues :',
-    type: 'number',
-    required: false,
-    display_if: {
-      '==': [{ var: 'ts_interrupted_presence' }, 1]
-    }
-  },
-  {
-    id: 'ts_aborted_presence',
-    text: 'Tentative avortée : Vous est-il arrivé de commencer à faire quelque chose... mais de vous arrêter de vous-même ?',
+    id: 's1_q2_suicidal_thoughts',
+    text: 'Q2. Pensées suicidaires actives non spécifiques. Pensées d\'ordre général non spécifiques autour de la volonté de mettre fin à ses jours/se suicider (par ex « j\'ai pensé à me suicider »), non associées à des pensées sur les manières permettant de se suicider/méthodes associées, ni à une intention ou à un scénario, au cours de la période d\'évaluation.\n\nAvez-vous réellement pensé à vous suicider ?',
     type: 'single_choice',
     required: true,
     options: [
@@ -2646,89 +2593,119 @@ export const CSSRS_HISTORY_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'ts_aborted_count',
-    text: 'Nombre total des tentatives avortées :',
-    type: 'number',
+    id: 's1_q3_methods',
+    text: 'Q3. Idéation suicidaire active avec la définition des méthodes (sans scénario), sans intention de passage à l\'acte : Le sujet pense au suicide et a envisagé au moins une méthode pour y parvenir au cours de la période d\'évaluation. Il ne s\'agit pas ici de l\'élaboration d\'un scénario spécifique comprenant le moment, le lieu ou la méthode (par ex. le sujet a pensé à une méthode pour se suicider mais ne dispose pas d\'un scénario précis) Il s\'agit par exemple d\'une personne déclarant « J\'ai pensé à avaler des médicaments, mais je n\'ai pas de scénario précis sur le moment, le lieu ou la manière dont je le ferais…et je n\'irai jamais jusque là ».\n\nAvez-vous pensé à la manière dont vous vous y prendriez ?',
+    type: 'single_choice',
     required: false,
     display_if: {
-      '==': [{ var: 'ts_aborted_presence' }, 1]
-    }
-  },
-  {
-    id: 'ts_preparations',
-    text: 'Préparatifs : Avez-vous pris certaines mesures pour faire une tentative de suicide ou pour préparer votre suicide ?',
-    type: 'single_choice',
-    required: true,
+      '==': [{ var: 's1_q2_suicidal_thoughts' }, 1]
+    },
     options: [
       { code: 1, label: 'Oui', score: 1 },
       { code: 0, label: 'Non', score: 0 }
     ]
   },
   {
-    id: 'lethality_recent',
-    text: 'Létalité/lésions médicales observées (Tentative la plus récente)',
+    id: 's1_q4_intention',
+    text: 'Q4. Idéation suicidaire active avec intention de passage à l\'acte, sans scénario précis. Pensées suicidaires actives, le sujet exprime une intention plus ou moins forte de passer à l\'acte et ne se contente pas de déclarer « J\'ai des pensées suicidaires, mais je ne ferai jamais rien pour les mettre en œuvre ».\n\nAvez-vous eu des pensées de ce genre et l\'intention de passer à l\'acte ?',
     type: 'single_choice',
     required: false,
+    display_if: {
+      '==': [{ var: 's1_q2_suicidal_thoughts' }, 1]
+    },
     options: [
-      { code: 0, label: '0 - Aucune atteinte physique ou très légère', score: 0 },
-      { code: 1, label: '1 - Atteinte physique légère', score: 1 },
-      { code: 2, label: '2 - Atteinte physique modérée (soins médicaux)', score: 2 },
-      { code: 3, label: '3 - Atteinte physique grave (soins intensifs probables)', score: 3 },
-      { code: 4, label: '4 - Atteinte physique très grave (soins intensifs nécessaires)', score: 4 },
-      { code: 5, label: '5 - Décès', score: 5 }
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
     ]
   },
   {
-    id: 'date_recent',
-    text: 'Date de la tentative la plus récente :',
-    type: 'text',
+    id: 's1_q5_detailed_scenario',
+    text: 'Q5. Idéation suicidaire active avec scénario précis et intention de passer à l\'acte. Pensées suicidaires associées à l\'élaboration complète ou partielle d\'un scénario détaillé ; le sujet exprime une intention plus ou moins forte de mettre ce scénario à exécution.\n\nAvez-vous commencé ou fini d\'élaborer un scénario détaillé sur la manière dont vous voulez vous suicider ? Avez-vous l\'intention de mettre ce scénario à exécution ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 's1_q2_suicidal_thoughts' }, 1]
+    },
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  
+  // Section 2 - Intensity of Ideation
+  {
+    id: 'section_2_intensity',
+    text: 'Section 2 - INTENSITE DE L\'IDEATION',
+    help: 'Les aspects suivants doivent être évalués en fonction du type d\'idéation le plus grave (c.-à-d. idéations 1 à 5 ci-dessus, 1 étant la moins grave et 5 la plus grave). La question portera sur le moment où il/elle s\'est senti(e) le plus suicidaire.',
+    type: 'section',
     required: false
   },
   {
-    id: 'lethality_most_lethal',
-    text: 'Létalité/lésions médicales observées (Tentative la plus létale)',
+    id: 's2_q1_ideation_severity',
+    text: 'Q1. Idéation la plus grave (N° du type 1 à 5):',
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: '0 - Aucune atteinte physique ou très légère', score: 0 },
-      { code: 1, label: '1 - Atteinte physique légère', score: 1 },
-      { code: 2, label: '2 - Atteinte physique modérée (soins médicaux)', score: 2 },
-      { code: 3, label: '3 - Atteinte physique grave (soins intensifs probables)', score: 3 },
-      { code: 4, label: '4 - Atteinte physique très grave (soins intensifs nécessaires)', score: 4 },
-      { code: 5, label: '5 - Décès', score: 5 }
+      { code: 1, label: '1', score: 1 },
+      { code: 2, label: '2', score: 2 },
+      { code: 3, label: '3', score: 3 },
+      { code: 4, label: '4', score: 4 },
+      { code: 5, label: '5', score: 5 }
     ]
   },
   {
-    id: 'date_most_lethal',
-    text: 'Date de la tentative la plus létale :',
-    type: 'text',
-    required: false
-  },
-  {
-    id: 'lethality_first',
-    text: 'Létalité/lésions médicales observées (Première tentative)',
+    id: 's2_q2_frequency',
+    text: 'Q2. Fréquence. Combien de fois avez-vous eu ces pensées ?',
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: '0 - Aucune atteinte physique ou très légère', score: 0 },
-      { code: 1, label: '1 - Atteinte physique légère', score: 1 },
-      { code: 2, label: '2 - Atteinte physique modérée (soins médicaux)', score: 2 },
-      { code: 3, label: '3 - Atteinte physique grave (soins intensifs probables)', score: 3 },
-      { code: 4, label: '4 - Atteinte physique très grave (soins intensifs nécessaires)', score: 4 },
-      { code: 5, label: '5 - Décès', score: 5 }
+      { code: 1, label: '1 - Moins d\'une fois par semaine', score: 1 },
+      { code: 2, label: '2 - Une fois par semaine', score: 2 },
+      { code: 3, label: '3 - 2 à 5 fois par semaine', score: 3 },
+      { code: 4, label: '4 - Tous les jours ou presque', score: 4 },
+      { code: 5, label: '5 - Plusieurs fois par jour', score: 5 }
     ]
   },
   {
-    id: 'date_first_confirm',
-    text: 'Date de la première tentative :',
-    type: 'text',
-    required: false
+    id: 's2_q3_duration',
+    text: 'Q3. Durée. Lorsque vous avez ces pensées, combien de temps durent-elles ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - Quelques instants : quelques secondes ou quelques minutes', score: 1 },
+      { code: 2, label: '2 - Moins d\'une heure/un certain temps', score: 2 },
+      { code: 3, label: '3 - 1 à 4 heures/longtemps', score: 3 },
+      { code: 4, label: '4 - 4 à 8 heures/une grande partie de la journée', score: 4 },
+      { code: 5, label: '5 - Plus de 8 heures/en permanence ou tout le temps', score: 5 }
+    ]
   },
   {
-    id: 'potential_lethality',
-    text: 'Létalité probable d\'une tentative avérée en l\'absence de lésions médicales (si létalité observée = 0)',
-    type: 'text',
-    required: false
+    id: 's2_q4_control',
+    text: 'Q4. Maîtrise des pensées suicidaires. Pourriez-vous/pouvez-vous arrêter de penser au suicide ou à votre envie de mourir si vous le voul(i)ez ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - Maîtrise facilement ses pensées', score: 1 },
+      { code: 2, label: '2 - Capable de maîtriser ses pensées avec de légères difficultés', score: 2 },
+      { code: 3, label: '3 - Capable de maîtriser ses pensées avec quelques difficultés', score: 3 },
+      { code: 4, label: '4 - Capable de maîtriser ses pensées avec de grandes difficultés', score: 4 },
+      { code: 5, label: '5 - Incapable de maîtriser ses pensées', score: 5 },
+      { code: 0, label: '0 - N\'essaie pas de maîtriser ses pensées', score: 0 }
+    ]
+  },
+  {
+    id: 's2_q5_causes',
+    text: 'Q5. Causes de l\'idéation. Quelles sont les raisons pour lesquelles vous avez souhaité mourir ou vous suicider ? Était-ce pour faire cesser la douleur ou bien pour ne plus ressentir votre mal-être (en d\'autres termes, vous ne pouviez pas continuer à vivre avec cette douleur ou ce mal-être), ou bien pour attirer l\'attention, vous venger ou faire réagir les autres ? Ou tout cela à la fois ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - Uniquement pour attirer l\'attention, vous venger ou faire réagir les autres', score: 1 },
+      { code: 2, label: '2 - Principalement pour attirer l\'attention, vous venger ou faire réagir les autres', score: 2 },
+      { code: 3, label: '3 - Autant pour attirer l\'attention, vous venger ou faire réagir les autres que pour faire cesser la douleur', score: 3 },
+      { code: 4, label: '4 - Principalement pour faire cesser la douleur (vous ne pouviez pas continuer à vivre avec cette douleur ou ce mal-être)', score: 4 },
+      { code: 5, label: '5 - Uniquement pour faire cesser la douleur (vous ne pouviez pas continuer à vivre avec cette douleur ou ce mal-être)', score: 5 },
+      { code: 0, label: '0 - Sans objet', score: 0 }
+    ]
   }
 ];
 
@@ -2736,7 +2713,7 @@ export const CSSRS_HISTORY_DEFINITION: QuestionnaireDefinition = {
   id: 'cssrs_history',
   code: 'CSSRS_HISTORY_FR',
   title: 'Histoire des Conduites Suicidaires (C-SSRS Supplement)',
-  description: 'Recueil détaillé de l\'historique des tentatives de suicide, incluant la violence, la gravité médicale (létalité) et les comportements interrompus/avortés.',
+  description: 'Évaluation de l\'idéation suicidaire et de son intensité, incluant le désir de mort, les pensées suicidaires actives, les méthodes envisagées, l\'intention de passage à l\'acte et le niveau d\'intensité (fréquence, durée, maîtrise, causes).',
   questions: CSSRS_HISTORY_QUESTIONS,
   metadata: {
     singleColumn: true,

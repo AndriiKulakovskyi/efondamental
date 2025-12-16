@@ -2072,43 +2072,19 @@ export interface CssrsHistoryResponse {
   visit_id: string;
   patient_id: string;
   
-  // Historical Overview
-  ts_first_date?: string | null; // Date of first suicide attempt
-  ts_total_count?: number | null; // Total number of attempts
+  // Section 1: Suicidal Ideation (Idéation suicidaire)
+  s1_q1_wish_death?: number | null; // 0=Non, 1=Oui
+  s1_q2_suicidal_thoughts?: number | null; // 0=Non, 1=Oui
+  s1_q3_methods?: number | null; // 0=Non, 1=Oui (conditional on Q2=1)
+  s1_q4_intention?: number | null; // 0=Non, 1=Oui (conditional on Q2=1)
+  s1_q5_detailed_scenario?: number | null; // 0=Non, 1=Oui (conditional on Q2=1)
   
-  // Violent Attempts
-  ts_violent_presence?: number | null; // 0=No, 1=Yes, 99=Don't know
-  ts_violent_count?: number | null;
-  
-  // Serious Non-Violent Attempts
-  ts_serious_presence?: number | null; // 0=No, 1=Yes, 99=Don't know
-  ts_serious_count?: number | null;
-  
-  // Interrupted Attempts
-  ts_interrupted_presence?: number | null; // 0=No, 1=Yes
-  ts_interrupted_count?: number | null;
-  
-  // Aborted Attempts
-  ts_aborted_presence?: number | null; // 0=No, 1=Yes
-  ts_aborted_count?: number | null;
-  
-  // Preparations
-  ts_preparations?: number | null; // 0=No, 1=Yes
-  
-  // Lethality - Most Recent
-  lethality_recent?: number | null; // 0-5 scale
-  date_recent?: string | null;
-  
-  // Lethality - Most Lethal
-  lethality_most_lethal?: number | null; // 0-5 scale
-  date_most_lethal?: string | null;
-  
-  // Lethality - First
-  lethality_first?: number | null; // 0-5 scale
-  date_first_confirm?: string | null;
-  
-  // Potential Lethality
-  potential_lethality?: string | null;
+  // Section 2: Intensity of Ideation (INTENSITE DE L'IDEATION)
+  s2_q1_ideation_severity?: number | null; // 1-5 scale
+  s2_q2_frequency?: number | null; // 1-5 scale
+  s2_q3_duration?: number | null; // 1-5 scale
+  s2_q4_control?: number | null; // 0-5 scale (0=Does not try to control)
+  s2_q5_causes?: number | null; // 0-5 scale (0=N/A)
   
   // Metadata
   completed_at: string;
