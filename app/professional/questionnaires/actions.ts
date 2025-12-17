@@ -39,6 +39,7 @@ import {
   saveCssrsResponse,
   saveIsaResponse,
   saveSisResponse,
+  saveSuicideHistoryResponse,
   saveWais4CriteriaResponse,
   saveWais4LearningResponse,
   saveWais4MatricesResponse,
@@ -125,6 +126,7 @@ import {
   CssrsResponseInsert,
   IsaResponseInsert,
   SisResponseInsert,
+  SuicideHistoryResponseInsert,
   SocialResponseInsert,
   TobaccoResponseInsert,
   FagerstromResponseInsert,
@@ -448,6 +450,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as SisResponseInsert);
+        break;
+
+      case 'SUICIDE_HISTORY_FR':
+        result = await saveSuicideHistoryResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as SuicideHistoryResponseInsert);
         break;
 
       case 'SOCIAL':

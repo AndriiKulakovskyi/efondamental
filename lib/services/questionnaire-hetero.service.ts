@@ -27,6 +27,8 @@ import {
   IsaResponseInsert,
   SisResponse,
   SisResponseInsert,
+  SuicideHistoryResponse,
+  SuicideHistoryResponseInsert,
   Wais4CriteriaResponse,
   Wais4CriteriaResponseInsert,
   Wais4LearningResponse,
@@ -914,6 +916,44 @@ export async function saveSisResponse(
     .from('responses_sis')
     .upsert({
       ...responseWithoutGeneratedFields
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Suicide History (Histoire des conduites suicidaires)
+// ============================================================================
+
+export async function getSuicideHistoryResponse(
+  visitId: string
+): Promise<SuicideHistoryResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_suicide_history')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveSuicideHistoryResponse(
+  response: SuicideHistoryResponseInsert
+): Promise<SuicideHistoryResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_suicide_history')
+    .upsert({
+      ...response
     }, { onConflict: 'visit_id' })
     .select()
     .single();

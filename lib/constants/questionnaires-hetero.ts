@@ -5419,6 +5419,192 @@ export const SIS_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
+// Suicide History (Histoire des conduites suicidaires)
+// ============================================================================
+
+const SEVERITY_OPTIONS = [
+  { code: 0, label: '0 - Aucune atteinte physique ou atteinte physique très légère (par ex. égratignures)', score: 0 },
+  { code: 1, label: '1 - Atteinte physique légère (par ex. élocution ralentie, brûlures au premier degré, légers saignements, entorses)', score: 1 },
+  { code: 2, label: '2 - Atteinte physique modérée nécessitant une prise en charge médicale (par ex. personne consciente mais somnolente, altération de la réactivité, brûlures au deuxième degré, saignement d\'un vaisseau important)', score: 2 },
+  { code: 3, label: '3 - Atteinte physique grave, hospitalisation nécessaire et soins intensifs probablement nécessaires (par ex. état comateux avec réflexes intacts, brûlures au troisième degré sur moins de 20% de la surface corporelle, hémorragie importante mais sans risque vital, fractures importantes)', score: 3 },
+  { code: 4, label: '4 - Atteinte physique très grave, hospitalisation et soins intensifs nécessaires (par ex. état comateux avec absence de réflexes, brûlures au troisième degré sur plus de 20% de la surface corporelle, hémorragie importante associée à une instabilité des signes vitaux, atteinte majeure d\'un organe vital)', score: 4 },
+  { code: 5, label: '5 - Décès', score: 5 }
+];
+
+export const SUICIDE_HISTORY_QUESTIONS: Question[] = [
+  {
+    id: 'q1_first_attempt_date',
+    text: 'Q1. Date de la première tentative de suicide',
+    type: 'date',
+    required: false
+  },
+  {
+    id: 'q2_attempt_count',
+    text: 'Q2. Combien de fois avez-vous tenté de vous suicider ?',
+    type: 'number',
+    required: false,
+    min: 0
+  },
+  {
+    id: 'q3_violent_attempts',
+    text: 'Q3. Existe-t-il des TS violentes (arme à feu, immolation, noyade, saut, pendaison, autre) ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'yes', label: 'Oui', score: 1 },
+      { code: 'no', label: 'Non', score: 0 },
+      { code: 'unknown', label: 'Ne sais pas', score: 0 }
+    ]
+  },
+  {
+    id: 'q3_1_violent_count',
+    text: 'Q3.1. Nombre de tentatives de suicide violentes',
+    type: 'number',
+    required: false,
+    min: 0,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_violent_attempts' }, 'yes'] }
+  },
+  {
+    id: 'q4_serious_attempts',
+    text: 'Q4. Existe-t-il des tentatives de suicide graves (passage en réanimation) non violentes (médicamenteuses, phlébotomie) ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'yes', label: 'Oui', score: 1 },
+      { code: 'no', label: 'Non', score: 0 },
+      { code: 'unknown', label: 'Ne sais pas', score: 0 }
+    ]
+  },
+  {
+    id: 'q4_1_serious_count',
+    text: 'Q4.1. Nombre de tentatives de suicide graves',
+    type: 'number',
+    required: false,
+    min: 0,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q4_serious_attempts' }, 'yes'] }
+  },
+  {
+    id: 'q5_self_harm',
+    text: 'Q5. Le sujet a-t-il eu un comportement auto-agressif non suicidaire ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q6_interrupted',
+    text: 'Q6. Tentative interrompue : Interruption (par des facteurs extérieurs) de la mise en oeuvre par la personne d\'un acte potentiellement auto-agressif (sinon, une tentative avérée aurait eu lieu). Surdosage : la personne a des comprimés dans la main, mais quelqu\'un l\'empêche de les avaler. Si elle ingère un ou plusieurs comprimés, il s\'agit d\'une tentative avérée plutôt que d\'une tentative interrompue. Arme à feu : la personne pointe une arme vers elle, mais l\'arme lui est reprise par quelqu\'un ou quelque chose l\'empêche d\'appuyer sur la gâchette. Si elle appuie sur la gâchette et même si le coup ne part pas, il s\'agit d\'une tentative avérée. Saut dans le vide : la personne s\'apprête à sauter, mais quelqu\'un la retient et l\'éloigne du bord. Pendaison : la personne a une corde autour du cou mais ne s\'est pas encore pendue car quelqu\'un l\'en empêche.\n\nVous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais d\'en être empêché(e) par quelqu\'un ou quelque chose avant de véritablement passer à l\'acte ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q6_1_interrupted_count',
+    text: 'Q6.1. Nombre total de tentatives interrompues',
+    type: 'number',
+    required: false,
+    min: 0,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q6_interrupted' }, 1] }
+  },
+  {
+    id: 'q7_aborted',
+    text: 'Q7. Tentative avortée : La personne se prépare à se suicider, mais s\'interrompt d\'elle-même avant d\'avoir réellement eu un comportement autodestructeur. Les exemples sont similaires à ceux illustrant une tentative interrompue, si ce n\'est qu\'ici la personne interrompt d\'elle-même sa tentative au lieu d\'être interrompue par un facteur extérieur.\n\nVous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais de vous arrêter de vous-même avant de véritablement passer à l\'acte ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q7_1_aborted_count',
+    text: 'Q7.1. Nombre total de tentatives avortées',
+    type: 'number',
+    required: false,
+    min: 0,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q7_aborted' }, 1] }
+  },
+  {
+    id: 'q8_preparations',
+    text: 'Q8. Préparatifs : Actes ou préparatifs en vue d\'une tentative de suicide imminente. Il peut s\'agir de tout ce qui dépasse le stade de la verbalisation ou de la pensée, comme l\'élaboration d\'une méthode spécifique (par ex. se procurer des comprimés ou une arme à feu) ou la prise de dispositions en vue de son suicide (par ex. dons d\'objets, rédaction d\'une lettre d\'adieu).\n\nAvez-vous pris certaines mesures pour faire une tentative de suicide ou pour préparer votre suicide (par ex. rassembler des comprimés, vous procurer une arme à feu, donner vos objets de valeur ou écrire une lettre d\'adieu) ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q9_recent_severity',
+    text: 'Q9. Tentative la plus récente',
+    type: 'single_choice',
+    required: false,
+    options: SEVERITY_OPTIONS
+  },
+  {
+    id: 'q10_recent_date',
+    text: 'Q10. Date de la tentative la plus récente',
+    type: 'date',
+    required: false
+  },
+  {
+    id: 'q11_lethal_severity',
+    text: 'Q11. Tentative la plus létale',
+    type: 'single_choice',
+    required: false,
+    options: SEVERITY_OPTIONS
+  },
+  {
+    id: 'q12_lethal_date',
+    text: 'Q12. Date de la tentative la plus létale',
+    type: 'date',
+    required: false
+  },
+  {
+    id: 'q13_first_severity',
+    text: 'Q13. Première tentative',
+    type: 'single_choice',
+    required: false,
+    options: SEVERITY_OPTIONS
+  },
+  {
+    id: 'q13_1_first_lethality',
+    text: 'Q13.1. La Première tentative',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q13_first_severity' }, 0] },
+    options: [
+      { code: 0, label: '0 - Comportement peu enclin à engendrer des blessures', score: 0 },
+      { code: 1, label: '1 - Comportement susceptible d\'engendrer des blessures mais ne pouvant causer la mort', score: 1 },
+      { code: 2, label: '2 - Comportement susceptible de causer la mort malgré des soins médicaux disponibles', score: 2 }
+    ]
+  }
+];
+
+export const SUICIDE_HISTORY_DEFINITION: QuestionnaireDefinition = {
+  id: 'suicide_history',
+  code: 'SUICIDE_HISTORY_FR',
+  title: 'Histoire des conduites suicidaires',
+  description: 'Évaluation de l\'historique des tentatives de suicide, incluant les dates, le nombre de tentatives, les types de tentatives (violentes, graves, interrompues, avortées) et leur gravité.',
+  questions: SUICIDE_HISTORY_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================
 

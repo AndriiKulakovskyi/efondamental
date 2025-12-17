@@ -2301,6 +2301,74 @@ export interface SisResponse {
 
 export type SisResponseInsert = Omit<SisResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score' | 'circumstances_subscore' | 'conception_subscore'>;
 
+// ===== Suicide History (Histoire des conduites suicidaires) Response =====
+export interface SuicideHistoryResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Q1: Date of first suicide attempt
+  q1_first_attempt_date?: string | null;
+  
+  // Q2: Number of suicide attempts
+  q2_attempt_count?: number | null;
+  
+  // Q3: Violent suicide attempts (yes/no/unknown)
+  q3_violent_attempts?: 'yes' | 'no' | 'unknown' | null;
+  
+  // Q3.1: Number of violent attempts (conditional on Q3=yes)
+  q3_1_violent_count?: number | null;
+  
+  // Q4: Serious non-violent attempts (yes/no/unknown)
+  q4_serious_attempts?: 'yes' | 'no' | 'unknown' | null;
+  
+  // Q4.1: Number of serious non-violent attempts (conditional on Q4=yes)
+  q4_1_serious_count?: number | null;
+  
+  // Q5: Non-suicidal self-harm behavior (0=No, 1=Yes)
+  q5_self_harm?: number | null;
+  
+  // Q6: Interrupted attempt (0=No, 1=Yes)
+  q6_interrupted?: number | null;
+  
+  // Q6.1: Number of interrupted attempts (conditional on Q6=1)
+  q6_1_interrupted_count?: number | null;
+  
+  // Q7: Aborted attempt (0=No, 1=Yes)
+  q7_aborted?: number | null;
+  
+  // Q7.1: Number of aborted attempts (conditional on Q7=1)
+  q7_1_aborted_count?: number | null;
+  
+  // Q8: Preparations for suicide (0=No, 1=Yes)
+  q8_preparations?: number | null;
+  
+  // Q9: Most recent attempt severity (0-5 scale)
+  q9_recent_severity?: number | null;
+  
+  // Q10: Date of most recent attempt
+  q10_recent_date?: string | null;
+  
+  // Q11: Most lethal attempt severity (0-5 scale)
+  q11_lethal_severity?: number | null;
+  
+  // Q12: Date of most lethal attempt
+  q12_lethal_date?: string | null;
+  
+  // Q13: First attempt severity (0-5 scale)
+  q13_first_severity?: number | null;
+  
+  // Q13.1: First attempt lethality (0-2 scale, conditional on Q13=0)
+  q13_1_first_lethality?: number | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SuicideHistoryResponseInsert = Omit<SuicideHistoryResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
 // ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================

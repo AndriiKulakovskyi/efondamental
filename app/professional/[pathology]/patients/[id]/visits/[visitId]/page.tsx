@@ -48,6 +48,7 @@ import {
   CSSRS_DEFINITION,
   ISA_DEFINITION,
   SIS_DEFINITION,
+  SUICIDE_HISTORY_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
   WAIS4_MATRICES_DEFINITION,
@@ -472,6 +473,13 @@ export default async function VisitDetailPage({
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['SIS_FR']?.completed || false,
             completedAt: questionnaireStatuses['SIS_FR']?.completed_at,
+          },
+          {
+            ...SUICIDE_HISTORY_DEFINITION,
+            id: SUICIDE_HISTORY_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['SUICIDE_HISTORY_FR']?.completed || false,
+            completedAt: questionnaireStatuses['SUICIDE_HISTORY_FR']?.completed_at,
           }
         );
         
