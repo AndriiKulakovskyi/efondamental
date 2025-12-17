@@ -25,8 +25,6 @@ import {
   CssrsResponseInsert,
   IsaResponse,
   IsaResponseInsert,
-  CssrsHistoryResponse,
-  CssrsHistoryResponseInsert,
   SisResponse,
   SisResponseInsert,
   Wais4CriteriaResponse,
@@ -873,44 +871,6 @@ export async function saveIsaResponse(
 
   const { data, error } = await supabase
     .from('responses_isa')
-    .upsert({
-      ...response
-    }, { onConflict: 'visit_id' })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
-}
-
-// ============================================================================
-// C-SSRS History (Histoire des Conduites Suicidaires)
-// ============================================================================
-
-export async function getCssrsHistoryResponse(
-  visitId: string
-): Promise<CssrsHistoryResponse | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('responses_cssrs_history')
-    .select('*')
-    .eq('visit_id', visitId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') return null;
-    throw error;
-  }
-  return data;
-}
-
-export async function saveCssrsHistoryResponse(
-  response: CssrsHistoryResponseInsert
-): Promise<CssrsHistoryResponse> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('responses_cssrs_history')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })

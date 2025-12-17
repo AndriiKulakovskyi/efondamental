@@ -39,7 +39,6 @@ import {
   FAMILY_HISTORY_DEFINITION,
   CSSRS_DEFINITION,
   ISA_DEFINITION,
-  CSSRS_HISTORY_DEFINITION,
   SIS_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
@@ -124,7 +123,6 @@ import {
   getFamilyHistoryResponse,
   getCssrsResponse,
   getIsaResponse,
-  getCssrsHistoryResponse,
   getSisResponse,
   getWais4CriteriaResponse,
   getWais4LearningResponse,
@@ -232,7 +230,6 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === FAMILY_HISTORY_DEFINITION.code) questionnaire = FAMILY_HISTORY_DEFINITION;
   else if (code === CSSRS_DEFINITION.code) questionnaire = CSSRS_DEFINITION;
   else if (code === ISA_DEFINITION.code) questionnaire = ISA_DEFINITION;
-  else if (code === CSSRS_HISTORY_DEFINITION.code) questionnaire = CSSRS_HISTORY_DEFINITION;
   else if (code === SIS_DEFINITION.code) questionnaire = SIS_DEFINITION;
   else if (code === WAIS4_CRITERIA_DEFINITION.code) questionnaire = WAIS4_CRITERIA_DEFINITION;
   else if (code === WAIS4_LEARNING_DEFINITION.code) questionnaire = WAIS4_LEARNING_DEFINITION;
@@ -319,7 +316,6 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === FAMILY_HISTORY_DEFINITION.code) existingResponse = await getFamilyHistoryResponse(visitId);
   else if (code === CSSRS_DEFINITION.code) existingResponse = await getCssrsResponse(visitId);
   else if (code === ISA_DEFINITION.code) existingResponse = await getIsaResponse(visitId);
-  else if (code === CSSRS_HISTORY_DEFINITION.code) existingResponse = await getCssrsHistoryResponse(visitId);
   else if (code === SIS_DEFINITION.code) existingResponse = await getSisResponse(visitId);
   else if (code === WAIS4_CRITERIA_DEFINITION.code) existingResponse = await getWais4CriteriaResponse(visitId);
   else if (code === WAIS4_LEARNING_DEFINITION.code) existingResponse = await getWais4LearningResponse(visitId);

@@ -38,7 +38,6 @@ import {
   saveFamilyHistoryResponse,
   saveCssrsResponse,
   saveIsaResponse,
-  saveCssrsHistoryResponse,
   saveSisResponse,
   saveWais4CriteriaResponse,
   saveWais4LearningResponse,
@@ -125,7 +124,6 @@ import {
   FamilyHistoryResponseInsert,
   CssrsResponseInsert,
   IsaResponseInsert,
-  CssrsHistoryResponseInsert,
   SisResponseInsert,
   SocialResponseInsert,
   TobaccoResponseInsert,
@@ -442,14 +440,6 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as IsaResponseInsert);
-        break;
-
-      case 'CSSRS_HISTORY_FR':
-        result = await saveCssrsHistoryResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as CssrsHistoryResponseInsert);
         break;
 
       case 'SIS_FR':

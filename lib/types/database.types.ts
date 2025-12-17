@@ -2263,34 +2263,6 @@ export interface IsaResponse {
 
 export type IsaResponseInsert = Omit<IsaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
-// ===== C-SSRS History (Histoire des Conduites Suicidaires) Response =====
-export interface CssrsHistoryResponse {
-  id: string;
-  visit_id: string;
-  patient_id: string;
-  
-  // Section 1: Suicidal Ideation (Idéation suicidaire)
-  s1_q1_wish_death?: number | null; // 0=Non, 1=Oui
-  s1_q2_suicidal_thoughts?: number | null; // 0=Non, 1=Oui
-  s1_q3_methods?: number | null; // 0=Non, 1=Oui (conditional on Q2=1)
-  s1_q4_intention?: number | null; // 0=Non, 1=Oui (conditional on Q2=1)
-  s1_q5_detailed_scenario?: number | null; // 0=Non, 1=Oui (conditional on Q2=1)
-  
-  // Section 2: Intensity of Ideation (INTENSITE DE L'IDEATION)
-  s2_q1_ideation_severity?: number | null; // 1-5 scale
-  s2_q2_frequency?: number | null; // 1-5 scale
-  s2_q3_duration?: number | null; // 1-5 scale
-  s2_q4_control?: number | null; // 0-5 scale (0=Does not try to control)
-  s2_q5_causes?: number | null; // 0-5 scale (0=N/A)
-  
-  // Metadata
-  completed_at: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export type CssrsHistoryResponseInsert = Omit<CssrsHistoryResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
-
 // ===== SIS (Suicide Intent Scale) Response =====
 export interface SisResponse {
   id: string;

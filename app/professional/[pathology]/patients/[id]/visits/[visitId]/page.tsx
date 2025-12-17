@@ -47,7 +47,6 @@ import {
   FAMILY_HISTORY_DEFINITION,
   CSSRS_DEFINITION,
   ISA_DEFINITION,
-  CSSRS_HISTORY_DEFINITION,
   SIS_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
@@ -466,13 +465,6 @@ export default async function VisitDetailPage({
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['ISA_FR']?.completed || false,
             completedAt: questionnaireStatuses['ISA_FR']?.completed_at,
-          },
-          {
-            ...CSSRS_HISTORY_DEFINITION,
-            id: CSSRS_HISTORY_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['CSSRS_HISTORY_FR']?.completed || false,
-            completedAt: questionnaireStatuses['CSSRS_HISTORY_FR']?.completed_at,
           },
           {
             ...SIS_DEFINITION,
