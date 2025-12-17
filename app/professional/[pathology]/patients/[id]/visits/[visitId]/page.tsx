@@ -56,6 +56,7 @@ import {
   PATHO_DERMATO_DEFINITION,
   PATHO_URINAIRE_DEFINITION,
   ANTECEDENTS_GYNECO_DEFINITION,
+  PATHO_HEPATO_GASTRO_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
   WAIS4_MATRICES_DEFINITION,
@@ -560,6 +561,13 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['ANTECEDENTS_GYNECO_FR']?.completed || false,
                   completedAt: questionnaireStatuses['ANTECEDENTS_GYNECO_FR']?.completed_at,
+                },
+                {
+                  ...PATHO_HEPATO_GASTRO_DEFINITION,
+                  id: PATHO_HEPATO_GASTRO_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['PATHO_HEPATO_GASTRO_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['PATHO_HEPATO_GASTRO_FR']?.completed_at,
                 }
               ]
             }
@@ -1086,6 +1094,13 @@ export default async function VisitDetailPage({
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['ANTECEDENTS_GYNECO_FR']?.completed || false,
             completedAt: questionnaireStatuses['ANTECEDENTS_GYNECO_FR']?.completed_at,
+          },
+          {
+            ...PATHO_HEPATO_GASTRO_DEFINITION,
+            id: PATHO_HEPATO_GASTRO_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['PATHO_HEPATO_GASTRO_FR']?.completed || false,
+            completedAt: questionnaireStatuses['PATHO_HEPATO_GASTRO_FR']?.completed_at,
           }
         ];
         

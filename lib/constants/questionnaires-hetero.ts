@@ -6840,6 +6840,174 @@ export const ANTECEDENTS_GYNECO_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
+// Pathologies hépato-gastro-entérologiques (Hepato-gastro-enterological Pathologies)
+// ============================================================================
+
+export const PATHO_HEPATO_GASTRO_QUESTIONS: Question[] = [
+  // 1. Maladies inflammatoires chroniques de l'intestin (MICI)
+  {
+    id: 'q1_1_mici_presence',
+    text: 'Maladies inflammatoires chroniques de l\'intestin',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q1_2_mici_start_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_1_mici_presence' }, 'yes'] }
+  },
+  {
+    id: 'q1_3_mici_treated',
+    text: 'Traitées',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_1_mici_presence' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q1_4_mici_balanced',
+    text: 'Équilibrées',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_1_mici_presence' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q1_5_mici_type',
+    text: 'Type de maladie',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_1_mici_presence' }, 'yes'] },
+    options: [
+      { code: 'crohn', label: 'Maladie de Crohn', score: 0 },
+      { code: 'rch', label: 'Rectocolite hémorragique', score: 0 },
+      { code: 'unknown', label: 'Ne sais pas', score: 0 }
+    ]
+  },
+
+  // 2. Cirrhose
+  {
+    id: 'q2_1_cirrhosis_presence',
+    text: 'Cirrhose',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q2_2_cirrhosis_start_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_1_cirrhosis_presence' }, 'yes'] }
+  },
+  {
+    id: 'q2_3_cirrhosis_treated',
+    text: 'Traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_1_cirrhosis_presence' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q2_4_cirrhosis_balanced',
+    text: 'Équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_1_cirrhosis_presence' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+
+  // 3. Ulcère gastro-duodénal
+  {
+    id: 'q3_1_ulcer_presence',
+    text: 'Ulcère gastro-duodénal',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q3_2_ulcer_start_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_1_ulcer_presence' }, 'yes'] }
+  },
+  {
+    id: 'q3_3_ulcer_treated',
+    text: 'Traité',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_1_ulcer_presence' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q3_4_ulcer_balanced',
+    text: 'Équilibré',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_1_ulcer_presence' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+
+  // 4. Hépatites médicamenteuses
+  {
+    id: 'q4_1_hepatitis_presence',
+    text: 'Hépatites médicamenteuses',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q4_2_hepatitis_start_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q4_1_hepatitis_presence' }, 'yes'] }
+  },
+  {
+    id: 'q4_3_hepatitis_treatment_type',
+    text: 'Nature du traitement',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q4_1_hepatitis_presence' }, 'yes'] },
+    options: [
+      { code: 'neuroleptiques', label: 'Neuroleptiques', score: 0 },
+      { code: 'antidepresseurs', label: 'Antidépresseurs', score: 0 },
+      { code: 'anticonvulsivants', label: 'Anticonvulsivants', score: 0 },
+      { code: 'autres', label: 'Autres traitements', score: 0 }
+    ]
+  }
+];
+
+export const PATHO_HEPATO_GASTRO_DEFINITION: QuestionnaireDefinition = {
+  id: 'patho_hepato_gastro',
+  code: 'PATHO_HEPATO_GASTRO_FR',
+  title: 'Pathologies hépato-gastro-entérologiques',
+  description: 'Recueil des antécédents de pathologies hépato-gastro-entérologiques du patient (MICI, cirrhose, ulcère, hépatites médicamenteuses).',
+  questions: PATHO_HEPATO_GASTRO_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================
 

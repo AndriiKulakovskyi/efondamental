@@ -47,6 +47,7 @@ import {
   savePathoDermatoResponse,
   savePathoUrinaireResponse,
   saveAntecedentsGynecoResponse,
+  savePathoHepatoGastroResponse,
   saveWais4CriteriaResponse,
   saveWais4LearningResponse,
   saveWais4MatricesResponse,
@@ -141,6 +142,7 @@ import {
   PathoDermatoResponseInsert,
   PathoUrinaireResponseInsert,
   AntecedentsGynecoResponseInsert,
+  PathoHepatoGastroResponseInsert,
   SocialResponseInsert,
   TobaccoResponseInsert,
   FagerstromResponseInsert,
@@ -528,6 +530,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as AntecedentsGynecoResponseInsert);
+        break;
+
+      case 'PATHO_HEPATO_GASTRO_FR':
+        result = await savePathoHepatoGastroResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as PathoHepatoGastroResponseInsert);
         break;
 
       case 'SOCIAL':

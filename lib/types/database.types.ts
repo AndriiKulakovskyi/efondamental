@@ -2661,6 +2661,44 @@ export interface AntecedentsGynecoResponse {
 
 export type AntecedentsGynecoResponseInsert = Omit<AntecedentsGynecoResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ===== Pathologies hépato-gastro-entérologiques Response =====
+export interface PathoHepatoGastroResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // 1. Maladies inflammatoires chroniques de l'intestin (MICI)
+  q1_1_mici_presence?: 'yes' | 'no' | 'unknown' | null;
+  q1_2_mici_start_date?: string | null;
+  q1_3_mici_treated?: 'yes' | 'no' | null;
+  q1_4_mici_balanced?: 'yes' | 'no' | null;
+  q1_5_mici_type?: 'crohn' | 'rch' | 'unknown' | null;
+  
+  // 2. Cirrhose
+  q2_1_cirrhosis_presence?: 'yes' | 'no' | 'unknown' | null;
+  q2_2_cirrhosis_start_date?: string | null;
+  q2_3_cirrhosis_treated?: 'yes' | 'no' | null;
+  q2_4_cirrhosis_balanced?: 'yes' | 'no' | null;
+  
+  // 3. Ulcère gastro-duodénal
+  q3_1_ulcer_presence?: 'yes' | 'no' | 'unknown' | null;
+  q3_2_ulcer_start_date?: string | null;
+  q3_3_ulcer_treated?: 'yes' | 'no' | null;
+  q3_4_ulcer_balanced?: 'yes' | 'no' | null;
+  
+  // 4. Hépatites médicamenteuses
+  q4_1_hepatitis_presence?: 'yes' | 'no' | 'unknown' | null;
+  q4_2_hepatitis_start_date?: string | null;
+  q4_3_hepatitis_treatment_type?: 'neuroleptiques' | 'antidepresseurs' | 'anticonvulsivants' | 'autres' | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PathoHepatoGastroResponseInsert = Omit<PathoHepatoGastroResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
 // ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================
