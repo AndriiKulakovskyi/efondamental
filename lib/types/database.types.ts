@@ -1878,30 +1878,60 @@ export interface FamilyHistoryResponse {
   daughter1_deceased?: 'oui' | 'non' | null;
   daughter1_death_date?: string | null;
   daughter1_death_cause?: string | null;
+  daughter1_psychiatric?: 'aucun' | 'edm_unipolaire' | 'bipolaire' | 'schizophrene' | 'ne_sais_pas' | null;
+  daughter1_suicide?: 'aucun' | 'tentative' | 'abouti' | 'ne_sais_pas' | null;
+  daughter1_substance?: string[] | null;
+  daughter1_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  daughter1_dementia?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  daughter1_cardio?: string[] | null;
   
   daughter2_dob?: string | null;
   daughter2_has_issues?: boolean | null;
   daughter2_deceased?: 'oui' | 'non' | null;
   daughter2_death_date?: string | null;
   daughter2_death_cause?: string | null;
+  daughter2_psychiatric?: 'aucun' | 'edm_unipolaire' | 'bipolaire' | 'schizophrene' | 'ne_sais_pas' | null;
+  daughter2_suicide?: 'aucun' | 'tentative' | 'abouti' | 'ne_sais_pas' | null;
+  daughter2_substance?: string[] | null;
+  daughter2_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  daughter2_dementia?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  daughter2_cardio?: string[] | null;
   
   daughter3_dob?: string | null;
   daughter3_has_issues?: boolean | null;
   daughter3_deceased?: 'oui' | 'non' | null;
   daughter3_death_date?: string | null;
   daughter3_death_cause?: string | null;
+  daughter3_psychiatric?: 'aucun' | 'edm_unipolaire' | 'bipolaire' | 'schizophrene' | 'ne_sais_pas' | null;
+  daughter3_suicide?: 'aucun' | 'tentative' | 'abouti' | 'ne_sais_pas' | null;
+  daughter3_substance?: string[] | null;
+  daughter3_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  daughter3_dementia?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  daughter3_cardio?: string[] | null;
   
   daughter4_dob?: string | null;
   daughter4_has_issues?: boolean | null;
   daughter4_deceased?: 'oui' | 'non' | null;
   daughter4_death_date?: string | null;
   daughter4_death_cause?: string | null;
+  daughter4_psychiatric?: 'aucun' | 'edm_unipolaire' | 'bipolaire' | 'schizophrene' | 'ne_sais_pas' | null;
+  daughter4_suicide?: 'aucun' | 'tentative' | 'abouti' | 'ne_sais_pas' | null;
+  daughter4_substance?: string[] | null;
+  daughter4_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  daughter4_dementia?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  daughter4_cardio?: string[] | null;
   
   daughter5_dob?: string | null;
   daughter5_has_issues?: boolean | null;
   daughter5_deceased?: 'oui' | 'non' | null;
   daughter5_death_date?: string | null;
   daughter5_death_cause?: string | null;
+  daughter5_psychiatric?: 'aucun' | 'edm_unipolaire' | 'bipolaire' | 'schizophrene' | 'ne_sais_pas' | null;
+  daughter5_suicide?: 'aucun' | 'tentative' | 'abouti' | 'ne_sais_pas' | null;
+  daughter5_substance?: string[] | null;
+  daughter5_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  daughter5_dementia?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  daughter5_cardio?: string[] | null;
   
   // Sons (Fils)
   num_sons?: string | null; // '0', '1', '2', '3', '4', '5', '>5'
@@ -1912,30 +1942,60 @@ export interface FamilyHistoryResponse {
   son1_deceased?: 'oui' | 'non' | null;
   son1_death_date?: string | null;
   son1_death_cause?: string | null;
+  son1_psychiatric?: 'aucun' | 'edm_unipolaire' | 'bipolaire' | 'schizophrene' | 'ne_sais_pas' | null;
+  son1_suicide?: 'aucun' | 'tentative' | 'abouti' | 'ne_sais_pas' | null;
+  son1_substance?: string[] | null;
+  son1_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  son1_dementia?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  son1_cardio?: string[] | null;
   
   son2_dob?: string | null;
   son2_has_issues?: boolean | null;
   son2_deceased?: 'oui' | 'non' | null;
   son2_death_date?: string | null;
   son2_death_cause?: string | null;
+  son2_psychiatric?: 'aucun' | 'edm_unipolaire' | 'bipolaire' | 'schizophrene' | 'ne_sais_pas' | null;
+  son2_suicide?: 'aucun' | 'tentative' | 'abouti' | 'ne_sais_pas' | null;
+  son2_substance?: string[] | null;
+  son2_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  son2_dementia?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  son2_cardio?: string[] | null;
   
   son3_dob?: string | null;
   son3_has_issues?: boolean | null;
   son3_deceased?: 'oui' | 'non' | null;
   son3_death_date?: string | null;
   son3_death_cause?: string | null;
+  son3_psychiatric?: 'aucun' | 'edm_unipolaire' | 'bipolaire' | 'schizophrene' | 'ne_sais_pas' | null;
+  son3_suicide?: 'aucun' | 'tentative' | 'abouti' | 'ne_sais_pas' | null;
+  son3_substance?: string[] | null;
+  son3_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  son3_dementia?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  son3_cardio?: string[] | null;
   
   son4_dob?: string | null;
   son4_has_issues?: boolean | null;
   son4_deceased?: 'oui' | 'non' | null;
   son4_death_date?: string | null;
   son4_death_cause?: string | null;
+  son4_psychiatric?: 'aucun' | 'edm_unipolaire' | 'bipolaire' | 'schizophrene' | 'ne_sais_pas' | null;
+  son4_suicide?: 'aucun' | 'tentative' | 'abouti' | 'ne_sais_pas' | null;
+  son4_substance?: string[] | null;
+  son4_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  son4_dementia?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  son4_cardio?: string[] | null;
   
   son5_dob?: string | null;
   son5_has_issues?: boolean | null;
   son5_deceased?: 'oui' | 'non' | null;
   son5_death_date?: string | null;
   son5_death_cause?: string | null;
+  son5_psychiatric?: 'aucun' | 'edm_unipolaire' | 'bipolaire' | 'schizophrene' | 'ne_sais_pas' | null;
+  son5_suicide?: 'aucun' | 'tentative' | 'abouti' | 'ne_sais_pas' | null;
+  son5_substance?: string[] | null;
+  son5_anxiety?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  son5_dementia?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  son5_cardio?: string[] | null;
   
   // Sisters (Soeurs)
   num_sisters?: string | null; // '0', '1', '2', '3', '4', '5', '>5'

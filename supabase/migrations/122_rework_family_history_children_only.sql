@@ -36,6 +36,12 @@ CREATE TABLE responses_family_history (
     daughter1_deceased VARCHAR(10) CHECK (daughter1_deceased IN ('oui', 'non')),
     daughter1_death_date DATE,
     daughter1_death_cause TEXT,
+    daughter1_psychiatric VARCHAR(20) CHECK (daughter1_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    daughter1_suicide VARCHAR(20) CHECK (daughter1_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    daughter1_substance TEXT[], -- Array for multiple choice
+    daughter1_anxiety VARCHAR(20) CHECK (daughter1_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    daughter1_dementia VARCHAR(20) CHECK (daughter1_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    daughter1_cardio TEXT[], -- Array for multiple choice
     
     -- Daughter 2
     daughter2_dob DATE,
@@ -43,6 +49,12 @@ CREATE TABLE responses_family_history (
     daughter2_deceased VARCHAR(10) CHECK (daughter2_deceased IN ('oui', 'non')),
     daughter2_death_date DATE,
     daughter2_death_cause TEXT,
+    daughter2_psychiatric VARCHAR(20) CHECK (daughter2_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    daughter2_suicide VARCHAR(20) CHECK (daughter2_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    daughter2_substance TEXT[],
+    daughter2_anxiety VARCHAR(20) CHECK (daughter2_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    daughter2_dementia VARCHAR(20) CHECK (daughter2_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    daughter2_cardio TEXT[],
     
     -- Daughter 3
     daughter3_dob DATE,
@@ -50,6 +62,12 @@ CREATE TABLE responses_family_history (
     daughter3_deceased VARCHAR(10) CHECK (daughter3_deceased IN ('oui', 'non')),
     daughter3_death_date DATE,
     daughter3_death_cause TEXT,
+    daughter3_psychiatric VARCHAR(20) CHECK (daughter3_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    daughter3_suicide VARCHAR(20) CHECK (daughter3_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    daughter3_substance TEXT[],
+    daughter3_anxiety VARCHAR(20) CHECK (daughter3_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    daughter3_dementia VARCHAR(20) CHECK (daughter3_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    daughter3_cardio TEXT[],
     
     -- Daughter 4
     daughter4_dob DATE,
@@ -57,6 +75,12 @@ CREATE TABLE responses_family_history (
     daughter4_deceased VARCHAR(10) CHECK (daughter4_deceased IN ('oui', 'non')),
     daughter4_death_date DATE,
     daughter4_death_cause TEXT,
+    daughter4_psychiatric VARCHAR(20) CHECK (daughter4_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    daughter4_suicide VARCHAR(20) CHECK (daughter4_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    daughter4_substance TEXT[],
+    daughter4_anxiety VARCHAR(20) CHECK (daughter4_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    daughter4_dementia VARCHAR(20) CHECK (daughter4_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    daughter4_cardio TEXT[],
     
     -- Daughter 5
     daughter5_dob DATE,
@@ -64,6 +88,12 @@ CREATE TABLE responses_family_history (
     daughter5_deceased VARCHAR(10) CHECK (daughter5_deceased IN ('oui', 'non')),
     daughter5_death_date DATE,
     daughter5_death_cause TEXT,
+    daughter5_psychiatric VARCHAR(20) CHECK (daughter5_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    daughter5_suicide VARCHAR(20) CHECK (daughter5_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    daughter5_substance TEXT[],
+    daughter5_anxiety VARCHAR(20) CHECK (daughter5_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    daughter5_dementia VARCHAR(20) CHECK (daughter5_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    daughter5_cardio TEXT[],
     
     -- ========================================================================
     -- SONS (Fils)
@@ -81,6 +111,12 @@ CREATE TABLE responses_family_history (
     son1_deceased VARCHAR(10) CHECK (son1_deceased IN ('oui', 'non')),
     son1_death_date DATE,
     son1_death_cause TEXT,
+    son1_psychiatric VARCHAR(20) CHECK (son1_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    son1_suicide VARCHAR(20) CHECK (son1_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    son1_substance TEXT[],
+    son1_anxiety VARCHAR(20) CHECK (son1_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    son1_dementia VARCHAR(20) CHECK (son1_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    son1_cardio TEXT[],
     
     -- Son 2
     son2_dob DATE,
@@ -88,6 +124,12 @@ CREATE TABLE responses_family_history (
     son2_deceased VARCHAR(10) CHECK (son2_deceased IN ('oui', 'non')),
     son2_death_date DATE,
     son2_death_cause TEXT,
+    son2_psychiatric VARCHAR(20) CHECK (son2_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    son2_suicide VARCHAR(20) CHECK (son2_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    son2_substance TEXT[],
+    son2_anxiety VARCHAR(20) CHECK (son2_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    son2_dementia VARCHAR(20) CHECK (son2_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    son2_cardio TEXT[],
     
     -- Son 3
     son3_dob DATE,
@@ -95,6 +137,12 @@ CREATE TABLE responses_family_history (
     son3_deceased VARCHAR(10) CHECK (son3_deceased IN ('oui', 'non')),
     son3_death_date DATE,
     son3_death_cause TEXT,
+    son3_psychiatric VARCHAR(20) CHECK (son3_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    son3_suicide VARCHAR(20) CHECK (son3_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    son3_substance TEXT[],
+    son3_anxiety VARCHAR(20) CHECK (son3_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    son3_dementia VARCHAR(20) CHECK (son3_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    son3_cardio TEXT[],
     
     -- Son 4
     son4_dob DATE,
@@ -102,6 +150,12 @@ CREATE TABLE responses_family_history (
     son4_deceased VARCHAR(10) CHECK (son4_deceased IN ('oui', 'non')),
     son4_death_date DATE,
     son4_death_cause TEXT,
+    son4_psychiatric VARCHAR(20) CHECK (son4_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    son4_suicide VARCHAR(20) CHECK (son4_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    son4_substance TEXT[],
+    son4_anxiety VARCHAR(20) CHECK (son4_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    son4_dementia VARCHAR(20) CHECK (son4_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    son4_cardio TEXT[],
     
     -- Son 5
     son5_dob DATE,
@@ -109,6 +163,12 @@ CREATE TABLE responses_family_history (
     son5_deceased VARCHAR(10) CHECK (son5_deceased IN ('oui', 'non')),
     son5_death_date DATE,
     son5_death_cause TEXT,
+    son5_psychiatric VARCHAR(20) CHECK (son5_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    son5_suicide VARCHAR(20) CHECK (son5_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    son5_substance TEXT[],
+    son5_anxiety VARCHAR(20) CHECK (son5_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    son5_dementia VARCHAR(20) CHECK (son5_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    son5_cardio TEXT[],
     
     -- ========================================================================
     -- SISTERS (Soeurs)

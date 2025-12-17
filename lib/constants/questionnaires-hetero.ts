@@ -1766,6 +1766,79 @@ export const FAMILY_HISTORY_QUESTIONS: Question[] = [
       ]
     }
   },
+  {
+    id: 'daughter1_psychiatric',
+    text: 'Fille 1 - Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 1] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'edm_unipolaire', label: 'EDM ou Unipolaire' },
+      { code: 'bipolaire', label: 'Bipolaire' },
+      { code: 'schizophrene', label: 'Schizophrène' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter1_suicide',
+    text: 'Fille 1 - Suicide',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 1] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'tentative', label: 'Tentative de suicide' },
+      { code: 'abouti', label: 'Suicide abouti' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter1_substance',
+    text: 'Fille 1 - Dépendance ou abus de substances',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 1] },
+    options: ['Aucun', 'Alcool', 'Cannabis', 'Autre substance', 'Ne sais pas']
+  },
+  {
+    id: 'daughter1_anxiety',
+    text: 'Fille 1 - Troubles anxieux',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 1] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter1_dementia',
+    text: 'Fille 1 - Démence',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 1] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter1_cardio',
+    text: 'Fille 1 - Votre fille a-t-elle des facteurs de risques cardio-vasculaires',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 1] },
+    options: ['Aucun', 'Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension', 'Ne sais pas']
+  },
   
   // Daughter 2
   {
@@ -1809,6 +1882,79 @@ export const FAMILY_HISTORY_QUESTIONS: Question[] = [
         { '==': [{ var: 'daughter2_deceased' }, 'oui'] }
       ]
     }
+  },
+  {
+    id: 'daughter2_psychiatric',
+    text: 'Fille 2 - Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 2] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'edm_unipolaire', label: 'EDM ou Unipolaire' },
+      { code: 'bipolaire', label: 'Bipolaire' },
+      { code: 'schizophrene', label: 'Schizophrène' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter2_suicide',
+    text: 'Fille 2 - Suicide',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 2] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'tentative', label: 'Tentative de suicide' },
+      { code: 'abouti', label: 'Suicide abouti' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter2_substance',
+    text: 'Fille 2 - Dépendance ou abus de substances',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 2] },
+    options: ['Aucun', 'Alcool', 'Cannabis', 'Autre substance', 'Ne sais pas']
+  },
+  {
+    id: 'daughter2_anxiety',
+    text: 'Fille 2 - Troubles anxieux',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 2] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter2_dementia',
+    text: 'Fille 2 - Démence',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 2] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter2_cardio',
+    text: 'Fille 2 - Votre fille a-t-elle des facteurs de risques cardio-vasculaires',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 2] },
+    options: ['Aucun', 'Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension', 'Ne sais pas']
   },
   
   // Daughter 3
@@ -1854,6 +2000,79 @@ export const FAMILY_HISTORY_QUESTIONS: Question[] = [
       ]
     }
   },
+  {
+    id: 'daughter3_psychiatric',
+    text: 'Fille 3 - Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 3] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'edm_unipolaire', label: 'EDM ou Unipolaire' },
+      { code: 'bipolaire', label: 'Bipolaire' },
+      { code: 'schizophrene', label: 'Schizophrène' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter3_suicide',
+    text: 'Fille 3 - Suicide',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 3] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'tentative', label: 'Tentative de suicide' },
+      { code: 'abouti', label: 'Suicide abouti' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter3_substance',
+    text: 'Fille 3 - Dépendance ou abus de substances',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 3] },
+    options: ['Aucun', 'Alcool', 'Cannabis', 'Autre substance', 'Ne sais pas']
+  },
+  {
+    id: 'daughter3_anxiety',
+    text: 'Fille 3 - Troubles anxieux',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 3] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter3_dementia',
+    text: 'Fille 3 - Démence',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 3] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter3_cardio',
+    text: 'Fille 3 - Votre fille a-t-elle des facteurs de risques cardio-vasculaires',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 3] },
+    options: ['Aucun', 'Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension', 'Ne sais pas']
+  },
   
   // Daughter 4
   {
@@ -1898,6 +2117,79 @@ export const FAMILY_HISTORY_QUESTIONS: Question[] = [
       ]
     }
   },
+  {
+    id: 'daughter4_psychiatric',
+    text: 'Fille 4 - Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 4] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'edm_unipolaire', label: 'EDM ou Unipolaire' },
+      { code: 'bipolaire', label: 'Bipolaire' },
+      { code: 'schizophrene', label: 'Schizophrène' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter4_suicide',
+    text: 'Fille 4 - Suicide',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 4] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'tentative', label: 'Tentative de suicide' },
+      { code: 'abouti', label: 'Suicide abouti' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter4_substance',
+    text: 'Fille 4 - Dépendance ou abus de substances',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 4] },
+    options: ['Aucun', 'Alcool', 'Cannabis', 'Autre substance', 'Ne sais pas']
+  },
+  {
+    id: 'daughter4_anxiety',
+    text: 'Fille 4 - Troubles anxieux',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 4] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter4_dementia',
+    text: 'Fille 4 - Démence',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 4] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter4_cardio',
+    text: 'Fille 4 - Votre fille a-t-elle des facteurs de risques cardio-vasculaires',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 4] },
+    options: ['Aucun', 'Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension', 'Ne sais pas']
+  },
   
   // Daughter 5
   {
@@ -1941,6 +2233,79 @@ export const FAMILY_HISTORY_QUESTIONS: Question[] = [
         { '==': [{ var: 'daughter5_deceased' }, 'oui'] }
       ]
     }
+  },
+  {
+    id: 'daughter5_psychiatric',
+    text: 'Fille 5 - Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 5] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'edm_unipolaire', label: 'EDM ou Unipolaire' },
+      { code: 'bipolaire', label: 'Bipolaire' },
+      { code: 'schizophrene', label: 'Schizophrène' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter5_suicide',
+    text: 'Fille 5 - Suicide',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 5] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'tentative', label: 'Tentative de suicide' },
+      { code: 'abouti', label: 'Suicide abouti' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter5_substance',
+    text: 'Fille 5 - Dépendance ou abus de substances',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 5] },
+    options: ['Aucun', 'Alcool', 'Cannabis', 'Autre substance', 'Ne sais pas']
+  },
+  {
+    id: 'daughter5_anxiety',
+    text: 'Fille 5 - Troubles anxieux',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 5] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter5_dementia',
+    text: 'Fille 5 - Démence',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 5] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'daughter5_cardio',
+    text: 'Fille 5 - Votre fille a-t-elle des facteurs de risques cardio-vasculaires',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 5] },
+    options: ['Aucun', 'Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension', 'Ne sais pas']
   },
   
   // ========================================================================
@@ -2027,6 +2392,79 @@ export const FAMILY_HISTORY_QUESTIONS: Question[] = [
       ]
     }
   },
+  {
+    id: 'son1_psychiatric',
+    text: 'Fils 1 - Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 1] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'edm_unipolaire', label: 'EDM ou Unipolaire' },
+      { code: 'bipolaire', label: 'Bipolaire' },
+      { code: 'schizophrene', label: 'Schizophrène' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son1_suicide',
+    text: 'Fils 1 - Suicide',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 1] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'tentative', label: 'Tentative de suicide' },
+      { code: 'abouti', label: 'Suicide abouti' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son1_substance',
+    text: 'Fils 1 - Dépendance ou abus de substances',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 1] },
+    options: ['Aucun', 'Alcool', 'Cannabis', 'Autre substance', 'Ne sais pas']
+  },
+  {
+    id: 'son1_anxiety',
+    text: 'Fils 1 - Troubles anxieux',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 1] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son1_dementia',
+    text: 'Fils 1 - Démence',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 1] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son1_cardio',
+    text: 'Fils 1 - Votre fils a-t-il des facteurs de risques cardio-vasculaires',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 1] },
+    options: ['Aucun', 'Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension', 'Ne sais pas']
+  },
   
   // Son 2
   {
@@ -2070,6 +2508,79 @@ export const FAMILY_HISTORY_QUESTIONS: Question[] = [
         { '==': [{ var: 'son2_deceased' }, 'oui'] }
       ]
     }
+  },
+  {
+    id: 'son2_psychiatric',
+    text: 'Fils 2 - Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 2] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'edm_unipolaire', label: 'EDM ou Unipolaire' },
+      { code: 'bipolaire', label: 'Bipolaire' },
+      { code: 'schizophrene', label: 'Schizophrène' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son2_suicide',
+    text: 'Fils 2 - Suicide',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 2] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'tentative', label: 'Tentative de suicide' },
+      { code: 'abouti', label: 'Suicide abouti' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son2_substance',
+    text: 'Fils 2 - Dépendance ou abus de substances',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 2] },
+    options: ['Aucun', 'Alcool', 'Cannabis', 'Autre substance', 'Ne sais pas']
+  },
+  {
+    id: 'son2_anxiety',
+    text: 'Fils 2 - Troubles anxieux',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 2] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son2_dementia',
+    text: 'Fils 2 - Démence',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 2] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son2_cardio',
+    text: 'Fils 2 - Votre fils a-t-il des facteurs de risques cardio-vasculaires',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 2] },
+    options: ['Aucun', 'Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension', 'Ne sais pas']
   },
   
   // Son 3
@@ -2115,6 +2626,79 @@ export const FAMILY_HISTORY_QUESTIONS: Question[] = [
       ]
     }
   },
+  {
+    id: 'son3_psychiatric',
+    text: 'Fils 3 - Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 3] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'edm_unipolaire', label: 'EDM ou Unipolaire' },
+      { code: 'bipolaire', label: 'Bipolaire' },
+      { code: 'schizophrene', label: 'Schizophrène' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son3_suicide',
+    text: 'Fils 3 - Suicide',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 3] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'tentative', label: 'Tentative de suicide' },
+      { code: 'abouti', label: 'Suicide abouti' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son3_substance',
+    text: 'Fils 3 - Dépendance ou abus de substances',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 3] },
+    options: ['Aucun', 'Alcool', 'Cannabis', 'Autre substance', 'Ne sais pas']
+  },
+  {
+    id: 'son3_anxiety',
+    text: 'Fils 3 - Troubles anxieux',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 3] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son3_dementia',
+    text: 'Fils 3 - Démence',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 3] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son3_cardio',
+    text: 'Fils 3 - Votre fils a-t-il des facteurs de risques cardio-vasculaires',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 3] },
+    options: ['Aucun', 'Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension', 'Ne sais pas']
+  },
   
   // Son 4
   {
@@ -2159,6 +2743,79 @@ export const FAMILY_HISTORY_QUESTIONS: Question[] = [
       ]
     }
   },
+  {
+    id: 'son4_psychiatric',
+    text: 'Fils 4 - Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 4] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'edm_unipolaire', label: 'EDM ou Unipolaire' },
+      { code: 'bipolaire', label: 'Bipolaire' },
+      { code: 'schizophrene', label: 'Schizophrène' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son4_suicide',
+    text: 'Fils 4 - Suicide',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 4] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'tentative', label: 'Tentative de suicide' },
+      { code: 'abouti', label: 'Suicide abouti' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son4_substance',
+    text: 'Fils 4 - Dépendance ou abus de substances',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 4] },
+    options: ['Aucun', 'Alcool', 'Cannabis', 'Autre substance', 'Ne sais pas']
+  },
+  {
+    id: 'son4_anxiety',
+    text: 'Fils 4 - Troubles anxieux',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 4] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son4_dementia',
+    text: 'Fils 4 - Démence',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 4] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son4_cardio',
+    text: 'Fils 4 - Votre fils a-t-il des facteurs de risques cardio-vasculaires',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 4] },
+    options: ['Aucun', 'Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension', 'Ne sais pas']
+  },
   
   // Son 5
   {
@@ -2202,6 +2859,79 @@ export const FAMILY_HISTORY_QUESTIONS: Question[] = [
         { '==': [{ var: 'son5_deceased' }, 'oui'] }
       ]
     }
+  },
+  {
+    id: 'son5_psychiatric',
+    text: 'Fils 5 - Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 5] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'edm_unipolaire', label: 'EDM ou Unipolaire' },
+      { code: 'bipolaire', label: 'Bipolaire' },
+      { code: 'schizophrene', label: 'Schizophrène' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son5_suicide',
+    text: 'Fils 5 - Suicide',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 5] },
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'tentative', label: 'Tentative de suicide' },
+      { code: 'abouti', label: 'Suicide abouti' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son5_substance',
+    text: 'Fils 5 - Dépendance ou abus de substances',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 5] },
+    options: ['Aucun', 'Alcool', 'Cannabis', 'Autre substance', 'Ne sais pas']
+  },
+  {
+    id: 'son5_anxiety',
+    text: 'Fils 5 - Troubles anxieux',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 5] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son5_dementia',
+    text: 'Fils 5 - Démence',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 5] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  {
+    id: 'son5_cardio',
+    text: 'Fils 5 - Votre fils a-t-il des facteurs de risques cardio-vasculaires',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 5] },
+    options: ['Aucun', 'Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension', 'Ne sais pas']
   },
   
   // ========================================================================
