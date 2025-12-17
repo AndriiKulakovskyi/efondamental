@@ -53,6 +53,7 @@ import {
   PATHO_NEURO_DEFINITION,
   PATHO_CARDIO_DEFINITION,
   PATHO_ENDOC_DEFINITION,
+  PATHO_DERMATO_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
   WAIS4_MATRICES_DEFINITION,
@@ -536,6 +537,13 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['PATHO_ENDOC_FR']?.completed || false,
                   completedAt: questionnaireStatuses['PATHO_ENDOC_FR']?.completed_at,
+                },
+                {
+                  ...PATHO_DERMATO_DEFINITION,
+                  id: PATHO_DERMATO_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['PATHO_DERMATO_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['PATHO_DERMATO_FR']?.completed_at,
                 }
               ]
             }
@@ -1011,6 +1019,45 @@ export default async function VisitDetailPage({
             completedAt: questionnaireStatuses['ISA_FR']?.completed_at,
           }
         ];
+
+        // Build Histoire somatique section questionnaires
+        const histoireSomatiqueQuestionnaires = [
+          {
+            ...PERINATALITE_DEFINITION,
+            id: PERINATALITE_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['PERINATALITE_FR']?.completed || false,
+            completedAt: questionnaireStatuses['PERINATALITE_FR']?.completed_at,
+          },
+          {
+            ...PATHO_NEURO_DEFINITION,
+            id: PATHO_NEURO_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['PATHO_NEURO_FR']?.completed || false,
+            completedAt: questionnaireStatuses['PATHO_NEURO_FR']?.completed_at,
+          },
+          {
+            ...PATHO_CARDIO_DEFINITION,
+            id: PATHO_CARDIO_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['PATHO_CARDIO_FR']?.completed || false,
+            completedAt: questionnaireStatuses['PATHO_CARDIO_FR']?.completed_at,
+          },
+          {
+            ...PATHO_ENDOC_DEFINITION,
+            id: PATHO_ENDOC_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['PATHO_ENDOC_FR']?.completed || false,
+            completedAt: questionnaireStatuses['PATHO_ENDOC_FR']?.completed_at,
+          },
+          {
+            ...PATHO_DERMATO_DEFINITION,
+            id: PATHO_DERMATO_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['PATHO_DERMATO_FR']?.completed || false,
+            completedAt: questionnaireStatuses['PATHO_DERMATO_FR']?.completed_at,
+          }
+        ];
         
         return {
           id: 'mod_medical_eval',
@@ -1026,6 +1073,11 @@ export default async function VisitDetailPage({
               id: 'suicide',
               name: 'Suicide',
               questionnaires: suicideQuestionnaires
+            },
+            {
+              id: 'histoire_somatique',
+              name: 'Histoire somatique',
+              questionnaires: histoireSomatiqueQuestionnaires
             }
           ]
         };

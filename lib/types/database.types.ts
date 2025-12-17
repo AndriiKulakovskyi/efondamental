@@ -2546,6 +2546,57 @@ export interface PathoEndocResponse {
 
 export type PathoEndocResponseInsert = Omit<PathoEndocResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ===== Pathologies Dermatologiques (Dermatological Conditions) Response =====
+export interface PathoDermatoResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // 1. Psoriasis
+  q1_psoriasis?: 'yes' | 'no' | 'unknown' | null;
+  q1_1_psoriasis_date?: string | null;
+  q1_2_psoriasis_treated?: 'yes' | 'no' | null;
+  q1_3_psoriasis_balanced?: 'yes' | 'no' | null;
+  q1_4_psoriasis_lithium_effect?: 'yes' | 'no' | 'unknown' | null;
+  q1_5_psoriasis_triggered_lithium?: 'yes' | 'no' | null;
+  q1_6_psoriasis_aggravated_lithium?: 'yes' | 'no' | null;
+  
+  // 2. Acné
+  q2_acne?: 'yes' | 'no' | 'unknown' | null;
+  q2_1_acne_date?: string | null;
+  q2_2_acne_treated?: 'yes' | 'no' | null;
+  q2_3_acne_balanced?: 'yes' | 'no' | null;
+  q2_4_acne_lithium_effect?: 'yes' | 'no' | 'unknown' | null;
+  q2_5_acne_triggered_lithium?: 'yes' | 'no' | null;
+  q2_6_acne_aggravated_lithium?: 'yes' | 'no' | null;
+  
+  // 3. Eczéma
+  q3_eczema?: 'yes' | 'no' | 'unknown' | null;
+  q3_1_eczema_date?: string | null;
+  q3_2_eczema_treated?: 'yes' | 'no' | null;
+  q3_3_eczema_balanced?: 'yes' | 'no' | null;
+  
+  // 4. Toxidermie médicamenteuse
+  q4_toxidermie?: 'yes' | 'no' | 'unknown' | null;
+  q4_1_toxidermie_date?: string | null;
+  q4_2_toxidermie_type?: 'simple_eruption' | 'lyell' | 'stevens_johnson' | null;
+  q4_3_toxidermie_medication?: string[] | null;
+  
+  // 5. Perte importante de cheveux
+  q5_hair_loss?: 'yes' | 'no' | 'unknown' | null;
+  q5_1_hair_loss_date?: string | null;
+  q5_2_hair_loss_treated?: 'yes' | 'no' | null;
+  q5_3_hair_loss_balanced?: 'yes' | 'no' | null;
+  q5_4_hair_loss_depakine?: 'yes' | 'no' | 'unknown' | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PathoDermatoResponseInsert = Omit<PathoDermatoResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
 // ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================

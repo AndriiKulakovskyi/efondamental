@@ -6301,6 +6301,276 @@ export const PATHO_ENDOC_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
+// Pathologies Dermatologiques (Dermatological Conditions)
+// ============================================================================
+
+const TOXIDERMIE_TYPE_OPTIONS = [
+  { code: 'simple_eruption', label: 'Éruption cutanée simple', score: 0 },
+  { code: 'lyell', label: 'Syndrome de Lyell', score: 0 },
+  { code: 'stevens_johnson', label: 'Syndrome de Stevens-Johnson', score: 0 }
+];
+
+const TOXIDERMIE_MEDICATION_OPTIONS = [
+  { code: 'antibiotics', label: 'Antibiotiques', score: 0 },
+  { code: 'nsaid', label: 'AINS', score: 0 },
+  { code: 'anticonvulsants', label: 'Anticonvulsivants', score: 0 },
+  { code: 'other', label: 'Autres médicaments', score: 0 }
+];
+
+export const PATHO_DERMATO_QUESTIONS: Question[] = [
+  // 1. Psoriasis
+  {
+    id: 'q1_psoriasis',
+    text: 'Psoriasis',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q1_1_psoriasis_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_psoriasis' }, 'yes'] }
+  },
+  {
+    id: 'q1_2_psoriasis_treated',
+    text: 'Traité',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_psoriasis' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q1_3_psoriasis_balanced',
+    text: 'Équilibré',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_psoriasis' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q1_4_psoriasis_lithium_effect',
+    text: 'Votre psoriasis a-t-il été déclenché ou aggravé par le lithium',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_psoriasis' }, 'yes'] },
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q1_5_psoriasis_triggered_lithium',
+    text: 'Déclenché par le lithium',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_psoriasis' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q1_6_psoriasis_aggravated_lithium',
+    text: 'Aggravé par le lithium',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_psoriasis' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+
+  // 2. Acné
+  {
+    id: 'q2_acne',
+    text: 'Acné',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q2_1_acne_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_acne' }, 'yes'] }
+  },
+  {
+    id: 'q2_2_acne_treated',
+    text: 'Traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_acne' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q2_3_acne_balanced',
+    text: 'Équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_acne' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q2_4_acne_lithium_effect',
+    text: 'Votre acné a-t-elle été déclenchée ou aggravée par le lithium',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_acne' }, 'yes'] },
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q2_5_acne_triggered_lithium',
+    text: 'Déclenchée par le lithium',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_acne' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q2_6_acne_aggravated_lithium',
+    text: 'Aggravée par le lithium',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_acne' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+
+  // 3. Eczéma
+  {
+    id: 'q3_eczema',
+    text: 'Eczéma',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q3_1_eczema_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_eczema' }, 'yes'] }
+  },
+  {
+    id: 'q3_2_eczema_treated',
+    text: 'Traité',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_eczema' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q3_3_eczema_balanced',
+    text: 'Équilibré',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_eczema' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+
+  // 4. Toxidermie médicamenteuse
+  {
+    id: 'q4_toxidermie',
+    text: 'Toxidermie médicamenteuse',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q4_1_toxidermie_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q4_toxidermie' }, 'yes'] }
+  },
+  {
+    id: 'q4_2_toxidermie_type',
+    text: 'Type de toxidermie',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q4_toxidermie' }, 'yes'] },
+    options: TOXIDERMIE_TYPE_OPTIONS
+  },
+  {
+    id: 'q4_3_toxidermie_medication',
+    text: 'Médicament en cause',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q4_toxidermie' }, 'yes'] },
+    options: TOXIDERMIE_MEDICATION_OPTIONS
+  },
+
+  // 5. Perte importante de cheveux
+  {
+    id: 'q5_hair_loss',
+    text: 'Perte importante de cheveux',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q5_1_hair_loss_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q5_hair_loss' }, 'yes'] }
+  },
+  {
+    id: 'q5_2_hair_loss_treated',
+    text: 'Traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q5_hair_loss' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q5_3_hair_loss_balanced',
+    text: 'Équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q5_hair_loss' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q5_4_hair_loss_depakine',
+    text: 'Votre perte de cheveux a-t-elle été déclenchée ou aggravée par le traitement Depakine, Depamide ou Depakote',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q5_hair_loss' }, 'yes'] },
+    options: YES_NO_UNKNOWN_OPTIONS
+  }
+];
+
+export const PATHO_DERMATO_DEFINITION: QuestionnaireDefinition = {
+  id: 'patho_dermato',
+  code: 'PATHO_DERMATO_FR',
+  title: 'Pathologies dermatologiques',
+  description: 'Recueil des antécédents de pathologies dermatologiques du patient (psoriasis, acné, eczéma, toxidermie médicamenteuse, perte de cheveux).',
+  questions: PATHO_DERMATO_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================
 

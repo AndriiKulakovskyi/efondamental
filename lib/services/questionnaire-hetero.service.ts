@@ -37,6 +37,8 @@ import {
   PathoCardioResponseInsert,
   PathoEndocResponse,
   PathoEndocResponseInsert,
+  PathoDermatoResponse,
+  PathoDermatoResponseInsert,
   Wais4CriteriaResponse,
   Wais4CriteriaResponseInsert,
   Wais4LearningResponse,
@@ -1112,6 +1114,44 @@ export async function savePathoEndocResponse(
 
   const { data, error } = await supabase
     .from('responses_patho_endoc')
+    .upsert({
+      ...response
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Pathologies Dermatologiques (Dermatological Conditions)
+// ============================================================================
+
+export async function getPathoDermatoResponse(
+  visitId: string
+): Promise<PathoDermatoResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_patho_dermato')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function savePathoDermatoResponse(
+  response: PathoDermatoResponseInsert
+): Promise<PathoDermatoResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_patho_dermato')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
