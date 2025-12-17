@@ -40,6 +40,7 @@ import {
   saveIsaResponse,
   saveSisResponse,
   saveSuicideHistoryResponse,
+  savePerinataliteResponse,
   saveWais4CriteriaResponse,
   saveWais4LearningResponse,
   saveWais4MatricesResponse,
@@ -127,6 +128,7 @@ import {
   IsaResponseInsert,
   SisResponseInsert,
   SuicideHistoryResponseInsert,
+  PerinataliteResponseInsert,
   SocialResponseInsert,
   TobaccoResponseInsert,
   FagerstromResponseInsert,
@@ -458,6 +460,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as SuicideHistoryResponseInsert);
+        break;
+
+      case 'PERINATALITE_FR':
+        result = await savePerinataliteResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as PerinataliteResponseInsert);
         break;
 
       case 'SOCIAL':

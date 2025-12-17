@@ -49,6 +49,7 @@ import {
   ISA_DEFINITION,
   SIS_DEFINITION,
   SUICIDE_HISTORY_DEFINITION,
+  PERINATALITE_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
   WAIS4_MATRICES_DEFINITION,
@@ -500,6 +501,19 @@ export default async function VisitDetailPage({
               id: 'suicide',
               name: 'Suicide',
               questionnaires: suicideQuestionnaires
+            },
+            {
+              id: 'histoire_somatique',
+              name: 'Histoire somatique',
+              questionnaires: [
+                {
+                  ...PERINATALITE_DEFINITION,
+                  id: PERINATALITE_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['PERINATALITE_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['PERINATALITE_FR']?.completed_at,
+                }
+              ]
             }
           ]
         };

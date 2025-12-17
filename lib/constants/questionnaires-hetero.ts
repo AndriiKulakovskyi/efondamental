@@ -5605,6 +5605,124 @@ export const SUICIDE_HISTORY_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
+// Périnatalité (Perinatal History)
+// ============================================================================
+
+export const PERINATALITE_QUESTIONS: Question[] = [
+  {
+    id: 'q1_mother_age',
+    text: 'Âge de la mère à la naissance (en années)',
+    type: 'number',
+    required: false,
+    min: 10,
+    max: 60
+  },
+  {
+    id: 'q2_father_age',
+    text: 'Âge du père à la naissance (en années)',
+    type: 'number',
+    required: false,
+    min: 10,
+    max: 80
+  },
+  {
+    id: 'q3_birth_condition',
+    text: 'Naissance',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'premature', label: 'Prématurité', score: 0 },
+      { code: 'term', label: 'Né à terme', score: 0 },
+      { code: 'post_mature', label: 'Post-maturité', score: 0 },
+      { code: 'unknown', label: 'Ne sais pas', score: 0 }
+    ]
+  },
+  {
+    id: 'q4_gestational_age',
+    text: 'Âge gestationnel (en semaines d\'aménorrhée révolues)',
+    type: 'number',
+    required: false,
+    min: 22,
+    max: 45
+  },
+  {
+    id: 'q5_birth_type',
+    text: 'Type de naissance',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'vaginal', label: 'Voie basse', score: 0 },
+      { code: 'cesarean', label: 'Césarienne', score: 0 },
+      { code: 'unknown', label: 'Ne sais pas', score: 0 }
+    ]
+  },
+  {
+    id: 'q6_birth_weight',
+    text: 'Poids de naissance (en grammes)',
+    type: 'number',
+    required: false,
+    min: 300,
+    max: 6000
+  },
+  {
+    id: 'q7_birth_length',
+    text: 'Taille de naissance (cm)',
+    type: 'number',
+    required: false,
+    min: 30,
+    max: 65
+  },
+  {
+    id: 'q8_head_circumference',
+    text: 'Périmètre crânien (cm)',
+    type: 'number',
+    required: false,
+    min: 25,
+    max: 45
+  },
+  {
+    id: 'q9_apgar_1min',
+    text: 'Score d\'Apgar à 1 minute',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 10
+  },
+  {
+    id: 'q10_apgar_5min',
+    text: 'Score d\'Apgar à 5 minutes',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 10
+  },
+  {
+    id: 'q11_neonatal_hospitalization',
+    text: 'Hospitalisation en néonatologie',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'yes', label: 'Oui', score: 1 },
+      { code: 'no', label: 'Non', score: 0 },
+      { code: 'unknown', label: 'Ne sais pas', score: 0 }
+    ]
+  }
+];
+
+export const PERINATALITE_DEFINITION: QuestionnaireDefinition = {
+  id: 'perinatalite',
+  code: 'PERINATALITE_FR',
+  title: 'Périnatalité',
+  description: 'Recueil des informations périnatales et des conditions de naissance du patient.',
+  questions: PERINATALITE_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================
 

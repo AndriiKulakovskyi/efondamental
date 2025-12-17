@@ -41,6 +41,7 @@ import {
   ISA_DEFINITION,
   SIS_DEFINITION,
   SUICIDE_HISTORY_DEFINITION,
+  PERINATALITE_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
   WAIS4_MATRICES_DEFINITION,
@@ -126,6 +127,7 @@ import {
   getIsaResponse,
   getSisResponse,
   getSuicideHistoryResponse,
+  getPerinataliteResponse,
   getWais4CriteriaResponse,
   getWais4LearningResponse,
   getWais4MatricesResponse,
@@ -234,6 +236,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ISA_DEFINITION.code) questionnaire = ISA_DEFINITION;
   else if (code === SIS_DEFINITION.code) questionnaire = SIS_DEFINITION;
   else if (code === SUICIDE_HISTORY_DEFINITION.code) questionnaire = SUICIDE_HISTORY_DEFINITION;
+  else if (code === PERINATALITE_DEFINITION.code) questionnaire = PERINATALITE_DEFINITION;
   else if (code === WAIS4_CRITERIA_DEFINITION.code) questionnaire = WAIS4_CRITERIA_DEFINITION;
   else if (code === WAIS4_LEARNING_DEFINITION.code) questionnaire = WAIS4_LEARNING_DEFINITION;
   else if (code === WAIS4_MATRICES_DEFINITION.code) questionnaire = WAIS4_MATRICES_DEFINITION;
@@ -321,6 +324,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ISA_DEFINITION.code) existingResponse = await getIsaResponse(visitId);
   else if (code === SIS_DEFINITION.code) existingResponse = await getSisResponse(visitId);
   else if (code === SUICIDE_HISTORY_DEFINITION.code) existingResponse = await getSuicideHistoryResponse(visitId);
+  else if (code === PERINATALITE_DEFINITION.code) existingResponse = await getPerinataliteResponse(visitId);
   else if (code === WAIS4_CRITERIA_DEFINITION.code) existingResponse = await getWais4CriteriaResponse(visitId);
   else if (code === WAIS4_LEARNING_DEFINITION.code) existingResponse = await getWais4LearningResponse(visitId);
   else if (code === WAIS4_MATRICES_DEFINITION.code) existingResponse = await getWais4MatricesResponse(visitId);

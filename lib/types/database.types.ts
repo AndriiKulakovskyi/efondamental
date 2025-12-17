@@ -2369,6 +2369,53 @@ export interface SuicideHistoryResponse {
 
 export type SuicideHistoryResponseInsert = Omit<SuicideHistoryResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ===== Périnatalité (Perinatal History) Response =====
+export interface PerinataliteResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Q1: Mother's age at birth (years)
+  q1_mother_age?: number | null;
+  
+  // Q2: Father's age at birth (years)
+  q2_father_age?: number | null;
+  
+  // Q3: Birth conditions
+  q3_birth_condition?: 'premature' | 'term' | 'post_mature' | 'unknown' | null;
+  
+  // Q4: Gestational age (weeks)
+  q4_gestational_age?: number | null;
+  
+  // Q5: Type of birth
+  q5_birth_type?: 'vaginal' | 'cesarean' | 'unknown' | null;
+  
+  // Q6: Birth weight (grams)
+  q6_birth_weight?: number | null;
+  
+  // Q7: Birth length (cm)
+  q7_birth_length?: number | null;
+  
+  // Q8: Head circumference (cm)
+  q8_head_circumference?: number | null;
+  
+  // Q9: Apgar score at 1 minute
+  q9_apgar_1min?: number | null;
+  
+  // Q10: Apgar score at 5 minutes
+  q10_apgar_5min?: number | null;
+  
+  // Q11: Neonatal hospitalization
+  q11_neonatal_hospitalization?: 'yes' | 'no' | 'unknown' | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PerinataliteResponseInsert = Omit<PerinataliteResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
 // ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================

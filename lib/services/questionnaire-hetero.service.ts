@@ -29,6 +29,8 @@ import {
   SisResponseInsert,
   SuicideHistoryResponse,
   SuicideHistoryResponseInsert,
+  PerinataliteResponse,
+  PerinataliteResponseInsert,
   Wais4CriteriaResponse,
   Wais4CriteriaResponseInsert,
   Wais4LearningResponse,
@@ -952,6 +954,44 @@ export async function saveSuicideHistoryResponse(
 
   const { data, error } = await supabase
     .from('responses_suicide_history')
+    .upsert({
+      ...response
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Périnatalité (Perinatal History)
+// ============================================================================
+
+export async function getPerinataliteResponse(
+  visitId: string
+): Promise<PerinataliteResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_perinatalite')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function savePerinataliteResponse(
+  response: PerinataliteResponseInsert
+): Promise<PerinataliteResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_perinatalite')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
