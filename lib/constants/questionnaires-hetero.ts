@@ -2735,6 +2735,87 @@ export const FAMILY_HISTORY_QUESTIONS: Question[] = [
         { '==': [{ var: 'brother5_deceased' }, 'oui'] }
       ]
     }
+  },
+  
+  // ========================================================================
+  // SECTION 3 - PARENTS (Mère et Père)
+  // ========================================================================
+  
+  {
+    id: 'section_parents',
+    text: 'Section 3 - Parents',
+    type: 'section',
+    required: false
+  },
+  
+  // ========================================================================
+  // MOTHER (Mère)
+  // ========================================================================
+  
+  {
+    id: 'mother_history',
+    text: 'Q5. Mère',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  {
+    id: 'mother_deceased',
+    text: 'Q6. Mère - Décès',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  
+  {
+    id: 'mother_death_cause',
+    text: 'Q6.1. Mère - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ var: 'mother_deceased' }, 'oui'] }
+  },
+  
+  // ========================================================================
+  // FATHER (Père)
+  // ========================================================================
+  
+  {
+    id: 'father_history',
+    text: 'Q7. Père',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  {
+    id: 'father_deceased',
+    text: 'Q8. Père - Décès',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  
+  {
+    id: 'father_death_cause',
+    text: 'Q8.1. Père - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ var: 'father_deceased' }, 'oui'] }
   }
 ];
 
@@ -2742,7 +2823,7 @@ export const FAMILY_HISTORY_DEFINITION: QuestionnaireDefinition = {
   id: 'family_history',
   code: 'FAMILY_HISTORY_FR',
   title: 'Antécédents Familiaux',
-  description: 'Évaluation des antécédents psychiatriques, de dépendance, de suicide et de facteurs de risque cardio-vasculaires. Section 1: Enfants (filles et fils). Section 2: Frères et Soeurs (soeurs et frères).',
+  description: 'Évaluation des antécédents familiaux. Section 1: Enfants (filles et fils). Section 2: Frères et Soeurs (soeurs et frères). Section 3: Parents (mère et père).',
   questions: FAMILY_HISTORY_QUESTIONS,
   metadata: {
     singleColumn: true,

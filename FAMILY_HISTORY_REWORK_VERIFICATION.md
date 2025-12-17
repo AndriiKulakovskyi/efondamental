@@ -2,9 +2,10 @@
 
 ## Implementation Summary
 
-The "Antécédents familiaux" questionnaire has been successfully reworked with two sections:
+The "Antécédents familiaux" questionnaire has been successfully reworked with three sections:
 - **Section 1 - Enfants (Children)**: Support for up to 5 daughters and 5 sons with issues
 - **Section 2 - Frères et Soeurs (Siblings)**: Support for up to 5 sisters and 5 brothers with issues
+- **Section 3 - Parents**: Basic information about mother and father (history and death details)
 
 ## Changes Made
 
@@ -24,6 +25,13 @@ The "Antécédents familiaux" questionnaire has been successfully reworked with 
   - **Section 2 - Frères et Soeurs:**
     - Same structure for sisters (sister1-sister5)
     - Same structure for brothers (brother1-brother5)
+  - **Section 3 - Parents:**
+    - `mother_history` (VARCHAR: 'oui', 'non', 'ne_sais_pas')
+    - `mother_deceased` (VARCHAR: 'oui', 'non')
+    - `mother_death_cause` (TEXT)
+    - `father_history` (VARCHAR: 'oui', 'non', 'ne_sais_pas')
+    - `father_deceased` (VARCHAR: 'oui', 'non')
+    - `father_death_cause` (TEXT)
 
 ### 2. TypeScript Types
 - **File**: `lib/types/database.types.ts`
@@ -92,6 +100,28 @@ The "Antécédents familiaux" questionnaire has been successfully reworked with 
 
 12. **Q4.2.N: Brother N details** (Repeating blocks 1-5)
     - Same structure as sisters with "Frère N" labels
+
+### Section 3 - Parents (Mère et Père)
+
+13. **Q5: Mother** (Required)
+    - Options: Oui, Non, Ne sais pas
+
+14. **Q6: Mother - Death** (Required)
+    - Options: Oui, Non
+
+15. **Q6.1: Mother - Cause of death** (Conditional)
+    - Display condition: `{ '==': [{ var: 'mother_deceased' }, 'oui'] }`
+    - Type: Text input
+
+16. **Q7: Father** (Required)
+    - Options: Oui, Non, Ne sais pas
+
+17. **Q8: Father - Death** (Required)
+    - Options: Oui, Non
+
+18. **Q8.1: Father - Cause of death** (Conditional)
+    - Display condition: `{ '==': [{ var: 'father_deceased' }, 'oui'] }`
+    - Type: Text input
 
 ## JSON Logic Operators Used
 

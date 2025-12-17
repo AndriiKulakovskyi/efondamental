@@ -1,7 +1,8 @@
 -- eFondaMental Platform - Family History Questionnaire Rework
 -- Section 1: Enfants (Children: Daughters and Sons)
 -- Section 2: Frères et Soeurs (Siblings: Sisters and Brothers)
--- Flat structure supporting up to 5 of each category with branching logic
+-- Section 3: Parents (Mother and Father)
+-- Flat structure supporting up to 5 of each category (children/siblings) with branching logic
 
 -- ============================================================================
 -- Drop existing table (accepting data loss)
@@ -199,6 +200,20 @@ CREATE TABLE responses_family_history (
     brother5_death_cause TEXT,
     
     -- ========================================================================
+    -- PARENTS (Mère et Père)
+    -- ========================================================================
+    
+    -- Mother
+    mother_history VARCHAR(20) CHECK (mother_history IN ('oui', 'non', 'ne_sais_pas')),
+    mother_deceased VARCHAR(10) CHECK (mother_deceased IN ('oui', 'non')),
+    mother_death_cause TEXT,
+    
+    -- Father
+    father_history VARCHAR(20) CHECK (father_history IN ('oui', 'non', 'ne_sais_pas')),
+    father_deceased VARCHAR(10) CHECK (father_deceased IN ('oui', 'non')),
+    father_death_cause TEXT,
+    
+    -- ========================================================================
     -- Metadata
     -- ========================================================================
     
@@ -254,7 +269,7 @@ CREATE TRIGGER update_responses_family_history_updated_at
 -- ============================================================================
 
 COMMENT ON TABLE responses_family_history IS 
-'Stores responses for the Family History questionnaire. Section 1: Enfants (Children) - up to 5 daughters and 5 sons. Section 2: Frères et Soeurs (Siblings) - up to 5 sisters and 5 brothers. All with psychiatric/cardiovascular risk factors, suicide attempts, and substance abuse history.';
+'Stores responses for the Family History questionnaire. Section 1: Enfants (Children) - up to 5 daughters and 5 sons. Section 2: Frères et Soeurs (Siblings) - up to 5 sisters and 5 brothers. Section 3: Parents (Mother and Father) - basic history and death information.';
 
 COMMENT ON COLUMN responses_family_history.num_daughters IS 
 'Q1: Number of daughters (0, 1-5, or >5)';
@@ -279,4 +294,16 @@ COMMENT ON COLUMN responses_family_history.num_brothers IS
 
 COMMENT ON COLUMN responses_family_history.num_brothers_with_issues IS 
 'Q4.1: Number of brothers with psychiatric disorder, substance abuse, suicide attempt, or cardiovascular risk';
+
+COMMENT ON COLUMN responses_family_history.mother_history IS 
+'Q5: Mother history (oui/non/ne_sais_pas)';
+
+COMMENT ON COLUMN responses_family_history.mother_deceased IS 
+'Q6: Mother deceased (oui/non)';
+
+COMMENT ON COLUMN responses_family_history.father_history IS 
+'Q7: Father history (oui/non/ne_sais_pas)';
+
+COMMENT ON COLUMN responses_family_history.father_deceased IS 
+'Q8: Father deceased (oui/non)';
 

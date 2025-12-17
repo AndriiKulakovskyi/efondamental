@@ -2005,6 +2005,15 @@ export interface FamilyHistoryResponse {
   brother5_death_date?: string | null;
   brother5_death_cause?: string | null;
   
+  // Parents (Mère et Père)
+  mother_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  mother_deceased?: 'oui' | 'non' | null;
+  mother_death_cause?: string | null;
+  
+  father_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  father_deceased?: 'oui' | 'non' | null;
+  father_death_cause?: string | null;
+  
   // Metadata
   completed_by?: string | null;
   completed_at: string;
