@@ -50,6 +50,7 @@ import {
   SIS_DEFINITION,
   SUICIDE_HISTORY_DEFINITION,
   PERINATALITE_DEFINITION,
+  PATHO_NEURO_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
   WAIS4_MATRICES_DEFINITION,
@@ -512,6 +513,13 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['PERINATALITE_FR']?.completed || false,
                   completedAt: questionnaireStatuses['PERINATALITE_FR']?.completed_at,
+                },
+                {
+                  ...PATHO_NEURO_DEFINITION,
+                  id: PATHO_NEURO_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['PATHO_NEURO_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['PATHO_NEURO_FR']?.completed_at,
                 }
               ]
             }

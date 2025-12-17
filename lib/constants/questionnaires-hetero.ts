@@ -5723,6 +5723,217 @@ export const PERINATALITE_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
+// Pathologies Neurologiques (Neurological Conditions)
+// ============================================================================
+
+const YES_NO_UNKNOWN_OPTIONS = [
+  { code: 'yes', label: 'Oui', score: 1 },
+  { code: 'no', label: 'Non', score: 0 },
+  { code: 'unknown', label: 'Ne sais pas', score: 0 }
+];
+
+const YES_NO_OPTIONS = [
+  { code: 'yes', label: 'Oui', score: 1 },
+  { code: 'no', label: 'Non', score: 0 }
+];
+
+export const PATHO_NEURO_QUESTIONS: Question[] = [
+  // 1. Migraine
+  {
+    id: 'q1_migraine',
+    text: 'Migraine',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q1_1_migraine_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_migraine' }, 'yes'] }
+  },
+  {
+    id: 'q1_2_migraine_treated',
+    text: 'Traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_migraine' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q1_3_migraine_balanced',
+    text: 'Équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_migraine' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+
+  // 2. Sclérose en plaques
+  {
+    id: 'q2_sclerose',
+    text: 'Sclérose en plaques',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q2_1_sclerose_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_sclerose' }, 'yes'] }
+  },
+  {
+    id: 'q2_2_sclerose_treated',
+    text: 'Traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_sclerose' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q2_3_sclerose_balanced',
+    text: 'Équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_sclerose' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+
+  // 3. Épilepsie
+  {
+    id: 'q3_epilepsie',
+    text: 'Épilepsie',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q3_1_epilepsie_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_epilepsie' }, 'yes'] }
+  },
+  {
+    id: 'q3_2_epilepsie_treated',
+    text: 'Traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_epilepsie' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q3_3_epilepsie_balanced',
+    text: 'Équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_epilepsie' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+
+  // 4. Méningite
+  {
+    id: 'q4_meningite',
+    text: 'Méningite',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q4_1_meningite_date',
+    text: 'Date de survenue',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q4_meningite' }, 'yes'] }
+  },
+
+  // 5. Traumatisme crânien
+  {
+    id: 'q5_trauma_cranien',
+    text: 'Traumatisme crânien',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q5_1_trauma_cranien_date',
+    text: 'Date de survenue',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q5_trauma_cranien' }, 'yes'] }
+  },
+
+  // 6. Accident Vasculaire Cérébral (AVC)
+  {
+    id: 'q6_avc',
+    text: 'Accident Vasculaire Cérébral',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q6_1_avc_date',
+    text: 'Date de survenue',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q6_avc' }, 'yes'] }
+  },
+
+  // 7. Autre maladie neurologique
+  {
+    id: 'q7_autre',
+    text: 'Autre maladie neurologique',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q7_1_autre_date',
+    text: 'Date de survenue',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q7_autre' }, 'yes'] }
+  },
+  {
+    id: 'q7_2_autre_specify',
+    text: 'Spécifier',
+    type: 'text',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q7_autre' }, 'yes'] }
+  }
+];
+
+export const PATHO_NEURO_DEFINITION: QuestionnaireDefinition = {
+  id: 'patho_neuro',
+  code: 'PATHO_NEURO_FR',
+  title: 'Pathologies neurologiques',
+  description: 'Recueil des antécédents de pathologies neurologiques du patient (migraine, sclérose en plaques, épilepsie, méningite, traumatisme crânien, AVC, autres).',
+  questions: PATHO_NEURO_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================
 

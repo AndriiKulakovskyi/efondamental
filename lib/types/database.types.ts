@@ -2416,6 +2416,55 @@ export interface PerinataliteResponse {
 
 export type PerinataliteResponseInsert = Omit<PerinataliteResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ===== Pathologies Neurologiques (Neurological Conditions) Response =====
+export interface PathoNeuroResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // 1. Migraine
+  q1_migraine?: 'yes' | 'no' | 'unknown' | null;
+  q1_1_migraine_date?: string | null;
+  q1_2_migraine_treated?: 'yes' | 'no' | null;
+  q1_3_migraine_balanced?: 'yes' | 'no' | null;
+  
+  // 2. Sclérose en plaques
+  q2_sclerose?: 'yes' | 'no' | 'unknown' | null;
+  q2_1_sclerose_date?: string | null;
+  q2_2_sclerose_treated?: 'yes' | 'no' | null;
+  q2_3_sclerose_balanced?: 'yes' | 'no' | null;
+  
+  // 3. Épilepsie
+  q3_epilepsie?: 'yes' | 'no' | 'unknown' | null;
+  q3_1_epilepsie_date?: string | null;
+  q3_2_epilepsie_treated?: 'yes' | 'no' | null;
+  q3_3_epilepsie_balanced?: 'yes' | 'no' | null;
+  
+  // 4. Méningite
+  q4_meningite?: 'yes' | 'no' | 'unknown' | null;
+  q4_1_meningite_date?: string | null;
+  
+  // 5. Traumatisme crânien
+  q5_trauma_cranien?: 'yes' | 'no' | 'unknown' | null;
+  q5_1_trauma_cranien_date?: string | null;
+  
+  // 6. AVC
+  q6_avc?: 'yes' | 'no' | 'unknown' | null;
+  q6_1_avc_date?: string | null;
+  
+  // 7. Autre maladie neurologique
+  q7_autre?: 'yes' | 'no' | 'unknown' | null;
+  q7_1_autre_date?: string | null;
+  q7_2_autre_specify?: string | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PathoNeuroResponseInsert = Omit<PathoNeuroResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
 // ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================

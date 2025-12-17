@@ -31,6 +31,8 @@ import {
   SuicideHistoryResponseInsert,
   PerinataliteResponse,
   PerinataliteResponseInsert,
+  PathoNeuroResponse,
+  PathoNeuroResponseInsert,
   Wais4CriteriaResponse,
   Wais4CriteriaResponseInsert,
   Wais4LearningResponse,
@@ -992,6 +994,44 @@ export async function savePerinataliteResponse(
 
   const { data, error } = await supabase
     .from('responses_perinatalite')
+    .upsert({
+      ...response
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Pathologies Neurologiques (Neurological Conditions)
+// ============================================================================
+
+export async function getPathoNeuroResponse(
+  visitId: string
+): Promise<PathoNeuroResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_patho_neuro')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function savePathoNeuroResponse(
+  response: PathoNeuroResponseInsert
+): Promise<PathoNeuroResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_patho_neuro')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
