@@ -47,6 +47,7 @@ import {
   PATHO_ENDOC_DEFINITION,
   PATHO_DERMATO_DEFINITION,
   PATHO_URINAIRE_DEFINITION,
+  ANTECEDENTS_GYNECO_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
   WAIS4_MATRICES_DEFINITION,
@@ -138,6 +139,7 @@ import {
   getPathoEndocResponse,
   getPathoDermatoResponse,
   getPathoUrinaireResponse,
+  getAntecedentsGynecoResponse,
   getWais4CriteriaResponse,
   getWais4LearningResponse,
   getWais4MatricesResponse,
@@ -252,6 +254,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === PATHO_ENDOC_DEFINITION.code) questionnaire = PATHO_ENDOC_DEFINITION;
   else if (code === PATHO_DERMATO_DEFINITION.code) questionnaire = PATHO_DERMATO_DEFINITION;
   else if (code === PATHO_URINAIRE_DEFINITION.code) questionnaire = PATHO_URINAIRE_DEFINITION;
+  else if (code === ANTECEDENTS_GYNECO_DEFINITION.code) questionnaire = ANTECEDENTS_GYNECO_DEFINITION;
   else if (code === WAIS4_CRITERIA_DEFINITION.code) questionnaire = WAIS4_CRITERIA_DEFINITION;
   else if (code === WAIS4_LEARNING_DEFINITION.code) questionnaire = WAIS4_LEARNING_DEFINITION;
   else if (code === WAIS4_MATRICES_DEFINITION.code) questionnaire = WAIS4_MATRICES_DEFINITION;
@@ -345,6 +348,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === PATHO_ENDOC_DEFINITION.code) existingResponse = await getPathoEndocResponse(visitId);
   else if (code === PATHO_DERMATO_DEFINITION.code) existingResponse = await getPathoDermatoResponse(visitId);
   else if (code === PATHO_URINAIRE_DEFINITION.code) existingResponse = await getPathoUrinaireResponse(visitId);
+  else if (code === ANTECEDENTS_GYNECO_DEFINITION.code) existingResponse = await getAntecedentsGynecoResponse(visitId);
   else if (code === WAIS4_CRITERIA_DEFINITION.code) existingResponse = await getWais4CriteriaResponse(visitId);
   else if (code === WAIS4_LEARNING_DEFINITION.code) existingResponse = await getWais4LearningResponse(visitId);
   else if (code === WAIS4_MATRICES_DEFINITION.code) existingResponse = await getWais4MatricesResponse(visitId);

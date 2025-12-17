@@ -41,6 +41,8 @@ import {
   PathoDermatoResponseInsert,
   PathoUrinaireResponse,
   PathoUrinaireResponseInsert,
+  AntecedentsGynecoResponse,
+  AntecedentsGynecoResponseInsert,
   Wais4CriteriaResponse,
   Wais4CriteriaResponseInsert,
   Wais4LearningResponse,
@@ -1192,6 +1194,44 @@ export async function savePathoUrinaireResponse(
 
   const { data, error } = await supabase
     .from('responses_patho_urinaire')
+    .upsert({
+      ...response
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Antécédents gynécologiques (Gynecological History)
+// ============================================================================
+
+export async function getAntecedentsGynecoResponse(
+  visitId: string
+): Promise<AntecedentsGynecoResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_antecedents_gyneco')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveAntecedentsGynecoResponse(
+  response: AntecedentsGynecoResponseInsert
+): Promise<AntecedentsGynecoResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_antecedents_gyneco')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })

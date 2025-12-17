@@ -6710,6 +6710,136 @@ export const PATHO_URINAIRE_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
+// Antécédents gynécologiques (Gynecological History)
+// ============================================================================
+
+const COUNT_OPTIONS_0_15 = [
+  { code: 0, label: '0', score: 0 },
+  { code: 1, label: '1', score: 0 },
+  { code: 2, label: '2', score: 0 },
+  { code: 3, label: '3', score: 0 },
+  { code: 4, label: '4', score: 0 },
+  { code: 5, label: '5', score: 0 },
+  { code: 6, label: '6', score: 0 },
+  { code: 7, label: '7', score: 0 },
+  { code: 8, label: '8', score: 0 },
+  { code: 9, label: '9', score: 0 },
+  { code: 10, label: '10', score: 0 },
+  { code: 11, label: '11', score: 0 },
+  { code: 12, label: '12', score: 0 },
+  { code: 13, label: '13', score: 0 },
+  { code: 14, label: '14', score: 0 },
+  { code: 15, label: '>15', score: 0 }
+];
+
+export const ANTECEDENTS_GYNECO_QUESTIONS: Question[] = [
+  // 1. Nombre de grossesses
+  {
+    id: 'q1_pregnancy_count',
+    text: 'Nombre de grossesses',
+    type: 'single_choice',
+    required: false,
+    options: COUNT_OPTIONS_0_15
+  },
+  // 2. Nombre d'enfants nés vivants
+  {
+    id: 'q2_live_birth_count',
+    text: 'Nombre d\'enfants nés vivants',
+    type: 'single_choice',
+    required: false,
+    options: COUNT_OPTIONS_0_15
+  },
+  // 3. Nombre de fausses couches spontanées
+  {
+    id: 'q3_miscarriage_count',
+    text: 'Nombre de fausses couches spontanées',
+    type: 'single_choice',
+    required: false,
+    options: COUNT_OPTIONS_0_15
+  },
+  // 4. Nombre d'interruptions volontaires de grossesse (IVG)
+  {
+    id: 'q4_ivg_count',
+    text: 'Nombre d\'interruptions volontaires de grossesse (IVG)',
+    type: 'single_choice',
+    required: false,
+    options: COUNT_OPTIONS_0_15
+  },
+  // 5. Nombre d'interruptions thérapeutiques de grossesse (ITG)
+  {
+    id: 'q5_itg_count',
+    text: 'Nombre d\'interruptions thérapeutiques de grossesse (ITG)',
+    type: 'single_choice',
+    required: false,
+    options: COUNT_OPTIONS_0_15
+  },
+
+  // 6. Ménopause
+  {
+    id: 'q6_menopause',
+    text: 'Ménopause',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q6_1_menopause_date',
+    text: 'Date de survenue de la ménopause',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q6_menopause' }, 'yes'] }
+  },
+  {
+    id: 'q6_2_hormonal_treatment',
+    text: 'Traitement hormonal',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q6_menopause' }, 'yes'] },
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q6_3_hormonal_treatment_start_date',
+    text: 'Date de début du traitement',
+    type: 'date',
+    required: false,
+    indentLevel: 2,
+    display_if: { '==': [{ var: 'q6_2_hormonal_treatment' }, 'yes'] }
+  },
+
+  // 7. Pathologie gynécologique (hors cancer)
+  {
+    id: 'q7_gyneco_pathology',
+    text: 'Pathologie gynécologique (hors cancer)',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q7_1_gyneco_pathology_specify',
+    text: 'Spécifier',
+    type: 'text',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q7_gyneco_pathology' }, 'yes'] }
+  }
+];
+
+export const ANTECEDENTS_GYNECO_DEFINITION: QuestionnaireDefinition = {
+  id: 'antecedents_gyneco',
+  code: 'ANTECEDENTS_GYNECO_FR',
+  title: 'Antécédents gynécologiques',
+  description: 'Recueil des antécédents gynécologiques de la patiente (grossesses, ménopause, pathologies gynécologiques).',
+  questions: ANTECEDENTS_GYNECO_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================
 

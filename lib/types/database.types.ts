@@ -2630,6 +2630,37 @@ export interface PathoUrinaireResponse {
 
 export type PathoUrinaireResponseInsert = Omit<PathoUrinaireResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ===== Antécédents gynécologiques (Gynecological History) Response =====
+export interface AntecedentsGynecoResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // 1-5. Pregnancy-related counts
+  q1_pregnancy_count?: number | null;
+  q2_live_birth_count?: number | null;
+  q3_miscarriage_count?: number | null;
+  q4_ivg_count?: number | null;
+  q5_itg_count?: number | null;
+  
+  // 6. Ménopause
+  q6_menopause?: 'yes' | 'no' | 'unknown' | null;
+  q6_1_menopause_date?: string | null;
+  q6_2_hormonal_treatment?: 'yes' | 'no' | 'unknown' | null;
+  q6_3_hormonal_treatment_start_date?: string | null;
+  
+  // 7. Pathologie gynécologique
+  q7_gyneco_pathology?: 'yes' | 'no' | 'unknown' | null;
+  q7_1_gyneco_pathology_specify?: string | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type AntecedentsGynecoResponseInsert = Omit<AntecedentsGynecoResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
 // ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================

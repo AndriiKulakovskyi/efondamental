@@ -54,6 +54,7 @@ import {
   getPathoEndocResponse,
   getPathoDermatoResponse,
   getPathoUrinaireResponse,
+  getAntecedentsGynecoResponse,
   getWais4CriteriaResponse,
   getWais4LearningResponse,
   getWais4MatricesResponse,
@@ -121,6 +122,7 @@ import {
   PATHO_ENDOC_DEFINITION,
   PATHO_DERMATO_DEFINITION,
   PATHO_URINAIRE_DEFINITION,
+  ANTECEDENTS_GYNECO_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
   WAIS4_MATRICES_DEFINITION,
@@ -507,7 +509,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_medical_eval',
         name: 'Evaluation Médicale',
         description: 'Évaluation médicale complète',
-        questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION, DIVA_DEFINITION, FAMILY_HISTORY_DEFINITION, CSSRS_DEFINITION, ISA_DEFINITION, SIS_DEFINITION, SUICIDE_HISTORY_DEFINITION, PERINATALITE_DEFINITION, PATHO_NEURO_DEFINITION, PATHO_CARDIO_DEFINITION, PATHO_ENDOC_DEFINITION, PATHO_DERMATO_DEFINITION, PATHO_URINAIRE_DEFINITION]
+        questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION, DIVA_DEFINITION, FAMILY_HISTORY_DEFINITION, CSSRS_DEFINITION, ISA_DEFINITION, SIS_DEFINITION, SUICIDE_HISTORY_DEFINITION, PERINATALITE_DEFINITION, PATHO_NEURO_DEFINITION, PATHO_CARDIO_DEFINITION, PATHO_ENDOC_DEFINITION, PATHO_DERMATO_DEFINITION, PATHO_URINAIRE_DEFINITION, ANTECEDENTS_GYNECO_DEFINITION]
       },
       {
         id: 'mod_neuropsy',
@@ -645,7 +647,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti,
       madrs, ymrs, cgi, egf, alda, etatPatient, fast, social,
       tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biologicalAssessment,
-      dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs, isa, sis, suicideHistory, perinatalite, pathoNeuro, pathoCardio, pathoEndoc, pathoDermato, pathoUrinaire,
+      dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs, isa, sis, suicideHistory, perinatalite, pathoNeuro, pathoCardio, pathoEndoc, pathoDermato, pathoUrinaire, antecedentsGyneco,
       wais4Criteria, wais4Learning, wais4Matrices, wais4DigitSpan
     ] = await Promise.all([
       // ETAT questionnaires
@@ -713,6 +715,8 @@ export async function getVisitCompletionStatus(visitId: string) {
       getPathoDermatoResponse(visitId),
       // Pathologies des voies urinaires
       getPathoUrinaireResponse(visitId),
+      // Antécédents gynécologiques
+      getAntecedentsGynecoResponse(visitId),
       // WAIS-4 Criteria
       getWais4CriteriaResponse(visitId),
       // WAIS-4 Learning
@@ -770,6 +774,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (pathoEndoc) completed++;
     if (pathoDermato) completed++;
     if (pathoUrinaire) completed++;
+    if (antecedentsGyneco) completed++;
     if (wais4Criteria) completed++;
     if (wais4Learning) completed++;
     if (wais4Matrices) completed++;
