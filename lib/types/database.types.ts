@@ -2744,6 +2744,79 @@ export interface PathoAllergiqueResponse {
 export type PathoAllergiqueResponseInsert = Omit<PathoAllergiqueResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
+// AUTRES PATHOLOGIES (Other Pathologies - Histoire Somatique)
+// ============================================================================
+
+export interface AutresPathoResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // 0. Global response
+  q0_global_response?: 'non_pour_tous' | 'ne_sais_pas_pour_tous' | 'detailed' | null;
+  
+  // I. Pathologies cancéreuses
+  q1_1_neoplasique_presence?: 'yes' | 'no' | 'unknown' | null;
+  q1_2_neoplasique_date?: string | null;
+  q1_3_cancer_types?: string[] | null;
+  q1_4_cancer_specify?: string | null;
+  
+  // II. Pathologies infectieuses
+  // VIH
+  q2_1_vih_presence?: 'yes' | 'no' | 'unknown' | null;
+  q2_2_vih_date?: string | null;
+  q2_3_vih_treated?: 'yes' | 'no' | null;
+  q2_4_vih_balanced?: 'yes' | 'no' | null;
+  
+  // Hépatite virale chronique
+  q3_1_hepatite_presence?: 'yes' | 'no' | 'unknown' | null;
+  q3_2_hepatite_date?: string | null;
+  q3_3_hepatite_type?: 'hepatite_b' | 'hepatite_c' | 'hepatite_d' | 'non_classee' | 'unknown' | null;
+  q3_4_hepatite_treated?: 'yes' | 'no' | null;
+  q3_5_hepatite_balanced?: 'yes' | 'no' | null;
+  
+  // III. Antécédents chirurgicaux graves
+  q4_1_chirurgicaux_presence?: 'yes' | 'no' | 'unknown' | null;
+  q4_2_chirurgicaux_specify?: string | null;
+  
+  // IV. Maladie génétique
+  q5_1_genetique_presence?: 'yes' | 'no' | 'unknown' | null;
+  q5_2_genetique_specify?: string | null;
+  
+  // V. Pathologies ophtalmologiques
+  q6_0_ophtalmo_presence?: 'yes' | 'no' | 'unknown' | null;
+  
+  // Glaucome par fermeture de l'angle
+  q6_1_1_glaucome_fermeture_presence?: 'yes' | 'no' | 'unknown' | null;
+  q6_1_2_glaucome_fermeture_date?: string | null;
+  q6_1_3_glaucome_fermeture_treatment_triggered?: 'yes' | 'no' | null;
+  q6_1_4_glaucome_fermeture_treatment_type?: 'neuroleptiques' | 'antidepresseurs' | 'autres' | null;
+  
+  // Glaucome chronique à angle ouvert
+  q6_2_1_glaucome_ouvert_presence?: 'yes' | 'no' | 'unknown' | null;
+  q6_2_2_glaucome_ouvert_date?: string | null;
+  q6_2_3_glaucome_ouvert_treated?: 'yes' | 'no' | null;
+  q6_2_4_glaucome_ouvert_balanced?: 'yes' | 'no' | null;
+  
+  // Cataracte
+  q6_3_1_cataracte_presence?: 'yes' | 'no' | 'unknown' | null;
+  q6_3_2_cataracte_date?: string | null;
+  q6_3_3_cataracte_treated?: 'yes' | 'no' | null;
+  q6_3_4_cataracte_balanced?: 'yes' | 'no' | null;
+  
+  // VI. Autre pathologie somatique
+  q7_1_autre_presence?: 'yes' | 'no' | 'unknown' | null;
+  q7_2_autre_specify?: string | null;
+  
+  // Metadata
+  completed_at?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type AutresPathoResponseInsert = Omit<AutresPathoResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================
 

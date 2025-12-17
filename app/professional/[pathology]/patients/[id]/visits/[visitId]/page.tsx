@@ -58,6 +58,7 @@ import {
   ANTECEDENTS_GYNECO_DEFINITION,
   PATHO_HEPATO_GASTRO_DEFINITION,
   PATHO_ALLERGIQUE_DEFINITION,
+  AUTRES_PATHO_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
   WAIS4_MATRICES_DEFINITION,
@@ -576,6 +577,13 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['PATHO_ALLERGIQUE_FR']?.completed || false,
                   completedAt: questionnaireStatuses['PATHO_ALLERGIQUE_FR']?.completed_at,
+                },
+                {
+                  ...AUTRES_PATHO_DEFINITION,
+                  id: AUTRES_PATHO_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['AUTRES_PATHO_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['AUTRES_PATHO_FR']?.completed_at,
                 }
               ]
             }
@@ -1116,6 +1124,13 @@ export default async function VisitDetailPage({
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['PATHO_ALLERGIQUE_FR']?.completed || false,
             completedAt: questionnaireStatuses['PATHO_ALLERGIQUE_FR']?.completed_at,
+          },
+          {
+            ...AUTRES_PATHO_DEFINITION,
+            id: AUTRES_PATHO_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['AUTRES_PATHO_FR']?.completed || false,
+            completedAt: questionnaireStatuses['AUTRES_PATHO_FR']?.completed_at,
           }
         ];
         

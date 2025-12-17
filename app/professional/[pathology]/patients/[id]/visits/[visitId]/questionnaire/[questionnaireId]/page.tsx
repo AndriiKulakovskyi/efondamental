@@ -50,6 +50,7 @@ import {
   ANTECEDENTS_GYNECO_DEFINITION,
   PATHO_HEPATO_GASTRO_DEFINITION,
   PATHO_ALLERGIQUE_DEFINITION,
+  AUTRES_PATHO_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
   WAIS4_MATRICES_DEFINITION,
@@ -144,6 +145,7 @@ import {
   getAntecedentsGynecoResponse,
   getPathoHepatoGastroResponse,
   getPathoAllergiqueResponse,
+  getAutresPathoResponse,
   getWais4CriteriaResponse,
   getWais4LearningResponse,
   getWais4MatricesResponse,
@@ -261,6 +263,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ANTECEDENTS_GYNECO_DEFINITION.code) questionnaire = ANTECEDENTS_GYNECO_DEFINITION;
   else if (code === PATHO_HEPATO_GASTRO_DEFINITION.code) questionnaire = PATHO_HEPATO_GASTRO_DEFINITION;
   else if (code === PATHO_ALLERGIQUE_DEFINITION.code) questionnaire = PATHO_ALLERGIQUE_DEFINITION;
+  else if (code === AUTRES_PATHO_DEFINITION.code) questionnaire = AUTRES_PATHO_DEFINITION;
   else if (code === WAIS4_CRITERIA_DEFINITION.code) questionnaire = WAIS4_CRITERIA_DEFINITION;
   else if (code === WAIS4_LEARNING_DEFINITION.code) questionnaire = WAIS4_LEARNING_DEFINITION;
   else if (code === WAIS4_MATRICES_DEFINITION.code) questionnaire = WAIS4_MATRICES_DEFINITION;
@@ -357,6 +360,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ANTECEDENTS_GYNECO_DEFINITION.code) existingResponse = await getAntecedentsGynecoResponse(visitId);
   else if (code === PATHO_HEPATO_GASTRO_DEFINITION.code) existingResponse = await getPathoHepatoGastroResponse(visitId);
   else if (code === PATHO_ALLERGIQUE_DEFINITION.code) existingResponse = await getPathoAllergiqueResponse(visitId);
+  else if (code === AUTRES_PATHO_DEFINITION.code) existingResponse = await getAutresPathoResponse(visitId);
   else if (code === WAIS4_CRITERIA_DEFINITION.code) existingResponse = await getWais4CriteriaResponse(visitId);
   else if (code === WAIS4_LEARNING_DEFINITION.code) existingResponse = await getWais4LearningResponse(visitId);
   else if (code === WAIS4_MATRICES_DEFINITION.code) existingResponse = await getWais4MatricesResponse(visitId);

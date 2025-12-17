@@ -7184,6 +7184,507 @@ export const PATHO_ALLERGIQUE_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
+// AUTRES PATHOLOGIES (Other Pathologies - Histoire Somatique)
+// ============================================================================
+
+const CANCER_TYPE_OPTIONS: QuestionOption[] = [
+  { code: 'digestifs', label: 'Cancers digestifs', score: 0 },
+  { code: 'orl', label: 'Cancers ORL', score: 0 },
+  { code: 'pulmonaires', label: 'Cancers pulmonaires', score: 0 },
+  { code: 'gynecologiques', label: 'Cancers gynécologiques', score: 0 },
+  { code: 'autres', label: 'Autres cancers', score: 0 }
+];
+
+const HEPATITIS_TYPE_OPTIONS: QuestionOption[] = [
+  { code: 'hepatite_b', label: 'Hépatite B', score: 0 },
+  { code: 'hepatite_c', label: 'Hépatite C', score: 0 },
+  { code: 'hepatite_d', label: 'Hépatite D', score: 0 },
+  { code: 'non_classee', label: 'Hépatite non classée', score: 0 },
+  { code: 'unknown', label: 'Ne sais pas', score: 0 }
+];
+
+const GLOBAL_RESPONSE_OPTIONS: QuestionOption[] = [
+  { code: 'non_pour_tous', label: 'Non pour tous', score: 0 },
+  { code: 'ne_sais_pas_pour_tous', label: 'Ne sais pas pour tous', score: 0 },
+  { code: 'detailed', label: 'Réponse détaillée', score: 0 }
+];
+
+const TREATMENT_TYPE_OPHTALMO_OPTIONS: QuestionOption[] = [
+  { code: 'neuroleptiques', label: 'Neuroleptiques', score: 0 },
+  { code: 'antidepresseurs', label: 'Antidépresseurs', score: 0 },
+  { code: 'autres', label: 'Autres traitements', score: 0 }
+];
+
+export const AUTRES_PATHO_QUESTIONS: Question[] = [
+  // 0. Global response
+  {
+    id: 'q0_global_response',
+    text: 'Autres pathologies',
+    type: 'single_choice',
+    required: false,
+    options: GLOBAL_RESPONSE_OPTIONS,
+    help: 'Sélectionnez "Réponse détaillée" pour renseigner chaque pathologie individuellement.'
+  },
+
+  // ============================================================================
+  // I. PATHOLOGIES CANCEREUSES
+  // ============================================================================
+  {
+    id: 'section_cancer',
+    text: 'I. Pathologies cancéreuses',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ var: 'q0_global_response' }, 'detailed'] }
+  },
+
+  // 1. Pathologies néoplasiques
+  {
+    id: 'q1_1_neoplasique_presence',
+    text: 'Pathologies néoplasiques',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q1_2_neoplasique_date',
+    text: 'Date du premier diagnostic de cancer',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q1_1_neoplasique_presence' }, 'yes'] }
+    ]}
+  },
+  {
+    id: 'q1_3_cancer_types',
+    text: 'Type de cancer',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q1_1_neoplasique_presence' }, 'yes'] }
+    ]},
+    options: CANCER_TYPE_OPTIONS
+  },
+  {
+    id: 'q1_4_cancer_specify',
+    text: 'Spécifier le type de cancer',
+    type: 'text',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q1_1_neoplasique_presence' }, 'yes'] },
+      { 'in': ['autres', { var: 'q1_3_cancer_types' }] }
+    ]}
+  },
+
+  // ============================================================================
+  // II. PATHOLOGIES INFECTIEUSES
+  // ============================================================================
+  {
+    id: 'section_infectieuses',
+    text: 'II. Pathologies infectieuses',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+    help: 'Si le patient ne sait pas, proposer un dépistage sérologique pour le VIH et l\'hépatite.'
+  },
+
+  // 2. Infection à VIH
+  {
+    id: 'q2_1_vih_presence',
+    text: 'Infection à VIH',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q2_2_vih_date',
+    text: 'Date de diagnostic',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q2_1_vih_presence' }, 'yes'] }
+    ]}
+  },
+  {
+    id: 'q2_3_vih_treated',
+    text: 'Traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q2_1_vih_presence' }, 'yes'] }
+    ]},
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q2_4_vih_balanced',
+    text: 'Équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q2_1_vih_presence' }, 'yes'] }
+    ]},
+    options: YES_NO_OPTIONS
+  },
+
+  // 3. Hépatite virale chronique
+  {
+    id: 'q3_1_hepatite_presence',
+    text: 'Hépatite virale chronique',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q3_2_hepatite_date',
+    text: 'Date de diagnostic',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q3_1_hepatite_presence' }, 'yes'] }
+    ]}
+  },
+  {
+    id: 'q3_3_hepatite_type',
+    text: 'Nature du virus',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q3_1_hepatite_presence' }, 'yes'] }
+    ]},
+    options: HEPATITIS_TYPE_OPTIONS
+  },
+  {
+    id: 'q3_4_hepatite_treated',
+    text: 'Traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q3_1_hepatite_presence' }, 'yes'] }
+    ]},
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q3_5_hepatite_balanced',
+    text: 'Équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q3_1_hepatite_presence' }, 'yes'] }
+    ]},
+    options: YES_NO_OPTIONS
+  },
+
+  // ============================================================================
+  // III. ANTECEDENTS CHIRURGICAUX GRAVES
+  // ============================================================================
+  {
+    id: 'section_chirurgicaux',
+    text: 'III. Antécédents chirurgicaux graves',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ var: 'q0_global_response' }, 'detailed'] }
+  },
+
+  // 4. Antécédents chirurgicaux graves
+  {
+    id: 'q4_1_chirurgicaux_presence',
+    text: 'Antécédents chirurgicaux graves',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q4_2_chirurgicaux_specify',
+    text: 'Spécifier',
+    type: 'text',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q4_1_chirurgicaux_presence' }, 'yes'] }
+    ]}
+  },
+
+  // ============================================================================
+  // IV. MALADIE GENETIQUE
+  // ============================================================================
+  {
+    id: 'section_genetique',
+    text: 'IV. Maladie génétique',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ var: 'q0_global_response' }, 'detailed'] }
+  },
+
+  // 5. Maladie génétique
+  {
+    id: 'q5_1_genetique_presence',
+    text: 'Maladie génétique',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q5_2_genetique_specify',
+    text: 'Spécifier la maladie génétique',
+    type: 'text',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q5_1_genetique_presence' }, 'yes'] }
+    ]}
+  },
+
+  // ============================================================================
+  // V. PATHOLOGIES OPHTALMOLOGIQUES
+  // ============================================================================
+  {
+    id: 'section_ophtalmo',
+    text: 'V. Pathologies ophtalmologiques',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ var: 'q0_global_response' }, 'detailed'] }
+  },
+
+  // 6. Pathologies ophtalmologiques - Présence globale
+  {
+    id: 'q6_0_ophtalmo_presence',
+    text: 'Pathologies ophtalmologiques',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+
+  // 6.1 Glaucome par fermeture de l'angle
+  {
+    id: 'q6_1_1_glaucome_fermeture_presence',
+    text: 'Glaucome par fermeture de l\'angle',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q6_0_ophtalmo_presence' }, 'yes'] }
+    ]},
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q6_1_2_glaucome_fermeture_date',
+    text: 'Date de diagnostic',
+    type: 'date',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q6_0_ophtalmo_presence' }, 'yes'] },
+      { '==': [{ var: 'q6_1_1_glaucome_fermeture_presence' }, 'yes'] }
+    ]}
+  },
+  {
+    id: 'q6_1_3_glaucome_fermeture_treatment_triggered',
+    text: 'Survenue sous traitement',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q6_0_ophtalmo_presence' }, 'yes'] },
+      { '==': [{ var: 'q6_1_1_glaucome_fermeture_presence' }, 'yes'] }
+    ]},
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q6_1_4_glaucome_fermeture_treatment_type',
+    text: 'Nature du traitement',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q6_0_ophtalmo_presence' }, 'yes'] },
+      { '==': [{ var: 'q6_1_1_glaucome_fermeture_presence' }, 'yes'] },
+      { '==': [{ var: 'q6_1_3_glaucome_fermeture_treatment_triggered' }, 'yes'] }
+    ]},
+    options: TREATMENT_TYPE_OPHTALMO_OPTIONS
+  },
+
+  // 6.2 Glaucome chronique à angle ouvert
+  {
+    id: 'q6_2_1_glaucome_ouvert_presence',
+    text: 'Glaucome chronique à angle ouvert',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q6_0_ophtalmo_presence' }, 'yes'] }
+    ]},
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q6_2_2_glaucome_ouvert_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q6_0_ophtalmo_presence' }, 'yes'] },
+      { '==': [{ var: 'q6_2_1_glaucome_ouvert_presence' }, 'yes'] }
+    ]}
+  },
+  {
+    id: 'q6_2_3_glaucome_ouvert_treated',
+    text: 'Traité',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q6_0_ophtalmo_presence' }, 'yes'] },
+      { '==': [{ var: 'q6_2_1_glaucome_ouvert_presence' }, 'yes'] }
+    ]},
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q6_2_4_glaucome_ouvert_balanced',
+    text: 'Équilibré',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q6_0_ophtalmo_presence' }, 'yes'] },
+      { '==': [{ var: 'q6_2_1_glaucome_ouvert_presence' }, 'yes'] }
+    ]},
+    options: YES_NO_OPTIONS
+  },
+
+  // 6.3 Cataracte
+  {
+    id: 'q6_3_1_cataracte_presence',
+    text: 'Cataracte',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q6_0_ophtalmo_presence' }, 'yes'] }
+    ]},
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q6_3_2_cataracte_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q6_0_ophtalmo_presence' }, 'yes'] },
+      { '==': [{ var: 'q6_3_1_cataracte_presence' }, 'yes'] }
+    ]}
+  },
+  {
+    id: 'q6_3_3_cataracte_treated',
+    text: 'Traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q6_0_ophtalmo_presence' }, 'yes'] },
+      { '==': [{ var: 'q6_3_1_cataracte_presence' }, 'yes'] }
+    ]},
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q6_3_4_cataracte_balanced',
+    text: 'Équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q6_0_ophtalmo_presence' }, 'yes'] },
+      { '==': [{ var: 'q6_3_1_cataracte_presence' }, 'yes'] }
+    ]},
+    options: YES_NO_OPTIONS
+  },
+
+  // ============================================================================
+  // VI. AUTRE PATHOLOGIE SOMATIQUE
+  // ============================================================================
+  {
+    id: 'section_autre',
+    text: 'VI. Autre pathologie somatique',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ var: 'q0_global_response' }, 'detailed'] }
+  },
+
+  // 7. Autre pathologie somatique
+  {
+    id: 'q7_1_autre_presence',
+    text: 'Autre pathologie somatique',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q7_2_autre_specify',
+    text: 'Spécifier',
+    type: 'text',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [
+      { '==': [{ var: 'q0_global_response' }, 'detailed'] },
+      { '==': [{ var: 'q7_1_autre_presence' }, 'yes'] }
+    ]}
+  }
+];
+
+export const AUTRES_PATHO_DEFINITION: QuestionnaireDefinition = {
+  id: 'autres_patho',
+  code: 'AUTRES_PATHO_FR',
+  title: 'Autres pathologies',
+  description: 'Recueil des antécédents de pathologies diverses du patient: cancers, infections (VIH, hépatites), antécédents chirurgicaux, maladies génétiques, pathologies ophtalmologiques, et autres pathologies somatiques.',
+  questions: AUTRES_PATHO_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================
 
