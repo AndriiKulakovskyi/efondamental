@@ -2205,12 +2205,12 @@ export interface CssrsResponse {
   visit_id: string;
   patient_id: string;
   
-  // Suicidal Ideation Questions
-  q1_wish_dead?: boolean | null;
-  q2_non_specific?: boolean | null;
-  q3_method_no_intent?: boolean | null;
-  q4_intent_no_plan?: boolean | null;
-  q5_plan_intent?: boolean | null;
+  // Suicidal Ideation Questions (0=No, 1=Yes)
+  q1_wish_dead?: number | null;
+  q2_non_specific?: number | null;
+  q3_method_no_intent?: number | null;
+  q4_intent_no_plan?: number | null;
+  q5_plan_intent?: number | null;
   
   // Intensity of Ideation
   int_most_severe?: number | null; // 1-5

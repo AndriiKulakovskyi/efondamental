@@ -4896,36 +4896,56 @@ export const CSSRS_QUESTIONS: Question[] = [
     id: 'q1_wish_dead',
     text: '1. Désir d\'être mort(e) : Avez-vous souhaité être mort(e) ou de vous endormir et de ne jamais vous réveiller ?',
     help: 'Si la réponse aux questions 1 et 2 est "non", passez à la fin du questionnaire.',
-    type: 'boolean',
-    required: true
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
   },
   {
     id: 'q2_non_specific',
     text: '2. Pensées suicidaires actives non spécifiques : Avez-vous réellement pensé à vous suicider ?',
     help: 'Si la réponse est "oui", posez les questions 3, 4 et 5.',
-    type: 'boolean',
-    required: true
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
   },
   {
     id: 'q3_method_no_intent',
     text: '3. Idéation suicidaire active avec la définition des méthodes (sans scénario), sans intention de passage à l\'acte : Avez-vous pensé à la manière dont vous vous y prendriez ?',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'q2_non_specific' }, true] }
+    display_if: { '==': [{ var: 'q2_non_specific' }, 1] },
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
   },
   {
     id: 'q4_intent_no_plan',
     text: '4. Idéation suicidaire active avec intention de passage à l\'acte, sans scénario précis : Avez-vous eu des pensées de ce genre et l\'intention de passer à l\'acte ?',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'q2_non_specific' }, true] }
+    display_if: { '==': [{ var: 'q2_non_specific' }, 1] },
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
   },
   {
     id: 'q5_plan_intent',
     text: '5. Idéation suicidaire active avec scénario précis et intention de passer à l\'acte : Avez-vous commencé ou fini d\'élaborer un scénario détaillé sur la manière dont vous voulez vous suicider ? Et avez-vous l\'intention de mettre ce scénario à exécution ?',
-    type: 'boolean',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ var: 'q2_non_specific' }, true] }
+    display_if: { '==': [{ var: 'q2_non_specific' }, 1] },
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
   },
   
   // Intensity of Ideation
@@ -4936,8 +4956,8 @@ export const CSSRS_QUESTIONS: Question[] = [
     required: false,
     display_if: {
       or: [
-        { '==': [{ var: 'q1_wish_dead' }, true] },
-        { '==': [{ var: 'q2_non_specific' }, true] }
+        { '==': [{ var: 'q1_wish_dead' }, 1] },
+        { '==': [{ var: 'q2_non_specific' }, 1] }
       ]
     }
   },
@@ -4949,8 +4969,8 @@ export const CSSRS_QUESTIONS: Question[] = [
     required: false,
     display_if: {
       or: [
-        { '==': [{ var: 'q1_wish_dead' }, true] },
-        { '==': [{ var: 'q2_non_specific' }, true] }
+        { '==': [{ var: 'q1_wish_dead' }, 1] },
+        { '==': [{ var: 'q2_non_specific' }, 1] }
       ]
     },
     options: [
@@ -4968,8 +4988,8 @@ export const CSSRS_QUESTIONS: Question[] = [
     required: false,
     display_if: {
       or: [
-        { '==': [{ var: 'q1_wish_dead' }, true] },
-        { '==': [{ var: 'q2_non_specific' }, true] }
+        { '==': [{ var: 'q1_wish_dead' }, 1] },
+        { '==': [{ var: 'q2_non_specific' }, 1] }
       ]
     },
     options: [
@@ -4987,8 +5007,8 @@ export const CSSRS_QUESTIONS: Question[] = [
     required: false,
     display_if: {
       or: [
-        { '==': [{ var: 'q1_wish_dead' }, true] },
-        { '==': [{ var: 'q2_non_specific' }, true] }
+        { '==': [{ var: 'q1_wish_dead' }, 1] },
+        { '==': [{ var: 'q2_non_specific' }, 1] }
       ]
     },
     options: [
@@ -5006,8 +5026,8 @@ export const CSSRS_QUESTIONS: Question[] = [
     required: false,
     display_if: {
       or: [
-        { '==': [{ var: 'q1_wish_dead' }, true] },
-        { '==': [{ var: 'q2_non_specific' }, true] }
+        { '==': [{ var: 'q1_wish_dead' }, 1] },
+        { '==': [{ var: 'q2_non_specific' }, 1] }
       ]
     },
     options: [
@@ -5026,8 +5046,8 @@ export const CSSRS_QUESTIONS: Question[] = [
     required: false,
     display_if: {
       or: [
-        { '==': [{ var: 'q1_wish_dead' }, true] },
-        { '==': [{ var: 'q2_non_specific' }, true] }
+        { '==': [{ var: 'q1_wish_dead' }, 1] },
+        { '==': [{ var: 'q2_non_specific' }, 1] }
       ]
     },
     options: [
@@ -5045,8 +5065,8 @@ export const CSSRS_QUESTIONS: Question[] = [
     required: false,
     display_if: {
       or: [
-        { '==': [{ var: 'q1_wish_dead' }, true] },
-        { '==': [{ var: 'q2_non_specific' }, true] }
+        { '==': [{ var: 'q1_wish_dead' }, 1] },
+        { '==': [{ var: 'q2_non_specific' }, 1] }
       ]
     },
     options: [
@@ -5289,7 +5309,7 @@ export const CSSRS_HISTORY_QUESTIONS: Question[] = [
   // Section 2 - Intensity of Ideation
   {
     id: 'section_2_intensity',
-    text: 'Section 2 - INTENSITE DE L\'IDEATION',
+    text: 'Section 2 - Intensité de l\'idéation',
     help: 'Les aspects suivants doivent être évalués en fonction du type d\'idéation le plus grave (c.-à-d. idéations 1 à 5 ci-dessus, 1 étant la moins grave et 5 la plus grave). La question portera sur le moment où il/elle s\'est senti(e) le plus suicidaire.',
     type: 'section',
     required: false
