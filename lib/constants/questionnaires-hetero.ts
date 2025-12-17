@@ -1666,553 +1666,550 @@ export const DIVA_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
-// FAMILY HISTORY (Antécédents Familiaux / Anamnesis)
+// FAMILY HISTORY (Antécédents Familiaux)
+// Section 1 - Enfants (Children Only)
 // ============================================================================
-
-// Helper function to create family member psychiatric assessment
-const createPsyAssessment = (member: string, prefix: string): Question[] => [
-  {
-    id: `${prefix}_psy_thymic`,
-    text: `${member} - Troubles Thymiques`,
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: `${prefix}_psy_thymic_type`,
-    text: `${member} - Si Troubles Thymiques, spécifier`,
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: `${prefix}_psy_thymic` }, 'oui'] },
-    options: [
-      { code: 'unipolaire', label: 'EDM ou Unipolaire' },
-      { code: 'bipolaire', label: 'Bipolaire' },
-      { code: 'nsp', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: `${prefix}_psy_schizo`,
-    text: `${member} - Troubles Schizophréniques`,
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: `${prefix}_psy_suicide`,
-    text: `${member} - Suicide`,
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 0, label: 'Aucun', score: 0 },
-      { code: 1, label: 'Tentative de suicide', score: 1 },
-      { code: 2, label: 'Suicide abouti', score: 2 },
-      { code: 99, label: 'Ne sais pas', score: 99 }
-    ]
-  },
-  {
-    id: `${prefix}_psy_substance`,
-    text: `${member} - Dépendance ou abus de substances`,
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: `${prefix}_psy_substance_types`,
-    text: `${member} - Si substances, spécifier (sélection multiple)`,
-    type: 'multiple_choice',
-    required: false,
-    display_if: { '==': [{ var: `${prefix}_psy_substance` }, 'oui'] },
-    options: ['Alcool', 'Cannabis', 'Autre']
-  },
-  {
-    id: `${prefix}_psy_anxiety`,
-    text: `${member} - Troubles anxieux`,
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  }
-];
 
 export const FAMILY_HISTORY_QUESTIONS: Question[] = [
   // ========================================================================
-  // MOTHER (Mère)
+  // SECTION 1 - CHILDREN (Enfants)
   // ========================================================================
-  {
-    id: 'section_mother',
-    text: 'Mère',
-    type: 'section',
-    required: false
-  },
-  {
-    id: 'mother_deceased',
-    text: 'Est-elle décédée ?',
-    type: 'single_choice',
-    required: true,
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'mother_death_cause',
-    text: 'Cause du décès',
-    type: 'text',
-    required: false,
-    display_if: { '==': [{ var: 'mother_deceased' }, 'oui'] }
-  },
-  {
-    id: 'mother_psy_history',
-    text: 'Votre mère a-t-elle des antécédents de maladie psychiatrique ?',
-    type: 'single_choice',
-    required: true,
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'section_mother_psy',
-    text: 'Mère - Détails Psychiatriques',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ var: 'mother_psy_history' }, 'oui'] }
-  },
-  ...createPsyAssessment('Mère', 'mother'),
-  {
-    id: 'mother_psy_dementia',
-    text: 'Mère - Démence',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'mother_psy_history' }, 'oui'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'section_mother_cardio',
-    text: 'Mère - Facteurs Cardiovasculaires',
-    type: 'section',
-    required: false
-  },
-  {
-    id: 'mother_cardio_history',
-    text: 'Votre mère a-t-elle des facteurs de risques cardio-vasculaires ?',
-    type: 'single_choice',
-    required: true,
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'mother_cardio_types',
-    text: 'Si risques cardio, spécifier (sélection multiple)',
-    type: 'multiple_choice',
-    required: false,
-    display_if: { '==': [{ var: 'mother_cardio_history' }, 'oui'] },
-    options: ['Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension']
-  },
-  {
-    id: 'mother_diabetes_type',
-    text: 'Pour le diabète, spécifier le type',
-    type: 'single_choice',
-    required: false,
-    display_if: { 'in': ['Diabète', { var: 'mother_cardio_types' }] },
-    options: [
-      { code: 1, label: 'Type I', score: 1 },
-      { code: 2, label: 'Type II', score: 2 },
-      { code: 99, label: 'Ne sais pas', score: 99 }
-    ]
-  },
   
-  // ========================================================================
-  // FATHER (Père)
-  // ========================================================================
-  {
-    id: 'section_father',
-    text: 'Père',
-    type: 'section',
-    required: false
-  },
-  {
-    id: 'father_deceased',
-    text: 'Est-il décédé ?',
-    type: 'single_choice',
-    required: true,
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'father_death_cause',
-    text: 'Cause du décès',
-    type: 'text',
-    required: false,
-    display_if: { '==': [{ var: 'father_deceased' }, 'oui'] }
-  },
-  {
-    id: 'father_psy_history',
-    text: 'Votre père a-t-il des antécédents de maladie psychiatrique ?',
-    type: 'single_choice',
-    required: true,
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'section_father_psy',
-    text: 'Père - Détails Psychiatriques',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ var: 'father_psy_history' }, 'oui'] }
-  },
-  ...createPsyAssessment('Père', 'father'),
-  {
-    id: 'father_psy_dementia',
-    text: 'Père - Démence',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ var: 'father_psy_history' }, 'oui'] },
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'section_father_cardio',
-    text: 'Père - Facteurs Cardiovasculaires',
-    type: 'section',
-    required: false
-  },
-  {
-    id: 'father_cardio_history',
-    text: 'Votre père a-t-il des facteurs de risques cardio-vasculaires ?',
-    type: 'single_choice',
-    required: true,
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'father_cardio_types',
-    text: 'Si risques cardio, spécifier (sélection multiple)',
-    type: 'multiple_choice',
-    required: false,
-    display_if: { '==': [{ var: 'father_cardio_history' }, 'oui'] },
-    options: ['Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension']
-  },
-  {
-    id: 'father_diabetes_type',
-    text: 'Pour le diabète, spécifier le type',
-    type: 'single_choice',
-    required: false,
-    display_if: { 'in': ['Diabète', { var: 'father_cardio_types' }] },
-    options: [
-      { code: 1, label: 'Type I', score: 1 },
-      { code: 2, label: 'Type II', score: 2 },
-      { code: 99, label: 'Ne sais pas', score: 99 }
-    ]
-  },
-  
-  // ========================================================================
-  // GRANDPARENTS (Grands-Parents)
-  // ========================================================================
-  {
-    id: 'section_grandparents',
-    text: 'Grands-Parents',
-    type: 'section',
-    required: false
-  },
-  {
-    id: 'gp_maternal_grandmother_notes',
-    text: 'Grand-mère maternelle - Antécédents (notes libres)',
-    type: 'text',
-    required: false
-  },
-  {
-    id: 'gp_maternal_grandfather_notes',
-    text: 'Grand-père maternel - Antécédents (notes libres)',
-    type: 'text',
-    required: false
-  },
-  {
-    id: 'gp_paternal_grandmother_notes',
-    text: 'Grand-mère paternelle - Antécédents (notes libres)',
-    type: 'text',
-    required: false
-  },
-  {
-    id: 'gp_paternal_grandfather_notes',
-    text: 'Grand-père paternel - Antécédents (notes libres)',
-    type: 'text',
-    required: false
-  },
-  
-  // ========================================================================
-  // CHILDREN (Enfants)
-  // ========================================================================
   {
     id: 'section_children',
-    text: 'Enfants',
+    text: 'Section 1 - Enfants',
     type: 'section',
     required: false
   },
+  
+  // ========================================================================
+  // DAUGHTERS (Filles)
+  // ========================================================================
+  
   {
-    id: 'has_children',
-    text: 'Avez-vous des enfants ?',
+    id: 'num_daughters',
+    text: 'Q1. Nombre de filles',
     type: 'single_choice',
     required: true,
+    options: [
+      { code: '0', label: 'Aucune' },
+      { code: '1', label: '1' },
+      { code: '2', label: '2' },
+      { code: '3', label: '3' },
+      { code: '4', label: '4' },
+      { code: '5', label: '5' },
+      { code: '>5', label: '>5' }
+    ]
+  },
+  
+  {
+    id: 'num_daughters_with_issues',
+    text: 'Q1.1. Parmi elles, veuillez indiquer combien présentent un trouble psychiatrique, un abus ou une dépendance à une substance, un antécédent de tentative de suicide ou un facteur de risque cardio-vasculaire',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      and: [
+        { '!=': [{ var: 'num_daughters' }, null] },
+        { '!=': [{ var: 'num_daughters' }, '0'] }
+      ]
+    },
+    options: [
+      { code: 0, label: 'Aucune', score: 0 },
+      { code: 1, label: '1', score: 1 },
+      { code: 2, label: '2', score: 2 },
+      { code: 3, label: '3', score: 3 },
+      { code: 4, label: '4', score: 4 },
+      { code: 5, label: '5', score: 5 }
+    ]
+  },
+  
+  // Daughter 1
+  {
+    id: 'daughter1_dob',
+    text: 'Fille 1 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 1] }
+  },
+  {
+    id: 'daughter1_deceased',
+    text: 'Fille 1 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 1] },
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
     ]
   },
   {
-    id: 'children_psy_count',
-    text: 'Parmi eux, combien ont des antécédents de maladie psychiatrique ?',
-    type: 'number',
+    id: 'daughter1_death_date',
+    text: 'Fille 1 - Date du décès',
+    type: 'date',
     required: false,
-    min: 0,
-    max: 20,
-    display_if: { '==': [{ var: 'has_children' }, 'oui'] }
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_daughters_with_issues' }, 1] },
+        { '==': [{ var: 'daughter1_deceased' }, 'oui'] }
+      ]
+    }
   },
   {
-    id: 'children_cardio_count',
-    text: 'Parmi eux, combien ont des facteurs de risque cardio-vasculaires ?',
-    type: 'number',
-    required: false,
-    min: 0,
-    max: 20,
-    display_if: { '==': [{ var: 'has_children' }, 'oui'] }
-  },
-  
-  // Child 1 - 4 (simplified, can be expanded)
-  {
-    id: 'section_child1',
-    text: 'Enfant 1 (optionnel)',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ var: 'has_children' }, 'oui'] }
-  },
-  {
-    id: 'child1_gender',
-    text: 'Sexe',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'M', label: 'Fils' },
-      { code: 'F', label: 'Fille' }
-    ]
-  },
-  {
-    id: 'child1_dob',
-    text: 'Date de naissance (format libre)',
+    id: 'daughter1_death_cause',
+    text: 'Fille 1 - Cause du décès',
     type: 'text',
-    required: false
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_daughters_with_issues' }, 1] },
+        { '==': [{ var: 'daughter1_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Daughter 2
+  {
+    id: 'daughter2_dob',
+    text: 'Fille 2 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 2] }
   },
   {
-    id: 'child1_psy_history',
-    text: 'Antécédents psychiatriques',
+    id: 'daughter2_deceased',
+    text: 'Fille 2 - Décès',
     type: 'single_choice',
     required: false,
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'child1_psy_details',
-    text: 'Détails Psy (sélection multiple)',
-    type: 'multiple_choice',
-    required: false,
-    display_if: { '==': [{ var: 'child1_psy_history' }, 'oui'] },
-    options: ['Troubles Thymiques', 'Schizophrénie', 'Suicide (tentative/abouti)', 'Substances', 'Anxiété', 'Démence']
-  },
-  {
-    id: 'child1_cardio',
-    text: 'Facteurs de risques cardio-vasculaires',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  
-  // Repeat for Child 2, 3, 4 (abbreviated for brevity)
-  { id: 'section_child2', text: 'Enfant 2 (optionnel)', type: 'section', required: false, display_if: { '==': [{ var: 'has_children' }, 'oui'] } },
-  { id: 'child2_gender', text: 'Sexe', type: 'single_choice', required: false, options: [{ code: 'M', label: 'Fils' }, { code: 'F', label: 'Fille' }] },
-  { id: 'child2_dob', text: 'Date de naissance', type: 'text', required: false },
-  { id: 'child2_psy_history', text: 'Antécédents psychiatriques', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  { id: 'child2_psy_details', text: 'Détails Psy', type: 'multiple_choice', required: false, display_if: { '==': [{ var: 'child2_psy_history' }, 'oui'] }, options: ['Troubles Thymiques', 'Schizophrénie', 'Suicide (tentative/abouti)', 'Substances', 'Anxiété', 'Démence'] },
-  { id: 'child2_cardio', text: 'Facteurs cardio', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  
-  { id: 'section_child3', text: 'Enfant 3 (optionnel)', type: 'section', required: false, display_if: { '==': [{ var: 'has_children' }, 'oui'] } },
-  { id: 'child3_gender', text: 'Sexe', type: 'single_choice', required: false, options: [{ code: 'M', label: 'Fils' }, { code: 'F', label: 'Fille' }] },
-  { id: 'child3_dob', text: 'Date de naissance', type: 'text', required: false },
-  { id: 'child3_psy_history', text: 'Antécédents psychiatriques', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  { id: 'child3_psy_details', text: 'Détails Psy', type: 'multiple_choice', required: false, display_if: { '==': [{ var: 'child3_psy_history' }, 'oui'] }, options: ['Troubles Thymiques', 'Schizophrénie', 'Suicide (tentative/abouti)', 'Substances', 'Anxiété', 'Démence'] },
-  { id: 'child3_cardio', text: 'Facteurs cardio', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  
-  { id: 'section_child4', text: 'Enfant 4 (optionnel)', type: 'section', required: false, display_if: { '==': [{ var: 'has_children' }, 'oui'] } },
-  { id: 'child4_gender', text: 'Sexe', type: 'single_choice', required: false, options: [{ code: 'M', label: 'Fils' }, { code: 'F', label: 'Fille' }] },
-  { id: 'child4_dob', text: 'Date de naissance', type: 'text', required: false },
-  { id: 'child4_psy_history', text: 'Antécédents psychiatriques', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  { id: 'child4_psy_details', text: 'Détails Psy', type: 'multiple_choice', required: false, display_if: { '==': [{ var: 'child4_psy_history' }, 'oui'] }, options: ['Troubles Thymiques', 'Schizophrénie', 'Suicide (tentative/abouti)', 'Substances', 'Anxiété', 'Démence'] },
-  { id: 'child4_cardio', text: 'Facteurs cardio', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  
-  // ========================================================================
-  // SIBLINGS (Frères et Soeurs)
-  // ========================================================================
-  {
-    id: 'section_siblings',
-    text: 'Frères et Soeurs',
-    type: 'section',
-    required: false
-  },
-  {
-    id: 'has_siblings',
-    text: 'Avez-vous des frères/soeurs ?',
-    type: 'single_choice',
-    required: true,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 2] },
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
     ]
   },
-  
-  // Sibling 1 - 4 (detailed for first, abbreviated for others)
   {
-    id: 'section_sibling1',
-    text: 'Frère/Soeur 1 (optionnel)',
-    type: 'section',
+    id: 'daughter2_death_date',
+    text: 'Fille 2 - Date du décès',
+    type: 'date',
     required: false,
-    display_if: { '==': [{ var: 'has_siblings' }, 'oui'] }
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_daughters_with_issues' }, 2] },
+        { '==': [{ var: 'daughter2_deceased' }, 'oui'] }
+      ]
+    }
   },
   {
-    id: 'sibling1_gender',
-    text: 'Sexe',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'M', label: 'Frère' },
-      { code: 'F', label: 'Soeur' }
-    ]
-  },
-  {
-    id: 'sibling1_deceased',
-    text: 'Est-il/elle décédé(e) ?',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
-    ]
-  },
-  {
-    id: 'sibling1_death_cause',
-    text: 'Cause du décès',
+    id: 'daughter2_death_cause',
+    text: 'Fille 2 - Cause du décès',
     type: 'text',
     required: false,
-    display_if: { '==': [{ var: 'sibling1_deceased' }, 'oui'] }
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_daughters_with_issues' }, 2] },
+        { '==': [{ var: 'daughter2_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Daughter 3
+  {
+    id: 'daughter3_dob',
+    text: 'Fille 3 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 3] }
   },
   {
-    id: 'sibling1_psy_history',
-    text: 'Antécédents psychiatriques',
+    id: 'daughter3_deceased',
+    text: 'Fille 3 - Décès',
     type: 'single_choice',
     required: false,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 3] },
     options: [
       { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+      { code: 'non', label: 'Non' }
     ]
   },
-  ...createPsyAssessment('Frère/Soeur 1', 'sibling1').filter(q => q.id !== 'sibling1_psy_dementia'), // No dementia for siblings
   {
-    id: 'sibling1_cardio_history',
-    text: 'Facteurs de risques cardio-vasculaires',
+    id: 'daughter3_death_date',
+    text: 'Fille 3 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_daughters_with_issues' }, 3] },
+        { '==': [{ var: 'daughter3_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'daughter3_death_cause',
+    text: 'Fille 3 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_daughters_with_issues' }, 3] },
+        { '==': [{ var: 'daughter3_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Daughter 4
+  {
+    id: 'daughter4_dob',
+    text: 'Fille 4 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 4] }
+  },
+  {
+    id: 'daughter4_deceased',
+    text: 'Fille 4 - Décès',
     type: 'single_choice',
     required: false,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 4] },
     options: [
       { code: 'oui', label: 'Oui' },
-      { code: 'non', label: 'Non' },
-      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+      { code: 'non', label: 'Non' }
     ]
   },
   {
-    id: 'sibling1_cardio_types',
-    text: 'Si risques cardio, spécifier',
-    type: 'multiple_choice',
+    id: 'daughter4_death_date',
+    text: 'Fille 4 - Date du décès',
+    type: 'date',
     required: false,
-    display_if: { '==': [{ var: 'sibling1_cardio_history' }, 'oui'] },
-    options: ['Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension']
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_daughters_with_issues' }, 4] },
+        { '==': [{ var: 'daughter4_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'daughter4_death_cause',
+    text: 'Fille 4 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_daughters_with_issues' }, 4] },
+        { '==': [{ var: 'daughter4_deceased' }, 'oui'] }
+      ]
+    }
   },
   
-  // Siblings 2-4 (abbreviated)
-  { id: 'section_sibling2', text: 'Frère/Soeur 2 (optionnel)', type: 'section', required: false, display_if: { '==': [{ var: 'has_siblings' }, 'oui'] } },
-  { id: 'sibling2_gender', text: 'Sexe', type: 'single_choice', required: false, options: [{ code: 'M', label: 'Frère' }, { code: 'F', label: 'Soeur' }] },
-  { id: 'sibling2_deceased', text: 'Décédé(e) ?', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  { id: 'sibling2_death_cause', text: 'Cause du décès', type: 'text', required: false, display_if: { '==': [{ var: 'sibling2_deceased' }, 'oui'] } },
-  { id: 'sibling2_psy_history', text: 'Antécédents psychiatriques', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  ...createPsyAssessment('Frère/Soeur 2', 'sibling2').filter(q => q.id !== 'sibling2_psy_dementia'),
-  { id: 'sibling2_cardio_history', text: 'Facteurs cardio', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  { id: 'sibling2_cardio_types', text: 'Types de risques cardio', type: 'multiple_choice', required: false, display_if: { '==': [{ var: 'sibling2_cardio_history' }, 'oui'] }, options: ['Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension'] },
+  // Daughter 5
+  {
+    id: 'daughter5_dob',
+    text: 'Fille 5 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 5] }
+  },
+  {
+    id: 'daughter5_deceased',
+    text: 'Fille 5 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_daughters_with_issues' }, 5] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'daughter5_death_date',
+    text: 'Fille 5 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_daughters_with_issues' }, 5] },
+        { '==': [{ var: 'daughter5_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'daughter5_death_cause',
+    text: 'Fille 5 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_daughters_with_issues' }, 5] },
+        { '==': [{ var: 'daughter5_deceased' }, 'oui'] }
+      ]
+    }
+  },
   
-  { id: 'section_sibling3', text: 'Frère/Soeur 3 (optionnel)', type: 'section', required: false, display_if: { '==': [{ var: 'has_siblings' }, 'oui'] } },
-  { id: 'sibling3_gender', text: 'Sexe', type: 'single_choice', required: false, options: [{ code: 'M', label: 'Frère' }, { code: 'F', label: 'Soeur' }] },
-  { id: 'sibling3_deceased', text: 'Décédé(e) ?', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  { id: 'sibling3_death_cause', text: 'Cause du décès', type: 'text', required: false, display_if: { '==': [{ var: 'sibling3_deceased' }, 'oui'] } },
-  { id: 'sibling3_psy_history', text: 'Antécédents psychiatriques', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  ...createPsyAssessment('Frère/Soeur 3', 'sibling3').filter(q => q.id !== 'sibling3_psy_dementia'),
-  { id: 'sibling3_cardio_history', text: 'Facteurs cardio', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  { id: 'sibling3_cardio_types', text: 'Types de risques cardio', type: 'multiple_choice', required: false, display_if: { '==': [{ var: 'sibling3_cardio_history' }, 'oui'] }, options: ['Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension'] },
+  // ========================================================================
+  // SONS (Fils)
+  // ========================================================================
   
-  { id: 'section_sibling4', text: 'Frère/Soeur 4 (optionnel)', type: 'section', required: false, display_if: { '==': [{ var: 'has_siblings' }, 'oui'] } },
-  { id: 'sibling4_gender', text: 'Sexe', type: 'single_choice', required: false, options: [{ code: 'M', label: 'Frère' }, { code: 'F', label: 'Soeur' }] },
-  { id: 'sibling4_deceased', text: 'Décédé(e) ?', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  { id: 'sibling4_death_cause', text: 'Cause du décès', type: 'text', required: false, display_if: { '==': [{ var: 'sibling4_deceased' }, 'oui'] } },
-  { id: 'sibling4_psy_history', text: 'Antécédents psychiatriques', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  ...createPsyAssessment('Frère/Soeur 4', 'sibling4').filter(q => q.id !== 'sibling4_psy_dementia'),
-  { id: 'sibling4_cardio_history', text: 'Facteurs cardio', type: 'single_choice', required: false, options: [{ code: 'oui', label: 'Oui' }, { code: 'non', label: 'Non' }, { code: 'ne_sais_pas', label: 'Ne sais pas' }] },
-  { id: 'sibling4_cardio_types', text: 'Types de risques cardio', type: 'multiple_choice', required: false, display_if: { '==': [{ var: 'sibling4_cardio_history' }, 'oui'] }, options: ['Diabète', 'Obésité', 'Hyperlipidémie', 'Hypertension'] }
+  {
+    id: 'num_sons',
+    text: 'Q2. Nombre de fils',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: '0', label: 'Aucun' },
+      { code: '1', label: '1' },
+      { code: '2', label: '2' },
+      { code: '3', label: '3' },
+      { code: '4', label: '4' },
+      { code: '5', label: '5' },
+      { code: '>5', label: '>5' }
+    ]
+  },
+  
+  {
+    id: 'num_sons_with_issues',
+    text: 'Q2.1. Parmi eux, veuillez indiquer combien présentent un trouble psychiatrique, un abus ou une dépendance à une substance, un antécédent de tentative de suicide ou un facteur de risque cardio-vasculaire',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      and: [
+        { '!=': [{ var: 'num_sons' }, null] },
+        { '!=': [{ var: 'num_sons' }, '0'] }
+      ]
+    },
+    options: [
+      { code: 0, label: 'Aucun', score: 0 },
+      { code: 1, label: '1', score: 1 },
+      { code: 2, label: '2', score: 2 },
+      { code: 3, label: '3', score: 3 },
+      { code: 4, label: '4', score: 4 },
+      { code: 5, label: '5', score: 5 }
+    ]
+  },
+  
+  // Son 1
+  {
+    id: 'son1_dob',
+    text: 'Fils 1 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 1] }
+  },
+  {
+    id: 'son1_deceased',
+    text: 'Fils 1 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 1] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'son1_death_date',
+    text: 'Fils 1 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sons_with_issues' }, 1] },
+        { '==': [{ var: 'son1_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'son1_death_cause',
+    text: 'Fils 1 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sons_with_issues' }, 1] },
+        { '==': [{ var: 'son1_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Son 2
+  {
+    id: 'son2_dob',
+    text: 'Fils 2 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 2] }
+  },
+  {
+    id: 'son2_deceased',
+    text: 'Fils 2 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 2] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'son2_death_date',
+    text: 'Fils 2 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sons_with_issues' }, 2] },
+        { '==': [{ var: 'son2_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'son2_death_cause',
+    text: 'Fils 2 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sons_with_issues' }, 2] },
+        { '==': [{ var: 'son2_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Son 3
+  {
+    id: 'son3_dob',
+    text: 'Fils 3 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 3] }
+  },
+  {
+    id: 'son3_deceased',
+    text: 'Fils 3 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 3] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'son3_death_date',
+    text: 'Fils 3 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sons_with_issues' }, 3] },
+        { '==': [{ var: 'son3_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'son3_death_cause',
+    text: 'Fils 3 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sons_with_issues' }, 3] },
+        { '==': [{ var: 'son3_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Son 4
+  {
+    id: 'son4_dob',
+    text: 'Fils 4 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 4] }
+  },
+  {
+    id: 'son4_deceased',
+    text: 'Fils 4 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 4] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'son4_death_date',
+    text: 'Fils 4 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sons_with_issues' }, 4] },
+        { '==': [{ var: 'son4_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'son4_death_cause',
+    text: 'Fils 4 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sons_with_issues' }, 4] },
+        { '==': [{ var: 'son4_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Son 5
+  {
+    id: 'son5_dob',
+    text: 'Fils 5 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 5] }
+  },
+  {
+    id: 'son5_deceased',
+    text: 'Fils 5 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sons_with_issues' }, 5] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'son5_death_date',
+    text: 'Fils 5 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sons_with_issues' }, 5] },
+        { '==': [{ var: 'son5_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'son5_death_cause',
+    text: 'Fils 5 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sons_with_issues' }, 5] },
+        { '==': [{ var: 'son5_deceased' }, 'oui'] }
+      ]
+    }
+  }
 ];
 
 export const FAMILY_HISTORY_DEFINITION: QuestionnaireDefinition = {
   id: 'family_history',
   code: 'FAMILY_HISTORY_FR',
-  title: 'Antécédents Familiaux (Anamnèse)',
-  description: 'Évaluation systématique des antécédents psychiatriques et cardiovasculaires chez les ascendants, descendants et collatéraux.',
+  title: 'Antécédents Familiaux - Section 1 : Enfants',
+  description: 'Évaluation des antécédents psychiatriques, de dépendance, de suicide et de facteurs de risque cardio-vasculaires chez les enfants (filles et fils).',
   questions: FAMILY_HISTORY_QUESTIONS,
   metadata: {
     singleColumn: true,

@@ -195,6 +195,11 @@ export function evaluateCondition(
 }
 
 function evaluateExpression(expr: any, answers: QuestionnaireAnswers): any {
+  // Handle null/undefined first
+  if (expr === null || expr === undefined) {
+    return null;
+  }
+  
   if (typeof expr === 'number') {
     return expr;
   }
