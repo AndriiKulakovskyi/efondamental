@@ -2465,6 +2465,47 @@ export interface PathoNeuroResponse {
 
 export type PathoNeuroResponseInsert = Omit<PathoNeuroResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ===== Pathologies Cardio-vasculaires (Cardiovascular Conditions) Response =====
+export interface PathoCardioResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // 1. Hypertension artérielle
+  q1_hypertension?: 'yes' | 'no' | 'unknown' | null;
+  q1_1_hypertension_date?: string | null;
+  q1_2_hypertension_treated?: 'yes' | 'no' | null;
+  q1_3_hypertension_balanced?: 'yes' | 'no' | null;
+  
+  // 2. Maladie coronarienne
+  q2_coronary?: 'yes' | 'no' | 'unknown' | null;
+  q2_1_coronary_date?: string | null;
+  q2_2_coronary_treated?: 'yes' | 'no' | null;
+  q2_3_coronary_balanced?: 'yes' | 'no' | null;
+  
+  // 3. Infarctus du myocarde
+  q3_infarctus?: 'yes' | 'no' | 'unknown' | null;
+  q3_1_infarctus_date?: string | null;
+  
+  // 4. Trouble du rythme cardiaque
+  q4_rythme?: 'yes' | 'no' | 'unknown' | null;
+  q4_1_rythme_date?: string | null;
+  q4_2_rythme_treated?: 'yes' | 'no' | null;
+  q4_3_rythme_balanced?: 'yes' | 'no' | null;
+  
+  // 5. Autre maladie cardio-vasculaire
+  q5_autre?: 'yes' | 'no' | 'unknown' | null;
+  q5_1_autre_specify?: string | null;
+  q5_2_autre_date?: string | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PathoCardioResponseInsert = Omit<PathoCardioResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
 // ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================

@@ -51,6 +51,7 @@ import {
   SUICIDE_HISTORY_DEFINITION,
   PERINATALITE_DEFINITION,
   PATHO_NEURO_DEFINITION,
+  PATHO_CARDIO_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
   WAIS4_MATRICES_DEFINITION,
@@ -520,6 +521,13 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['PATHO_NEURO_FR']?.completed || false,
                   completedAt: questionnaireStatuses['PATHO_NEURO_FR']?.completed_at,
+                },
+                {
+                  ...PATHO_CARDIO_DEFINITION,
+                  id: PATHO_CARDIO_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['PATHO_CARDIO_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['PATHO_CARDIO_FR']?.completed_at,
                 }
               ]
             }

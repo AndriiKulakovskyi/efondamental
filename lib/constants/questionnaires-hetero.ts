@@ -5934,6 +5934,172 @@ export const PATHO_NEURO_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
+// Pathologies Cardio-vasculaires (Cardiovascular Conditions)
+// ============================================================================
+
+export const PATHO_CARDIO_QUESTIONS: Question[] = [
+  // 1. Hypertension artérielle
+  {
+    id: 'q1_hypertension',
+    text: 'Hypertension artérielle',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q1_1_hypertension_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_hypertension' }, 'yes'] }
+  },
+  {
+    id: 'q1_2_hypertension_treated',
+    text: 'Traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_hypertension' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q1_3_hypertension_balanced',
+    text: 'Équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_hypertension' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+
+  // 2. Maladie coronarienne
+  {
+    id: 'q2_coronary',
+    text: 'Maladie coronarienne',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q2_1_coronary_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_coronary' }, 'yes'] }
+  },
+  {
+    id: 'q2_2_coronary_treated',
+    text: 'Traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_coronary' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q2_3_coronary_balanced',
+    text: 'Équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_coronary' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+
+  // 3. Infarctus du myocarde
+  {
+    id: 'q3_infarctus',
+    text: 'Infarctus du myocarde',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q3_1_infarctus_date',
+    text: 'Date de survenue',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_infarctus' }, 'yes'] }
+  },
+
+  // 4. Trouble du rythme cardiaque
+  {
+    id: 'q4_rythme',
+    text: 'Trouble du rythme cardiaque',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q4_1_rythme_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q4_rythme' }, 'yes'] }
+  },
+  {
+    id: 'q4_2_rythme_treated',
+    text: 'Traité',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q4_rythme' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q4_3_rythme_balanced',
+    text: 'Équilibré',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q4_rythme' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+
+  // 5. Autre maladie cardio-vasculaire
+  {
+    id: 'q5_autre',
+    text: 'Autre maladie cardio-vasculaire',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q5_1_autre_specify',
+    text: 'Spécifier la maladie',
+    type: 'text',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q5_autre' }, 'yes'] }
+  },
+  {
+    id: 'q5_2_autre_date',
+    text: 'Date de survenue',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q5_autre' }, 'yes'] }
+  }
+];
+
+export const PATHO_CARDIO_DEFINITION: QuestionnaireDefinition = {
+  id: 'patho_cardio',
+  code: 'PATHO_CARDIO_FR',
+  title: 'Pathologies cardio-vasculaires',
+  description: 'Recueil des antécédents de pathologies cardio-vasculaires du patient (hypertension artérielle, maladie coronarienne, infarctus du myocarde, trouble du rythme cardiaque, autres).',
+  questions: PATHO_CARDIO_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================
 

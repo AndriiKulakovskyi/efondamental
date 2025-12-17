@@ -33,6 +33,8 @@ import {
   PerinataliteResponseInsert,
   PathoNeuroResponse,
   PathoNeuroResponseInsert,
+  PathoCardioResponse,
+  PathoCardioResponseInsert,
   Wais4CriteriaResponse,
   Wais4CriteriaResponseInsert,
   Wais4LearningResponse,
@@ -1032,6 +1034,44 @@ export async function savePathoNeuroResponse(
 
   const { data, error } = await supabase
     .from('responses_patho_neuro')
+    .upsert({
+      ...response
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Pathologies Cardio-vasculaires (Cardiovascular Conditions)
+// ============================================================================
+
+export async function getPathoCardioResponse(
+  visitId: string
+): Promise<PathoCardioResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_patho_cardio')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function savePathoCardioResponse(
+  response: PathoCardioResponseInsert
+): Promise<PathoCardioResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_patho_cardio')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
