@@ -5079,12 +5079,6 @@ export const CSSRS_DEFINITION: QuestionnaireDefinition = {
 
 export const ISA_QUESTIONS: Question[] = [
   {
-    id: 'intro',
-    text: 'Cette échelle doit toujours être administrée, même en cas d\'absence de tentative de suicide avérée.',
-    type: 'text',
-    required: false
-  },
-  {
     id: 'q1_life_worth',
     text: '1. Avez-vous déjà eu l\'impression que la vie ne vaut pas la peine d\'être vécue ?',
     type: 'single_choice',
@@ -5210,7 +5204,7 @@ export const ISA_DEFINITION: QuestionnaireDefinition = {
   id: 'isa',
   code: 'ISA_FR',
   title: 'Intentionnalité Suicidaire Actuelle',
-  description: 'Échelle évaluant les pensées, désirs et tentatives de suicide, ainsi que leur temporalité récente ou passée.',
+  description: 'Cette échelle doit toujours être administrée, même en cas d\'absence de tentative de suicide avérée.\n\nÉchelle évaluant les pensées, désirs et tentatives de suicide, ainsi que leur temporalité récente ou passée.',
   questions: ISA_QUESTIONS,
   metadata: {
     singleColumn: true,
