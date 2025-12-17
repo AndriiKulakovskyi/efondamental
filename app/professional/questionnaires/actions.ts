@@ -43,6 +43,7 @@ import {
   savePerinataliteResponse,
   savePathoNeuroResponse,
   savePathoCardioResponse,
+  savePathoEndocResponse,
   saveWais4CriteriaResponse,
   saveWais4LearningResponse,
   saveWais4MatricesResponse,
@@ -133,6 +134,7 @@ import {
   PerinataliteResponseInsert,
   PathoNeuroResponseInsert,
   PathoCardioResponseInsert,
+  PathoEndocResponseInsert,
   SocialResponseInsert,
   TobaccoResponseInsert,
   FagerstromResponseInsert,
@@ -488,6 +490,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as PathoCardioResponseInsert);
+        break;
+
+      case 'PATHO_ENDOC_FR':
+        result = await savePathoEndocResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as PathoEndocResponseInsert);
         break;
 
       case 'SOCIAL':

@@ -6100,6 +6100,207 @@ export const PATHO_CARDIO_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
+// Pathologies Endocriniennes et Métaboliques (Endocrine and Metabolic Conditions)
+// ============================================================================
+
+const DIABETE_TYPE_OPTIONS = [
+  { code: 'type1', label: 'Type I', score: 0 },
+  { code: 'type2', label: 'Type II', score: 0 },
+  { code: 'unknown', label: 'Ne sais pas', score: 0 }
+];
+
+const DYSTHYROIDIE_TYPE_OPTIONS = [
+  { code: 'hypo', label: 'Hypo-thyroïdie', score: 0 },
+  { code: 'hyper', label: 'Hyper-thyroïdie', score: 0 },
+  { code: 'unknown', label: 'Ne sais pas', score: 0 }
+];
+
+const DYSTHYROIDIE_ORIGIN_OPTIONS = [
+  { code: 'lithium', label: 'Induite par le Lithium', score: 0 },
+  { code: 'other_treatment', label: 'Induite par un autre traitement', score: 0 }
+];
+
+const DYSLIPIDEMIE_TYPE_OPTIONS = [
+  { code: 'hypercholesterolemia', label: 'Hypercholestérolémie', score: 0 },
+  { code: 'hypertriglyceridemia', label: 'Hypertriglycéridémie', score: 0 },
+  { code: 'both', label: 'Les deux', score: 0 },
+  { code: 'unknown', label: 'Ne sais pas', score: 0 }
+];
+
+export const PATHO_ENDOC_QUESTIONS: Question[] = [
+  // 1. Diabète
+  {
+    id: 'q1_diabete',
+    text: 'Diabète',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q1_1_diabete_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_diabete' }, 'yes'] }
+  },
+  {
+    id: 'q1_2_diabete_treated',
+    text: 'Traité',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_diabete' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q1_3_diabete_balanced',
+    text: 'Équilibré',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_diabete' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q1_4_diabete_type',
+    text: 'Type de diabète',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_diabete' }, 'yes'] },
+    options: DIABETE_TYPE_OPTIONS
+  },
+
+  // 2. Dysthyroïdie
+  {
+    id: 'q2_dysthyroidie',
+    text: 'Dysthyroïdie',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q2_1_dysthyroidie_type',
+    text: 'Type de dysthyroïdie',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_dysthyroidie' }, 'yes'] },
+    options: DYSTHYROIDIE_TYPE_OPTIONS
+  },
+  {
+    id: 'q2_2_dysthyroidie_origin',
+    text: 'Préciser',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_dysthyroidie' }, 'yes'] },
+    options: DYSTHYROIDIE_ORIGIN_OPTIONS
+  },
+  {
+    id: 'q2_3_dysthyroidie_treated',
+    text: 'Traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_dysthyroidie' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q2_4_dysthyroidie_balanced',
+    text: 'Équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_dysthyroidie' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+
+  // 3. Dyslipidémie
+  {
+    id: 'q3_dyslipidemie',
+    text: 'Dyslipidémie',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q3_1_dyslipidemie_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_dyslipidemie' }, 'yes'] }
+  },
+  {
+    id: 'q3_2_dyslipidemie_treated',
+    text: 'Traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_dyslipidemie' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q3_3_dyslipidemie_balanced',
+    text: 'Équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_dyslipidemie' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q3_4_dyslipidemie_type',
+    text: 'Type de dyslipidémie',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_dyslipidemie' }, 'yes'] },
+    options: DYSLIPIDEMIE_TYPE_OPTIONS
+  },
+
+  // 4. Autres endocrinopathies
+  {
+    id: 'q4_autres',
+    text: 'Autres endocrinopathies',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q4_1_autres_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q4_autres' }, 'yes'] }
+  },
+  {
+    id: 'q4_2_autres_specify',
+    text: 'Spécifier l\'endocrinopathie',
+    type: 'text',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q4_autres' }, 'yes'] }
+  }
+];
+
+export const PATHO_ENDOC_DEFINITION: QuestionnaireDefinition = {
+  id: 'patho_endoc',
+  code: 'PATHO_ENDOC_FR',
+  title: 'Pathologies endocriniennes et métaboliques',
+  description: 'Recueil des antécédents de pathologies endocriniennes et métaboliques du patient (diabète, dysthyroïdie, dyslipidémie, autres endocrinopathies).',
+  questions: PATHO_ENDOC_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================
 

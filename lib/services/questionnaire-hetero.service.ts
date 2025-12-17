@@ -35,6 +35,8 @@ import {
   PathoNeuroResponseInsert,
   PathoCardioResponse,
   PathoCardioResponseInsert,
+  PathoEndocResponse,
+  PathoEndocResponseInsert,
   Wais4CriteriaResponse,
   Wais4CriteriaResponseInsert,
   Wais4LearningResponse,
@@ -1072,6 +1074,44 @@ export async function savePathoCardioResponse(
 
   const { data, error } = await supabase
     .from('responses_patho_cardio')
+    .upsert({
+      ...response
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Pathologies Endocriniennes et Métaboliques (Endocrine and Metabolic Conditions)
+// ============================================================================
+
+export async function getPathoEndocResponse(
+  visitId: string
+): Promise<PathoEndocResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_patho_endoc')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function savePathoEndocResponse(
+  response: PathoEndocResponseInsert
+): Promise<PathoEndocResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_patho_endoc')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })

@@ -2506,6 +2506,46 @@ export interface PathoCardioResponse {
 
 export type PathoCardioResponseInsert = Omit<PathoCardioResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ===== Pathologies Endocriniennes et Métaboliques (Endocrine and Metabolic Conditions) Response =====
+export interface PathoEndocResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // 1. Diabète
+  q1_diabete?: 'yes' | 'no' | 'unknown' | null;
+  q1_1_diabete_date?: string | null;
+  q1_2_diabete_treated?: 'yes' | 'no' | null;
+  q1_3_diabete_balanced?: 'yes' | 'no' | null;
+  q1_4_diabete_type?: 'type1' | 'type2' | 'unknown' | null;
+  
+  // 2. Dysthyroïdie
+  q2_dysthyroidie?: 'yes' | 'no' | 'unknown' | null;
+  q2_1_dysthyroidie_type?: 'hypo' | 'hyper' | 'unknown' | null;
+  q2_2_dysthyroidie_origin?: 'lithium' | 'other_treatment' | null;
+  q2_3_dysthyroidie_treated?: 'yes' | 'no' | null;
+  q2_4_dysthyroidie_balanced?: 'yes' | 'no' | null;
+  
+  // 3. Dyslipidémie
+  q3_dyslipidemie?: 'yes' | 'no' | 'unknown' | null;
+  q3_1_dyslipidemie_date?: string | null;
+  q3_2_dyslipidemie_treated?: 'yes' | 'no' | null;
+  q3_3_dyslipidemie_balanced?: 'yes' | 'no' | null;
+  q3_4_dyslipidemie_type?: 'hypercholesterolemia' | 'hypertriglyceridemia' | 'both' | 'unknown' | null;
+  
+  // 4. Autres endocrinopathies
+  q4_autres?: 'yes' | 'no' | 'unknown' | null;
+  q4_1_autres_date?: string | null;
+  q4_2_autres_specify?: string | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PathoEndocResponseInsert = Omit<PathoEndocResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
 // ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================

@@ -52,6 +52,7 @@ import {
   PERINATALITE_DEFINITION,
   PATHO_NEURO_DEFINITION,
   PATHO_CARDIO_DEFINITION,
+  PATHO_ENDOC_DEFINITION,
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
   WAIS4_MATRICES_DEFINITION,
@@ -528,6 +529,13 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['PATHO_CARDIO_FR']?.completed || false,
                   completedAt: questionnaireStatuses['PATHO_CARDIO_FR']?.completed_at,
+                },
+                {
+                  ...PATHO_ENDOC_DEFINITION,
+                  id: PATHO_ENDOC_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['PATHO_ENDOC_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['PATHO_ENDOC_FR']?.completed_at,
                 }
               ]
             }
