@@ -377,9 +377,10 @@ export default async function VisitDetailPage({
           }
         ]
       },
-      // Build medical evaluation questionnaires with conditional DIVA
+      // Build medical evaluation module with sections
       (() => {
-        const medicalEvalQuestionnaires: any[] = [
+        // Build DSM5 section questionnaires with conditional DIVA
+        const dsm5Questionnaires: any[] = [
           {
             ...DSM5_HUMEUR_DEFINITION,
             id: DSM5_HUMEUR_DEFINITION.code,
@@ -409,7 +410,7 @@ export default async function VisitDetailPage({
         // - If DSM5 answered with "Non" or "Ne sais pas": show as locked/grayed (not applicable)
         if (!dsm5ComorbidAnswered) {
           // DSM5 not yet completed - show DIVA as conditional/locked
-          medicalEvalQuestionnaires.push({
+          dsm5Questionnaires.push({
             ...DIVA_DEFINITION,
             id: DIVA_DEFINITION.code,
             target_role: 'healthcare_professional',
@@ -421,7 +422,7 @@ export default async function VisitDetailPage({
           });
         } else if (isDivaRequired) {
           // DSM5 answered with "Oui" - show DIVA enabled
-          medicalEvalQuestionnaires.push({
+          dsm5Questionnaires.push({
             ...DIVA_DEFINITION,
             id: DIVA_DEFINITION.code,
             target_role: 'healthcare_professional',
@@ -432,7 +433,7 @@ export default async function VisitDetailPage({
           });
         } else {
           // DSM5 answered with "Non" or "Ne sais pas" - show DIVA as locked/grayed (not applicable)
-          medicalEvalQuestionnaires.push({
+          dsm5Questionnaires.push({
             ...DIVA_DEFINITION,
             id: DIVA_DEFINITION.code,
             target_role: 'healthcare_professional',
@@ -443,16 +444,9 @@ export default async function VisitDetailPage({
             conditionMessage: 'Non applicable - le patient n\'a pas été évalué avec la DIVA',
           });
         }
-        
-        // Add remaining medical evaluation questionnaires
-        medicalEvalQuestionnaires.push(
-          {
-            ...FAMILY_HISTORY_DEFINITION,
-            id: FAMILY_HISTORY_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['FAMILY_HISTORY_FR']?.completed || false,
-            completedAt: questionnaireStatuses['FAMILY_HISTORY_FR']?.completed_at,
-          },
+
+        // Build Suicide section questionnaires
+        const suicideQuestionnaires = [
           {
             ...CSSRS_DEFINITION,
             id: CSSRS_DEFINITION.code,
@@ -481,13 +475,33 @@ export default async function VisitDetailPage({
             completed: questionnaireStatuses['SUICIDE_HISTORY_FR']?.completed || false,
             completedAt: questionnaireStatuses['SUICIDE_HISTORY_FR']?.completed_at,
           }
-        );
+        ];
         
         return {
           id: 'mod_medical_eval',
           name: 'Evaluation Médicale',
           description: 'Évaluation médicale complète',
-          questionnaires: medicalEvalQuestionnaires
+          questionnaires: [
+            {
+              ...FAMILY_HISTORY_DEFINITION,
+              id: FAMILY_HISTORY_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['FAMILY_HISTORY_FR']?.completed || false,
+              completedAt: questionnaireStatuses['FAMILY_HISTORY_FR']?.completed_at,
+            }
+          ],
+          sections: [
+            {
+              id: 'dsm5',
+              name: 'DSM5',
+              questionnaires: dsm5Questionnaires
+            },
+            {
+              id: 'suicide',
+              name: 'Suicide',
+              questionnaires: suicideQuestionnaires
+            }
+          ]
         };
       })(),
       {
@@ -891,9 +905,10 @@ export default async function VisitDetailPage({
           }
         ]
       },
-      // Build medical evaluation questionnaires with conditional DIVA
+      // Build medical evaluation module with sections for follow-up visits
       (() => {
-        const medicalEvalQuestionnaires: any[] = [
+        // Build DSM5 section questionnaires with conditional DIVA
+        const dsm5Questionnaires: any[] = [
           {
             ...DSM5_COMORBID_DEFINITION,
             id: DSM5_COMORBID_DEFINITION.code,
@@ -906,7 +921,7 @@ export default async function VisitDetailPage({
         // Add DIVA with conditional display properties (ALWAYS visible, same logic as initial_evaluation)
         if (!dsm5ComorbidAnswered) {
           // DSM5 not yet completed - show DIVA as conditional/locked
-          medicalEvalQuestionnaires.push({
+          dsm5Questionnaires.push({
             ...DIVA_DEFINITION,
             id: DIVA_DEFINITION.code,
             target_role: 'healthcare_professional',
@@ -918,7 +933,7 @@ export default async function VisitDetailPage({
           });
         } else if (isDivaRequired) {
           // DSM5 answered with "Oui" - show DIVA enabled
-          medicalEvalQuestionnaires.push({
+          dsm5Questionnaires.push({
             ...DIVA_DEFINITION,
             id: DIVA_DEFINITION.code,
             target_role: 'healthcare_professional',
@@ -929,7 +944,7 @@ export default async function VisitDetailPage({
           });
         } else {
           // DSM5 answered with "Non" or "Ne sais pas" - show DIVA as locked/grayed (not applicable)
-          medicalEvalQuestionnaires.push({
+          dsm5Questionnaires.push({
             ...DIVA_DEFINITION,
             id: DIVA_DEFINITION.code,
             target_role: 'healthcare_professional',
@@ -940,9 +955,9 @@ export default async function VisitDetailPage({
             conditionMessage: 'Non applicable - le patient n\'a pas été évalué avec la DIVA',
           });
         }
-        
-        // Add remaining medical evaluation questionnaires
-        medicalEvalQuestionnaires.push(
+
+        // Build Suicide section questionnaires
+        const suicideQuestionnaires = [
           {
             ...CSSRS_DEFINITION,
             id: CSSRS_DEFINITION.code,
@@ -957,13 +972,24 @@ export default async function VisitDetailPage({
             completed: questionnaireStatuses['ISA_FR']?.completed || false,
             completedAt: questionnaireStatuses['ISA_FR']?.completed_at,
           }
-        );
+        ];
         
         return {
           id: 'mod_medical_eval',
           name: 'Evaluation Médicale',
           description: 'Évaluation médicale complète',
-          questionnaires: medicalEvalQuestionnaires
+          sections: [
+            {
+              id: 'dsm5',
+              name: 'DSM5',
+              questionnaires: dsm5Questionnaires
+            },
+            {
+              id: 'suicide',
+              name: 'Suicide',
+              questionnaires: suicideQuestionnaires
+            }
+          ]
         };
       })(),
       {
