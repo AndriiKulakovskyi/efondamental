@@ -2202,14 +2202,547 @@ export const FAMILY_HISTORY_QUESTIONS: Question[] = [
         { '==': [{ var: 'son5_deceased' }, 'oui'] }
       ]
     }
+  },
+  
+  // ========================================================================
+  // SECTION 2 - SIBLINGS (Frères et Soeurs)
+  // ========================================================================
+  
+  {
+    id: 'section_siblings',
+    text: 'Section 2 - Frères et Soeurs',
+    type: 'section',
+    required: false
+  },
+  
+  // ========================================================================
+  // SISTERS (Soeurs)
+  // ========================================================================
+  
+  {
+    id: 'num_sisters',
+    text: 'Q3. Nombre de soeurs',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: '0', label: 'Aucune' },
+      { code: '1', label: '1' },
+      { code: '2', label: '2' },
+      { code: '3', label: '3' },
+      { code: '4', label: '4' },
+      { code: '5', label: '5' },
+      { code: '>5', label: '>5' }
+    ]
+  },
+  
+  {
+    id: 'num_sisters_with_issues',
+    text: 'Q3.1. Parmi elles, veuillez indiquer combien présentent un trouble psychiatrique, un abus ou une dépendance à une substance, un antécédent de tentative de suicide ou un facteur de risque cardio-vasculaire',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      and: [
+        { '!=': [{ var: 'num_sisters' }, null] },
+        { '!=': [{ var: 'num_sisters' }, '0'] }
+      ]
+    },
+    options: [
+      { code: 0, label: 'Aucune', score: 0 },
+      { code: 1, label: '1', score: 1 },
+      { code: 2, label: '2', score: 2 },
+      { code: 3, label: '3', score: 3 },
+      { code: 4, label: '4', score: 4 },
+      { code: 5, label: '5', score: 5 }
+    ]
+  },
+  
+  // Sister 1
+  {
+    id: 'sister1_dob',
+    text: 'Soeur 1 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sisters_with_issues' }, 1] }
+  },
+  {
+    id: 'sister1_deceased',
+    text: 'Soeur 1 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sisters_with_issues' }, 1] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'sister1_death_date',
+    text: 'Soeur 1 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sisters_with_issues' }, 1] },
+        { '==': [{ var: 'sister1_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'sister1_death_cause',
+    text: 'Soeur 1 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sisters_with_issues' }, 1] },
+        { '==': [{ var: 'sister1_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Sister 2
+  {
+    id: 'sister2_dob',
+    text: 'Soeur 2 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sisters_with_issues' }, 2] }
+  },
+  {
+    id: 'sister2_deceased',
+    text: 'Soeur 2 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sisters_with_issues' }, 2] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'sister2_death_date',
+    text: 'Soeur 2 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sisters_with_issues' }, 2] },
+        { '==': [{ var: 'sister2_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'sister2_death_cause',
+    text: 'Soeur 2 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sisters_with_issues' }, 2] },
+        { '==': [{ var: 'sister2_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Sister 3
+  {
+    id: 'sister3_dob',
+    text: 'Soeur 3 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sisters_with_issues' }, 3] }
+  },
+  {
+    id: 'sister3_deceased',
+    text: 'Soeur 3 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sisters_with_issues' }, 3] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'sister3_death_date',
+    text: 'Soeur 3 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sisters_with_issues' }, 3] },
+        { '==': [{ var: 'sister3_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'sister3_death_cause',
+    text: 'Soeur 3 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sisters_with_issues' }, 3] },
+        { '==': [{ var: 'sister3_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Sister 4
+  {
+    id: 'sister4_dob',
+    text: 'Soeur 4 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sisters_with_issues' }, 4] }
+  },
+  {
+    id: 'sister4_deceased',
+    text: 'Soeur 4 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sisters_with_issues' }, 4] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'sister4_death_date',
+    text: 'Soeur 4 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sisters_with_issues' }, 4] },
+        { '==': [{ var: 'sister4_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'sister4_death_cause',
+    text: 'Soeur 4 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sisters_with_issues' }, 4] },
+        { '==': [{ var: 'sister4_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Sister 5
+  {
+    id: 'sister5_dob',
+    text: 'Soeur 5 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sisters_with_issues' }, 5] }
+  },
+  {
+    id: 'sister5_deceased',
+    text: 'Soeur 5 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_sisters_with_issues' }, 5] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'sister5_death_date',
+    text: 'Soeur 5 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sisters_with_issues' }, 5] },
+        { '==': [{ var: 'sister5_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'sister5_death_cause',
+    text: 'Soeur 5 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_sisters_with_issues' }, 5] },
+        { '==': [{ var: 'sister5_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // ========================================================================
+  // BROTHERS (Frères)
+  // ========================================================================
+  
+  {
+    id: 'num_brothers',
+    text: 'Q4. Nombre de frères',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: '0', label: 'Aucun' },
+      { code: '1', label: '1' },
+      { code: '2', label: '2' },
+      { code: '3', label: '3' },
+      { code: '4', label: '4' },
+      { code: '5', label: '5' },
+      { code: '>5', label: '>5' }
+    ]
+  },
+  
+  {
+    id: 'num_brothers_with_issues',
+    text: 'Q4.1. Parmi eux, veuillez indiquer combien présentent un trouble psychiatrique, un abus ou une dépendance à une substance, un antécédent de tentative de suicide ou un facteur de risque cardio-vasculaire',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      and: [
+        { '!=': [{ var: 'num_brothers' }, null] },
+        { '!=': [{ var: 'num_brothers' }, '0'] }
+      ]
+    },
+    options: [
+      { code: 0, label: 'Aucun', score: 0 },
+      { code: 1, label: '1', score: 1 },
+      { code: 2, label: '2', score: 2 },
+      { code: 3, label: '3', score: 3 },
+      { code: 4, label: '4', score: 4 },
+      { code: 5, label: '5', score: 5 }
+    ]
+  },
+  
+  // Brother 1
+  {
+    id: 'brother1_dob',
+    text: 'Frère 1 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_brothers_with_issues' }, 1] }
+  },
+  {
+    id: 'brother1_deceased',
+    text: 'Frère 1 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_brothers_with_issues' }, 1] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'brother1_death_date',
+    text: 'Frère 1 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_brothers_with_issues' }, 1] },
+        { '==': [{ var: 'brother1_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'brother1_death_cause',
+    text: 'Frère 1 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_brothers_with_issues' }, 1] },
+        { '==': [{ var: 'brother1_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Brother 2
+  {
+    id: 'brother2_dob',
+    text: 'Frère 2 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_brothers_with_issues' }, 2] }
+  },
+  {
+    id: 'brother2_deceased',
+    text: 'Frère 2 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_brothers_with_issues' }, 2] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'brother2_death_date',
+    text: 'Frère 2 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_brothers_with_issues' }, 2] },
+        { '==': [{ var: 'brother2_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'brother2_death_cause',
+    text: 'Frère 2 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_brothers_with_issues' }, 2] },
+        { '==': [{ var: 'brother2_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Brother 3
+  {
+    id: 'brother3_dob',
+    text: 'Frère 3 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_brothers_with_issues' }, 3] }
+  },
+  {
+    id: 'brother3_deceased',
+    text: 'Frère 3 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_brothers_with_issues' }, 3] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'brother3_death_date',
+    text: 'Frère 3 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_brothers_with_issues' }, 3] },
+        { '==': [{ var: 'brother3_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'brother3_death_cause',
+    text: 'Frère 3 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_brothers_with_issues' }, 3] },
+        { '==': [{ var: 'brother3_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Brother 4
+  {
+    id: 'brother4_dob',
+    text: 'Frère 4 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_brothers_with_issues' }, 4] }
+  },
+  {
+    id: 'brother4_deceased',
+    text: 'Frère 4 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_brothers_with_issues' }, 4] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'brother4_death_date',
+    text: 'Frère 4 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_brothers_with_issues' }, 4] },
+        { '==': [{ var: 'brother4_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'brother4_death_cause',
+    text: 'Frère 4 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_brothers_with_issues' }, 4] },
+        { '==': [{ var: 'brother4_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  
+  // Brother 5
+  {
+    id: 'brother5_dob',
+    text: 'Frère 5 - Date de naissance',
+    type: 'date',
+    required: false,
+    display_if: { '>=': [{ var: 'num_brothers_with_issues' }, 5] }
+  },
+  {
+    id: 'brother5_deceased',
+    text: 'Frère 5 - Décès',
+    type: 'single_choice',
+    required: false,
+    display_if: { '>=': [{ var: 'num_brothers_with_issues' }, 5] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'brother5_death_date',
+    text: 'Frère 5 - Date du décès',
+    type: 'date',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_brothers_with_issues' }, 5] },
+        { '==': [{ var: 'brother5_deceased' }, 'oui'] }
+      ]
+    }
+  },
+  {
+    id: 'brother5_death_cause',
+    text: 'Frère 5 - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: {
+      and: [
+        { '>=': [{ var: 'num_brothers_with_issues' }, 5] },
+        { '==': [{ var: 'brother5_deceased' }, 'oui'] }
+      ]
+    }
   }
 ];
 
 export const FAMILY_HISTORY_DEFINITION: QuestionnaireDefinition = {
   id: 'family_history',
   code: 'FAMILY_HISTORY_FR',
-  title: 'Antécédents Familiaux - Section 1 : Enfants',
-  description: 'Évaluation des antécédents psychiatriques, de dépendance, de suicide et de facteurs de risque cardio-vasculaires chez les enfants (filles et fils).',
+  title: 'Antécédents Familiaux',
+  description: 'Évaluation des antécédents psychiatriques, de dépendance, de suicide et de facteurs de risque cardio-vasculaires. Section 1: Enfants (filles et fils). Section 2: Frères et Soeurs (soeurs et frères).',
   questions: FAMILY_HISTORY_QUESTIONS,
   metadata: {
     singleColumn: true,

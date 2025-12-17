@@ -1937,6 +1937,74 @@ export interface FamilyHistoryResponse {
   son5_death_date?: string | null;
   son5_death_cause?: string | null;
   
+  // Sisters (Soeurs)
+  num_sisters?: string | null; // '0', '1', '2', '3', '4', '5', '>5'
+  num_sisters_with_issues?: number | null; // 0-5
+  
+  sister1_dob?: string | null;
+  sister1_has_issues?: boolean | null;
+  sister1_deceased?: 'oui' | 'non' | null;
+  sister1_death_date?: string | null;
+  sister1_death_cause?: string | null;
+  
+  sister2_dob?: string | null;
+  sister2_has_issues?: boolean | null;
+  sister2_deceased?: 'oui' | 'non' | null;
+  sister2_death_date?: string | null;
+  sister2_death_cause?: string | null;
+  
+  sister3_dob?: string | null;
+  sister3_has_issues?: boolean | null;
+  sister3_deceased?: 'oui' | 'non' | null;
+  sister3_death_date?: string | null;
+  sister3_death_cause?: string | null;
+  
+  sister4_dob?: string | null;
+  sister4_has_issues?: boolean | null;
+  sister4_deceased?: 'oui' | 'non' | null;
+  sister4_death_date?: string | null;
+  sister4_death_cause?: string | null;
+  
+  sister5_dob?: string | null;
+  sister5_has_issues?: boolean | null;
+  sister5_deceased?: 'oui' | 'non' | null;
+  sister5_death_date?: string | null;
+  sister5_death_cause?: string | null;
+  
+  // Brothers (Frères)
+  num_brothers?: string | null; // '0', '1', '2', '3', '4', '5', '>5'
+  num_brothers_with_issues?: number | null; // 0-5
+  
+  brother1_dob?: string | null;
+  brother1_has_issues?: boolean | null;
+  brother1_deceased?: 'oui' | 'non' | null;
+  brother1_death_date?: string | null;
+  brother1_death_cause?: string | null;
+  
+  brother2_dob?: string | null;
+  brother2_has_issues?: boolean | null;
+  brother2_deceased?: 'oui' | 'non' | null;
+  brother2_death_date?: string | null;
+  brother2_death_cause?: string | null;
+  
+  brother3_dob?: string | null;
+  brother3_has_issues?: boolean | null;
+  brother3_deceased?: 'oui' | 'non' | null;
+  brother3_death_date?: string | null;
+  brother3_death_cause?: string | null;
+  
+  brother4_dob?: string | null;
+  brother4_has_issues?: boolean | null;
+  brother4_deceased?: 'oui' | 'non' | null;
+  brother4_death_date?: string | null;
+  brother4_death_cause?: string | null;
+  
+  brother5_dob?: string | null;
+  brother5_has_issues?: boolean | null;
+  brother5_deceased?: 'oui' | 'non' | null;
+  brother5_death_date?: string | null;
+  brother5_death_cause?: string | null;
+  
   // Metadata
   completed_by?: string | null;
   completed_at: string;

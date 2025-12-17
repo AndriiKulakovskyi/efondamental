@@ -1,6 +1,7 @@
 -- eFondaMental Platform - Family History Questionnaire Rework
--- Focus exclusively on Section 1 - Enfants (Children: Daughters and Sons)
--- Flat structure supporting up to 5 daughters and 5 sons with branching logic
+-- Section 1: Enfants (Children: Daughters and Sons)
+-- Section 2: Frères et Soeurs (Siblings: Sisters and Brothers)
+-- Flat structure supporting up to 5 of each category with branching logic
 
 -- ============================================================================
 -- Drop existing table (accepting data loss)
@@ -108,6 +109,96 @@ CREATE TABLE responses_family_history (
     son5_death_cause TEXT,
     
     -- ========================================================================
+    -- SISTERS (Soeurs)
+    -- ========================================================================
+    
+    -- Q3: Number of sisters
+    num_sisters VARCHAR(10) CHECK (num_sisters IN ('0', '1', '2', '3', '4', '5', '>5')),
+    
+    -- Q3.1: Number of sisters with issues
+    num_sisters_with_issues INTEGER CHECK (num_sisters_with_issues BETWEEN 0 AND 5),
+    
+    -- Sister 1
+    sister1_dob DATE,
+    sister1_has_issues BOOLEAN DEFAULT FALSE,
+    sister1_deceased VARCHAR(10) CHECK (sister1_deceased IN ('oui', 'non')),
+    sister1_death_date DATE,
+    sister1_death_cause TEXT,
+    
+    -- Sister 2
+    sister2_dob DATE,
+    sister2_has_issues BOOLEAN DEFAULT FALSE,
+    sister2_deceased VARCHAR(10) CHECK (sister2_deceased IN ('oui', 'non')),
+    sister2_death_date DATE,
+    sister2_death_cause TEXT,
+    
+    -- Sister 3
+    sister3_dob DATE,
+    sister3_has_issues BOOLEAN DEFAULT FALSE,
+    sister3_deceased VARCHAR(10) CHECK (sister3_deceased IN ('oui', 'non')),
+    sister3_death_date DATE,
+    sister3_death_cause TEXT,
+    
+    -- Sister 4
+    sister4_dob DATE,
+    sister4_has_issues BOOLEAN DEFAULT FALSE,
+    sister4_deceased VARCHAR(10) CHECK (sister4_deceased IN ('oui', 'non')),
+    sister4_death_date DATE,
+    sister4_death_cause TEXT,
+    
+    -- Sister 5
+    sister5_dob DATE,
+    sister5_has_issues BOOLEAN DEFAULT FALSE,
+    sister5_deceased VARCHAR(10) CHECK (sister5_deceased IN ('oui', 'non')),
+    sister5_death_date DATE,
+    sister5_death_cause TEXT,
+    
+    -- ========================================================================
+    -- BROTHERS (Frères)
+    -- ========================================================================
+    
+    -- Q4: Number of brothers
+    num_brothers VARCHAR(10) CHECK (num_brothers IN ('0', '1', '2', '3', '4', '5', '>5')),
+    
+    -- Q4.1: Number of brothers with issues
+    num_brothers_with_issues INTEGER CHECK (num_brothers_with_issues BETWEEN 0 AND 5),
+    
+    -- Brother 1
+    brother1_dob DATE,
+    brother1_has_issues BOOLEAN DEFAULT FALSE,
+    brother1_deceased VARCHAR(10) CHECK (brother1_deceased IN ('oui', 'non')),
+    brother1_death_date DATE,
+    brother1_death_cause TEXT,
+    
+    -- Brother 2
+    brother2_dob DATE,
+    brother2_has_issues BOOLEAN DEFAULT FALSE,
+    brother2_deceased VARCHAR(10) CHECK (brother2_deceased IN ('oui', 'non')),
+    brother2_death_date DATE,
+    brother2_death_cause TEXT,
+    
+    -- Brother 3
+    brother3_dob DATE,
+    brother3_has_issues BOOLEAN DEFAULT FALSE,
+    brother3_deceased VARCHAR(10) CHECK (brother3_deceased IN ('oui', 'non')),
+    brother3_death_date DATE,
+    brother3_death_cause TEXT,
+    
+    -- Brother 4
+    brother4_dob DATE,
+    brother4_has_issues BOOLEAN DEFAULT FALSE,
+    brother4_deceased VARCHAR(10) CHECK (brother4_deceased IN ('oui', 'non')),
+    brother4_death_date DATE,
+    brother4_death_cause TEXT,
+    
+    -- Brother 5
+    brother5_dob DATE,
+    brother5_has_issues BOOLEAN DEFAULT FALSE,
+    brother5_deceased VARCHAR(10) CHECK (brother5_deceased IN ('oui', 'non')),
+    brother5_death_date DATE,
+    brother5_death_cause TEXT,
+    
+    -- ========================================================================
     -- Metadata
     -- ========================================================================
     
@@ -163,7 +254,7 @@ CREATE TRIGGER update_responses_family_history_updated_at
 -- ============================================================================
 
 COMMENT ON TABLE responses_family_history IS 
-'Stores responses for the Family History questionnaire - Section 1: Enfants (Children). Supports up to 5 daughters and 5 sons with psychiatric/cardiovascular risk factors, suicide attempts, and substance abuse history.';
+'Stores responses for the Family History questionnaire. Section 1: Enfants (Children) - up to 5 daughters and 5 sons. Section 2: Frères et Soeurs (Siblings) - up to 5 sisters and 5 brothers. All with psychiatric/cardiovascular risk factors, suicide attempts, and substance abuse history.';
 
 COMMENT ON COLUMN responses_family_history.num_daughters IS 
 'Q1: Number of daughters (0, 1-5, or >5)';
@@ -176,4 +267,16 @@ COMMENT ON COLUMN responses_family_history.num_sons IS
 
 COMMENT ON COLUMN responses_family_history.num_sons_with_issues IS 
 'Q2.1: Number of sons with psychiatric disorder, substance abuse, suicide attempt, or cardiovascular risk';
+
+COMMENT ON COLUMN responses_family_history.num_sisters IS 
+'Q3: Number of sisters (0, 1-5, or >5)';
+
+COMMENT ON COLUMN responses_family_history.num_sisters_with_issues IS 
+'Q3.1: Number of sisters with psychiatric disorder, substance abuse, suicide attempt, or cardiovascular risk';
+
+COMMENT ON COLUMN responses_family_history.num_brothers IS 
+'Q4: Number of brothers (0, 1-5, or >5)';
+
+COMMENT ON COLUMN responses_family_history.num_brothers_with_issues IS 
+'Q4.1: Number of brothers with psychiatric disorder, substance abuse, suicide attempt, or cardiovascular risk';
 

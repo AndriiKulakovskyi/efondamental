@@ -2,7 +2,9 @@
 
 ## Implementation Summary
 
-The "Antécédents familiaux" questionnaire has been successfully reworked to focus exclusively on **Section 1 - Enfants (Children)**, with support for up to 5 daughters and 5 sons with issues.
+The "Antécédents familiaux" questionnaire has been successfully reworked with two sections:
+- **Section 1 - Enfants (Children)**: Support for up to 5 daughters and 5 sons with issues
+- **Section 2 - Frères et Soeurs (Siblings)**: Support for up to 5 sisters and 5 brothers with issues
 
 ## Changes Made
 
@@ -10,14 +12,18 @@ The "Antécédents familiaux" questionnaire has been successfully reworked to fo
 - **File**: `supabase/migrations/122_rework_family_history_children_only.sql`
 - **Action**: DROP and recreate `responses_family_history` table
 - **Structure**: Flat schema with:
-  - `num_daughters` (VARCHAR: '0', '1'-'5', '>5')
-  - `num_daughters_with_issues` (INTEGER: 0-5)
-  - `daughter1_dob` through `daughter5_dob` (DATE)
-  - `daughter1_has_issues` through `daughter5_has_issues` (BOOLEAN)
-  - `daughter1_deceased` through `daughter5_deceased` (VARCHAR: 'oui', 'non')
-  - `daughter1_death_date` through `daughter5_death_date` (DATE)
-  - `daughter1_death_cause` through `daughter5_death_cause` (TEXT)
-  - Same structure for sons (son1-son5)
+  - **Section 1 - Enfants:**
+    - `num_daughters` (VARCHAR: '0', '1'-'5', '>5')
+    - `num_daughters_with_issues` (INTEGER: 0-5)
+    - `daughter1_dob` through `daughter5_dob` (DATE)
+    - `daughter1_has_issues` through `daughter5_has_issues` (BOOLEAN)
+    - `daughter1_deceased` through `daughter5_deceased` (VARCHAR: 'oui', 'non')
+    - `daughter1_death_date` through `daughter5_death_date` (DATE)
+    - `daughter1_death_cause` through `daughter5_death_cause` (TEXT)
+    - Same structure for sons (son1-son5)
+  - **Section 2 - Frères et Soeurs:**
+    - Same structure for sisters (sister1-sister5)
+    - Same structure for brothers (brother1-brother5)
 
 ### 2. TypeScript Types
 - **File**: `lib/types/database.types.ts`
@@ -33,13 +39,13 @@ The "Antécédents familiaux" questionnaire has been successfully reworked to fo
 
 ## Branching Logic Implementation
 
-### Question Flow
+### Section 1 - Enfants (Children)
 
 1. **Q1: Number of daughters** (Required)
    - Options: Aucune (0), 1, 2, 3, 4, 5, >5
 
 2. **Q1.1: Number of daughters with issues** (Conditional)
-   - Display condition: `{ 'in': [{ var: 'num_daughters' }, ['1', '2', '3', '4', '5', '>5']] }`
+   - Display condition: `{ and: [{ '!=': [{ var: 'num_daughters' }, null] }, { '!=': [{ var: 'num_daughters' }, '0'] }] }`
    - Options: Aucune (0), 1, 2, 3, 4, 5
 
 3. **Q1.2.N: Daughter N details** (Repeating blocks 1-5)
@@ -48,8 +54,8 @@ The "Antécédents familiaux" questionnaire has been successfully reworked to fo
      - Date of birth (DATE) - Label: "Fille N - Date de naissance"
      - Deceased? (SINGLE_CHOICE: Oui/Non) - Label: "Fille N - Décès"
      - If deceased == 'oui':
-       - Death date (DATE) - Label: "Fille N - Date du décès" - Condition: `{ and: [{ '>=': [{ var: 'num_daughters_with_issues' }, N] }, { '==': [{ var: 'daughterN_deceased' }, 'oui'] }] }`
-       - Cause of death (TEXT) - Label: "Fille N - Cause du décès" - Same condition
+       - Death date (DATE) - Label: "Fille N - Date du décès"
+       - Cause of death (TEXT) - Label: "Fille N - Cause du décès"
 
 4. **Q2: Number of sons** (Required)
    - Same structure as daughters
@@ -59,6 +65,33 @@ The "Antécédents familiaux" questionnaire has been successfully reworked to fo
 
 6. **Q2.2.N: Son N details** (Repeating blocks 1-5)
    - Same structure as daughters with "Fils N" labels
+
+### Section 2 - Frères et Soeurs (Siblings)
+
+7. **Q3: Number of sisters** (Required)
+   - Options: Aucune (0), 1, 2, 3, 4, 5, >5
+
+8. **Q3.1: Number of sisters with issues** (Conditional)
+   - Display condition: `{ and: [{ '!=': [{ var: 'num_sisters' }, null] }, { '!=': [{ var: 'num_sisters' }, '0'] }] }`
+   - Options: Aucune (0), 1, 2, 3, 4, 5
+
+9. **Q3.2.N: Sister N details** (Repeating blocks 1-5)
+   - Display condition: `{ '>=': [{ var: 'num_sisters_with_issues' }, N] }`
+   - Questions per sister:
+     - Date of birth (DATE) - Label: "Soeur N - Date de naissance"
+     - Deceased? (SINGLE_CHOICE: Oui/Non) - Label: "Soeur N - Décès"
+     - If deceased == 'oui':
+       - Death date (DATE) - Label: "Soeur N - Date du décès"
+       - Cause of death (TEXT) - Label: "Soeur N - Cause du décès"
+
+10. **Q4: Number of brothers** (Required)
+    - Same structure as sisters
+
+11. **Q4.1: Number of brothers with issues** (Conditional)
+    - Same structure as sisters
+
+12. **Q4.2.N: Brother N details** (Repeating blocks 1-5)
+    - Same structure as sisters with "Frère N" labels
 
 ## JSON Logic Operators Used
 
@@ -132,9 +165,9 @@ No changes needed - the following work automatically:
 
 ## Known Limitations
 
-1. **Maximum 5 children per gender**: The flat structure supports up to 5 daughters and 5 sons with issues
-2. **">5" option**: If user selects ">5", they can still only enter details for up to 5 children
-3. **No information storage for children without issues**: Only children with issues are tracked in detail
+1. **Maximum 5 per category**: The flat structure supports up to 5 daughters, 5 sons, 5 sisters, and 5 brothers with issues
+2. **">5" option**: If user selects ">5", they can still only enter details for up to 5 individuals per category
+3. **No information storage for individuals without issues**: Only individuals with issues are tracked in detail
 
 ## Verification Status
 
