@@ -6571,6 +6571,145 @@ export const PATHO_DERMATO_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
+// Pathologies des voies urinaires (Urinary Tract Conditions)
+// ============================================================================
+
+const URINARY_TREATMENT_OPTIONS = [
+  { code: 'neuroleptics', label: 'Neuroleptiques', score: 0 },
+  { code: 'antidepressants', label: 'Antidépresseurs', score: 0 },
+  { code: 'other', label: 'Autres traitements', score: 0 }
+];
+
+export const PATHO_URINAIRE_QUESTIONS: Question[] = [
+  // 1. Néphropathie
+  {
+    id: 'q1_nephropathy',
+    text: 'Néphropathie',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q1_1_nephropathy_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_nephropathy' }, 'yes'] }
+  },
+  {
+    id: 'q1_2_nephropathy_treated',
+    text: 'Traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_nephropathy' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q1_3_nephropathy_balanced',
+    text: 'Équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_nephropathy' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q1_4_nephropathy_lithium_link',
+    text: 'Néphropathie en lien probable avec un traitement passé ou actuel par le lithium',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q1_nephropathy' }, 'yes'] },
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+
+  // 2. Adénome prostatique
+  {
+    id: 'q2_prostatic_adenoma',
+    text: 'Adénome prostatique',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q2_1_prostatic_adenoma_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_prostatic_adenoma' }, 'yes'] }
+  },
+  {
+    id: 'q2_2_prostatic_adenoma_treated',
+    text: 'Traité',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_prostatic_adenoma' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q2_3_prostatic_adenoma_balanced',
+    text: 'Équilibré',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_prostatic_adenoma' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+
+  // 3. Rétention aiguë d'urine
+  {
+    id: 'q3_urinary_retention',
+    text: 'Rétention aiguë d\'urine',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q3_1_urinary_retention_date',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_urinary_retention' }, 'yes'] }
+  },
+  {
+    id: 'q3_2_urinary_retention_treatment_triggered',
+    text: 'Déclenchée sous traitement',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_urinary_retention' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q3_3_urinary_retention_treatment_type',
+    text: 'Nature du traitement',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { '==': [{ var: 'q3_2_urinary_retention_treatment_triggered' }, 'yes'] },
+    options: URINARY_TREATMENT_OPTIONS
+  }
+];
+
+export const PATHO_URINAIRE_DEFINITION: QuestionnaireDefinition = {
+  id: 'patho_urinaire',
+  code: 'PATHO_URINAIRE_FR',
+  title: 'Pathologies des voies urinaires',
+  description: 'Recueil des antécédents de pathologies des voies urinaires du patient (néphropathie, adénome prostatique, rétention urinaire).',
+  questions: PATHO_URINAIRE_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================
 

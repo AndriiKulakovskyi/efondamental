@@ -39,6 +39,8 @@ import {
   PathoEndocResponseInsert,
   PathoDermatoResponse,
   PathoDermatoResponseInsert,
+  PathoUrinaireResponse,
+  PathoUrinaireResponseInsert,
   Wais4CriteriaResponse,
   Wais4CriteriaResponseInsert,
   Wais4LearningResponse,
@@ -1152,6 +1154,44 @@ export async function savePathoDermatoResponse(
 
   const { data, error } = await supabase
     .from('responses_patho_dermato')
+    .upsert({
+      ...response
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Pathologies des voies urinaires (Urinary Tract Conditions)
+// ============================================================================
+
+export async function getPathoUrinaireResponse(
+  visitId: string
+): Promise<PathoUrinaireResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_patho_urinaire')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function savePathoUrinaireResponse(
+  response: PathoUrinaireResponseInsert
+): Promise<PathoUrinaireResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_patho_urinaire')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })

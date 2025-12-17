@@ -2597,6 +2597,39 @@ export interface PathoDermatoResponse {
 
 export type PathoDermatoResponseInsert = Omit<PathoDermatoResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ===== Pathologies des voies urinaires (Urinary Tract Conditions) Response =====
+export interface PathoUrinaireResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // 1. Néphropathie
+  q1_nephropathy?: 'yes' | 'no' | 'unknown' | null;
+  q1_1_nephropathy_date?: string | null;
+  q1_2_nephropathy_treated?: 'yes' | 'no' | null;
+  q1_3_nephropathy_balanced?: 'yes' | 'no' | null;
+  q1_4_nephropathy_lithium_link?: 'yes' | 'no' | 'unknown' | null;
+  
+  // 2. Adénome prostatique
+  q2_prostatic_adenoma?: 'yes' | 'no' | 'unknown' | null;
+  q2_1_prostatic_adenoma_date?: string | null;
+  q2_2_prostatic_adenoma_treated?: 'yes' | 'no' | null;
+  q2_3_prostatic_adenoma_balanced?: 'yes' | 'no' | null;
+  
+  // 3. Rétention aiguë d'urine
+  q3_urinary_retention?: 'yes' | 'no' | 'unknown' | null;
+  q3_1_urinary_retention_date?: string | null;
+  q3_2_urinary_retention_treatment_triggered?: 'yes' | 'no' | null;
+  q3_3_urinary_retention_treatment_type?: string[] | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PathoUrinaireResponseInsert = Omit<PathoUrinaireResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
 // ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================
