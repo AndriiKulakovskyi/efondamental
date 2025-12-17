@@ -1671,10 +1671,18 @@ export function QuestionnaireRenderer({
       return null;
     }
 
+    // Get indent class based on indentLevel
+    const getIndentClass = (level?: number) => {
+      switch (level) {
+        case 1: return 'pl-8 border-l-4 border-slate-200';
+        case 2: return 'pl-16 border-l-4 border-slate-300';
+        case 3: return 'pl-24 border-l-4 border-slate-400';
+        default: return '';
+      }
+    };
+
     return (
-      <div key={question.id} className={`space-y-3 ${isUnitField ? 'col-span-1' : ''}`} style={{
-        marginLeft: question.indentLevel ? `${question.indentLevel * 2}rem` : undefined
-      }}>
+      <div key={question.id} className={`space-y-3 ${isUnitField ? 'col-span-1' : ''} ${getIndentClass(question.indentLevel)}`}>
         <Label htmlFor={question.id} className="text-base font-semibold text-slate-800">
           {question.text}
           {isRequired && <span className="text-brand ml-1">*</span>}

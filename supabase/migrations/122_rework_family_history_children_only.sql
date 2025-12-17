@@ -186,6 +186,12 @@ CREATE TABLE responses_family_history (
     sister1_deceased VARCHAR(10) CHECK (sister1_deceased IN ('oui', 'non')),
     sister1_death_date DATE,
     sister1_death_cause TEXT,
+    sister1_psychiatric VARCHAR(20) CHECK (sister1_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    sister1_suicide VARCHAR(20) CHECK (sister1_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    sister1_substance TEXT[],
+    sister1_anxiety VARCHAR(20) CHECK (sister1_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    sister1_dementia VARCHAR(20) CHECK (sister1_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    sister1_cardio TEXT[],
     
     -- Sister 2
     sister2_dob DATE,
@@ -193,6 +199,12 @@ CREATE TABLE responses_family_history (
     sister2_deceased VARCHAR(10) CHECK (sister2_deceased IN ('oui', 'non')),
     sister2_death_date DATE,
     sister2_death_cause TEXT,
+    sister2_psychiatric VARCHAR(20) CHECK (sister2_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    sister2_suicide VARCHAR(20) CHECK (sister2_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    sister2_substance TEXT[],
+    sister2_anxiety VARCHAR(20) CHECK (sister2_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    sister2_dementia VARCHAR(20) CHECK (sister2_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    sister2_cardio TEXT[],
     
     -- Sister 3
     sister3_dob DATE,
@@ -200,6 +212,12 @@ CREATE TABLE responses_family_history (
     sister3_deceased VARCHAR(10) CHECK (sister3_deceased IN ('oui', 'non')),
     sister3_death_date DATE,
     sister3_death_cause TEXT,
+    sister3_psychiatric VARCHAR(20) CHECK (sister3_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    sister3_suicide VARCHAR(20) CHECK (sister3_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    sister3_substance TEXT[],
+    sister3_anxiety VARCHAR(20) CHECK (sister3_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    sister3_dementia VARCHAR(20) CHECK (sister3_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    sister3_cardio TEXT[],
     
     -- Sister 4
     sister4_dob DATE,
@@ -207,6 +225,12 @@ CREATE TABLE responses_family_history (
     sister4_deceased VARCHAR(10) CHECK (sister4_deceased IN ('oui', 'non')),
     sister4_death_date DATE,
     sister4_death_cause TEXT,
+    sister4_psychiatric VARCHAR(20) CHECK (sister4_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    sister4_suicide VARCHAR(20) CHECK (sister4_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    sister4_substance TEXT[],
+    sister4_anxiety VARCHAR(20) CHECK (sister4_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    sister4_dementia VARCHAR(20) CHECK (sister4_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    sister4_cardio TEXT[],
     
     -- Sister 5
     sister5_dob DATE,
@@ -214,6 +238,12 @@ CREATE TABLE responses_family_history (
     sister5_deceased VARCHAR(10) CHECK (sister5_deceased IN ('oui', 'non')),
     sister5_death_date DATE,
     sister5_death_cause TEXT,
+    sister5_psychiatric VARCHAR(20) CHECK (sister5_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    sister5_suicide VARCHAR(20) CHECK (sister5_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    sister5_substance TEXT[],
+    sister5_anxiety VARCHAR(20) CHECK (sister5_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    sister5_dementia VARCHAR(20) CHECK (sister5_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    sister5_cardio TEXT[],
     
     -- ========================================================================
     -- BROTHERS (Frères)
@@ -231,6 +261,12 @@ CREATE TABLE responses_family_history (
     brother1_deceased VARCHAR(10) CHECK (brother1_deceased IN ('oui', 'non')),
     brother1_death_date DATE,
     brother1_death_cause TEXT,
+    brother1_psychiatric VARCHAR(20) CHECK (brother1_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    brother1_suicide VARCHAR(20) CHECK (brother1_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    brother1_substance TEXT[],
+    brother1_anxiety VARCHAR(20) CHECK (brother1_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    brother1_dementia VARCHAR(20) CHECK (brother1_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    brother1_cardio TEXT[],
     
     -- Brother 2
     brother2_dob DATE,
@@ -238,6 +274,12 @@ CREATE TABLE responses_family_history (
     brother2_deceased VARCHAR(10) CHECK (brother2_deceased IN ('oui', 'non')),
     brother2_death_date DATE,
     brother2_death_cause TEXT,
+    brother2_psychiatric VARCHAR(20) CHECK (brother2_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    brother2_suicide VARCHAR(20) CHECK (brother2_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    brother2_substance TEXT[],
+    brother2_anxiety VARCHAR(20) CHECK (brother2_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    brother2_dementia VARCHAR(20) CHECK (brother2_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    brother2_cardio TEXT[],
     
     -- Brother 3
     brother3_dob DATE,
@@ -245,6 +287,12 @@ CREATE TABLE responses_family_history (
     brother3_deceased VARCHAR(10) CHECK (brother3_deceased IN ('oui', 'non')),
     brother3_death_date DATE,
     brother3_death_cause TEXT,
+    brother3_psychiatric VARCHAR(20) CHECK (brother3_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    brother3_suicide VARCHAR(20) CHECK (brother3_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    brother3_substance TEXT[],
+    brother3_anxiety VARCHAR(20) CHECK (brother3_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    brother3_dementia VARCHAR(20) CHECK (brother3_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    brother3_cardio TEXT[],
     
     -- Brother 4
     brother4_dob DATE,
@@ -252,6 +300,12 @@ CREATE TABLE responses_family_history (
     brother4_deceased VARCHAR(10) CHECK (brother4_deceased IN ('oui', 'non')),
     brother4_death_date DATE,
     brother4_death_cause TEXT,
+    brother4_psychiatric VARCHAR(20) CHECK (brother4_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    brother4_suicide VARCHAR(20) CHECK (brother4_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    brother4_substance TEXT[],
+    brother4_anxiety VARCHAR(20) CHECK (brother4_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    brother4_dementia VARCHAR(20) CHECK (brother4_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    brother4_cardio TEXT[],
     
     -- Brother 5
     brother5_dob DATE,
@@ -259,6 +313,12 @@ CREATE TABLE responses_family_history (
     brother5_deceased VARCHAR(10) CHECK (brother5_deceased IN ('oui', 'non')),
     brother5_death_date DATE,
     brother5_death_cause TEXT,
+    brother5_psychiatric VARCHAR(20) CHECK (brother5_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    brother5_suicide VARCHAR(20) CHECK (brother5_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    brother5_substance TEXT[],
+    brother5_anxiety VARCHAR(20) CHECK (brother5_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    brother5_dementia VARCHAR(20) CHECK (brother5_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    brother5_cardio TEXT[],
     
     -- ========================================================================
     -- PARENTS (Mère et Père)
@@ -268,11 +328,23 @@ CREATE TABLE responses_family_history (
     mother_history VARCHAR(20) CHECK (mother_history IN ('oui', 'non', 'ne_sais_pas')),
     mother_deceased VARCHAR(10) CHECK (mother_deceased IN ('oui', 'non')),
     mother_death_cause TEXT,
+    mother_psychiatric VARCHAR(20) CHECK (mother_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    mother_suicide VARCHAR(20) CHECK (mother_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    mother_substance TEXT[],
+    mother_anxiety VARCHAR(20) CHECK (mother_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    mother_dementia VARCHAR(20) CHECK (mother_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    mother_cardio TEXT[],
     
     -- Father
     father_history VARCHAR(20) CHECK (father_history IN ('oui', 'non', 'ne_sais_pas')),
     father_deceased VARCHAR(10) CHECK (father_deceased IN ('oui', 'non')),
     father_death_cause TEXT,
+    father_psychiatric VARCHAR(20) CHECK (father_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    father_suicide VARCHAR(20) CHECK (father_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    father_substance TEXT[],
+    father_anxiety VARCHAR(20) CHECK (father_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    father_dementia VARCHAR(20) CHECK (father_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    father_cardio TEXT[],
     
     -- ========================================================================
     -- GRANDPARENTS (Grands-Parents)
@@ -282,21 +354,45 @@ CREATE TABLE responses_family_history (
     grandmother_maternal_history VARCHAR(20) CHECK (grandmother_maternal_history IN ('oui', 'non', 'ne_sais_pas')),
     grandmother_maternal_deceased VARCHAR(10) CHECK (grandmother_maternal_deceased IN ('oui', 'non')),
     grandmother_maternal_death_cause TEXT,
+    grandmother_maternal_psychiatric VARCHAR(20) CHECK (grandmother_maternal_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    grandmother_maternal_suicide VARCHAR(20) CHECK (grandmother_maternal_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    grandmother_maternal_substance TEXT[],
+    grandmother_maternal_anxiety VARCHAR(20) CHECK (grandmother_maternal_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    grandmother_maternal_dementia VARCHAR(20) CHECK (grandmother_maternal_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    grandmother_maternal_cardio TEXT[],
     
     -- Maternal Grandfather (Grand-père maternel)
     grandfather_maternal_history VARCHAR(20) CHECK (grandfather_maternal_history IN ('oui', 'non', 'ne_sais_pas')),
     grandfather_maternal_deceased VARCHAR(10) CHECK (grandfather_maternal_deceased IN ('oui', 'non')),
     grandfather_maternal_death_cause TEXT,
+    grandfather_maternal_psychiatric VARCHAR(20) CHECK (grandfather_maternal_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    grandfather_maternal_suicide VARCHAR(20) CHECK (grandfather_maternal_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    grandfather_maternal_substance TEXT[],
+    grandfather_maternal_anxiety VARCHAR(20) CHECK (grandfather_maternal_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    grandfather_maternal_dementia VARCHAR(20) CHECK (grandfather_maternal_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    grandfather_maternal_cardio TEXT[],
     
     -- Paternal Grandmother (Grand-mère paternelle)
     grandmother_paternal_history VARCHAR(20) CHECK (grandmother_paternal_history IN ('oui', 'non', 'ne_sais_pas')),
     grandmother_paternal_deceased VARCHAR(10) CHECK (grandmother_paternal_deceased IN ('oui', 'non')),
     grandmother_paternal_death_cause TEXT,
+    grandmother_paternal_psychiatric VARCHAR(20) CHECK (grandmother_paternal_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    grandmother_paternal_suicide VARCHAR(20) CHECK (grandmother_paternal_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    grandmother_paternal_substance TEXT[],
+    grandmother_paternal_anxiety VARCHAR(20) CHECK (grandmother_paternal_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    grandmother_paternal_dementia VARCHAR(20) CHECK (grandmother_paternal_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    grandmother_paternal_cardio TEXT[],
     
     -- Paternal Grandfather (Grand-père paternel)
     grandfather_paternal_history VARCHAR(20) CHECK (grandfather_paternal_history IN ('oui', 'non', 'ne_sais_pas')),
     grandfather_paternal_deceased VARCHAR(10) CHECK (grandfather_paternal_deceased IN ('oui', 'non')),
     grandfather_paternal_death_cause TEXT,
+    grandfather_paternal_psychiatric VARCHAR(20) CHECK (grandfather_paternal_psychiatric IN ('aucun', 'edm_unipolaire', 'bipolaire', 'schizophrene', 'ne_sais_pas')),
+    grandfather_paternal_suicide VARCHAR(20) CHECK (grandfather_paternal_suicide IN ('aucun', 'tentative', 'abouti', 'ne_sais_pas')),
+    grandfather_paternal_substance TEXT[],
+    grandfather_paternal_anxiety VARCHAR(20) CHECK (grandfather_paternal_anxiety IN ('oui', 'non', 'ne_sais_pas')),
+    grandfather_paternal_dementia VARCHAR(20) CHECK (grandfather_paternal_dementia IN ('oui', 'non', 'ne_sais_pas')),
+    grandfather_paternal_cardio TEXT[],
     
     -- ========================================================================
     -- Metadata
