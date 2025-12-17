@@ -45,6 +45,8 @@ import {
   AntecedentsGynecoResponseInsert,
   PathoHepatoGastroResponse,
   PathoHepatoGastroResponseInsert,
+  PathoAllergiqueResponse,
+  PathoAllergiqueResponseInsert,
   Wais4CriteriaResponse,
   Wais4CriteriaResponseInsert,
   Wais4LearningResponse,
@@ -1272,6 +1274,44 @@ export async function savePathoHepatoGastroResponse(
 
   const { data, error } = await supabase
     .from('responses_patho_hepato_gastro')
+    .upsert({
+      ...response
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Pathologies allergiques et inflammatoires
+// ============================================================================
+
+export async function getPathoAllergiqueResponse(
+  visitId: string
+): Promise<PathoAllergiqueResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_patho_allergique')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function savePathoAllergiqueResponse(
+  response: PathoAllergiqueResponseInsert
+): Promise<PathoAllergiqueResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_patho_allergique')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })

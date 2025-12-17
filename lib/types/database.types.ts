@@ -2699,6 +2699,50 @@ export interface PathoHepatoGastroResponse {
 
 export type PathoHepatoGastroResponseInsert = Omit<PathoHepatoGastroResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ===== Pathologies allergiques et inflammatoires Response =====
+export interface PathoAllergiqueResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // 0. Presence question
+  q0_presence?: 'yes' | 'no' | 'unknown' | null;
+  
+  // 1. Selection of pathologies (multi-select)
+  q1_pathologies_selection?: string[] | null;
+  
+  // 2. Asthme
+  q2_1_asthme_treated?: 'yes' | 'no' | null;
+  q2_2_asthme_balanced?: 'yes' | 'no' | null;
+  q2_3_asthme_start_date?: string | null;
+  
+  // 3. Allergies hors asthme
+  q3_1_allergie_treated?: 'yes' | 'no' | null;
+  q3_2_allergie_balanced?: 'yes' | 'no' | null;
+  q3_3_allergie_start_date?: string | null;
+  
+  // 4. Lupus
+  q4_1_lupus_treated?: 'yes' | 'no' | null;
+  q4_2_lupus_balanced?: 'yes' | 'no' | null;
+  q4_3_lupus_start_date?: string | null;
+  
+  // 5. Polyarthrite rhumatoïde
+  q5_1_polyarthrite_treated?: 'yes' | 'no' | null;
+  q5_2_polyarthrite_balanced?: 'yes' | 'no' | null;
+  q5_3_polyarthrite_start_date?: string | null;
+  
+  // 6. Autres maladies auto-immunes
+  q6_1_autoimmune_start_date?: string | null;
+  q6_2_autoimmune_type?: string | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PathoAllergiqueResponseInsert = Omit<PathoAllergiqueResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
 // ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================

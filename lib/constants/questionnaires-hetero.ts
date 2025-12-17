@@ -7008,6 +7008,182 @@ export const PATHO_HEPATO_GASTRO_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
+// Pathologies allergiques et inflammatoires (Allergic and Inflammatory Pathologies)
+// ============================================================================
+
+export const PATHO_ALLERGIQUE_QUESTIONS: Question[] = [
+  // 0. Main presence question
+  {
+    id: 'q0_presence',
+    text: 'Pathologies allergiques et inflammatoires',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_UNKNOWN_OPTIONS
+  },
+
+  // 1. Selection of pathologies (multi-select, conditional on presence = yes)
+  {
+    id: 'q1_pathologies_selection',
+    text: 'Spécifier les pathologies concernées',
+    type: 'multiple_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q0_presence' }, 'yes'] },
+    options: [
+      { code: 'asthme', label: 'Asthme (allergique ou non)', score: 0 },
+      { code: 'allergies', label: 'Allergies hors asthme', score: 0 },
+      { code: 'lupus', label: 'Lupus', score: 0 },
+      { code: 'polyarthrite', label: 'Polyarthrite rhumatoïde', score: 0 },
+      { code: 'autres_autoimmunes', label: 'Autres maladies auto-immunes', score: 0 }
+    ]
+  },
+
+  // 2. Asthme (conditional on 'asthme' in selection)
+  {
+    id: 'q2_1_asthme_treated',
+    text: 'Asthme traité',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'in': ['asthme', { var: 'q1_pathologies_selection' }] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q2_2_asthme_balanced',
+    text: 'Asthme équilibré',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'in': ['asthme', { var: 'q1_pathologies_selection' }] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q2_3_asthme_start_date',
+    text: 'Date de début de l\'asthme',
+    type: 'date',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'in': ['asthme', { var: 'q1_pathologies_selection' }] }
+  },
+
+  // 3. Allergies hors asthme (conditional on 'allergies' in selection)
+  {
+    id: 'q3_1_allergie_treated',
+    text: 'Allergie traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'in': ['allergies', { var: 'q1_pathologies_selection' }] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q3_2_allergie_balanced',
+    text: 'Allergie équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'in': ['allergies', { var: 'q1_pathologies_selection' }] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q3_3_allergie_start_date',
+    text: 'Date de début de l\'allergie',
+    type: 'date',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'in': ['allergies', { var: 'q1_pathologies_selection' }] }
+  },
+
+  // 4. Lupus (conditional on 'lupus' in selection)
+  {
+    id: 'q4_1_lupus_treated',
+    text: 'Lupus traité',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'in': ['lupus', { var: 'q1_pathologies_selection' }] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q4_2_lupus_balanced',
+    text: 'Lupus équilibré',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'in': ['lupus', { var: 'q1_pathologies_selection' }] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q4_3_lupus_start_date',
+    text: 'Date de début du lupus',
+    type: 'date',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'in': ['lupus', { var: 'q1_pathologies_selection' }] }
+  },
+
+  // 5. Polyarthrite rhumatoïde (conditional on 'polyarthrite' in selection)
+  {
+    id: 'q5_1_polyarthrite_treated',
+    text: 'Polyarthrite traitée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'in': ['polyarthrite', { var: 'q1_pathologies_selection' }] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q5_2_polyarthrite_balanced',
+    text: 'Polyarthrite équilibrée',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'in': ['polyarthrite', { var: 'q1_pathologies_selection' }] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q5_3_polyarthrite_start_date',
+    text: 'Date de début de la polyarthrite',
+    type: 'date',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'in': ['polyarthrite', { var: 'q1_pathologies_selection' }] }
+  },
+
+  // 6. Autres maladies auto-immunes (conditional on 'autres_autoimmunes' in selection)
+  {
+    id: 'q6_1_autoimmune_start_date',
+    text: 'Date de début de la maladie auto-immune',
+    type: 'date',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'in': ['autres_autoimmunes', { var: 'q1_pathologies_selection' }] }
+  },
+  {
+    id: 'q6_2_autoimmune_type',
+    text: 'Type de la maladie auto-immune',
+    type: 'text',
+    required: false,
+    indentLevel: 2,
+    display_if: { 'in': ['autres_autoimmunes', { var: 'q1_pathologies_selection' }] },
+    help: 'Nom du diagnostic, système organique impliqué, qualificatifs optionnels (systémique / organe-spécifique)'
+  }
+];
+
+export const PATHO_ALLERGIQUE_DEFINITION: QuestionnaireDefinition = {
+  id: 'patho_allergique',
+  code: 'PATHO_ALLERGIQUE_FR',
+  title: 'Pathologies allergiques et inflammatoires',
+  description: 'Recueil des antécédents de pathologies allergiques et inflammatoires du patient (asthme, allergies, lupus, polyarthrite rhumatoïde, maladies auto-immunes).',
+  questions: PATHO_ALLERGIQUE_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
 // WAIS-IV Clinical Criteria (Neuropsychological Evaluation)
 // ============================================================================
 

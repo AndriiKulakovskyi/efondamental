@@ -180,7 +180,9 @@ export function evaluateCondition(
   if (condition['in']) {
     const [value, array] = condition['in'];
     const evaluatedValue = evaluateExpression(value, answers);
-    return Array.isArray(array) && array.includes(evaluatedValue);
+    const evaluatedArray = evaluateExpression(array, answers);
+    // Support both static arrays and variable references to arrays
+    return Array.isArray(evaluatedArray) && evaluatedArray.includes(evaluatedValue);
   }
 
   if (condition['and']) {
