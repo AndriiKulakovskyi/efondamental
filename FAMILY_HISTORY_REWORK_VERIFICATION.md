@@ -2,10 +2,11 @@
 
 ## Implementation Summary
 
-The "Antécédents familiaux" questionnaire has been successfully reworked with three sections:
+The "Antécédents familiaux" questionnaire has been successfully reworked with four sections:
 - **Section 1 - Enfants (Children)**: Support for up to 5 daughters and 5 sons with issues
 - **Section 2 - Frères et Soeurs (Siblings)**: Support for up to 5 sisters and 5 brothers with issues
 - **Section 3 - Parents**: Basic information about mother and father (history and death details)
+- **Section 4 - Grands-Parents**: Basic information about all 4 grandparents (history and death details)
 
 ## Changes Made
 
@@ -32,6 +33,12 @@ The "Antécédents familiaux" questionnaire has been successfully reworked with 
     - `father_history` (VARCHAR: 'oui', 'non', 'ne_sais_pas')
     - `father_deceased` (VARCHAR: 'oui', 'non')
     - `father_death_cause` (TEXT)
+  - **Section 4 - Grands-Parents:**
+    - `grandmother_maternal_history`, `grandmother_maternal_deceased`, `grandmother_maternal_death_cause`
+    - `grandfather_maternal_history`, `grandfather_maternal_deceased`, `grandfather_maternal_death_cause`
+    - `grandmother_paternal_history`, `grandmother_paternal_deceased`, `grandmother_paternal_death_cause`
+    - `grandfather_paternal_history`, `grandfather_paternal_deceased`, `grandfather_paternal_death_cause`
+    - All follow the same pattern as parents (VARCHAR for history/deceased, TEXT for cause)
 
 ### 2. TypeScript Types
 - **File**: `lib/types/database.types.ts`
@@ -121,6 +128,48 @@ The "Antécédents familiaux" questionnaire has been successfully reworked with 
 
 18. **Q8.1: Father - Cause of death** (Conditional)
     - Display condition: `{ '==': [{ var: 'father_deceased' }, 'oui'] }`
+    - Type: Text input
+
+### Section 4 - Grands-Parents (Grandparents)
+
+19. **Q9: Maternal Grandmother** (Required)
+    - Options: Oui, Non, Ne sais pas
+
+20. **Q10: Maternal Grandmother - Death** (Required)
+    - Options: Oui, Non
+
+21. **Q10.1: Maternal Grandmother - Cause of death** (Conditional)
+    - Display condition: `{ '==': [{ var: 'grandmother_maternal_deceased' }, 'oui'] }`
+    - Type: Text input
+
+22. **Q11: Maternal Grandfather** (Required)
+    - Options: Oui, Non, Ne sais pas
+
+23. **Q12: Maternal Grandfather - Death** (Required)
+    - Options: Oui, Non
+
+24. **Q12.1: Maternal Grandfather - Cause of death** (Conditional)
+    - Display condition: `{ '==': [{ var: 'grandfather_maternal_deceased' }, 'oui'] }`
+    - Type: Text input
+
+25. **Q13: Paternal Grandmother** (Required)
+    - Options: Oui, Non, Ne sais pas
+
+26. **Q14: Paternal Grandmother - Death** (Required)
+    - Options: Oui, Non
+
+27. **Q14.1: Paternal Grandmother - Cause of death** (Conditional)
+    - Display condition: `{ '==': [{ var: 'grandmother_paternal_deceased' }, 'oui'] }`
+    - Type: Text input
+
+28. **Q15: Paternal Grandfather** (Required)
+    - Options: Oui, Non, Ne sais pas
+
+29. **Q16: Paternal Grandfather - Death** (Required)
+    - Options: Oui, Non
+
+30. **Q16.1: Paternal Grandfather - Cause of death** (Conditional)
+    - Display condition: `{ '==': [{ var: 'grandfather_paternal_deceased' }, 'oui'] }`
     - Type: Text input
 
 ## JSON Logic Operators Used

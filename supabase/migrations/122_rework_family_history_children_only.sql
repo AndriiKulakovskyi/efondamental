@@ -2,6 +2,7 @@
 -- Section 1: Enfants (Children: Daughters and Sons)
 -- Section 2: Frères et Soeurs (Siblings: Sisters and Brothers)
 -- Section 3: Parents (Mother and Father)
+-- Section 4: Grands-Parents (Grandparents: Maternal and Paternal)
 -- Flat structure supporting up to 5 of each category (children/siblings) with branching logic
 
 -- ============================================================================
@@ -214,6 +215,30 @@ CREATE TABLE responses_family_history (
     father_death_cause TEXT,
     
     -- ========================================================================
+    -- GRANDPARENTS (Grands-Parents)
+    -- ========================================================================
+    
+    -- Maternal Grandmother (Grand-mère maternelle)
+    grandmother_maternal_history VARCHAR(20) CHECK (grandmother_maternal_history IN ('oui', 'non', 'ne_sais_pas')),
+    grandmother_maternal_deceased VARCHAR(10) CHECK (grandmother_maternal_deceased IN ('oui', 'non')),
+    grandmother_maternal_death_cause TEXT,
+    
+    -- Maternal Grandfather (Grand-père maternel)
+    grandfather_maternal_history VARCHAR(20) CHECK (grandfather_maternal_history IN ('oui', 'non', 'ne_sais_pas')),
+    grandfather_maternal_deceased VARCHAR(10) CHECK (grandfather_maternal_deceased IN ('oui', 'non')),
+    grandfather_maternal_death_cause TEXT,
+    
+    -- Paternal Grandmother (Grand-mère paternelle)
+    grandmother_paternal_history VARCHAR(20) CHECK (grandmother_paternal_history IN ('oui', 'non', 'ne_sais_pas')),
+    grandmother_paternal_deceased VARCHAR(10) CHECK (grandmother_paternal_deceased IN ('oui', 'non')),
+    grandmother_paternal_death_cause TEXT,
+    
+    -- Paternal Grandfather (Grand-père paternel)
+    grandfather_paternal_history VARCHAR(20) CHECK (grandfather_paternal_history IN ('oui', 'non', 'ne_sais_pas')),
+    grandfather_paternal_deceased VARCHAR(10) CHECK (grandfather_paternal_deceased IN ('oui', 'non')),
+    grandfather_paternal_death_cause TEXT,
+    
+    -- ========================================================================
     -- Metadata
     -- ========================================================================
     
@@ -269,7 +294,7 @@ CREATE TRIGGER update_responses_family_history_updated_at
 -- ============================================================================
 
 COMMENT ON TABLE responses_family_history IS 
-'Stores responses for the Family History questionnaire. Section 1: Enfants (Children) - up to 5 daughters and 5 sons. Section 2: Frères et Soeurs (Siblings) - up to 5 sisters and 5 brothers. Section 3: Parents (Mother and Father) - basic history and death information.';
+'Stores responses for the Family History questionnaire. Section 1: Enfants (Children) - up to 5 daughters and 5 sons. Section 2: Frères et Soeurs (Siblings) - up to 5 sisters and 5 brothers. Section 3: Parents (Mother and Father). Section 4: Grands-Parents (Grandparents: maternal and paternal). All with basic history and death information.';
 
 COMMENT ON COLUMN responses_family_history.num_daughters IS 
 'Q1: Number of daughters (0, 1-5, or >5)';
@@ -306,4 +331,28 @@ COMMENT ON COLUMN responses_family_history.father_history IS
 
 COMMENT ON COLUMN responses_family_history.father_deceased IS 
 'Q8: Father deceased (oui/non)';
+
+COMMENT ON COLUMN responses_family_history.grandmother_maternal_history IS 
+'Q9: Maternal grandmother history (oui/non/ne_sais_pas)';
+
+COMMENT ON COLUMN responses_family_history.grandmother_maternal_deceased IS 
+'Q10: Maternal grandmother deceased (oui/non)';
+
+COMMENT ON COLUMN responses_family_history.grandfather_maternal_history IS 
+'Q11: Maternal grandfather history (oui/non/ne_sais_pas)';
+
+COMMENT ON COLUMN responses_family_history.grandfather_maternal_deceased IS 
+'Q12: Maternal grandfather deceased (oui/non)';
+
+COMMENT ON COLUMN responses_family_history.grandmother_paternal_history IS 
+'Q13: Paternal grandmother history (oui/non/ne_sais_pas)';
+
+COMMENT ON COLUMN responses_family_history.grandmother_paternal_deceased IS 
+'Q14: Paternal grandmother deceased (oui/non)';
+
+COMMENT ON COLUMN responses_family_history.grandfather_paternal_history IS 
+'Q15: Paternal grandfather history (oui/non/ne_sais_pas)';
+
+COMMENT ON COLUMN responses_family_history.grandfather_paternal_deceased IS 
+'Q16: Paternal grandfather deceased (oui/non)';
 

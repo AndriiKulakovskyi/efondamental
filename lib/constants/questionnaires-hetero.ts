@@ -2816,6 +2816,157 @@ export const FAMILY_HISTORY_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     display_if: { '==': [{ var: 'father_deceased' }, 'oui'] }
+  },
+  
+  // ========================================================================
+  // SECTION 4 - GRANDPARENTS (Grands-Parents)
+  // ========================================================================
+  
+  {
+    id: 'section_grandparents',
+    text: 'Section 4 - Grands-Parents',
+    type: 'section',
+    required: false
+  },
+  
+  // ========================================================================
+  // MATERNAL GRANDMOTHER (Grand-mère maternelle)
+  // ========================================================================
+  
+  {
+    id: 'grandmother_maternal_history',
+    text: 'Q9. Grand-mère maternelle',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  {
+    id: 'grandmother_maternal_deceased',
+    text: 'Q10. Grand-mère maternelle - Décès',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  
+  {
+    id: 'grandmother_maternal_death_cause',
+    text: 'Q10.1. Grand-mère maternelle - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ var: 'grandmother_maternal_deceased' }, 'oui'] }
+  },
+  
+  // ========================================================================
+  // MATERNAL GRANDFATHER (Grand-père maternel)
+  // ========================================================================
+  
+  {
+    id: 'grandfather_maternal_history',
+    text: 'Q11. Grand-père maternel',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  {
+    id: 'grandfather_maternal_deceased',
+    text: 'Q12. Grand-père maternel - Décès',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  
+  {
+    id: 'grandfather_maternal_death_cause',
+    text: 'Q12.1. Grand-père maternel - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ var: 'grandfather_maternal_deceased' }, 'oui'] }
+  },
+  
+  // ========================================================================
+  // PATERNAL GRANDMOTHER (Grand-mère paternelle)
+  // ========================================================================
+  
+  {
+    id: 'grandmother_paternal_history',
+    text: 'Q13. Grand-mère paternelle',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  {
+    id: 'grandmother_paternal_deceased',
+    text: 'Q14. Grand-mère paternelle - Décès',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  
+  {
+    id: 'grandmother_paternal_death_cause',
+    text: 'Q14.1. Grand-mère paternelle - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ var: 'grandmother_paternal_deceased' }, 'oui'] }
+  },
+  
+  // ========================================================================
+  // PATERNAL GRANDFATHER (Grand-père paternel)
+  // ========================================================================
+  
+  {
+    id: 'grandfather_paternal_history',
+    text: 'Q15. Grand-père paternel',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' },
+      { code: 'ne_sais_pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  {
+    id: 'grandfather_paternal_deceased',
+    text: 'Q16. Grand-père paternel - Décès',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  
+  {
+    id: 'grandfather_paternal_death_cause',
+    text: 'Q16.1. Grand-père paternel - Cause du décès',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ var: 'grandfather_paternal_deceased' }, 'oui'] }
   }
 ];
 
@@ -2823,7 +2974,7 @@ export const FAMILY_HISTORY_DEFINITION: QuestionnaireDefinition = {
   id: 'family_history',
   code: 'FAMILY_HISTORY_FR',
   title: 'Antécédents Familiaux',
-  description: 'Évaluation des antécédents familiaux. Section 1: Enfants (filles et fils). Section 2: Frères et Soeurs (soeurs et frères). Section 3: Parents (mère et père).',
+  description: 'Évaluation des antécédents familiaux. Section 1: Enfants. Section 2: Frères et Soeurs. Section 3: Parents. Section 4: Grands-Parents.',
   questions: FAMILY_HISTORY_QUESTIONS,
   metadata: {
     singleColumn: true,

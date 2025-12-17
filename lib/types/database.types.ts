@@ -2014,6 +2014,23 @@ export interface FamilyHistoryResponse {
   father_deceased?: 'oui' | 'non' | null;
   father_death_cause?: string | null;
   
+  // Grandparents (Grands-Parents)
+  grandmother_maternal_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  grandmother_maternal_deceased?: 'oui' | 'non' | null;
+  grandmother_maternal_death_cause?: string | null;
+  
+  grandfather_maternal_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  grandfather_maternal_deceased?: 'oui' | 'non' | null;
+  grandfather_maternal_death_cause?: string | null;
+  
+  grandmother_paternal_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  grandmother_paternal_deceased?: 'oui' | 'non' | null;
+  grandmother_paternal_death_cause?: string | null;
+  
+  grandfather_paternal_history?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  grandfather_paternal_deceased?: 'oui' | 'non' | null;
+  grandfather_paternal_death_cause?: string | null;
+  
   // Metadata
   completed_by?: string | null;
   completed_at: string;
