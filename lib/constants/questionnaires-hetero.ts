@@ -7815,6 +7815,17 @@ export const WAIS4_CRITERIA_QUESTIONS: Question[] = [
       { code: 1, label: 'Oui', score: 0 },
       { code: 0, label: 'Non', score: 0 }
     ]
+  },
+  {
+    id: 'accepted_for_neuropsy_evaluation',
+    section: 'Acceptation pour Évaluation',
+    text: 'Patient accepté pour l\'évaluation Neuropsychologique',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 0 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
   }
 ];
 

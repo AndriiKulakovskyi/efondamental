@@ -652,7 +652,19 @@ export async function submitProfessionalQuestionnaireAction(
         result = await saveWais4CriteriaResponse({
           visit_id: visitId,
           patient_id: patientId,
-          ...responses as any
+          collection_date: responses.collection_date,
+          age: responses.age,
+          laterality: responses.laterality,
+          native_french_speaker: responses.native_french_speaker,
+          time_since_last_eval: responses.time_since_last_eval,
+          patient_euthymic: responses.patient_euthymic,
+          no_episode_3months: responses.no_episode_3months,
+          socio_prof_data_present: responses.socio_prof_data_present,
+          years_of_education: responses.years_of_education,
+          no_visual_impairment: responses.no_visual_impairment,
+          no_hearing_impairment: responses.no_hearing_impairment,
+          no_ect_past_year: responses.no_ect_past_year,
+          accepted_for_neuropsy_evaluation: responses.accepted_for_neuropsy_evaluation,
         } as Wais4CriteriaResponseInsert);
         break;
 
@@ -797,7 +809,19 @@ export async function submitProfessionalQuestionnaireAction(
         result = await saveWais3CriteriaResponse({
           visit_id: visitId,
           patient_id: patientId,
-          ...responses as any
+          collection_date: responses.collection_date,
+          age: responses.age,
+          laterality: responses.laterality,
+          native_french_speaker: responses.native_french_speaker,
+          time_since_last_eval: responses.time_since_last_eval,
+          patient_euthymic: responses.patient_euthymic,
+          no_episode_3months: responses.no_episode_3months,
+          socio_prof_data_present: responses.socio_prof_data_present,
+          years_of_education: responses.years_of_education,
+          no_visual_impairment: responses.no_visual_impairment,
+          no_hearing_impairment: responses.no_hearing_impairment,
+          no_ect_past_year: responses.no_ect_past_year,
+          accepted_for_neuropsy_evaluation: responses.accepted_for_neuropsy_evaluation,
         } as Wais3CriteriaResponseInsert);
         break;
 

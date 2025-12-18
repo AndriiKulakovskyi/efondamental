@@ -2845,6 +2845,9 @@ export interface Wais4CriteriaResponse {
   no_hearing_impairment: number; // 0 or 1
   no_ect_past_year: number; // 0 or 1
   
+  // Acceptance for Neuropsychological Evaluation
+  accepted_for_neuropsy_evaluation?: number | null; // 0 or 1
+  
   // Metadata
   completed_by?: string | null;
   completed_at: string;
@@ -3660,6 +3663,9 @@ export interface Wais3CriteriaResponse {
   no_visual_impairment: number; // 0 or 1
   no_hearing_impairment: number; // 0 or 1
   no_ect_past_year: number; // 0 or 1
+  
+  // Acceptance for Neuropsychological Evaluation
+  accepted_for_neuropsy_evaluation?: number | null; // 0 or 1
   
   // Metadata
   completed_by?: string | null;
