@@ -67,6 +67,115 @@ export const SOCIAL_QUESTIONS: Question[] = [
       { code: 'autres', label: 'Autres' }
     ]
   },
+  {
+    id: 'active_work_duration',
+    text: 'Depuis combien de temps travaillez-vous de manière consécutive (sans interruption > 6 mois)',
+    type: 'single_choice',
+    required: true,
+    display_if: { '==': [{ var: 'professional_status' }, 'actif'] },
+    options: [
+      { code: 'moins_1_an', label: '< 1 an' },
+      { code: '1_an', label: '1 an' },
+      { code: '2_ans', label: '2 ans' },
+      { code: '3_ans', label: '3 ans' },
+      { code: '4_ans', label: '4 ans' },
+      { code: '5_ans', label: '5 ans' },
+      { code: '6_ans', label: '6 ans' },
+      { code: '7_ans', label: '7 ans' },
+      { code: '8_ans', label: '8 ans' },
+      { code: '9_ans', label: '9 ans' },
+      { code: '10_20_ans', label: 'Entre 10 et 20 ans' },
+      { code: '20_30_ans', label: 'Entre 20 et 30 ans' },
+      { code: 'plus_30_ans', label: '> 30 ans' }
+    ]
+  },
+  {
+    id: 'is_full_time',
+    text: 'Est-ce un emploi temps plein',
+    type: 'single_choice',
+    required: true,
+    display_if: { '==': [{ var: 'professional_status' }, 'actif'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'professional_class_active',
+    text: 'Donner la classe professionnelle',
+    type: 'single_choice',
+    required: true,
+    display_if: { '==': [{ var: 'professional_status' }, 'actif'] },
+    options: [
+      { code: 'agriculteur_exploitant', label: 'Agriculteur exploitant' },
+      { code: 'artisan', label: 'Artisan' },
+      { code: 'cadre_fp_intellectuelle_artistique', label: 'Cadre de la fonction publique, profession intellectuelle et artistique' },
+      { code: 'cadre_entreprise', label: "Cadre d'entreprise" },
+      { code: 'chef_entreprise_10_plus', label: 'Chef d\'entreprise de 10 salariés ou plus' },
+      { code: 'commercant_assimile', label: 'Commerçant et assimilé' },
+      { code: 'contremaitre_agent_maitrise', label: 'Contremaître, agent de maîtrise' },
+      { code: 'employe_fp', label: 'Employé de la fonction publique' },
+      { code: 'employe_administratif_entreprise', label: "Employé administratif d'entreprise" },
+      { code: 'employe_commerce', label: 'Employé de commerce' },
+      { code: 'ouvrier_qualifie', label: 'Ouvrier qualifié' },
+      { code: 'ouvrier_non_qualifie', label: 'Ouvrier non qualifiés' },
+      { code: 'ouvrier_agricole', label: 'Ouvrier agricole' },
+      { code: 'personnel_service_particuliers', label: 'Personnel de service direct aux particuliers' },
+      { code: 'prof_intermediaire_enseignement_sante_fp', label: 'Profession intermédiaire de l\'enseignement, de la santé, de la fonction publique et assimilés' },
+      { code: 'prof_intermediaire_admin_com_entreprises', label: 'Profession intermédiaire administrative et commerciale des entreprises' },
+      { code: 'profession_liberale_assimile', label: 'Profession libérale et assimilé' },
+      { code: 'technicien', label: 'Technicien' }
+    ]
+  },
+  {
+    id: 'last_job_end_date',
+    text: 'Date de fin du dernier emploi (au moins emploi à mi-temps)',
+    type: 'date',
+    required: true,
+    display_if: { '==': [{ var: 'professional_status' }, 'sans_emploi'] }
+  },
+  {
+    id: 'professional_class_unemployed',
+    text: 'Donner la classe professionnelle',
+    type: 'single_choice',
+    required: true,
+    display_if: { '==': [{ var: 'professional_status' }, 'sans_emploi'] },
+    options: [
+      { code: 'agriculteur_exploitant', label: 'Agriculteur exploitant' },
+      { code: 'artisan', label: 'Artisan' },
+      { code: 'cadre_fp_intellectuelle_artistique', label: 'Cadre de la fonction publique, profession intellectuelle et artistique' },
+      { code: 'cadre_entreprise', label: "Cadre d'entreprise" },
+      { code: 'chef_entreprise_10_plus', label: 'Chef d\'entreprise de 10 salariés ou plus' },
+      { code: 'commercant_assimile', label: 'Commerçant et assimilé' },
+      { code: 'contremaitre_agent_maitrise', label: 'Contremaître, agent de maîtrise' },
+      { code: 'employe_fp', label: 'Employé de la fonction publique' },
+      { code: 'employe_administratif_entreprise', label: "Employé administratif d'entreprise" },
+      { code: 'employe_commerce', label: 'Employé de commerce' },
+      { code: 'ouvrier_qualifie', label: 'Ouvrier qualifié' },
+      { code: 'ouvrier_non_qualifie', label: 'Ouvrier non qualifiés' },
+      { code: 'ouvrier_agricole', label: 'Ouvrier agricole' },
+      { code: 'personnel_service_particuliers', label: 'Personnel de service direct aux particuliers' },
+      { code: 'prof_intermediaire_enseignement_sante_fp', label: 'Profession intermédiaire de l\'enseignement, de la santé, de la fonction publique et assimilés' },
+      { code: 'prof_intermediaire_admin_com_entreprises', label: 'Profession intermédiaire administrative et commerciale des entreprises' },
+      { code: 'profession_liberale_assimile', label: 'Profession libérale et assimilé' },
+      { code: 'technicien', label: 'Technicien' }
+    ]
+  },
+  {
+    id: 'main_income_source',
+    text: 'Source principale de revenus',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'salaire', label: 'Salaire' },
+      { code: 'rmi_rsa', label: 'RMI/RSA' },
+      { code: 'aah', label: 'AAH' },
+      { code: 'pension_invalidite', label: "Pension d'invalidité" },
+      { code: 'allocations_chomage', label: 'Allocations de chômage' },
+      { code: 'apl', label: 'APL' },
+      { code: 'autres', label: 'Autres' }
+    ]
+  },
   
   // 4. Parcours professionnel
   // 4.1 Age du premier emploi
@@ -196,6 +305,19 @@ export const SOCIAL_QUESTIONS: Question[] = [
       { code: 'sauvegarde_justice', label: 'Sauvegarde de justice' }
     ]
   },
+  {
+    id: 'debt_level',
+    text: "Niveau d'endettement",
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'aucun', label: 'Aucun' },
+      { code: 'facile_a_gerer', label: 'Endettement facile à gérer' },
+      { code: 'difficile_a_gerer', label: 'Endettement difficile à gérer' },
+      { code: 'tres_difficile_a_gerer', label: 'Endettement très difficile à gérer' },
+      { code: 'non_renseigne', label: 'Non renseigné' }
+    ]
+  },
   
   // 8. Arrêt de travail actuel
   {
@@ -207,6 +329,17 @@ export const SOCIAL_QUESTIONS: Question[] = [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
       { code: 'non_applicable', label: 'Non applicable' }
+    ]
+  },
+  {
+    id: 'long_term_leave',
+    text: 'Longue durée',
+    type: 'single_choice',
+    required: true,
+    display_if: { '==': [{ var: 'current_work_leave' }, 'oui'] },
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
     ]
   },
   
@@ -221,6 +354,15 @@ export const SOCIAL_QUESTIONS: Question[] = [
       { code: 'non', label: 'Non' },
       { code: 'non_applicable', label: 'Non applicable' }
     ]
+  },
+  {
+    id: 'cumulative_leave_weeks',
+    text: "Nombre de semaines cumulées sur l'année",
+    type: 'number',
+    required: true,
+    min: 0,
+    max: 52,
+    display_if: { '==': [{ var: 'past_year_work_leave' }, 'oui'] }
   }
 ];
 
