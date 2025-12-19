@@ -1306,26 +1306,68 @@ export const MATHYS_DEFINITION: QuestionnaireDefinition = {
 
 // PSQI (Pittsburgh Sleep Quality Index)
 export const PSQI_QUESTIONS: Question[] = [
-  { id: 'q1_bedtime', text: 'À quelle heure vous êtes-vous habituellement couché(e) au cours du mois dernier ?', type: 'text', required: true, help: 'Format: HH:MM' },
-  { id: 'q2_minutes_to_sleep', text: 'Combien de minutes vous a-t-il fallu (en moyenne) pour vous endormir chaque nuit au cours du mois dernier ?', type: 'number', required: true, min: 0 },
-  { id: 'q3_waketime', text: 'À quelle heure vous êtes-vous habituellement levé(e) le matin au cours du mois dernier ?', type: 'text', required: true, help: 'Format: HH:MM' },
-  { id: 'q4_hours_sleep', text: "Combien d'heures de sommeil avez-vous effectivement eu par nuit au cours du mois dernier ?", type: 'number', required: true, min: 0, max: 24 },
+  { 
+    id: 'q1_bedtime', 
+    text: '1. Au cours des 30 derniers jours, à quelle heure vous êtes-vous généralement couché(e) le soir? (format HH:MM)', 
+    type: 'text', 
+    required: true, 
+    help: 'A noter en H24 ex: si le patient se couche à 23:00 ne surtout pas mettre 11H(du soir)',
+    metadata: { placeholder: 'HH:MM', pattern: '^([01]\\d|2[0-3]):[0-5]\\d$' }
+  },
+  { 
+    id: 'q2_minutes_to_sleep', 
+    text: '2. Au cours des 30 derniers jours, au bout de combien de temps (en minutes) vous êtes-vous généralement endormi(e) le soir ?', 
+    type: 'number', 
+    required: true, 
+    min: 0 
+  },
+  { 
+    id: 'q3_waketime', 
+    text: '3. Au cours des 30 derniers jours, à quelle heure vous êtes-vous généralement levé(e) le matin ? (format HH:MM)', 
+    type: 'text', 
+    required: true, 
+    help: 'A noter en H24 ex: si le patient se couche à 23:00 ne surtout pas mettre 11H(du soir)',
+    metadata: { placeholder: 'HH:MM', pattern: '^([01]\\d|2[0-3]):[0-5]\\d$' }
+  },
+  { 
+    id: 'q4_hours_sleep', 
+    text: '4. Au cours des 30 derniers jours, combien d’heures avez-vous vraiment dormi par nuit ? (format HH:MM)', 
+    type: 'text', 
+    required: true, 
+    help: 'A noter en H24 ex: si vous avez dormi 6 heures et 30 minutes, notez 06:30',
+    metadata: { placeholder: 'HH:MM', pattern: '^([01]\\d|2[0-4]):[0-5]\\d$' }
+  },
   // Q5: Fréquence des troubles du sommeil
-  { id: 'q5a', text: "Vous n'êtes pas arrivé(e) à vous endormir en 30 minutes", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5b', text: 'Réveil au milieu de la nuit ou tôt le matin', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5c', text: 'Levers nocturnes pour aller aux toilettes', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5d', text: 'Difficultés respiratoires', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5e', text: 'Toux ou ronflement bruyant', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5f', text: 'Trop froid', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5g', text: 'Trop chaud', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5h', text: 'Cauchemars', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5i', text: 'Douleurs', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5j', text: 'Autre raison', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5a', text: "5a. Vous n’êtes pas arrivé(e) à vous endormir en 30 minutes", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5b', text: '5b. Vous vous êtes réveillé(e) au milieu de la nuit ou plus tôt que d’habitude', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5c', text: '5c. Vous avez dû vous lever pour aller aux toilettes', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5d', text: '5d. Vous avez eu du mal à respirer', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5e', text: '5e. Vous avez toussé ou ronflé bruyamment', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5f', text: '5f. Vous avez eu trop froid', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5g', text: '5g. Vous avez eu trop chaud', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5h', text: '5h. Vous avez fait des cauchemars', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5i', text: '5i. Vous avez eu des douleurs', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5j', text: '5j. Combien de fois, au cours des 30 derniers jours, avez-vous eu des difficultés à dormir pour d’autres raisons ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
   { id: 'q5j_text', text: 'Si autre raison, préciser', type: 'text', required: false, display_if: { ">": [{ "var": "answers.q5j" }, 0] } },
-  { id: 'q6', text: 'Comment évalueriez-vous globalement la qualité de votre sommeil au cours du mois dernier ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Très bonne' }, { code: 1, label: 'Assez bonne' }, { code: 2, label: 'Assez mauvaise' }, { code: 3, label: 'Très mauvaise' }] },
-  { id: 'q7', text: 'Au cours du mois dernier, à quelle fréquence avez-vous pris des médicaments (avec ou sans ordonnance) pour vous aider à dormir ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q8', text: "Au cours du mois dernier, à quelle fréquence avez-vous eu des difficultés à rester éveillé(e) en conduisant, en mangeant ou lors d'une activité sociale ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q9', text: "Au cours du mois dernier, avez-vous représenté un problème pour vous de maintenir assez d'enthousiasme pour faire les choses ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Aucun problème' }, { code: 1, label: 'Un tout petit problème' }, { code: 2, label: 'Quelque peu un problème' }, { code: 3, label: 'Un très grand problème' }] }
+  { id: 'q6', text: '6. Comment qualifieriez-vous la qualité de votre sommeil en général au cours des 30 derniers jours ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Très bonne' }, { code: 1, label: 'Assez bonne' }, { code: 2, label: 'Assez mauvaise' }, { code: 3, label: 'Très mauvaise' }] },
+  { id: 'q7', text: '7. Au cours des 30 derniers jours, combien de fois avez-vous pris des médicaments pour mieux dormir (médicaments prescrits par votre médecin ou vendus sans ordonnance) ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q8', text: '8. Au cours des 30 derniers jours, combien de fois avez-vous eu des difficultés à rester éveillé(e) en conduisant, en mangeant, ou en participant à des activités avec d’autres personnes ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q9', text: '9. Au cours des 30 derniers jours, combien vous a-t-il été difficile d’être suffisamment motivé(e) pour mener à bien vos activités ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas difficile du tout' }, { code: 1, label: 'Légèrement difficile' }, { code: 2, label: 'Assez difficile' }, { code: 3, label: 'Très difficile' }] },
+  {
+    id: 'psqi_scores_section',
+    text: 'Résultats PSQI',
+    type: 'section',
+    required: false,
+    help: 'Calcul des scores de qualité du sommeil.'
+  },
+  { id: 'c4_efficiency', text: 'Score efficience sommeil', type: 'number', required: false, readonly: true },
+  { id: 'c3_duration', text: 'Score durée de sommeil', type: 'number', required: false, readonly: true },
+  { id: 'c5_disturbances', text: 'Score du trouble du sommeil', type: 'number', required: false, readonly: true },
+  { id: 'c2_latency', text: 'Score latence avant sommeil', type: 'number', required: false, readonly: true },
+  { id: 'c1_subjective_quality', text: 'Score sur la qualité du sommeil', type: 'number', required: false, readonly: true },
+  { id: 'c6_medication', text: 'Score médication', type: 'number', required: false, readonly: true },
+  { id: 'c7_daytime_dysfunction', text: 'Score de dysfonctionnement dû au sommeil', type: 'number', required: false, readonly: true },
+  { id: 'total_score', text: 'Score total', type: 'number', required: false, readonly: true }
 ];
 
 export const PSQI_DEFINITION: QuestionnaireDefinition = {

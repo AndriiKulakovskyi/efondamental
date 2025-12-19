@@ -532,7 +532,7 @@ export interface PsqiResponse {
   q1_bedtime?: string | null;
   q2_minutes_to_sleep?: number | null;
   q3_waketime?: string | null;
-  q4_hours_sleep?: number | null;
+  q4_hours_sleep?: string | null;
   q5a?: number | null;
   q5b?: number | null;
   q5c?: number | null;
