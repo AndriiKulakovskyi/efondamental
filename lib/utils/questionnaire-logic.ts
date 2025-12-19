@@ -9,6 +9,42 @@ import { evaluateCondition as evaluateJSONLogicCondition } from '@/lib/questionn
 // CONDITIONAL LOGIC EVALUATION
 // ============================================================================
 
+/**
+ * Evaluate visibility condition for a question based on visibleWhen property
+ */
+function evaluateVisibleWhen(
+  visibleWhen: Question['visibleWhen'],
+  responses: Record<string, any>
+): boolean {
+  if (!visibleWhen) return true;
+  
+  // Check if it's a simple condition or compound condition
+  if ('field' in visibleWhen) {
+    // Simple condition
+    const value = responses[visibleWhen.field];
+    if (visibleWhen.condition === 'isNotEmpty') {
+      return value !== undefined && value !== null && value !== '';
+    }
+  } else if ('operator' in visibleWhen) {
+    // Compound condition with operator
+    const results = visibleWhen.conditions.map(cond => {
+      const value = responses[cond.field];
+      if (cond.condition === 'isNotEmpty') {
+        return value !== undefined && value !== null && value !== '';
+      }
+      return false;
+    });
+    
+    if (visibleWhen.operator === 'and') {
+      return results.every(r => r);
+    } else if (visibleWhen.operator === 'or') {
+      return results.some(r => r);
+    }
+  }
+  
+  return true;
+}
+
 export function evaluateConditionalLogic(
   questionnaire: QuestionnaireDefinition,
   responses: Record<string, any>
@@ -19,10 +55,15 @@ export function evaluateConditionalLogic(
   const visibleQuestions: string[] = [];
   const requiredQuestions: string[] = [];
 
-  // Evaluate display_if conditions for each question
+  // Evaluate display_if and visibleWhen conditions for each question
   questionnaire.questions.forEach((q) => {
-    // If no display_if, default is visible
-    const isVisible = !q.display_if || evaluateJSONLogicCondition(q.display_if, responses);
+    // Check display_if (JSONLogic) - if no display_if, default is visible
+    let isVisible = !q.display_if || evaluateJSONLogicCondition(q.display_if, responses);
+    
+    // Additionally check visibleWhen (simple conditions)
+    if (isVisible && q.visibleWhen) {
+      isVisible = evaluateVisibleWhen(q.visibleWhen, responses);
+    }
     
     if (isVisible) {
       visibleQuestions.push(q.id);

@@ -10998,13 +10998,21 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     max: 90,
     help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
-  // Code Subtest section
+  
+  // SECTION 1: Code Subtest
+  {
+    id: 'section_code',
+    text: 'WAIS-III (Wechsler, 1997) - Subtest Code',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'wais_cod_tot',
     text: 'Nombre total de cases remplies de façon correcte',
     type: 'number',
     required: true,
-    section: 'Subtest Code',
+    section: 'WAIS-III (Wechsler, 1997) – Subtest Code',
     min: 0
   },
   {
@@ -11012,7 +11020,7 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     text: 'Nombre de cases remplies de façon incorrecte',
     type: 'number',
     required: true,
-    section: 'Subtest Code',
+    section: 'WAIS-III (Wechsler, 1997) – Subtest Code',
     min: 0
   },
   {
@@ -11020,8 +11028,12 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     text: 'Note brute totale',
     type: 'number',
     required: false,
-    section: 'Subtest Code - Scores calculés',
+    section: 'WAIS-III (Wechsler, 1997) – Subtest Code',
     readonly: true,
+    visibleWhen: {
+      field: 'wais_cod_tot',
+      condition: 'isNotEmpty'
+    },
     help: 'Note brute = Nombre total de cases correctement remplies (les erreurs sont ignorées dans cette implémentation)'
   },
   {
@@ -11029,8 +11041,12 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     text: 'Note standard - Code',
     type: 'number',
     required: false,
-    section: 'Subtest Code - Scores calculés',
+    section: 'WAIS-III (Wechsler, 1997) – Subtest Code',
     readonly: true,
+    visibleWhen: {
+      field: 'wais_cod_brut',
+      condition: 'isNotEmpty'
+    },
     help: 'Note standard selon les normes WAIS-III basée sur l\'âge'
   },
   {
@@ -11038,17 +11054,29 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     text: 'Valeur standardisée (Code)',
     type: 'number',
     required: false,
-    section: 'Subtest Code - Scores calculés',
+    section: 'WAIS-III (Wechsler, 1997) – Subtest Code',
     readonly: true,
+    visibleWhen: {
+      field: 'wais_cod_std',
+      condition: 'isNotEmpty'
+    },
     help: 'Valeur standardisée par rapport à une moyenne de 10 et un écart type de 3'
   },
-  // Symboles Subtest section
+  
+  // SECTION 2: Symboles Subtest
+  {
+    id: 'section_symboles',
+    text: 'WAIS-III (Wechsler, 1997) - Subtest Symboles',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'wais_symb_tot',
     text: 'Nombre total de cases remplies de façon correcte',
     type: 'number',
     required: true,
-    section: 'Subtest Symboles',
+    section: 'WAIS-III (Wechsler, 1997) – Subtest Symboles',
     min: 0
   },
   {
@@ -11056,7 +11084,7 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     text: 'Nombre de cases remplies de façon incorrecte',
     type: 'number',
     required: true,
-    section: 'Subtest Symboles',
+    section: 'WAIS-III (Wechsler, 1997) – Subtest Symboles',
     min: 0
   },
   {
@@ -11064,8 +11092,12 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     text: 'Note brute totale',
     type: 'number',
     required: false,
-    section: 'Subtest Symboles - Scores calculés',
+    section: 'WAIS-III (Wechsler, 1997) – Subtest Symboles',
     readonly: true,
+    visibleWhen: {
+      field: 'wais_symb_tot',
+      condition: 'isNotEmpty'
+    },
     help: 'Note brute = Total correct - Nombre incorrect'
   },
   {
@@ -11073,8 +11105,12 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     text: 'Note standard - Symboles',
     type: 'number',
     required: false,
-    section: 'Subtest Symboles - Scores calculés',
+    section: 'WAIS-III (Wechsler, 1997) – Subtest Symboles',
     readonly: true,
+    visibleWhen: {
+      field: 'wais_symb_brut',
+      condition: 'isNotEmpty'
+    },
     help: 'Note standard selon les normes WAIS-III basée sur l\'âge'
   },
   {
@@ -11082,46 +11118,77 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
     text: 'Valeur standardisée (Symboles)',
     type: 'number',
     required: false,
-    section: 'Subtest Symboles - Scores calculés',
+    section: 'WAIS-III (Wechsler, 1997) – Subtest Symboles',
     readonly: true,
+    visibleWhen: {
+      field: 'wais_symb_std',
+      condition: 'isNotEmpty'
+    },
     help: 'Valeur standardisée par rapport à une moyenne de 10 et un écart type de 3'
   },
-  // IVT section
+  
+  // SECTION 3: IVT
+  {
+    id: 'section_ivt',
+    text: 'WAIS-III (Wechsler, 1997) - Indice de Vitesse de Traitement (IVT)',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'wais_somme_ivt',
     text: 'Somme des notes standard',
     type: 'number',
     required: false,
-    section: 'IVT - Indice de Vitesse de Traitement',
+    section: 'WAIS-III (Wechsler, 1997) – Indice de Vitesse de Traitement (IVT)',
     readonly: true,
-    help: 'Note standard Code + Note standard Symboles'
+    visibleWhen: {
+      operator: 'and',
+      conditions: [
+        { field: 'wais_cod_std', condition: 'isNotEmpty' },
+        { field: 'wais_symb_std', condition: 'isNotEmpty' }
+      ]
+    },
+    help: 'Note standard Code + Note standard Symboles (calculée automatiquement)'
   },
   {
     id: 'wais_ivt',
     text: 'Indice de Vitesse de Traitement (IVT)',
     type: 'number',
     required: false,
-    section: 'IVT - Indice de Vitesse de Traitement',
+    section: 'WAIS-III (Wechsler, 1997) – Indice de Vitesse de Traitement (IVT)',
     readonly: true,
-    help: 'Indice composite dérivé de la table de conversion'
+    visibleWhen: {
+      field: 'wais_somme_ivt',
+      condition: 'isNotEmpty'
+    },
+    help: 'Indice composite dérivé de la table de conversion (calculé automatiquement)'
   },
   {
     id: 'wais_ivt_rang',
     text: 'Rang percentile de l\'IVT',
     type: 'text',
     required: false,
-    section: 'IVT - Indice de Vitesse de Traitement',
+    section: 'WAIS-III (Wechsler, 1997) – Indice de Vitesse de Traitement (IVT)',
     readonly: true,
-    help: 'Rang percentile de l\'Indice de Vitesse de Traitement'
+    visibleWhen: {
+      field: 'wais_ivt',
+      condition: 'isNotEmpty'
+    },
+    help: 'Rang percentile de l\'Indice de Vitesse de Traitement (calculé automatiquement)'
   },
   {
     id: 'wais_ivt_95',
     text: 'Intervalle de confiance à 95%',
     type: 'text',
     required: false,
-    section: 'IVT - Indice de Vitesse de Traitement',
+    section: 'WAIS-III (Wechsler, 1997) – Indice de Vitesse de Traitement (IVT)',
     readonly: true,
-    help: 'Intervalle de confiance à 95% de l\'IVT'
+    visibleWhen: {
+      field: 'wais_ivt',
+      condition: 'isNotEmpty'
+    },
+    help: 'Intervalle de confiance à 95% de l\'IVT (calculé automatiquement)'
   }
 ];
 

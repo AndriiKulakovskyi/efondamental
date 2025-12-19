@@ -176,6 +176,13 @@ export interface Question {
   maxLabel?: string;
   display_if?: any; // JSONLogic condition
   required_if?: any; // JSONLogic condition
+  visibleWhen?: { // Simple condition for field visibility
+    field: string;
+    condition: 'isNotEmpty';
+  } | {
+    operator: 'and' | 'or';
+    conditions: Array<{ field: string; condition: 'isNotEmpty' }>;
+  };
   metadata?: Record<string, any>;
   indentLevel?: number; // For visual indentation of branching questions
   is_label?: boolean; // Custom property to indicate if it's a label rather than an input
