@@ -3608,28 +3608,27 @@ export async function savePriseMResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Calculate section scores
-  const gastroScore = (response.q1 ?? 0) + (response.q2 ?? 0) + (response.q3 ?? 0) + (response.q4 ?? 0);
-  const cardiacScore = (response.q5 ?? 0) + (response.q6 ?? 0) + (response.q7 ?? 0);
-  const skinScore = (response.q8 ?? 0) + (response.q9 ?? 0) + (response.q10 ?? 0);
-  const neuroScore = (response.q11 ?? 0) + (response.q12 ?? 0) + (response.q13 ?? 0) + (response.q14 ?? 0);
-  const visionHearingScore = (response.q15 ?? 0) + (response.q16 ?? 0);
-  const sleepScore = (response.q21 ?? 0) + (response.q22 ?? 0);
-  const otherScore = (response.q26 ?? 0) + (response.q27 ?? 0) + (response.q28 ?? 0) + 
-                     (response.q29 ?? 0) + (response.q30 ?? 0) + (response.q31 ?? 0) + (response.q32 ?? 0);
+  // Remove demographic metadata fields that are not part of the table schema
+  const { patient_age, patient_gender, patient_sex, ...responseData } = response as any;
 
-  // Gender-specific scoring
-  let urogenitalScore = (response.q17 ?? 0) + (response.q18 ?? 0) + (response.q19 ?? 0);
-  let sexualScore = (response.q23 ?? 0) + (response.q24 ?? 0);
-  let itemsScored = 31; // Default excluding one gender-specific item
+  // Calculate section scores (updated for q1-q31 structure)
+  const gastroScore = (responseData.q1 ?? 0) + (responseData.q2 ?? 0) + (responseData.q3 ?? 0) + (responseData.q4 ?? 0);
+  const cardiacScore = (responseData.q5 ?? 0) + (responseData.q6 ?? 0) + (responseData.q7 ?? 0);
+  const skinScore = (responseData.q8 ?? 0) + (responseData.q9 ?? 0) + (responseData.q10 ?? 0);
+  const neuroScore = (responseData.q11 ?? 0) + (responseData.q12 ?? 0) + (responseData.q13 ?? 0) + (responseData.q14 ?? 0);
+  const visionHearingScore = (responseData.q15 ?? 0) + (responseData.q16 ?? 0);
+  const sleepScore = (responseData.q21 ?? 0) + (responseData.q22 ?? 0);
+  
+  // Updated: q25-q31 are "other" symptoms (was q26-q32)
+  const otherScore = (responseData.q25 ?? 0) + (responseData.q26 ?? 0) + (responseData.q27 ?? 0) + 
+                     (responseData.q28 ?? 0) + (responseData.q29 ?? 0) + (responseData.q30 ?? 0) + (responseData.q31 ?? 0);
 
-  if (response.gender === 'F') {
-    urogenitalScore += (response.q20 ?? 0);
-    itemsScored = response.q20 !== null && response.q20 !== undefined ? 32 : 31;
-  } else if (response.gender === 'M') {
-    sexualScore += (response.q25 ?? 0);
-    itemsScored = response.q25 !== null && response.q25 !== undefined ? 32 : 31;
-  }
+  // Urogenital and sexual scores (q17-q20 for urogenital, q23-q24 for sexual)
+  const urogenitalScore = (responseData.q17 ?? 0) + (responseData.q18 ?? 0) + (responseData.q19 ?? 0) + (responseData.q20 ?? 0);
+  const sexualScore = (responseData.q23 ?? 0) + (responseData.q24 ?? 0);
+  
+  // Count items scored (all 31 questions)
+  const itemsScored = 31;
 
   const totalScore = gastroScore + cardiacScore + skinScore + neuroScore + 
                      visionHearingScore + urogenitalScore + sleepScore + 
@@ -3638,7 +3637,7 @@ export async function savePriseMResponse(
   const { data, error } = await supabase
     .from('responses_prise_m')
     .upsert({
-      ...response,
+      ...responseData,
       gastro_score: gastroScore,
       cardiac_score: cardiacScore,
       skin_score: skinScore,

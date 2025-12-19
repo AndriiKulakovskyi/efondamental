@@ -577,73 +577,483 @@ export const EQ5D5L_DEFINITION: QuestionnaireDefinition = {
 
 // PRISE-M (Medication side effects - gender-specific)
 export const PRISE_M_QUESTIONS: Question[] = [
+  // Consigne initiale
   {
-    id: 'gender',
-    text: 'Sexe du patient',
+    id: 'instructions',
+    text: 'PRISE-M',
+    type: 'section',
+    required: false,
+    help: 'Pour tous les symptômes ci-dessous, cochez la case qui correspond à ce que vous avez ressenti au cours de la semaine écoulée. si, et seulement si, vous pensez que se sont des effets secondaires dus à votre traitement médicamenteux actuel.'
+  },
+  // Question de filtrage
+  {
+    id: 'taking_medication',
+    text: 'Prenez-vous actuellement un traitement médicamenteux ?',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 'M', label: 'Masculin' },
-      { code: 'F', label: 'Féminin' }
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
     ]
   },
+  
   // Section 1: Troubles gastro-intestinaux
-  { id: 'q1', text: 'Diarrhée', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q2', text: 'Constipation', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q3', text: 'Bouche sèche', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q4', text: 'Nausée, vomissement', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
+  {
+    id: 'section_gastro',
+    text: '1 - Troubles gastro-intestinaux',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q1', 
+    text: 'Diarrhée', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q2', 
+    text: 'Constipation', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q3', 
+    text: 'Bouche sèche', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q4', 
+    text: 'Nausée, vomissement', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  
   // Section 2: Troubles cardiaques
-  { id: 'q5', text: 'Palpitations', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q6', text: 'Vertiges', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q7', text: 'Douleurs dans la poitrine', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
+  {
+    id: 'section_cardio',
+    text: '2 - Troubles cardiaques',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q5', 
+    text: 'Palpitations', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q6', 
+    text: 'Vertiges', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q7', 
+    text: 'Douleurs dans la poitrine', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  
   // Section 3: Problèmes cutanés
-  { id: 'q8', text: 'Augmentation de la transpiration', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q9', text: 'Démangeaisons', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q10', text: 'Sécheresse de la peau', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
+  {
+    id: 'section_cutane',
+    text: '3 - Problèmes cutanés',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q8', 
+    text: 'Augmentation de la transpiration', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q9', 
+    text: 'Démangeaisons', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q10', 
+    text: 'Sécheresse de la peau', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  
   // Section 4: Troubles neurologiques
-  { id: 'q11', text: 'Mal à la tête', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q12', text: 'Tremblements', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q13', text: 'Mauvais contrôle moteur', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q14', text: 'Étourdissements', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
+  {
+    id: 'section_neuro',
+    text: '4 - Troubles neurologiques',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q11', 
+    text: 'Mal à la tête', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q12', 
+    text: 'Tremblements', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q13', 
+    text: 'Mauvais contrôle moteur', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q14', 
+    text: 'Étourdissements', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  
   // Section 5: Vision/Audition
-  { id: 'q15', text: 'Vision floue', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q16', text: 'Acouphènes (bourdonnements dans les oreilles)', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  // Section 6: Troubles uro-génital
-  { id: 'q17', text: 'Difficultés pour uriner', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q18', text: 'Mictions douloureuses', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q19', text: 'Mictions fréquentes', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
+  {
+    id: 'section_vision_audition',
+    text: '5 - Vision/Audition',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q15', 
+    text: 'Vision floue', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q16', 
+    text: 'Acouphènes (bourdonnements dans les oreilles)', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  
+  // Section 6: Troubles uro-génitaux
+  {
+    id: 'section_uro_genital',
+    text: '6 - Troubles uro-génitaux',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q17', 
+    text: 'Difficultés pour uriner', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q18', 
+    text: 'Mictions douloureuses', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q19', 
+    text: 'Mictions fréquentes', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
   {
     id: 'q20',
-    text: 'Règles irrégulières',
+    text: 'Règles irrégulières (pour les femmes)',
     type: 'single_choice',
     required: false,
-    options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }],
-    display_if: { "==": [{ "var": "answers.gender" }, "F"] },
-    required_if: { "==": [{ "var": "answers.gender" }, "F"] }
+    display_if: { 
+      "and": [
+        { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+        { "==": [{ "var": "answers.patient_gender" }, "F"] }
+      ]
+    },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ]
   },
+  
   // Section 7: Problèmes de sommeil
-  { id: 'q21', text: "Difficultés d'endormissement", type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q22', text: 'Augmentation du temps de sommeil', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  // Section 8: Fonctions sexuelles
-  { id: 'q23', text: 'Perte du désir sexuel', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q24', text: 'Difficultés à atteindre un orgasme', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
   {
-    id: 'q25',
-    text: "Troubles de l'érection",
-    type: 'single_choice',
+    id: 'section_sommeil',
+    text: '7 - Problèmes de sommeil',
+    type: 'section',
     required: false,
-    options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }],
-    display_if: { "==": [{ "var": "answers.gender" }, "M"] },
-    required_if: { "==": [{ "var": "answers.gender" }, "M"] }
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
   },
+  { 
+    id: 'q21', 
+    text: "Difficultés d'endormissement", 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q22', 
+    text: 'Augmentation du temps de sommeil', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  
+  // Section 8: Fonctions sexuelles
+  {
+    id: 'section_sexuel',
+    text: '8 - Fonctions sexuelles',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q23', 
+    text: 'Perte du désir sexuel', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q24', 
+    text: "Difficultés à atteindre un orgasme (Troubles de l'érection pour l'homme)", 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  
   // Section 9: Autres troubles
-  { id: 'q26', text: 'Anxiété', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q27', text: 'Difficultés de concentration', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q28', text: 'Malaise général', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q29', text: 'Agitation', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q30', text: 'Fatigue', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q31', text: "Diminution de l'énergie", type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q32', text: 'Prise de poids', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] }
+  {
+    id: 'section_autres',
+    text: '9 - Autres troubles',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q25', 
+    text: 'Anxiété', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q26', 
+    text: 'Difficultés de concentration', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q27', 
+    text: 'Malaise général', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q28', 
+    text: 'Agitation', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q29', 
+    text: 'Fatigue', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q30', 
+    text: "Diminution de l'énergie", 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q31', 
+    text: 'Prise de poids', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  }
 ];
 
 export const PRISE_M_DEFINITION: QuestionnaireDefinition = {
@@ -654,7 +1064,8 @@ export const PRISE_M_DEFINITION: QuestionnaireDefinition = {
   questions: PRISE_M_QUESTIONS,
   metadata: {
     pathologies: ['bipolar'],
-    target_role: 'patient'
+    target_role: 'patient',
+    instructions: 'Consignes : Pour tous les symptômes ci-dessous, cochez la case qui correspond à ce que vous avez ressenti au cours de la semaine écoulée. si, et seulement si, vous pensez que se sont des effets secondaires dus à votre traitement médicamenteux actuel.'
   }
 };
 
