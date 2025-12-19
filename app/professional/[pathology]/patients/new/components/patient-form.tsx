@@ -24,6 +24,7 @@ export function PatientForm({ pathology, doctors, currentUserId }: PatientFormPr
     firstName: "",
     lastName: "",
     dateOfBirth: "",
+    yearsOfEducation: "",
     medicalRecordNumber: "",
     gender: "",
     placeOfBirth: "",
@@ -172,6 +173,26 @@ export function PatientForm({ pathology, doctors, currentUserId }: PatientFormPr
                 required
               />
               <p className="text-[10px] text-slate-400 mt-1.5 ml-1">Le patient doit avoir au moins 15 ans</p>
+            </div>
+
+            {/* Annees d'etudes */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Annees d&apos;etudes (depuis le CP) <span className="text-brand">*</span>
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="30"
+                value={formData.yearsOfEducation}
+                onChange={(e) => setFormData({ ...formData, yearsOfEducation: e.target.value })}
+                placeholder="Ex: 12"
+                className={inputClassName}
+                required
+              />
+              <p className="text-[10px] text-slate-400 mt-1.5 ml-1">
+                Nombre total d&apos;annees de scolarite (CP = 1ere annee)
+              </p>
             </div>
 
             {/* Numero de dossier medical */}

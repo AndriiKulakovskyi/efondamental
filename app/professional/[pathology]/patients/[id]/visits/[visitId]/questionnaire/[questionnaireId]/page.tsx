@@ -460,6 +460,27 @@ export default async function ProfessionalQuestionnairePage({
       } else {
         console.log('[Demographics Debug] Patient has no gender!');
       }
+      
+      // Inject years_of_education if available
+      if (patient.years_of_education !== null && patient.years_of_education !== undefined) {
+        console.log('[Demographics Debug] Years of education:', patient.years_of_education);
+        
+        // Most questionnaires use years_of_education
+        initialResponses = { ...initialResponses, years_of_education: patient.years_of_education };
+        
+        // WAIS3 Digit Span uses 'education_level' field (categorized)
+        if (code === 'WAIS3_DIGIT_SPAN_FR') {
+          // Convert years to category: 0: <2, 1: 2-11, 2: 12, 3: 13-14, 4: >=15
+          let educationLevel = 0;
+          if (patient.years_of_education >= 15) educationLevel = 4;
+          else if (patient.years_of_education >= 13) educationLevel = 3;
+          else if (patient.years_of_education === 12) educationLevel = 2;
+          else if (patient.years_of_education >= 2) educationLevel = 1;
+          
+          initialResponses = { ...initialResponses, education_level: educationLevel };
+          console.log('[Demographics Debug] Converted to education_level category:', educationLevel);
+        }
+      }
     }
     
     console.log('[Demographics Debug] Final initialResponses keys:', Object.keys(initialResponses));

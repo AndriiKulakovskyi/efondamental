@@ -84,6 +84,7 @@ export interface Patient {
   metadata: Record<string, any> | null;
   active: boolean;
   assigned_to: string | null;
+  years_of_education: number | null;
   created_by: string;
   created_at: string;
   updated_at: string;

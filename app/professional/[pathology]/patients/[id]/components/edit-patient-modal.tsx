@@ -32,6 +32,7 @@ interface PatientData {
   phone: string | null;
   address: string | null;
   emergency_contact: EmergencyContact | null;
+  years_of_education: number | null;
 }
 
 interface EditPatientModalProps {
@@ -58,6 +59,7 @@ export function EditPatientModal({ patient, isOpen, onClose }: EditPatientModalP
   const [firstName, setFirstName] = useState(patient.first_name);
   const [lastName, setLastName] = useState(patient.last_name);
   const [dateOfBirth, setDateOfBirth] = useState(patient.date_of_birth);
+  const [yearsOfEducation, setYearsOfEducation] = useState(patient.years_of_education?.toString() || "");
   const [gender, setGender] = useState(normalizeGender(patient.gender));
   const [placeOfBirth, setPlaceOfBirth] = useState(patient.place_of_birth || "");
   const [email, setEmail] = useState(patient.email || "");
@@ -134,6 +136,7 @@ export function EditPatientModal({ patient, isOpen, onClose }: EditPatientModalP
           first_name: firstName.trim(),
           last_name: lastName.trim(),
           date_of_birth: dateOfBirth,
+          years_of_education: yearsOfEducation ? parseInt(yearsOfEducation) : null,
           gender: gender || null,
           place_of_birth: placeOfBirth.trim() || null,
           email: email.trim() || null,
@@ -225,6 +228,24 @@ export function EditPatientModal({ patient, isOpen, onClose }: EditPatientModalP
               </div>
               
               <div className="space-y-2">
+                <Label htmlFor="yearsOfEducation">Annees d&apos;etudes (depuis le CP) *</Label>
+                <Input
+                  id="yearsOfEducation"
+                  type="number"
+                  min="0"
+                  max="30"
+                  value={yearsOfEducation}
+                  onChange={(e) => setYearsOfEducation(e.target.value)}
+                  required
+                />
+                <p className="text-xs text-slate-500">
+                  Nombre total d&apos;annees de scolarite
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label htmlFor="gender">Sexe a la naissance *</Label>
                 <select
                   id="gender"
@@ -238,19 +259,19 @@ export function EditPatientModal({ patient, isOpen, onClose }: EditPatientModalP
                   <option value="F">Femme</option>
                 </select>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="placeOfBirth">Lieu de naissance</Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <Input
-                  id="placeOfBirth"
-                  value={placeOfBirth}
-                  onChange={(e) => setPlaceOfBirth(e.target.value)}
-                  placeholder="Lieu de naissance"
-                  className="pl-10"
-                />
+              <div className="space-y-2">
+                <Label htmlFor="placeOfBirth">Lieu de naissance</Label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input
+                    id="placeOfBirth"
+                    value={placeOfBirth}
+                    onChange={(e) => setPlaceOfBirth(e.target.value)}
+                    placeholder="Lieu de naissance"
+                    className="pl-10"
+                  />
+                </div>
               </div>
             </div>
           </div>

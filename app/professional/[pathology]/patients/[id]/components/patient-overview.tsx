@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User, Calendar, Mail, Phone, MapPin, Users, Heart, Pencil } from "lucide-react";
+import { User, Calendar, Mail, Phone, MapPin, Users, Heart, Pencil, GraduationCap } from "lucide-react";
 import { formatShortDate, calculateAge } from "@/lib/utils/date";
 import { Button } from "@/components/ui/button";
 import { EditPatientModal } from "./edit-patient-modal";
@@ -61,6 +61,18 @@ export function PatientOverview({ patient }: PatientOverviewProps) {
               <dt className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Genre</dt>
               <dd className="text-sm text-slate-900 font-medium mt-0.5 capitalize">
                 {patient.gender || "Non spécifié"}
+              </dd>
+            </div>
+          </div>
+          
+          <div className="flex items-start gap-3">
+            <GraduationCap className="h-4 w-4 text-slate-400 mt-0.5" />
+            <div className="flex-1">
+              <dt className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Années d&apos;études</dt>
+              <dd className="text-sm text-slate-900 font-medium mt-0.5">
+                {patient.years_of_education !== null && patient.years_of_education !== undefined 
+                  ? `${patient.years_of_education} ans` 
+                  : "Non spécifié"}
               </dd>
             </div>
           </div>

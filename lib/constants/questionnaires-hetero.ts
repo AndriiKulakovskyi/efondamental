@@ -7780,8 +7780,9 @@ export const WAIS4_CRITERIA_QUESTIONS: Question[] = [
     text: 'Nombre d\'années d\'études (depuis les cours préparatoires)',
     type: 'number',
     required: true,
+    readonly: true,
     min: 0,
-    help: 'Nombre total d\'années de scolarité'
+    help: 'Calculé automatiquement depuis le profil du patient'
   },
   {
     id: 'no_visual_impairment',
@@ -11226,6 +11227,7 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     text: 'Niveau d\'études',
     type: 'single_choice',
     required: false,
+    readonly: true,
     section: 'Données démographiques',
     options: [
       { code: 0, label: '< 2 ans', score: 0 },
@@ -11234,7 +11236,16 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
       { code: 3, label: '13-14 ans', score: 3 },
       { code: 4, label: '>= 15 ans', score: 4 }
     ],
-    help: 'Niveau d\'études pour le calcul des z-scores d\'empan'
+    help: 'Calculé automatiquement depuis le profil du patient'
+  },
+  
+  // Section header for Forward Digit Span
+  {
+    id: 'section_direct',
+    text: 'Empan de chiffres en ordre direct',
+    type: 'section',
+    required: false,
+    section: ''
   },
   
   // Forward (Ordre Direct) items
@@ -11441,6 +11452,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     section: 'Scores - Ordre Direct',
     readonly: true,
     help: 'Z-score basé sur l\'âge et le niveau d\'études'
+  },
+  
+  // Section header for Backward Digit Span
+  {
+    id: 'section_inverse',
+    text: 'Empan de chiffres en ordre inverse',
+    type: 'section',
+    required: false,
+    section: ''
   },
   
   // Backward (Ordre Inverse) items

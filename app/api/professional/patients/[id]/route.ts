@@ -45,6 +45,7 @@ export async function PATCH(
       first_name,
       last_name,
       date_of_birth,
+      years_of_education,
       gender,
       place_of_birth,
       email, 
@@ -133,6 +134,12 @@ export async function PATCH(
       updates.date_of_birth = date_of_birth;
       if (patient.date_of_birth !== date_of_birth) {
         changes.date_of_birth = { old: patient.date_of_birth, new: date_of_birth };
+      }
+    }
+    if (years_of_education !== undefined) {
+      updates.years_of_education = years_of_education;
+      if ((patient as any).years_of_education !== years_of_education) {
+        changes.years_of_education = { old: (patient as any).years_of_education, new: years_of_education };
       }
     }
     if (gender !== undefined) {
