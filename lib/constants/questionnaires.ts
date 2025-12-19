@@ -1070,27 +1070,36 @@ export const PRISE_M_DEFINITION: QuestionnaireDefinition = {
 };
 
 // STAI-YA (State anxiety)
+// STAI-YA (State anxiety)
 export const STAI_YA_QUESTIONS: Question[] = [
-  { id: 'q1', text: 'Je me sens calme.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q2', text: 'Je me sens en sécurité, sans inquiétude, en sûreté.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q3', text: 'Je suis tendu(e), crispé(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q4', text: 'Je me sens surmené(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q5', text: 'Je me sens tranquille, bien dans ma peau.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q6', text: 'Je me sens ému(e), bouleversé(e), contrarié(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q7', text: "L'idée de malheurs éventuels me tracasse en ce moment.", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q8', text: 'Je me sens content(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q9', text: 'Je me sens effrayé(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q10', text: 'Je me sens à mon aise.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q11', text: "Je sens que j'ai confiance en moi.", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q12', text: 'Je me sens nerveux (nerveuse), irritable.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q13', text: "J'ai la frousse, la trouille (j'ai peur).", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q14', text: 'Je me sens indécis(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q15', text: 'Je suis décontracté(e), détendu(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q16', text: 'Je suis satisfait(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q17', text: 'Je suis inquiet, soucieux (inquiète, soucieuse).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q18', text: "Je ne sais plus où j'en suis, je me sens déconcerté(e), dérouté(e).", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q19', text: 'Je me sens solide, posé(e), pondéré(e), réfléchi(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q20', text: 'Je me sens de bonne humeur, aimable.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] }
+  {
+    id: 'instructions',
+    text: 'Consignes',
+    type: 'section',
+    required: false,
+    help: "Un certain nombre de phrases que l'on utilise pour se décrire sont données ci-dessous. Lisez chaque phrase, puis cochez, parmi les quatre points à droite, celui qui correspond le mieux à ce que vous ressentez A L'INSTANT, JUSTE EN CE MOMENT. Il n'y a pas de bonnes ni de mauvaises réponses. Ne passez pas trop de temps sur l'une ou l'autre de ces propositions, et indiquez la réponse qui décrit le mieux vos sentiments actuels."
+  },
+  { id: 'q1', text: '1. Je me sens calme.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q2', text: '2. Je me sens en sécurité, sans inquiétude, en sûreté.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q3', text: '3. Je suis tendu(e), crispé(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q4', text: '4. Je me sens surmené(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q5', text: '5. Je me sens tranquille, bien dans ma peau.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q6', text: '6. Je me sens ému(e), bouleversé(e), contrarié(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q7', text: "7. L'idée de malheurs éventuels me tracasse en ce moment.", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q8', text: '8. Je me sens content(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q9', text: '9. Je me sens effrayé(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q10', text: '10. Je me sens à mon aise.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q11', text: "11. Je sens que j'ai confiance en moi.", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q12', text: '12. Je me sens nerveux (nerveuse), irritable.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q13', text: "13. J'ai la frousse, la trouille (j'ai peur).", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q14', text: '14. Je me sens indécis(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q15', text: '15. Je suis décontracté(e), détendu(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q16', text: '16. Je suis satisfait(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q17', text: '17. Je suis inquiet, soucieux (inquiète, soucieuse).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q18', text: "18. Je ne sais plus où j'en suis, je me sens déconcerté(e), dérouté(e).", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q19', text: '19. Je me sens solide, posé(e), pondéré(e), réfléchi(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q20', text: '20. Je me sens de bonne humeur, aimable.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'note_t', text: 'Note T', type: 'number', required: false, help: 'Saisissez la Note T calculée.' }
 ];
 
 export const STAI_YA_DEFINITION: QuestionnaireDefinition = {
@@ -1102,7 +1111,8 @@ export const STAI_YA_DEFINITION: QuestionnaireDefinition = {
   metadata: {
     pathologies: ['bipolar'],
     target_role: 'patient',
-    reverse_items: [1, 2, 5, 8, 10, 11, 15, 16, 19, 20]
+    reverse_items: [1, 2, 5, 8, 10, 11, 15, 16, 19, 20],
+    instructions: "Un certain nombre de phrases que l'on utilise pour se décrire sont données ci-dessous. Lisez chaque phrase, puis cochez, parmi les quatre points à droite, celui qui correspond le mieux à ce que vous ressentez A L'INSTANT, JUSTE EN CE MOMENT. Il n'y a pas de bonnes ni de mauvaises réponses. Ne passez pas trop de temps sur l'une ou l'autre de ces propositions, et indiquez la réponse qui décrit le mieux vos sentiments actuels."
   }
 };
 

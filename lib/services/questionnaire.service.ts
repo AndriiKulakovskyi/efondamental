@@ -3682,12 +3682,15 @@ export async function saveStaiYaResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
+  // Remove instructions section if present
+  const { instructions, ...responseData } = response as any;
+
   // Reverse score items: 1, 2, 5, 8, 10, 11, 15, 16, 19, 20
   const reverseItems = [1, 2, 5, 8, 10, 11, 15, 16, 19, 20];
   let totalScore = 0;
 
   for (let i = 1; i <= 20; i++) {
-    const value = response[`q${i}` as keyof StaiYaResponseInsert] as number;
+    const value = responseData[`q${i}` as keyof StaiYaResponseInsert] as number;
     if (reverseItems.includes(i)) {
       totalScore += (5 - value);
     } else {
@@ -3697,24 +3700,27 @@ export async function saveStaiYaResponse(
 
   let anxietyLevel = '';
   let interpretation = '';
-  if (totalScore <= 35) {
-    anxietyLevel = 'low';
-    interpretation = 'Anxiété faible';
+  if (totalScore < 35) {
+    anxietyLevel = 'very_low';
+    interpretation = 'Anxiété état très faible';
   } else if (totalScore <= 45) {
-    anxietyLevel = 'moderate';
-    interpretation = 'Anxiété modérée';
+    anxietyLevel = 'low';
+    interpretation = 'Anxiété état faible';
   } else if (totalScore <= 55) {
+    anxietyLevel = 'moderate';
+    interpretation = 'Anxiété état moyenne';
+  } else if (totalScore <= 65) {
     anxietyLevel = 'high';
-    interpretation = 'Anxiété élevée';
+    interpretation = 'Anxiété état élevée';
   } else {
     anxietyLevel = 'very_high';
-    interpretation = 'Anxiété très élevée';
+    interpretation = 'Anxiété état très élevée';
   }
 
   const { data, error } = await supabase
     .from('responses_stai_ya')
     .upsert({
-      ...response,
+      ...responseData,
       total_score: totalScore,
       anxiety_level: anxietyLevel,
       interpretation,
