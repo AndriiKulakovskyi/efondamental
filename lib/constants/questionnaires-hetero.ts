@@ -11212,6 +11212,12 @@ export const WAIS3_CODE_SYMBOLES_DEFINITION: QuestionnaireDefinition = {
 export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
   // Demographics section
   {
+      id: 'section_demo',
+      text: 'Données démographiques',
+      type: 'section',
+      required: false
+  },
+  {
     id: 'patient_age',
     text: 'Âge du patient (calculé automatiquement)',
     type: 'number',
@@ -11244,8 +11250,7 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     id: 'section_direct',
     text: 'Empan de chiffres en ordre direct',
     type: 'section',
-    required: false,
-    section: ''
+    required: false
   },
   
   // Forward (Ordre Direct) items
@@ -11459,8 +11464,7 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     id: 'section_inverse',
     text: 'Empan de chiffres en ordre inverse',
     type: 'section',
-    required: false,
-    section: ''
+    required: false
   },
   
   // Backward (Ordre Inverse) items
