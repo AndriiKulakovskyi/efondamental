@@ -3818,60 +3818,47 @@ export async function saveMathysResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
+  // Remove metadata fields that are not part of the table schema
+  const { instructions, emotions_section, ...responseData } = response as any;
+
   // Reverse score items: 5, 6, 7, 8, 9, 10, 17, 18
   const reverseItems = [5, 6, 7, 8, 9, 10, 17, 18];
-  
-  // Calculate subscales
-  let emotionalHyperreactivity = 0;
-  let emotionalHyporeactivity = 0;
-  let cognitiveSpeed = 0;
-  let motorActivity = 0;
-  let motivation = 0;
   
   // Apply reverse scoring and calculate subscales
   const processedScores: Record<number, number> = {};
   for (let i = 1; i <= 20; i++) {
-    let value = response[`q${i}` as keyof MathysResponseInsert] as number;
+    const rawValue = responseData[`q${i}` as keyof MathysResponseInsert] as number;
     if (reverseItems.includes(i)) {
-      value = 10 - value;
+      processedScores[i] = 10 - rawValue;
+    } else {
+      processedScores[i] = rawValue;
     }
-    processedScores[i] = value;
   }
   
-  // Subscale mappings (from Python implementation)
-  emotionalHyperreactivity = (processedScores[1] + processedScores[3] + 
-                              processedScores[11] + processedScores[13] + processedScores[16]) / 5;
-  emotionalHyporeactivity = (processedScores[2] + processedScores[4] + 
-                             processedScores[12] + processedScores[14] + processedScores[19]) / 5;
-  cognitiveSpeed = (processedScores[5] + processedScores[8] + processedScores[15]) / 3;
-  motorActivity = (processedScores[6] + processedScores[7] + processedScores[18]) / 3;
-  motivation = (processedScores[9] + processedScores[10] + processedScores[17] + processedScores[20]) / 4;
+  // New Subscale calculations (Sums as per user request)
+  const subscoreEmotion = processedScores[3] + processedScores[7] + processedScores[10] + processedScores[18];
+  const subscoreMotivation = processedScores[2] + processedScores[11] + processedScores[12] + processedScores[15] + processedScores[16] + processedScores[17] + processedScores[19];
+  const subscorePerception = processedScores[1] + processedScores[6] + processedScores[8] + processedScores[13] + processedScores[20];
+  const subscoreInteraction = processedScores[4] + processedScores[14];
+  const subscoreCognition = processedScores[5] + processedScores[9];
   
-  const totalScore = (emotionalHyperreactivity + emotionalHyporeactivity + 
-                      cognitiveSpeed + motorActivity + motivation) / 5;
+  const totalScore = subscoreEmotion + subscoreMotivation + subscorePerception + subscoreInteraction + subscoreCognition;
   
-  let interpretation = `Score total: ${totalScore.toFixed(2)}/10. `;
-  if (totalScore >= 7) {
-    interpretation += 'État thymique très élevé.';
-  } else if (totalScore >= 5) {
-    interpretation += 'État thymique modérément élevé.';
-  } else if (totalScore >= 3) {
-    interpretation += 'État thymique normal.';
-  } else {
-    interpretation += 'État thymique bas.';
-  }
-
   const { data, error } = await supabase
     .from('responses_mathys')
     .upsert({
-      ...response,
-      emotional_hyperreactivity: Number(emotionalHyperreactivity.toFixed(2)),
-      emotional_hyporeactivity: Number(emotionalHyporeactivity.toFixed(2)),
-      cognitive_speed: Number(cognitiveSpeed.toFixed(2)),
-      motor_activity: Number(motorActivity.toFixed(2)),
-      motivation: Number(motivation.toFixed(2)),
-      total_score: Number(totalScore.toFixed(2)),
-      interpretation,
+      ...responseData,
+      emotional_hyperreactivity: Number((subscoreEmotion / 4).toFixed(2)),
+      emotional_hyporeactivity: Number((subscoreMotivation / 7).toFixed(2)),
+      cognitive_speed: Number((subscoreCognition / 2).toFixed(2)),
+      motor_activity: Number((subscorePerception / 5).toFixed(2)),
+      motivation: Number((subscoreInteraction / 2).toFixed(2)),
+      subscore_emotion: subscoreEmotion,
+      subscore_motivation: subscoreMotivation,
+      subscore_perception: subscorePerception,
+      subscore_interaction: subscoreInteraction,
+      subscore_cognition: subscoreCognition,
+      total_score: totalScore,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

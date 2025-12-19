@@ -480,6 +480,40 @@ export function QuestionnaireRenderer({
         }
       }
 
+      // Compute MATHYS sums progressively as fields are entered
+      const mathysFields = Array.from({ length: 20 }, (_, i) => `q${i + 1}`);
+      const hasAnyMathysQ = mathysFields.some(f => prev[f] !== undefined && prev[f] !== null);
+      if (hasAnyMathysQ) {
+        const reverseItems = [5, 6, 7, 8, 9, 10, 17, 18];
+        const processed: Record<number, number> = {};
+        for (let i = 1; i <= 20; i++) {
+          const val = prev[`q${i}`];
+          if (val !== undefined && val !== null) {
+            processed[i] = reverseItems.includes(i) ? 10 - Number(val) : Number(val);
+          } else {
+            processed[i] = 0;
+          }
+        }
+        
+        // Sums as per request (Emotion=3+7+10+18, Motivation=2+11+12+15+16+17+19, etc.)
+        const sumEmotion = processed[3] + processed[7] + processed[10] + processed[18];
+        const sumMotivation = processed[2] + processed[11] + processed[12] + processed[15] + processed[16] + processed[17] + processed[19];
+        const sumPerception = processed[1] + processed[6] + processed[8] + processed[13] + processed[20];
+        const sumInteraction = processed[4] + processed[14];
+        const sumCognition = processed[5] + processed[9];
+        
+        // Update subscores (Sums)
+        if (updated.subscore_emotion !== sumEmotion) { updated.subscore_emotion = sumEmotion; hasChanges = true; }
+        if (updated.subscore_motivation !== sumMotivation) { updated.subscore_motivation = sumMotivation; hasChanges = true; }
+        if (updated.subscore_perception !== sumPerception) { updated.subscore_perception = sumPerception; hasChanges = true; }
+        if (updated.subscore_interaction !== sumInteraction) { updated.subscore_interaction = sumInteraction; hasChanges = true; }
+        if (updated.subscore_cognition !== sumCognition) { updated.subscore_cognition = sumCognition; hasChanges = true; }
+        
+        // Total score sum
+        const mathysTotal = sumEmotion + sumMotivation + sumPerception + sumInteraction + sumCognition;
+        if (updated.total_score !== mathysTotal) { updated.total_score = mathysTotal; hasChanges = true; }
+      }
+
       // Compute SCIP Z-scores
       // Simple formula: Z = (raw_score - mean) / std for each subscale
       const SCIP_NORMS = {
@@ -1428,7 +1462,12 @@ export function QuestionnaireRenderer({
     responses.inverse_1a, responses.inverse_1b, responses.inverse_2a, responses.inverse_2b,
     responses.inverse_3a, responses.inverse_3b, responses.inverse_4a, responses.inverse_4b,
     responses.inverse_5a, responses.inverse_5b, responses.inverse_6a, responses.inverse_6b,
-    responses.inverse_7a, responses.inverse_7b, responses.inverse_8a, responses.inverse_8b
+    responses.inverse_7a, responses.inverse_7b, responses.inverse_8a, responses.inverse_8b,
+    // MATHYS items
+    responses.q1, responses.q2, responses.q3, responses.q4, responses.q5,
+    responses.q6, responses.q7, responses.q8, responses.q9, responses.q10,
+    responses.q11, responses.q12, responses.q13, responses.q14, responses.q15,
+    responses.q16, responses.q17, responses.q18, responses.q19, responses.q20
   ]);
 
   // Separate useEffect for Rapport Total / HDL calculation (lipid profile)
@@ -1757,24 +1796,51 @@ export function QuestionnaireRenderer({
 
         {question.type === "scale" && (
           <div className="space-y-2">
-            <Input
-              id={question.id}
-              type="range"
-              value={value || question.min || 0}
-              onChange={(e) =>
-                handleResponseChange(question.id, Number(e.target.value))
-              }
-              min={question.min || 0}
-              max={question.max || 10}
-              disabled={readonly}
-              required={isRequired}
-              className="w-full"
-            />
-            <div className="flex justify-between text-xs text-slate-500">
-              <span>{question.minLabel || question.min}</span>
-              <span className="font-semibold">{value || question.min || 0}</span>
-              <span>{question.maxLabel || question.max}</span>
-            </div>
+            {!value && value !== 0 ? (
+              <div 
+                className="w-full h-10 bg-slate-100 rounded-lg flex items-center justify-center cursor-pointer hover:bg-slate-200 transition-colors border-2 border-dashed border-slate-300"
+                onClick={() => handleResponseChange(question.id, question.min || 0)}
+              >
+                <span className="text-sm text-slate-500 font-medium">Cliquez pour noter (0 à 10)</span>
+              </div>
+            ) : (
+              <>
+                <Input
+                  id={question.id}
+                  type="range"
+                  value={value}
+                  onChange={(e) =>
+                    handleResponseChange(question.id, Number(e.target.value))
+                  }
+                  min={question.min || 0}
+                  max={question.max || 10}
+                  step={question.metadata?.step || 1}
+                  disabled={readonly}
+                  required={isRequired}
+                  className="w-full accent-brand"
+                />
+                <div className="flex justify-between text-xs text-slate-500">
+                  <span className="cursor-pointer hover:text-brand transition-colors" onClick={() => handleResponseChange(question.id, question.min || 0)}>
+                    {question.minLabel || question.min}
+                  </span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-lg font-bold text-brand bg-brand/10 px-3 py-1 rounded-full mb-1">
+                      {value}
+                    </span>
+                    <button 
+                      type="button" 
+                      className="text-[10px] text-slate-400 hover:text-red-500 transition-colors underline"
+                      onClick={() => handleResponseChange(question.id, null)}
+                    >
+                      Effacer
+                    </button>
+                  </div>
+                  <span className="cursor-pointer hover:text-brand transition-colors" onClick={() => handleResponseChange(question.id, question.max || 10)}>
+                    {question.maxLabel || question.max}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         )}
 

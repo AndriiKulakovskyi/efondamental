@@ -1233,27 +1233,61 @@ export const MARS_DEFINITION: QuestionnaireDefinition = {
 };
 
 // MAThyS (Multidimensional thymic states)
+// MAThyS (Multidimensional thymic states)
 export const MATHYS_QUESTIONS: Question[] = [
-  { id: 'q1', text: "Je suis moins sensible que d'habitude aux couleurs / Je suis plus sensible que d'habitude aux couleurs", type: 'scale', required: true, min: 0, max: 10, minLabel: "Moins sensible", maxLabel: "Plus sensible" },
-  { id: 'q2', text: "Je manque de tonus / J'ai une tension interne importante", type: 'scale', required: true, min: 0, max: 10, minLabel: "Manque de tonus", maxLabel: "Tension interne" },
-  { id: 'q3', text: "J'ai l'impression d'être anesthésié(e) sur le plan des émotions / J'ai parfois le sentiment de perdre le contrôle de mes émotions", type: 'scale', required: true, min: 0, max: 10, minLabel: "Anesthésié(e)", maxLabel: "Perte de contrôle" },
-  { id: 'q4', text: "Je suis replié(e) sur moi / J'ai l'impression d'être ouvert(e) au monde", type: 'scale', required: true, min: 0, max: 10, minLabel: "Replié(e)", maxLabel: "Ouvert(e)" },
-  { id: 'q5', text: "Mes pensées vont lentement / Mes pensées vont vite", type: 'scale', required: true, min: 0, max: 10, minLabel: "Pensées lentes", maxLabel: "Pensées rapides" },
-  { id: 'q6', text: "Mes mouvements sont lents / Mes mouvements sont rapides", type: 'scale', required: true, min: 0, max: 10, minLabel: "Mouvements lents", maxLabel: "Mouvements rapides" },
-  { id: 'q7', text: "Je me sens ralenti(e) / Je me sens accéléré(e)", type: 'scale', required: true, min: 0, max: 10, minLabel: "Ralenti(e)", maxLabel: "Accéléré(e)" },
-  { id: 'q8', text: "J'ai des difficultés à penser / Je pense avec facilité", type: 'scale', required: true, min: 0, max: 10, minLabel: "Difficultés", maxLabel: "Facilité" },
-  { id: 'q9', text: "Je n'ai envie de rien / J'ai envie de plein de choses", type: 'scale', required: true, min: 0, max: 10, minLabel: "Aucune envie", maxLabel: "Plein d'envies" },
-  { id: 'q10', text: "Je n'ai pas d'intérêt pour ce qui m'entoure / Je suis très intéressé(e) par ce qui m'entoure", type: 'scale', required: true, min: 0, max: 10, minLabel: "Pas d'intérêt", maxLabel: "Très intéressé(e)" },
-  { id: 'q11', text: "Mes sens (goût, toucher, odorat, vue, ouïe) me semblent émoussés / Mes sens (goût, toucher, odorat, vue, ouïe) me semblent aiguisés", type: 'scale', required: true, min: 0, max: 10, minLabel: "Sens émoussés", maxLabel: "Sens aiguisés" },
-  { id: 'q12', text: "Je n'ai pas d'énergie / J'ai beaucoup d'énergie", type: 'scale', required: true, min: 0, max: 10, minLabel: "Pas d'énergie", maxLabel: "Beaucoup d'énergie" },
-  { id: 'q13', text: "Je me sens triste / Je me sens gai(e)", type: 'scale', required: true, min: 0, max: 10, minLabel: "Triste", maxLabel: "Gai(e)" },
-  { id: 'q14', text: "Je me sens calme / Je me sens agité(e)", type: 'scale', required: true, min: 0, max: 10, minLabel: "Calme", maxLabel: "Agité(e)" },
-  { id: 'q15', text: "J'ai peu d'idées / J'ai plein d'idées", type: 'scale', required: true, min: 0, max: 10, minLabel: "Peu d'idées", maxLabel: "Plein d'idées" },
-  { id: 'q16', text: "Je suis peu réactif(ve) à ce qui m'entoure / Je suis très réactif(ve) à ce qui m'entoure", type: 'scale', required: true, min: 0, max: 10, minLabel: "Peu réactif(ve)", maxLabel: "Très réactif(ve)" },
-  { id: 'q17', text: "Je ne prends aucune initiative / Je prends beaucoup d'initiatives", type: 'scale', required: true, min: 0, max: 10, minLabel: "Aucune initiative", maxLabel: "Beaucoup d'initiatives" },
-  { id: 'q18', text: "Je ne me lance dans aucune activité / Je me lance dans plein d'activités", type: 'scale', required: true, min: 0, max: 10, minLabel: "Aucune activité", maxLabel: "Plein d'activités" },
-  { id: 'q19', text: "J'ai l'impression de vivre au ralenti / J'ai l'impression de vivre intensement", type: 'scale', required: true, min: 0, max: 10, minLabel: "Au ralenti", maxLabel: "Intensement" },
-  { id: 'q20', text: "Je me sens fatigué(e) / Je me sens en pleine forme", type: 'scale', required: true, min: 0, max: 10, minLabel: "Fatigué(e)", maxLabel: "Pleine forme" }
+  {
+    id: 'instructions',
+    text: 'Consignes',
+    type: 'section',
+    required: false,
+    help: "Consigne de cotation : coter toujours le score le plus extrême (0 au lieu de 1 par exemple ; 10 au lieu de 9). Chaque item est coté entre 0 et 10, avec possibilité de demi points (Ex.: 2.5).\n\n**Attention : contrairement au calque, ne pas inverser les scores préalablement. ex: item 9: Mon cerveau ne s'arrête pas = 0 | Mon cerveau fonctionne au ralenti = 10.**"
+  },
+  { id: 'q1', text: "1. Je suis moins sensible que d'habitude aux couleurs | Je suis plus sensible que d'habitude aux couleurs", type: 'scale', required: true, min: 0, max: 10, minLabel: "Moins sensible", maxLabel: "Plus sensible", metadata: { step: 0.5 } },
+  { id: 'q2', text: "2. Je manque de tonus | J'ai une tension interne importante", type: 'scale', required: true, min: 0, max: 10, minLabel: "Manque de tonus", maxLabel: "Tension interne", metadata: { step: 0.5 } },
+  { id: 'q3', text: "3. J'ai l'impression d'être anesthésié(e) sur le plan des émotions | J'ai parfois le sentiment de perdre le contrôle de mes émotions", type: 'scale', required: true, min: 0, max: 10, minLabel: "Anesthésié(e)", maxLabel: "Perte de contrôle", metadata: { step: 0.5 } },
+  { id: 'q4', text: "4. Je suis replié(e) sur moi | Je suis désinhibé(e)", type: 'scale', required: true, min: 0, max: 10, minLabel: "Replié(e)", maxLabel: "Désinhibé(e)", metadata: { step: 0.5 } },
+  { id: 'q5', text: "5. Je suis facilement distrait(e), la moindre chose me fait perdre mon attention | Je ne suis pas attentif (ve) à mon environnement", type: 'scale', required: true, min: 0, max: 10, minLabel: "Distrait(e)", maxLabel: "Inattentif (ve)", metadata: { step: 0.5 } },
+  { id: 'q6', text: "6. Je suis plus sensible que d'habitude au toucher | Je suis moins sensible que d'habitude au toucher", type: 'scale', required: true, min: 0, max: 10, minLabel: "Plus sensible", maxLabel: "Moins sensible", metadata: { step: 0.5 } },
+  { id: 'q7', text: "7. J'ai l'impression que mon humeur varie beaucoup en fonction de mon environnement | Mon humeur est monotone et peu changeante", type: 'scale', required: true, min: 0, max: 10, minLabel: "Humeur variable", maxLabel: "Humeur monotone", metadata: { step: 0.5 } },
+  { id: 'q8', text: "8. Je suis particulièrement sensible à la musique | Je suis plus indifférent que d'habitude à la musique", type: 'scale', required: true, min: 0, max: 10, minLabel: "Sensible musique", maxLabel: "Indifférent musique", metadata: { step: 0.5 } },
+  { id: 'q9', text: "9. Mon cerveau ne s'arrête jamais | Mon cerveau fonctionne au ralenti", type: 'scale', required: true, min: 0, max: 10, minLabel: "Ne s'arrête jamais", maxLabel: "Au ralenti", metadata: { step: 0.5 } },
+  { id: 'q10', text: "10. Je suis plus réactif (ve) à mon environnement | Je suis moins réactif (ve) à mon environnement", type: 'scale', required: true, min: 0, max: 10, minLabel: "Plus réactif(ve)", maxLabel: "Moins réactif(ve)", metadata: { step: 0.5 } },
+  { id: 'q11', text: "11. Je me sens sans énergie | J'ai le sentiment d'avoir une grande énergie", type: 'scale', required: true, min: 0, max: 10, minLabel: "Sans énergie", maxLabel: "Grande énergie", metadata: { step: 0.5 } },
+  { id: 'q12', text: "12. J'ai le sentiment que mes pensées sont ralenties | J'ai le sentiment que mes idées défilent dans ma tête", type: 'scale', required: true, min: 0, max: 10, minLabel: "Pensées ralenties", maxLabel: "Idées défilent", metadata: { step: 0.5 } },
+  { id: 'q13', text: "13. Je trouve la nourriture sans goût | Je recherche les plaisirs gastronomiques car j'en apprécie davantage les saveurs", type: 'scale', required: true, min: 0, max: 10, minLabel: "Sans goût", maxLabel: "Plaisirs gastronomiques", metadata: { step: 0.5 } },
+  { id: 'q14', text: "14. J'ai moins envie de communiquer avec les autres | J'ai plus envie de communiquer avec les autres", type: 'scale', required: true, min: 0, max: 10, minLabel: "Moins envie", maxLabel: "Plus envie", metadata: { step: 0.5 } },
+  { id: 'q15', text: "15. Je manque de motivation pour aller de l'avant | Je multiplie les projets nouveaux", type: 'scale', required: true, min: 0, max: 10, minLabel: "Manque motivation", maxLabel: "Multiplie projets", metadata: { step: 0.5 } },
+  { id: 'q16', text: "16. Ma perte d'intérêt pour mon environnement m'empêche de gérer le quotidien | J'ai envie de faire plus de choses que d'habitude", type: 'scale', required: true, min: 0, max: 10, minLabel: "Perte intérêt", maxLabel: "Envie faire plus", metadata: { step: 0.5 } },
+  { id: 'q17', text: "17. Je prends les décisions de manière plus rapide que d'habitude | J'ai plus de difficultés que d'habitude à prendre des décisions", type: 'scale', required: true, min: 0, max: 10, minLabel: "Décisions rapides", maxLabel: "Difficultés décisions", metadata: { step: 0.5 } },
+  { id: 'q18', text: "18. Je ressens les émotions de manière très intense | Mes émotions sont atténuées", type: 'scale', required: true, min: 0, max: 10, minLabel: "Émotions intenses", maxLabel: "Émotions atténuées", metadata: { step: 0.5 } },
+  { id: 'q19', text: "19. Je suis ralenti(e) dans mes mouvements | Je suis physiquement agité(e)", type: 'scale', required: true, min: 0, max: 10, minLabel: "Ralenti(e)", maxLabel: "Agité(e)", metadata: { step: 0.5 } },
+  { id: 'q20', text: "20. J'ai l'impression d'être moins sensible aux odeurs que d'habitude | J'ai l'impression d'être plus sensible aux odeurs que d'habitude", type: 'scale', required: true, min: 0, max: 10, minLabel: "Moins sensible odeurs", maxLabel: "Plus sensible odeurs", metadata: { step: 0.5 } },
+  {
+    id: 'scores_section',
+    text: 'Calcul des scores MAThyS',
+    type: 'section',
+    required: false,
+    help: "Les scores ci-dessous sont calculés automatiquement en fonction de vos réponses aux 20 items précédents."
+  },
+  { id: 'subscore_emotion', text: 'Score Emotion à la MATHYS', type: 'number', required: false, readonly: true },
+  { id: 'subscore_motivation', text: 'Score Motivation à la MATHYS', type: 'number', required: false, readonly: true },
+  { id: 'subscore_perception', text: 'Score Perception sensorielle à la MATHYS', type: 'number', required: false, readonly: true },
+  { id: 'subscore_interaction', text: 'Score Interaction personnelle à la MATHYS', type: 'number', required: false, readonly: true },
+  { id: 'subscore_cognition', text: 'Score Cognition à la MATHYS', type: 'number', required: false, readonly: true },
+  {
+    id: 'emotions_section',
+    text: 'Intensité des émotions',
+    type: 'section',
+    required: false,
+    help: "Veuillez coter l'intensité des émotions suivantes sur la semaine écoulée."
+  },
+  { id: 'tristesse', text: 'Tristesse', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 2.5, label: 'Occasionnellement' }, { code: 5, label: 'Souvent' }, { code: 7.5, label: 'Très souvent' }, { code: 10, label: 'Constamment' }] },
+  { id: 'joie', text: 'Joie', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 2.5, label: 'Occasionnellement' }, { code: 5, label: 'Souvent' }, { code: 7.5, label: 'Très souvent' }, { code: 10, label: 'Constamment' }] },
+  { id: 'irritabilite', text: 'Irritabilité', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 2.5, label: 'Occasionnellement' }, { code: 5, label: 'Souvent' }, { code: 7.5, label: 'Très souvent' }, { code: 10, label: 'Constamment' }] },
+  { id: 'panique', text: 'Panique', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 2.5, label: 'Occasionnellement' }, { code: 5, label: 'Souvent' }, { code: 7.5, label: 'Très souvent' }, { code: 10, label: 'Constamment' }] },
+  { id: 'anxiete', text: 'Anxiété', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 2.5, label: 'Occasionnellement' }, { code: 5, label: 'Souvent' }, { code: 7.5, label: 'Très souvent' }, { code: 10, label: 'Constamment' }] },
+  { id: 'colere', text: 'Colère', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 2.5, label: 'Occasionnellement' }, { code: 5, label: 'Souvent' }, { code: 7.5, label: 'Très souvent' }, { code: 10, label: 'Constamment' }] },
+  { id: 'exaltation', text: 'Exaltation', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 2.5, label: 'Occasionnellement' }, { code: 5, label: 'Souvent' }, { code: 7.5, label: 'Très souvent' }, { code: 10, label: 'Constamment' }] }
 ];
 
 export const MATHYS_DEFINITION: QuestionnaireDefinition = {
@@ -1265,7 +1299,8 @@ export const MATHYS_DEFINITION: QuestionnaireDefinition = {
   metadata: {
     pathologies: ['bipolar'],
     target_role: 'patient',
-    reverse_items: [5, 6, 7, 8, 9, 10, 17, 18]
+    reverse_items: [5, 6, 7, 8, 9, 10, 17, 18],
+    instructions: "Consigne de cotation : coter toujours le score le plus extrême (0 au lieu de 1 par exemple ; 10 au lieu de 9). Chaque item est coté entre 0 et 10, avec possibilité de demi points (Ex.: 2.5).\n\n**Attention : contrairement au calque, ne pas inverser les scores préalablement. ex: item 9: Mon cerveau ne s'arrête pas = 0 | Mon cerveau fonctionne au ralenti = 10.**"
   }
 };
 

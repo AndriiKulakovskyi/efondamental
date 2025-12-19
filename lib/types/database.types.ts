@@ -497,11 +497,23 @@ export interface MathysResponse {
   q18: number;
   q19: number;
   q20: number;
-  emotional_hyperreactivity?: number | null;
-  emotional_hyporeactivity?: number | null;
-  cognitive_speed?: number | null;
-  motor_activity?: number | null;
-  motivation?: number | null;
+  tristesse?: number | null;
+  joie?: number | null;
+  irritabilite?: number | null;
+  panique?: number | null;
+  anxiete?: number | null;
+  colere?: number | null;
+  exaltation?: number | null;
+  emotional_hyperreactivity?: number | null; // Legacy
+  emotional_hyporeactivity?: number | null;  // Legacy
+  cognitive_speed?: number | null;           // Legacy
+  motor_activity?: number | null;            // Legacy
+  motivation?: number | null;                // Legacy
+  subscore_emotion?: number | null;
+  subscore_motivation?: number | null;
+  subscore_perception?: number | null;
+  subscore_interaction?: number | null;
+  subscore_cognition?: number | null;
   total_score?: number | null;
   interpretation?: string | null;
   completed_by?: string | null;
