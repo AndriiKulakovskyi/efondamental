@@ -2682,6 +2682,7 @@ export async function saveWais3CriteriaResponse(
       no_visual_impairment: response.no_visual_impairment,
       no_hearing_impairment: response.no_hearing_impairment,
       no_ect_past_year: response.no_ect_past_year,
+      accepted_for_neuropsy_evaluation: response.accepted_for_neuropsy_evaluation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
