@@ -10656,236 +10656,288 @@ export const WAIS3_MATRICES_QUESTIONS: Question[] = [
   {
     id: 'item_01',
     text: 'Note pour l\'item 1',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_02',
     text: 'Note pour l\'item 2',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_03',
     text: 'Note pour l\'item 3',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_04',
     text: 'Note pour l\'item 4',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_05',
     text: 'Note pour l\'item 5',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_06',
     text: 'Note pour l\'item 6',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_07',
     text: 'Note pour l\'item 7',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_08',
     text: 'Note pour l\'item 8',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_09',
     text: 'Note pour l\'item 9',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_10',
     text: 'Note pour l\'item 10',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_11',
     text: 'Note pour l\'item 11',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_12',
     text: 'Note pour l\'item 12',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_13',
     text: 'Note pour l\'item 13',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_14',
     text: 'Note pour l\'item 14',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_15',
     text: 'Note pour l\'item 15',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_16',
     text: 'Note pour l\'item 16',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_17',
     text: 'Note pour l\'item 17',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_18',
     text: 'Note pour l\'item 18',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_19',
     text: 'Note pour l\'item 19',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_20',
     text: 'Note pour l\'item 20',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_21',
     text: 'Note pour l\'item 21',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_22',
     text: 'Note pour l\'item 22',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_23',
     text: 'Note pour l\'item 23',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_24',
     text: 'Note pour l\'item 24',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_25',
     text: 'Note pour l\'item 25',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   {
     id: 'item_26',
     text: 'Note pour l\'item 26',
-    type: 'number',
+    type: 'single_choice',
     required: true,
     section: 'Notes par item (0 ou 1)',
-    min: 0,
-    max: 1
+    options: [
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
+    ]
   },
   // Computed scores section
   {
@@ -10908,7 +10960,7 @@ export const WAIS3_MATRICES_QUESTIONS: Question[] = [
   },
   {
     id: 'standardized_value',
-    text: 'Valeur standardisée',
+    text: 'Déviation par rapport à la moyenne et l\'écart type',
     type: 'number',
     required: false,
     section: 'Scores calculés',

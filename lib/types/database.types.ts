@@ -3800,9 +3800,9 @@ export interface Wais3MatricesResponse {
   item_26: number;
   
   // Computed scores
-  total_raw_score?: number;
-  standard_score?: number;
-  standardized_value?: number;
+  total_raw_score?: number | null;
+  standard_score?: number | null;
+  standardized_value?: number | null;
   
   // Metadata
   completed_by?: string;

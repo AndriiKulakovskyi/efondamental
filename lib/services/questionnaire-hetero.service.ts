@@ -2923,6 +2923,7 @@ export async function saveWais3MatricesResponse(
       item_24: response.item_24,
       item_25: response.item_25,
       item_26: response.item_26,
+      total_raw_score: scores.total_raw_score,
       standard_score: scores.standard_score,
       standardized_value: scores.standardized_value,
       completed_by: user.data.user?.id

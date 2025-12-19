@@ -94,45 +94,62 @@ function calculateStandardizedValue(standardScore: number): number {
  */
 export function calculateWais3MatricesScores(data: {
   patient_age: number;
-  item_01: number;
-  item_02: number;
-  item_03: number;
-  item_04: number;
-  item_05: number;
-  item_06: number;
-  item_07: number;
-  item_08: number;
-  item_09: number;
-  item_10: number;
-  item_11: number;
-  item_12: number;
-  item_13: number;
-  item_14: number;
-  item_15: number;
-  item_16: number;
-  item_17: number;
-  item_18: number;
-  item_19: number;
-  item_20: number;
-  item_21: number;
-  item_22: number;
-  item_23: number;
-  item_24: number;
-  item_25: number;
-  item_26: number;
+  item_01?: number;
+  item_02?: number;
+  item_03?: number;
+  item_04?: number;
+  item_05?: number;
+  item_06?: number;
+  item_07?: number;
+  item_08?: number;
+  item_09?: number;
+  item_10?: number;
+  item_11?: number;
+  item_12?: number;
+  item_13?: number;
+  item_14?: number;
+  item_15?: number;
+  item_16?: number;
+  item_17?: number;
+  item_18?: number;
+  item_19?: number;
+  item_20?: number;
+  item_21?: number;
+  item_22?: number;
+  item_23?: number;
+  item_24?: number;
+  item_25?: number;
+  item_26?: number;
 }): {
-  total_raw_score: number;
-  standard_score: number;
-  standardized_value: number;
+  total_raw_score: number | null;
+  standard_score: number | null;
+  standardized_value: number | null;
 } {
-  // Calculate total raw score
-  const total_raw_score = 
-    data.item_01 + data.item_02 + data.item_03 + data.item_04 + data.item_05 +
-    data.item_06 + data.item_07 + data.item_08 + data.item_09 + data.item_10 +
-    data.item_11 + data.item_12 + data.item_13 + data.item_14 + data.item_15 +
-    data.item_16 + data.item_17 + data.item_18 + data.item_19 + data.item_20 +
-    data.item_21 + data.item_22 + data.item_23 + data.item_24 + data.item_25 +
-    data.item_26;
+  // Validate all items are provided and valid (0 or 1)
+  const itemValues = [
+    data.item_01, data.item_02, data.item_03, data.item_04, data.item_05,
+    data.item_06, data.item_07, data.item_08, data.item_09, data.item_10,
+    data.item_11, data.item_12, data.item_13, data.item_14, data.item_15,
+    data.item_16, data.item_17, data.item_18, data.item_19, data.item_20,
+    data.item_21, data.item_22, data.item_23, data.item_24, data.item_25,
+    data.item_26
+  ];
+  
+  // Check if any item is missing or invalid
+  const hasInvalidItem = itemValues.some(val => 
+    val === undefined || val === null || val < 0 || val > 1
+  );
+  
+  if (hasInvalidItem) {
+    return {
+      total_raw_score: null,
+      standard_score: null,
+      standardized_value: null
+    };
+  }
+  
+  // Calculate total raw score (all items are valid)
+  const total_raw_score = itemValues.reduce((sum, val) => sum + val!, 0);
   
   // Get age group
   const ageGroup = getAgeGroup(data.patient_age);
