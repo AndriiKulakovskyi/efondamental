@@ -450,6 +450,7 @@ export interface MarsResponse {
   id: string;
   visit_id: string;
   patient_id: string;
+  taking_medication?: 'oui' | 'non' | null;
   q1: number;
   q2: number;
   q3: number;

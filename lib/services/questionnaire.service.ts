@@ -3757,28 +3757,32 @@ export async function saveMarsResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Remove adherence_percentage if present (it's a generated column)
-  const { adherence_percentage, ...responseWithoutGeneratedFields } = response as any;
+  // Remove metadata fields that are not part of the table schema
+  const { adherence_percentage, instructions, ...responseData } = response as any;
 
-  // MARS scoring: items 7,8 are positive (YES=1), others are negative (NO=1)
-  const positiveItems = [7, 8];
+  // Calculate score only if taking medication
   let totalScore = 0;
-
-  for (let i = 1; i <= 10; i++) {
-    const value = responseWithoutGeneratedFields[`q${i}` as keyof MarsResponseInsert] as number;
-    if (positiveItems.includes(i)) {
-      totalScore += value; // YES=1, NO=0
-    } else {
-      totalScore += (1 - value); // NO=1, YES=0
+  if (responseData.taking_medication === 'oui') {
+    // MARS scoring: items 7,8 are positive (YES=1), others are negative (NO=1)
+    const positiveItems = [7, 8];
+    for (let i = 1; i <= 10; i++) {
+      const value = responseData[`q${i}` as keyof MarsResponseInsert] as number;
+      if (positiveItems.includes(i)) {
+        totalScore += value; // YES=1, NO=0
+      } else {
+        totalScore += (1 - value); // NO=1, YES=0
+      }
     }
   }
 
-  const interpretation = totalScore >= 7 ? 'Bonne adhérence' : 'Adhérence insuffisante';
+  const interpretation = responseData.taking_medication === 'oui' 
+    ? (totalScore >= 7 ? 'Bonne adhérence' : 'Adhérence insuffisante')
+    : 'Non applicable (pas de traitement)';
 
   const { data, error } = await supabase
     .from('responses_mars')
     .upsert({
-      ...responseWithoutGeneratedFields,
+      ...responseData,
       total_score: totalScore,
       interpretation,
       completed_by: user.data.user?.id

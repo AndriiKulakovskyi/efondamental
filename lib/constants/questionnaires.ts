@@ -1118,16 +1118,103 @@ export const STAI_YA_DEFINITION: QuestionnaireDefinition = {
 
 // MARS (Medication adherence)
 export const MARS_QUESTIONS: Question[] = [
-  { id: 'q1', text: "Vous est-il parfois arrivé d'oublier de prendre vos médicaments ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q2', text: "Négligez-vous parfois l'heure de prise d'un de vos médicaments ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q3', text: 'Lorsque vous vous sentez mieux, interrompez-vous parfois votre traitement ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q4', text: "Vous est-il arrivé d'arrêter le traitement parce que vous vous sentiez moins bien en le prenant ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q5', text: 'Je ne prends les médicaments que lorsque je me sens malade.', type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q6', text: "Ce n'est pas naturel pour mon corps et mon esprit d'être équilibré par des médicaments.", type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q7', text: 'Mes idées sont plus claires avec les médicaments.', type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q8', text: 'En continuant à prendre les médicaments, je peux éviter de tomber à nouveau malade.', type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q9', text: 'Avec les médicaments, je me sens bizarre, comme un « zombie ».', type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q10', text: 'Les médicaments me rendent lourd(e) et fatigué(e).', type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] }
+  {
+    id: 'instructions',
+    text: 'Consignes',
+    type: 'section',
+    required: false,
+    help: "Ce questionnaire consiste à mieux comprendre les difficultés liées à la prise de médicament. Votre aide nous sera précieuse pour mieux vous aider et améliorer, nous l'espérons, les résultats thérapeutiques. Veuillez s'il vous plaît répondre à l'ensemble des questions en cochant la réponse qui correspond le mieux à votre comportement ou attitude vis à vis du traitement que vous prenez sur la semaine qui vient de s'écouler."
+  },
+  {
+    id: 'taking_medication',
+    text: 'Prenez-vous actuellement un traitement médicamenteux ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  { 
+    id: 'q1', 
+    text: "Vous est-il parfois arrivé d'oublier de prendre vos médicaments ?", 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q2', 
+    text: "Négligez-vous parfois l'heure de prise d'un de vos médicaments ?", 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q3', 
+    text: 'Lorsque vous vous sentez mieux, interrompez-vous parfois votre traitement ?', 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q4', 
+    text: "Vous est-il arrivé d'arrêter le traitement parce que vous vous sentiez moins bien en le prenant ?", 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q5', 
+    text: 'Je ne prends les médicaments que lorsque je me sens malade.', 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q6', 
+    text: "Ce n'est pas naturel pour mon corps et mon esprit d'être équilibré par des médicaments.", 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q7', 
+    text: 'Mes idées sont plus claires avec les médicaments.', 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q8', 
+    text: 'En continuant à prendre les médicaments, je peux éviter de tomber à nouveau malade.', 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q9', 
+    text: 'Avec les médicaments, je me sens bizarre, comme un « zombie ».', 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q10', 
+    text: 'Les médicaments me rendent lourd(e) et fatigué(e).', 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  }
 ];
 
 export const MARS_DEFINITION: QuestionnaireDefinition = {
@@ -1140,7 +1227,8 @@ export const MARS_DEFINITION: QuestionnaireDefinition = {
     pathologies: ['bipolar'],
     target_role: 'patient',
     positive_items: [7, 8],
-    negative_items: [1, 2, 3, 4, 5, 6, 9, 10]
+    negative_items: [1, 2, 3, 4, 5, 6, 9, 10],
+    instructions: "Ce questionnaire consiste à mieux comprendre les difficultés liées à la prise de médicament. Votre aide nous sera précieuse pour mieux vous aider et améliorer, nous l'espérons, les résultats thérapeutiques. Veuillez s'il vous plaît répondre à l'ensemble des questions en cochant la réponse qui correspond le mieux à votre comportement ou attitude vis à vis du traitement que vous prenez sur la semaine qui vient de s'écouler."
   }
 };
 
