@@ -357,7 +357,7 @@ export interface PriseMResponse {
   id: string;
   visit_id: string;
   patient_id: string;
-  gender?: 'M' | 'F' | null;
+  taking_medication?: 'oui' | 'non' | null;
   q1?: number | null;
   q2?: number | null;
   q3?: number | null;
@@ -389,7 +389,6 @@ export interface PriseMResponse {
   q29?: number | null;
   q30?: number | null;
   q31?: number | null;
-  q32?: number | null;
   gastro_score?: number | null;
   cardiac_score?: number | null;
   skin_score?: number | null;
@@ -434,6 +433,7 @@ export interface StaiYaResponse {
   q18: number;
   q19: number;
   q20: number;
+  note_t?: number | null;
   total_score?: number | null;
   anxiety_level?: string | null;
   interpretation?: string | null;
