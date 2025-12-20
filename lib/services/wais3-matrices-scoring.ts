@@ -149,7 +149,7 @@ export function calculateWais3MatricesScores(data: {
   }
   
   // Calculate total raw score (all items are valid)
-  const total_raw_score = itemValues.reduce((sum, val) => sum + val!, 0);
+  const total_raw_score = itemValues.reduce((sum: number, val) => sum + val!, 0);
   
   // Get age group
   const ageGroup = getAgeGroup(data.patient_age);
