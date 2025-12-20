@@ -1306,6 +1306,13 @@ export const MATHYS_DEFINITION: QuestionnaireDefinition = {
 
 // PSQI (Pittsburgh Sleep Quality Index)
 export const PSQI_QUESTIONS: Question[] = [
+  {
+    id: 'instructions',
+    text: 'Évaluation de la qualité du sommeil',
+    type: 'section',
+    required: false,
+    help: "Consigne de cotation : coter toujours le score le plus extrême (0 au lieu de 1 par exemple ; 10 au lieu de 9). Chaque item est coté entre 0 et 10, avec possibilité de demi points (Ex.: 2.5).\n\n**Attention : contrairement au calque, ne pas inverser les scores préalablement. ex: item 9: Mon cerveau ne s'arrête pas = 0 | Mon cerveau fonctionne au ralenti = 10.**"
+  },
   { 
     id: 'q1_bedtime', 
     text: '1. Au cours des 30 derniers jours, à quelle heure vous êtes-vous généralement couché(e) le soir? (format HH:MM)', 
@@ -1353,13 +1360,7 @@ export const PSQI_QUESTIONS: Question[] = [
   { id: 'q7', text: '7. Au cours des 30 derniers jours, combien de fois avez-vous pris des médicaments pour mieux dormir (médicaments prescrits par votre médecin ou vendus sans ordonnance) ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
   { id: 'q8', text: '8. Au cours des 30 derniers jours, combien de fois avez-vous eu des difficultés à rester éveillé(e) en conduisant, en mangeant, ou en participant à des activités avec d’autres personnes ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
   { id: 'q9', text: '9. Au cours des 30 derniers jours, combien vous a-t-il été difficile d’être suffisamment motivé(e) pour mener à bien vos activités ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas difficile du tout' }, { code: 1, label: 'Légèrement difficile' }, { code: 2, label: 'Assez difficile' }, { code: 3, label: 'Très difficile' }] },
-  {
-    id: 'psqi_scores_section',
-    text: 'Résultats PSQI',
-    type: 'section',
-    required: false,
-    help: 'Calcul des scores de qualité du sommeil.'
-  },
+
   { id: 'c4_efficiency', text: 'Score efficience sommeil', type: 'number', required: false, readonly: true },
   { id: 'c3_duration', text: 'Score durée de sommeil', type: 'number', required: false, readonly: true },
   { id: 'c5_disturbances', text: 'Score du trouble du sommeil', type: 'number', required: false, readonly: true },
