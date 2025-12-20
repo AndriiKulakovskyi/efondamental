@@ -827,7 +827,7 @@ export function QuestionnaireRenderer({
 
       // Compute Fluences Verbales scores progressively as fields are entered
       // Only execute for Fluences Verbales questionnaires
-      if (definition?.code === 'FLUENCES_VERBALES_FR' || definition?.code === 'WAIS3_FLUENCES_VERBALES_FR') {
+      if (questionnaire?.code === 'FLUENCES_VERBALES_FR' || questionnaire?.code === 'WAIS3_FLUENCES_VERBALES_FR') {
       const fvAge = Number(prev.patient_age);
       const fvEdu = Number(prev.years_of_education);
       const fvP = Number(prev.fv_p_tot_correct);
