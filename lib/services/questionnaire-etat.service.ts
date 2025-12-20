@@ -27,11 +27,22 @@ export async function getPsqiResponse(
   return data;
 }
 
+// Helper to convert HH:MM to decimal hours
+function parseHHMMToHours(timeStr: string | null | undefined): number {
+  if (!timeStr || !timeStr.includes(':')) return 0;
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  if (isNaN(hours) || isNaN(minutes)) return 0;
+  return hours + (minutes / 60);
+}
+
 export async function savePsqiResponse(
   response: PsqiResponseInsert
 ): Promise<PsqiResponse> {
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
+
+  // Parse hours sleep from HH:MM
+  const decimalHoursSleep = parseHHMMToHours(response.q4_hours_sleep);
 
   // Calculate 7 component scores
   // Component 1: Subjective sleep quality
@@ -50,12 +61,10 @@ export async function savePsqiResponse(
 
   // Component 3: Sleep duration
   let c3Duration = 0;
-  if (response.q4_hours_sleep !== undefined && response.q4_hours_sleep !== null) {
-    if (response.q4_hours_sleep > 7) c3Duration = 0;
-    else if (response.q4_hours_sleep >= 6) c3Duration = 1;
-    else if (response.q4_hours_sleep >= 5) c3Duration = 2;
-    else c3Duration = 3;
-  }
+  if (decimalHoursSleep > 7) c3Duration = 0;
+  else if (decimalHoursSleep >= 6) c3Duration = 1;
+  else if (decimalHoursSleep >= 5) c3Duration = 2;
+  else c3Duration = 3;
 
   // Component 4: Sleep efficiency
   let timeInBedHours = 0;
@@ -72,7 +81,7 @@ export async function savePsqiResponse(
     timeInBedHours = (waketime.getTime() - bedtime.getTime()) / (1000 * 60 * 60);
     
     if (timeInBedHours > 0) {
-      sleepEfficiencyPct = (response.q4_hours_sleep / timeInBedHours) * 100;
+      sleepEfficiencyPct = (decimalHoursSleep / timeInBedHours) * 100;
       if (sleepEfficiencyPct >= 85) c4Efficiency = 0;
       else if (sleepEfficiencyPct >= 75) c4Efficiency = 1;
       else if (sleepEfficiencyPct >= 65) c4Efficiency = 2;
@@ -107,10 +116,22 @@ export async function savePsqiResponse(
     interpretation = 'Mauvais dormeur';
   }
 
+  // Filter out any metadata/extra fields that don't belong in the DB
+  const { 
+    psqi_scores_section, 
+    emotions_section, 
+    subscore_emotion, 
+    subscore_motivation, 
+    subscore_perception, 
+    subscore_interaction, 
+    subscore_cognition,
+    ...dbResponse 
+  } = response as any;
+
   const { data, error } = await supabase
     .from('responses_psqi')
     .upsert({
-      ...response,
+      ...dbResponse,
       c1_subjective_quality: c1SubjectiveQuality,
       c2_latency: c2Latency,
       c3_duration: c3Duration,

@@ -365,7 +365,7 @@ export interface PriseMResponse {
   id: string;
   visit_id: string;
   patient_id: string;
-  gender?: 'M' | 'F' | null;
+  taking_medication?: 'oui' | 'non' | null;
   q1?: number | null;
   q2?: number | null;
   q3?: number | null;
@@ -397,7 +397,6 @@ export interface PriseMResponse {
   q29?: number | null;
   q30?: number | null;
   q31?: number | null;
-  q32?: number | null;
   gastro_score?: number | null;
   cardiac_score?: number | null;
   skin_score?: number | null;
@@ -442,6 +441,7 @@ export interface StaiYaResponse {
   q18: number;
   q19: number;
   q20: number;
+  note_t?: number | null;
   total_score?: number | null;
   anxiety_level?: string | null;
   interpretation?: string | null;
@@ -458,6 +458,7 @@ export interface MarsResponse {
   id: string;
   visit_id: string;
   patient_id: string;
+  taking_medication?: 'oui' | 'non' | null;
   q1: number;
   q2: number;
   q3: number;
@@ -504,11 +505,23 @@ export interface MathysResponse {
   q18: number;
   q19: number;
   q20: number;
-  emotional_hyperreactivity?: number | null;
-  emotional_hyporeactivity?: number | null;
-  cognitive_speed?: number | null;
-  motor_activity?: number | null;
-  motivation?: number | null;
+  tristesse?: number | null;
+  joie?: number | null;
+  irritabilite?: number | null;
+  panique?: number | null;
+  anxiete?: number | null;
+  colere?: number | null;
+  exaltation?: number | null;
+  emotional_hyperreactivity?: number | null; // Legacy
+  emotional_hyporeactivity?: number | null;  // Legacy
+  cognitive_speed?: number | null;           // Legacy
+  motor_activity?: number | null;            // Legacy
+  motivation?: number | null;                // Legacy
+  subscore_emotion?: number | null;
+  subscore_motivation?: number | null;
+  subscore_perception?: number | null;
+  subscore_interaction?: number | null;
+  subscore_cognition?: number | null;
   total_score?: number | null;
   interpretation?: string | null;
   completed_by?: string | null;
@@ -527,7 +540,7 @@ export interface PsqiResponse {
   q1_bedtime?: string | null;
   q2_minutes_to_sleep?: number | null;
   q3_waketime?: string | null;
-  q4_hours_sleep?: number | null;
+  q4_hours_sleep?: string | null;
   q5a?: number | null;
   q5b?: number | null;
   q5c?: number | null;

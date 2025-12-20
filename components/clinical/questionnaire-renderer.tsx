@@ -481,6 +481,127 @@ export function QuestionnaireRenderer({
         }
       }
 
+      // Compute MATHYS sums progressively as fields are entered
+      const isMathys = questionnaire.code === 'MATHYS';
+      if (isMathys) {
+        const isAnswered = (id: string) => prev[id] !== undefined && prev[id] !== null && prev[id] !== '';
+        const reverseItems = [5, 6, 7, 8, 9, 10, 17, 18];
+        const val = (id: string) => {
+          const num = Number(prev[id]);
+          const qNum = parseInt(id.replace('q', ''));
+          return reverseItems.includes(qNum) ? 10 - num : num;
+        };
+
+        const emotionQs = ['q3', 'q7', 'q10', 'q18'];
+        const motivationQs = ['q2', 'q11', 'q12', 'q15', 'q16', 'q17', 'q19'];
+        const perceptionQs = ['q1', 'q6', 'q8', 'q13', 'q20'];
+        const interactionQs = ['q4', 'q14'];
+        const cognitionQs = ['q5', 'q9'];
+
+        const sumEmotion = emotionQs.every(isAnswered) ? emotionQs.reduce((acc, q) => acc + val(q), 0) : undefined;
+        const sumMotivation = motivationQs.every(isAnswered) ? motivationQs.reduce((acc, q) => acc + val(q), 0) : undefined;
+        const sumPerception = perceptionQs.every(isAnswered) ? perceptionQs.reduce((acc, q) => acc + val(q), 0) : undefined;
+        const sumInteraction = interactionQs.every(isAnswered) ? interactionQs.reduce((acc, q) => acc + val(q), 0) : undefined;
+        const sumCognition = cognitionQs.every(isAnswered) ? cognitionQs.reduce((acc, q) => acc + val(q), 0) : undefined;
+
+        if (updated.subscore_emotion !== sumEmotion) { updated.subscore_emotion = sumEmotion; hasChanges = true; }
+        if (updated.subscore_motivation !== sumMotivation) { updated.subscore_motivation = sumMotivation; hasChanges = true; }
+        if (updated.subscore_perception !== sumPerception) { updated.subscore_perception = sumPerception; hasChanges = true; }
+        if (updated.subscore_interaction !== sumInteraction) { updated.subscore_interaction = sumInteraction; hasChanges = true; }
+        if (updated.subscore_cognition !== sumCognition) { updated.subscore_cognition = sumCognition; hasChanges = true; }
+
+        const allSubscores = [sumEmotion, sumMotivation, sumPerception, sumInteraction, sumCognition];
+        const mathysTotal = allSubscores.every(s => s !== undefined) ? (sumEmotion! + sumMotivation! + sumPerception! + sumInteraction! + sumCognition!) : undefined;
+        if (updated.total_score !== mathysTotal) { updated.total_score = mathysTotal; hasChanges = true; }
+      }
+
+      // Compute PSQI scores progressively
+      const isPsqi = questionnaire.code === 'PSQI';
+      if (isPsqi) {
+        const isAnswered = (id: string) => prev[id] !== undefined && prev[id] !== null && prev[id] !== '';
+        const isValidTime = (str: any) => typeof str === 'string' && /^\d{1,2}:\d{2}$/.test(str);
+        
+        const hhmmToHours = (str: any) => {
+          if (!isValidTime(str)) return 0;
+          const [h, m] = str.split(':').map(Number);
+          return h + (m / 60);
+        };
+
+        // C1: Quality (q6)
+        const c1 = isAnswered('q6') ? Number(prev.q6) : undefined;
+        
+        // C2: Latency (q2_minutes_to_sleep AND q5a)
+        let c2: number | undefined = undefined;
+        if (isAnswered('q2_minutes_to_sleep') && isAnswered('q5a')) {
+          const q2min = Number(prev.q2_minutes_to_sleep);
+          let lScore = 0;
+          if (q2min <= 15) lScore = 0;
+          else if (q2min <= 30) lScore = 1;
+          else if (q2min <= 60) lScore = 2;
+          else lScore = 3;
+          c2 = Math.min(3, Math.floor((lScore + Number(prev.q5a)) / 2));
+        }
+        
+        // C3: Duration (q4_hours_sleep)
+        let c3: number | undefined = undefined;
+        if (isValidTime(prev.q4_hours_sleep)) {
+          const q4Hours = hhmmToHours(prev.q4_hours_sleep);
+          if (q4Hours > 7) c3 = 0;
+          else if (q4Hours >= 6) c3 = 1;
+          else if (q4Hours >= 5) c3 = 2;
+          else c3 = 3;
+        }
+        
+        // C4: Efficiency (q1_bedtime, q3_waketime, q4_hours_sleep)
+        let c4: number | undefined = undefined;
+        if (isValidTime(prev.q1_bedtime) && isValidTime(prev.q3_waketime) && isValidTime(prev.q4_hours_sleep)) {
+          const q1Time = hhmmToHours(prev.q1_bedtime);
+          const q3Time = hhmmToHours(prev.q3_waketime);
+          const q4Hours = hhmmToHours(prev.q4_hours_sleep);
+          let tib = q3Time - q1Time;
+          if (tib <= 0) tib += 24; 
+          if (tib > 0) {
+            const eff = (q4Hours / tib) * 100;
+            if (eff >= 85) c4 = 0;
+            else if (eff >= 75) c4 = 1;
+            else if (eff >= 65) c4 = 2;
+            else c4 = 3;
+          }
+        }
+
+        // C5: Disturbances (q5b to q5j)
+        const dFields = ['q5b', 'q5c', 'q5d', 'q5e', 'q5f', 'q5g', 'q5h', 'q5i', 'q5j'];
+        let c5: number | undefined = undefined;
+        if (dFields.every(isAnswered)) {
+          const dSum = dFields.reduce((acc, f) => acc + Number(prev[f]), 0);
+          if (dSum === 0) c5 = 0;
+          else if (dSum <= 9) c5 = 1;
+          else if (dSum <= 18) c5 = 2;
+          else c5 = 3;
+        }
+
+        // C6: Medication (q7)
+        const c6 = isAnswered('q7') ? Number(prev.q7) : undefined;
+
+        // C7: Daytime dysfunction (q8 AND q9)
+        let c7: number | undefined = undefined;
+        if (isAnswered('q8') && isAnswered('q9')) {
+          c7 = Math.min(3, Math.floor((Number(prev.q8) + Number(prev.q9)) / 2));
+        }
+
+        const components = [c1, c2, c3, c4, c5, c6, c7];
+        const total = components.every(c => c !== undefined) ? components.reduce((acc, c) => acc! + c!, 0) : undefined;
+
+        if (updated.c1_subjective_quality !== c1) { updated.c1_subjective_quality = c1; hasChanges = true; }
+        if (updated.c2_latency !== c2) { updated.c2_latency = c2; hasChanges = true; }
+        if (updated.c3_duration !== c3) { updated.c3_duration = c3; hasChanges = true; }
+        if (updated.c4_efficiency !== c4) { updated.c4_efficiency = c4; hasChanges = true; }
+        if (updated.c5_disturbances !== c5) { updated.c5_disturbances = c5; hasChanges = true; }
+        if (updated.c6_medication !== c6) { updated.c6_medication = c6; hasChanges = true; }
+        if (updated.c7_daytime_dysfunction !== c7) { updated.c7_daytime_dysfunction = c7; hasChanges = true; }
+        if (updated.total_score !== total) { updated.total_score = total; hasChanges = true; }
+      }
+
       // Compute SCIP Z-scores
       // Simple formula: Z = (raw_score - mean) / std for each subscale
       const SCIP_NORMS = {
@@ -1516,7 +1637,17 @@ export function QuestionnaireRenderer({
     responses.inverse_1a, responses.inverse_1b, responses.inverse_2a, responses.inverse_2b,
     responses.inverse_3a, responses.inverse_3b, responses.inverse_4a, responses.inverse_4b,
     responses.inverse_5a, responses.inverse_5b, responses.inverse_6a, responses.inverse_6b,
-    responses.inverse_7a, responses.inverse_7b, responses.inverse_8a, responses.inverse_8b
+    responses.inverse_7a, responses.inverse_7b, responses.inverse_8a, responses.inverse_8b,
+    // MATHYS items
+    responses.q1, responses.q2, responses.q3, responses.q4, responses.q5,
+    responses.q6, responses.q7, responses.q8, responses.q9, responses.q10,
+    responses.q11, responses.q12, responses.q13, responses.q14, responses.q15,
+    responses.q16, responses.q17, responses.q18, responses.q19, responses.q20,
+    // PSQI items
+    responses.q1_bedtime, responses.q2_minutes_to_sleep, responses.q3_waketime, responses.q4_hours_sleep,
+    responses.q5a, responses.q5b, responses.q5c, responses.q5d, responses.q5e, responses.q5f,
+    responses.q5g, responses.q5h, responses.q5i, responses.q5j,
+    responses.q6, responses.q7, responses.q8, responses.q9
   ]);
 
   // Separate useEffect for Rapport Total / HDL calculation (lipid profile)
@@ -1798,17 +1929,65 @@ export function QuestionnaireRenderer({
         )}
 
         {question.type === "text" && (
-          <Input
-            id={question.id}
-            type="text"
-            value={value || ""}
-            onChange={(e) => handleResponseChange(question.id, e.target.value)}
-            disabled={readonly || question.readonly}
-            required={isRequired}
-            className={`bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand ${
-              question.readonly ? "bg-slate-50 text-slate-700" : ""
-            }`}
-          />
+          <div className="space-y-1">
+            <Input
+              id={question.id}
+              type="text"
+              value={value || ""}
+              onChange={(e) => {
+                let v = e.target.value;
+                if (question.metadata?.placeholder === "HH:MM") {
+                  // Strict digit-only extraction
+                  const digits = v.replace(/[^\d]/g, '').substring(0, 4);
+                  
+                  // Validation logic
+                  if (digits.length >= 1) {
+                    const h1 = parseInt(digits[0]);
+                    if (h1 > 2) { handleResponseChange(question.id, ""); return; }
+                  }
+                  
+                  if (digits.length >= 2) {
+                    const h = parseInt(digits.substring(0, 2));
+                    const maxH = question.id.includes('hours_sleep') ? 24 : 23;
+                    if (h > maxH) { handleResponseChange(question.id, ""); return; }
+                  }
+                  
+                  if (digits.length >= 3) {
+                    const m1 = parseInt(digits[2]);
+                    if (m1 > 5) { handleResponseChange(question.id, digits.substring(0, 2) + ":"); return; }
+                  }
+
+                  // Auto-formatting HH:MM
+                  if (digits.length > 2) {
+                    v = digits.substring(0, 2) + ":" + digits.substring(2);
+                  } else if (v.length === 2 && !v.includes(':') && e.nativeEvent instanceof InputEvent && e.nativeEvent.inputType !== 'deleteContentBackward') {
+                    v = digits + ":";
+                  } else {
+                    v = digits;
+                  }
+                }
+                handleResponseChange(question.id, v);
+              }}
+              onBlur={(e) => {
+                const val = e.target.value;
+                if (question.metadata?.pattern) {
+                  const regex = new RegExp(question.metadata.pattern);
+                  if (val && !regex.test(val)) {
+                    handleResponseChange(question.id, "");
+                  }
+                }
+              }}
+              placeholder={question.metadata?.placeholder || ""}
+              disabled={readonly || question.readonly}
+              required={isRequired}
+              className={`bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand ${
+                question.readonly ? "bg-slate-50 text-slate-700 font-medium" : ""
+              } ${question.metadata?.pattern && value && !new RegExp(question.metadata.pattern).test(value) ? 'border-red-500 bg-red-50 text-red-600' : ''}`}
+            />
+            {question.metadata?.pattern && value && !new RegExp(question.metadata.pattern).test(value) && (
+              <p className="text-[10px] text-red-500 font-medium px-2">Format invalide (Ex: 08:30)</p>
+            )}
+          </div>
         )}
 
         {question.type === "number" && (
@@ -1845,24 +2024,51 @@ export function QuestionnaireRenderer({
 
         {question.type === "scale" && (
           <div className="space-y-2">
-            <Input
-              id={question.id}
-              type="range"
-              value={value || question.min || 0}
-              onChange={(e) =>
-                handleResponseChange(question.id, Number(e.target.value))
-              }
-              min={question.min || 0}
-              max={question.max || 10}
-              disabled={readonly}
-              required={isRequired}
-              className="w-full"
-            />
-            <div className="flex justify-between text-xs text-slate-500">
-              <span>{question.minLabel || question.min}</span>
-              <span className="font-semibold">{value || question.min || 0}</span>
-              <span>{question.maxLabel || question.max}</span>
-            </div>
+            {!value && value !== 0 ? (
+              <div 
+                className="w-full h-10 bg-slate-100 rounded-lg flex items-center justify-center cursor-pointer hover:bg-slate-200 transition-colors border-2 border-dashed border-slate-300"
+                onClick={() => handleResponseChange(question.id, question.min || 0)}
+              >
+                <span className="text-sm text-slate-500 font-medium">Cliquez pour noter (0 à 10)</span>
+              </div>
+            ) : (
+              <>
+                <Input
+                  id={question.id}
+                  type="range"
+                  value={value}
+                  onChange={(e) =>
+                    handleResponseChange(question.id, Number(e.target.value))
+                  }
+                  min={question.min || 0}
+                  max={question.max || 10}
+                  step={question.metadata?.step || 1}
+                  disabled={readonly}
+                  required={isRequired}
+                  className="w-full accent-brand"
+                />
+                <div className="flex justify-between text-xs text-slate-500">
+                  <span className="cursor-pointer hover:text-brand transition-colors" onClick={() => handleResponseChange(question.id, question.min || 0)}>
+                    {question.minLabel || question.min}
+                  </span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-lg font-bold text-brand bg-brand/10 px-3 py-1 rounded-full mb-1">
+                      {value}
+                    </span>
+                    <button 
+                      type="button" 
+                      className="text-[10px] text-slate-400 hover:text-red-500 transition-colors underline"
+                      onClick={() => handleResponseChange(question.id, null)}
+                    >
+                      Effacer
+                    </button>
+                  </div>
+                  <span className="cursor-pointer hover:text-brand transition-colors" onClick={() => handleResponseChange(question.id, question.max || 10)}>
+                    {question.maxLabel || question.max}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         )}
 

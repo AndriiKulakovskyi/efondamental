@@ -577,73 +577,483 @@ export const EQ5D5L_DEFINITION: QuestionnaireDefinition = {
 
 // PRISE-M (Medication side effects - gender-specific)
 export const PRISE_M_QUESTIONS: Question[] = [
+  // Consigne initiale
   {
-    id: 'gender',
-    text: 'Sexe du patient',
+    id: 'instructions',
+    text: 'PRISE-M',
+    type: 'section',
+    required: false,
+    help: 'Pour tous les symptômes ci-dessous, cochez la case qui correspond à ce que vous avez ressenti au cours de la semaine écoulée. si, et seulement si, vous pensez que se sont des effets secondaires dus à votre traitement médicamenteux actuel.'
+  },
+  // Question de filtrage
+  {
+    id: 'taking_medication',
+    text: 'Prenez-vous actuellement un traitement médicamenteux ?',
     type: 'single_choice',
     required: true,
     options: [
-      { code: 'M', label: 'Masculin' },
-      { code: 'F', label: 'Féminin' }
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
     ]
   },
+  
   // Section 1: Troubles gastro-intestinaux
-  { id: 'q1', text: 'Diarrhée', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q2', text: 'Constipation', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q3', text: 'Bouche sèche', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q4', text: 'Nausée, vomissement', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
+  {
+    id: 'section_gastro',
+    text: '1 - Troubles gastro-intestinaux',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q1', 
+    text: 'Diarrhée', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q2', 
+    text: 'Constipation', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q3', 
+    text: 'Bouche sèche', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q4', 
+    text: 'Nausée, vomissement', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  
   // Section 2: Troubles cardiaques
-  { id: 'q5', text: 'Palpitations', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q6', text: 'Vertiges', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q7', text: 'Douleurs dans la poitrine', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
+  {
+    id: 'section_cardio',
+    text: '2 - Troubles cardiaques',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q5', 
+    text: 'Palpitations', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q6', 
+    text: 'Vertiges', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q7', 
+    text: 'Douleurs dans la poitrine', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  
   // Section 3: Problèmes cutanés
-  { id: 'q8', text: 'Augmentation de la transpiration', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q9', text: 'Démangeaisons', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q10', text: 'Sécheresse de la peau', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
+  {
+    id: 'section_cutane',
+    text: '3 - Problèmes cutanés',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q8', 
+    text: 'Augmentation de la transpiration', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q9', 
+    text: 'Démangeaisons', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q10', 
+    text: 'Sécheresse de la peau', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  
   // Section 4: Troubles neurologiques
-  { id: 'q11', text: 'Mal à la tête', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q12', text: 'Tremblements', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q13', text: 'Mauvais contrôle moteur', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q14', text: 'Étourdissements', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
+  {
+    id: 'section_neuro',
+    text: '4 - Troubles neurologiques',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q11', 
+    text: 'Mal à la tête', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q12', 
+    text: 'Tremblements', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q13', 
+    text: 'Mauvais contrôle moteur', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q14', 
+    text: 'Étourdissements', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  
   // Section 5: Vision/Audition
-  { id: 'q15', text: 'Vision floue', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q16', text: 'Acouphènes (bourdonnements dans les oreilles)', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  // Section 6: Troubles uro-génital
-  { id: 'q17', text: 'Difficultés pour uriner', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q18', text: 'Mictions douloureuses', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q19', text: 'Mictions fréquentes', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
+  {
+    id: 'section_vision_audition',
+    text: '5 - Vision/Audition',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q15', 
+    text: 'Vision floue', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q16', 
+    text: 'Acouphènes (bourdonnements dans les oreilles)', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  
+  // Section 6: Troubles uro-génitaux
+  {
+    id: 'section_uro_genital',
+    text: '6 - Troubles uro-génitaux',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q17', 
+    text: 'Difficultés pour uriner', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q18', 
+    text: 'Mictions douloureuses', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q19', 
+    text: 'Mictions fréquentes', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
   {
     id: 'q20',
-    text: 'Règles irrégulières',
+    text: 'Règles irrégulières (pour les femmes)',
     type: 'single_choice',
     required: false,
-    options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }],
-    display_if: { "==": [{ "var": "answers.gender" }, "F"] },
-    required_if: { "==": [{ "var": "answers.gender" }, "F"] }
+    display_if: { 
+      "and": [
+        { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+        { "==": [{ "var": "answers.patient_gender" }, "F"] }
+      ]
+    },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ]
   },
+  
   // Section 7: Problèmes de sommeil
-  { id: 'q21', text: "Difficultés d'endormissement", type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q22', text: 'Augmentation du temps de sommeil', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  // Section 8: Fonctions sexuelles
-  { id: 'q23', text: 'Perte du désir sexuel', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q24', text: 'Difficultés à atteindre un orgasme', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
   {
-    id: 'q25',
-    text: "Troubles de l'érection",
-    type: 'single_choice',
+    id: 'section_sommeil',
+    text: '7 - Problèmes de sommeil',
+    type: 'section',
     required: false,
-    options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }],
-    display_if: { "==": [{ "var": "answers.gender" }, "M"] },
-    required_if: { "==": [{ "var": "answers.gender" }, "M"] }
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
   },
+  { 
+    id: 'q21', 
+    text: "Difficultés d'endormissement", 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q22', 
+    text: 'Augmentation du temps de sommeil', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  
+  // Section 8: Fonctions sexuelles
+  {
+    id: 'section_sexuel',
+    text: '8 - Fonctions sexuelles',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q23', 
+    text: 'Perte du désir sexuel', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q24', 
+    text: "Difficultés à atteindre un orgasme (Troubles de l'érection pour l'homme)", 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  
   // Section 9: Autres troubles
-  { id: 'q26', text: 'Anxiété', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q27', text: 'Difficultés de concentration', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q28', text: 'Malaise général', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q29', text: 'Agitation', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q30', text: 'Fatigue', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q31', text: "Diminution de l'énergie", type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] },
-  { id: 'q32', text: 'Prise de poids', type: 'single_choice', required: false, options: [{ code: 0, label: 'Absent' }, { code: 1, label: 'Léger' }, { code: 2, label: 'Modéré/Sévère' }] }
+  {
+    id: 'section_autres',
+    text: '9 - Autres troubles',
+    type: 'section',
+    required: false,
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] }
+  },
+  { 
+    id: 'q25', 
+    text: 'Anxiété', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q26', 
+    text: 'Difficultés de concentration', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q27', 
+    text: 'Malaise général', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q28', 
+    text: 'Agitation', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q29', 
+    text: 'Fatigue', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q30', 
+    text: "Diminution de l'énergie", 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  },
+  { 
+    id: 'q31', 
+    text: 'Prise de poids', 
+    type: 'single_choice', 
+    required: false, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [
+      { code: 0, label: 'Absent' }, 
+      { code: 1, label: 'Tolérable' }, 
+      { code: 2, label: 'Pénible' }
+    ] 
+  }
 ];
 
 export const PRISE_M_DEFINITION: QuestionnaireDefinition = {
@@ -654,32 +1064,42 @@ export const PRISE_M_DEFINITION: QuestionnaireDefinition = {
   questions: PRISE_M_QUESTIONS,
   metadata: {
     pathologies: ['bipolar'],
-    target_role: 'patient'
+    target_role: 'patient',
+    instructions: 'Consignes : Pour tous les symptômes ci-dessous, cochez la case qui correspond à ce que vous avez ressenti au cours de la semaine écoulée. si, et seulement si, vous pensez que se sont des effets secondaires dus à votre traitement médicamenteux actuel.'
   }
 };
 
 // STAI-YA (State anxiety)
+// STAI-YA (State anxiety)
 export const STAI_YA_QUESTIONS: Question[] = [
-  { id: 'q1', text: 'Je me sens calme.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q2', text: 'Je me sens en sécurité, sans inquiétude, en sûreté.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q3', text: 'Je suis tendu(e), crispé(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q4', text: 'Je me sens surmené(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q5', text: 'Je me sens tranquille, bien dans ma peau.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q6', text: 'Je me sens ému(e), bouleversé(e), contrarié(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q7', text: "L'idée de malheurs éventuels me tracasse en ce moment.", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q8', text: 'Je me sens content(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q9', text: 'Je me sens effrayé(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q10', text: 'Je me sens à mon aise.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q11', text: "Je sens que j'ai confiance en moi.", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q12', text: 'Je me sens nerveux (nerveuse), irritable.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q13', text: "J'ai la frousse, la trouille (j'ai peur).", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q14', text: 'Je me sens indécis(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q15', text: 'Je suis décontracté(e), détendu(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q16', text: 'Je suis satisfait(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q17', text: 'Je suis inquiet, soucieux (inquiète, soucieuse).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q18', text: "Je ne sais plus où j'en suis, je me sens déconcerté(e), dérouté(e).", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q19', text: 'Je me sens solide, posé(e), pondéré(e), réfléchi(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
-  { id: 'q20', text: 'Je me sens de bonne humeur, aimable.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] }
+  {
+    id: 'instructions',
+    text: 'Consignes',
+    type: 'section',
+    required: false,
+    help: "Un certain nombre de phrases que l'on utilise pour se décrire sont données ci-dessous. Lisez chaque phrase, puis cochez, parmi les quatre points à droite, celui qui correspond le mieux à ce que vous ressentez A L'INSTANT, JUSTE EN CE MOMENT. Il n'y a pas de bonnes ni de mauvaises réponses. Ne passez pas trop de temps sur l'une ou l'autre de ces propositions, et indiquez la réponse qui décrit le mieux vos sentiments actuels."
+  },
+  { id: 'q1', text: '1. Je me sens calme.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q2', text: '2. Je me sens en sécurité, sans inquiétude, en sûreté.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q3', text: '3. Je suis tendu(e), crispé(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q4', text: '4. Je me sens surmené(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q5', text: '5. Je me sens tranquille, bien dans ma peau.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q6', text: '6. Je me sens ému(e), bouleversé(e), contrarié(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q7', text: "7. L'idée de malheurs éventuels me tracasse en ce moment.", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q8', text: '8. Je me sens content(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q9', text: '9. Je me sens effrayé(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q10', text: '10. Je me sens à mon aise.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q11', text: "11. Je sens que j'ai confiance en moi.", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q12', text: '12. Je me sens nerveux (nerveuse), irritable.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q13', text: "13. J'ai la frousse, la trouille (j'ai peur).", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q14', text: '14. Je me sens indécis(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q15', text: '15. Je suis décontracté(e), détendu(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q16', text: '16. Je suis satisfait(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q17', text: '17. Je suis inquiet, soucieux (inquiète, soucieuse).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q18', text: "18. Je ne sais plus où j'en suis, je me sens déconcerté(e), dérouté(e).", type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q19', text: '19. Je me sens solide, posé(e), pondéré(e), réfléchi(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'q20', text: '20. Je me sens de bonne humeur, aimable.', type: 'single_choice', required: true, options: [{ code: 1, label: 'non' }, { code: 2, label: 'plutôt non' }, { code: 3, label: 'plutôt oui' }, { code: 4, label: 'oui' }] },
+  { id: 'note_t', text: 'Note T', type: 'number', required: false, help: 'Saisissez la Note T calculée.' }
 ];
 
 export const STAI_YA_DEFINITION: QuestionnaireDefinition = {
@@ -691,22 +1111,110 @@ export const STAI_YA_DEFINITION: QuestionnaireDefinition = {
   metadata: {
     pathologies: ['bipolar'],
     target_role: 'patient',
-    reverse_items: [1, 2, 5, 8, 10, 11, 15, 16, 19, 20]
+    reverse_items: [1, 2, 5, 8, 10, 11, 15, 16, 19, 20],
+    instructions: "Un certain nombre de phrases que l'on utilise pour se décrire sont données ci-dessous. Lisez chaque phrase, puis cochez, parmi les quatre points à droite, celui qui correspond le mieux à ce que vous ressentez A L'INSTANT, JUSTE EN CE MOMENT. Il n'y a pas de bonnes ni de mauvaises réponses. Ne passez pas trop de temps sur l'une ou l'autre de ces propositions, et indiquez la réponse qui décrit le mieux vos sentiments actuels."
   }
 };
 
 // MARS (Medication adherence)
 export const MARS_QUESTIONS: Question[] = [
-  { id: 'q1', text: "Vous est-il parfois arrivé d'oublier de prendre vos médicaments ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q2', text: "Négligez-vous parfois l'heure de prise d'un de vos médicaments ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q3', text: 'Lorsque vous vous sentez mieux, interrompez-vous parfois votre traitement ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q4', text: "Vous est-il arrivé d'arrêter le traitement parce que vous vous sentiez moins bien en le prenant ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q5', text: 'Je ne prends les médicaments que lorsque je me sens malade.', type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q6', text: "Ce n'est pas naturel pour mon corps et mon esprit d'être équilibré par des médicaments.", type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q7', text: 'Mes idées sont plus claires avec les médicaments.', type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q8', text: 'En continuant à prendre les médicaments, je peux éviter de tomber à nouveau malade.', type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q9', text: 'Avec les médicaments, je me sens bizarre, comme un « zombie ».', type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] },
-  { id: 'q10', text: 'Les médicaments me rendent lourd(e) et fatigué(e).', type: 'single_choice', required: true, options: [{ code: 0, label: 'Non' }, { code: 1, label: 'Oui' }] }
+  {
+    id: 'instructions',
+    text: 'Consignes',
+    type: 'section',
+    required: false,
+    help: "Ce questionnaire consiste à mieux comprendre les difficultés liées à la prise de médicament. Votre aide nous sera précieuse pour mieux vous aider et améliorer, nous l'espérons, les résultats thérapeutiques. Veuillez s'il vous plaît répondre à l'ensemble des questions en cochant la réponse qui correspond le mieux à votre comportement ou attitude vis à vis du traitement que vous prenez sur la semaine qui vient de s'écouler."
+  },
+  {
+    id: 'taking_medication',
+    text: 'Prenez-vous actuellement un traitement médicamenteux ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui' },
+      { code: 'non', label: 'Non' }
+    ]
+  },
+  { 
+    id: 'q1', 
+    text: "Vous est-il parfois arrivé d'oublier de prendre vos médicaments ?", 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q2', 
+    text: "Négligez-vous parfois l'heure de prise d'un de vos médicaments ?", 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q3', 
+    text: 'Lorsque vous vous sentez mieux, interrompez-vous parfois votre traitement ?', 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q4', 
+    text: "Vous est-il arrivé d'arrêter le traitement parce que vous vous sentiez moins bien en le prenant ?", 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q5', 
+    text: 'Je ne prends les médicaments que lorsque je me sens malade.', 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q6', 
+    text: "Ce n'est pas naturel pour mon corps et mon esprit d'être équilibré par des médicaments.", 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q7', 
+    text: 'Mes idées sont plus claires avec les médicaments.', 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q8', 
+    text: 'En continuant à prendre les médicaments, je peux éviter de tomber à nouveau malade.', 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q9', 
+    text: 'Avec les médicaments, je me sens bizarre, comme un « zombie ».', 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  },
+  { 
+    id: 'q10', 
+    text: 'Les médicaments me rendent lourd(e) et fatigué(e).', 
+    type: 'single_choice', 
+    required: true, 
+    display_if: { "==": [{ "var": "answers.taking_medication" }, "oui"] },
+    options: [{ code: 1, label: 'Oui' }, { code: 0, label: 'Non' }] 
+  }
 ];
 
 export const MARS_DEFINITION: QuestionnaireDefinition = {
@@ -719,32 +1227,67 @@ export const MARS_DEFINITION: QuestionnaireDefinition = {
     pathologies: ['bipolar'],
     target_role: 'patient',
     positive_items: [7, 8],
-    negative_items: [1, 2, 3, 4, 5, 6, 9, 10]
+    negative_items: [1, 2, 3, 4, 5, 6, 9, 10],
+    instructions: "Ce questionnaire consiste à mieux comprendre les difficultés liées à la prise de médicament. Votre aide nous sera précieuse pour mieux vous aider et améliorer, nous l'espérons, les résultats thérapeutiques. Veuillez s'il vous plaît répondre à l'ensemble des questions en cochant la réponse qui correspond le mieux à votre comportement ou attitude vis à vis du traitement que vous prenez sur la semaine qui vient de s'écouler."
   }
 };
 
 // MAThyS (Multidimensional thymic states)
+// MAThyS (Multidimensional thymic states)
 export const MATHYS_QUESTIONS: Question[] = [
-  { id: 'q1', text: "Je suis moins sensible que d'habitude aux couleurs / Je suis plus sensible que d'habitude aux couleurs", type: 'scale', required: true, min: 0, max: 10, minLabel: "Moins sensible", maxLabel: "Plus sensible" },
-  { id: 'q2', text: "Je manque de tonus / J'ai une tension interne importante", type: 'scale', required: true, min: 0, max: 10, minLabel: "Manque de tonus", maxLabel: "Tension interne" },
-  { id: 'q3', text: "J'ai l'impression d'être anesthésié(e) sur le plan des émotions / J'ai parfois le sentiment de perdre le contrôle de mes émotions", type: 'scale', required: true, min: 0, max: 10, minLabel: "Anesthésié(e)", maxLabel: "Perte de contrôle" },
-  { id: 'q4', text: "Je suis replié(e) sur moi / J'ai l'impression d'être ouvert(e) au monde", type: 'scale', required: true, min: 0, max: 10, minLabel: "Replié(e)", maxLabel: "Ouvert(e)" },
-  { id: 'q5', text: "Mes pensées vont lentement / Mes pensées vont vite", type: 'scale', required: true, min: 0, max: 10, minLabel: "Pensées lentes", maxLabel: "Pensées rapides" },
-  { id: 'q6', text: "Mes mouvements sont lents / Mes mouvements sont rapides", type: 'scale', required: true, min: 0, max: 10, minLabel: "Mouvements lents", maxLabel: "Mouvements rapides" },
-  { id: 'q7', text: "Je me sens ralenti(e) / Je me sens accéléré(e)", type: 'scale', required: true, min: 0, max: 10, minLabel: "Ralenti(e)", maxLabel: "Accéléré(e)" },
-  { id: 'q8', text: "J'ai des difficultés à penser / Je pense avec facilité", type: 'scale', required: true, min: 0, max: 10, minLabel: "Difficultés", maxLabel: "Facilité" },
-  { id: 'q9', text: "Je n'ai envie de rien / J'ai envie de plein de choses", type: 'scale', required: true, min: 0, max: 10, minLabel: "Aucune envie", maxLabel: "Plein d'envies" },
-  { id: 'q10', text: "Je n'ai pas d'intérêt pour ce qui m'entoure / Je suis très intéressé(e) par ce qui m'entoure", type: 'scale', required: true, min: 0, max: 10, minLabel: "Pas d'intérêt", maxLabel: "Très intéressé(e)" },
-  { id: 'q11', text: "Mes sens (goût, toucher, odorat, vue, ouïe) me semblent émoussés / Mes sens (goût, toucher, odorat, vue, ouïe) me semblent aiguisés", type: 'scale', required: true, min: 0, max: 10, minLabel: "Sens émoussés", maxLabel: "Sens aiguisés" },
-  { id: 'q12', text: "Je n'ai pas d'énergie / J'ai beaucoup d'énergie", type: 'scale', required: true, min: 0, max: 10, minLabel: "Pas d'énergie", maxLabel: "Beaucoup d'énergie" },
-  { id: 'q13', text: "Je me sens triste / Je me sens gai(e)", type: 'scale', required: true, min: 0, max: 10, minLabel: "Triste", maxLabel: "Gai(e)" },
-  { id: 'q14', text: "Je me sens calme / Je me sens agité(e)", type: 'scale', required: true, min: 0, max: 10, minLabel: "Calme", maxLabel: "Agité(e)" },
-  { id: 'q15', text: "J'ai peu d'idées / J'ai plein d'idées", type: 'scale', required: true, min: 0, max: 10, minLabel: "Peu d'idées", maxLabel: "Plein d'idées" },
-  { id: 'q16', text: "Je suis peu réactif(ve) à ce qui m'entoure / Je suis très réactif(ve) à ce qui m'entoure", type: 'scale', required: true, min: 0, max: 10, minLabel: "Peu réactif(ve)", maxLabel: "Très réactif(ve)" },
-  { id: 'q17', text: "Je ne prends aucune initiative / Je prends beaucoup d'initiatives", type: 'scale', required: true, min: 0, max: 10, minLabel: "Aucune initiative", maxLabel: "Beaucoup d'initiatives" },
-  { id: 'q18', text: "Je ne me lance dans aucune activité / Je me lance dans plein d'activités", type: 'scale', required: true, min: 0, max: 10, minLabel: "Aucune activité", maxLabel: "Plein d'activités" },
-  { id: 'q19', text: "J'ai l'impression de vivre au ralenti / J'ai l'impression de vivre intensement", type: 'scale', required: true, min: 0, max: 10, minLabel: "Au ralenti", maxLabel: "Intensement" },
-  { id: 'q20', text: "Je me sens fatigué(e) / Je me sens en pleine forme", type: 'scale', required: true, min: 0, max: 10, minLabel: "Fatigué(e)", maxLabel: "Pleine forme" }
+  {
+    id: 'instructions',
+    text: 'Consignes',
+    type: 'section',
+    required: false,
+    help: "Consigne de cotation : coter toujours le score le plus extrême (0 au lieu de 1 par exemple ; 10 au lieu de 9). Chaque item est coté entre 0 et 10, avec possibilité de demi points (Ex.: 2.5).\n\n**Attention : contrairement au calque, ne pas inverser les scores préalablement. ex: item 9: Mon cerveau ne s'arrête pas = 0 | Mon cerveau fonctionne au ralenti = 10.**"
+  },
+  { id: 'q1', text: "1. Je suis moins sensible que d'habitude aux couleurs | Je suis plus sensible que d'habitude aux couleurs", type: 'scale', required: true, min: 0, max: 10, minLabel: "Moins sensible", maxLabel: "Plus sensible", metadata: { step: 0.5 } },
+  { id: 'q2', text: "2. Je manque de tonus | J'ai une tension interne importante", type: 'scale', required: true, min: 0, max: 10, minLabel: "Manque de tonus", maxLabel: "Tension interne", metadata: { step: 0.5 } },
+  { id: 'q3', text: "3. J'ai l'impression d'être anesthésié(e) sur le plan des émotions | J'ai parfois le sentiment de perdre le contrôle de mes émotions", type: 'scale', required: true, min: 0, max: 10, minLabel: "Anesthésié(e)", maxLabel: "Perte de contrôle", metadata: { step: 0.5 } },
+  { id: 'q4', text: "4. Je suis replié(e) sur moi | Je suis désinhibé(e)", type: 'scale', required: true, min: 0, max: 10, minLabel: "Replié(e)", maxLabel: "Désinhibé(e)", metadata: { step: 0.5 } },
+  { id: 'q5', text: "5. Je suis facilement distrait(e), la moindre chose me fait perdre mon attention | Je ne suis pas attentif (ve) à mon environnement", type: 'scale', required: true, min: 0, max: 10, minLabel: "Distrait(e)", maxLabel: "Inattentif (ve)", metadata: { step: 0.5 } },
+  { id: 'q6', text: "6. Je suis plus sensible que d'habitude au toucher | Je suis moins sensible que d'habitude au toucher", type: 'scale', required: true, min: 0, max: 10, minLabel: "Plus sensible", maxLabel: "Moins sensible", metadata: { step: 0.5 } },
+  { id: 'q7', text: "7. J'ai l'impression que mon humeur varie beaucoup en fonction de mon environnement | Mon humeur est monotone et peu changeante", type: 'scale', required: true, min: 0, max: 10, minLabel: "Humeur variable", maxLabel: "Humeur monotone", metadata: { step: 0.5 } },
+  { id: 'q8', text: "8. Je suis particulièrement sensible à la musique | Je suis plus indifférent que d'habitude à la musique", type: 'scale', required: true, min: 0, max: 10, minLabel: "Sensible musique", maxLabel: "Indifférent musique", metadata: { step: 0.5 } },
+  { id: 'q9', text: "9. Mon cerveau ne s'arrête jamais | Mon cerveau fonctionne au ralenti", type: 'scale', required: true, min: 0, max: 10, minLabel: "Ne s'arrête jamais", maxLabel: "Au ralenti", metadata: { step: 0.5 } },
+  { id: 'q10', text: "10. Je suis plus réactif (ve) à mon environnement | Je suis moins réactif (ve) à mon environnement", type: 'scale', required: true, min: 0, max: 10, minLabel: "Plus réactif(ve)", maxLabel: "Moins réactif(ve)", metadata: { step: 0.5 } },
+  { id: 'q11', text: "11. Je me sens sans énergie | J'ai le sentiment d'avoir une grande énergie", type: 'scale', required: true, min: 0, max: 10, minLabel: "Sans énergie", maxLabel: "Grande énergie", metadata: { step: 0.5 } },
+  { id: 'q12', text: "12. J'ai le sentiment que mes pensées sont ralenties | J'ai le sentiment que mes idées défilent dans ma tête", type: 'scale', required: true, min: 0, max: 10, minLabel: "Pensées ralenties", maxLabel: "Idées défilent", metadata: { step: 0.5 } },
+  { id: 'q13', text: "13. Je trouve la nourriture sans goût | Je recherche les plaisirs gastronomiques car j'en apprécie davantage les saveurs", type: 'scale', required: true, min: 0, max: 10, minLabel: "Sans goût", maxLabel: "Plaisirs gastronomiques", metadata: { step: 0.5 } },
+  { id: 'q14', text: "14. J'ai moins envie de communiquer avec les autres | J'ai plus envie de communiquer avec les autres", type: 'scale', required: true, min: 0, max: 10, minLabel: "Moins envie", maxLabel: "Plus envie", metadata: { step: 0.5 } },
+  { id: 'q15', text: "15. Je manque de motivation pour aller de l'avant | Je multiplie les projets nouveaux", type: 'scale', required: true, min: 0, max: 10, minLabel: "Manque motivation", maxLabel: "Multiplie projets", metadata: { step: 0.5 } },
+  { id: 'q16', text: "16. Ma perte d'intérêt pour mon environnement m'empêche de gérer le quotidien | J'ai envie de faire plus de choses que d'habitude", type: 'scale', required: true, min: 0, max: 10, minLabel: "Perte intérêt", maxLabel: "Envie faire plus", metadata: { step: 0.5 } },
+  { id: 'q17', text: "17. Je prends les décisions de manière plus rapide que d'habitude | J'ai plus de difficultés que d'habitude à prendre des décisions", type: 'scale', required: true, min: 0, max: 10, minLabel: "Décisions rapides", maxLabel: "Difficultés décisions", metadata: { step: 0.5 } },
+  { id: 'q18', text: "18. Je ressens les émotions de manière très intense | Mes émotions sont atténuées", type: 'scale', required: true, min: 0, max: 10, minLabel: "Émotions intenses", maxLabel: "Émotions atténuées", metadata: { step: 0.5 } },
+  { id: 'q19', text: "19. Je suis ralenti(e) dans mes mouvements | Je suis physiquement agité(e)", type: 'scale', required: true, min: 0, max: 10, minLabel: "Ralenti(e)", maxLabel: "Agité(e)", metadata: { step: 0.5 } },
+  { id: 'q20', text: "20. J'ai l'impression d'être moins sensible aux odeurs que d'habitude | J'ai l'impression d'être plus sensible aux odeurs que d'habitude", type: 'scale', required: true, min: 0, max: 10, minLabel: "Moins sensible odeurs", maxLabel: "Plus sensible odeurs", metadata: { step: 0.5 } },
+  {
+    id: 'scores_section',
+    text: 'Calcul des scores MAThyS',
+    type: 'section',
+    required: false,
+    help: "Les scores ci-dessous sont calculés automatiquement en fonction de vos réponses aux 20 items précédents."
+  },
+  { id: 'subscore_emotion', text: 'Score Emotion à la MATHYS', type: 'number', required: false, readonly: true },
+  { id: 'subscore_motivation', text: 'Score Motivation à la MATHYS', type: 'number', required: false, readonly: true },
+  { id: 'subscore_perception', text: 'Score Perception sensorielle à la MATHYS', type: 'number', required: false, readonly: true },
+  { id: 'subscore_interaction', text: 'Score Interaction personnelle à la MATHYS', type: 'number', required: false, readonly: true },
+  { id: 'subscore_cognition', text: 'Score Cognition à la MATHYS', type: 'number', required: false, readonly: true },
+  {
+    id: 'emotions_section',
+    text: 'Intensité des émotions',
+    type: 'section',
+    required: false,
+    help: "Veuillez coter l'intensité des émotions suivantes sur la semaine écoulée."
+  },
+  { id: 'tristesse', text: 'Tristesse', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 2.5, label: 'Occasionnellement' }, { code: 5, label: 'Souvent' }, { code: 7.5, label: 'Très souvent' }, { code: 10, label: 'Constamment' }] },
+  { id: 'joie', text: 'Joie', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 2.5, label: 'Occasionnellement' }, { code: 5, label: 'Souvent' }, { code: 7.5, label: 'Très souvent' }, { code: 10, label: 'Constamment' }] },
+  { id: 'irritabilite', text: 'Irritabilité', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 2.5, label: 'Occasionnellement' }, { code: 5, label: 'Souvent' }, { code: 7.5, label: 'Très souvent' }, { code: 10, label: 'Constamment' }] },
+  { id: 'panique', text: 'Panique', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 2.5, label: 'Occasionnellement' }, { code: 5, label: 'Souvent' }, { code: 7.5, label: 'Très souvent' }, { code: 10, label: 'Constamment' }] },
+  { id: 'anxiete', text: 'Anxiété', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 2.5, label: 'Occasionnellement' }, { code: 5, label: 'Souvent' }, { code: 7.5, label: 'Très souvent' }, { code: 10, label: 'Constamment' }] },
+  { id: 'colere', text: 'Colère', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 2.5, label: 'Occasionnellement' }, { code: 5, label: 'Souvent' }, { code: 7.5, label: 'Très souvent' }, { code: 10, label: 'Constamment' }] },
+  { id: 'exaltation', text: 'Exaltation', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 2.5, label: 'Occasionnellement' }, { code: 5, label: 'Souvent' }, { code: 7.5, label: 'Très souvent' }, { code: 10, label: 'Constamment' }] }
 ];
 
 export const MATHYS_DEFINITION: QuestionnaireDefinition = {
@@ -756,32 +1299,75 @@ export const MATHYS_DEFINITION: QuestionnaireDefinition = {
   metadata: {
     pathologies: ['bipolar'],
     target_role: 'patient',
-    reverse_items: [5, 6, 7, 8, 9, 10, 17, 18]
+    reverse_items: [5, 6, 7, 8, 9, 10, 17, 18],
+    instructions: "Consigne de cotation : coter toujours le score le plus extrême (0 au lieu de 1 par exemple ; 10 au lieu de 9). Chaque item est coté entre 0 et 10, avec possibilité de demi points (Ex.: 2.5).\n\n**Attention : contrairement au calque, ne pas inverser les scores préalablement. ex: item 9: Mon cerveau ne s'arrête pas = 0 | Mon cerveau fonctionne au ralenti = 10.**"
   }
 };
 
 // PSQI (Pittsburgh Sleep Quality Index)
 export const PSQI_QUESTIONS: Question[] = [
-  { id: 'q1_bedtime', text: 'À quelle heure vous êtes-vous habituellement couché(e) au cours du mois dernier ?', type: 'text', required: true, help: 'Format: HH:MM' },
-  { id: 'q2_minutes_to_sleep', text: 'Combien de minutes vous a-t-il fallu (en moyenne) pour vous endormir chaque nuit au cours du mois dernier ?', type: 'number', required: true, min: 0 },
-  { id: 'q3_waketime', text: 'À quelle heure vous êtes-vous habituellement levé(e) le matin au cours du mois dernier ?', type: 'text', required: true, help: 'Format: HH:MM' },
-  { id: 'q4_hours_sleep', text: "Combien d'heures de sommeil avez-vous effectivement eu par nuit au cours du mois dernier ?", type: 'number', required: true, min: 0, max: 24 },
+  { 
+    id: 'q1_bedtime', 
+    text: '1. Au cours des 30 derniers jours, à quelle heure vous êtes-vous généralement couché(e) le soir? (format HH:MM)', 
+    type: 'text', 
+    required: true, 
+    help: 'A noter en H24 ex: si le patient se couche à 23:00 ne surtout pas mettre 11H(du soir)',
+    metadata: { placeholder: 'HH:MM', pattern: '^([01]\\d|2[0-3]):[0-5]\\d$' }
+  },
+  { 
+    id: 'q2_minutes_to_sleep', 
+    text: '2. Au cours des 30 derniers jours, au bout de combien de temps (en minutes) vous êtes-vous généralement endormi(e) le soir ?', 
+    type: 'number', 
+    required: true, 
+    min: 0 
+  },
+  { 
+    id: 'q3_waketime', 
+    text: '3. Au cours des 30 derniers jours, à quelle heure vous êtes-vous généralement levé(e) le matin ? (format HH:MM)', 
+    type: 'text', 
+    required: true, 
+    help: 'A noter en H24 ex: si le patient se couche à 23:00 ne surtout pas mettre 11H(du soir)',
+    metadata: { placeholder: 'HH:MM', pattern: '^([01]\\d|2[0-3]):[0-5]\\d$' }
+  },
+  { 
+    id: 'q4_hours_sleep', 
+    text: '4. Au cours des 30 derniers jours, combien d’heures avez-vous vraiment dormi par nuit ? (format HH:MM)', 
+    type: 'text', 
+    required: true, 
+    help: 'A noter en H24 ex: si vous avez dormi 6 heures et 30 minutes, notez 06:30',
+    metadata: { placeholder: 'HH:MM', pattern: '^([01]\\d|2[0-4]):[0-5]\\d$' }
+  },
   // Q5: Fréquence des troubles du sommeil
-  { id: 'q5a', text: "Vous n'êtes pas arrivé(e) à vous endormir en 30 minutes", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5b', text: 'Réveil au milieu de la nuit ou tôt le matin', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5c', text: 'Levers nocturnes pour aller aux toilettes', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5d', text: 'Difficultés respiratoires', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5e', text: 'Toux ou ronflement bruyant', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5f', text: 'Trop froid', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5g', text: 'Trop chaud', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5h', text: 'Cauchemars', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5i', text: 'Douleurs', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q5j', text: 'Autre raison', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5a', text: "5a. Vous n’êtes pas arrivé(e) à vous endormir en 30 minutes", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5b', text: '5b. Vous vous êtes réveillé(e) au milieu de la nuit ou plus tôt que d’habitude', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5c', text: '5c. Vous avez dû vous lever pour aller aux toilettes', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5d', text: '5d. Vous avez eu du mal à respirer', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5e', text: '5e. Vous avez toussé ou ronflé bruyamment', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5f', text: '5f. Vous avez eu trop froid', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5g', text: '5g. Vous avez eu trop chaud', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5h', text: '5h. Vous avez fait des cauchemars', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5i', text: '5i. Vous avez eu des douleurs', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q5j', text: '5j. Combien de fois, au cours des 30 derniers jours, avez-vous eu des difficultés à dormir pour d’autres raisons ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
   { id: 'q5j_text', text: 'Si autre raison, préciser', type: 'text', required: false, display_if: { ">": [{ "var": "answers.q5j" }, 0] } },
-  { id: 'q6', text: 'Comment évalueriez-vous globalement la qualité de votre sommeil au cours du mois dernier ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Très bonne' }, { code: 1, label: 'Assez bonne' }, { code: 2, label: 'Assez mauvaise' }, { code: 3, label: 'Très mauvaise' }] },
-  { id: 'q7', text: 'Au cours du mois dernier, à quelle fréquence avez-vous pris des médicaments (avec ou sans ordonnance) pour vous aider à dormir ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q8', text: "Au cours du mois dernier, à quelle fréquence avez-vous eu des difficultés à rester éveillé(e) en conduisant, en mangeant ou lors d'une activité sociale ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: "Moins d'une fois par semaine" }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
-  { id: 'q9', text: "Au cours du mois dernier, avez-vous représenté un problème pour vous de maintenir assez d'enthousiasme pour faire les choses ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Aucun problème' }, { code: 1, label: 'Un tout petit problème' }, { code: 2, label: 'Quelque peu un problème' }, { code: 3, label: 'Un très grand problème' }] }
+  { id: 'q6', text: '6. Comment qualifieriez-vous la qualité de votre sommeil en général au cours des 30 derniers jours ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Très bonne' }, { code: 1, label: 'Assez bonne' }, { code: 2, label: 'Assez mauvaise' }, { code: 3, label: 'Très mauvaise' }] },
+  { id: 'q7', text: '7. Au cours des 30 derniers jours, combien de fois avez-vous pris des médicaments pour mieux dormir (médicaments prescrits par votre médecin ou vendus sans ordonnance) ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q8', text: '8. Au cours des 30 derniers jours, combien de fois avez-vous eu des difficultés à rester éveillé(e) en conduisant, en mangeant, ou en participant à des activités avec d’autres personnes ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais au cours des 30 derniers jours' }, { code: 1, label: 'Moins d’une fois par semaine' }, { code: 2, label: 'Une ou deux fois par semaine' }, { code: 3, label: 'Trois fois par semaine ou plus' }] },
+  { id: 'q9', text: '9. Au cours des 30 derniers jours, combien vous a-t-il été difficile d’être suffisamment motivé(e) pour mener à bien vos activités ?', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas difficile du tout' }, { code: 1, label: 'Légèrement difficile' }, { code: 2, label: 'Assez difficile' }, { code: 3, label: 'Très difficile' }] },
+  {
+    id: 'psqi_scores_section',
+    text: 'Résultats PSQI',
+    type: 'section',
+    required: false,
+    help: 'Calcul des scores de qualité du sommeil.'
+  },
+  { id: 'c4_efficiency', text: 'Score efficience sommeil', type: 'number', required: false, readonly: true },
+  { id: 'c3_duration', text: 'Score durée de sommeil', type: 'number', required: false, readonly: true },
+  { id: 'c5_disturbances', text: 'Score du trouble du sommeil', type: 'number', required: false, readonly: true },
+  { id: 'c2_latency', text: 'Score latence avant sommeil', type: 'number', required: false, readonly: true },
+  { id: 'c1_subjective_quality', text: 'Score sur la qualité du sommeil', type: 'number', required: false, readonly: true },
+  { id: 'c6_medication', text: 'Score médication', type: 'number', required: false, readonly: true },
+  { id: 'c7_daytime_dysfunction', text: 'Score de dysfonctionnement dû au sommeil', type: 'number', required: false, readonly: true },
+  { id: 'total_score', text: 'Score total', type: 'number', required: false, readonly: true }
 ];
 
 export const PSQI_DEFINITION: QuestionnaireDefinition = {
@@ -798,15 +1384,15 @@ export const PSQI_DEFINITION: QuestionnaireDefinition = {
 
 // Epworth (Sleepiness Scale)
 export const EPWORTH_QUESTIONS: Question[] = [
-  { id: 'q1', text: 'Assis en train de lire', type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
-  { id: 'q2', text: 'En train de regarder la télévision', type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
-  { id: 'q3', text: 'Assis, inactif, dans un endroit public (au théâtre, en réunion)', type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
-  { id: 'q4', text: 'Comme passager dans une voiture roulant sans arrêt pendant une heure', type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
-  { id: 'q5', text: "Allongé l'après-midi pour se reposer quand les circonstances le permettent", type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
-  { id: 'q6', text: 'Assis en train de parler à quelqu’un', type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
-  { id: 'q7', text: 'Assis calmement après un repas sans alcool', type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
-  { id: 'q8', text: 'Dans une auto immobilisée quelques minutes dans un encombrement', type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
-  { id: 'q9', text: 'Ces envies de dormir surviennent-elles ? (cocher une seule réponse)', type: 'single_choice', required: false, options: [{ code: 0, label: 'seulement après les repas' }, { code: 1, label: 'à certaines heures du jour, toujours les mêmes' }, { code: 2, label: 'la nuit' }, { code: 3, label: "n'importe quelle heure du jour" }] }
+  { id: 'q1', text: '1. Assis en train de lire', type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
+  { id: 'q2', text: '2. En train de regarder la télévision', type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
+  { id: 'q3', text: '3. Assis, inactif, dans un endroit public (au théâtre, en réunion)', type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
+  { id: 'q4', text: '4. Comme passager dans une voiture roulant sans arrêt pendant une heure', type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
+  { id: 'q5', text: "5. Allongé l'après-midi pour se reposer quand les circonstances le permettent", type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
+  { id: 'q6', text: '6. Assis en train de parler à quelqu’un', type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
+  { id: 'q7', text: '7. Assis calmement après un repas sans alcool', type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
+  { id: 'q8', text: '8. Dans une auto immobilisée quelques minutes dans un encombrement', type: 'single_choice', required: true, options: [{ code: 0, label: '0 – ne somnolerait jamais' }, { code: 1, label: "1 – faible chance de s'endormir" }, { code: 2, label: "2 – chance moyenne de s'endormir" }, { code: 3, label: "3 – forte chance de s'endormir" }] },
+  { id: 'q9', text: '9. Ces envies de dormir surviennent-elles ? (cocher une seule réponse)', type: 'single_choice', required: false, options: [{ code: 0, label: 'seulement après les repas' }, { code: 1, label: 'à certaines heures du jour, toujours les mêmes' }, { code: 2, label: 'la nuit' }, { code: 3, label: "n'importe quelle heure du jour" }] }
 ];
 
 export const EPWORTH_DEFINITION: QuestionnaireDefinition = {
@@ -814,6 +1400,7 @@ export const EPWORTH_DEFINITION: QuestionnaireDefinition = {
   code: 'EPWORTH',
   title: 'Epworth',
   description: 'Échelle de Somnolence d’Epworth',
+  instructions: "Vous arrive-t-il de somnoler ou de vous endormir - et pas seulement de vous sentir fatigué - dans les situations suivantes ? Cette question s'adresse à votre vie dans les mois derniers.\nMême si vous ne vous êtes pas trouvé récemment dans l'une des situations suivantes, essayez de vous représenter comme elles auraient pu vous affecter.\nChoisissez dans l'échelle suivante le nombre le plus approprié à chaque situation :",
   questions: EPWORTH_QUESTIONS,
   metadata: {
     pathologies: ['bipolar'],

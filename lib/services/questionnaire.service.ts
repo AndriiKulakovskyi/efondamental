@@ -3608,28 +3608,27 @@ export async function savePriseMResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Calculate section scores
-  const gastroScore = (response.q1 ?? 0) + (response.q2 ?? 0) + (response.q3 ?? 0) + (response.q4 ?? 0);
-  const cardiacScore = (response.q5 ?? 0) + (response.q6 ?? 0) + (response.q7 ?? 0);
-  const skinScore = (response.q8 ?? 0) + (response.q9 ?? 0) + (response.q10 ?? 0);
-  const neuroScore = (response.q11 ?? 0) + (response.q12 ?? 0) + (response.q13 ?? 0) + (response.q14 ?? 0);
-  const visionHearingScore = (response.q15 ?? 0) + (response.q16 ?? 0);
-  const sleepScore = (response.q21 ?? 0) + (response.q22 ?? 0);
-  const otherScore = (response.q26 ?? 0) + (response.q27 ?? 0) + (response.q28 ?? 0) + 
-                     (response.q29 ?? 0) + (response.q30 ?? 0) + (response.q31 ?? 0) + (response.q32 ?? 0);
+  // Remove demographic metadata fields that are not part of the table schema
+  const { patient_age, patient_gender, patient_sex, ...responseData } = response as any;
 
-  // Gender-specific scoring
-  let urogenitalScore = (response.q17 ?? 0) + (response.q18 ?? 0) + (response.q19 ?? 0);
-  let sexualScore = (response.q23 ?? 0) + (response.q24 ?? 0);
-  let itemsScored = 31; // Default excluding one gender-specific item
+  // Calculate section scores (updated for q1-q31 structure)
+  const gastroScore = (responseData.q1 ?? 0) + (responseData.q2 ?? 0) + (responseData.q3 ?? 0) + (responseData.q4 ?? 0);
+  const cardiacScore = (responseData.q5 ?? 0) + (responseData.q6 ?? 0) + (responseData.q7 ?? 0);
+  const skinScore = (responseData.q8 ?? 0) + (responseData.q9 ?? 0) + (responseData.q10 ?? 0);
+  const neuroScore = (responseData.q11 ?? 0) + (responseData.q12 ?? 0) + (responseData.q13 ?? 0) + (responseData.q14 ?? 0);
+  const visionHearingScore = (responseData.q15 ?? 0) + (responseData.q16 ?? 0);
+  const sleepScore = (responseData.q21 ?? 0) + (responseData.q22 ?? 0);
+  
+  // Updated: q25-q31 are "other" symptoms (was q26-q32)
+  const otherScore = (responseData.q25 ?? 0) + (responseData.q26 ?? 0) + (responseData.q27 ?? 0) + 
+                     (responseData.q28 ?? 0) + (responseData.q29 ?? 0) + (responseData.q30 ?? 0) + (responseData.q31 ?? 0);
 
-  if (response.gender === 'F') {
-    urogenitalScore += (response.q20 ?? 0);
-    itemsScored = response.q20 !== null && response.q20 !== undefined ? 32 : 31;
-  } else if (response.gender === 'M') {
-    sexualScore += (response.q25 ?? 0);
-    itemsScored = response.q25 !== null && response.q25 !== undefined ? 32 : 31;
-  }
+  // Urogenital and sexual scores (q17-q20 for urogenital, q23-q24 for sexual)
+  const urogenitalScore = (responseData.q17 ?? 0) + (responseData.q18 ?? 0) + (responseData.q19 ?? 0) + (responseData.q20 ?? 0);
+  const sexualScore = (responseData.q23 ?? 0) + (responseData.q24 ?? 0);
+  
+  // Count items scored (all 31 questions)
+  const itemsScored = 31;
 
   const totalScore = gastroScore + cardiacScore + skinScore + neuroScore + 
                      visionHearingScore + urogenitalScore + sleepScore + 
@@ -3638,7 +3637,7 @@ export async function savePriseMResponse(
   const { data, error } = await supabase
     .from('responses_prise_m')
     .upsert({
-      ...response,
+      ...responseData,
       gastro_score: gastroScore,
       cardiac_score: cardiacScore,
       skin_score: skinScore,
@@ -3683,12 +3682,15 @@ export async function saveStaiYaResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
+  // Remove instructions section if present
+  const { instructions, ...responseData } = response as any;
+
   // Reverse score items: 1, 2, 5, 8, 10, 11, 15, 16, 19, 20
   const reverseItems = [1, 2, 5, 8, 10, 11, 15, 16, 19, 20];
   let totalScore = 0;
 
   for (let i = 1; i <= 20; i++) {
-    const value = response[`q${i}` as keyof StaiYaResponseInsert] as number;
+    const value = responseData[`q${i}` as keyof StaiYaResponseInsert] as number;
     if (reverseItems.includes(i)) {
       totalScore += (5 - value);
     } else {
@@ -3698,24 +3700,27 @@ export async function saveStaiYaResponse(
 
   let anxietyLevel = '';
   let interpretation = '';
-  if (totalScore <= 35) {
-    anxietyLevel = 'low';
-    interpretation = 'Anxiété faible';
+  if (totalScore < 35) {
+    anxietyLevel = 'very_low';
+    interpretation = 'Anxiété état très faible';
   } else if (totalScore <= 45) {
-    anxietyLevel = 'moderate';
-    interpretation = 'Anxiété modérée';
+    anxietyLevel = 'low';
+    interpretation = 'Anxiété état faible';
   } else if (totalScore <= 55) {
+    anxietyLevel = 'moderate';
+    interpretation = 'Anxiété état moyenne';
+  } else if (totalScore <= 65) {
     anxietyLevel = 'high';
-    interpretation = 'Anxiété élevée';
+    interpretation = 'Anxiété état élevée';
   } else {
     anxietyLevel = 'very_high';
-    interpretation = 'Anxiété très élevée';
+    interpretation = 'Anxiété état très élevée';
   }
 
   const { data, error } = await supabase
     .from('responses_stai_ya')
     .upsert({
-      ...response,
+      ...responseData,
       total_score: totalScore,
       anxiety_level: anxietyLevel,
       interpretation,
@@ -3752,28 +3757,32 @@ export async function saveMarsResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Remove adherence_percentage if present (it's a generated column)
-  const { adherence_percentage, ...responseWithoutGeneratedFields } = response as any;
+  // Remove metadata fields that are not part of the table schema
+  const { adherence_percentage, instructions, ...responseData } = response as any;
 
-  // MARS scoring: items 7,8 are positive (YES=1), others are negative (NO=1)
-  const positiveItems = [7, 8];
+  // Calculate score only if taking medication
   let totalScore = 0;
-
-  for (let i = 1; i <= 10; i++) {
-    const value = responseWithoutGeneratedFields[`q${i}` as keyof MarsResponseInsert] as number;
-    if (positiveItems.includes(i)) {
-      totalScore += value; // YES=1, NO=0
-    } else {
-      totalScore += (1 - value); // NO=1, YES=0
+  if (responseData.taking_medication === 'oui') {
+    // MARS scoring: items 7,8 are positive (YES=1), others are negative (NO=1)
+    const positiveItems = [7, 8];
+    for (let i = 1; i <= 10; i++) {
+      const value = responseData[`q${i}` as keyof MarsResponseInsert] as number;
+      if (positiveItems.includes(i)) {
+        totalScore += value; // YES=1, NO=0
+      } else {
+        totalScore += (1 - value); // NO=1, YES=0
+      }
     }
   }
 
-  const interpretation = totalScore >= 7 ? 'Bonne adhérence' : 'Adhérence insuffisante';
+  const interpretation = responseData.taking_medication === 'oui' 
+    ? (totalScore >= 7 ? 'Bonne adhérence' : 'Adhérence insuffisante')
+    : 'Non applicable (pas de traitement)';
 
   const { data, error } = await supabase
     .from('responses_mars')
     .upsert({
-      ...responseWithoutGeneratedFields,
+      ...responseData,
       total_score: totalScore,
       interpretation,
       completed_by: user.data.user?.id
@@ -3809,60 +3818,47 @@ export async function saveMathysResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
+  // Remove metadata fields that are not part of the table schema
+  const { instructions, emotions_section, ...responseData } = response as any;
+
   // Reverse score items: 5, 6, 7, 8, 9, 10, 17, 18
   const reverseItems = [5, 6, 7, 8, 9, 10, 17, 18];
-  
-  // Calculate subscales
-  let emotionalHyperreactivity = 0;
-  let emotionalHyporeactivity = 0;
-  let cognitiveSpeed = 0;
-  let motorActivity = 0;
-  let motivation = 0;
   
   // Apply reverse scoring and calculate subscales
   const processedScores: Record<number, number> = {};
   for (let i = 1; i <= 20; i++) {
-    let value = response[`q${i}` as keyof MathysResponseInsert] as number;
+    const rawValue = responseData[`q${i}` as keyof MathysResponseInsert] as number;
     if (reverseItems.includes(i)) {
-      value = 10 - value;
+      processedScores[i] = 10 - rawValue;
+    } else {
+      processedScores[i] = rawValue;
     }
-    processedScores[i] = value;
   }
   
-  // Subscale mappings (from Python implementation)
-  emotionalHyperreactivity = (processedScores[1] + processedScores[3] + 
-                              processedScores[11] + processedScores[13] + processedScores[16]) / 5;
-  emotionalHyporeactivity = (processedScores[2] + processedScores[4] + 
-                             processedScores[12] + processedScores[14] + processedScores[19]) / 5;
-  cognitiveSpeed = (processedScores[5] + processedScores[8] + processedScores[15]) / 3;
-  motorActivity = (processedScores[6] + processedScores[7] + processedScores[18]) / 3;
-  motivation = (processedScores[9] + processedScores[10] + processedScores[17] + processedScores[20]) / 4;
+  // New Subscale calculations (Sums as per user request)
+  const subscoreEmotion = processedScores[3] + processedScores[7] + processedScores[10] + processedScores[18];
+  const subscoreMotivation = processedScores[2] + processedScores[11] + processedScores[12] + processedScores[15] + processedScores[16] + processedScores[17] + processedScores[19];
+  const subscorePerception = processedScores[1] + processedScores[6] + processedScores[8] + processedScores[13] + processedScores[20];
+  const subscoreInteraction = processedScores[4] + processedScores[14];
+  const subscoreCognition = processedScores[5] + processedScores[9];
   
-  const totalScore = (emotionalHyperreactivity + emotionalHyporeactivity + 
-                      cognitiveSpeed + motorActivity + motivation) / 5;
+  const totalScore = subscoreEmotion + subscoreMotivation + subscorePerception + subscoreInteraction + subscoreCognition;
   
-  let interpretation = `Score total: ${totalScore.toFixed(2)}/10. `;
-  if (totalScore >= 7) {
-    interpretation += 'État thymique très élevé.';
-  } else if (totalScore >= 5) {
-    interpretation += 'État thymique modérément élevé.';
-  } else if (totalScore >= 3) {
-    interpretation += 'État thymique normal.';
-  } else {
-    interpretation += 'État thymique bas.';
-  }
-
   const { data, error } = await supabase
     .from('responses_mathys')
     .upsert({
-      ...response,
-      emotional_hyperreactivity: Number(emotionalHyperreactivity.toFixed(2)),
-      emotional_hyporeactivity: Number(emotionalHyporeactivity.toFixed(2)),
-      cognitive_speed: Number(cognitiveSpeed.toFixed(2)),
-      motor_activity: Number(motorActivity.toFixed(2)),
-      motivation: Number(motivation.toFixed(2)),
-      total_score: Number(totalScore.toFixed(2)),
-      interpretation,
+      ...responseData,
+      emotional_hyperreactivity: Number((subscoreEmotion / 4).toFixed(2)),
+      emotional_hyporeactivity: Number((subscoreMotivation / 7).toFixed(2)),
+      cognitive_speed: Number((subscoreCognition / 2).toFixed(2)),
+      motor_activity: Number((subscorePerception / 5).toFixed(2)),
+      motivation: Number((subscoreInteraction / 2).toFixed(2)),
+      subscore_emotion: subscoreEmotion,
+      subscore_motivation: subscoreMotivation,
+      subscore_perception: subscorePerception,
+      subscore_interaction: subscoreInteraction,
+      subscore_cognition: subscoreCognition,
+      total_score: totalScore,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
