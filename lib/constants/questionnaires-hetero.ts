@@ -11451,12 +11451,12 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
   },
   {
     id: 'wais_mc_end_z',
-    text: 'Z-score empan endroit',
+    text: 'Empan endroit - Note Z',
     type: 'number',
     required: false,
     section: 'Scores - Ordre Direct',
     readonly: true,
-    help: 'Z-score basé sur l\'âge et le niveau d\'études'
+    help: 'Z-score basé sur l\'âge et le niveau d\'études (normes GREFEX)'
   },
   
   // Section header for Backward Digit Span
@@ -11643,12 +11643,12 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
   },
   {
     id: 'wais_mc_env_z',
-    text: 'Z-score empan envers',
+    text: 'Empan envers - Note Z',
     type: 'number',
     required: false,
     section: 'Scores - Ordre Inverse',
     readonly: true,
-    help: 'Z-score basé sur l\'âge et le niveau d\'études'
+    help: 'Z-score basé sur l\'âge et le niveau d\'études (normes GREFEX)'
   },
   
   // Total scores
