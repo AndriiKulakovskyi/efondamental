@@ -826,6 +826,8 @@ export function QuestionnaireRenderer({
       }
 
       // Compute Fluences Verbales scores progressively as fields are entered
+      // Only execute for Fluences Verbales questionnaires
+      if (definition?.code === 'FLUENCES_VERBALES_FR' || definition?.code === 'WAIS3_FLUENCES_VERBALES_FR') {
       const fvAge = Number(prev.patient_age);
       const fvEdu = Number(prev.years_of_education);
       const fvP = Number(prev.fv_p_tot_correct);
@@ -940,6 +942,7 @@ export function QuestionnaireRenderer({
           }
         }
       }
+      } // End Fluences Verbales calculations
 
       // Compute WAIS-III Vocabulaire total score (sum of item1 to item33)
       const vocabItems = [

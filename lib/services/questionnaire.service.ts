@@ -3608,8 +3608,16 @@ export async function savePriseMResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Remove demographic metadata fields that are not part of the table schema
-  const { patient_age, patient_gender, patient_sex, ...responseData } = response as any;
+  // Remove demographic metadata fields and any Fluences Verbales fields that don't belong
+  const { 
+    patient_age, patient_gender, patient_sex,
+    // Fluences Verbales fields (should not be in PRISE-M)
+    fv_p_tot_rupregle, fv_anim_tot_rupregle,
+    fv_p_tot_correct_z, fv_p_tot_correct_pc,
+    fv_anim_tot_correct_z, fv_anim_tot_correct_pc,
+    years_of_education,
+    ...responseData 
+  } = response as any;
 
   // Calculate section scores (updated for q1-q31 structure)
   const gastroScore = (responseData.q1 ?? 0) + (responseData.q2 ?? 0) + (responseData.q3 ?? 0) + (responseData.q4 ?? 0);

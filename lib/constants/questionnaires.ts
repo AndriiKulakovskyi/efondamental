@@ -1237,7 +1237,7 @@ export const MARS_DEFINITION: QuestionnaireDefinition = {
 export const MATHYS_QUESTIONS: Question[] = [
   {
     id: 'instructions',
-    text: 'Consignes',
+    text: 'Évaluation des états thymiques',
     type: 'section',
     required: false,
     help: "Consigne de cotation : coter toujours le score le plus extrême (0 au lieu de 1 par exemple ; 10 au lieu de 9). Chaque item est coté entre 0 et 10, avec possibilité de demi points (Ex.: 2.5).\n\n**Attention : contrairement au calque, ne pas inverser les scores préalablement. ex: item 9: Mon cerveau ne s'arrête pas = 0 | Mon cerveau fonctionne au ralenti = 10.**"
@@ -1262,13 +1262,13 @@ export const MATHYS_QUESTIONS: Question[] = [
   { id: 'q18', text: "18. Je ressens les émotions de manière très intense | Mes émotions sont atténuées", type: 'scale', required: true, min: 0, max: 10, minLabel: "Émotions intenses", maxLabel: "Émotions atténuées", metadata: { step: 0.5 } },
   { id: 'q19', text: "19. Je suis ralenti(e) dans mes mouvements | Je suis physiquement agité(e)", type: 'scale', required: true, min: 0, max: 10, minLabel: "Ralenti(e)", maxLabel: "Agité(e)", metadata: { step: 0.5 } },
   { id: 'q20', text: "20. J'ai l'impression d'être moins sensible aux odeurs que d'habitude | J'ai l'impression d'être plus sensible aux odeurs que d'habitude", type: 'scale', required: true, min: 0, max: 10, minLabel: "Moins sensible odeurs", maxLabel: "Plus sensible odeurs", metadata: { step: 0.5 } },
-  {
-    id: 'scores_section',
-    text: 'Calcul des scores MAThyS',
-    type: 'section',
-    required: false,
-    help: "Les scores ci-dessous sont calculés automatiquement en fonction de vos réponses aux 20 items précédents."
-  },
+  // {
+  //   id: 'scores_section',
+  //   text: 'Calcul des scores MAThyS',
+  //   type: 'section',
+  //   required: false,
+  //   help: "Les scores ci-dessous sont calculés automatiquement en fonction de vos réponses aux 20 items précédents."
+  // },
   { id: 'subscore_emotion', text: 'Score Emotion à la MATHYS', type: 'number', required: false, readonly: true },
   { id: 'subscore_motivation', text: 'Score Motivation à la MATHYS', type: 'number', required: false, readonly: true },
   { id: 'subscore_perception', text: 'Score Perception sensorielle à la MATHYS', type: 'number', required: false, readonly: true },
