@@ -11705,87 +11705,122 @@ export const WAIS3_DIGIT_SPAN_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 // WAIS-III - CPT II V.5 (Conners' Continuous Performance Test II)
 // ============================================================================
+
+const CPT2_GUIDELINE_OPTIONS: QuestionOption[] = [
+  { code: 1, label: 'Markedly atypical', score: 1 },
+  { code: 2, label: 'Mildly atypical', score: 2 },
+  { code: 3, label: 'A little slow', score: 3 },
+  { code: 4, label: 'Within average range', score: 4 },
+  { code: 5, label: 'Good performance', score: 5 },
+  { code: 6, label: 'Very good performance', score: 6 },
+  { code: 7, label: 'A little fast', score: 7 },
+  { code: 8, label: 'Atypically fast', score: 8 }
+];
+
 export const WAIS3_CPT2_QUESTIONS: Question[] = [
-  // Omissions
+  // Section: Omissions %
+  {
+    id: 'section_omissions',
+    text: 'Omissions %',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'cpt2_omissions_value',
-    text: 'Omissions - Value',
+    text: 'Value',
     type: 'number',
     required: false,
-    section: 'Omissions',
+    section: 'Omissions %',
     help: 'Missed targets'
   },
   {
     id: 'cpt2_omissions_pourcentage',
-    text: 'Omissions - Pourcentage',
+    text: 'Pourcentage',
     type: 'number',
     required: false,
-    section: 'Omissions'
+    section: 'Omissions %'
   },
   {
     id: 'cpt2_omissions_tscore',
-    text: 'Omissions - T-score',
+    text: 'T-score',
     type: 'number',
     required: false,
-    section: 'Omissions'
+    section: 'Omissions %'
   },
   {
     id: 'cpt2_omissions_percentile',
-    text: 'Omissions - Percentile',
+    text: 'Percentile',
     type: 'number',
     required: false,
-    section: 'Omissions'
+    section: 'Omissions %'
   },
   {
     id: 'cpt2_omissions_guideline',
-    text: 'Omissions - Guideline',
-    type: 'text',
+    text: 'Guideline',
+    type: 'single_choice',
     required: false,
-    section: 'Omissions'
+    section: 'Omissions %',
+    options: CPT2_GUIDELINE_OPTIONS
   },
   
-  // Commissions
+  // Section: Commissions %
+  {
+    id: 'section_comissions',
+    text: 'Commissions %',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'cpt2_comissions_value',
-    text: 'Commissions - Value',
+    text: 'Value',
     type: 'number',
     required: false,
-    section: 'Commissions',
+    section: 'Commissions %',
     help: 'Incorrect responses to non-targets'
   },
   {
     id: 'cpt2_comissions_pourcentage',
-    text: 'Commissions - Pourcentage',
+    text: 'Pourcentage',
     type: 'number',
     required: false,
-    section: 'Commissions'
+    section: 'Commissions %'
   },
   {
     id: 'cpt2_comissions_tscore',
-    text: 'Commissions - T-score',
+    text: 'T-score',
     type: 'number',
     required: false,
-    section: 'Commissions'
+    section: 'Commissions %'
   },
   {
     id: 'cpt2_comissions_percentile',
-    text: 'Commissions - Percentile',
+    text: 'Percentile',
     type: 'number',
     required: false,
-    section: 'Commissions'
+    section: 'Commissions %'
   },
   {
     id: 'cpt2_comissions_guideline',
-    text: 'Commissions - Guideline',
-    type: 'text',
+    text: 'Guideline',
+    type: 'single_choice',
     required: false,
-    section: 'Commissions'
+    section: 'Commissions %',
+    options: CPT2_GUIDELINE_OPTIONS
   },
   
-  // Hit RT
+  // Section: Hit RT
+  {
+    id: 'section_hitrt',
+    text: 'Hit RT',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'cpt2_hitrt_value',
-    text: 'Hit RT - Value',
+    text: 'Value',
     type: 'number',
     required: false,
     section: 'Hit RT',
@@ -11793,30 +11828,38 @@ export const WAIS3_CPT2_QUESTIONS: Question[] = [
   },
   {
     id: 'cpt2_hitrt_tscore',
-    text: 'Hit RT - T-score',
+    text: 'T-score',
     type: 'number',
     required: false,
     section: 'Hit RT'
   },
   {
     id: 'cpt2_hitrt_percentile',
-    text: 'Hit RT - Percentile',
+    text: 'Percentile',
     type: 'number',
     required: false,
     section: 'Hit RT'
   },
   {
     id: 'cpt2_hitrt_guideline',
-    text: 'Hit RT - Guideline',
-    type: 'text',
+    text: 'Guideline',
+    type: 'single_choice',
     required: false,
-    section: 'Hit RT'
+    section: 'Hit RT',
+    options: CPT2_GUIDELINE_OPTIONS
   },
   
-  // Hit RT Std. Error
+  // Section: Hit RT Std. Error
+  {
+    id: 'section_hitrtstder',
+    text: 'Hit RT Std. Error',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'cpt2_hitrtstder_value',
-    text: 'Hit RT Std. Error - Value',
+    text: 'Value',
     type: 'number',
     required: false,
     section: 'Hit RT Std. Error',
@@ -11824,30 +11867,38 @@ export const WAIS3_CPT2_QUESTIONS: Question[] = [
   },
   {
     id: 'cpt2_hitrtstder_tscore',
-    text: 'Hit RT Std. Error - T-score',
+    text: 'T-score',
     type: 'number',
     required: false,
     section: 'Hit RT Std. Error'
   },
   {
     id: 'cpt2_hitrtstder_percentile',
-    text: 'Hit RT Std. Error - Percentile',
+    text: 'Percentile',
     type: 'number',
     required: false,
     section: 'Hit RT Std. Error'
   },
   {
     id: 'cpt2_hitrtstder_guideline',
-    text: 'Hit RT Std. Error - Guideline',
-    type: 'text',
+    text: 'Guideline',
+    type: 'single_choice',
     required: false,
-    section: 'Hit RT Std. Error'
+    section: 'Hit RT Std. Error',
+    options: CPT2_GUIDELINE_OPTIONS
   },
   
-  // Variability
+  // Section: Variability
+  {
+    id: 'section_variability',
+    text: 'Variability',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'cpt2_variability_value',
-    text: 'Variability - Value',
+    text: 'Value',
     type: 'number',
     required: false,
     section: 'Variability',
@@ -11855,30 +11906,38 @@ export const WAIS3_CPT2_QUESTIONS: Question[] = [
   },
   {
     id: 'cpt2_variability_tscore',
-    text: 'Variability - T-score',
+    text: 'T-score',
     type: 'number',
     required: false,
     section: 'Variability'
   },
   {
     id: 'cpt2_variability_percentile',
-    text: 'Variability - Percentile',
+    text: 'Percentile',
     type: 'number',
     required: false,
     section: 'Variability'
   },
   {
     id: 'cpt2_variability_guideline',
-    text: 'Variability - Guideline',
-    type: 'text',
+    text: 'Guideline',
+    type: 'single_choice',
     required: false,
-    section: 'Variability'
+    section: 'Variability',
+    options: CPT2_GUIDELINE_OPTIONS
   },
   
-  // Detectability (d')
+  // Section: Detectability (d')
+  {
+    id: 'section_detectability',
+    text: 'Detectability (d\')',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'cpt2_detectability_value',
-    text: 'Detectability (d\') - Value',
+    text: 'Value',
     type: 'number',
     required: false,
     section: 'Detectability (d\')',
@@ -11886,99 +11945,123 @@ export const WAIS3_CPT2_QUESTIONS: Question[] = [
   },
   {
     id: 'cpt2_detectability_tscore',
-    text: 'Detectability (d\') - T-score',
+    text: 'T-score',
     type: 'number',
     required: false,
     section: 'Detectability (d\')'
   },
   {
     id: 'cpt2_detectability_percentile',
-    text: 'Detectability (d\') - Percentile',
+    text: 'Percentile',
     type: 'number',
     required: false,
     section: 'Detectability (d\')'
   },
   {
     id: 'cpt2_detectability_guideline',
-    text: 'Detectability (d\') - Guideline',
-    type: 'text',
+    text: 'Guideline',
+    type: 'single_choice',
     required: false,
-    section: 'Detectability (d\')'
+    section: 'Detectability (d\')',
+    options: CPT2_GUIDELINE_OPTIONS
   },
   
-  // Response Style (Beta)
+  // Section: Response style (Beta)
+  {
+    id: 'section_responsestyle',
+    text: 'Response style (Beta)',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'cpt2_responsestyle_value',
-    text: 'Response Style (Beta) - Value',
+    text: 'Value',
     type: 'number',
     required: false,
-    section: 'Response Style (Beta)',
+    section: 'Response style (Beta)',
     help: 'Response bias (conservative vs. risky)'
   },
   {
     id: 'cpt2_responsestyle_tscore',
-    text: 'Response Style (Beta) - T-score',
+    text: 'T-score',
     type: 'number',
     required: false,
-    section: 'Response Style (Beta)'
+    section: 'Response style (Beta)'
   },
   {
     id: 'cpt2_responsestyle_percentile',
-    text: 'Response Style (Beta) - Percentile',
+    text: 'Percentile',
     type: 'number',
     required: false,
-    section: 'Response Style (Beta)'
+    section: 'Response style (Beta)'
   },
   {
     id: 'cpt2_responsestyle_guideline',
-    text: 'Response Style (Beta) - Guideline',
-    type: 'text',
+    text: 'Guideline',
+    type: 'single_choice',
     required: false,
-    section: 'Response Style (Beta)'
+    section: 'Response style (Beta)',
+    options: CPT2_GUIDELINE_OPTIONS
   },
   
-  // Perseverations
+  // Section: Perseverations %
+  {
+    id: 'section_perseverations',
+    text: 'Perseverations %',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'cpt2_perseverations_value',
-    text: 'Perseverations - Value',
+    text: 'Value',
     type: 'number',
     required: false,
-    section: 'Perseverations',
+    section: 'Perseverations %',
     help: 'Repetitive responding'
   },
   {
     id: 'cpt2_perseverations_pourcentage',
-    text: 'Perseverations - Pourcentage',
+    text: 'Pourcentage',
     type: 'number',
     required: false,
-    section: 'Perseverations'
+    section: 'Perseverations %'
   },
   {
     id: 'cpt2_perseverations_tscore',
-    text: 'Perseverations - T-score',
+    text: 'T-score',
     type: 'number',
     required: false,
-    section: 'Perseverations'
+    section: 'Perseverations %'
   },
   {
     id: 'cpt2_perseverations_percentile',
-    text: 'Perseverations - Percentile',
+    text: 'Percentile',
     type: 'number',
     required: false,
-    section: 'Perseverations'
+    section: 'Perseverations %'
   },
   {
     id: 'cpt2_perseverations_guideline',
-    text: 'Perseverations - Guideline',
-    type: 'text',
+    text: 'Guideline',
+    type: 'single_choice',
     required: false,
-    section: 'Perseverations'
+    section: 'Perseverations %',
+    options: CPT2_GUIDELINE_OPTIONS
   },
   
-  // Hit RT Block Change
+  // Section: Hit RT Block Change
+  {
+    id: 'section_hitrtblockchange',
+    text: 'Hit RT Block Change',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'cpt2_hitrtblockchange_value',
-    text: 'Hit RT Block Change - Value',
+    text: 'Value',
     type: 'number',
     required: false,
     section: 'Hit RT Block Change',
@@ -11986,30 +12069,38 @@ export const WAIS3_CPT2_QUESTIONS: Question[] = [
   },
   {
     id: 'cpt2_hitrtblockchange_tscore',
-    text: 'Hit RT Block Change - T-score',
+    text: 'T-score',
     type: 'number',
     required: false,
     section: 'Hit RT Block Change'
   },
   {
     id: 'cpt2_hitrtblockchange_percentile',
-    text: 'Hit RT Block Change - Percentile',
+    text: 'Percentile',
     type: 'number',
     required: false,
     section: 'Hit RT Block Change'
   },
   {
     id: 'cpt2_hitrtblockchange_guideline',
-    text: 'Hit RT Block Change - Guideline',
-    type: 'text',
+    text: 'Guideline',
+    type: 'single_choice',
     required: false,
-    section: 'Hit RT Block Change'
+    section: 'Hit RT Block Change',
+    options: CPT2_GUIDELINE_OPTIONS
   },
   
-  // Hit SE Block Change
+  // Section: Hit SE Block Change
+  {
+    id: 'section_hitseblockchange',
+    text: 'Hit SE Block Change',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'cpt2_hitseblockchange_value',
-    text: 'Hit SE Block Change - Value',
+    text: 'Value',
     type: 'number',
     required: false,
     section: 'Hit SE Block Change',
@@ -12017,30 +12108,38 @@ export const WAIS3_CPT2_QUESTIONS: Question[] = [
   },
   {
     id: 'cpt2_hitseblockchange_tscore',
-    text: 'Hit SE Block Change - T-score',
+    text: 'T-score',
     type: 'number',
     required: false,
     section: 'Hit SE Block Change'
   },
   {
     id: 'cpt2_hitseblockchange_percentile',
-    text: 'Hit SE Block Change - Percentile',
+    text: 'Percentile',
     type: 'number',
     required: false,
     section: 'Hit SE Block Change'
   },
   {
     id: 'cpt2_hitseblockchange_guideline',
-    text: 'Hit SE Block Change - Guideline',
-    type: 'text',
+    text: 'Guideline',
+    type: 'single_choice',
     required: false,
-    section: 'Hit SE Block Change'
+    section: 'Hit SE Block Change',
+    options: CPT2_GUIDELINE_OPTIONS
   },
   
-  // Hit RT ISI Change
+  // Section: Hit RT ISI Change
+  {
+    id: 'section_hitrtisichange',
+    text: 'Hit RT ISI Change',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'cpt2_hitrtisichange_value',
-    text: 'Hit RT ISI Change - Value',
+    text: 'Value',
     type: 'number',
     required: false,
     section: 'Hit RT ISI Change',
@@ -12048,30 +12147,38 @@ export const WAIS3_CPT2_QUESTIONS: Question[] = [
   },
   {
     id: 'cpt2_hitrtisichange_tscore',
-    text: 'Hit RT ISI Change - T-score',
+    text: 'T-score',
     type: 'number',
     required: false,
     section: 'Hit RT ISI Change'
   },
   {
     id: 'cpt2_hitrtisichange_percentile',
-    text: 'Hit RT ISI Change - Percentile',
+    text: 'Percentile',
     type: 'number',
     required: false,
     section: 'Hit RT ISI Change'
   },
   {
     id: 'cpt2_hitrtisichange_guideline',
-    text: 'Hit RT ISI Change - Guideline',
-    type: 'text',
+    text: 'Guideline',
+    type: 'single_choice',
     required: false,
-    section: 'Hit RT ISI Change'
+    section: 'Hit RT ISI Change',
+    options: CPT2_GUIDELINE_OPTIONS
   },
   
-  // Hit SE ISI Change
+  // Section: Hit SE ISI Change
+  {
+    id: 'section_hitseisichange',
+    text: 'Hit SE ISI Change',
+    type: 'section',
+    required: false,
+    section: ''
+  },
   {
     id: 'cpt2_hitseisichange_value',
-    text: 'Hit SE ISI Change - Value',
+    text: 'Value',
     type: 'number',
     required: false,
     section: 'Hit SE ISI Change',
@@ -12079,24 +12186,25 @@ export const WAIS3_CPT2_QUESTIONS: Question[] = [
   },
   {
     id: 'cpt2_hitseisichange_tscore',
-    text: 'Hit SE ISI Change - T-score',
+    text: 'T-score',
     type: 'number',
     required: false,
     section: 'Hit SE ISI Change'
   },
   {
     id: 'cpt2_hitseisichange_percentile',
-    text: 'Hit SE ISI Change - Percentile',
+    text: 'Percentile',
     type: 'number',
     required: false,
     section: 'Hit SE ISI Change'
   },
   {
     id: 'cpt2_hitseisichange_guideline',
-    text: 'Hit SE ISI Change - Guideline',
-    type: 'text',
+    text: 'Guideline',
+    type: 'single_choice',
     required: false,
-    section: 'Hit SE ISI Change'
+    section: 'Hit SE ISI Change',
+    options: CPT2_GUIDELINE_OPTIONS
   }
 ];
 
@@ -12104,7 +12212,7 @@ export const WAIS3_CPT2_DEFINITION: QuestionnaireDefinition = {
   id: 'wais3_cpt2',
   code: 'WAIS3_CPT2_FR',
   title: 'WAIS-III - CPT II V.5',
-  description: 'Conners\' Continuous Performance Test II (CPT II V.5) by C. Keith Conners, Ph.D. and MHS Staff. Ce formulaire permet la saisie des resultats calcules par le logiciel CPT II externe. Instructions: Appuyez sur la barre d\'espace ou sur le bouton gauche de la souris pour toutes les lettres EXCEPTE pour le X.',
+  description: 'Conners\' Continuous Performance Test II (CPT II V.5) by C. Keith Conners, Ph.D. and MHS Staff. Ce formulaire permet la saisie des resultats calcules par le logiciel CPT II externe. Instructions: « Appuyez sur la barre d’espace ou sur le bouton gauche de la souris pour toutes les lettres EXCEPTÉ pour le X. S’il vous plaît répondez aussi vite que possible mais aussi correctement que possible. Quand vous appuierez sur le bouton OK l’exercice commencera. » Si le patient pose des questions pendant le test, dire : « je pourrai vous répondre dès que vous aurez terminé. S’il vous plaît continuez. »',
   questions: WAIS3_CPT2_QUESTIONS,
   metadata: {
     singleColumn: true,

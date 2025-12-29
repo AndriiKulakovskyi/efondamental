@@ -3953,75 +3953,75 @@ export interface Wais3Cpt2Response {
   cpt2_omissions_pourcentage?: number;
   cpt2_omissions_tscore?: number;
   cpt2_omissions_percentile?: number;
-  cpt2_omissions_guideline?: string;
+  cpt2_omissions_guideline?: number;
   
   // Commissions
   cpt2_comissions_value?: number;
   cpt2_comissions_pourcentage?: number;
   cpt2_comissions_tscore?: number;
   cpt2_comissions_percentile?: number;
-  cpt2_comissions_guideline?: string;
+  cpt2_comissions_guideline?: number;
   
   // Hit RT
   cpt2_hitrt_value?: number;
   cpt2_hitrt_tscore?: number;
   cpt2_hitrt_percentile?: number;
-  cpt2_hitrt_guideline?: string;
+  cpt2_hitrt_guideline?: number;
   
   // Hit RT Std. Error
   cpt2_hitrtstder_value?: number;
   cpt2_hitrtstder_tscore?: number;
   cpt2_hitrtstder_percentile?: number;
-  cpt2_hitrtstder_guideline?: string;
+  cpt2_hitrtstder_guideline?: number;
   
   // Variability
   cpt2_variability_value?: number;
   cpt2_variability_tscore?: number;
   cpt2_variability_percentile?: number;
-  cpt2_variability_guideline?: string;
+  cpt2_variability_guideline?: number;
   
   // Detectability (d')
   cpt2_detectability_value?: number;
   cpt2_detectability_tscore?: number;
   cpt2_detectability_percentile?: number;
-  cpt2_detectability_guideline?: string;
+  cpt2_detectability_guideline?: number;
   
   // Response Style (Beta)
   cpt2_responsestyle_value?: number;
   cpt2_responsestyle_tscore?: number;
   cpt2_responsestyle_percentile?: number;
-  cpt2_responsestyle_guideline?: string;
+  cpt2_responsestyle_guideline?: number;
   
   // Perseverations
   cpt2_perseverations_value?: number;
   cpt2_perseverations_pourcentage?: number;
   cpt2_perseverations_tscore?: number;
   cpt2_perseverations_percentile?: number;
-  cpt2_perseverations_guideline?: string;
+  cpt2_perseverations_guideline?: number;
   
   // Hit RT Block Change
   cpt2_hitrtblockchange_value?: number;
   cpt2_hitrtblockchange_tscore?: number;
   cpt2_hitrtblockchange_percentile?: number;
-  cpt2_hitrtblockchange_guideline?: string;
+  cpt2_hitrtblockchange_guideline?: number;
   
   // Hit SE Block Change
   cpt2_hitseblockchange_value?: number;
   cpt2_hitseblockchange_tscore?: number;
   cpt2_hitseblockchange_percentile?: number;
-  cpt2_hitseblockchange_guideline?: string;
+  cpt2_hitseblockchange_guideline?: number;
   
   // Hit RT ISI Change
   cpt2_hitrtisichange_value?: number;
   cpt2_hitrtisichange_tscore?: number;
   cpt2_hitrtisichange_percentile?: number;
-  cpt2_hitrtisichange_guideline?: string;
+  cpt2_hitrtisichange_guideline?: number;
   
   // Hit SE ISI Change
   cpt2_hitseisichange_value?: number;
   cpt2_hitseisichange_tscore?: number;
   cpt2_hitseisichange_percentile?: number;
-  cpt2_hitseisichange_guideline?: string;
+  cpt2_hitseisichange_guideline?: number;
   
   // Metadata
   completed_by?: string;
