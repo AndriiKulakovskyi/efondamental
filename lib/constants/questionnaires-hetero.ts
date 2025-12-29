@@ -8499,6 +8499,24 @@ export const CVLT_QUESTIONS: Question[] = [
     required: false,
     readonly: true,
     help: 'Calcule automatiquement selon les normes'
+  },
+  
+  // Section: Delai
+  {
+    id: 'section_delai',
+    text: 'Delai',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'cvlt_delai',
+    section: 'Delai',
+    text: 'Delai entre 1er rappels et rappels differes (en minutes)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 120,
+    help: 'Delai en minutes entre les premiers rappels et les rappels differes (typiquement 20 minutes)'
   }
 ];
 

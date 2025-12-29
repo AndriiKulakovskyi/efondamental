@@ -3017,6 +3017,9 @@ export interface CvltResponse {
   // Response Bias (optional)
   response_bias?: number | null;
   
+  // Delai (optional)
+  cvlt_delai?: number | null;
+  
   // Computed Standard Scores
   trial_1_std?: number | null;
   trial_5_std?: string | null; // Can be numeric or centile range
@@ -3546,6 +3549,7 @@ export interface Wais3CvltResponse {
   primacy?: number | null;
   recency?: number | null;
   response_bias?: number | null;
+  cvlt_delai?: number | null;
   trial_1_std?: number | null;
   trial_5_std?: string | null;
   total_1_5_std?: number | null;
