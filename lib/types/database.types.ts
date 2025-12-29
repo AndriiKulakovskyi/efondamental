@@ -3200,19 +3200,26 @@ export interface TmtResponse {
   // Computed scores - Part A
   tmta_errtot?: number | null; // Total errors
   tmta_tps_z?: number | null; // Z-score for time
-  tmta_tps_pc?: number | null; // Percentile for time
+  tmta_tps_pc?: string | null; // Percentile for time (can be range like "25 - 50")
   tmta_errtot_z?: number | null; // Z-score for errors
+  tmta_errtot_pc?: string | null; // Percentile for errors
   
   // Computed scores - Part B
   tmtb_errtot?: number | null; // Total errors
   tmtb_tps_z?: number | null; // Z-score for time
-  tmtb_tps_pc?: number | null; // Percentile for time
+  tmtb_tps_pc?: string | null; // Percentile for time (can be range like "25 - 50")
   tmtb_errtot_z?: number | null; // Z-score for errors
+  tmtb_errtot_pc?: string | null; // Percentile for errors
   tmtb_err_persev_z?: number | null; // Z-score for perseverative errors
+  tmtb_err_persev_pc?: string | null; // Percentile for perseverative errors
   
   // Computed scores - Difference (B - A)
   tmt_b_a_tps?: number | null; // Time difference B - A
   tmt_b_a_tps_z?: number | null; // Z-score for time difference
+  tmt_b_a_tps_pc?: string | null; // Percentile for time difference
+  tmt_b_a_err?: number | null; // Error difference B - A
+  tmt_b_a_err_z?: number | null; // Z-score for error difference
+  tmt_b_a_err_pc?: string | null; // Percentile for error difference
   
   // Metadata
   completed_by?: string | null;
@@ -3221,7 +3228,13 @@ export interface TmtResponse {
   updated_at: string;
 }
 
-export type TmtResponseInsert = Omit<TmtResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'tmta_errtot' | 'tmta_tps_z' | 'tmta_tps_pc' | 'tmta_errtot_z' | 'tmtb_errtot' | 'tmtb_tps_z' | 'tmtb_tps_pc' | 'tmtb_errtot_z' | 'tmtb_err_persev_z' | 'tmt_b_a_tps' | 'tmt_b_a_tps_z'>;
+export type TmtResponseInsert = Omit<TmtResponse, 
+  'id' | 'created_at' | 'updated_at' | 'completed_at' | 
+  'tmta_errtot' | 'tmta_tps_z' | 'tmta_tps_pc' | 'tmta_errtot_z' | 'tmta_errtot_pc' |
+  'tmtb_errtot' | 'tmtb_tps_z' | 'tmtb_tps_pc' | 'tmtb_errtot_z' | 'tmtb_errtot_pc' | 
+  'tmtb_err_persev_z' | 'tmtb_err_persev_pc' |
+  'tmt_b_a_tps' | 'tmt_b_a_tps_z' | 'tmt_b_a_tps_pc' | 'tmt_b_a_err' | 'tmt_b_a_err_z' | 'tmt_b_a_err_pc'
+>;
 
 // ============================================================================
 // Stroop Test (Golden 1978)
@@ -3599,22 +3612,35 @@ export interface Wais3TmtResponse {
   tmtb_err_persev: number;
   tmta_errtot?: number | null;
   tmta_tps_z?: number | null;
-  tmta_tps_pc?: number | null;
+  tmta_tps_pc?: string | null;
   tmta_errtot_z?: number | null;
+  tmta_errtot_pc?: string | null;
   tmtb_errtot?: number | null;
   tmtb_tps_z?: number | null;
-  tmtb_tps_pc?: number | null;
+  tmtb_tps_pc?: string | null;
   tmtb_errtot_z?: number | null;
+  tmtb_errtot_pc?: string | null;
   tmtb_err_persev_z?: number | null;
+  tmtb_err_persev_pc?: string | null;
   tmt_b_a_tps?: number | null;
   tmt_b_a_tps_z?: number | null;
+  tmt_b_a_tps_pc?: string | null;
+  tmt_b_a_err?: number | null;
+  tmt_b_a_err_z?: number | null;
+  tmt_b_a_err_pc?: string | null;
   completed_by?: string | null;
   completed_at: string;
   created_at: string;
   updated_at: string;
 }
 
-export type Wais3TmtResponseInsert = Omit<Wais3TmtResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'tmta_errtot' | 'tmta_tps_z' | 'tmta_tps_pc' | 'tmta_errtot_z' | 'tmtb_errtot' | 'tmtb_tps_z' | 'tmtb_tps_pc' | 'tmtb_errtot_z' | 'tmtb_err_persev_z' | 'tmt_b_a_tps' | 'tmt_b_a_tps_z'>;
+export type Wais3TmtResponseInsert = Omit<Wais3TmtResponse, 
+  'id' | 'created_at' | 'updated_at' | 'completed_at' | 
+  'tmta_errtot' | 'tmta_tps_z' | 'tmta_tps_pc' | 'tmta_errtot_z' | 'tmta_errtot_pc' |
+  'tmtb_errtot' | 'tmtb_tps_z' | 'tmtb_tps_pc' | 'tmtb_errtot_z' | 'tmtb_errtot_pc' |
+  'tmtb_err_persev_z' | 'tmtb_err_persev_pc' |
+  'tmt_b_a_tps' | 'tmt_b_a_tps_z' | 'tmt_b_a_tps_pc' | 'tmt_b_a_err' | 'tmt_b_a_err_z' | 'tmt_b_a_err_pc'
+>;
 
 // WAIS-III Stroop Test (Golden 1978)
 export interface Wais3StroopResponse {

@@ -9218,11 +9218,13 @@ export const TMT_QUESTIONS: Question[] = [
   },
   {
     id: 'years_of_education',
-    text: 'Annees de scolarisation',
+    text: 'Annees de scolarisation (calculees automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     min: 0,
-    max: 30
+    max: 30,
+    help: 'Calcule automatiquement depuis le profil du patient'
   },
   // Section: Partie A
   {

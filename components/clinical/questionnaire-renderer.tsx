@@ -251,10 +251,6 @@ export function QuestionnaireRenderer({
             updated.tmtb_errtot_z = tmtScores.tmtb_errtot_z;
             hasChanges = true;
           }
-          if (updated.tmtb_err_persev_z !== tmtScores.tmtb_err_persev_z) {
-            updated.tmtb_err_persev_z = tmtScores.tmtb_err_persev_z;
-            hasChanges = true;
-          }
           if (updated.tmt_b_a_tps !== tmtScores.tmt_b_a_tps) {
             updated.tmt_b_a_tps = tmtScores.tmt_b_a_tps;
             hasChanges = true;

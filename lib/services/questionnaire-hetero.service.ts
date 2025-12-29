@@ -1794,18 +1794,8 @@ export async function saveTmtResponse(
       tmtb_err: response.tmtb_err,
       tmtb_cor: response.tmtb_cor,
       tmtb_err_persev: response.tmtb_err_persev,
-      // Computed scores
-      tmta_errtot: scores.tmta_errtot,
-      tmta_tps_z: scores.tmta_tps_z,
-      tmta_tps_pc: scores.tmta_tps_pc,
-      tmta_errtot_z: scores.tmta_errtot_z,
-      tmtb_errtot: scores.tmtb_errtot,
-      tmtb_tps_z: scores.tmtb_tps_z,
-      tmtb_tps_pc: scores.tmtb_tps_pc,
-      tmtb_errtot_z: scores.tmtb_errtot_z,
-      tmtb_err_persev_z: scores.tmtb_err_persev_z,
-      tmt_b_a_tps: scores.tmt_b_a_tps,
-      tmt_b_a_tps_z: scores.tmt_b_a_tps_z,
+      // All computed scores from scoring service
+      ...scores,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
