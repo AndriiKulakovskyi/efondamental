@@ -8053,7 +8053,7 @@ export const CVLT_QUESTIONS: Question[] = [
   {
     id: 'patient_age',
     section: 'Donnees Demographiques',
-    text: 'Age du patient (calcule automatiquement)',
+    text: 'Age du patient',
     type: 'number',
     required: true,
     readonly: true,
@@ -8064,7 +8064,7 @@ export const CVLT_QUESTIONS: Question[] = [
   {
     id: 'years_of_education',
     section: 'Donnees Demographiques',
-    text: 'Nombre d\'annees d\'etudes (calcule automatiquement depuis le profil)',
+    text: 'Annees d\'etudes',
     type: 'number',
     required: true,
     readonly: true,
@@ -8075,7 +8075,7 @@ export const CVLT_QUESTIONS: Question[] = [
   {
     id: 'patient_sex',
     section: 'Donnees Demographiques',
-    text: 'Sexe du patient (renseigne automatiquement)',
+    text: 'Sexe',
     type: 'single_choice',
     required: true,
     readonly: true,
@@ -8089,14 +8089,14 @@ export const CVLT_QUESTIONS: Question[] = [
   // Section: Liste A (Lundi) - Apprentissage
   {
     id: 'section_list_a',
-    text: 'Liste A (Lundi) - Apprentissage',
+    text: 'Rappel Liste A',
     type: 'section',
     required: false
   },
   {
     id: 'trial_1',
-    section: 'Liste A (Lundi) - Apprentissage',
-    text: 'Essai 1 - Note brute (Nombre de mots correctement rappeles)',
+    section: 'Rappel Liste A',
+    text: 'Rappel 1 (Liste A Essai 1)',
     type: 'number',
     required: true,
     min: 0,
@@ -8104,8 +8104,8 @@ export const CVLT_QUESTIONS: Question[] = [
   },
   {
     id: 'trial_2',
-    section: 'Liste A (Lundi) - Apprentissage',
-    text: 'Essai 2 - Note brute',
+    section: 'Rappel Liste A',
+    text: 'Rappel 2',
     type: 'number',
     required: true,
     min: 0,
@@ -8113,8 +8113,8 @@ export const CVLT_QUESTIONS: Question[] = [
   },
   {
     id: 'trial_3',
-    section: 'Liste A (Lundi) - Apprentissage',
-    text: 'Essai 3 - Note brute',
+    section: 'Rappel Liste A',
+    text: 'Rappel 3',
     type: 'number',
     required: true,
     min: 0,
@@ -8122,8 +8122,8 @@ export const CVLT_QUESTIONS: Question[] = [
   },
   {
     id: 'trial_4',
-    section: 'Liste A (Lundi) - Apprentissage',
-    text: 'Essai 4 - Note brute',
+    section: 'Rappel Liste A',
+    text: 'Rappel 4',
     type: 'number',
     required: true,
     min: 0,
@@ -8131,113 +8131,206 @@ export const CVLT_QUESTIONS: Question[] = [
   },
   {
     id: 'trial_5',
-    section: 'Liste A (Lundi) - Apprentissage',
-    text: 'Essai 5 - Note brute',
+    section: 'Rappel Liste A',
+    text: 'Rappel 5 (Liste A Essai 5)',
     type: 'number',
     required: true,
     min: 0,
     max: 16
+  },
+  {
+    id: 'trials_1_5_total',
+    section: 'Rappel Liste A',
+    text: 'Lundi Total (Somme Rappels 1-5)',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement (somme des essais 1 a 5)'
+  },
+  {
+    id: 'trial_1_std',
+    section: 'Rappel Liste A',
+    text: 'Note Standard Rappel 1',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement selon les normes'
+  },
+  {
+    id: 'trial_5_std',
+    section: 'Rappel Liste A',
+    text: 'Note Standard Rappel 5',
+    type: 'text',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement selon les normes (z-score ou percentile selon age)'
+  },
+  {
+    id: 'trials_1_5_total_std',
+    section: 'Rappel Liste A',
+    text: 'Note Standard Lundi Total (1-5)',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement selon les normes'
   },
   
   // Section: Liste B (Mardi) - Interference
   {
     id: 'section_list_b',
-    text: 'Liste B (Mardi) - Interference',
+    text: 'Liste B',
     type: 'section',
     required: false
   },
   {
     id: 'list_b',
-    section: 'Liste B (Mardi) - Interference',
-    text: 'Liste B - Note brute (Rappel immediat)',
+    section: 'Liste B',
+    text: 'Mardi (Liste B)',
     type: 'number',
     required: true,
     min: 0,
     max: 16
   },
+  {
+    id: 'list_b_std',
+    section: 'Liste B',
+    text: 'Note Standard Liste B',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement selon les normes'
+  },
   
   // Section: Rappel a Court Terme
   {
     id: 'section_short_term',
-    text: 'Rappel a Court Terme',
+    text: 'Rappels Court Terme (Short Delay)',
     type: 'section',
     required: false
   },
   {
     id: 'sdfr',
-    section: 'Rappel a Court Terme',
-    text: 'Rappel Libre a Court Terme (Liste A) - Note brute',
+    section: 'Rappels Court Terme (Short Delay)',
+    text: 'Rappel libre a court terme',
     type: 'number',
     required: true,
     min: 0,
-    max: 16,
-    help: 'Short Delay Free Recall'
+    max: 16
   },
   {
     id: 'sdcr',
-    section: 'Rappel a Court Terme',
-    text: 'Rappel Indice a Court Terme (Liste A) - Note brute',
+    section: 'Rappels Court Terme (Short Delay)',
+    text: 'Rappel indice a court terme',
     type: 'number',
     required: true,
     min: 0,
-    max: 16,
-    help: 'Short Delay Cued Recall'
+    max: 16
+  },
+  {
+    id: 'sdfr_std',
+    section: 'Rappels Court Terme (Short Delay)',
+    text: 'Note Standard Rappel Libre Court Terme',
+    type: 'text',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement selon les normes (z-score ou percentile selon age)'
+  },
+  {
+    id: 'sdcr_std',
+    section: 'Rappels Court Terme (Short Delay)',
+    text: 'Note Standard Rappel Indice Court Terme',
+    type: 'text',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement selon les normes (z-score ou percentile selon age)'
   },
   
   // Section: Rappel a Long Terme (20 min)
   {
     id: 'section_long_term',
-    text: 'Rappel a Long Terme (20 min)',
+    text: 'Rappels Long Terme (Long Delay)',
     type: 'section',
     required: false
   },
   {
     id: 'ldfr',
-    section: 'Rappel a Long Terme (20 min)',
-    text: 'Rappel Libre a Long Terme (Liste A) - Note brute',
+    section: 'Rappels Long Terme (Long Delay)',
+    text: 'Rappel libre a long terme',
     type: 'number',
     required: true,
     min: 0,
-    max: 16,
-    help: 'Long Delay Free Recall'
+    max: 16
   },
   {
     id: 'ldcr',
-    section: 'Rappel a Long Terme (20 min)',
-    text: 'Rappel Indice a Long Terme (Liste A) - Note brute',
+    section: 'Rappels Long Terme (Long Delay)',
+    text: 'Rappel indice a long terme',
     type: 'number',
     required: true,
     min: 0,
-    max: 16,
-    help: 'Long Delay Cued Recall'
+    max: 16
+  },
+  {
+    id: 'ldfr_std',
+    section: 'Rappels Long Terme (Long Delay)',
+    text: 'Note Standard Rappel Libre Long Terme',
+    type: 'text',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement selon les normes (z-score ou percentile selon age)'
+  },
+  {
+    id: 'ldcr_std',
+    section: 'Rappels Long Terme (Long Delay)',
+    text: 'Note Standard Rappel Indice Long Terme',
+    type: 'text',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement selon les normes (z-score ou percentile selon age)'
   },
   
   // Section: Indices de Strategie
   {
     id: 'section_strategy',
-    text: 'Indices de Strategie',
+    text: 'Indices de Regroupement',
     type: 'section',
     required: false
   },
   {
     id: 'semantic_clustering',
-    section: 'Indices de Strategie',
+    section: 'Indices de Regroupement',
     text: 'Indice de regroupement semantique',
     type: 'number',
     required: false,
     min: 0,
-    max: 10,
-    help: 'Optionnel'
+    max: 10
   },
   {
     id: 'serial_clustering',
-    section: 'Indices de Strategie',
-    text: 'Indice de regroupement seriel',
+    section: 'Indices de Regroupement',
+    text: 'Indice de regroupement serial',
     type: 'number',
     required: false,
     min: 0,
-    max: 30,
-    help: 'Optionnel'
+    max: 30
+  },
+  {
+    id: 'semantic_std',
+    section: 'Indices de Regroupement',
+    text: 'Note Standard Indice Semantique',
+    type: 'text',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement selon les normes'
+  },
+  {
+    id: 'serial_std',
+    section: 'Indices de Regroupement',
+    text: 'Note Standard Indice Serial (Centiles)',
+    type: 'text',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement (percentile)'
   },
   
   // Section: Erreurs
@@ -8250,28 +8343,44 @@ export const CVLT_QUESTIONS: Question[] = [
   {
     id: 'perseverations',
     section: 'Erreurs',
-    text: 'Total Perseverations',
+    text: 'Total perseverations',
     type: 'number',
     required: false,
     min: 0,
-    max: 50,
-    help: 'Optionnel'
+    max: 50
   },
   {
     id: 'intrusions',
     section: 'Erreurs',
-    text: 'Total Intrusions',
+    text: 'Total intrusions',
     type: 'number',
     required: false,
     min: 0,
-    max: 50,
-    help: 'Optionnel'
+    max: 50
+  },
+  {
+    id: 'persev_std',
+    section: 'Erreurs',
+    text: 'Note Standard Perseverations (Centiles)',
+    type: 'text',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement (percentile)'
+  },
+  {
+    id: 'intru_std',
+    section: 'Erreurs',
+    text: 'Note Standard Intrusions (Centiles)',
+    type: 'text',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement (percentile)'
   },
   
   // Section: Reconnaissance (optionnel)
   {
     id: 'section_recognition',
-    text: 'Reconnaissance (Optionnel)',
+    text: 'Reconnaissance',
     type: 'section',
     required: false
   },
@@ -8282,8 +8391,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 0,
-    max: 16,
-    help: 'Optionnel - Nombre de mots correctement reconnus'
+    max: 16
   },
   {
     id: 'false_positives',
@@ -8292,56 +8400,105 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 0,
-    max: 50,
-    help: 'Optionnel'
+    max: 50
   },
   {
     id: 'discriminability',
     section: 'Reconnaissance',
-    text: 'Discriminabilite (%)',
+    text: 'Discriminabilite',
     type: 'number',
     required: false,
     min: 0,
-    max: 100,
-    help: 'Optionnel - Capacite a distinguer les cibles des distracteurs'
+    max: 100
+  },
+  {
+    id: 'recog_std',
+    section: 'Reconnaissance',
+    text: 'Note Standard Reconnaissances (Centiles)',
+    type: 'text',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement (percentile)'
+  },
+  {
+    id: 'false_recog_std',
+    section: 'Reconnaissance',
+    text: 'Note Standard Fausses Reconnaissances (Centiles)',
+    type: 'text',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement (percentile)'
+  },
+  {
+    id: 'discrim_std',
+    section: 'Reconnaissance',
+    text: 'Note Standard Discriminabilite (Centiles)',
+    type: 'text',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement (percentile)'
   },
   
   // Section: Effets de Region (optionnel)
   {
     id: 'section_region',
-    text: 'Effets de Region (Optionnel)',
+    text: 'Effets de Position & Biais',
     type: 'section',
     required: false
   },
   {
     id: 'primacy',
-    section: 'Effets de Region',
-    text: 'Effet de primaute (%)',
+    section: 'Effets de Position & Biais',
+    text: 'Primaute',
     type: 'number',
     required: false,
     min: 0,
-    max: 100,
-    help: 'Optionnel - Pourcentage de mots rappeles du debut de la liste'
+    max: 100
   },
   {
     id: 'recency',
-    section: 'Effets de Region',
-    text: 'Effet de recence (%)',
+    section: 'Effets de Position & Biais',
+    text: 'Recence',
     type: 'number',
     required: false,
     min: 0,
-    max: 100,
-    help: 'Optionnel - Pourcentage de mots rappeles de la fin de la liste'
+    max: 100
   },
   {
     id: 'response_bias',
-    section: 'Effets de Region',
-    text: 'Biais de reponse',
+    section: 'Effets de Position & Biais',
+    text: 'Biais',
     type: 'number',
     required: false,
     min: -1,
-    max: 1,
-    help: 'Optionnel - Tendance a repondre oui ou non (-1 a +1)'
+    max: 1
+  },
+  {
+    id: 'primacy_std',
+    section: 'Effets de Position & Biais',
+    text: 'Note Standard Primaute',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement selon les normes'
+  },
+  {
+    id: 'recency_std',
+    section: 'Effets de Position & Biais',
+    text: 'Note Standard Recence',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement selon les normes'
+  },
+  {
+    id: 'bias_std',
+    section: 'Effets de Position & Biais',
+    text: 'Note Standard Biais',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Calcule automatiquement selon les normes'
   }
 ];
 

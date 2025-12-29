@@ -114,6 +114,9 @@ export function validateQuestionnaireResponse(
   // Validate question types
   for (const question of questionnaire.questions) {
     if (!visibleQuestions.includes(question.id)) continue;
+    
+    // Skip validation for readonly fields (they're computed/auto-filled)
+    if (question.readonly) continue;
 
     const response = responses[question.id];
     if (response === undefined || response === null || response === '') continue;

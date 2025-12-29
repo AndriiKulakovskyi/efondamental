@@ -1506,6 +1506,33 @@ export function QuestionnaireRenderer({
         }
       }
 
+      // Compute CVLT scores (simple calculations only, complex scoring done on backend)
+      const hasCvltFields = prev.trial_1 !== undefined || prev.trial_2 !== undefined;
+      
+      if (hasCvltFields) {
+        // Calculate Lundi Total (sum of trials 1-5)
+        if (prev.trial_1 !== undefined && prev.trial_2 !== undefined && 
+            prev.trial_3 !== undefined && prev.trial_4 !== undefined && 
+            prev.trial_5 !== undefined) {
+          const trial1 = Number(prev.trial_1) || 0;
+          const trial2 = Number(prev.trial_2) || 0;
+          const trial3 = Number(prev.trial_3) || 0;
+          const trial4 = Number(prev.trial_4) || 0;
+          const trial5 = Number(prev.trial_5) || 0;
+          
+          const lundiTotal = trial1 + trial2 + trial3 + trial4 + trial5;
+          
+          if (updated.trials_1_5_total !== lundiTotal) {
+            updated.trials_1_5_total = lundiTotal;
+            hasChanges = true;
+          }
+        }
+        
+        // Note: Standard scores (trial_1_std, trial_5_std, etc.) and percentile calculations
+        // are computed on the backend using complex regression formulas and lookup tables.
+        // See the scoring JSON specification for details.
+      }
+
       return hasChanges ? updated : prev;
     });
   }, [
@@ -1641,6 +1668,8 @@ export function QuestionnaireRenderer({
     responses.inverse_3a, responses.inverse_3b, responses.inverse_4a, responses.inverse_4b,
     responses.inverse_5a, responses.inverse_5b, responses.inverse_6a, responses.inverse_6b,
     responses.inverse_7a, responses.inverse_7b, responses.inverse_8a, responses.inverse_8b,
+    // CVLT fields
+    responses.trial_1, responses.trial_2, responses.trial_3, responses.trial_4, responses.trial_5,
     // MATHYS items
     responses.q1, responses.q2, responses.q3, responses.q4, responses.q5,
     responses.q6, responses.q7, responses.q8, responses.q9, responses.q10,

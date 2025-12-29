@@ -3044,7 +3044,14 @@ export interface CvltResponse {
   updated_at: string;
 }
 
-export type CvltResponseInsert = Omit<CvltResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_1_5'>;
+export type CvltResponseInsert = Omit<CvltResponse, 
+  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_1_5' | 
+  'trial_1_std' | 'trial_5_std' | 'total_1_5_std' | 'list_b_std' | 
+  'sdfr_std' | 'sdcr_std' | 'ldfr_std' | 'ldcr_std' | 
+  'semantic_std' | 'serial_std' | 'persev_std' | 'intru_std' | 
+  'recog_std' | 'false_recog_std' | 'discrim_std' | 
+  'primacy_std' | 'recency_std' | 'bias_std'
+>;
 
 // ============================================================================
 // WAIS-IV Subtest Code (Processing Speed)
@@ -3563,7 +3570,14 @@ export interface Wais3CvltResponse {
   updated_at: string;
 }
 
-export type Wais3CvltResponseInsert = Omit<Wais3CvltResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_1_5'>;
+export type Wais3CvltResponseInsert = Omit<Wais3CvltResponse, 
+  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_1_5' | 
+  'trial_1_std' | 'trial_5_std' | 'total_1_5_std' | 'list_b_std' | 
+  'sdfr_std' | 'sdcr_std' | 'ldfr_std' | 'ldcr_std' | 
+  'semantic_std' | 'serial_std' | 'persev_std' | 'intru_std' | 
+  'recog_std' | 'false_recog_std' | 'discrim_std' | 
+  'primacy_std' | 'recency_std' | 'bias_std'
+>;
 
 // WAIS-III TMT (Trail Making Test)
 export interface Wais3TmtResponse {
