@@ -1931,7 +1931,7 @@ export function QuestionnaireRenderer({
           </div>
         )}
 
-        {question.type === "text" && (
+        {question.type === "text" && !question.metadata?.displayOnly && (
           <div className="space-y-1">
             <Input
               id={question.id}

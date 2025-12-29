@@ -12225,7 +12225,19 @@ export const WAIS3_CPT2_DEFINITION: QuestionnaireDefinition = {
 // MEM-III (Wechsler, 2001) - Memoire Spatiale
 // ============================================================================
 
+const MEM3_SPATIAL_SCORE_OPTIONS: QuestionOption[] = [
+  { code: 0, label: '0', score: 0 },
+  { code: 1, label: '1', score: 1 }
+];
+
 export const MEM3_SPATIAL_QUESTIONS: Question[] = [
+  {
+    id: 'section_general',
+    text: 'Informations generales',
+    type: 'section',
+    required: false
+  },
+
   // Patient age
   {
     id: 'patient_age',
@@ -12238,6 +12250,30 @@ export const MEM3_SPATIAL_QUESTIONS: Question[] = [
     max: 90,
     help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
   },
+
+  // Stopping rule instructions (bold text with description)
+  {
+    id: 'regle_arret_info',
+    text: '',
+    type: 'text',
+    required: false,
+    readonly: true,
+    section: 'Informations generales',
+    metadata: { displayOnly: true },
+    help: '**REGLE D\'ARRET**\n\nOrdre direct et Ordre inverse.\n\nEchec a 2 essais d\'un meme item.\n\nPour Ordre direct et Ordre inverse, administrer les 2 essais d\'un meme item, meme si l\'essai 1 est reussi. Administrer Ordre inverse, meme si le sujet a echoue a Ordre direct.'
+  },
+
+  // Scoring rule instructions (bold text with description)
+  {
+    id: 'regle_cotation_info',
+    text: '',
+    type: 'text',
+    required: false,
+    readonly: true,
+    section: 'Informations generales',
+    metadata: { displayOnly: true },
+    help: '**REGLE DE COTATION**\n\nChaque essai : 0 ou 1 point.\n\nNote a l\'item : Essai 1 + Essai 2'
+  },
   
   // Forward (Ordre Direct) items
   {
@@ -12246,22 +12282,22 @@ export const MEM3_SPATIAL_QUESTIONS: Question[] = [
     type: 'section',
     required: false
   },
-  { id: 'odirect_1a', text: 'ITEM 1 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_1b', text: 'ITEM 1 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_2a', text: 'ITEM 2 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_2b', text: 'ITEM 2 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_3a', text: 'ITEM 3 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_3b', text: 'ITEM 3 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_4a', text: 'ITEM 4 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_4b', text: 'ITEM 4 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_5a', text: 'ITEM 5 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_5b', text: 'ITEM 5 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_6a', text: 'ITEM 6 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_6b', text: 'ITEM 6 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_7a', text: 'ITEM 7 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_7b', text: 'ITEM 7 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_8a', text: 'ITEM 8 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
-  { id: 'odirect_8b', text: 'ITEM 8 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Direct', min: 0, max: 1 },
+  { id: 'odirect_1a', text: 'ITEM 1 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_1b', text: 'ITEM 1 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_2a', text: 'ITEM 2 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_2b', text: 'ITEM 2 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_3a', text: 'ITEM 3 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_3b', text: 'ITEM 3 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_4a', text: 'ITEM 4 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_4b', text: 'ITEM 4 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_5a', text: 'ITEM 5 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_5b', text: 'ITEM 5 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_6a', text: 'ITEM 6 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_6b', text: 'ITEM 6 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_7a', text: 'ITEM 7 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_7b', text: 'ITEM 7 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_8a', text: 'ITEM 8 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'odirect_8b', text: 'ITEM 8 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
   
   // Forward computed scores
   { id: 'mspatiale_odirect_tot', text: 'Note brute - Ordre Direct (0-16)', type: 'number', required: false, section: 'Ordre Direct', readonly: true, help: 'Somme des scores Ordre Direct (calcule automatiquement)' },
@@ -12275,22 +12311,22 @@ export const MEM3_SPATIAL_QUESTIONS: Question[] = [
     type: 'section',
     required: false
   },
-  { id: 'inverse_1a', text: 'ITEM 1 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_1b', text: 'ITEM 1 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_2a', text: 'ITEM 2 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_2b', text: 'ITEM 2 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_3a', text: 'ITEM 3 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_3b', text: 'ITEM 3 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_4a', text: 'ITEM 4 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_4b', text: 'ITEM 4 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_5a', text: 'ITEM 5 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_5b', text: 'ITEM 5 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_6a', text: 'ITEM 6 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_6b', text: 'ITEM 6 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_7a', text: 'ITEM 7 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_7b', text: 'ITEM 7 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_8a', text: 'ITEM 8 - Note a l\'essai 1', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
-  { id: 'inverse_8b', text: 'ITEM 8 - Note a l\'essai 2', type: 'number', required: true, section: 'Ordre Inverse', min: 0, max: 1 },
+  { id: 'inverse_1a', text: 'ITEM 1 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_1b', text: 'ITEM 1 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_2a', text: 'ITEM 2 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_2b', text: 'ITEM 2 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_3a', text: 'ITEM 3 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_3b', text: 'ITEM 3 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_4a', text: 'ITEM 4 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_4b', text: 'ITEM 4 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_5a', text: 'ITEM 5 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_5b', text: 'ITEM 5 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_6a', text: 'ITEM 6 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_6b', text: 'ITEM 6 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_7a', text: 'ITEM 7 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_7b', text: 'ITEM 7 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_8a', text: 'ITEM 8 - Note a l\'essai 1', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
+  { id: 'inverse_8b', text: 'ITEM 8 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
   
   // Backward computed scores
   { id: 'mspatiale_inverse_tot', text: 'Note brute - Ordre Inverse (0-16)', type: 'number', required: false, section: 'Ordre Inverse', readonly: true, help: 'Somme des scores Ordre Inverse (calcule automatiquement)' },
