@@ -8064,12 +8064,13 @@ export const CVLT_QUESTIONS: Question[] = [
   {
     id: 'years_of_education',
     section: 'Donnees Demographiques',
-    text: 'Nombre d\'annees d\'etudes (requis pour le calcul des normes)',
+    text: 'Nombre d\'annees d\'etudes (calcule automatiquement depuis le profil)',
     type: 'number',
     required: true,
+    readonly: true,
     min: 0,
     max: 30,
-    help: 'Le niveau d\'education est necessaire pour certains calculs'
+    help: 'Calcule automatiquement depuis le profil du patient'
   },
   {
     id: 'patient_sex',

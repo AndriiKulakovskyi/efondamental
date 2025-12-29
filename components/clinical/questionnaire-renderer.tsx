@@ -2084,7 +2084,7 @@ export function QuestionnaireRenderer({
               const finalVal = isNaN(numVal) ? val : numVal;
               handleResponseChange(question.id, finalVal);
             }}
-            disabled={readonly}
+            disabled={readonly || question.readonly}
             required={isRequired}
           >
             <SelectTrigger className="bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand">
