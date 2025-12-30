@@ -88,7 +88,6 @@ import { calculateTmtScores } from './tmt-scoring';
 import { calculateStroopScores } from './stroop-scoring';
 import { calculateFluencesVerbalesScores } from './fluences-verbales-scoring';
 import { calculateWais4SimilitudesScores } from './wais4-similitudes-scoring';
-import { calculateTestCommissionsScores } from './test-commissions-scoring';
 import { calculateScipScores } from './scip-scoring';
 import { calculateWais3MatricesScores } from './wais3-matrices-scoring';
 import { calculateWais3CodeSymbolesScores } from './wais3-code-symboles-scoring';
@@ -2222,16 +2221,6 @@ export async function saveTestCommissionsResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Calculate scores using the scoring function
-  const scores = calculateTestCommissionsScores({
-    patient_age: response.patient_age,
-    nsc: response.nsc,
-    com01: response.com01,
-    com02: response.com02,
-    com03: response.com03,
-    com04: response.com04
-  });
-
   const { data, error } = await supabase
     .from('responses_test_commissions')
     .upsert({
@@ -2244,17 +2233,17 @@ export async function saveTestCommissionsResponse(
       com03: response.com03,
       com04: response.com04,
       com05: response.com05,
-      com01s1: scores.com01s1,
-      com01s2: scores.com01s2,
-      com02s1: scores.com02s1,
-      com02s2: scores.com02s2,
-      com03s1: scores.com03s1,
-      com03s2: scores.com03s2,
-      com04s1: scores.com04s1,
-      com04s2: scores.com04s2,
-      com04s3: scores.com04s3,
-      com04s4: scores.com04s4,
-      com04s5: scores.com04s5,
+      com01s1: response.com01s1,
+      com01s2: response.com01s2,
+      com02s1: response.com02s1,
+      com02s2: response.com02s2,
+      com03s1: response.com03s1,
+      com03s2: response.com03s2,
+      com04s1: response.com04s1,
+      com04s2: response.com04s2,
+      com04s3: response.com04s3,
+      com04s4: response.com04s4,
+      com04s5: response.com04s5,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

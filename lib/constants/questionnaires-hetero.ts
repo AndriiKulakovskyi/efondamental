@@ -10422,10 +10422,10 @@ export const WAIS4_SIMILITUDES_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 
 export const TEST_COMMISSIONS_QUESTIONS: Question[] = [
-  // Clinical Criteria Section
+  // Demographic Information Section
   {
     id: 'section_criteria',
-    text: 'Criteres cliniques',
+    text: 'Informations démographiques',
     type: 'section',
     required: false
   },
@@ -10449,10 +10449,10 @@ export const TEST_COMMISSIONS_QUESTIONS: Question[] = [
       { code: 1, label: ">= baccalaureat", score: 1 }
     ]
   },
-  // Time Section
+  // Test des Commissions Section
   {
-    id: 'section_temps',
-    text: 'Temps',
+    id: 'section_test',
+    text: 'Test des commissions',
     type: 'section',
     required: false
   },
@@ -10460,126 +10460,94 @@ export const TEST_COMMISSIONS_QUESTIONS: Question[] = [
     id: 'com01',
     text: 'Temps de realisation (en minutes)',
     type: 'number',
-    required: true,
+    required: false,
     min: 0
   },
   {
     id: 'com01s1',
     text: 'Temps de realisation (Percentile)',
-    type: 'text',
-    required: false,
-    readonly: true
+    type: 'number',
+    required: false
   },
   {
     id: 'com01s2',
-    text: 'Temps de realisation (Note z)',
+    text: 'Temps de realisation (note z)',
     type: 'number',
-    required: false,
-    readonly: true
-  },
-  // Errors Section
-  {
-    id: 'section_erreurs',
-    text: 'Erreurs',
-    type: 'section',
     required: false
   },
   {
     id: 'com02',
     text: 'Nombre de detours inutiles',
     type: 'number',
-    required: true,
+    required: false,
     min: 0
   },
   {
     id: 'com02s1',
     text: 'Nombre de detours inutiles (Percentile)',
-    type: 'text',
-    required: false,
-    readonly: true
+    type: 'number',
+    required: false
   },
   {
     id: 'com02s2',
-    text: 'Nombre de detours inutiles (Note z)',
+    text: 'Nombre de detours inutiles (note z)',
     type: 'number',
-    required: false,
-    readonly: true
+    required: false
   },
   {
     id: 'com03',
     text: 'Nombre de trajets avec non respect des horaires',
     type: 'number',
-    required: true,
+    required: false,
     min: 0
   },
   {
     id: 'com03s1',
     text: 'Nombre de trajets avec non respect des horaires (Percentile)',
-    type: 'text',
-    required: false,
-    readonly: true
+    type: 'number',
+    required: false
   },
   {
     id: 'com03s2',
     text: 'Nombre de trajets avec non respect des horaires (Note z)',
     type: 'number',
-    required: false,
-    readonly: true
+    required: false
   },
   {
     id: 'com04',
     text: 'Nombre d\'erreurs logiques',
     type: 'number',
-    required: true,
+    required: false,
     min: 0
   },
   {
     id: 'com04s1',
     text: 'Nombre d\'erreurs logiques (Percentile)',
-    type: 'text',
-    required: false,
-    readonly: true
+    type: 'number',
+    required: false
   },
   {
     id: 'com04s2',
     text: 'Nombre d\'erreurs logiques (Note z)',
     type: 'number',
-    required: false,
-    readonly: true
-  },
-  // Total Section
-  {
-    id: 'section_total',
-    text: 'Total',
-    type: 'section',
     required: false
   },
   {
     id: 'com04s3',
     text: 'Nombre d\'erreurs total',
     type: 'number',
-    required: false,
-    readonly: true
+    required: false
   },
   {
     id: 'com04s4',
     text: 'Nombre d\'erreurs total (Percentile)',
-    type: 'text',
-    required: false,
-    readonly: true
+    type: 'number',
+    required: false
   },
   {
     id: 'com04s5',
     text: 'Nombre d\'erreurs total (Note z)',
     type: 'number',
-    required: false,
-    readonly: true
-  },
-  // Sequence Section
-  {
-    id: 'section_sequence',
-    text: 'Sequence',
-    type: 'section',
     required: false
   },
   {
