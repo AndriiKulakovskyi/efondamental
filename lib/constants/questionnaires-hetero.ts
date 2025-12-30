@@ -10814,59 +10814,98 @@ export const WAIS3_LEARNING_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 
 const WAIS3_VOCABULAIRE_OPTIONS: QuestionOption[] = [
-  { code: 0, label: '0 - Réponse incorrecte', score: 0 },
-  { code: 1, label: '1 - Réponse partielle', score: 1 },
-  { code: 2, label: '2 - Réponse correcte', score: 2 }
+  { code: 0, label: 'Réponse incorrecte ou absence de réponse', score: 0 },
+  { code: 1, label: 'Réponse partielle', score: 1 },
+  { code: 2, label: 'Réponse correcte', score: 2 }
 ];
 
 export const WAIS3_VOCABULAIRE_QUESTIONS: Question[] = [
-  { id: 'item1', text: '1. Bateau', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item2', text: '2. Fauteuil', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item3', text: '3. Bol', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item4', text: '4. Instruire', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item5', text: '5. Hier', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item6', text: '6. Arracher', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item7', text: '7. Sanction', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item8', text: '8. Refuge', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item9', text: '9. Calendrier', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item10', text: '10. Baleine', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item11', text: '11. Mime', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item12', text: '12. Persévérer', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item13', text: '13. Sauvage', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item14', text: '14. Héréditaire', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item15', text: '15. Connivence', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item16', text: '16. Grandiose', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item17', text: '17. Confier', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item18', text: '18. Vigoureux', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item19', text: '19. Contracter', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item20', text: '20. Initiative', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item21', text: '21. Esquisse', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item22', text: '22. Irritable', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item23', text: '23. Invectiver', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item24', text: '24. Hétérogène', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item25', text: '25. Assimiler', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item26', text: '26. Concertation', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item27', text: '27. Emulation', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item28', text: '28. Pittoresque', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item29', text: '29. Evasif', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item30', text: '30. Elaborer', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item31', text: '31. Prosaïque', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item32', text: '32. Apologie', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item33', text: '33. Conjecture', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  // Patient demographics section
+  {
+    id: 'patient_age',
+    text: 'Âge du patient (calculé automatiquement)',
+    type: 'number',
+    required: true,
+    readonly: true,
+    section: 'Données démographiques',
+    min: 16,
+    max: 120,
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
+  },
+  // Vocabulary items section
+  {
+    id: 'section_items',
+    text: 'Items de vocabulaire',
+    type: 'section',
+    required: false
+  },
+  { id: 'item1', text: 'Note pour l\'item 1 - Bateau', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item2', text: 'Note pour l\'item 2 - Fauteuil', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item3', text: 'Note pour l\'item 3 - Bol', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item4', text: 'Note pour l\'item 4 - Instruire', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item5', text: 'Note pour l\'item 5 - Hier', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item6', text: 'Note pour l\'item 6 - Arracher', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item7', text: 'Note pour l\'item 7 - Sanction', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item8', text: 'Note pour l\'item 8 - Refuge', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item9', text: 'Note pour l\'item 9 - Calendrier', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item10', text: 'Note pour l\'item 10 - Baleine', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item11', text: 'Note pour l\'item 11 - Mime', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item12', text: 'Note pour l\'item 12 - Persévérer', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item13', text: 'Note pour l\'item 13 - Sauvage', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item14', text: 'Note pour l\'item 14 - Héréditaire', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item15', text: 'Note pour l\'item 15 - Connivence', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item16', text: 'Note pour l\'item 16 - Grandiose', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item17', text: 'Note pour l\'item 17 - Confier', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item18', text: 'Note pour l\'item 18 - Vigoureux', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item19', text: 'Note pour l\'item 19 - Contracter', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item20', text: 'Note pour l\'item 20 - Initiative', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item21', text: 'Note pour l\'item 21 - Esquisse', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item22', text: 'Note pour l\'item 22 - Irritable', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item23', text: 'Note pour l\'item 23 - Invectiver', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item24', text: 'Note pour l\'item 24 - Hétérogène', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item25', text: 'Note pour l\'item 25 - Assimiler', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item26', text: 'Note pour l\'item 26 - Concertation', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item27', text: 'Note pour l\'item 27 - Emulation', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item28', text: 'Note pour l\'item 28 - Pittoresque', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item29', text: 'Note pour l\'item 29 - Evasif', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item30', text: 'Note pour l\'item 30 - Elaborer', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item31', text: 'Note pour l\'item 31 - Prosaïque', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item32', text: 'Note pour l\'item 32 - Apologie', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
+  { id: 'item33', text: 'Note pour l\'item 33 - Conjecture', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
   // Score section
   {
     id: 'section_scores',
-    text: 'Score',
+    text: 'Scores',
     type: 'section',
     required: false
   },
   {
     id: 'total_raw_score',
-    text: 'Note brute totale (0-66)',
+    text: 'Note brute à la WAIS VOCABULAIRE',
     type: 'number',
     required: false,
     readonly: true,
-    help: 'Somme des scores des 33 items (calculé automatiquement)'
+    help: 'Somme des 33 items (0-66). Calculé automatiquement par l\'application. Inclut les scores manuellement entrés selon les règles WAIS-III (crédits automatiques, arrêts).',
+    min: 0,
+    max: 66
+  },
+  {
+    id: 'standard_score',
+    text: 'Note standard à la WAIS VOCABULAIRE',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Score standardisé ajusté par âge (1-19), calculé automatiquement',
+    min: 1,
+    max: 19
+  },
+  {
+    id: 'standardized_value',
+    text: 'Valeur standardisée (moyenne=10, écart-type=3)',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Transformation z-score : (note standard - 10) / 3, calculé automatiquement'
   }
 ];
 
@@ -10874,7 +10913,7 @@ export const WAIS3_VOCABULAIRE_DEFINITION: QuestionnaireDefinition = {
   id: 'wais3_vocabulaire',
   code: 'WAIS3_VOCABULAIRE_FR',
   title: 'WAIS-III - Subtest Vocabulaire',
-  description: 'Subtest Vocabulaire de la WAIS-III (Wechsler, 1997) - Évaluation des connaissances lexicales.',
+  description: 'Subtest Vocabulaire de la WAIS-III (Wechsler, 1997) - Évaluation des connaissances lexicales.\n\n**Règles d\'administration WAIS-III:**\n• Pour les 16 ans et plus : Commencer à l\'item 4 (Instruire)\n• **Règle de retour :** Si les items 4-7 ne sont pas tous parfaits (2 points), administrer les items 1-3 en ordre inverse\n• **Crédit automatique :** Les items avant le point de départ non administrés reçoivent 2 points chacun\n• **Arrêt :** Discontinuer après 6 scores consécutifs de 0\n• Entrer manuellement les scores selon ces règles (le système calcule la somme)',
   questions: WAIS3_VOCABULAIRE_QUESTIONS,
   metadata: {
     singleColumn: true,

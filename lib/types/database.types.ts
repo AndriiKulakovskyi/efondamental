@@ -3796,6 +3796,9 @@ export interface Wais3VocabulaireResponse {
   visit_id: string;
   patient_id: string;
   
+  // Patient demographics (required for scoring)
+  patient_age: number;
+  
   // Item scores (0-2 for each item)
   item1: number;  // Bateau
   item2: number;  // Fauteuil
@@ -3831,8 +3834,10 @@ export interface Wais3VocabulaireResponse {
   item32: number; // Apologie
   item33: number; // Conjecture
   
-  // Total raw score (computed)
-  total_raw_score?: number | null;
+  // Computed scores
+  total_raw_score?: number | null; // Sum of all items (0-66), DB-computed
+  standard_score?: number | null; // Age-adjusted scaled score (1-19)
+  standardized_value?: number | null; // Normalized: (standard_score - 10) / 3
   
   // Metadata
   completed_by?: string | null;
@@ -3841,7 +3846,7 @@ export interface Wais3VocabulaireResponse {
   updated_at: string;
 }
 
-export type Wais3VocabulaireResponseInsert = Omit<Wais3VocabulaireResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_raw_score'>;
+export type Wais3VocabulaireResponseInsert = Omit<Wais3VocabulaireResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_raw_score' | 'standard_score' | 'standardized_value'>;
 
 // WAIS-III Matrices
 export interface Wais3MatricesResponse {

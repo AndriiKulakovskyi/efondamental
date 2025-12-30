@@ -2745,6 +2745,8 @@ export async function saveWais3LearningResponse(
 
 import { Wais3VocabulaireResponse, Wais3VocabulaireResponseInsert } from '@/lib/types/database.types';
 
+import { calculateWais3VocabulaireScores } from './wais3-vocabulaire-scoring';
+
 export async function getWais3VocabulaireResponse(
   visitId: string
 ): Promise<Wais3VocabulaireResponse | null> {
@@ -2772,12 +2774,29 @@ export async function saveWais3VocabulaireResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Total raw score is computed by the database (GENERATED ALWAYS AS)
+  // Calculate raw score (sum of all 33 items) - APPLICATION-COMPUTED
+  const rawScore = 
+    response.item1 + response.item2 + response.item3 + response.item4 + response.item5 +
+    response.item6 + response.item7 + response.item8 + response.item9 + response.item10 +
+    response.item11 + response.item12 + response.item13 + response.item14 + response.item15 +
+    response.item16 + response.item17 + response.item18 + response.item19 + response.item20 +
+    response.item21 + response.item22 + response.item23 + response.item24 + response.item25 +
+    response.item26 + response.item27 + response.item28 + response.item29 + response.item30 +
+    response.item31 + response.item32 + response.item33;
+
+  // Calculate standard scores using age-stratified norms - APPLICATION-COMPUTED
+  const scores = calculateWais3VocabulaireScores({
+    patient_age: response.patient_age,
+    total_raw_score: rawScore
+  });
+
+  // All scores (raw, standard, standardized) computed in application and stored in database
   const { data, error } = await supabase
     .from('responses_wais3_vocabulaire')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
+      patient_age: response.patient_age,
       item1: response.item1,
       item2: response.item2,
       item3: response.item3,
@@ -2811,6 +2830,9 @@ export async function saveWais3VocabulaireResponse(
       item31: response.item31,
       item32: response.item32,
       item33: response.item33,
+      total_raw_score: rawScore, // APPLICATION-COMPUTED
+      standard_score: scores.standard_score, // APPLICATION-COMPUTED
+      standardized_value: scores.standardized_value, // APPLICATION-COMPUTED
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
