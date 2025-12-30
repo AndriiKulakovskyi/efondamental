@@ -8611,8 +8611,11 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
     required: false,
     readonly: true,
     visibleWhen: {
-      field: 'wais_cod_tot',
-      condition: 'isNotEmpty'
+      operator: 'and',
+      conditions: [
+        { field: 'wais_cod_tot', condition: 'isNotEmpty' },
+        { field: 'wais_cod_err', condition: 'isNotEmpty' }
+      ]
     },
     help: 'Raw score equals the total number of correctly filled boxes'
   },
@@ -8624,8 +8627,11 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
     required: false,
     readonly: true,
     visibleWhen: {
-      field: 'wais_cod_brut',
-      condition: 'isNotEmpty'
+      operator: 'and',
+      conditions: [
+        { field: 'wais_cod_tot', condition: 'isNotEmpty' },
+        { field: 'wais_cod_err', condition: 'isNotEmpty' }
+      ]
     },
     help: 'Age-adjusted standard score (scale: 1-19, mean=10, SD=3)'
   },
@@ -8637,8 +8643,11 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
     required: false,
     readonly: true,
     visibleWhen: {
-      field: 'wais_cod_std',
-      condition: 'isNotEmpty'
+      operator: 'and',
+      conditions: [
+        { field: 'wais_cod_tot', condition: 'isNotEmpty' },
+        { field: 'wais_cod_err', condition: 'isNotEmpty' }
+      ]
     },
     help: 'Z-score showing deviation from mean in standard deviation units'
   },
@@ -8678,8 +8687,11 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
     required: false,
     readonly: true,
     visibleWhen: {
-      field: 'wais_symb_tot',
-      condition: 'isNotEmpty'
+      operator: 'and',
+      conditions: [
+        { field: 'wais_symb_tot', condition: 'isNotEmpty' },
+        { field: 'wais_symb_err', condition: 'isNotEmpty' }
+      ]
     },
     help: 'Raw score equals total correct minus errors'
   },
@@ -8691,8 +8703,11 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
     required: false,
     readonly: true,
     visibleWhen: {
-      field: 'wais_symb_brut',
-      condition: 'isNotEmpty'
+      operator: 'and',
+      conditions: [
+        { field: 'wais_symb_tot', condition: 'isNotEmpty' },
+        { field: 'wais_symb_err', condition: 'isNotEmpty' }
+      ]
     },
     help: 'Age-adjusted standard score (scale: 1-19, mean=10, SD=3)'
   },
@@ -8704,8 +8719,11 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
     required: false,
     readonly: true,
     visibleWhen: {
-      field: 'wais_symb_std',
-      condition: 'isNotEmpty'
+      operator: 'and',
+      conditions: [
+        { field: 'wais_symb_tot', condition: 'isNotEmpty' },
+        { field: 'wais_symb_err', condition: 'isNotEmpty' }
+      ]
     },
     help: 'Z-score showing deviation from mean in standard deviation units'
   },
