@@ -85,8 +85,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
     
     if (code === 'WAIS4_CODE_FR') {
       // WAIS-IV Code: Standardized score 8-12 is average
-      if (data.standardized_score >= 13) return 'success';
-      if (data.standardized_score >= 8) return 'info';
+      if (data.wais_cod_std >= 13) return 'success';
+      if (data.wais_cod_std >= 8) return 'info';
       return 'warning';
     }
     
@@ -196,7 +196,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 : code === 'CVLT_FR'
                 ? (data.total_1_5 !== undefined ? data.total_1_5 : '-')
                 : code === 'WAIS4_CODE_FR'
-                ? (data.standardized_score !== undefined ? data.standardized_score : '-')
+                ? (data.wais_cod_std !== undefined ? data.wais_cod_std : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM_FR' && '/20'}
               {code === 'QIDS_SR16_FR' && '/27'}
@@ -459,21 +459,21 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="grid grid-cols-2 gap-2">
               <div className="flex justify-between">
                 <span className="text-gray-600">Reponses correctes:</span>
-                <span className="font-semibold">{data.total_correct ?? '-'}/135</span>
+                <span className="font-semibold">{data.wais_cod_tot ?? '-'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Erreurs:</span>
-                <span className="font-semibold">{data.total_errors ?? '-'}</span>
+                <span className="font-semibold">{data.wais_cod_err ?? '-'}</span>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2 pt-2 border-t">
               <div className="flex justify-between">
                 <span className="text-gray-600">Note Brute:</span>
-                <span className="font-semibold">{data.raw_score ?? data.total_correct ?? '-'}</span>
+                <span className="font-semibold">{data.wais_cod_brut ?? '-'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Note Standard:</span>
-                <span className="font-semibold">{data.standardized_score ?? '-'}/19</span>
+                <span className="font-semibold">{data.wais_cod_std ?? '-'}/19</span>
               </div>
             </div>
             <div className="flex justify-between pt-2 border-t">
@@ -482,7 +482,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600 font-medium">Z-Score (Valeur CR):</span>
-              <span className="font-bold text-lg">{data.z_score !== null && data.z_score !== undefined ? data.z_score : '-'}</span>
+              <span className="font-bold text-lg">{data.wais_cod_cr !== null && data.wais_cod_cr !== undefined ? data.wais_cod_cr : '-'}</span>
             </div>
           </div>
         )}

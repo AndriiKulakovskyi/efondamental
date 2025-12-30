@@ -3070,13 +3070,13 @@ export interface Wais4CodeResponse {
   patient_age: number; // 16-90
   
   // Cotation inputs
-  total_correct: number; // 0-135
-  total_errors: number; // 0-135
+  wais_cod_tot: number; // Total correctly filled boxes (0-135)
+  wais_cod_err: number; // Incorrectly filled boxes (0-135)
   
   // Computed scores
-  raw_score?: number; // = total_correct (generated column)
-  standardized_score?: number | null; // 1-19
-  z_score?: number | null; // (standardized_score - 10) / 3
+  wais_cod_brut?: number | null; // Raw total score (Note brute totale)
+  wais_cod_std?: number | null; // Standard score (Note standard - Code) 1-19
+  wais_cod_cr?: number | null; // Standardized value (Valeur standardisée)
   
   // Metadata
   completed_by?: string | null;
@@ -3085,7 +3085,7 @@ export interface Wais4CodeResponse {
   updated_at: string;
 }
 
-export type Wais4CodeResponseInsert = Omit<Wais4CodeResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'raw_score'>;
+export type Wais4CodeResponseInsert = Omit<Wais4CodeResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
 // WAIS-IV Digit Span (Memoire des chiffres)

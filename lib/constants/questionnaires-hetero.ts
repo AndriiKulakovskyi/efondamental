@@ -8584,7 +8584,7 @@ export const WAIS4_CODE_QUESTIONS: Question[] = [
     required: false
   },
   {
-    id: 'total_correct',
+    id: 'wais_cod_tot',
     section: 'Cotation',
     text: 'Nombre total de cases remplies de facon correctes',
     type: 'number',
@@ -8593,13 +8593,54 @@ export const WAIS4_CODE_QUESTIONS: Question[] = [
     max: 135
   },
   {
-    id: 'total_errors',
+    id: 'wais_cod_err',
     section: 'Cotation',
     text: 'Nombre de cases remplies de facon incorrecte',
     type: 'number',
     required: true,
     min: 0,
     max: 135
+  },
+  
+  // Computed Scores
+  {
+    id: 'wais_cod_brut',
+    section: 'Cotation',
+    text: 'Note brute totale',
+    type: 'number',
+    required: false,
+    readonly: true,
+    visibleWhen: {
+      field: 'wais_cod_tot',
+      condition: 'isNotEmpty'
+    },
+    help: 'Note brute = Nombre total de cases correctement remplies'
+  },
+  {
+    id: 'wais_cod_std',
+    section: 'Cotation',
+    text: 'Note standard - Code',
+    type: 'number',
+    required: false,
+    readonly: true,
+    visibleWhen: {
+      field: 'wais_cod_brut',
+      condition: 'isNotEmpty'
+    },
+    help: 'Note standard selon les normes WAIS-IV basee sur l\'age (1-19)'
+  },
+  {
+    id: 'wais_cod_cr',
+    section: 'Cotation',
+    text: 'Valeur standardisee par rapport a une moyenne de 10 et un ecart type de 3',
+    type: 'number',
+    required: false,
+    readonly: true,
+    visibleWhen: {
+      field: 'wais_cod_std',
+      condition: 'isNotEmpty'
+    },
+    help: 'Valeur standardisee (z-score): (note standard - 10) / 3'
   }
 ];
 
