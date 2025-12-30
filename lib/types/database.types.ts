@@ -3301,21 +3301,29 @@ export interface FluencesVerbalesResponse {
   
   // Lettre P (Phonemic)
   fv_p_tot_correct: number;
+  fv_p_persev?: number | null; // Perseverations
   fv_p_deriv?: number | null;
   fv_p_intrus?: number | null;
   fv_p_propres?: number | null;
+  fv_p_cluster_tot?: number | null; // Number of clusters
+  fv_p_cluster_taille?: number | null; // Average cluster size (decimal)
+  fv_p_switch_tot?: number | null; // Number of switches
   fv_p_tot_rupregle?: number | null; // Total rule violations
   fv_p_tot_correct_z?: number | null; // Z-score
-  fv_p_tot_correct_pc?: number | null; // Percentile
+  fv_p_tot_correct_pc?: string | null; // Percentile (can be range like "25 - 50")
   
   // Categorie Animaux (Semantic)
   fv_anim_tot_correct: number;
+  fv_anim_persev?: number | null; // Perseverations
   fv_anim_deriv?: number | null;
   fv_anim_intrus?: number | null;
   fv_anim_propres?: number | null;
+  fv_anim_cluster_tot?: number | null; // Number of clusters
+  fv_anim_cluster_taille?: number | null; // Average cluster size (decimal)
+  fv_anim_switch_tot?: number | null; // Number of switches
   fv_anim_tot_rupregle?: number | null; // Total rule violations
   fv_anim_tot_correct_z?: number | null; // Z-score
-  fv_anim_tot_correct_pc?: number | null; // Percentile
+  fv_anim_tot_correct_pc?: string | null; // Percentile (can be range like "25 - 50")
   
   // Metadata
   completed_by?: string | null;
@@ -3679,19 +3687,27 @@ export interface Wais3FluencesVerbalesResponse {
   patient_age: number;
   years_of_education: number;
   fv_p_tot_correct: number;
+  fv_p_persev?: number | null; // Perseverations
   fv_p_deriv?: number | null;
   fv_p_intrus?: number | null;
   fv_p_propres?: number | null;
+  fv_p_cluster_tot?: number | null; // Number of clusters
+  fv_p_cluster_taille?: number | null; // Average cluster size (decimal)
+  fv_p_switch_tot?: number | null; // Number of switches
   fv_p_tot_rupregle?: number | null;
   fv_p_tot_correct_z?: number | null;
-  fv_p_tot_correct_pc?: number | null;
+  fv_p_tot_correct_pc?: string | null; // Changed to string for ranges
   fv_anim_tot_correct: number;
+  fv_anim_persev?: number | null; // Perseverations
   fv_anim_deriv?: number | null;
   fv_anim_intrus?: number | null;
   fv_anim_propres?: number | null;
+  fv_anim_cluster_tot?: number | null; // Number of clusters
+  fv_anim_cluster_taille?: number | null; // Average cluster size (decimal)
+  fv_anim_switch_tot?: number | null; // Number of switches
   fv_anim_tot_rupregle?: number | null;
   fv_anim_tot_correct_z?: number | null;
-  fv_anim_tot_correct_pc?: number | null;
+  fv_anim_tot_correct_pc?: string | null; // Changed to string for ranges
   completed_by?: string | null;
   completed_at: string;
   created_at: string;

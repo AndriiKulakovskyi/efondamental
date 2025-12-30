@@ -9656,11 +9656,13 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
   },
   {
     id: 'years_of_education',
-    text: 'Annees de scolarisation',
+    text: 'Annees de scolarisation (calculees automatiquement)',
     type: 'number',
     required: true,
+    readonly: true,
     min: 0,
-    max: 30
+    max: 30,
+    help: 'Calcule automatiquement depuis le profil du patient'
   },
   // Section: Lettre P (Phonemique)
   {
@@ -9674,6 +9676,14 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     text: 'Nombre total de mots corrects lettre P',
     type: 'number',
     required: true,
+    min: 0,
+    max: 100
+  },
+  {
+    id: 'fv_p_persev',
+    text: 'Perseverations lettre P',
+    type: 'number',
+    required: false,
     min: 0,
     max: 100
   },
@@ -9702,6 +9712,31 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     max: 50
   },
   {
+    id: 'fv_p_cluster_tot',
+    text: 'Nombre de clusters',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 100
+  },
+  {
+    id: 'fv_p_cluster_taille',
+    text: 'Taille moyenne d\'un cluster',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50,
+    help: 'Valeur decimale (ex: 2.5)'
+  },
+  {
+    id: 'fv_p_switch_tot',
+    text: 'Nombre de switch',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 100
+  },
+  {
     id: 'fv_p_tot_rupregle',
     text: 'Total ruptures de regle (MD + I + NP)',
     type: 'number',
@@ -9720,7 +9755,7 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     id: 'fv_p_tot_correct_pc',
     text: 'Percentile lettre P',
     help: 'Rang percentile selon age et education',
-    type: 'number',
+    type: 'text',
     required: false,
     readonly: true
   },
@@ -9736,6 +9771,14 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     text: 'Nombre total de mots corrects categorie animaux',
     type: 'number',
     required: true,
+    min: 0,
+    max: 100
+  },
+  {
+    id: 'fv_anim_persev',
+    text: 'Perseverations categorie animaux',
+    type: 'number',
+    required: false,
     min: 0,
     max: 100
   },
@@ -9764,6 +9807,31 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     max: 50
   },
   {
+    id: 'fv_anim_cluster_tot',
+    text: 'Nombre de clusters',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 100
+  },
+  {
+    id: 'fv_anim_cluster_taille',
+    text: 'Taille moyenne d\'un cluster',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50,
+    help: 'Valeur decimale (ex: 2.5)'
+  },
+  {
+    id: 'fv_anim_switch_tot',
+    text: 'Nombre de switch',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 100
+  },
+  {
     id: 'fv_anim_tot_rupregle',
     text: 'Total ruptures de regle (MD + I + NP)',
     type: 'number',
@@ -9782,7 +9850,7 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     id: 'fv_anim_tot_correct_pc',
     text: 'Percentile categorie animaux',
     help: 'Rang percentile selon age et education',
-    type: 'number',
+    type: 'text',
     required: false,
     readonly: true
   }

@@ -9,11 +9,11 @@ interface FluencesVerbalesScores {
   // Lettre P scores
   fv_p_tot_rupregle: number;
   fv_p_tot_correct_z: number;
-  fv_p_tot_correct_pc: number;
+  fv_p_tot_correct_pc: string; // Changed from number to string for ranges
   // Animaux scores
   fv_anim_tot_rupregle: number;
   fv_anim_tot_correct_z: number;
-  fv_anim_tot_correct_pc: number;
+  fv_anim_tot_correct_pc: string; // Changed from number to string for ranges
 }
 
 interface FluencesVerbalesInput {
@@ -117,20 +117,36 @@ function calculateZScore(value: number, mean: number, stdDev: number): number {
 
 /**
  * Determine percentile based on value and percentile thresholds
+ * Returns string with exact percentile, range, or boundary indicator
  * Percentile order in norms: [p5, p10, p25, p50, p75, p90, p95]
  */
-function calculatePercentile(value: number, norms: number[]): number {
+function calculatePercentile(value: number, norms: number[]): string {
   const [p5, p10, p25, p50, p75, p90, p95] = norms;
   
   // Higher is better for fluency measures
-  if (value >= p95) return 95;
-  if (value >= p90) return 90;
-  if (value >= p75) return 75;
-  if (value >= p50) return 50;
-  if (value >= p25) return 25;
-  if (value >= p10) return 10;
-  if (value >= p5) return 5;
-  return 1; // Below 5th percentile
+  
+  // Check for exact matches first
+  if (value === p95) return '95';
+  if (value === p90) return '90';
+  if (value === p75) return '75';
+  if (value === p50) return '50';
+  if (value === p25) return '25';
+  if (value === p10) return '10';
+  if (value === p5) return '5';
+  
+  // Above 95th percentile
+  if (value > p95) return '> 95';
+  
+  // Determine range
+  if (value > p90) return '90 - 95';
+  if (value > p75) return '75 - 90';
+  if (value > p50) return '50 - 75';
+  if (value > p25) return '25 - 50';
+  if (value > p10) return '10 - 25';
+  if (value > p5) return '5 - 10';
+  
+  // Below 5th percentile
+  return '< 5';
 }
 
 /**
