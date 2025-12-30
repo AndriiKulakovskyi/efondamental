@@ -7697,6 +7697,25 @@ export const WAIS4_CRITERIA_QUESTIONS: Question[] = [
     required: true
   },
   {
+    id: 'assessment_time',
+    section: 'Informations Générales',
+    text: 'Heure passation bilan',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: '09h', label: '09h', score: 0 },
+      { code: '10h', label: '10h', score: 0 },
+      { code: '11h', label: '11h', score: 0 },
+      { code: '12h', label: '12h', score: 0 },
+      { code: '13h', label: '13h', score: 0 },
+      { code: '14h', label: '14h', score: 0 },
+      { code: '15h', label: '15h', score: 0 },
+      { code: '16h', label: '16h', score: 0 },
+      { code: '17h', label: '17h', score: 0 },
+      { code: '18h', label: '18h', score: 0 }
+    ]
+  },
+  {
     id: 'age',
     section: 'Informations Générales',
     text: 'Age du patient (calculé automatiquement)',

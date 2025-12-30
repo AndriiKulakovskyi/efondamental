@@ -2848,6 +2848,7 @@ export interface Wais4CriteriaResponse {
   
   // General Information
   collection_date: string; // Date field
+  assessment_time?: string | null; // Time of assessment (09h-18h)
   age: number; // 16-90
   laterality: 'gaucher' | 'droitier' | 'ambidextre';
   native_french_speaker: number; // 0 or 1
@@ -3727,6 +3728,7 @@ export interface Wais3CriteriaResponse {
   
   // General Information
   collection_date: string; // Date field
+  assessment_time?: string | null; // Time of assessment (09h-18h)
   age: number; // 16-90
   laterality: 'gaucher' | 'droitier' | 'ambidextre';
   native_french_speaker: number; // 0 or 1
