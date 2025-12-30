@@ -1572,11 +1572,11 @@ export async function saveCvltResponse(
 }
 
 // ============================================================================
-// WAIS-IV Subtest Code (Processing Speed)
+// WAIS-IV Code, Symboles & IVT (Processing Speed Index)
 // ============================================================================
 
 import { Wais4CodeResponse, Wais4CodeResponseInsert } from '@/lib/types/database.types';
-import { calculateWais4CodeScores } from './wais4-code-scoring';
+import { calculateWais4CodeSymbolesScores } from './wais4-code-scoring';
 
 export async function getWais4CodeResponse(visitId: string): Promise<Wais4CodeResponse | null> {
   const supabase = await createClient();
@@ -1601,10 +1601,13 @@ export async function saveWais4CodeResponse(
   const user = await supabase.auth.getUser();
 
   // Calculate scores using WAIS-IV normative tables
-  const scores = calculateWais4CodeScores({
+  // Supports both Code-only (legacy) and Code+Symboles+IVT (new)
+  const scores = calculateWais4CodeSymbolesScores({
     patient_age: response.patient_age,
     wais_cod_tot: response.wais_cod_tot,
-    wais_cod_err: response.wais_cod_err
+    wais_cod_err: response.wais_cod_err,
+    wais_symb_tot: response.wais_symb_tot,
+    wais_symb_err: response.wais_symb_err
   });
 
   const { data, error } = await supabase
@@ -1613,11 +1616,23 @@ export async function saveWais4CodeResponse(
       visit_id: response.visit_id,
       patient_id: response.patient_id,
       patient_age: response.patient_age,
+      // Code subtest
       wais_cod_tot: response.wais_cod_tot,
       wais_cod_err: response.wais_cod_err,
       wais_cod_brut: scores.wais_cod_brut,
       wais_cod_std: scores.wais_cod_std,
       wais_cod_cr: scores.wais_cod_cr,
+      // Symboles subtest (optional)
+      wais_symb_tot: response.wais_symb_tot ?? null,
+      wais_symb_err: response.wais_symb_err ?? null,
+      wais_symb_brut: scores.wais_symb_brut ?? null,
+      wais_symb_std: scores.wais_symb_std ?? null,
+      wais_symb_cr: scores.wais_symb_cr ?? null,
+      // IVT composite (optional)
+      wais_somme_ivt: scores.wais_somme_ivt ?? null,
+      wais_ivt: scores.wais_ivt ?? null,
+      wais_ivt_rang: scores.wais_ivt_rang ?? null,
+      wais_ivt_95: scores.wais_ivt_95 ?? null,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

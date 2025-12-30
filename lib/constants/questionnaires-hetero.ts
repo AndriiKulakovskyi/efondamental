@@ -8553,11 +8553,11 @@ export const CVLT_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
-// WAIS-IV - Subtest Code (Processing Speed)
+// WAIS-IV - Code, Symboles & IVT (Processing Speed Index)
 // ============================================================================
 
-export const WAIS4_CODE_QUESTIONS: Question[] = [
-  // Section: Donnees Demographiques
+export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
+  // Demographics Section
   {
     id: 'section_demo',
     text: 'Donnees Demographiques',
@@ -8572,41 +8572,41 @@ export const WAIS4_CODE_QUESTIONS: Question[] = [
     required: true,
     readonly: true,
     min: 16,
-    max: 90,
+    max: 120,
     help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
   },
   
-  // Section: Cotation
+  // SECTION 1: Code Subtest
   {
-    id: 'section_cotation',
-    text: 'Cotation',
+    id: 'section_code',
+    text: 'WAIS-IV (Wechsler, 2008) - Subtest Code',
     type: 'section',
     required: false
   },
   {
     id: 'wais_cod_tot',
-    section: 'Cotation',
+    section: 'WAIS-IV (Wechsler, 2008) - Subtest Code',
     text: 'Nombre total de cases remplies de facon correctes',
     type: 'number',
     required: true,
     min: 0,
-    max: 135
+    max: 135,
+    help: 'Total number of correctly filled boxes'
   },
   {
     id: 'wais_cod_err',
-    section: 'Cotation',
+    section: 'WAIS-IV (Wechsler, 2008) - Subtest Code',
     text: 'Nombre de cases remplies de facon incorrecte',
     type: 'number',
     required: true,
     min: 0,
-    max: 135
+    max: 135,
+    help: 'Number of incorrectly filled boxes (collected but not used in WAIS-IV scoring)'
   },
-  
-  // Computed Scores
   {
     id: 'wais_cod_brut',
-    section: 'Cotation',
-    text: 'Note brute totale',
+    section: 'WAIS-IV (Wechsler, 2008) - Subtest Code',
+    text: 'Note brute totale = Nombre total de cases correctement remplies',
     type: 'number',
     required: false,
     readonly: true,
@@ -8614,11 +8614,11 @@ export const WAIS4_CODE_QUESTIONS: Question[] = [
       field: 'wais_cod_tot',
       condition: 'isNotEmpty'
     },
-    help: 'Note brute = Nombre total de cases correctement remplies'
+    help: 'Raw score equals the total number of correctly filled boxes'
   },
   {
     id: 'wais_cod_std',
-    section: 'Cotation',
+    section: 'WAIS-IV (Wechsler, 2008) - Subtest Code',
     text: 'Note standard - Code',
     type: 'number',
     required: false,
@@ -8627,11 +8627,11 @@ export const WAIS4_CODE_QUESTIONS: Question[] = [
       field: 'wais_cod_brut',
       condition: 'isNotEmpty'
     },
-    help: 'Note standard selon les normes WAIS-IV basee sur l\'age (1-19)'
+    help: 'Age-adjusted standard score (scale: 1-19, mean=10, SD=3)'
   },
   {
     id: 'wais_cod_cr',
-    section: 'Cotation',
+    section: 'WAIS-IV (Wechsler, 2008) - Subtest Code',
     text: 'Valeur standardisee par rapport a une moyenne de 10 et un ecart type de 3',
     type: 'number',
     required: false,
@@ -8640,22 +8640,156 @@ export const WAIS4_CODE_QUESTIONS: Question[] = [
       field: 'wais_cod_std',
       condition: 'isNotEmpty'
     },
-    help: 'Valeur standardisee (z-score): (note standard - 10) / 3'
+    help: 'Z-score showing deviation from mean in standard deviation units'
+  },
+  
+  // SECTION 2: Symboles (Symbol Search) Subtest
+  {
+    id: 'section_symboles',
+    text: 'WAIS-IV (Wechsler, 2008) - Subtest Symboles',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'wais_symb_tot',
+    section: 'WAIS-IV (Wechsler, 2008) - Subtest Symboles',
+    text: 'Nombre total de cases remplies de facon correctes',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 60,
+    help: 'Total number of correctly filled boxes'
+  },
+  {
+    id: 'wais_symb_err',
+    section: 'WAIS-IV (Wechsler, 2008) - Subtest Symboles',
+    text: 'Nombre de cases remplies de facon incorrecte',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 60,
+    help: 'Number of incorrectly filled boxes (subtracted from total)'
+  },
+  {
+    id: 'wais_symb_brut',
+    section: 'WAIS-IV (Wechsler, 2008) - Subtest Symboles',
+    text: 'Note brute totale = Nombre total de cases correctement remplies',
+    type: 'number',
+    required: false,
+    readonly: true,
+    visibleWhen: {
+      field: 'wais_symb_tot',
+      condition: 'isNotEmpty'
+    },
+    help: 'Raw score equals total correct minus errors'
+  },
+  {
+    id: 'wais_symb_std',
+    section: 'WAIS-IV (Wechsler, 2008) - Subtest Symboles',
+    text: 'Note standard - Symboles',
+    type: 'number',
+    required: false,
+    readonly: true,
+    visibleWhen: {
+      field: 'wais_symb_brut',
+      condition: 'isNotEmpty'
+    },
+    help: 'Age-adjusted standard score (scale: 1-19, mean=10, SD=3)'
+  },
+  {
+    id: 'wais_symb_cr',
+    section: 'WAIS-IV (Wechsler, 2008) - Subtest Symboles',
+    text: 'Valeur standardisee par rapport a une moyenne de 10 et un ecart type de 3',
+    type: 'number',
+    required: false,
+    readonly: true,
+    visibleWhen: {
+      field: 'wais_symb_std',
+      condition: 'isNotEmpty'
+    },
+    help: 'Z-score showing deviation from mean in standard deviation units'
+  },
+  
+  // SECTION 3: IVT (Processing Speed Index)
+  {
+    id: 'section_ivt',
+    text: 'WAIS-IV (Wechsler, 2008) - Subtest IVT : Indice de vitesse de traitement',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'wais_somme_ivt',
+    section: 'WAIS-IV (Wechsler, 2008) - Subtest IVT : Indice de vitesse de traitement',
+    text: 'Somme des notes standard',
+    type: 'number',
+    required: false,
+    readonly: true,
+    visibleWhen: {
+      operator: 'and',
+      conditions: [
+        { field: 'wais_cod_std', condition: 'isNotEmpty' },
+        { field: 'wais_symb_std', condition: 'isNotEmpty' }
+      ]
+    },
+    help: 'Sum of Code and Symboles standard scores'
+  },
+  {
+    id: 'wais_ivt',
+    section: 'WAIS-IV (Wechsler, 2008) - Subtest IVT : Indice de vitesse de traitement',
+    text: 'Indice de vitesse de traitement',
+    type: 'number',
+    required: false,
+    readonly: true,
+    visibleWhen: {
+      field: 'wais_somme_ivt',
+      condition: 'isNotEmpty'
+    },
+    help: 'Processing Speed Index composite score (scale: 50-150, mean=100, SD=15)'
+  },
+  {
+    id: 'wais_ivt_rang',
+    section: 'WAIS-IV (Wechsler, 2008) - Subtest IVT : Indice de vitesse de traitement',
+    text: 'Rang de l\'Indice de Vitesse de Traitement',
+    type: 'text',
+    required: false,
+    readonly: true,
+    visibleWhen: {
+      field: 'wais_ivt',
+      condition: 'isNotEmpty'
+    },
+    help: 'Percentile rank corresponding to the IVT score'
+  },
+  {
+    id: 'wais_ivt_95',
+    section: 'WAIS-IV (Wechsler, 2008) - Subtest IVT : Indice de vitesse de traitement',
+    text: 'Intervalle de confiance a 95% de l\'Indice de Vitesse de Traitement',
+    type: 'text',
+    required: false,
+    readonly: true,
+    visibleWhen: {
+      field: 'wais_ivt',
+      condition: 'isNotEmpty'
+    },
+    help: '95% confidence interval for the IVT score'
   }
 ];
 
-export const WAIS4_CODE_DEFINITION: QuestionnaireDefinition = {
-  id: 'wais4_code',
-  code: 'WAIS4_CODE_FR',
-  title: 'WAIS-IV Subtest Code',
-  description: 'Subtest Code de l\'echelle d\'intelligence de Wechsler pour adultes (WAIS-IV). Evalue la vitesse de traitement graphique.',
-  questions: WAIS4_CODE_QUESTIONS,
+export const WAIS4_CODE_SYMBOLES_IVT_DEFINITION: QuestionnaireDefinition = {
+  id: 'wais4_code_symboles_ivt',
+  code: 'WAIS_IV_CODE_SYMBOLES_IVT',
+  title: 'WAIS-IV (Wechsler, 2008) - Code, Symboles & IVT',
+  description: 'Processing Speed Index (IVT) comprising Code and Symbol Search subtests. The PSI measures the speed of mental and graphomotor processing.',
+  questions: WAIS4_CODE_SYMBOLES_IVT_QUESTIONS,
   metadata: {
     singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional'
   }
 };
+
+// Backward compatibility alias - old code references
+export const WAIS4_CODE_DEFINITION = WAIS4_CODE_SYMBOLES_IVT_DEFINITION;
+
 
 // ============================================================================
 // WAIS-IV - Subtest Memoire des Chiffres (Digit Span)

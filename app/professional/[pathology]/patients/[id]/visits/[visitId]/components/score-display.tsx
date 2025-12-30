@@ -83,8 +83,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
-    if (code === 'WAIS4_CODE_FR') {
-      // WAIS-IV Code: Standardized score 8-12 is average
+    if (code === 'WAIS4_CODE_FR' || code === 'WAIS_IV_CODE_SYMBOLES_IVT') {
+      // WAIS-IV Code/Symboles/IVT: Use IVT composite if available, else Code standard score
+      if (data.wais_ivt !== null && data.wais_ivt !== undefined) {
+        // IVT composite scoring: 50-150 scale, mean=100, SD=15
+        if (data.wais_ivt >= 110) return 'success';  // High Average to Superior
+        if (data.wais_ivt >= 90) return 'info';      // Average
+        if (data.wais_ivt >= 80) return 'warning';   // Low Average
+        return 'error';                              // Below 80 = Borderline or lower
+      }
+      // Fallback to Code standard score: 1-19 scale, mean=10, SD=3
       if (data.wais_cod_std >= 13) return 'success';
       if (data.wais_cod_std >= 8) return 'info';
       return 'warning';
@@ -180,6 +188,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'WAIS4_MATRICES_FR' && 'Résultats WAIS-IV Matrices'}
               {code === 'CVLT_FR' && 'Résultats CVLT'}
               {code === 'WAIS4_CODE_FR' && 'Résultats WAIS-IV Code'}
+              {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && 'Résultats WAIS-IV Code, Symboles & IVT'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -197,6 +206,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.total_1_5 !== undefined ? data.total_1_5 : '-')
                 : code === 'WAIS4_CODE_FR'
                 ? (data.wais_cod_std !== undefined ? data.wais_cod_std : '-')
+                : code === 'WAIS_IV_CODE_SYMBOLES_IVT'
+                ? (data.wais_ivt !== undefined && data.wais_ivt !== null ? data.wais_ivt : (data.wais_cod_std !== undefined ? data.wais_cod_std : '-'))
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM_FR' && '/20'}
               {code === 'QIDS_SR16_FR' && '/27'}
@@ -205,6 +216,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'WAIS4_MATRICES_FR' && '/19'}
               {code === 'CVLT_FR' && '/80'}
               {code === 'WAIS4_CODE_FR' && '/19'}
+              {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && (data.wais_ivt !== undefined && data.wais_ivt !== null ? '/150' : '/19')}
             </span>
           </div>
         </div>
@@ -483,6 +495,100 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="flex justify-between">
               <span className="text-gray-600 font-medium">Z-Score (Valeur CR):</span>
               <span className="font-bold text-lg">{data.wais_cod_cr !== null && data.wais_cod_cr !== undefined ? data.wais_cod_cr : '-'}</span>
+            </div>
+          </div>
+        )}
+
+        {/* WAIS-IV Code, Symboles & IVT Details */}
+        {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            {/* Code Subtest */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Subtest Code</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Reponses correctes:</span>
+                  <span className="font-medium">{data.wais_cod_tot ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Erreurs:</span>
+                  <span className="font-medium">{data.wais_cod_err ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Note Brute:</span>
+                  <span className="font-medium">{data.wais_cod_brut ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Note Standard:</span>
+                  <span className="font-semibold">{data.wais_cod_std ?? '-'}/19</span>
+                </div>
+                <div className="flex justify-between col-span-2">
+                  <span className="text-gray-500">Z-Score:</span>
+                  <span className="font-medium">{data.wais_cod_cr !== null && data.wais_cod_cr !== undefined ? data.wais_cod_cr : '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Symboles Subtest (only show if data available) */}
+            {(data.wais_symb_tot !== null && data.wais_symb_tot !== undefined) && (
+              <div className="pt-2 border-t">
+                <h5 className="font-semibold text-gray-700 mb-2">Subtest Symboles</h5>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Reponses correctes:</span>
+                    <span className="font-medium">{data.wais_symb_tot ?? '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Erreurs:</span>
+                    <span className="font-medium">{data.wais_symb_err ?? '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Note Brute:</span>
+                    <span className="font-medium">{data.wais_symb_brut ?? '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Note Standard:</span>
+                    <span className="font-semibold">{data.wais_symb_std ?? '-'}/19</span>
+                  </div>
+                  <div className="flex justify-between col-span-2">
+                    <span className="text-gray-500">Z-Score:</span>
+                    <span className="font-medium">{data.wais_symb_cr !== null && data.wais_symb_cr !== undefined ? data.wais_symb_cr : '-'}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* IVT Composite (only show if both subtests completed) */}
+            {(data.wais_ivt !== null && data.wais_ivt !== undefined) && (
+              <div className="pt-2 border-t">
+                <h5 className="font-semibold text-gray-700 mb-2">Indice de Vitesse de Traitement (IVT)</h5>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Somme Notes Std:</span>
+                    <span className="font-medium">{data.wais_somme_ivt ?? '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Score IVT:</span>
+                    <span className="font-semibold">{data.wais_ivt ?? '-'}/150</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Rang Percentile:</span>
+                    <span className="font-medium">{data.wais_ivt_rang ?? '-'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">IC 95%:</span>
+                    <span className="font-medium">{data.wais_ivt_95 ?? '-'}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Demographics */}
+            <div className="pt-2 border-t">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Age du patient:</span>
+                <span className="font-semibold">{data.patient_age ?? '-'} ans</span>
+              </div>
             </div>
           </div>
         )}

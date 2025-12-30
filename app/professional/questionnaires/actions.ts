@@ -693,6 +693,7 @@ export async function submitProfessionalQuestionnaireAction(
         break;
 
       case 'WAIS4_CODE_FR':
+      case 'WAIS_IV_CODE_SYMBOLES_IVT':
         result = await saveWais4CodeResponse({
           visit_id: visitId,
           patient_id: patientId,

@@ -3058,7 +3058,7 @@ export type CvltResponseInsert = Omit<CvltResponse,
 >;
 
 // ============================================================================
-// WAIS-IV Subtest Code (Processing Speed)
+// WAIS-IV Code, Symboles & IVT (Processing Speed Index)
 // ============================================================================
 
 export interface Wais4CodeResponse {
@@ -3067,16 +3067,31 @@ export interface Wais4CodeResponse {
   patient_id: string;
   
   // Demographic data
-  patient_age: number; // 16-90
+  patient_age: number; // 16-120
   
-  // Cotation inputs
+  // Code Subtest inputs
   wais_cod_tot: number; // Total correctly filled boxes (0-135)
-  wais_cod_err: number; // Incorrectly filled boxes (0-135)
+  wais_cod_err: number; // Incorrectly filled boxes (0-135, collected but not used in scoring)
   
-  // Computed scores
+  // Code Subtest computed scores
   wais_cod_brut?: number | null; // Raw total score (Note brute totale)
   wais_cod_std?: number | null; // Standard score (Note standard - Code) 1-19
-  wais_cod_cr?: number | null; // Standardized value (Valeur standardisée)
+  wais_cod_cr?: number | null; // Standardized value (z-score)
+  
+  // Symboles (Symbol Search) Subtest inputs
+  wais_symb_tot?: number | null; // Total correctly filled boxes (0-60)
+  wais_symb_err?: number | null; // Incorrectly filled boxes (0-60, subtracted from total)
+  
+  // Symboles Subtest computed scores
+  wais_symb_brut?: number | null; // Raw score (total - errors)
+  wais_symb_std?: number | null; // Standard score (Note standard - Symboles) 1-19
+  wais_symb_cr?: number | null; // Standardized value (z-score)
+  
+  // IVT (Processing Speed Index) composite scores
+  wais_somme_ivt?: number | null; // Sum of Code + Symboles standard scores (2-38)
+  wais_ivt?: number | null; // Processing Speed Index (50-150, mean=100, SD=15)
+  wais_ivt_rang?: string | null; // Percentile rank
+  wais_ivt_95?: string | null; // 95% confidence interval
   
   // Metadata
   completed_by?: string | null;
