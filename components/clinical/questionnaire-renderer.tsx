@@ -515,37 +515,44 @@ export function QuestionnaireRenderer({
       const EMPAN_CROISSANT_MEANS = [5.6, 6.0, 6.0, 5.9, 5.8, 6.0, 5.6, 5.2, 5.0, 4.8, 5.1];
       const EMPAN_CROISSANT_SDS = [1.2, 1.3, 1.3, 1.1, 1.2, 1.2, 1.4, 1.4, 1.2, 1.2, 1.2];
       
-      // Standard score norm table by age group
-      const DIGIT_SPAN_NORMS: number[][] = [
-        [1, 1, 1, 1, 1, 2, 3, 3, 4, 5, 5, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
-        [1, 1, 1, 1, 1, 2, 3, 3, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
-        [1, 1, 1, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
-        [1, 1, 1, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
-        [1, 1, 1, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
-        [1, 1, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
-        [1, 1, 1, 1, 2, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
-        [1, 1, 1, 2, 3, 3, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
-        [1, 1, 1, 2, 3, 4, 4, 5, 5, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
-        [1, 1, 2, 3, 3, 4, 5, 5, 6, 6, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
-        [1, 1, 2, 3, 4, 4, 5, 6, 6, 7, 7, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
-        [1, 1, 2, 3, 4, 5, 5, 6, 7, 7, 8, 8, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
-        [1, 2, 3, 4, 5, 5, 6, 7, 7, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19]
-      ];
+      // Standard score thresholds by age group (from WAIS-IV normative data)
+      // Each array contains 19 thresholds: if raw_score <= threshold[k], standard score = k + 1
+      const DIGIT_SPAN_THRESHOLDS: Record<string, number[]> = {
+        '16-17': [8, 11, 14, 17, 19, 20, 22, 24, 25, 27, 29, 30, 32, 34, 36, 37, 39, 41, 48],
+        '18-19': [8, 11, 14, 17, 20, 22, 23, 25, 26, 28, 30, 32, 33, 35, 36, 38, 40, 42, 48],
+        '20-24': [10, 13, 15, 18, 20, 21, 23, 25, 26, 28, 30, 32, 34, 35, 37, 39, 41, 43, 48],
+        '25-29': [11, 13, 15, 18, 20, 21, 23, 25, 26, 28, 30, 32, 34, 35, 37, 38, 40, 42, 48],
+        '30-34': [11, 13, 15, 16, 18, 20, 22, 24, 26, 29, 31, 32, 34, 35, 36, 38, 40, 42, 48],
+        '35-44': [10, 12, 14, 16, 18, 20, 22, 24, 25, 27, 29, 32, 34, 35, 36, 38, 40, 42, 48],
+        '45-54': [6, 9, 12, 14, 16, 18, 20, 23, 25, 27, 29, 30, 32, 33, 35, 38, 40, 42, 48],
+        '55-64': [5, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 29, 31, 33, 35, 38, 40, 42, 48],
+        '65-69': [5, 8, 10, 12, 14, 16, 18, 20, 22, 24, 25, 27, 28, 30, 31, 33, 35, 36, 48],
+        '70-74': [5, 8, 10, 12, 14, 15, 17, 19, 20, 22, 24, 26, 27, 29, 31, 33, 35, 36, 48],
+        '75+': [4, 6, 8, 11, 14, 15, 17, 19, 20, 22, 24, 25, 26, 29, 31, 33, 35, 36, 48]
+      };
       
-      const getWais4AgeGroupIndex = (age: number): number => {
-        if (age >= 16 && age <= 17) return 0;
-        if (age >= 18 && age <= 19) return 1;
-        if (age >= 20 && age <= 24) return 2;
-        if (age >= 25 && age <= 29) return 3;
-        if (age >= 30 && age <= 34) return 4;
-        if (age >= 35 && age <= 44) return 5;
-        if (age >= 45 && age <= 54) return 6;
-        if (age >= 55 && age <= 64) return 7;
-        if (age >= 65 && age <= 69) return 8;
-        if (age >= 70 && age <= 74) return 9;
-        if (age >= 75 && age <= 79) return 10;
-        if (age >= 80 && age <= 84) return 11;
-        return 12;
+      const getWais4AgeGroupKey = (age: number): string => {
+        if (age >= 16 && age <= 17) return '16-17';
+        if (age >= 18 && age <= 19) return '18-19';
+        if (age >= 20 && age <= 24) return '20-24';
+        if (age >= 25 && age <= 29) return '25-29';
+        if (age >= 30 && age <= 34) return '30-34';
+        if (age >= 35 && age <= 44) return '35-44';
+        if (age >= 45 && age <= 54) return '45-54';
+        if (age >= 55 && age <= 64) return '55-64';
+        if (age >= 65 && age <= 69) return '65-69';
+        if (age >= 70 && age <= 74) return '70-74';
+        return '75+';
+      };
+      
+      // Calculate standard score using threshold algorithm: find k where raw_score <= threshold[k]
+      const getStandardScore = (rawScore: number, thresholds: number[]): number => {
+        for (let k = 0; k < thresholds.length; k++) {
+          if (rawScore <= thresholds[k]) {
+            return k + 1;
+          }
+        }
+        return 19; // Maximum standard score
       };
       
       const getEmpanAgeGroupIndex = (age: number): number => {
@@ -709,10 +716,10 @@ export function QuestionnaireRenderer({
           hasChanges = true;
         }
         
-        // Calculate standard score based on age and raw score
-        const ageGroupIdx = getWais4AgeGroupIndex(wais4Age);
-        const normalizedRawScore = Math.min(Math.max(wais_mc_tot, 0), 48);
-        const wais_mc_std = DIGIT_SPAN_NORMS[ageGroupIdx][normalizedRawScore];
+        // Calculate standard score based on age and raw score using threshold algorithm
+        const ageGroupKey = getWais4AgeGroupKey(wais4Age);
+        const thresholds = DIGIT_SPAN_THRESHOLDS[ageGroupKey];
+        const wais_mc_std = getStandardScore(wais_mc_tot, thresholds);
         
         if (updated.wais_mc_std !== wais_mc_std) {
           updated.wais_mc_std = wais_mc_std;
