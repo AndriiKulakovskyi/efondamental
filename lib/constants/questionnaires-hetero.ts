@@ -10151,7 +10151,7 @@ export const STROOP_QUESTIONS: Question[] = [
     type: 'number',
     required: true,
     min: 0,
-    max: 100
+    max: 120
   },
   {
     id: 'stroop_cw_tot_c',

@@ -2245,9 +2245,14 @@ export function QuestionnaireRenderer({
 
     return (
       <div key={question.id} className={`space-y-3 ${isUnitField ? 'col-span-1' : ''} ${getIndentClass(question.indentLevel)}`}>
-        <Label htmlFor={question.id} className="text-base font-semibold text-slate-800">
+        <Label htmlFor={question.id} className={`text-base font-semibold ${question.readonly ? 'text-indigo-700' : 'text-slate-800'}`}>
           {question.text}
           {isRequired && <span className="text-brand ml-1">*</span>}
+          {question.readonly && (
+            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 border border-indigo-200">
+              Calculated
+            </span>
+          )}
         </Label>
         
         {question.help && (
@@ -2323,8 +2328,10 @@ export function QuestionnaireRenderer({
               placeholder={question.metadata?.placeholder || ""}
               disabled={readonly || question.readonly}
               required={isRequired}
-              className={`bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand ${
-                question.readonly ? "bg-slate-50 text-slate-700 font-medium" : ""
+              className={`rounded-xl px-4 py-3.5 transition ${
+                question.readonly 
+                  ? "bg-indigo-50 border-indigo-200 text-indigo-800 font-semibold cursor-not-allowed" 
+                  : "bg-slate-50 border-slate-200 hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand"
               } ${question.metadata?.pattern && value && !new RegExp(question.metadata.pattern).test(value) ? 'border-red-500 bg-red-50 text-red-600' : ''}`}
             />
             {question.metadata?.pattern && value && !new RegExp(question.metadata.pattern).test(value) && (
@@ -2359,8 +2366,10 @@ export function QuestionnaireRenderer({
             }}
             disabled={readonly || question.readonly}
             required={isRequired}
-            className={`bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand ${
-              question.readonly ? "bg-slate-50 text-slate-700" : ""
+            className={`rounded-xl px-4 py-3.5 transition ${
+              question.readonly 
+                ? "bg-indigo-50 border-indigo-200 text-indigo-800 font-semibold cursor-not-allowed" 
+                : "bg-slate-50 border-slate-200 hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand"
             }`}
           />
         )}
