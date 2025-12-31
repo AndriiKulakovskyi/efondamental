@@ -9810,23 +9810,23 @@ export const TMT_QUESTIONS: Question[] = [
   },
   {
     id: 'patient_age',
-    text: 'Age du patient (calcule automatiquement)',
+    text: 'Age du patient',
     type: 'number',
     required: true,
     readonly: true,
     min: 16,
     max: 100,
-    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
   {
     id: 'years_of_education',
-    text: 'Annees de scolarisation (calculees automatiquement)',
+    text: 'Annees de scolarisation',
     type: 'number',
     required: true,
     readonly: true,
     min: 0,
     max: 30,
-    help: 'Calcule automatiquement depuis le profil du patient'
+    help: 'Calculé automatiquement depuis le profil du patient'
   },
   // Section: Partie A
   {
@@ -10025,13 +10025,13 @@ export const STROOP_QUESTIONS: Question[] = [
   },
   {
     id: 'patient_age',
-    text: 'Age du patient (calcule automatiquement)',
+    text: 'Age du patient',
     type: 'number',
     required: true,
     readonly: true,
     min: 16,
     max: 100,
-    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
   // Section: Planche A - Mots
   {
@@ -10248,23 +10248,23 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
   },
   {
     id: 'patient_age',
-    text: 'Age du patient (calcule automatiquement)',
+    text: 'Age du patient',
     type: 'number',
     required: true,
     readonly: true,
     min: 16,
     max: 100,
-    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
   {
     id: 'years_of_education',
-    text: 'Annees de scolarisation (calculees automatiquement)',
+    text: 'Annees de scolarisation',
     type: 'number',
     required: true,
     readonly: true,
     min: 0,
     max: 30,
-    help: 'Calcule automatiquement depuis le profil du patient'
+    help: 'Calculé automatiquement depuis le profil du patient'
   },
   // Section: Lettre P (Phonemique)
   {
@@ -10813,13 +10813,13 @@ export const WAIS4_SIMILITUDES_QUESTIONS: Question[] = [
   },
   {
     id: 'patient_age',
-    text: 'Age du patient (calcule automatiquement)',
+    text: 'Age du patient',
     type: 'number',
     required: true,
     readonly: true,
     min: 16,
     max: 90,
-    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
   // Items section
   {
@@ -11014,13 +11014,13 @@ export const TEST_COMMISSIONS_QUESTIONS: Question[] = [
   },
   {
     id: 'patient_age',
-    text: 'Age du patient (calcule automatiquement)',
+    text: 'Age du patient',
     type: 'number',
     required: true,
     readonly: true,
     min: 20,
     max: 60,
-    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
   {
     id: 'nsc',
@@ -13231,14 +13231,14 @@ export const MEM3_SPATIAL_QUESTIONS: Question[] = [
   // Patient age
   {
     id: 'patient_age',
-    text: 'Age du patient (calcule automatiquement)',
+    text: 'Age du patient',
     type: 'number',
     required: true,
     readonly: true,
     section: 'Informations generales',
     min: 16,
     max: 90,
-    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
 
   // Stopping rule instructions (bold text with description)
@@ -13250,7 +13250,7 @@ export const MEM3_SPATIAL_QUESTIONS: Question[] = [
     readonly: true,
     section: 'Informations generales',
     metadata: { displayOnly: true },
-    help: '**REGLE D\'ARRET**\n\nOrdre direct et Ordre inverse.\n\nEchec a 2 essais d\'un meme item.\n\nPour Ordre direct et Ordre inverse, administrer les 2 essais d\'un meme item, meme si l\'essai 1 est reussi. Administrer Ordre inverse, meme si le sujet a echoue a Ordre direct.'
+    help: '**RÈGLE D\'ARRET**\n\nOrdre direct et Ordre inverse.\n\nEchec a 2 essais d\'un meme item.\n\nPour Ordre direct et Ordre inverse, administrer les 2 essais d\'un meme item, meme si l\'essai 1 est reussi. Administrer Ordre inverse, meme si le sujet a echoue a Ordre direct.'
   },
 
   // Scoring rule instructions (bold text with description)
@@ -13262,7 +13262,7 @@ export const MEM3_SPATIAL_QUESTIONS: Question[] = [
     readonly: true,
     section: 'Informations generales',
     metadata: { displayOnly: true },
-    help: '**REGLE DE COTATION**\n\nChaque essai : 0 ou 1 point.\n\nNote a l\'item : Essai 1 + Essai 2'
+    help: '**RÈGLE DE COTATION**\n\nChaque essai : 0 ou 1 point.\n\nNote a l\'item : Essai 1 + Essai 2'
   },
   
   // Forward (Ordre Direct) items
@@ -13290,7 +13290,7 @@ export const MEM3_SPATIAL_QUESTIONS: Question[] = [
   { id: 'odirect_8b', text: 'ITEM 8 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Direct', options: MEM3_SPATIAL_SCORE_OPTIONS },
   
   // Forward computed scores
-  { id: 'mspatiale_odirect_tot', text: 'Note brute - Ordre Direct (0-16)', type: 'number', required: false, section: 'Ordre Direct', readonly: true, help: 'Somme des scores Ordre Direct (calcule automatiquement)' },
+  { id: 'mspatiale_odirect_tot', text: 'Note brute - Ordre Direct (0-16)', type: 'number', required: false, section: 'Ordre Direct', readonly: true, help: 'Somme des scores Ordre Direct (calculé automatiquement)' },
   { id: 'mspatiale_odirect_std', text: 'Note standard - Ordre Direct', type: 'number', required: false, section: 'Ordre Direct', readonly: true, help: 'Score standard selon l\'age' },
   { id: 'mspatiale_odirect_cr', text: 'Deviation standard - Ordre Direct', type: 'number', required: false, section: 'Ordre Direct', readonly: true, help: '(Note standard - 10) / 3' },
   
@@ -13319,7 +13319,7 @@ export const MEM3_SPATIAL_QUESTIONS: Question[] = [
   { id: 'inverse_8b', text: 'ITEM 8 - Note a l\'essai 2', type: 'single_choice', required: true, section: 'Ordre Inverse', options: MEM3_SPATIAL_SCORE_OPTIONS },
   
   // Backward computed scores
-  { id: 'mspatiale_inverse_tot', text: 'Note brute - Ordre Inverse (0-16)', type: 'number', required: false, section: 'Ordre Inverse', readonly: true, help: 'Somme des scores Ordre Inverse (calcule automatiquement)' },
+  { id: 'mspatiale_inverse_tot', text: 'Note brute - Ordre Inverse (0-16)', type: 'number', required: false, section: 'Ordre Inverse', readonly: true, help: 'Somme des scores Ordre Inverse (calculé automatiquement)' },
   { id: 'mspatiale_inverse_std', text: 'Note standard - Ordre Inverse', type: 'number', required: false, section: 'Ordre Inverse', readonly: true, help: 'Score standard selon l\'age' },
   { id: 'mspatiale_inverse_cr', text: 'Deviation standard - Ordre Inverse', type: 'number', required: false, section: 'Ordre Inverse', readonly: true, help: '(Note standard - 10) / 3' },
   
