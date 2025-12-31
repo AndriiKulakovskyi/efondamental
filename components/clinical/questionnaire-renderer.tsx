@@ -1073,16 +1073,32 @@ export function QuestionnaireRenderer({
       const calcFvZScore = (value: number, mean: number, stdDev: number) => 
         stdDev === 0 ? 0 : Number(((value - mean) / stdDev).toFixed(2));
       
-      const calcFvPercentile = (value: number, norms: number[]) => {
+      const calcFvPercentile = (value: number, norms: number[]): string => {
         const [p5, p10, p25, p50, p75, p90, p95] = norms;
-        if (value >= p95) return 95;
-        if (value >= p90) return 90;
-        if (value >= p75) return 75;
-        if (value >= p50) return 50;
-        if (value >= p25) return 25;
-        if (value >= p10) return 10;
-        if (value >= p5) return 5;
-        return 1;
+        
+        // Higher is better for fluency measures
+        // Check for exact matches first
+        if (value === p95) return '95';
+        if (value === p90) return '90';
+        if (value === p75) return '75';
+        if (value === p50) return '50';
+        if (value === p25) return '25';
+        if (value === p10) return '10';
+        if (value === p5) return '5';
+        
+        // Above 95th percentile
+        if (value > p95) return '> 95';
+        
+        // Determine range
+        if (value > p90) return '90 - 95';
+        if (value > p75) return '75 - 90';
+        if (value > p50) return '50 - 75';
+        if (value > p25) return '25 - 50';
+        if (value > p10) return '10 - 25';
+        if (value > p5) return '5 - 10';
+        
+        // Below 5th percentile
+        return '< 5';
       };
       
       if (!isNaN(fvAge) && fvAge > 0 && !isNaN(fvEdu) && fvEdu >= 0) {

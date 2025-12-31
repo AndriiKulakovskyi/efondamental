@@ -10296,24 +10296,24 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     type: 'number',
     required: true,
     readonly: true,
-    min: 16,
-    max: 100,
+    min: 18,
+    max: 120,
     help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
   {
     id: 'years_of_education',
-    text: 'Annees de scolarisation',
+    text: 'Années d\'études',
     type: 'number',
     required: true,
     readonly: true,
     min: 0,
-    max: 30,
+    max: 25,
     help: 'Calculé automatiquement depuis le profil du patient'
   },
-  // Section: Lettre P (Phonemique)
+  // Section: Fluence Phonemique - Lettre P
   {
     id: 'section_lettre_p',
-    text: 'Lettre P (Phonemique)',
+    text: 'Fluence Phonemique - Lettre P',
     type: 'section',
     required: false
   },
@@ -10321,25 +10321,26 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     id: 'fv_p_tot_correct',
     text: 'Nombre total de mots corrects lettre P',
     type: 'number',
-    required: true,
+    required: false,
     min: 0,
-    max: 100
+    max: 100,
+    help: 'Total number of correct words starting with P (excluding perseverations, intrusions, derived words, and proper nouns)'
   },
   {
     id: 'fv_p_persev',
-    text: 'Perseverations lettre P',
+    text: 'Persévérations lettre P',
     type: 'number',
     required: false,
     min: 0,
-    max: 100
+    help: 'Number of word repetitions (same word said multiple times)'
   },
   {
     id: 'fv_p_deriv',
-    text: 'Mots derives lettre P (MD)',
+    text: 'Mots dérivés lettre P (MD)',
     type: 'number',
     required: false,
     min: 0,
-    max: 50
+    help: 'Number of morphological variants of same root word (e.g., pain, pains, painful)'
   },
   {
     id: 'fv_p_intrus',
@@ -10347,7 +10348,7 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 0,
-    max: 50
+    help: 'Number of words not starting with P'
   },
   {
     id: 'fv_p_propres',
@@ -10355,7 +10356,7 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 0,
-    max: 50
+    help: 'Number of proper nouns (names of people, places, brands)'
   },
   {
     id: 'fv_p_cluster_tot',
@@ -10363,7 +10364,7 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 0,
-    max: 100
+    help: 'Number of phonemic or semantic clusters (groups of related words produced consecutively)'
   },
   {
     id: 'fv_p_cluster_taille',
@@ -10371,8 +10372,7 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 0,
-    max: 50,
-    help: 'Valeur decimale (ex: 2.5)'
+    help: 'Average number of words per cluster'
   },
   {
     id: 'fv_p_switch_tot',
@@ -10380,19 +10380,20 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 0,
-    max: 100
+    help: 'Number of transitions/switches between different clusters'
   },
   {
     id: 'fv_p_tot_rupregle',
-    text: 'Total ruptures de regle (MD + I + NP)',
+    text: 'Ruptures de règle lettre P (MD+I+NP)',
     type: 'number',
     required: false,
-    readonly: true
+    readonly: true,
+    help: 'Total rule violations combining derived words, intrusions, and proper nouns'
   },
   {
     id: 'fv_p_tot_correct_z',
-    text: 'Z-score lettre P',
-    help: 'Score Z normalise selon age et education',
+    text: 'Déviation standard lettre P',
+    help: 'Z-score showing how many standard deviations the patient\'s performance differs from age and education-matched norms (GREFEX)',
     type: 'number',
     required: false,
     readonly: true
@@ -10400,15 +10401,15 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
   {
     id: 'fv_p_tot_correct_pc',
     text: 'Percentile lettre P',
-    help: 'Rang percentile selon age et education',
+    help: 'Percentile rank showing what percentage of the normative population scored below this patient',
     type: 'text',
     required: false,
     readonly: true
   },
-  // Section: Categorie Animaux (Semantique)
+  // Section: Fluence Semantique - Categorie Animaux
   {
     id: 'section_animaux',
-    text: 'Categorie Animaux (Semantique)',
+    text: 'Fluence Semantique - Categorie Animaux',
     type: 'section',
     required: false
   },
@@ -10416,41 +10417,42 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     id: 'fv_anim_tot_correct',
     text: 'Nombre total de mots corrects categorie animaux',
     type: 'number',
-    required: true,
+    required: false,
     min: 0,
-    max: 100
+    max: 120,
+    help: 'Total number of correct animal names (excluding perseverations, intrusions, derived words, and proper nouns)'
   },
   {
     id: 'fv_anim_persev',
-    text: 'Perseverations categorie animaux',
+    text: 'Persévérations catégorie animaux',
     type: 'number',
     required: false,
     min: 0,
-    max: 100
+    help: 'Number of animal name repetitions'
   },
   {
     id: 'fv_anim_deriv',
-    text: 'Mots derives categorie animaux (MD)',
+    text: 'Mots dérivés catégorie animaux (MD)',
     type: 'number',
     required: false,
     min: 0,
-    max: 50
+    help: 'Number of morphological variants (e.g., chat, chatte, chaton)'
   },
   {
     id: 'fv_anim_intrus',
-    text: 'Intrusions categorie animaux (I)',
+    text: 'Intrusions catégorie animaux (I)',
     type: 'number',
     required: false,
     min: 0,
-    max: 50
+    help: 'Number of non-animal words'
   },
   {
     id: 'fv_anim_propres',
-    text: 'Noms propres categorie animaux (NP)',
+    text: 'Noms propres catégorie animaux (NP)',
     type: 'number',
     required: false,
     min: 0,
-    max: 50
+    help: 'Number of proper nouns (pet names, fictional characters like Mickey)'
   },
   {
     id: 'fv_anim_cluster_tot',
@@ -10458,7 +10460,7 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 0,
-    max: 100
+    help: 'Number of semantic clusters (e.g., farm animals, birds, big cats)'
   },
   {
     id: 'fv_anim_cluster_taille',
@@ -10466,8 +10468,7 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 0,
-    max: 50,
-    help: 'Valeur decimale (ex: 2.5)'
+    help: 'Average number of animals per semantic cluster'
   },
   {
     id: 'fv_anim_switch_tot',
@@ -10475,27 +10476,28 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 0,
-    max: 100
+    help: 'Number of switches between different semantic categories'
   },
   {
     id: 'fv_anim_tot_rupregle',
-    text: 'Total ruptures de regle (MD + I + NP)',
+    text: 'Ruptures de règle catégorie animaux (MD+I+NP)',
     type: 'number',
     required: false,
-    readonly: true
+    readonly: true,
+    help: 'Total rule violations for semantic fluency task'
   },
   {
     id: 'fv_anim_tot_correct_z',
-    text: 'Z-score categorie animaux',
-    help: 'Score Z normalise selon age et education',
+    text: 'Déviation standard catégorie animaux',
+    help: 'Z-score showing deviations from age and education-matched norms for semantic fluency',
     type: 'number',
     required: false,
     readonly: true
   },
   {
     id: 'fv_anim_tot_correct_pc',
-    text: 'Percentile categorie animaux',
-    help: 'Rang percentile selon age et education',
+    text: 'Percentile catégorie animaux',
+    help: 'Percentile rank for semantic fluency performance',
     type: 'text',
     required: false,
     readonly: true
