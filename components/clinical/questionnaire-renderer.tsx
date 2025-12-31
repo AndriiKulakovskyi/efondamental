@@ -2250,7 +2250,7 @@ export function QuestionnaireRenderer({
           {isRequired && <span className="text-brand ml-1">*</span>}
           {question.readonly && (
             <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 border border-indigo-200">
-              Calculated
+              Calculé
             </span>
           )}
         </Label>

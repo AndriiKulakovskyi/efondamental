@@ -8078,7 +8078,7 @@ export const CVLT_QUESTIONS: Question[] = [
     readonly: true,
     min: 16,
     max: 100,
-    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
   {
     id: 'years_of_education',
@@ -8089,7 +8089,7 @@ export const CVLT_QUESTIONS: Question[] = [
     readonly: true,
     min: 0,
     max: 30,
-    help: 'Calcule automatiquement depuis le profil du patient'
+    help: 'Calculé automatiquement depuis le profil du patient'
   },
   {
     id: 'patient_sex',
@@ -8102,7 +8102,7 @@ export const CVLT_QUESTIONS: Question[] = [
       { code: 'F', label: 'Femme', score: 1 },
       { code: 'M', label: 'Homme', score: 2 }
     ],
-    help: 'Renseigne automatiquement depuis le profil du patient'
+    help: 'Renseigné automatiquement depuis le profil du patient'
   },
   
   // Section: Liste A (Lundi) - Apprentissage
@@ -8164,7 +8164,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement (somme des essais 1 a 5)'
+    help: 'Calculé automatiquement (somme des essais 1 a 5)'
   },
   {
     id: 'trial_1_std',
@@ -8173,7 +8173,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement selon les normes'
+    help: 'Calculé automatiquement selon les normes'
   },
   {
     id: 'trial_5_std',
@@ -8182,7 +8182,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement selon les normes (z-score ou percentile selon age)'
+    help: 'Calculé automatiquement selon les normes (z-score ou percentile selon age)'
   },
   {
     id: 'trials_1_5_total_std',
@@ -8191,7 +8191,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement selon les normes'
+    help: 'Calculé automatiquement selon les normes'
   },
   
   // Section: Liste B (Mardi) - Interference
@@ -8217,7 +8217,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement selon les normes'
+    help: 'Calculé automatiquement selon les normes'
   },
   
   // Section: Rappel a Court Terme
@@ -8252,7 +8252,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement selon les normes (z-score ou percentile selon age)'
+    help: 'Calculé automatiquement selon les normes (z-score ou percentile selon age)'
   },
   {
     id: 'sdcr_std',
@@ -8261,7 +8261,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement selon les normes (z-score ou percentile selon age)'
+    help: 'Calculé automatiquement selon les normes (z-score ou percentile selon age)'
   },
   
   // Section: Rappel a Long Terme (20 min)
@@ -8296,7 +8296,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement selon les normes (z-score ou percentile selon age)'
+    help: 'Calculé automatiquement selon les normes (z-score ou percentile selon age)'
   },
   {
     id: 'ldcr_std',
@@ -8305,7 +8305,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement selon les normes (z-score ou percentile selon age)'
+    help: 'Calculé automatiquement selon les normes (z-score ou percentile selon age)'
   },
   
   // Section: Indices de Strategie
@@ -8340,7 +8340,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement selon les normes'
+    help: 'Calculé automatiquement selon les normes'
   },
   {
     id: 'serial_std',
@@ -8349,7 +8349,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement (percentile)'
+    help: 'Calculé automatiquement (percentile)'
   },
   
   // Section: Erreurs
@@ -8384,7 +8384,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement (percentile)'
+    help: 'Calculé automatiquement (percentile)'
   },
   {
     id: 'intru_std',
@@ -8393,7 +8393,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement (percentile)'
+    help: 'Calculé automatiquement (percentile)'
   },
   
   // Section: Reconnaissance (optionnel)
@@ -8437,7 +8437,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement (percentile)'
+    help: 'Calculé automatiquement (percentile)'
   },
   {
     id: 'false_recog_std',
@@ -8446,7 +8446,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement (percentile)'
+    help: 'Calculé automatiquement (percentile)'
   },
   {
     id: 'discrim_std',
@@ -8455,7 +8455,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement (percentile)'
+    help: 'Calculé automatiquement (percentile)'
   },
   
   // Section: Effets de Region (optionnel)
@@ -8499,7 +8499,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement selon les normes'
+    help: 'Calculé automatiquement selon les normes'
   },
   {
     id: 'recency_std',
@@ -8508,7 +8508,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement selon les normes'
+    help: 'Calculé automatiquement selon les normes'
   },
   {
     id: 'bias_std',
@@ -8517,7 +8517,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     readonly: true,
-    help: 'Calcule automatiquement selon les normes'
+    help: 'Calculé automatiquement selon les normes'
   },
   
   // Section: Delai
@@ -8567,13 +8567,13 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
   {
     id: 'patient_age',
     section: 'Donnees Demographiques',
-    text: 'Age du patient (calcule automatiquement)',
+    text: 'Age du patient (calculé automatiquement)',
     type: 'number',
     required: true,
     readonly: true,
     min: 16,
     max: 120,
-    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
   
   // SECTION 1: Code Subtest
@@ -8591,7 +8591,7 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
     required: true,
     min: 0,
     max: 135,
-    help: 'Total number of correctly filled boxes'
+    help: 'Nombre total de cases correctement remplies'
   },
   {
     id: 'wais_cod_err',
@@ -8601,7 +8601,7 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
     required: true,
     min: 0,
     max: 135,
-    help: 'Number of incorrectly filled boxes (collected but not used in WAIS-IV scoring)'
+    help: 'Nombre de cases incorrectement remplies (collectées mais non utilisées dans le scoring WAIS-IV)'
   },
   {
     id: 'wais_cod_brut',
@@ -8617,7 +8617,7 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
         { field: 'wais_cod_err', condition: 'isNotEmpty' }
       ]
     },
-    help: 'Raw score equals the total number of correctly filled boxes'
+    help: 'Note brute égale au nombre total de cases correctement remplies'
   },
   {
     id: 'wais_cod_std',
@@ -8633,7 +8633,7 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
         { field: 'wais_cod_err', condition: 'isNotEmpty' }
       ]
     },
-    help: 'Age-adjusted standard score (scale: 1-19, mean=10, SD=3)'
+    help: 'Note standard selon les normes WAIS-IV basée sur l\'âge'
   },
   {
     id: 'wais_cod_cr',
@@ -8649,7 +8649,7 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
         { field: 'wais_cod_err', condition: 'isNotEmpty' }
       ]
     },
-    help: 'Z-score showing deviation from mean in standard deviation units'
+    help: 'Valeur standardisée par rapport à une moyenne de 10 et un écart type de 3'
   },
   
   // SECTION 2: Symboles (Symbol Search) Subtest
@@ -8667,7 +8667,7 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 60,
-    help: 'Total number of correctly filled boxes'
+    help: 'Nombre total de cases correctement remplies'
   },
   {
     id: 'wais_symb_err',
@@ -8677,7 +8677,7 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
     required: false,
     min: 0,
     max: 60,
-    help: 'Number of incorrectly filled boxes (subtracted from total)'
+    help: 'Nombre de cases incorrectement remplies (soustraites du total)'
   },
   {
     id: 'wais_symb_brut',
@@ -8693,7 +8693,7 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
         { field: 'wais_symb_err', condition: 'isNotEmpty' }
       ]
     },
-    help: 'Raw score equals total correct minus errors'
+    help: 'Note brute égale au nombre total de cases correctement remplies moins les erreurs'
   },
   {
     id: 'wais_symb_std',
@@ -8709,7 +8709,7 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
         { field: 'wais_symb_err', condition: 'isNotEmpty' }
       ]
     },
-    help: 'Age-adjusted standard score (scale: 1-19, mean=10, SD=3)'
+    help: 'Note standard selon les normes WAIS-IV basée sur l\'âge'
   },
   {
     id: 'wais_symb_cr',
@@ -8725,7 +8725,7 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
         { field: 'wais_symb_err', condition: 'isNotEmpty' }
       ]
     },
-    help: 'Z-score showing deviation from mean in standard deviation units'
+    help: 'Valeur standardisée par rapport à une moyenne de 10 et un écart type de 3'
   },
   
   // SECTION 3: IVT (Processing Speed Index)
@@ -8749,7 +8749,7 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
         { field: 'wais_symb_std', condition: 'isNotEmpty' }
       ]
     },
-    help: 'Sum of Code and Symboles standard scores'
+    help: 'Somme des notes standard Code et Symboles'
   },
   {
     id: 'wais_ivt',
@@ -8762,7 +8762,7 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
       field: 'wais_somme_ivt',
       condition: 'isNotEmpty'
     },
-    help: 'Processing Speed Index composite score (scale: 50-150, mean=100, SD=15)'
+    help: 'Indice de vitesse de traitement composite (échelle: 50-150, moyenne=100, écart type=15)'
   },
   {
     id: 'wais_ivt_rang',
@@ -8775,7 +8775,7 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
       field: 'wais_ivt',
       condition: 'isNotEmpty'
     },
-    help: 'Percentile rank corresponding to the IVT score'
+    help: 'Rang percentile correspondant à la note IVT'
   },
   {
     id: 'wais_ivt_95',
@@ -8788,7 +8788,7 @@ export const WAIS4_CODE_SYMBOLES_IVT_QUESTIONS: Question[] = [
       field: 'wais_ivt',
       condition: 'isNotEmpty'
     },
-    help: '95% confidence interval for the IVT score'
+    help: 'Intervalle de confiance à 95% pour la note IVT'
   }
 ];
 
@@ -8905,7 +8905,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     required: false,
     readonly: true,
     indentLevel: 1,
-    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+    help: 'Note à l\'item 2 (calculé automatiquement)'
   },
   {
     id: 'wais4_mcod_3a',
@@ -8937,7 +8937,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     required: false,
     readonly: true,
     indentLevel: 1,
-    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+    help: 'Note à l\'item 3 (calculé automatiquement)'
   },
   {
     id: 'wais4_mcod_4a',
@@ -8969,7 +8969,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     required: false,
     readonly: true,
     indentLevel: 1,
-    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+    help: 'Note à l\'item 4 (calculé automatiquement)'
   },
   {
     id: 'wais4_mcod_5a',
@@ -9001,7 +9001,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     required: false,
     readonly: true,
     indentLevel: 1,
-    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+    help: 'Note à l\'item 5 (calculé automatiquement)'
   },
   {
     id: 'wais4_mcod_6a',
@@ -9033,7 +9033,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     required: false,
     readonly: true,
     indentLevel: 1,
-    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+    help: 'Note à l\'item 6 (calculé automatiquement)'
   },
   {
     id: 'wais4_mcod_7a',
@@ -9065,7 +9065,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     required: false,
     readonly: true,
     indentLevel: 1,
-    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+    help: 'Note à l\'item 7 (calculé automatiquement)'
   },
   {
     id: 'wais4_mcod_8a',
@@ -9097,7 +9097,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     required: false,
     readonly: true,
     indentLevel: 1,
-    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+    help: 'Note à l\'item 8 (calculé automatiquement)'
   },
   
   // Section: Ordre Inverse (Backward)
@@ -9107,7 +9107,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'section',
     required: false,
     section: 'Ordre Inverse',
-    help: 'Répétition de séquences de chiffres dans l\'ordre inverse.'
+    help: 'Répétition de séquences de chiffres dans l\'ordre inverse (essai 1 + essai 2).'
   },
   {
     id: 'wais4_mcoi_1a',
