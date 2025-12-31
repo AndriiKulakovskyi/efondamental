@@ -9801,7 +9801,9 @@ export const WAIS4_DIGIT_SPAN_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 
 export const TMT_QUESTIONS: Question[] = [
+  // ============================================================================
   // Section: Informations demographiques
+  // ============================================================================
   {
     id: 'section_demo',
     text: 'Informations demographiques',
@@ -9814,184 +9816,226 @@ export const TMT_QUESTIONS: Question[] = [
     type: 'number',
     required: true,
     readonly: true,
-    min: 16,
-    max: 100,
-    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
+    min: 18,
+    max: 120,
+    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
   },
   {
     id: 'years_of_education',
-    text: 'Annees de scolarisation',
+    text: 'Annees d\'etudes',
     type: 'number',
     required: true,
     readonly: true,
     min: 0,
-    max: 30,
-    help: 'Calculé automatiquement depuis le profil du patient'
+    max: 25,
+    help: 'Calcule automatiquement depuis le profil du patient'
   },
-  // Section: Partie A
+  // ============================================================================
+  // Section 1: TMT Partie A
+  // ============================================================================
   {
     id: 'section_partie_a',
-    text: 'Partie A',
+    text: 'TMT Partie A',
     type: 'section',
     required: false
   },
+  // Input fields
   {
     id: 'tmta_tps',
     text: 'Temps de realisation (en secondes)',
+    help: 'Temps en secondes pour completer la Partie A (relier les nombres 1-25)',
     type: 'number',
-    required: true,
+    required: false,
     min: 0,
-    max: 600
-  },
-  {
-    id: 'tmta_err',
-    text: "Nombre d'erreurs non corrigees a la partie A du TMT",
-    type: 'number',
-    required: true,
-    min: 0,
-    max: 50
+    max: 300
   },
   {
     id: 'tmta_cor',
-    text: "Nombre d'erreurs corrigees a la partie A du TMT",
+    text: 'Nombre d\'erreurs corrigees',
+    help: 'Nombre d\'erreurs auto-corrigees par le patient pendant la Partie A',
     type: 'number',
     required: false,
-    min: 0,
-    max: 50
-  },
-  // Section: Partie B
-  {
-    id: 'section_partie_b',
-    text: 'Partie B',
-    type: 'section',
-    required: false
+    min: 0
   },
   {
-    id: 'tmtb_tps',
-    text: 'Temps pour effectuer la partie B en secondes',
-    type: 'number',
-    required: true,
-    min: 0,
-    max: 600
-  },
-  {
-    id: 'tmtb_err',
-    text: "Nombre d'erreurs non corrigees a la partie B du TMT",
-    type: 'number',
-    required: true,
-    min: 0,
-    max: 50
-  },
-  {
-    id: 'tmtb_cor',
-    text: "Nombre d'erreurs corrigees a la partie B du TMT",
+    id: 'tmta_err',
+    text: 'Nombre d\'erreurs non corrigees',
+    help: 'Nombre d\'erreurs non corrigees dans la Partie A',
     type: 'number',
     required: false,
-    min: 0,
-    max: 50
+    min: 0
   },
+  // Computed scores - Part A
   {
-    id: 'tmtb_err_persev',
-    text: "Nombre d'erreurs perseveratives",
-    type: 'number',
-    required: true,
-    min: 0,
-    max: 50
-  },
-  // Section: Scores calcules
-  {
-    id: 'section_scores',
-    text: 'Scores calcules',
-    type: 'section',
-    required: false
-  },
-  // Part A scores
-  {
-    id: 'tmta_errtot',
-    text: 'Partie A - Nombre total d\'erreurs',
-    help: 'Somme des erreurs non corrigees et corrigees',
-    type: 'number',
+    id: 'tmta_tps_pc',
+    text: 'Temps - Percentile',
+    help: 'Rang percentile pour le temps de realisation (norme selon age et education)',
+    type: 'text',
     required: false,
     readonly: true
   },
   {
     id: 'tmta_tps_z',
-    text: 'Partie A - Z-score Temps',
-    help: 'Score Z normalise pour le temps de realisation (norme selon age et education)',
+    text: 'Temps - Note Z',
+    help: 'Deviation par rapport a la moyenne et l\'ecart type (norme selon age et education)',
     type: 'number',
     required: false,
     readonly: true
   },
   {
-    id: 'tmta_tps_pc',
-    text: 'Partie A - Percentile Temps',
-    help: 'Rang percentile pour le temps de realisation',
-    type: 'number',
+    id: 'tmta_errtot_pc',
+    text: 'Erreurs - Percentile',
+    help: 'Rang percentile pour le nombre total d\'erreurs (corrigees + non corrigees)',
+    type: 'text',
     required: false,
     readonly: true
   },
   {
     id: 'tmta_errtot_z',
-    text: 'Partie A - Z-score Erreurs',
-    help: 'Score Z normalise pour le nombre total d\'erreurs',
+    text: 'Erreurs - Note Z',
+    help: 'Deviation par rapport a la moyenne et l\'ecart type pour les erreurs totales',
     type: 'number',
     required: false,
     readonly: true
   },
-  // Part B scores
+  // ============================================================================
+  // Section 2: TMT Partie B
+  // ============================================================================
   {
-    id: 'tmtb_errtot',
-    text: 'Partie B - Nombre total d\'erreurs',
-    help: 'Somme des erreurs non corrigees et corrigees',
+    id: 'section_partie_b',
+    text: 'TMT Partie B',
+    type: 'section',
+    required: false
+  },
+  // Input fields
+  {
+    id: 'tmtb_tps',
+    text: 'Temps pour effectuer la partie B (en secondes)',
+    help: 'Temps en secondes pour completer la Partie B (alterner nombres 1-13 et lettres A-L)',
     type: 'number',
+    required: false,
+    min: 0,
+    max: 500
+  },
+  {
+    id: 'tmtb_cor',
+    text: 'Nombre d\'erreurs corrigees',
+    help: 'Nombre d\'erreurs auto-corrigees pendant la Partie B',
+    type: 'number',
+    required: false,
+    min: 0
+  },
+  {
+    id: 'tmtb_err',
+    text: 'Nombre d\'erreurs non corrigees',
+    help: 'Nombre d\'erreurs non corrigees dans la Partie B',
+    type: 'number',
+    required: false,
+    min: 0
+  },
+  {
+    id: 'tmtb_err_persev',
+    text: 'Nombre d\'erreurs perseveratives',
+    help: 'Nombre d\'erreurs perseveratives (continuer avec la meme categorie au lieu d\'alterner)',
+    type: 'number',
+    required: false,
+    min: 0
+  },
+  // Computed scores - Part B
+  {
+    id: 'tmtb_tps_pc',
+    text: 'Temps - Percentile',
+    help: 'Rang percentile pour le temps de realisation',
+    type: 'text',
     required: false,
     readonly: true
   },
   {
     id: 'tmtb_tps_z',
-    text: 'Partie B - Z-score Temps',
-    help: 'Score Z normalise pour le temps de realisation (norme selon age et education)',
+    text: 'Temps - Note Z',
+    help: 'Deviation par rapport a la moyenne et l\'ecart type',
     type: 'number',
     required: false,
     readonly: true
   },
   {
-    id: 'tmtb_tps_pc',
-    text: 'Partie B - Percentile Temps',
-    help: 'Rang percentile pour le temps de realisation',
-    type: 'number',
+    id: 'tmtb_errtot_pc',
+    text: 'Erreurs - Percentile',
+    help: 'Rang percentile pour le nombre total d\'erreurs',
+    type: 'text',
     required: false,
     readonly: true
   },
   {
     id: 'tmtb_errtot_z',
-    text: 'Partie B - Z-score Erreurs',
-    help: 'Score Z normalise pour le nombre total d\'erreurs',
+    text: 'Erreurs - Note Z',
+    help: 'Deviation par rapport a la moyenne et l\'ecart type pour les erreurs totales',
     type: 'number',
     required: false,
     readonly: true
   },
   {
-    id: 'tmtb_err_persev_z',
-    text: 'Partie B - Z-score Erreurs perseveratives',
-    help: 'Score Z normalise pour le nombre d\'erreurs perseveratives',
-    type: 'number',
+    id: 'tmtb_err_persev_pc',
+    text: 'Erreurs perseveratives - Percentile',
+    help: 'Rang percentile pour le nombre d\'erreurs perseveratives',
+    type: 'text',
     required: false,
     readonly: true
   },
-  // B-A difference scores
+  // ============================================================================
+  // Section 3: Partie B - A (Scores de difference)
+  // ============================================================================
+  {
+    id: 'section_partie_b_a',
+    text: 'Partie B - A',
+    type: 'section',
+    required: false
+  },
+  // All computed scores - no input fields
   {
     id: 'tmt_b_a_tps',
-    text: 'Difference B-A - Temps (secondes)',
-    help: 'Difference de temps entre Partie B et Partie A',
+    text: 'Difference de temps B-A (secondes)',
+    help: 'Difference de temps entre Partie B et Partie A. Isole la composante de controle executif (flexibilite cognitive) de la vitesse de traitement de base.',
     type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'tmt_b_a_tps_pc',
+    text: 'Difference temps - Percentile',
+    help: 'Rang percentile pour la difference de temps B-A',
+    type: 'text',
     required: false,
     readonly: true
   },
   {
     id: 'tmt_b_a_tps_z',
-    text: 'Difference B-A - Z-score Temps',
-    help: 'Score Z normalise pour la difference de temps B-A',
+    text: 'Difference temps - Note Z',
+    help: 'Deviation par rapport a la moyenne et l\'ecart type pour la difference de temps B-A',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'tmt_b_a_err',
+    text: 'Difference erreurs B-A',
+    help: 'Difference du nombre total d\'erreurs entre Partie B et Partie A',
+    type: 'number',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'tmt_b_a_err_pc',
+    text: 'Difference erreurs - Percentile',
+    help: 'Rang percentile pour la difference d\'erreurs B-A',
+    type: 'text',
+    required: false,
+    readonly: true
+  },
+  {
+    id: 'tmt_b_a_err_z',
+    text: 'Difference erreurs - Note Z',
+    help: 'Deviation par rapport a la moyenne et l\'ecart type pour la difference d\'erreurs B-A',
     type: 'number',
     required: false,
     readonly: true

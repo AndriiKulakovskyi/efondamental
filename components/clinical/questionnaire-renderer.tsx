@@ -235,6 +235,10 @@ export function QuestionnaireRenderer({
             updated.tmta_errtot_z = tmtScores.tmta_errtot_z;
             hasChanges = true;
           }
+          if (updated.tmta_errtot_pc !== tmtScores.tmta_errtot_pc) {
+            updated.tmta_errtot_pc = tmtScores.tmta_errtot_pc;
+            hasChanges = true;
+          }
           if (updated.tmtb_errtot !== tmtScores.tmtb_errtot) {
             updated.tmtb_errtot = tmtScores.tmtb_errtot;
             hasChanges = true;
@@ -251,12 +255,40 @@ export function QuestionnaireRenderer({
             updated.tmtb_errtot_z = tmtScores.tmtb_errtot_z;
             hasChanges = true;
           }
+          if (updated.tmtb_errtot_pc !== tmtScores.tmtb_errtot_pc) {
+            updated.tmtb_errtot_pc = tmtScores.tmtb_errtot_pc;
+            hasChanges = true;
+          }
+          if (updated.tmtb_err_persev_z !== tmtScores.tmtb_err_persev_z) {
+            updated.tmtb_err_persev_z = tmtScores.tmtb_err_persev_z;
+            hasChanges = true;
+          }
+          if (updated.tmtb_err_persev_pc !== tmtScores.tmtb_err_persev_pc) {
+            updated.tmtb_err_persev_pc = tmtScores.tmtb_err_persev_pc;
+            hasChanges = true;
+          }
           if (updated.tmt_b_a_tps !== tmtScores.tmt_b_a_tps) {
             updated.tmt_b_a_tps = tmtScores.tmt_b_a_tps;
             hasChanges = true;
           }
           if (updated.tmt_b_a_tps_z !== tmtScores.tmt_b_a_tps_z) {
             updated.tmt_b_a_tps_z = tmtScores.tmt_b_a_tps_z;
+            hasChanges = true;
+          }
+          if (updated.tmt_b_a_tps_pc !== tmtScores.tmt_b_a_tps_pc) {
+            updated.tmt_b_a_tps_pc = tmtScores.tmt_b_a_tps_pc;
+            hasChanges = true;
+          }
+          if (updated.tmt_b_a_err !== tmtScores.tmt_b_a_err) {
+            updated.tmt_b_a_err = tmtScores.tmt_b_a_err;
+            hasChanges = true;
+          }
+          if (updated.tmt_b_a_err_z !== tmtScores.tmt_b_a_err_z) {
+            updated.tmt_b_a_err_z = tmtScores.tmt_b_a_err_z;
+            hasChanges = true;
+          }
+          if (updated.tmt_b_a_err_pc !== tmtScores.tmt_b_a_err_pc) {
+            updated.tmt_b_a_err_pc = tmtScores.tmt_b_a_err_pc;
             hasChanges = true;
           }
         } catch (e) {
