@@ -405,39 +405,28 @@ export function QuestionnaireRenderer({
         return val !== undefined && val !== null && val !== '';
       };
       
-      // Debug: Log WAIS-IV values
-      console.log('[WAIS4 DEBUG] Checking computation...', {
-        wais4_mcod_1a: prev.wais4_mcod_1a,
-        wais4_mcod_1b: prev.wais4_mcod_1b,
-        wais_mcod_1: prev.wais_mcod_1,
-        isValidA: isValidValue(prev.wais4_mcod_1a),
-        isValidB: isValidValue(prev.wais4_mcod_1b)
-      });
-      
       // Ordre Direct (Forward) - WAIS-IV uses wais4_ prefix
-      const directItems = [
-        { a: 'wais4_mcod_1a', b: 'wais4_mcod_1b', score: 'wais_mcod_1' },
-        { a: 'wais4_mcod_2a', b: 'wais4_mcod_2b', score: 'wais_mcod_2' },
-        { a: 'wais4_mcod_3a', b: 'wais4_mcod_3b', score: 'wais_mcod_3' },
-        { a: 'wais4_mcod_4a', b: 'wais4_mcod_4b', score: 'wais_mcod_4' },
-        { a: 'wais4_mcod_5a', b: 'wais4_mcod_5b', score: 'wais_mcod_5' },
-        { a: 'wais4_mcod_6a', b: 'wais4_mcod_6b', score: 'wais_mcod_6' },
-        { a: 'wais4_mcod_7a', b: 'wais4_mcod_7b', score: 'wais_mcod_7' },
-        { a: 'wais4_mcod_8a', b: 'wais4_mcod_8b', score: 'wais_mcod_8' }
+      const wais4DirectItems = [
+        { a: 'wais4_mcod_1a', b: 'wais4_mcod_1b', score: 'wais_mcod_1', span: 2 },
+        { a: 'wais4_mcod_2a', b: 'wais4_mcod_2b', score: 'wais_mcod_2', span: 3 },
+        { a: 'wais4_mcod_3a', b: 'wais4_mcod_3b', score: 'wais_mcod_3', span: 4 },
+        { a: 'wais4_mcod_4a', b: 'wais4_mcod_4b', score: 'wais_mcod_4', span: 5 },
+        { a: 'wais4_mcod_5a', b: 'wais4_mcod_5b', score: 'wais_mcod_5', span: 6 },
+        { a: 'wais4_mcod_6a', b: 'wais4_mcod_6b', score: 'wais_mcod_6', span: 7 },
+        { a: 'wais4_mcod_7a', b: 'wais4_mcod_7b', score: 'wais_mcod_7', span: 8 },
+        { a: 'wais4_mcod_8a', b: 'wais4_mcod_8b', score: 'wais_mcod_8', span: 9 }
       ];
       
-      directItems.forEach(item => {
+      wais4DirectItems.forEach(item => {
         const trialA = prev[item.a];
         const trialB = prev[item.b];
         
         // Only compute if both trials have valid values (including 0)
         if (isValidValue(trialA) && isValidValue(trialB)) {
           const itemScore = Number(trialA) + Number(trialB);
-          console.log(`[WAIS4 DEBUG] Computing ${item.score}: ${trialA} + ${trialB} = ${itemScore}`);
           if (updated[item.score] !== itemScore) {
             updated[item.score] = itemScore;
             hasChanges = true;
-            console.log(`[WAIS4 DEBUG] Updated ${item.score} to ${itemScore}`);
           }
         } else if (updated[item.score] !== undefined) {
           // Clear the score if either trial is missing
@@ -447,18 +436,18 @@ export function QuestionnaireRenderer({
       });
       
       // Ordre Inverse (Backward) - WAIS-IV uses wais4_ prefix
-      const inverseItems = [
-        { a: 'wais4_mcoi_1a', b: 'wais4_mcoi_1b', score: 'wais_mcoi_1' },
-        { a: 'wais4_mcoi_2a', b: 'wais4_mcoi_2b', score: 'wais_mcoi_2' },
-        { a: 'wais4_mcoi_3a', b: 'wais4_mcoi_3b', score: 'wais_mcoi_3' },
-        { a: 'wais4_mcoi_4a', b: 'wais4_mcoi_4b', score: 'wais_mcoi_4' },
-        { a: 'wais4_mcoi_5a', b: 'wais4_mcoi_5b', score: 'wais_mcoi_5' },
-        { a: 'wais4_mcoi_6a', b: 'wais4_mcoi_6b', score: 'wais_mcoi_6' },
-        { a: 'wais4_mcoi_7a', b: 'wais4_mcoi_7b', score: 'wais_mcoi_7' },
-        { a: 'wais4_mcoi_8a', b: 'wais4_mcoi_8b', score: 'wais_mcoi_8' }
+      const wais4InverseItems = [
+        { a: 'wais4_mcoi_1a', b: 'wais4_mcoi_1b', score: 'wais_mcoi_1', span: 2 },
+        { a: 'wais4_mcoi_2a', b: 'wais4_mcoi_2b', score: 'wais_mcoi_2', span: 3 },
+        { a: 'wais4_mcoi_3a', b: 'wais4_mcoi_3b', score: 'wais_mcoi_3', span: 4 },
+        { a: 'wais4_mcoi_4a', b: 'wais4_mcoi_4b', score: 'wais_mcoi_4', span: 5 },
+        { a: 'wais4_mcoi_5a', b: 'wais4_mcoi_5b', score: 'wais_mcoi_5', span: 6 },
+        { a: 'wais4_mcoi_6a', b: 'wais4_mcoi_6b', score: 'wais_mcoi_6', span: 7 },
+        { a: 'wais4_mcoi_7a', b: 'wais4_mcoi_7b', score: 'wais_mcoi_7', span: 8 },
+        { a: 'wais4_mcoi_8a', b: 'wais4_mcoi_8b', score: 'wais_mcoi_8', span: 9 }
       ];
       
-      inverseItems.forEach(item => {
+      wais4InverseItems.forEach(item => {
         const trialA = prev[item.a];
         const trialB = prev[item.b];
         
@@ -475,18 +464,18 @@ export function QuestionnaireRenderer({
       });
       
       // Ordre Croissant (Sequencing) - WAIS-IV uses wais4_ prefix
-      const sequencingItems = [
-        { a: 'wais4_mcoc_1a', b: 'wais4_mcoc_1b', score: 'wais_mcoc_1' },
-        { a: 'wais4_mcoc_2a', b: 'wais4_mcoc_2b', score: 'wais_mcoc_2' },
-        { a: 'wais4_mcoc_3a', b: 'wais4_mcoc_3b', score: 'wais_mcoc_3' },
-        { a: 'wais4_mcoc_4a', b: 'wais4_mcoc_4b', score: 'wais_mcoc_4' },
-        { a: 'wais4_mcoc_5a', b: 'wais4_mcoc_5b', score: 'wais_mcoc_5' },
-        { a: 'wais4_mcoc_6a', b: 'wais4_mcoc_6b', score: 'wais_mcoc_6' },
-        { a: 'wais4_mcoc_7a', b: 'wais4_mcoc_7b', score: 'wais_mcoc_7' },
-        { a: 'wais4_mcoc_8a', b: 'wais4_mcoc_8b', score: 'wais_mcoc_8' }
+      const wais4SequencingItems = [
+        { a: 'wais4_mcoc_1a', b: 'wais4_mcoc_1b', score: 'wais_mcoc_1', span: 2 },
+        { a: 'wais4_mcoc_2a', b: 'wais4_mcoc_2b', score: 'wais_mcoc_2', span: 3 },
+        { a: 'wais4_mcoc_3a', b: 'wais4_mcoc_3b', score: 'wais_mcoc_3', span: 4 },
+        { a: 'wais4_mcoc_4a', b: 'wais4_mcoc_4b', score: 'wais_mcoc_4', span: 5 },
+        { a: 'wais4_mcoc_5a', b: 'wais4_mcoc_5b', score: 'wais_mcoc_5', span: 6 },
+        { a: 'wais4_mcoc_6a', b: 'wais4_mcoc_6b', score: 'wais_mcoc_6', span: 7 },
+        { a: 'wais4_mcoc_7a', b: 'wais4_mcoc_7b', score: 'wais_mcoc_7', span: 8 },
+        { a: 'wais4_mcoc_8a', b: 'wais4_mcoc_8b', score: 'wais_mcoc_8', span: 9 }
       ];
       
-      sequencingItems.forEach(item => {
+      wais4SequencingItems.forEach(item => {
         const trialA = prev[item.a];
         const trialB = prev[item.b];
         
@@ -501,6 +490,242 @@ export function QuestionnaireRenderer({
           hasChanges = true;
         }
       });
+      
+      // WAIS-IV Section totals, empans, and global scores
+      // Check if ALL items in a section are filled
+      const allDirectFilled = wais4DirectItems.every(item => 
+        isValidValue(prev[item.a]) && isValidValue(prev[item.b])
+      );
+      const allInverseFilled = wais4InverseItems.every(item => 
+        isValidValue(prev[item.a]) && isValidValue(prev[item.b])
+      );
+      const allSequencingFilled = wais4SequencingItems.every(item => 
+        isValidValue(prev[item.a]) && isValidValue(prev[item.b])
+      );
+      
+      // Get patient age for Z-score and standard score calculations
+      const wais4Age = Number(prev.patient_age);
+      const hasValidWais4Age = !isNaN(wais4Age) && wais4Age >= 16 && wais4Age <= 90;
+      
+      // Empan normative data
+      const EMPAN_ENDROIT_MEANS = [6.5, 6.5, 6.5, 6.5, 6.3, 6.2, 6.2, 5.8, 5.7, 5.3, 5.6];
+      const EMPAN_ENDROIT_SDS = [1.1, 1.2, 1.3, 1.3, 1.4, 1.3, 1.3, 1.5, 1.2, 1.3, 1.2];
+      const EMPAN_ENVERS_MEANS = [4.7, 4.9, 4.8, 4.9, 5.1, 4.8, 4.6, 4.3, 4.0, 3.9, 3.8];
+      const EMPAN_ENVERS_SDS = [1.3, 1.3, 1.3, 1.1, 1.4, 1.4, 1.3, 1.5, 1.3, 1.0, 1.2];
+      const EMPAN_CROISSANT_MEANS = [5.6, 6.0, 6.0, 5.9, 5.8, 6.0, 5.6, 5.2, 5.0, 4.8, 5.1];
+      const EMPAN_CROISSANT_SDS = [1.2, 1.3, 1.3, 1.1, 1.2, 1.2, 1.4, 1.4, 1.2, 1.2, 1.2];
+      
+      // Standard score norm table by age group
+      const DIGIT_SPAN_NORMS: number[][] = [
+        [1, 1, 1, 1, 1, 2, 3, 3, 4, 5, 5, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
+        [1, 1, 1, 1, 1, 2, 3, 3, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
+        [1, 1, 1, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
+        [1, 1, 1, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
+        [1, 1, 1, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
+        [1, 1, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
+        [1, 1, 1, 1, 2, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
+        [1, 1, 1, 2, 3, 3, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
+        [1, 1, 1, 2, 3, 4, 4, 5, 5, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
+        [1, 1, 2, 3, 3, 4, 5, 5, 6, 6, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
+        [1, 1, 2, 3, 4, 4, 5, 6, 6, 7, 7, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
+        [1, 1, 2, 3, 4, 5, 5, 6, 7, 7, 8, 8, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
+        [1, 2, 3, 4, 5, 5, 6, 7, 7, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19]
+      ];
+      
+      const getWais4AgeGroupIndex = (age: number): number => {
+        if (age >= 16 && age <= 17) return 0;
+        if (age >= 18 && age <= 19) return 1;
+        if (age >= 20 && age <= 24) return 2;
+        if (age >= 25 && age <= 29) return 3;
+        if (age >= 30 && age <= 34) return 4;
+        if (age >= 35 && age <= 44) return 5;
+        if (age >= 45 && age <= 54) return 6;
+        if (age >= 55 && age <= 64) return 7;
+        if (age >= 65 && age <= 69) return 8;
+        if (age >= 70 && age <= 74) return 9;
+        if (age >= 75 && age <= 79) return 10;
+        if (age >= 80 && age <= 84) return 11;
+        return 12;
+      };
+      
+      const getEmpanAgeGroupIndex = (age: number): number => {
+        if (age >= 16 && age <= 17) return 0;
+        if (age >= 18 && age <= 19) return 1;
+        if (age >= 20 && age <= 24) return 2;
+        if (age >= 25 && age <= 29) return 3;
+        if (age >= 30 && age <= 34) return 4;
+        if (age >= 35 && age <= 44) return 5;
+        if (age >= 45 && age <= 54) return 6;
+        if (age >= 55 && age <= 64) return 7;
+        if (age >= 65 && age <= 69) return 8;
+        if (age >= 70 && age <= 74) return 9;
+        return 10;
+      };
+      
+      // Calculate section totals using discontinue rule (sum until first 0)
+      if (allDirectFilled) {
+        let wais_mcod_tot = 0;
+        let wais_mc_end = 1; // Default empan if no items passed
+        let discontinued = false;
+        
+        for (let i = 0; i < wais4DirectItems.length; i++) {
+          const item = wais4DirectItems[i];
+          const itemScore = Number(prev[item.a]) + Number(prev[item.b]);
+          
+          if (itemScore === 0 && !discontinued) {
+            discontinued = true;
+            wais_mc_end = item.span - 1; // Empan is the span of the last passed item
+          }
+          
+          if (!discontinued) {
+            wais_mcod_tot += itemScore;
+            wais_mc_end = item.span; // Update empan to current span
+          }
+        }
+        
+        if (updated.wais_mcod_tot !== wais_mcod_tot) {
+          updated.wais_mcod_tot = wais_mcod_tot;
+          hasChanges = true;
+        }
+        if (updated.wais_mc_end !== wais_mc_end) {
+          updated.wais_mc_end = wais_mc_end;
+          hasChanges = true;
+        }
+        
+        // Calculate empan Z-score
+        if (hasValidWais4Age) {
+          const ageIdx = getEmpanAgeGroupIndex(wais4Age);
+          const zScore = Number(((wais_mc_end - EMPAN_ENDROIT_MEANS[ageIdx]) / EMPAN_ENDROIT_SDS[ageIdx]).toFixed(2));
+          if (updated.wais_mc_end_std !== zScore) {
+            updated.wais_mc_end_std = zScore;
+            hasChanges = true;
+          }
+        }
+      }
+      
+      if (allInverseFilled) {
+        let wais_mcoi_tot = 0;
+        let wais_mc_env = 1;
+        let discontinued = false;
+        
+        // Special rule: if item 1 fails, start from item 2
+        const item1Score = Number(prev[wais4InverseItems[0].a]) + Number(prev[wais4InverseItems[0].b]);
+        const startIdx = item1Score === 0 ? 1 : 0;
+        
+        if (item1Score > 0) {
+          wais_mcoi_tot += item1Score;
+          wais_mc_env = wais4InverseItems[0].span;
+        }
+        
+        for (let i = startIdx === 0 ? 1 : startIdx; i < wais4InverseItems.length; i++) {
+          const item = wais4InverseItems[i];
+          const itemScore = Number(prev[item.a]) + Number(prev[item.b]);
+          
+          if (itemScore === 0 && !discontinued) {
+            discontinued = true;
+          }
+          
+          if (!discontinued) {
+            wais_mcoi_tot += itemScore;
+            wais_mc_env = item.span;
+          }
+        }
+        
+        if (updated.wais_mcoi_tot !== wais_mcoi_tot) {
+          updated.wais_mcoi_tot = wais_mcoi_tot;
+          hasChanges = true;
+        }
+        if (updated.wais_mc_env !== wais_mc_env) {
+          updated.wais_mc_env = wais_mc_env;
+          hasChanges = true;
+        }
+        
+        // Calculate empan Z-score
+        if (hasValidWais4Age) {
+          const ageIdx = getEmpanAgeGroupIndex(wais4Age);
+          const zScore = Number(((wais_mc_env - EMPAN_ENVERS_MEANS[ageIdx]) / EMPAN_ENVERS_SDS[ageIdx]).toFixed(2));
+          if (updated.wais_mc_env_std !== zScore) {
+            updated.wais_mc_env_std = zScore;
+            hasChanges = true;
+          }
+        }
+      }
+      
+      if (allSequencingFilled) {
+        let wais_mcoc_tot = 0;
+        let wais_mc_cro = 1;
+        let discontinued = false;
+        
+        for (let i = 0; i < wais4SequencingItems.length; i++) {
+          const item = wais4SequencingItems[i];
+          const itemScore = Number(prev[item.a]) + Number(prev[item.b]);
+          
+          if (itemScore === 0 && !discontinued) {
+            discontinued = true;
+            wais_mc_cro = item.span - 1;
+          }
+          
+          if (!discontinued) {
+            wais_mcoc_tot += itemScore;
+            wais_mc_cro = item.span;
+          }
+        }
+        
+        if (updated.wais_mcoc_tot !== wais_mcoc_tot) {
+          updated.wais_mcoc_tot = wais_mcoc_tot;
+          hasChanges = true;
+        }
+        if (updated.wais_mc_cro !== wais_mc_cro) {
+          updated.wais_mc_cro = wais_mc_cro;
+          hasChanges = true;
+        }
+        
+        // Calculate empan Z-score
+        if (hasValidWais4Age) {
+          const ageIdx = getEmpanAgeGroupIndex(wais4Age);
+          const zScore = Number(((wais_mc_cro - EMPAN_CROISSANT_MEANS[ageIdx]) / EMPAN_CROISSANT_SDS[ageIdx]).toFixed(2));
+          if (updated.wais_mc_cro_std !== zScore) {
+            updated.wais_mc_cro_std = zScore;
+            hasChanges = true;
+          }
+        }
+      }
+      
+      // Calculate empan difference (endroit - envers) when both are available
+      if (updated.wais_mc_end !== undefined && updated.wais_mc_env !== undefined) {
+        const wais_mc_emp = updated.wais_mc_end - updated.wais_mc_env;
+        if (updated.wais_mc_emp !== wais_mc_emp) {
+          updated.wais_mc_emp = wais_mc_emp;
+          hasChanges = true;
+        }
+      }
+      
+      // Calculate global scores when all sections are complete
+      if (allDirectFilled && allInverseFilled && allSequencingFilled && hasValidWais4Age) {
+        const wais_mc_tot = (updated.wais_mcod_tot || 0) + (updated.wais_mcoi_tot || 0) + (updated.wais_mcoc_tot || 0);
+        
+        if (updated.wais_mc_tot !== wais_mc_tot) {
+          updated.wais_mc_tot = wais_mc_tot;
+          hasChanges = true;
+        }
+        
+        // Calculate standard score based on age and raw score
+        const ageGroupIdx = getWais4AgeGroupIndex(wais4Age);
+        const normalizedRawScore = Math.min(Math.max(wais_mc_tot, 0), 48);
+        const wais_mc_std = DIGIT_SPAN_NORMS[ageGroupIdx][normalizedRawScore];
+        
+        if (updated.wais_mc_std !== wais_mc_std) {
+          updated.wais_mc_std = wais_mc_std;
+          hasChanges = true;
+        }
+        
+        // Calculate standardized value: (standard_score - 10) / 3
+        const wais_mc_cr = Number(((wais_mc_std - 10) / 3).toFixed(2));
+        if (updated.wais_mc_cr !== wais_mc_cr) {
+          updated.wais_mc_cr = wais_mc_cr;
+          hasChanges = true;
+        }
+      }
 
       // Compute WAIS4 Similitudes scores
       const simiAge = Number(prev.patient_age);

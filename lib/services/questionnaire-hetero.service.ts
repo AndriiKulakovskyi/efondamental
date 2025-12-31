@@ -1726,10 +1726,13 @@ export async function saveWais4DigitSpanResponse(
     wais4_mcoc_8b: response.wais4_mcoc_8b
   });
 
+  // Remove fields that don't exist in the database table
+  const { patient_gender, years_of_education, ...dbResponse } = response as any;
+  
   const { data, error } = await supabase
     .from('responses_wais4_digit_span')
     .upsert({
-      ...response,
+      ...dbResponse,
       // Individual item scores
       wais_mcod_1: scores.wais_mcod_1,
       wais_mcod_2: scores.wais_mcod_2,
