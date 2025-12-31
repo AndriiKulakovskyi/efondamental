@@ -398,6 +398,110 @@ export function QuestionnaireRenderer({
         }
       }
 
+      // Compute WAIS-IV Digit Span item scores (sum of trial 1 + trial 2)
+      // This runs unconditionally - if fields don't exist, computation is skipped automatically
+      // Helper function to check if a value is valid (not undefined, null, or empty string)
+      const isValidValue = (val: any) => {
+        return val !== undefined && val !== null && val !== '';
+      };
+      
+      // Debug: Log WAIS-IV values
+      console.log('[WAIS4 DEBUG] Checking computation...', {
+        wais4_mcod_1a: prev.wais4_mcod_1a,
+        wais4_mcod_1b: prev.wais4_mcod_1b,
+        wais_mcod_1: prev.wais_mcod_1,
+        isValidA: isValidValue(prev.wais4_mcod_1a),
+        isValidB: isValidValue(prev.wais4_mcod_1b)
+      });
+      
+      // Ordre Direct (Forward) - WAIS-IV uses wais4_ prefix
+      const directItems = [
+        { a: 'wais4_mcod_1a', b: 'wais4_mcod_1b', score: 'wais_mcod_1' },
+        { a: 'wais4_mcod_2a', b: 'wais4_mcod_2b', score: 'wais_mcod_2' },
+        { a: 'wais4_mcod_3a', b: 'wais4_mcod_3b', score: 'wais_mcod_3' },
+        { a: 'wais4_mcod_4a', b: 'wais4_mcod_4b', score: 'wais_mcod_4' },
+        { a: 'wais4_mcod_5a', b: 'wais4_mcod_5b', score: 'wais_mcod_5' },
+        { a: 'wais4_mcod_6a', b: 'wais4_mcod_6b', score: 'wais_mcod_6' },
+        { a: 'wais4_mcod_7a', b: 'wais4_mcod_7b', score: 'wais_mcod_7' },
+        { a: 'wais4_mcod_8a', b: 'wais4_mcod_8b', score: 'wais_mcod_8' }
+      ];
+      
+      directItems.forEach(item => {
+        const trialA = prev[item.a];
+        const trialB = prev[item.b];
+        
+        // Only compute if both trials have valid values (including 0)
+        if (isValidValue(trialA) && isValidValue(trialB)) {
+          const itemScore = Number(trialA) + Number(trialB);
+          console.log(`[WAIS4 DEBUG] Computing ${item.score}: ${trialA} + ${trialB} = ${itemScore}`);
+          if (updated[item.score] !== itemScore) {
+            updated[item.score] = itemScore;
+            hasChanges = true;
+            console.log(`[WAIS4 DEBUG] Updated ${item.score} to ${itemScore}`);
+          }
+        } else if (updated[item.score] !== undefined) {
+          // Clear the score if either trial is missing
+          delete updated[item.score];
+          hasChanges = true;
+        }
+      });
+      
+      // Ordre Inverse (Backward) - WAIS-IV uses wais4_ prefix
+      const inverseItems = [
+        { a: 'wais4_mcoi_1a', b: 'wais4_mcoi_1b', score: 'wais_mcoi_1' },
+        { a: 'wais4_mcoi_2a', b: 'wais4_mcoi_2b', score: 'wais_mcoi_2' },
+        { a: 'wais4_mcoi_3a', b: 'wais4_mcoi_3b', score: 'wais_mcoi_3' },
+        { a: 'wais4_mcoi_4a', b: 'wais4_mcoi_4b', score: 'wais_mcoi_4' },
+        { a: 'wais4_mcoi_5a', b: 'wais4_mcoi_5b', score: 'wais_mcoi_5' },
+        { a: 'wais4_mcoi_6a', b: 'wais4_mcoi_6b', score: 'wais_mcoi_6' },
+        { a: 'wais4_mcoi_7a', b: 'wais4_mcoi_7b', score: 'wais_mcoi_7' },
+        { a: 'wais4_mcoi_8a', b: 'wais4_mcoi_8b', score: 'wais_mcoi_8' }
+      ];
+      
+      inverseItems.forEach(item => {
+        const trialA = prev[item.a];
+        const trialB = prev[item.b];
+        
+        if (isValidValue(trialA) && isValidValue(trialB)) {
+          const itemScore = Number(trialA) + Number(trialB);
+          if (updated[item.score] !== itemScore) {
+            updated[item.score] = itemScore;
+            hasChanges = true;
+          }
+        } else if (updated[item.score] !== undefined) {
+          delete updated[item.score];
+          hasChanges = true;
+        }
+      });
+      
+      // Ordre Croissant (Sequencing) - WAIS-IV uses wais4_ prefix
+      const sequencingItems = [
+        { a: 'wais4_mcoc_1a', b: 'wais4_mcoc_1b', score: 'wais_mcoc_1' },
+        { a: 'wais4_mcoc_2a', b: 'wais4_mcoc_2b', score: 'wais_mcoc_2' },
+        { a: 'wais4_mcoc_3a', b: 'wais4_mcoc_3b', score: 'wais_mcoc_3' },
+        { a: 'wais4_mcoc_4a', b: 'wais4_mcoc_4b', score: 'wais_mcoc_4' },
+        { a: 'wais4_mcoc_5a', b: 'wais4_mcoc_5b', score: 'wais_mcoc_5' },
+        { a: 'wais4_mcoc_6a', b: 'wais4_mcoc_6b', score: 'wais_mcoc_6' },
+        { a: 'wais4_mcoc_7a', b: 'wais4_mcoc_7b', score: 'wais_mcoc_7' },
+        { a: 'wais4_mcoc_8a', b: 'wais4_mcoc_8b', score: 'wais_mcoc_8' }
+      ];
+      
+      sequencingItems.forEach(item => {
+        const trialA = prev[item.a];
+        const trialB = prev[item.b];
+        
+        if (isValidValue(trialA) && isValidValue(trialB)) {
+          const itemScore = Number(trialA) + Number(trialB);
+          if (updated[item.score] !== itemScore) {
+            updated[item.score] = itemScore;
+            hasChanges = true;
+          }
+        } else if (updated[item.score] !== undefined) {
+          delete updated[item.score];
+          hasChanges = true;
+        }
+      });
+
       // Compute WAIS4 Similitudes scores
       const simiAge = Number(prev.patient_age);
       const simiItems = ['item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'item7', 'item8', 'item9',
@@ -1560,6 +1664,19 @@ export function QuestionnaireRenderer({
     responses.mcoi_3a, responses.mcoi_3b, responses.mcoi_4a, responses.mcoi_4b,
     responses.mcoi_5a, responses.mcoi_5b, responses.mcoi_6a, responses.mcoi_6b,
     responses.mcoi_7a, responses.mcoi_7b,
+    // WAIS-IV Digit Span fields (with wais4_ prefix)
+    responses.wais4_mcod_1a, responses.wais4_mcod_1b, responses.wais4_mcod_2a, responses.wais4_mcod_2b,
+    responses.wais4_mcod_3a, responses.wais4_mcod_3b, responses.wais4_mcod_4a, responses.wais4_mcod_4b,
+    responses.wais4_mcod_5a, responses.wais4_mcod_5b, responses.wais4_mcod_6a, responses.wais4_mcod_6b,
+    responses.wais4_mcod_7a, responses.wais4_mcod_7b, responses.wais4_mcod_8a, responses.wais4_mcod_8b,
+    responses.wais4_mcoi_1a, responses.wais4_mcoi_1b, responses.wais4_mcoi_2a, responses.wais4_mcoi_2b,
+    responses.wais4_mcoi_3a, responses.wais4_mcoi_3b, responses.wais4_mcoi_4a, responses.wais4_mcoi_4b,
+    responses.wais4_mcoi_5a, responses.wais4_mcoi_5b, responses.wais4_mcoi_6a, responses.wais4_mcoi_6b,
+    responses.wais4_mcoi_7a, responses.wais4_mcoi_7b, responses.wais4_mcoi_8a, responses.wais4_mcoi_8b,
+    responses.wais4_mcoc_1a, responses.wais4_mcoc_1b, responses.wais4_mcoc_2a, responses.wais4_mcoc_2b,
+    responses.wais4_mcoc_3a, responses.wais4_mcoc_3b, responses.wais4_mcoc_4a, responses.wais4_mcoc_4b,
+    responses.wais4_mcoc_5a, responses.wais4_mcoc_5b, responses.wais4_mcoc_6a, responses.wais4_mcoc_6b,
+    responses.wais4_mcoc_7a, responses.wais4_mcoc_7b, responses.wais4_mcoc_8a, responses.wais4_mcoc_8b,
     // MEM-III Spatial Span fields
     responses.odirect_1a, responses.odirect_1b, responses.odirect_2a, responses.odirect_2b,
     responses.odirect_3a, responses.odirect_3b, responses.odirect_4a, responses.odirect_4b,

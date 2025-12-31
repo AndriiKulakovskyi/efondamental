@@ -8817,34 +8817,34 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
   // Demographic section
   {
     id: 'section_demo',
-    text: 'Donnees Demographiques',
+    text: 'Données démographiques',
     type: 'section',
     required: false,
-    section: 'Donnees Demographiques'
+    section: 'Données démographiques'
   },
   {
     id: 'patient_age',
-    section: 'Donnees Demographiques',
-    text: 'Age du patient (calcule automatiquement)',
+    section: 'Données démographiques',
+    text: 'Âge du patient (calculé automatiquement)',
     type: 'number',
     required: true,
     readonly: true,
     min: 16,
     max: 90,
-    help: 'Calcule automatiquement a partir de la date de naissance et de la date de visite'
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
   },
   
   // Section: Ordre Direct (Forward)
   {
     id: 'section_direct',
-    text: 'Memoire des chiffres - Ordre Direct',
+    text: 'Mémoire des chiffres - Ordre Direct',
     type: 'section',
     required: false,
     section: 'Ordre Direct',
-    help: 'Repetition de sequences de chiffres dans le meme ordre.'
+    help: 'Répétition de séquences de chiffres dans le même ordre.'
   },
   {
-    id: 'mcod_1a',
+    id: 'wais4_mcod_1a',
     section: 'Ordre Direct',
     text: 'Item 1 - Essai 1',
     type: 'single_choice',
@@ -8855,7 +8855,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_1b',
+    id: 'wais4_mcod_1b',
     section: 'Ordre Direct',
     text: 'Item 1 - Essai 2',
     type: 'single_choice',
@@ -8866,7 +8866,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_2a',
+    id: 'wais_mcod_1',
+    section: 'Ordre Direct',
+    text: 'Note a l\'item 1',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcod_2a',
     section: 'Ordre Direct',
     text: 'Item 2 - Essai 1',
     type: 'single_choice',
@@ -8877,7 +8887,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_2b',
+    id: 'wais4_mcod_2b',
     section: 'Ordre Direct',
     text: 'Item 2 - Essai 2',
     type: 'single_choice',
@@ -8888,7 +8898,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_3a',
+    id: 'wais_mcod_2',
+    section: 'Ordre Direct',
+    text: 'Note a l\'item 2',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcod_3a',
     section: 'Ordre Direct',
     text: 'Item 3 - Essai 1',
     type: 'single_choice',
@@ -8899,7 +8919,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_3b',
+    id: 'wais4_mcod_3b',
     section: 'Ordre Direct',
     text: 'Item 3 - Essai 2',
     type: 'single_choice',
@@ -8910,7 +8930,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_4a',
+    id: 'wais_mcod_3',
+    section: 'Ordre Direct',
+    text: 'Note a l\'item 3',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcod_4a',
     section: 'Ordre Direct',
     text: 'Item 4 - Essai 1',
     type: 'single_choice',
@@ -8921,7 +8951,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_4b',
+    id: 'wais4_mcod_4b',
     section: 'Ordre Direct',
     text: 'Item 4 - Essai 2',
     type: 'single_choice',
@@ -8932,7 +8962,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_5a',
+    id: 'wais_mcod_4',
+    section: 'Ordre Direct',
+    text: 'Note a l\'item 4',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcod_5a',
     section: 'Ordre Direct',
     text: 'Item 5 - Essai 1',
     type: 'single_choice',
@@ -8943,7 +8983,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_5b',
+    id: 'wais4_mcod_5b',
     section: 'Ordre Direct',
     text: 'Item 5 - Essai 2',
     type: 'single_choice',
@@ -8954,7 +8994,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_6a',
+    id: 'wais_mcod_5',
+    section: 'Ordre Direct',
+    text: 'Note a l\'item 5',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcod_6a',
     section: 'Ordre Direct',
     text: 'Item 6 - Essai 1',
     type: 'single_choice',
@@ -8965,7 +9015,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_6b',
+    id: 'wais4_mcod_6b',
     section: 'Ordre Direct',
     text: 'Item 6 - Essai 2',
     type: 'single_choice',
@@ -8976,7 +9026,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_7a',
+    id: 'wais_mcod_6',
+    section: 'Ordre Direct',
+    text: 'Note a l\'item 6',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcod_7a',
     section: 'Ordre Direct',
     text: 'Item 7 - Essai 1',
     type: 'single_choice',
@@ -8987,7 +9047,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_7b',
+    id: 'wais4_mcod_7b',
     section: 'Ordre Direct',
     text: 'Item 7 - Essai 2',
     type: 'single_choice',
@@ -8998,7 +9058,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_8a',
+    id: 'wais_mcod_7',
+    section: 'Ordre Direct',
+    text: 'Note a l\'item 7',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcod_8a',
     section: 'Ordre Direct',
     text: 'Item 8 - Essai 1',
     type: 'single_choice',
@@ -9009,7 +9079,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcod_8b',
+    id: 'wais4_mcod_8b',
     section: 'Ordre Direct',
     text: 'Item 8 - Essai 2',
     type: 'single_choice',
@@ -9018,19 +9088,29 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
       { code: 0, label: 'Incorrect', score: 0 },
       { code: 1, label: 'Correct', score: 1 }
     ]
+  },
+  {
+    id: 'wais_mcod_8',
+    section: 'Ordre Direct',
+    text: 'Note a l\'item 8',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
   },
   
   // Section: Ordre Inverse (Backward)
   {
     id: 'section_inverse',
-    text: 'Memoire des chiffres - Ordre Inverse',
+    text: 'Mémoire des chiffres - Ordre Inverse',
     type: 'section',
     required: false,
     section: 'Ordre Inverse',
-    help: 'Repetition de sequences de chiffres dans l\'ordre inverse.'
+    help: 'Répétition de séquences de chiffres dans l\'ordre inverse.'
   },
   {
-    id: 'mcoi_1a',
+    id: 'wais4_mcoi_1a',
     section: 'Ordre Inverse',
     text: 'Item 1 - Essai 1',
     type: 'single_choice',
@@ -9041,7 +9121,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_1b',
+    id: 'wais4_mcoi_1b',
     section: 'Ordre Inverse',
     text: 'Item 1 - Essai 2',
     type: 'single_choice',
@@ -9052,7 +9132,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_2a',
+    id: 'wais_mcoi_1',
+    section: 'Ordre Inverse',
+    text: 'Note a la serie 1 en ordre indirect',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcoi_2a',
     section: 'Ordre Inverse',
     text: 'Item 2 - Essai 1',
     type: 'single_choice',
@@ -9063,7 +9153,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_2b',
+    id: 'wais4_mcoi_2b',
     section: 'Ordre Inverse',
     text: 'Item 2 - Essai 2',
     type: 'single_choice',
@@ -9074,7 +9164,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_3a',
+    id: 'wais_mcoi_2',
+    section: 'Ordre Inverse',
+    text: 'Note a la serie 2 en ordre indirect',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcoi_3a',
     section: 'Ordre Inverse',
     text: 'Item 3 - Essai 1',
     type: 'single_choice',
@@ -9085,7 +9185,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_3b',
+    id: 'wais4_mcoi_3b',
     section: 'Ordre Inverse',
     text: 'Item 3 - Essai 2',
     type: 'single_choice',
@@ -9096,7 +9196,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_4a',
+    id: 'wais_mcoi_3',
+    section: 'Ordre Inverse',
+    text: 'Note a la serie 3 en ordre indirect',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcoi_4a',
     section: 'Ordre Inverse',
     text: 'Item 4 - Essai 1',
     type: 'single_choice',
@@ -9107,7 +9217,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_4b',
+    id: 'wais4_mcoi_4b',
     section: 'Ordre Inverse',
     text: 'Item 4 - Essai 2',
     type: 'single_choice',
@@ -9118,7 +9228,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_5a',
+    id: 'wais_mcoi_4',
+    section: 'Ordre Inverse',
+    text: 'Note a la serie 4 en ordre indirect',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcoi_5a',
     section: 'Ordre Inverse',
     text: 'Item 5 - Essai 1',
     type: 'single_choice',
@@ -9129,7 +9249,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_5b',
+    id: 'wais4_mcoi_5b',
     section: 'Ordre Inverse',
     text: 'Item 5 - Essai 2',
     type: 'single_choice',
@@ -9140,7 +9260,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_6a',
+    id: 'wais_mcoi_5',
+    section: 'Ordre Inverse',
+    text: 'Note a la serie 5 en ordre indirect',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcoi_6a',
     section: 'Ordre Inverse',
     text: 'Item 6 - Essai 1',
     type: 'single_choice',
@@ -9151,7 +9281,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_6b',
+    id: 'wais4_mcoi_6b',
     section: 'Ordre Inverse',
     text: 'Item 6 - Essai 2',
     type: 'single_choice',
@@ -9162,7 +9292,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_7a',
+    id: 'wais_mcoi_6',
+    section: 'Ordre Inverse',
+    text: 'Note a la serie 6 en ordre indirect',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcoi_7a',
     section: 'Ordre Inverse',
     text: 'Item 7 - Essai 1',
     type: 'single_choice',
@@ -9173,7 +9313,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_7b',
+    id: 'wais4_mcoi_7b',
     section: 'Ordre Inverse',
     text: 'Item 7 - Essai 2',
     type: 'single_choice',
@@ -9184,7 +9324,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_8a',
+    id: 'wais_mcoi_7',
+    section: 'Ordre Inverse',
+    text: 'Note a la serie 7 en ordre indirect',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcoi_8a',
     section: 'Ordre Inverse',
     text: 'Item 8 - Essai 1',
     type: 'single_choice',
@@ -9195,7 +9345,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoi_8b',
+    id: 'wais4_mcoi_8b',
     section: 'Ordre Inverse',
     text: 'Item 8 - Essai 2',
     type: 'single_choice',
@@ -9204,19 +9354,29 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
       { code: 0, label: 'Incorrect', score: 0 },
       { code: 1, label: 'Correct', score: 1 }
     ]
+  },
+  {
+    id: 'wais_mcoi_8',
+    section: 'Ordre Inverse',
+    text: 'Note a la serie 8 en ordre indirect',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
   },
   
   // Section: Ordre Croissant (Sequencing)
   {
     id: 'section_croissant',
-    text: 'Memoire des chiffres - Ordre Croissant',
+    text: 'Mémoire des chiffres - Ordre Croissant',
     type: 'section',
     required: false,
     section: 'Ordre Croissant',
-    help: 'Repetition de sequences de chiffres dans l\'ordre croissant.'
+    help: 'Répétition de séquences de chiffres dans l\'ordre croissant.'
   },
   {
-    id: 'mcoc_1a',
+    id: 'wais4_mcoc_1a',
     section: 'Ordre Croissant',
     text: 'Item 1 - Essai 1',
     type: 'single_choice',
@@ -9227,7 +9387,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_1b',
+    id: 'wais4_mcoc_1b',
     section: 'Ordre Croissant',
     text: 'Item 1 - Essai 2',
     type: 'single_choice',
@@ -9238,7 +9398,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_2a',
+    id: 'wais_mcoc_1',
+    section: 'Ordre Croissant',
+    text: 'Note a la serie 1 en ordre croissant',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcoc_2a',
     section: 'Ordre Croissant',
     text: 'Item 2 - Essai 1',
     type: 'single_choice',
@@ -9249,7 +9419,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_2b',
+    id: 'wais4_mcoc_2b',
     section: 'Ordre Croissant',
     text: 'Item 2 - Essai 2',
     type: 'single_choice',
@@ -9260,7 +9430,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_3a',
+    id: 'wais_mcoc_2',
+    section: 'Ordre Croissant',
+    text: 'Note a la serie 2 en ordre croissant',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcoc_3a',
     section: 'Ordre Croissant',
     text: 'Item 3 - Essai 1',
     type: 'single_choice',
@@ -9271,7 +9451,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_3b',
+    id: 'wais4_mcoc_3b',
     section: 'Ordre Croissant',
     text: 'Item 3 - Essai 2',
     type: 'single_choice',
@@ -9282,7 +9462,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_4a',
+    id: 'wais_mcoc_3',
+    section: 'Ordre Croissant',
+    text: 'Note a la serie 3 en ordre croissant',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcoc_4a',
     section: 'Ordre Croissant',
     text: 'Item 4 - Essai 1',
     type: 'single_choice',
@@ -9293,7 +9483,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_4b',
+    id: 'wais4_mcoc_4b',
     section: 'Ordre Croissant',
     text: 'Item 4 - Essai 2',
     type: 'single_choice',
@@ -9304,7 +9494,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_5a',
+    id: 'wais_mcoc_4',
+    section: 'Ordre Croissant',
+    text: 'Note a la serie 4 en ordre croissant',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcoc_5a',
     section: 'Ordre Croissant',
     text: 'Item 5 - Essai 1',
     type: 'single_choice',
@@ -9315,7 +9515,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_5b',
+    id: 'wais4_mcoc_5b',
     section: 'Ordre Croissant',
     text: 'Item 5 - Essai 2',
     type: 'single_choice',
@@ -9326,7 +9526,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_6a',
+    id: 'wais_mcoc_5',
+    section: 'Ordre Croissant',
+    text: 'Note a la serie 5 en ordre croissant',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcoc_6a',
     section: 'Ordre Croissant',
     text: 'Item 6 - Essai 1',
     type: 'single_choice',
@@ -9337,7 +9547,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_6b',
+    id: 'wais4_mcoc_6b',
     section: 'Ordre Croissant',
     text: 'Item 6 - Essai 2',
     type: 'single_choice',
@@ -9348,7 +9558,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_7a',
+    id: 'wais_mcoc_6',
+    section: 'Ordre Croissant',
+    text: 'Note a la serie 6 en ordre croissant',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcoc_7a',
     section: 'Ordre Croissant',
     text: 'Item 7 - Essai 1',
     type: 'single_choice',
@@ -9359,7 +9579,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_7b',
+    id: 'wais4_mcoc_7b',
     section: 'Ordre Croissant',
     text: 'Item 7 - Essai 2',
     type: 'single_choice',
@@ -9370,7 +9590,17 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_8a',
+    id: 'wais_mcoc_7',
+    section: 'Ordre Croissant',
+    text: 'Note a la serie 7 en ordre croissant',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  {
+    id: 'wais4_mcoc_8a',
     section: 'Ordre Croissant',
     text: 'Item 8 - Essai 1',
     type: 'single_choice',
@@ -9381,7 +9611,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'mcoc_8b',
+    id: 'wais4_mcoc_8b',
     section: 'Ordre Croissant',
     text: 'Item 8 - Essai 2',
     type: 'single_choice',
@@ -9390,14 +9620,174 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
       { code: 0, label: 'Incorrect', score: 0 },
       { code: 1, label: 'Correct', score: 1 }
     ]
+  },
+  {
+    id: 'wais_mcoc_8',
+    section: 'Ordre Croissant',
+    text: 'Note a la serie 8 en ordre croissant',
+    type: 'number',
+    required: false,
+    readonly: true,
+    indentLevel: 1,
+    help: 'Somme des essais 1 et 2 (calculé automatiquement)'
+  },
+  
+  // ============================================================================
+  // COMPUTED SCORES - SECTION TOTALS
+  // ============================================================================
+  {
+    id: 'section_totals',
+    text: 'Totaux par section (calculés automatiquement)',
+    type: 'section',
+    required: false,
+    section: 'Totaux par section'
+  },
+  {
+    id: 'wais_mcod_tot',
+    section: 'Totaux par section',
+    text: 'Total Ordre Direct',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Somme des items jusqu\'au premier score de 0 (0-16)'
+  },
+  {
+    id: 'wais_mcoi_tot',
+    section: 'Totaux par section',
+    text: 'Total Ordre Inverse',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Somme des items jusqu\'au premier score de 0 (0-16)'
+  },
+  {
+    id: 'wais_mcoc_tot',
+    section: 'Totaux par section',
+    text: 'Total Ordre Croissant',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Somme des items jusqu\'au premier score de 0 (0-16)'
+  },
+  
+  // ============================================================================
+  // COMPUTED SCORES - EMPAN CALCULATIONS
+  // ============================================================================
+  {
+    id: 'section_empan',
+    text: 'Calculs des empans (calculés automatiquement)',
+    type: 'section',
+    required: false,
+    section: 'Empans'
+  },
+  {
+    id: 'wais_mc_end',
+    section: 'Empans',
+    text: 'Empan endroit',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Nombre maximum de chiffres rappelés en ordre direct'
+  },
+  {
+    id: 'wais_mc_end_std',
+    section: 'Empans',
+    text: 'Empan endroit - Note Z',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Z-score basé sur les normes stratifiées par âge'
+  },
+  {
+    id: 'wais_mc_env',
+    section: 'Empans',
+    text: 'Empan envers',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Nombre maximum de chiffres rappelés en ordre inverse'
+  },
+  {
+    id: 'wais_mc_env_std',
+    section: 'Empans',
+    text: 'Empan envers - Note Z',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Z-score basé sur les normes stratifiées par âge'
+  },
+  {
+    id: 'wais_mc_cro',
+    section: 'Empans',
+    text: 'Empan croissant',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Nombre maximum de chiffres rappelés en ordre croissant'
+  },
+  {
+    id: 'wais_mc_cro_std',
+    section: 'Empans',
+    text: 'Empan croissant - Note Z',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Z-score basé sur les normes stratifiées par âge'
+  },
+  {
+    id: 'wais_mc_emp',
+    section: 'Empans',
+    text: 'Empan endroit - empan envers',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Différence entre empan endroit et empan envers'
+  },
+  
+  // ============================================================================
+  // COMPUTED SCORES - GLOBAL SCORES
+  // ============================================================================
+  {
+    id: 'section_global_scores',
+    text: 'Scores globaux (calculés automatiquement)',
+    type: 'section',
+    required: false,
+    section: 'Scores globaux'
+  },
+  {
+    id: 'wais_mc_tot',
+    section: 'Scores globaux',
+    text: 'Note brute - Mémoire des chiffres',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Somme des trois sections (0-48)'
+  },
+  {
+    id: 'wais_mc_std',
+    section: 'Scores globaux',
+    text: 'Note standard - Mémoire des chiffres',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Note standard basée sur les normes stratifiées par âge (1-19)'
+  },
+  {
+    id: 'wais_mc_cr',
+    section: 'Scores globaux',
+    text: 'Valeur standardisée (moyenne=10, écart-type=3)',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: '(Note standard - 10) / 3'
   }
 ];
 
 export const WAIS4_DIGIT_SPAN_DEFINITION: QuestionnaireDefinition = {
   id: 'wais4_digit_span',
   code: 'WAIS4_DIGIT_SPAN_FR',
-  title: 'WAIS-IV Subtest Memoire des chiffres (Digit Span)',
-  description: 'Subtest evaluant la memoire de travail auditive via trois taches : ordre direct, ordre inverse et ordre croissant.',
+  title: 'WAIS-IV Subtest Mémoire des chiffres (Digit Span)',
+  description: 'Subtest évaluant la mémoire de travail auditive via trois tâches : ordre direct, ordre inverse et ordre croissant.',
   questions: WAIS4_DIGIT_SPAN_QUESTIONS,
   metadata: {
     singleColumn: true,

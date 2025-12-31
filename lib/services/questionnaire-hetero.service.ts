@@ -1605,9 +1605,9 @@ export async function saveWais4CodeResponse(
   const scores = calculateWais4CodeSymbolesScores({
     patient_age: response.patient_age,
     wais_cod_tot: response.wais_cod_tot,
-    wais_cod_err: response.wais_cod_err,
-    wais_symb_tot: response.wais_symb_tot,
-    wais_symb_err: response.wais_symb_err
+    wais_cod_err: response.wais_cod_err ?? undefined,
+    wais_symb_tot: response.wais_symb_tot ?? undefined,
+    wais_symb_err: response.wais_symb_err ?? undefined
   });
 
   const { data, error } = await supabase
@@ -1674,62 +1674,96 @@ export async function saveWais4DigitSpanResponse(
   const scores = calculateDigitSpanScores({
     patient_age: response.patient_age,
     // Direct order
-    mcod_1a: response.mcod_1a,
-    mcod_1b: response.mcod_1b,
-    mcod_2a: response.mcod_2a,
-    mcod_2b: response.mcod_2b,
-    mcod_3a: response.mcod_3a,
-    mcod_3b: response.mcod_3b,
-    mcod_4a: response.mcod_4a,
-    mcod_4b: response.mcod_4b,
-    mcod_5a: response.mcod_5a,
-    mcod_5b: response.mcod_5b,
-    mcod_6a: response.mcod_6a,
-    mcod_6b: response.mcod_6b,
-    mcod_7a: response.mcod_7a,
-    mcod_7b: response.mcod_7b,
-    mcod_8a: response.mcod_8a,
-    mcod_8b: response.mcod_8b,
+    wais4_mcod_1a: response.wais4_mcod_1a,
+    wais4_mcod_1b: response.wais4_mcod_1b,
+    wais4_mcod_2a: response.wais4_mcod_2a,
+    wais4_mcod_2b: response.wais4_mcod_2b,
+    wais4_mcod_3a: response.wais4_mcod_3a,
+    wais4_mcod_3b: response.wais4_mcod_3b,
+    wais4_mcod_4a: response.wais4_mcod_4a,
+    wais4_mcod_4b: response.wais4_mcod_4b,
+    wais4_mcod_5a: response.wais4_mcod_5a,
+    wais4_mcod_5b: response.wais4_mcod_5b,
+    wais4_mcod_6a: response.wais4_mcod_6a,
+    wais4_mcod_6b: response.wais4_mcod_6b,
+    wais4_mcod_7a: response.wais4_mcod_7a,
+    wais4_mcod_7b: response.wais4_mcod_7b,
+    wais4_mcod_8a: response.wais4_mcod_8a,
+    wais4_mcod_8b: response.wais4_mcod_8b,
     // Inverse order
-    mcoi_1a: response.mcoi_1a,
-    mcoi_1b: response.mcoi_1b,
-    mcoi_2a: response.mcoi_2a,
-    mcoi_2b: response.mcoi_2b,
-    mcoi_3a: response.mcoi_3a,
-    mcoi_3b: response.mcoi_3b,
-    mcoi_4a: response.mcoi_4a,
-    mcoi_4b: response.mcoi_4b,
-    mcoi_5a: response.mcoi_5a,
-    mcoi_5b: response.mcoi_5b,
-    mcoi_6a: response.mcoi_6a,
-    mcoi_6b: response.mcoi_6b,
-    mcoi_7a: response.mcoi_7a,
-    mcoi_7b: response.mcoi_7b,
-    mcoi_8a: response.mcoi_8a,
-    mcoi_8b: response.mcoi_8b,
+    wais4_mcoi_1a: response.wais4_mcoi_1a,
+    wais4_mcoi_1b: response.wais4_mcoi_1b,
+    wais4_mcoi_2a: response.wais4_mcoi_2a,
+    wais4_mcoi_2b: response.wais4_mcoi_2b,
+    wais4_mcoi_3a: response.wais4_mcoi_3a,
+    wais4_mcoi_3b: response.wais4_mcoi_3b,
+    wais4_mcoi_4a: response.wais4_mcoi_4a,
+    wais4_mcoi_4b: response.wais4_mcoi_4b,
+    wais4_mcoi_5a: response.wais4_mcoi_5a,
+    wais4_mcoi_5b: response.wais4_mcoi_5b,
+    wais4_mcoi_6a: response.wais4_mcoi_6a,
+    wais4_mcoi_6b: response.wais4_mcoi_6b,
+    wais4_mcoi_7a: response.wais4_mcoi_7a,
+    wais4_mcoi_7b: response.wais4_mcoi_7b,
+    wais4_mcoi_8a: response.wais4_mcoi_8a,
+    wais4_mcoi_8b: response.wais4_mcoi_8b,
     // Sequencing order
-    mcoc_1a: response.mcoc_1a,
-    mcoc_1b: response.mcoc_1b,
-    mcoc_2a: response.mcoc_2a,
-    mcoc_2b: response.mcoc_2b,
-    mcoc_3a: response.mcoc_3a,
-    mcoc_3b: response.mcoc_3b,
-    mcoc_4a: response.mcoc_4a,
-    mcoc_4b: response.mcoc_4b,
-    mcoc_5a: response.mcoc_5a,
-    mcoc_5b: response.mcoc_5b,
-    mcoc_6a: response.mcoc_6a,
-    mcoc_6b: response.mcoc_6b,
-    mcoc_7a: response.mcoc_7a,
-    mcoc_7b: response.mcoc_7b,
-    mcoc_8a: response.mcoc_8a,
-    mcoc_8b: response.mcoc_8b
+    wais4_mcoc_1a: response.wais4_mcoc_1a,
+    wais4_mcoc_1b: response.wais4_mcoc_1b,
+    wais4_mcoc_2a: response.wais4_mcoc_2a,
+    wais4_mcoc_2b: response.wais4_mcoc_2b,
+    wais4_mcoc_3a: response.wais4_mcoc_3a,
+    wais4_mcoc_3b: response.wais4_mcoc_3b,
+    wais4_mcoc_4a: response.wais4_mcoc_4a,
+    wais4_mcoc_4b: response.wais4_mcoc_4b,
+    wais4_mcoc_5a: response.wais4_mcoc_5a,
+    wais4_mcoc_5b: response.wais4_mcoc_5b,
+    wais4_mcoc_6a: response.wais4_mcoc_6a,
+    wais4_mcoc_6b: response.wais4_mcoc_6b,
+    wais4_mcoc_7a: response.wais4_mcoc_7a,
+    wais4_mcoc_7b: response.wais4_mcoc_7b,
+    wais4_mcoc_8a: response.wais4_mcoc_8a,
+    wais4_mcoc_8b: response.wais4_mcoc_8b
   });
 
   const { data, error } = await supabase
     .from('responses_wais4_digit_span')
     .upsert({
       ...response,
+      // Individual item scores
+      wais_mcod_1: scores.wais_mcod_1,
+      wais_mcod_2: scores.wais_mcod_2,
+      wais_mcod_3: scores.wais_mcod_3,
+      wais_mcod_4: scores.wais_mcod_4,
+      wais_mcod_5: scores.wais_mcod_5,
+      wais_mcod_6: scores.wais_mcod_6,
+      wais_mcod_7: scores.wais_mcod_7,
+      wais_mcod_8: scores.wais_mcod_8,
+      
+      wais_mcoi_1: scores.wais_mcoi_1,
+      wais_mcoi_2: scores.wais_mcoi_2,
+      wais_mcoi_3: scores.wais_mcoi_3,
+      wais_mcoi_4: scores.wais_mcoi_4,
+      wais_mcoi_5: scores.wais_mcoi_5,
+      wais_mcoi_6: scores.wais_mcoi_6,
+      wais_mcoi_7: scores.wais_mcoi_7,
+      wais_mcoi_8: scores.wais_mcoi_8,
+      
+      wais_mcoc_1: scores.wais_mcoc_1,
+      wais_mcoc_2: scores.wais_mcoc_2,
+      wais_mcoc_3: scores.wais_mcoc_3,
+      wais_mcoc_4: scores.wais_mcoc_4,
+      wais_mcoc_5: scores.wais_mcoc_5,
+      wais_mcoc_6: scores.wais_mcoc_6,
+      wais_mcoc_7: scores.wais_mcoc_7,
+      wais_mcoc_8: scores.wais_mcoc_8,
+      
+      // Section totals with naming convention
+      wais_mcod_tot: scores.wais_mcod_tot,
+      wais_mcoi_tot: scores.wais_mcoi_tot,
+      wais_mcoc_tot: scores.wais_mcoc_tot,
+      
+      // Legacy field names (backward compatibility)
       mcod_total: scores.mcod_total,
       mcoi_total: scores.mcoi_total,
       mcoc_total: scores.mcoc_total,
@@ -1738,6 +1772,25 @@ export async function saveWais4DigitSpanResponse(
       empan_direct: scores.empan_direct,
       empan_inverse: scores.empan_inverse,
       empan_croissant: scores.empan_croissant,
+      
+      // Empan with naming convention
+      wais_mc_end: scores.wais_mc_end,
+      wais_mc_env: scores.wais_mc_env,
+      wais_mc_cro: scores.wais_mc_cro,
+      
+      // Empan Z-scores
+      wais_mc_end_std: scores.wais_mc_end_std,
+      wais_mc_env_std: scores.wais_mc_env_std,
+      wais_mc_cro_std: scores.wais_mc_cro_std,
+      
+      // Empan difference
+      wais_mc_emp: scores.wais_mc_emp,
+      
+      // Total and standard scores with naming convention
+      wais_mc_tot: scores.wais_mc_tot,
+      wais_mc_std: scores.wais_mc_std,
+      wais_mc_cr: scores.wais_mc_cr,
+      
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

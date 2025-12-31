@@ -3115,70 +3115,121 @@ export interface Wais4DigitSpanResponse {
   patient_age: number; // 16-90
   
   // Ordre Direct (Forward) - 8 items x 2 trials
-  mcod_1a: number;
-  mcod_1b: number;
-  mcod_2a?: number | null;
-  mcod_2b?: number | null;
-  mcod_3a?: number | null;
-  mcod_3b?: number | null;
-  mcod_4a?: number | null;
-  mcod_4b?: number | null;
-  mcod_5a?: number | null;
-  mcod_5b?: number | null;
-  mcod_6a?: number | null;
-  mcod_6b?: number | null;
-  mcod_7a?: number | null;
-  mcod_7b?: number | null;
-  mcod_8a?: number | null;
-  mcod_8b?: number | null;
+  wais4_mcod_1a: number;
+  wais4_mcod_1b: number;
+  wais4_mcod_2a?: number | null;
+  wais4_mcod_2b?: number | null;
+  wais4_mcod_3a?: number | null;
+  wais4_mcod_3b?: number | null;
+  wais4_mcod_4a?: number | null;
+  wais4_mcod_4b?: number | null;
+  wais4_mcod_5a?: number | null;
+  wais4_mcod_5b?: number | null;
+  wais4_mcod_6a?: number | null;
+  wais4_mcod_6b?: number | null;
+  wais4_mcod_7a?: number | null;
+  wais4_mcod_7b?: number | null;
+  wais4_mcod_8a?: number | null;
+  wais4_mcod_8b?: number | null;
   
   // Ordre Inverse (Backward) - 8 items x 2 trials
-  mcoi_1a: number;
-  mcoi_1b: number;
-  mcoi_2a?: number | null;
-  mcoi_2b?: number | null;
-  mcoi_3a?: number | null;
-  mcoi_3b?: number | null;
-  mcoi_4a?: number | null;
-  mcoi_4b?: number | null;
-  mcoi_5a?: number | null;
-  mcoi_5b?: number | null;
-  mcoi_6a?: number | null;
-  mcoi_6b?: number | null;
-  mcoi_7a?: number | null;
-  mcoi_7b?: number | null;
-  mcoi_8a?: number | null;
-  mcoi_8b?: number | null;
+  wais4_mcoi_1a: number;
+  wais4_mcoi_1b: number;
+  wais4_mcoi_2a?: number | null;
+  wais4_mcoi_2b?: number | null;
+  wais4_mcoi_3a?: number | null;
+  wais4_mcoi_3b?: number | null;
+  wais4_mcoi_4a?: number | null;
+  wais4_mcoi_4b?: number | null;
+  wais4_mcoi_5a?: number | null;
+  wais4_mcoi_5b?: number | null;
+  wais4_mcoi_6a?: number | null;
+  wais4_mcoi_6b?: number | null;
+  wais4_mcoi_7a?: number | null;
+  wais4_mcoi_7b?: number | null;
+  wais4_mcoi_8a?: number | null;
+  wais4_mcoi_8b?: number | null;
   
   // Ordre Croissant (Sequencing) - 8 items x 2 trials
-  mcoc_1a: number;
-  mcoc_1b: number;
-  mcoc_2a?: number | null;
-  mcoc_2b?: number | null;
-  mcoc_3a?: number | null;
-  mcoc_3b?: number | null;
-  mcoc_4a?: number | null;
-  mcoc_4b?: number | null;
-  mcoc_5a?: number | null;
-  mcoc_5b?: number | null;
-  mcoc_6a?: number | null;
-  mcoc_6b?: number | null;
-  mcoc_7a?: number | null;
-  mcoc_7b?: number | null;
-  mcoc_8a?: number | null;
-  mcoc_8b?: number | null;
+  wais4_mcoc_1a: number;
+  wais4_mcoc_1b: number;
+  wais4_mcoc_2a?: number | null;
+  wais4_mcoc_2b?: number | null;
+  wais4_mcoc_3a?: number | null;
+  wais4_mcoc_3b?: number | null;
+  wais4_mcoc_4a?: number | null;
+  wais4_mcoc_4b?: number | null;
+  wais4_mcoc_5a?: number | null;
+  wais4_mcoc_5b?: number | null;
+  wais4_mcoc_6a?: number | null;
+  wais4_mcoc_6b?: number | null;
+  wais4_mcoc_7a?: number | null;
+  wais4_mcoc_7b?: number | null;
+  wais4_mcoc_8a?: number | null;
+  wais4_mcoc_8b?: number | null;
   
-  // Computed scores
+  // Individual item scores (sum of trial 1 + trial 2)
+  wais_mcod_1?: number | null; // Item score Direct 1
+  wais_mcod_2?: number | null; // Item score Direct 2
+  wais_mcod_3?: number | null; // Item score Direct 3
+  wais_mcod_4?: number | null; // Item score Direct 4
+  wais_mcod_5?: number | null; // Item score Direct 5
+  wais_mcod_6?: number | null; // Item score Direct 6
+  wais_mcod_7?: number | null; // Item score Direct 7
+  wais_mcod_8?: number | null; // Item score Direct 8
+  
+  wais_mcoi_1?: number | null; // Item score Inverse 1
+  wais_mcoi_2?: number | null; // Item score Inverse 2
+  wais_mcoi_3?: number | null; // Item score Inverse 3
+  wais_mcoi_4?: number | null; // Item score Inverse 4
+  wais_mcoi_5?: number | null; // Item score Inverse 5
+  wais_mcoi_6?: number | null; // Item score Inverse 6
+  wais_mcoi_7?: number | null; // Item score Inverse 7
+  wais_mcoi_8?: number | null; // Item score Inverse 8
+  
+  wais_mcoc_1?: number | null; // Item score Croissant 1
+  wais_mcoc_2?: number | null; // Item score Croissant 2
+  wais_mcoc_3?: number | null; // Item score Croissant 3
+  wais_mcoc_4?: number | null; // Item score Croissant 4
+  wais_mcoc_5?: number | null; // Item score Croissant 5
+  wais_mcoc_6?: number | null; // Item score Croissant 6
+  wais_mcoc_7?: number | null; // Item score Croissant 7
+  wais_mcoc_8?: number | null; // Item score Croissant 8
+  
+  // Section totals with naming convention
+  wais_mcod_tot?: number | null; // Total Ordre Direct (0-16)
+  wais_mcoi_tot?: number | null; // Total Ordre Inverse (0-16)
+  wais_mcoc_tot?: number | null; // Total Ordre Croissant (0-16)
+  
+  // Legacy field names (kept for backward compatibility)
   mcod_total?: number | null; // Score total Ordre Direct (0-16)
   mcoi_total?: number | null; // Score total Ordre Inverse (0-16)
   mcoc_total?: number | null; // Score total Ordre Croissant (0-16)
   raw_score?: number | null; // Note Brute Totale (0-48)
   standardized_score?: number | null; // Note Standard (1-19)
   
-  // Process scores (empan)
+  // Process scores (empan) with naming convention
+  wais_mc_end?: number | null; // Empan endroit (forward span)
+  wais_mc_env?: number | null; // Empan envers (backward span)
+  wais_mc_cro?: number | null; // Empan croissant (sequencing span)
+  
+  // Legacy empan field names (kept for backward compatibility)
   empan_direct?: number | null; // Max span Direct
   empan_inverse?: number | null; // Max span Inverse
   empan_croissant?: number | null; // Max span Croissant
+  
+  // Empan Z-scores (age-stratified normative data)
+  wais_mc_end_std?: number | null; // Z-score empan endroit
+  wais_mc_env_std?: number | null; // Z-score empan envers
+  wais_mc_cro_std?: number | null; // Z-score empan croissant
+  
+  // Empan difference score
+  wais_mc_emp?: number | null; // Empan difference (endroit - envers)
+  
+  // Total and standard scores with naming convention
+  wais_mc_tot?: number | null; // Total raw score (0-48)
+  wais_mc_std?: number | null; // Standard score (1-19)
+  wais_mc_cr?: number | null; // Standardized value (std_score - 10) / 3
   
   // Metadata
   completed_by?: string | null;
@@ -3187,7 +3238,18 @@ export interface Wais4DigitSpanResponse {
   updated_at: string;
 }
 
-export type Wais4DigitSpanResponseInsert = Omit<Wais4DigitSpanResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'mcod_total' | 'mcoi_total' | 'mcoc_total' | 'raw_score' | 'standardized_score' | 'empan_direct' | 'empan_inverse' | 'empan_croissant'>;
+export type Wais4DigitSpanResponseInsert = Omit<Wais4DigitSpanResponse, 
+  'id' | 'created_at' | 'updated_at' | 'completed_at' | 
+  'mcod_total' | 'mcoi_total' | 'mcoc_total' | 'raw_score' | 'standardized_score' | 
+  'empan_direct' | 'empan_inverse' | 'empan_croissant' |
+  'wais_mcod_1' | 'wais_mcod_2' | 'wais_mcod_3' | 'wais_mcod_4' | 'wais_mcod_5' | 'wais_mcod_6' | 'wais_mcod_7' | 'wais_mcod_8' |
+  'wais_mcoi_1' | 'wais_mcoi_2' | 'wais_mcoi_3' | 'wais_mcoi_4' | 'wais_mcoi_5' | 'wais_mcoi_6' | 'wais_mcoi_7' | 'wais_mcoi_8' |
+  'wais_mcoc_1' | 'wais_mcoc_2' | 'wais_mcoc_3' | 'wais_mcoc_4' | 'wais_mcoc_5' | 'wais_mcoc_6' | 'wais_mcoc_7' | 'wais_mcoc_8' |
+  'wais_mcod_tot' | 'wais_mcoi_tot' | 'wais_mcoc_tot' |
+  'wais_mc_end' | 'wais_mc_env' | 'wais_mc_cro' |
+  'wais_mc_end_std' | 'wais_mc_env_std' | 'wais_mc_cro_std' |
+  'wais_mc_emp' | 'wais_mc_tot' | 'wais_mc_std' | 'wais_mc_cr'
+>;
 
 // ============================================================================
 // Trail Making Test (TMT) - Reitan 1955
