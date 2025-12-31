@@ -4057,6 +4057,25 @@ export interface Wais3DigitSpanResponse {
   mcoi_6a: number; mcoi_6b: number;
   mcoi_7a: number; mcoi_7b: number;
   
+  // Individual item scores (Ordre Direct)
+  wais3_mcod_1?: number;
+  wais3_mcod_2?: number;
+  wais3_mcod_3?: number;
+  wais3_mcod_4?: number;
+  wais3_mcod_5?: number;
+  wais3_mcod_6?: number;
+  wais3_mcod_7?: number;
+  wais3_mcod_8?: number;
+  
+  // Individual item scores (Ordre Inverse)
+  wais3_mcoi_1?: number;
+  wais3_mcoi_2?: number;
+  wais3_mcoi_3?: number;
+  wais3_mcoi_4?: number;
+  wais3_mcoi_5?: number;
+  wais3_mcoi_6?: number;
+  wais3_mcoi_7?: number;
+  
   // Computed scores
   wais_mcod_tot?: number;
   wais_mcoi_tot?: number;

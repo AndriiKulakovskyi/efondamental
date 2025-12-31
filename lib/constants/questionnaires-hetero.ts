@@ -12132,6 +12132,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
+    id: 'wais3_mcod_1',
+    text: 'Note a l\'item 1',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Direct (2 chiffres)',
+    indentLevel: 1
+  },
+  {
     id: 'mcod_2a',
     text: 'ITEM 2 - Note à l\'essai 1',
     type: 'single_choice',
@@ -12152,6 +12161,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
       { code: 0, label: 'Échec (0)', score: 0 },
       { code: 1, label: 'Réussite (1)', score: 1 }
     ]
+  },
+  {
+    id: 'wais3_mcod_2',
+    text: 'Note a l\'item 2',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Direct (3 chiffres)',
+    indentLevel: 1
   },
   {
     id: 'mcod_3a',
@@ -12176,6 +12194,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
+    id: 'wais3_mcod_3',
+    text: 'Note a l\'item 3',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Direct (4 chiffres)',
+    indentLevel: 1
+  },
+  {
     id: 'mcod_4a',
     text: 'ITEM 4 - Note à l\'essai 1',
     type: 'single_choice',
@@ -12196,6 +12223,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
       { code: 0, label: 'Échec (0)', score: 0 },
       { code: 1, label: 'Réussite (1)', score: 1 }
     ]
+  },
+  {
+    id: 'wais3_mcod_4',
+    text: 'Note a l\'item 4',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Direct (5 chiffres)',
+    indentLevel: 1
   },
   {
     id: 'mcod_5a',
@@ -12220,6 +12256,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
+    id: 'wais3_mcod_5',
+    text: 'Note a l\'item 5',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Direct (6 chiffres)',
+    indentLevel: 1
+  },
+  {
     id: 'mcod_6a',
     text: 'ITEM 6 - Note à l\'essai 1',
     type: 'single_choice',
@@ -12240,6 +12285,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
       { code: 0, label: 'Échec (0)', score: 0 },
       { code: 1, label: 'Réussite (1)', score: 1 }
     ]
+  },
+  {
+    id: 'wais3_mcod_6',
+    text: 'Note a l\'item 6',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Direct (7 chiffres)',
+    indentLevel: 1
   },
   {
     id: 'mcod_7a',
@@ -12264,6 +12318,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
+    id: 'wais3_mcod_7',
+    text: 'Note a l\'item 7',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Direct (8 chiffres)',
+    indentLevel: 1
+  },
+  {
     id: 'mcod_8a',
     text: 'ITEM 8 - Note à l\'essai 1',
     type: 'single_choice',
@@ -12284,6 +12347,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
       { code: 0, label: 'Échec (0)', score: 0 },
       { code: 1, label: 'Réussite (1)', score: 1 }
     ]
+  },
+  {
+    id: 'wais3_mcod_8',
+    text: 'Note a l\'item 8',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Direct (9 chiffres)',
+    indentLevel: 1
   },
   
   // Forward computed score
@@ -12346,6 +12418,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
+    id: 'wais3_mcoi_1',
+    text: 'Note a la serie 1 en ordre inverse',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Inverse (2 chiffres)',
+    indentLevel: 1
+  },
+  {
     id: 'mcoi_2a',
     text: 'ITEM 2 - Note à l\'essai 1',
     type: 'single_choice',
@@ -12366,6 +12447,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
       { code: 0, label: 'Échec (0)', score: 0 },
       { code: 1, label: 'Réussite (1)', score: 1 }
     ]
+  },
+  {
+    id: 'wais3_mcoi_2',
+    text: 'Note a la serie 2 en ordre inverse',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Inverse (3 chiffres)',
+    indentLevel: 1
   },
   {
     id: 'mcoi_3a',
@@ -12390,6 +12480,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
+    id: 'wais3_mcoi_3',
+    text: 'Note a la serie 3 en ordre inverse',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Inverse (4 chiffres)',
+    indentLevel: 1
+  },
+  {
     id: 'mcoi_4a',
     text: 'ITEM 4 - Note à l\'essai 1',
     type: 'single_choice',
@@ -12410,6 +12509,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
       { code: 0, label: 'Échec (0)', score: 0 },
       { code: 1, label: 'Réussite (1)', score: 1 }
     ]
+  },
+  {
+    id: 'wais3_mcoi_4',
+    text: 'Note a la serie 4 en ordre inverse',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Inverse (5 chiffres)',
+    indentLevel: 1
   },
   {
     id: 'mcoi_5a',
@@ -12434,6 +12542,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
+    id: 'wais3_mcoi_5',
+    text: 'Note a la serie 5 en ordre inverse',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Inverse (6 chiffres)',
+    indentLevel: 1
+  },
+  {
     id: 'mcoi_6a',
     text: 'ITEM 6 - Note à l\'essai 1',
     type: 'single_choice',
@@ -12456,6 +12573,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
     ]
   },
   {
+    id: 'wais3_mcoi_6',
+    text: 'Note a la serie 6 en ordre inverse',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Inverse (7 chiffres)',
+    indentLevel: 1
+  },
+  {
     id: 'mcoi_7a',
     text: 'ITEM 7 - Note à l\'essai 1',
     type: 'single_choice',
@@ -12476,6 +12602,15 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
       { code: 0, label: 'Échec (0)', score: 0 },
       { code: 1, label: 'Réussite (1)', score: 1 }
     ]
+  },
+  {
+    id: 'wais3_mcoi_7',
+    text: 'Note a la serie 7 en ordre inverse',
+    type: 'number',
+    required: false,
+    readonly: true,
+    section: 'Ordre Inverse (8 chiffres)',
+    indentLevel: 1
   },
   
   // Backward computed scores

@@ -1420,6 +1420,67 @@ export function QuestionnaireRenderer({
       const hasDigitSpanFields = prev.mcod_1a !== undefined || prev.mcoi_1a !== undefined;
       
       if (hasDigitSpanFields) {
+        // Helper function to check if a value is valid (not undefined, null, or empty string)
+        const isValidValue = (val: any) => {
+          return val !== undefined && val !== null && val !== '';
+        };
+        
+        // Compute WAIS-III individual item scores (sum of trial 1 + trial 2)
+        // Ordre Direct (Forward) - 8 items
+        const wais3DirectItems = [
+          { a: 'mcod_1a', b: 'mcod_1b', score: 'wais3_mcod_1' },
+          { a: 'mcod_2a', b: 'mcod_2b', score: 'wais3_mcod_2' },
+          { a: 'mcod_3a', b: 'mcod_3b', score: 'wais3_mcod_3' },
+          { a: 'mcod_4a', b: 'mcod_4b', score: 'wais3_mcod_4' },
+          { a: 'mcod_5a', b: 'mcod_5b', score: 'wais3_mcod_5' },
+          { a: 'mcod_6a', b: 'mcod_6b', score: 'wais3_mcod_6' },
+          { a: 'mcod_7a', b: 'mcod_7b', score: 'wais3_mcod_7' },
+          { a: 'mcod_8a', b: 'mcod_8b', score: 'wais3_mcod_8' }
+        ];
+        
+        wais3DirectItems.forEach(item => {
+          const trialA = prev[item.a];
+          const trialB = prev[item.b];
+          
+          if (isValidValue(trialA) && isValidValue(trialB)) {
+            const itemScore = Number(trialA) + Number(trialB);
+            if (updated[item.score] !== itemScore) {
+              updated[item.score] = itemScore;
+              hasChanges = true;
+            }
+          } else if (updated[item.score] !== undefined) {
+            delete updated[item.score];
+            hasChanges = true;
+          }
+        });
+        
+        // Ordre Inverse (Backward) - 7 items
+        const wais3InverseItems = [
+          { a: 'mcoi_1a', b: 'mcoi_1b', score: 'wais3_mcoi_1' },
+          { a: 'mcoi_2a', b: 'mcoi_2b', score: 'wais3_mcoi_2' },
+          { a: 'mcoi_3a', b: 'mcoi_3b', score: 'wais3_mcoi_3' },
+          { a: 'mcoi_4a', b: 'mcoi_4b', score: 'wais3_mcoi_4' },
+          { a: 'mcoi_5a', b: 'mcoi_5b', score: 'wais3_mcoi_5' },
+          { a: 'mcoi_6a', b: 'mcoi_6b', score: 'wais3_mcoi_6' },
+          { a: 'mcoi_7a', b: 'mcoi_7b', score: 'wais3_mcoi_7' }
+        ];
+        
+        wais3InverseItems.forEach(item => {
+          const trialA = prev[item.a];
+          const trialB = prev[item.b];
+          
+          if (isValidValue(trialA) && isValidValue(trialB)) {
+            const itemScore = Number(trialA) + Number(trialB);
+            if (updated[item.score] !== itemScore) {
+              updated[item.score] = itemScore;
+              hasChanges = true;
+            }
+          } else if (updated[item.score] !== undefined) {
+            delete updated[item.score];
+            hasChanges = true;
+          }
+        });
+        
         const dsAge = Number(prev.patient_age);
         const dsEducation = prev.education_level !== undefined ? Number(prev.education_level) : undefined;
         const hasValidAge = !isNaN(dsAge) && dsAge >= 16 && dsAge <= 90;
