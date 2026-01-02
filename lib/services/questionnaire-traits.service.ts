@@ -631,13 +631,15 @@ export async function saveAq12Response(
 }
 
 // CSM
+const CSM_SELECT_FIELDS = 'id, visit_id, patient_id, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, total_score, chronotype, interpretation, completed_by, completed_at, created_at, updated_at';
+
 export async function getCsmResponse(
   visitId: string
 ): Promise<CsmResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('responses_csm')
-    .select('*')
+    .select(CSM_SELECT_FIELDS)
     .eq('visit_id', visitId)
     .single();
 
@@ -654,32 +656,59 @@ export async function saveCsmResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Remove total_score if present (it's a generated column)
-  const { total_score, ...responseWithoutGeneratedFields } = response as any;
+  // Calculate total score (all 13 items)
+  // Score range: 13-55
+  const totalScore = response.q1 + response.q2 + response.q3 + response.q4 +
+                     response.q5 + response.q6 + response.q7 + response.q8 +
+                     response.q9 + response.q10 + response.q11 + response.q12 + response.q13;
 
-  // Total score is computed by database (generated column)
-  // Calculate total for interpretation
-  const totalScore = responseWithoutGeneratedFields.q1 + responseWithoutGeneratedFields.q2 + responseWithoutGeneratedFields.q3 + responseWithoutGeneratedFields.q4 +
-                     responseWithoutGeneratedFields.q5 + responseWithoutGeneratedFields.q6 + responseWithoutGeneratedFields.q7 + responseWithoutGeneratedFields.q8 +
-                     responseWithoutGeneratedFields.q9 + responseWithoutGeneratedFields.q10 + responseWithoutGeneratedFields.q11 + responseWithoutGeneratedFields.q12;
-
-  let interpretation = `Score total: ${totalScore}/55. `;
-  if (totalScore >= 44) {
-    interpretation += 'Type matinal prononcé.';
-  } else if (totalScore >= 32) {
-    interpretation += 'Type intermédiaire.';
+  // Determine chronotype based on 5-tier classification
+  let chronotype: string;
+  let chronotypeLabel: string;
+  
+  if (totalScore >= 48) {
+    chronotype = 'definitely_morning';
+    chronotypeLabel = 'Nettement matinal (type du matin)';
+  } else if (totalScore >= 42) {
+    chronotype = 'moderately_morning';
+    chronotypeLabel = 'Modérément matinal';
+  } else if (totalScore >= 29) {
+    chronotype = 'intermediate';
+    chronotypeLabel = 'Intermédiaire';
+  } else if (totalScore >= 22) {
+    chronotype = 'moderately_evening';
+    chronotypeLabel = 'Modérément vespéral';
   } else {
-    interpretation += 'Type vespéral prononcé.';
+    chronotype = 'definitely_evening';
+    chronotypeLabel = 'Nettement vespéral (type du soir)';
   }
 
+  const interpretation = `Score total: ${totalScore}/55. Chronotype: ${chronotypeLabel}.`;
+
+  // Only insert the fields that actually exist in the database
   const { data, error } = await supabase
     .from('responses_csm')
     .upsert({
-      ...responseWithoutGeneratedFields,
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      q1: response.q1,
+      q2: response.q2,
+      q3: response.q3,
+      q4: response.q4,
+      q5: response.q5,
+      q6: response.q6,
+      q7: response.q7,
+      q8: response.q8,
+      q9: response.q9,
+      q10: response.q10,
+      q11: response.q11,
+      q12: response.q12,
+      q13: response.q13,
+      chronotype,
       interpretation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
-    .select()
+    .select(CSM_SELECT_FIELDS)
     .single();
 
   if (error) throw error;

@@ -882,7 +882,9 @@ export interface CsmResponse {
   q10: number;
   q11: number;
   q12: number;
+  q13: number;
   total_score?: number | null;
+  chronotype?: string | null;
   interpretation?: string | null;
   completed_by?: string | null;
   completed_at: string;

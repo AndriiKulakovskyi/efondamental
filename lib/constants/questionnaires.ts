@@ -1723,31 +1723,126 @@ export const AQ12_DEFINITION: QuestionnaireDefinition = {
 };
 
 // CSM (Composite Scale of Morningness)
+// Scoring functions:
+// - valeur_champ1 (standard 1-4): Questions 3, 4, 5, 11
+// - valeur_champ2 (reverse 4-1): Questions 6, 8, 9, 10, 12, 13
+// - valeur_champ3 (reverse 5-1): Questions 1, 2, 7
 export const CSM_QUESTIONS: Question[] = [
-  { id: 'q1', text: "En ne considérant que le rythme de vie qui vous convient le mieux, à quelle heure vous lèveriez-vous en étant entièrement libre d'organiser votre journée ?", type: 'single_choice', required: true, options: [{ code: 5, label: 'entre 5h 00 et 6h 30' }, { code: 4, label: 'entre 6h 30 et 7h 45' }, { code: 3, label: 'entre 7h 45 et 9h 45' }, { code: 2, label: 'entre 9h45 et 11h 00' }, { code: 1, label: 'entre 11h00 et midi' }] },
-  { id: 'q2', text: "En ne considérant que le rythme de vie qui vous convient le mieux, à quelle heure vous coucheriez-vous sachant que vous êtes entièrement libre d'organiser votre soirée ?", type: 'single_choice', required: true, options: [{ code: 5, label: 'entre 20h 00 et 21h 00' }, { code: 4, label: 'entre 21h 00 et 22h 15' }, { code: 3, label: 'entre 22h 15 et 0h 30' }, { code: 2, label: 'entre 0h 30 et 1h 45' }, { code: 1, label: 'entre 1h 45 et 3h 00' }] },
-  { id: 'q3', text: "Dans des conditions adéquates (environnement favorable, sans contraintes particulières, etc.), à quel point cela vous est-il facile de vous lever le matin ?", type: 'single_choice', required: true, options: [{ code: 1, label: 'pas facile du tout' }, { code: 2, label: 'pas très facile' }, { code: 3, label: 'assez facile' }, { code: 4, label: 'très facile' }] },
-  { id: 'q4', text: 'Comment vous sentez-vous durant la demi-heure qui suit votre réveil du matin ?', type: 'single_choice', required: true, options: [{ code: 1, label: 'pas du tout réveillé' }, { code: 2, label: 'peu éveillé' }, { code: 3, label: 'relativement éveillé' }, { code: 4, label: 'très éveillé' }] },
-  { id: 'q5', text: 'Comment vous sentez-vous durant la demi-heure qui suit votre réveil du matin ?', type: 'single_choice', required: true, options: [{ code: 1, label: 'très fatigué' }, { code: 2, label: 'plutôt fatigué' }, { code: 3, label: 'plutôt en forme' }, { code: 4, label: 'très en forme' }] },
-  { id: 'q6', text: 'Vous avez décidé de faire de l’exercice physique. Un(e) ami(e) vous propose de faire du jogging 2 fois par semaine pendant 1 heure. Le meilleur moment pour lui(elle) est entre 7h et 8h du matin. En ne considérant que votre rythme personnel, dans quelle forme pensez-vous être ?', type: 'single_choice', required: true, options: [{ code: 1, label: 'dans une très mauvaise forme' }, { code: 2, label: 'dans une forme plutôt mauvaise' }, { code: 3, label: 'dans une forme raisonnable' }, { code: 4, label: 'dans une bonne forme' }] },
-  { id: 'q7', text: 'À quel moment de la soirée vous sentez-vous fatigué(e) et avez-vous besoin de dormir ?', type: 'single_choice', required: true, options: [{ code: 5, label: 'entre 20h 00 et 21h 00' }, { code: 4, label: 'entre 21h 00 et 22h 15' }, { code: 3, label: 'entre 22h 15 et 0h 45' }, { code: 2, label: 'entre 0h 45 et 2h 00' }, { code: 1, label: 'entre 2h 00 et 3h 00' }] },
-  { id: 'q8', text: "Vous avez décidé de faire de l’exercice physique. Un(e) ami(e) vous propose de faire du jogging 2 fois par semaine pendant 1 heure. Le meilleur moment pour lui(elle) est entre 22h et 23h. En ne considérant que votre rythme personnel, dans quelle forme pensez-vous être ?", type: 'single_choice', required: true, options: [{ code: 1, label: 'dans une très mauvaise forme' }, { code: 2, label: 'dans une forme plutôt mauvaise' }, { code: 3, label: 'dans une forme raisonnable' }, { code: 4, label: 'dans une bonne forme' }] },
-  { id: 'q9', text: 'Supposez que vous puissiez choisir vos heures de travail et que vous travailliez 5 heures par jour. Quelle tranche de 5 heures consécutives choisiriez-vous en sachant que votre travail est intéressant et que vous êtes payé(e) en fonction du résultat ?', type: 'single_choice', required: true, options: [{ code: 1, label: 'entre minuit et 5h du matin' }, { code: 2, label: 'entre 3h et 8h du matin' }, { code: 3, label: 'entre 8h du matin et 13h' }, { code: 4, label: 'entre 13h et 18h' }] },
-  { id: 'q10', text: 'À quelle heure de la journée pensez-vous atteindre votre maximum de bien-être ?', type: 'single_choice', required: true, options: [{ code: 1, label: 'entre minuit et 5h du matin' }, { code: 2, label: 'entre 5h et 8h du matin' }, { code: 3, label: 'entre 8h du matin et 10h' }, { code: 4, label: 'entre 10h et 17h' }] },
-  { id: 'q11', text: 'On parle de personnes du type « matin » et d’autres du type « soir ». Quel type pensez-vous être ?', type: 'single_choice', required: true, options: [{ code: 1, label: 'nettement du type « soir »' }, { code: 2, label: 'plutôt du type « soir » que du type « matin »' }, { code: 3, label: 'plutôt du type « matin » que du type « soir »' }, { code: 4, label: 'nettement du type « matin »' }] },
-  { id: 'q12', text: "Supposez que vous deviez passer un examen de 2 heures qui va vous demander le maximum de concentration et que vous soyez entièrement libre de choisir l’heure de la journée qui vous convient le mieux. Quelle période choisiriez-vous ?", type: 'single_choice', required: true, options: [{ code: 1, label: 'entre 19h et 21h' }, { code: 2, label: 'entre 15h et 17h' }, { code: 3, label: 'entre 11h et 13h' }, { code: 4, label: 'entre 8h et 10h' }] },
-  { id: 'q13', text: "Si vous alliez au lit à 23h, à quel niveau de fatigue seriez-vous ?", type: 'single_choice', required: true, options: [{ code: 1, label: 'pas du tout fatigué(e)' }, { code: 2, label: 'un peu fatigué(e)' }, { code: 3, label: 'assez fatigué(e)' }, { code: 4, label: 'très fatigué(e)' }] }
+  // Q1: valeur_champ3 (5-1 reverse)
+  { id: 'q1', text: "1. En ne considérant que le rythme de vie qui vous convient le mieux, à quelle heure vous lèveriez-vous en étant entièrement libre d'organiser votre journée", type: 'single_choice', required: true, options: [
+    { code: 5, label: 'Entre 5h00 et 6h30' },
+    { code: 4, label: 'Entre 6h30 et 7h45' },
+    { code: 3, label: 'Entre 7h45 et 9h45' },
+    { code: 2, label: 'Entre 9h45 et 11h00' },
+    { code: 1, label: 'Entre 11h00 et midi' }
+  ] },
+  // Q2: valeur_champ3 (5-1 reverse)
+  { id: 'q2', text: "2. En ne considérant que le rythme de vie qui vous convient le mieux, à quelle heure vous coucheriez-vous sachant que vous êtes entièrement libre d'organiser votre soirée", type: 'single_choice', required: true, options: [
+    { code: 5, label: 'Entre 20h00 et 21h00' },
+    { code: 4, label: 'Entre 21h00 et 22h15' },
+    { code: 3, label: 'Entre 22h15 et 0h30' },
+    { code: 2, label: 'Entre 0h30 et 1h45' },
+    { code: 1, label: 'Entre 1h45 et 3h00' }
+  ] },
+  // Q3: valeur_champ1 (standard 1-4)
+  { id: 'q3', text: "3. Dans des conditions adéquates (environnement favorable, sans contraintes particulières, etc.), à quel point cela vous est-il facile de vous lever le matin", type: 'single_choice', required: true, options: [
+    { code: 1, label: 'Pas facile du tout' },
+    { code: 2, label: 'Pas très facile' },
+    { code: 3, label: 'Assez facile' },
+    { code: 4, label: 'Très facile' }
+  ] },
+  // Q4: valeur_champ1 (standard 1-4) - alertness
+  { id: 'q4', text: "4. Comment vous sentez-vous durant la demi-heure qui suit votre réveil du matin (éveil)", type: 'single_choice', required: true, options: [
+    { code: 1, label: 'Pas du tout réveillé' },
+    { code: 2, label: 'Peu éveillé' },
+    { code: 3, label: 'Relativement éveillé' },
+    { code: 4, label: 'Très éveillé' }
+  ] },
+  // Q5: valeur_champ1 (standard 1-4) - energy
+  { id: 'q5', text: "5. Comment vous sentez-vous durant la demi-heure qui suit votre réveil du matin (fatigue)", type: 'single_choice', required: true, options: [
+    { code: 1, label: 'Très fatigué' },
+    { code: 2, label: 'Plutôt fatigué' },
+    { code: 3, label: 'Plutôt en forme' },
+    { code: 4, label: 'Tout à fait frais et dispos' }
+  ] },
+  // Q6: valeur_champ2 (reverse 4-1)
+  { id: 'q6', text: "6. Vous avez décidé de faire un sport. Un ami vous suggère de faire deux fois par semaine des séances d'une heure. Le meilleur moment pour lui est de 7 à 8 heures du matin. Ne considérant que le rythme qui vous convient le mieux, dans quelle forme pensez-vous être", type: 'single_choice', required: true, options: [
+    { code: 4, label: 'Bonne forme' },
+    { code: 3, label: 'Forme raisonnable' },
+    { code: 2, label: 'Vous trouvez cela difficile' },
+    { code: 1, label: 'Vous trouvez cela très difficile' }
+  ] },
+  // Q7: valeur_champ3 (5-1 reverse)
+  { id: 'q7', text: "7. A quelle heure dans la soirée vous sentez-vous fatigué au point de devoir aller vous coucher", type: 'single_choice', required: true, options: [
+    { code: 5, label: 'Entre 20h00 et 21h00' },
+    { code: 4, label: 'Entre 21h00 et 22h15' },
+    { code: 3, label: 'Entre 22h15 et 0h30' },
+    { code: 2, label: 'Entre 0h30 et 1h45' },
+    { code: 1, label: 'Entre 1h45 et 3h00' }
+  ] },
+  // Q8: valeur_champ2 (reverse 4-1)
+  { id: 'q8', text: "8. Vous devez être à votre maximum de performance pour un examen écrit qui dure 2 heures. On vous laisse libre de choisir l'heure à laquelle vous pensez être le plus efficace. Ce sera", type: 'single_choice', required: true, options: [
+    { code: 4, label: 'Entre 8h00 et 10h00' },
+    { code: 3, label: 'Entre 11h00 et 13h00' },
+    { code: 2, label: 'Entre 15h00 et 17h00' },
+    { code: 1, label: 'Entre 19h00 et 21h00' }
+  ] },
+  // Q9: valeur_champ2 (reverse 4-1)
+  { id: 'q9', text: "9. On entend souvent dire que telle personne est 'du matin' et que telle autre personne est 'du soir'. En ce qui vous concerne, vous seriez", type: 'single_choice', required: true, options: [
+    { code: 4, label: 'Tout à fait du matin' },
+    { code: 3, label: 'Plutôt du matin que du soir' },
+    { code: 2, label: 'Plutôt du soir que du matin' },
+    { code: 1, label: 'Tout à fait du soir' }
+  ] },
+  // Q10: valeur_champ2 (reverse 4-1)
+  { id: 'q10', text: "10. A quelle heure vous lèveriez-vous en prévision d'une journée de travail de 8 heures que vous êtes totalement libre d'organiser", type: 'single_choice', required: true, options: [
+    { code: 4, label: 'Avant 6h30' },
+    { code: 3, label: 'Entre 6h30 et 7h30' },
+    { code: 2, label: 'Entre 7h30 et 8h30' },
+    { code: 1, label: 'Après 8h30' }
+  ] },
+  // Q11: valeur_champ1 (standard 1-4)
+  { id: 'q11', text: "11. Si vous deviez toujours vous lever à 6h00, cela vous paraitrait", type: 'single_choice', required: true, options: [
+    { code: 1, label: 'Affreusement difficile' },
+    { code: 2, label: 'Plutôt difficile et déplaisant' },
+    { code: 3, label: 'Déplaisant sans plus' },
+    { code: 4, label: 'Sans aucune difficulté' }
+  ] },
+  // Q12: valeur_champ2 (reverse 4-1)
+  { id: 'q12', text: "12. Après une bonne nuit de sommeil, combien de temps vous faut-il pour être pleinement réveillé", type: 'single_choice', required: true, options: [
+    { code: 4, label: 'Moins de 10 minutes' },
+    { code: 3, label: 'Entre 11 et 20 minutes' },
+    { code: 2, label: 'Entre 21 et 40 minutes' },
+    { code: 1, label: 'Plus de 40 minutes' }
+  ] },
+  // Q13: valeur_champ2 (reverse 4-1)
+  { id: 'q13', text: "13. Dans quelle partie de la journée êtes-vous le plus actif", type: 'single_choice', required: true, options: [
+    { code: 4, label: 'Nettement actif le matin (bien réveillé le matin et fatigué le soir)' },
+    { code: 3, label: 'Plutôt actif le matin' },
+    { code: 2, label: 'Plutôt actif le soir' },
+    { code: 1, label: 'Nettement actif le soir (fatigué le matin et bien réveillé le soir)' }
+  ] }
 ];
 
 export const CSM_DEFINITION: QuestionnaireDefinition = {
   id: 'csm',
   code: 'CSM',
   title: 'CSM',
-  description: 'Composite Scale of Morningness',
+  description: 'Echelle composite de matinalité',
   questions: CSM_QUESTIONS,
   metadata: {
     pathologies: ['bipolar'],
-    target_role: 'patient'
+    target_role: 'patient',
+    instructions: "Les 13 questions suivantes concernent vos rythmes veille-sommeil et activité-repos. Cochez une seule réponse par question.",
+    score_range: { min: 13, max: 55 },
+    chronotype_classification: {
+      definitely_evening: { min: 13, max: 21, label: "Nettement vespéral (type du soir)" },
+      moderately_evening: { min: 22, max: 28, label: "Modérément vespéral" },
+      intermediate: { min: 29, max: 41, label: "Intermédiaire" },
+      moderately_morning: { min: 42, max: 47, label: "Modérément matinal" },
+      definitely_morning: { min: 48, max: 55, label: "Nettement matinal (type du matin)" }
+    },
+    clinical_relevance: "La perturbation des rythmes circadiens est une caractéristique centrale du trouble bipolaire. Le CSM aide à évaluer le chronotype qui peut être altéré chez les patients bipolaires."
   }
 };
 

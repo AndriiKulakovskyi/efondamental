@@ -85,6 +85,14 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'info';
     }
     
+    if (code === 'CSM') {
+      // CSM: Chronotype classification (13-55)
+      // Morning types (48-55) and evening types (13-21) are notable
+      if (data.chronotype === 'definitely_morning' || data.chronotype === 'definitely_evening') return 'info';
+      if (data.chronotype === 'moderately_morning' || data.chronotype === 'moderately_evening') return 'info';
+      return 'info'; // All chronotypes are informational, not pathological
+    }
+    
     if (code === 'ALDA') {
       // ALDA: Total score 7-10 = good responder, 4-6 = partial, 0-3 = non-responder
       if (data.alda_score >= 7) return 'success';
@@ -230,6 +238,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'CTQ_FR' && 'Résultats CTQ'}
               {code === 'BIS10_FR' && 'Résultats BIS-10'}
               {code === 'WURS25' && 'Résultats WURS-25'}
+              {code === 'CSM' && 'Résultats CSM - Chronotype'}
               {code === 'ALDA' && 'Score Alda'}
               {code === 'CGI' && 'Résultats CGI'}
               {code === 'WAIS4_MATRICES_FR' && 'Résultats WAIS-IV Matrices'}
@@ -251,6 +260,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.overall_impulsivity !== undefined ? data.overall_impulsivity.toFixed(2) : '-')
                 : code === 'WURS25'
                 ? (data.adhd_likely ? 'POSITIF' : 'NÉGATIF')
+                : code === 'CSM'
+                ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'ALDA'
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
                 : code === 'CGI'
@@ -268,6 +279,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'QIDS_SR16_FR' && '/27'}
               {code === 'CTQ_FR' && '/125'}
               {code === 'BIS10_FR' && '/4.0'}
+              {code === 'CSM' && '/55'}
               {code === 'ALDA' && '/10'}
               {code === 'CGI' && '/7'}
               {code === 'WAIS4_MATRICES_FR' && '/19'}
@@ -546,6 +558,31 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 Le score ne suggère pas de symptômes significatifs de TDAH dans l'enfance.
               </p>
             )}
+          </div>
+        )}
+
+        {/* CSM Details */}
+        {code === 'CSM' && (
+          <div className="text-sm space-y-2 mt-2 pt-2 border-t">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Score total:</span>
+              <span className="font-semibold">{data.total_score ?? '-'}/55</span>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">Chronotype:</span>
+              <span className="font-bold text-lg text-blue-700">
+                {data.chronotype === 'definitely_morning' && 'Nettement matinal'}
+                {data.chronotype === 'moderately_morning' && 'Modérément matinal'}
+                {data.chronotype === 'intermediate' && 'Intermédiaire'}
+                {data.chronotype === 'moderately_evening' && 'Modérément vespéral'}
+                {data.chronotype === 'definitely_evening' && 'Nettement vespéral'}
+                {!data.chronotype && '-'}
+              </span>
+            </div>
+            <div className="text-xs text-gray-600 mt-2 pt-2 border-t space-y-1">
+              <p><strong>Echelle:</strong> 13-21 (vespéral), 22-28 (mod. vespéral), 29-41 (intermédiaire), 42-47 (mod. matinal), 48-55 (matinal)</p>
+              <p>Le chronotype peut être perturbé dans le trouble bipolaire. Les types vespéraux sont souvent associés aux épisodes dépressifs.</p>
+            </div>
           </div>
         )}
 
