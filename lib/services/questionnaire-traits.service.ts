@@ -554,13 +554,15 @@ export async function saveWurs25Response(
 }
 
 // AQ-12
+const AQ12_SELECT_FIELDS = 'id, visit_id, patient_id, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, total_score, interpretation, completed_by, completed_at, created_at, updated_at';
+
 export async function getAq12Response(
   visitId: string
 ): Promise<Aq12Response | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('responses_aq12')
-    .select('*')
+    .select(AQ12_SELECT_FIELDS)
     .eq('visit_id', visitId)
     .single();
 
@@ -599,15 +601,29 @@ export async function saveAq12Response(
     `Colère: ${angerScore}/18, ` +
     `Hostilité: ${hostilityScore}/18.`;
 
+  // Only insert the fields that actually exist in the database
   const { data, error } = await supabase
     .from('responses_aq12')
     .upsert({
-      ...response,
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      q1: response.q1,
+      q2: response.q2,
+      q3: response.q3,
+      q4: response.q4,
+      q5: response.q5,
+      q6: response.q6,
+      q7: response.q7,
+      q8: response.q8,
+      q9: response.q9,
+      q10: response.q10,
+      q11: response.q11,
+      q12: response.q12,
       total_score: totalScore,
       interpretation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
-    .select()
+    .select(AQ12_SELECT_FIELDS)
     .single();
 
   if (error) throw error;
