@@ -71,6 +71,14 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'info';
     }
     
+    if (code === 'BIS10_FR') {
+      // BIS-10: High impulsivity >= 3.0, moderate >= 2.5
+      const score = data.overall_impulsivity || 0;
+      if (score >= 3.0) return 'error';
+      if (score >= 2.5) return 'warning';
+      return 'info';
+    }
+    
     if (code === 'ALDA') {
       // ALDA: Total score 7-10 = good responder, 4-6 = partial, 0-3 = non-responder
       if (data.alda_score >= 7) return 'success';
@@ -214,6 +222,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'MDQ_FR' && 'Résultat MDQ'}
               {code === 'ASRS_FR' && 'Résultat ASRS'}
               {code === 'CTQ_FR' && 'Résultats CTQ'}
+              {code === 'BIS10_FR' && 'Résultats BIS-10'}
               {code === 'ALDA' && 'Score Alda'}
               {code === 'CGI' && 'Résultats CGI'}
               {code === 'WAIS4_MATRICES_FR' && 'Résultats WAIS-IV Matrices'}
@@ -231,6 +240,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.screening_positive ? 'POSITIF' : 'NÉGATIF')
                 : code === 'CTQ_FR'
                 ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'BIS10_FR'
+                ? (data.overall_impulsivity !== undefined ? data.overall_impulsivity.toFixed(2) : '-')
                 : code === 'ALDA'
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
                 : code === 'CGI'
@@ -247,6 +258,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'ASRM_FR' && '/20'}
               {code === 'QIDS_SR16_FR' && '/27'}
               {code === 'CTQ_FR' && '/125'}
+              {code === 'BIS10_FR' && '/4.0'}
               {code === 'ALDA' && '/10'}
               {code === 'CGI' && '/7'}
               {code === 'WAIS4_MATRICES_FR' && '/19'}
@@ -463,6 +475,36 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             {data.denial_score > 0 && (
               <p className="text-xs text-orange-700 mt-1 pt-2 border-t">
                 Présence de déni ou minimisation détectée. Les résultats doivent être interprétés avec prudence.
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* BIS-10 Details */}
+        {code === 'BIS10_FR' && (
+          <div className="text-sm space-y-2 mt-2 pt-2 border-t">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Impulsivité cognitive:</span>
+                <span className="font-semibold">{data.cognitive_impulsivity_mean !== undefined ? data.cognitive_impulsivity_mean.toFixed(2) : '-'}/4.0</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Impulsivité motrice:</span>
+                <span className="font-semibold">{data.behavioral_impulsivity_mean !== undefined ? data.behavioral_impulsivity_mean.toFixed(2) : '-'}/4.0</span>
+              </div>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">Impulsivité générale:</span>
+              <span className="font-bold text-lg">{data.overall_impulsivity !== undefined ? data.overall_impulsivity.toFixed(2) : '-'}/4.0</span>
+            </div>
+            {data.overall_impulsivity >= 3.0 && (
+              <p className="text-xs text-red-700 mt-1 pt-2 border-t">
+                Niveau d'impulsivité élevé. Une évaluation clinique plus approfondie peut être recommandée.
+              </p>
+            )}
+            {data.overall_impulsivity >= 2.5 && data.overall_impulsivity < 3.0 && (
+              <p className="text-xs text-orange-700 mt-1 pt-2 border-t">
+                Niveau d'impulsivité modéré à élevé.
               </p>
             )}
           </div>

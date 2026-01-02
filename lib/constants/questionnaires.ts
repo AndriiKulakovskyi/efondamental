@@ -1517,35 +1517,40 @@ export const CTQ_DEFINITION: QuestionnaireDefinition = {
   }
 };
 
-// BIS-10 (Barratt Impulsiveness Scale - short)
+// BIS-10 (Barratt Impulsiveness Scale - short form from BIS-11)
 export const BIS10_QUESTIONS: Question[] = [
-  { id: 'q1', text: 'Je prépare soigneusement les tâches à accomplir.', type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement/Jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Presque toujours/Toujours' }] },
-  { id: 'q2', text: 'Je fais les choses sans réfléchir.', type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement/Jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Presque toujours/Toujours' }] },
-  { id: 'q3', text: 'Je décide rapidement.', type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement/Jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Presque toujours/Toujours' }] },
-  { id: 'q4', text: 'Je suis insouciant(e).', type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement/Jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Presque toujours/Toujours' }] },
-  { id: 'q5', text: 'Je ne fais pas attention.', type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement/Jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Presque toujours/Toujours' }] },
-  { id: 'q6', text: 'Je suis quelqu’un qui réfléchit.', type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement/Jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Presque toujours/Toujours' }] },
-  { id: 'q7', text: 'Je m’organise bien pour mes loisirs.', type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement/Jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Presque toujours/Toujours' }] },
-  { id: 'q8', text: 'Je me contrôle facilement.', type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement/Jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Presque toujours/Toujours' }] },
-  { id: 'q9', text: 'Je me concentre facilement.', type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement/Jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Presque toujours/Toujours' }] },
-  { id: 'q10', text: 'J’agis de façon impulsive.', type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement/Jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Presque toujours/Toujours' }] },
-  { id: 'q11', text: 'Je dis les choses sans réfléchir.', type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement/Jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Presque toujours/Toujours' }] },
-  { id: 'q12', text: 'J’agis sur un coup de tête.', type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement/Jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Presque toujours/Toujours' }] }
+  { id: 'q1', text: "1. Je prépare soigneusement les tâches à accomplir", type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement ou jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Toujours ou presque toujours' }] },
+  { id: 'q2', text: "6. J'ai des idées qui fusent", type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement ou jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Toujours ou presque toujours' }] },
+  { id: 'q3', text: "8. Je suis maître de moi", type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement ou jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Toujours ou presque toujours' }] },
+  { id: 'q4', text: "9. Je me concentre facilement", type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement ou jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Toujours ou presque toujours' }] },
+  { id: 'q5', text: "12. Je réfléchis soigneusement", type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement ou jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Toujours ou presque toujours' }] },
+  { id: 'q6', text: "14. Je dis les choses sans y penser", type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement ou jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Toujours ou presque toujours' }] },
+  { id: 'q7', text: "17. J'agis sur un coup de tête", type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement ou jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Toujours ou presque toujours' }] },
+  { id: 'q8', text: "20. J'agis selon l'inspiration du moment", type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement ou jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Toujours ou presque toujours' }] },
+  { id: 'q9', text: "21. Je suis quelqu'un de réfléchi", type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement ou jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Toujours ou presque toujours' }] },
+  { id: 'q10', text: "23. J'achète les choses sur un coup de tête", type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement ou jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Toujours ou presque toujours' }] },
+  { id: 'q11', text: "25. Je change de passe-temps", type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement ou jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Toujours ou presque toujours' }] },
+  { id: 'q12', text: "28. Je dépense ou paye à crédit plus que je ne gagne", type: 'single_choice', required: true, options: [{ code: 1, label: 'Rarement ou jamais' }, { code: 2, label: 'Occasionnellement' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Toujours ou presque toujours' }] }
 ];
 
 export const BIS10_DEFINITION: QuestionnaireDefinition = {
   id: 'bis10',
-  code: 'BIS10',
-  title: 'BIS-10',
-  description: 'Barratt Impulsiveness Scale - Version courte',
+  code: 'BIS10_FR',
+  title: 'BIS-10 - Barratt Impulsiveness Scale (Short Form)',
+  description: "Échelle d'impulsivité de Barratt - Version courte (12 items)",
   questions: BIS10_QUESTIONS,
   metadata: {
     pathologies: ['bipolar'],
     target_role: 'patient',
-    reverse_items: [1, 6, 7, 8, 9],
+    instructions: "Les gens agissent et réfléchissent différemment devant des situations variées. Ce questionnaire a pour but d'évaluer certaines de vos façons d'agir et de réfléchir. Lisez chaque énoncé et remplissez la case appropriée située sur la droite de la page. Ne passez pas trop de temps sur chaque énoncé. Répondez vite et honnêtement.",
+    reverse_items: [1, 3, 4, 5, 9],
     subscales: {
-      cognitive: [1, 3, 6, 7, 9],
-      behavioral: [2, 4, 5, 8, 10, 11, 12]
+      cognitive_impulsivity: [1, 3, 4, 5, 9],
+      motor_impulsivity: [2, 6, 7, 8, 10, 11, 12]
+    },
+    bis11_item_map: {
+      q1: 1, q2: 6, q3: 8, q4: 9, q5: 12, q6: 14,
+      q7: 17, q8: 20, q9: 21, q10: 23, q11: 25, q12: 28
     }
   }
 };

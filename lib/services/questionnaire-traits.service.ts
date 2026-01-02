@@ -234,45 +234,50 @@ export async function saveBis10Response(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Reverse score items: 1, 6, 7, 8, 9
-  const reverseItems = [1, 6, 7, 8, 9];
+  // BIS-10 uses items from BIS-11: 1, 6, 8, 9, 12, 14, 17, 20, 21, 23, 25, 28
+  // Reverse score items: BIS-11 items 1, 8, 9, 12, 21 (which map to q1, q3, q4, q5, q9)
+  const reverseItems = [1, 3, 4, 5, 9];
   const scores: Record<number, number> = {};
 
   // Process all items with reverse scoring
+  // Reverse formula: 5 - value (converts 1→4, 2→3, 3→2, 4→1)
   for (let i = 1; i <= 12; i++) {
     const value = response[`q${i}` as keyof Bis10ResponseInsert] as number;
     scores[i] = reverseItems.includes(i) ? (5 - value) : value;
   }
 
-  // Calculate subscale means (not sums due to unequal item counts)
-  // Cognitive impulsivity: items 1, 3, 6, 7, 9 (5 items)
-  const cognitiveSum = scores[1] + scores[3] + scores[6] + scores[7] + scores[9];
-  const cognitiveImpulsivityMean = cognitiveSum / 5;
+  // Calculate subscale means
+  // Cognitive Impulsivity (CI): BIS-11 items 1, 8, 9, 12, 21 → q1, q3, q4, q5, q9 (all reversed)
+  const cognitiveImpulsivity = (scores[1] + scores[3] + scores[4] + scores[5] + scores[9]) / 5;
 
-  // Behavioral impulsivity: items 2, 4, 5, 8, 10, 11, 12 (7 items)
-  const behavioralSum = scores[2] + scores[4] + scores[5] + scores[8] + 
-                        scores[10] + scores[11] + scores[12];
-  const behavioralImpulsivityMean = behavioralSum / 7;
+  // Motor Impulsivity (MI): BIS-11 items 6, 14, 17, 20, 23, 25, 28 → q2, q6, q7, q8, q10, q11, q12 (standard)
+  const motorImpulsivity = (scores[2] + scores[6] + scores[7] + scores[8] + scores[10] + scores[11] + scores[12]) / 7;
 
-  // Overall impulsivity (mean of all 12 items)
-  const overallImpulsivity = (cognitiveSum + behavioralSum) / 12;
+  // General Impulsivity (GI): mean of the two subscale means
+  const generalImpulsivity = (cognitiveImpulsivity + motorImpulsivity) / 2;
 
-  let interpretation = `Impulsivité globale: ${overallImpulsivity.toFixed(2)}/4. `;
-  if (overallImpulsivity >= 3) {
-    interpretation += 'Impulsivité élevée.';
-  } else if (overallImpulsivity >= 2) {
-    interpretation += 'Impulsivité modérée.';
+  // Build interpretation
+  let interpretation = `Impulsivité générale: ${generalImpulsivity.toFixed(2)}/4.0. `;
+  interpretation += `Impulsivité cognitive: ${cognitiveImpulsivity.toFixed(2)}/4.0. `;
+  interpretation += `Impulsivité motrice: ${motorImpulsivity.toFixed(2)}/4.0. `;
+  
+  if (generalImpulsivity >= 3.0) {
+    interpretation += 'Niveau d\'impulsivité élevé.';
+  } else if (generalImpulsivity >= 2.5) {
+    interpretation += 'Niveau d\'impulsivité modéré à élevé.';
+  } else if (generalImpulsivity >= 2.0) {
+    interpretation += 'Niveau d\'impulsivité modéré.';
   } else {
-    interpretation += 'Impulsivité faible.';
+    interpretation += 'Niveau d\'impulsivité faible.';
   }
 
   const { data, error } = await supabase
     .from('responses_bis10')
     .upsert({
       ...response,
-      cognitive_impulsivity_mean: Number(cognitiveImpulsivityMean.toFixed(2)),
-      behavioral_impulsivity_mean: Number(behavioralImpulsivityMean.toFixed(2)),
-      overall_impulsivity: Number(overallImpulsivity.toFixed(2)),
+      cognitive_impulsivity_mean: Number(cognitiveImpulsivity.toFixed(2)),
+      behavioral_impulsivity_mean: Number(motorImpulsivity.toFixed(2)), // Using behavioral field for motor impulsivity
+      overall_impulsivity: Number(generalImpulsivity.toFixed(2)),
       interpretation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })

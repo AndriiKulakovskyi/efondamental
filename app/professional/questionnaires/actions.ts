@@ -319,7 +319,7 @@ export async function submitProfessionalQuestionnaireAction(
         } as CtqResponseInsert);
         break;
 
-      case 'BIS10':
+      case 'BIS10_FR':
         result = await saveBis10Response({
           visit_id: visitId,
           patient_id: patientId,
