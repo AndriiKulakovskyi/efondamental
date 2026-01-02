@@ -150,40 +150,9 @@ export default async function VisitDetailPage({
   const wais4Accepted = wais4CriteriaResponse?.accepted_for_neuropsy_evaluation === 1;
   const wais3Accepted = wais3CriteriaResponse?.accepted_for_neuropsy_evaluation === 1;
   
-  // Adjust total questionnaires based on whether Fagerstrom and DIVA are required
-  // If tobacco not answered yet, exclude Fagerstrom from total (will be dynamic)
-  // If tobacco answered with non-smoker/unknown, exclude Fagerstrom
-  // If tobacco answered with smoker/ex-smoker, include Fagerstrom
-  const fagerstromAdjustment = (!tobaccoAnswered || !isFagerstromRequired) ? 1 : 0;
-  
-  // If DSM5 not answered yet, exclude DIVA from total (will be dynamic)
-  // If DSM5 answered with non/ne_sais_pas, exclude DIVA
-  // If DSM5 answered with oui, include DIVA
-  const divaAdjustment = (!dsm5ComorbidAnswered || !isDivaRequired) ? 1 : 0;
-  
-  // Transform completion status to match component expectations (snake_case -> camelCase)
-  // Adjust totals to exclude Fagerstrom and DIVA when not applicable
-  const completionStatus = {
-    totalQuestionnaires: rawCompletionStatus.total_questionnaires - fagerstromAdjustment - divaAdjustment,
-    completedQuestionnaires: (() => {
-      let adjusted = rawCompletionStatus.completed_questionnaires;
-      // Subtract Fagerstrom if completed but not required
-      if (!isFagerstromRequired && questionnaireStatuses['FAGERSTROM_FR']?.completed) {
-        adjusted -= 1;
-      }
-      // Subtract DIVA if completed but not required
-      if (!isDivaRequired && questionnaireStatuses['DIVA_FR']?.completed) {
-        adjusted -= 1;
-      }
-      return adjusted;
-    })(),
-    completionPercentage: 0, // Will recalculate below
-  };
-  
-  // Recalculate completion percentage with adjusted totals
-  completionStatus.completionPercentage = completionStatus.totalQuestionnaires > 0 
-    ? Math.round((completionStatus.completedQuestionnaires / completionStatus.totalQuestionnaires) * 100) 
-    : 0;
+  // NOTE: We will calculate actual completion status from constructed modules AFTER building them
+  // This ensures accuracy by using the same logic as individual module cards
+  // The RPC data is still used for questionnaire statuses, but progress is calculated from modules
 
   // Build modules with questionnaires based on visit type and RPC data
   let modulesWithQuestionnaires: VirtualModule[] = [];
@@ -1233,6 +1202,42 @@ export default async function VisitDetailPage({
       }
     ];
   }
+
+  // Calculate accurate completion status from constructed modules
+  // This ensures consistency with individual module progress displays
+  // Uses same filtering logic: exclude conditional questionnaires where conditionMet is false
+  const completionStatus = (() => {
+    let totalQuestionnaires = 0;
+    let completedQuestionnaires = 0;
+
+    for (const module of modulesWithQuestionnaires) {
+      const questionnaires = module.questionnaires || [];
+      for (const q of questionnaires) {
+        if (!q) continue;
+        
+        // Skip conditional questionnaires where condition is not met
+        // These are not required/visible, so don't count them
+        if (q.isConditional && q.conditionMet !== true) {
+          continue;
+        }
+        
+        totalQuestionnaires++;
+        if (q.completed) {
+          completedQuestionnaires++;
+        }
+      }
+    }
+
+    const completionPercentage = totalQuestionnaires > 0 
+      ? Math.round((completedQuestionnaires / totalQuestionnaires) * 100) 
+      : 0;
+
+    return {
+      totalQuestionnaires,
+      completedQuestionnaires,
+      completionPercentage
+    };
+  })();
 
   return (
     <div className="max-w-7xl mx-auto px-8 space-y-8">
