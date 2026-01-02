@@ -93,6 +93,12 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'info'; // All chronotypes are informational, not pathological
     }
     
+    if (code === 'CTI') {
+      // CTI: Circadian Type Inventory (11-55)
+      // All circadian types are informational
+      return 'info';
+    }
+    
     if (code === 'ALDA') {
       // ALDA: Total score 7-10 = good responder, 4-6 = partial, 0-3 = non-responder
       if (data.alda_score >= 7) return 'success';
@@ -239,6 +245,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'BIS10_FR' && 'Résultats BIS-10'}
               {code === 'WURS25' && 'Résultats WURS-25'}
               {code === 'CSM' && 'Résultats CSM - Chronotype'}
+              {code === 'CTI' && 'Résultats CTI - Type Circadien'}
               {code === 'ALDA' && 'Score Alda'}
               {code === 'CGI' && 'Résultats CGI'}
               {code === 'WAIS4_MATRICES_FR' && 'Résultats WAIS-IV Matrices'}
@@ -262,6 +269,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.adhd_likely ? 'POSITIF' : 'NÉGATIF')
                 : code === 'CSM'
                 ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'CTI'
+                ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'ALDA'
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
                 : code === 'CGI'
@@ -280,6 +289,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'CTQ_FR' && '/125'}
               {code === 'BIS10_FR' && '/4.0'}
               {code === 'CSM' && '/55'}
+              {code === 'CTI' && '/55'}
               {code === 'ALDA' && '/10'}
               {code === 'CGI' && '/7'}
               {code === 'WAIS4_MATRICES_FR' && '/19'}
@@ -582,6 +592,39 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="text-xs text-gray-600 mt-2 pt-2 border-t space-y-1">
               <p><strong>Echelle:</strong> 13-21 (vespéral), 22-28 (mod. vespéral), 29-41 (intermédiaire), 42-47 (mod. matinal), 48-55 (matinal)</p>
               <p>Le chronotype peut être perturbé dans le trouble bipolaire. Les types vespéraux sont souvent associés aux épisodes dépressifs.</p>
+            </div>
+          </div>
+        )}
+
+        {/* CTI Details */}
+        {code === 'CTI' && (
+          <div className="text-sm space-y-2 mt-2 pt-2 border-t">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Score total:</span>
+              <span className="font-semibold">{data.total_score ?? '-'}/55</span>
+            </div>
+            <div className="grid grid-cols-2 gap-4 pt-2 border-t">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Flexibilité:</span>
+                <span className="font-semibold">{data.flexibility_score ?? '-'}/25</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Languide:</span>
+                <span className="font-semibold">{data.languid_score ?? '-'}/30</span>
+              </div>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">Type circadien:</span>
+              <span className="font-bold text-lg text-blue-700">
+                {data.circadian_type === 'morning' && 'Type matinal'}
+                {data.circadian_type === 'intermediate' && 'Type intermédiaire'}
+                {data.circadian_type === 'evening' && 'Type vespéral'}
+                {!data.circadian_type && '-'}
+              </span>
+            </div>
+            <div className="text-xs text-gray-600 mt-2 pt-2 border-t space-y-1">
+              <p><strong>Echelle:</strong> Score &lt;28 (matinal), 28-37 (intermédiaire), &ge;38 (vespéral)</p>
+              <p><strong>Flexibilité:</strong> Capacité d'adaptation aux changements d'horaires. <strong>Languide:</strong> Tendance à la fatigue et au besoin de sommeil.</p>
             </div>
           </div>
         )}

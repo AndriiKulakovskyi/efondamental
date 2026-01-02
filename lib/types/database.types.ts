@@ -910,6 +910,8 @@ export interface CtiResponse {
   q9: number;
   q10: number;
   q11: number;
+  flexibility_score?: number | null;
+  languid_score?: number | null;
   total_score?: number | null;
   circadian_type?: string | null;
   interpretation?: string | null;

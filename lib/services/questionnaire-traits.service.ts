@@ -716,13 +716,16 @@ export async function saveCsmResponse(
 }
 
 // CTI
+// CTI
+const CTI_SELECT_FIELDS = 'id, visit_id, patient_id, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, flexibility_score, languid_score, total_score, circadian_type, interpretation, completed_by, completed_at, created_at, updated_at';
+
 export async function getCtiResponse(
   visitId: string
 ): Promise<CtiResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('responses_cti')
-    .select('*')
+    .select(CTI_SELECT_FIELDS)
     .eq('visit_id', visitId)
     .single();
 
@@ -740,39 +743,57 @@ export async function saveCtiResponse(
   const user = await supabase.auth.getUser();
 
   // Calculate subscale scores
-  // Flexibility/Rigidity: items 2, 4, 6, 8, 10
+  // Flexibility/Rigidity: items 2, 4, 6, 8, 10 (range 5-25)
   const flexibilityScore = response.q2 + response.q4 + response.q6 + response.q8 + response.q10;
   
-  // Languid/Vigorous: items 1, 3, 5, 7, 9, 11
+  // Languid/Vigorous: items 1, 3, 5, 7, 9, 11 (range 6-30)
   const languidScore = response.q1 + response.q3 + response.q5 + response.q7 + 
                        response.q9 + response.q11;
 
   const totalScore = flexibilityScore + languidScore;
 
+  // Determine circadian type based on total score
   let circadianType = '';
+  let circadianLabel = '';
   if (totalScore >= 38) {
     circadianType = 'evening';
+    circadianLabel = 'Type vespéral';
   } else if (totalScore >= 28) {
     circadianType = 'intermediate';
+    circadianLabel = 'Type intermédiaire';
   } else {
     circadianType = 'morning';
+    circadianLabel = 'Type matinal';
   }
 
   const interpretation = `Score total: ${totalScore}/55. ` +
-    `Flexibilité: ${flexibilityScore}/25, ` +
-    `Languide: ${languidScore}/30. ` +
-    `Type circadien: ${circadianType}.`;
+    `Flexibilité: ${flexibilityScore}/25, Languide: ${languidScore}/30. ` +
+    `${circadianLabel}.`;
 
   const { data, error } = await supabase
     .from('responses_cti')
     .upsert({
-      ...response,
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      q1: response.q1,
+      q2: response.q2,
+      q3: response.q3,
+      q4: response.q4,
+      q5: response.q5,
+      q6: response.q6,
+      q7: response.q7,
+      q8: response.q8,
+      q9: response.q9,
+      q10: response.q10,
+      q11: response.q11,
+      flexibility_score: flexibilityScore,
+      languid_score: languidScore,
       total_score: totalScore,
       circadian_type: circadianType,
       interpretation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
-    .select()
+    .select(CTI_SELECT_FIELDS)
     .single();
 
   if (error) throw error;
