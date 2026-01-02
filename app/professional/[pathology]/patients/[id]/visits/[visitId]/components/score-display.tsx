@@ -51,6 +51,12 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return isPositive ? 'warning' : 'info';
     }
     
+    if (code === 'ASRS_FR') {
+      // ASRS: Screening positive if >= 4 items meet threshold in Part A
+      const isPositive = data.screening_positive || data.part_a_positive_items >= 4;
+      return isPositive ? 'warning' : 'info';
+    }
+    
     if (code === 'ALDA') {
       // ALDA: Total score 7-10 = good responder, 4-6 = partial, 0-3 = non-responder
       if (data.alda_score >= 7) return 'success';
@@ -115,6 +121,15 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       interpretation = 'Performance inférieure à la moyenne';
     } else {
       interpretation = 'Performance significativement inférieure à la moyenne';
+    }
+  }
+  
+  // Generate interpretation for ASRS if not present
+  if (code === 'ASRS_FR' && !interpretation) {
+    if (data.screening_positive) {
+      interpretation = `Dépistage POSITIF (${data.part_a_positive_items || 0}/6 items Partie A ≥ seuil). Les réponses suggèrent des symptômes cohérents avec un TDAH chez l'adulte. Une évaluation clinique complète est recommandée.`;
+    } else {
+      interpretation = `Dépistage négatif (${data.part_a_positive_items || 0}/6 items Partie A ≥ seuil). Les réponses ne suggèrent pas de symptômes de TDAH basés sur les critères de dépistage de la Partie A.`;
     }
   }
   
@@ -183,6 +198,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'ASRM_FR' && 'Score ASRM'}
               {code === 'QIDS_SR16_FR' && 'Score QIDS-SR16'}
               {code === 'MDQ_FR' && 'Résultat MDQ'}
+              {code === 'ASRS_FR' && 'Résultat ASRS'}
               {code === 'ALDA' && 'Score Alda'}
               {code === 'CGI' && 'Résultats CGI'}
               {code === 'WAIS4_MATRICES_FR' && 'Résultats WAIS-IV Matrices'}
@@ -195,7 +211,9 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <TrendingUp className="h-4 w-4" />
             <span className="text-xl font-bold">
               {code === 'MDQ_FR' 
-                ? (data.interpretation?.includes('Positif') ? 'POSITIF' : 'NÉGATIF') 
+                ? (data.interpretation?.includes('Positif') ? 'POSITIF' : 'NÉGATIF')
+                : code === 'ASRS_FR'
+                ? (data.screening_positive ? 'POSITIF' : 'NÉGATIF')
                 : code === 'ALDA'
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
                 : code === 'CGI'
@@ -338,6 +356,33 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <span>Impact (Q3):</span>
               <span className="font-semibold">{mdqDetails.impactLabel}</span>
             </div>
+          </div>
+        )}
+
+        {/* ASRS Details */}
+        {code === 'ASRS_FR' && (
+          <div className="text-sm space-y-2 mt-2 pt-2 border-t">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Items Partie A ≥ seuil:</span>
+                <span className="font-semibold">{data.part_a_positive_items ?? '-'}/6</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Score Total (18 items):</span>
+                <span className="font-semibold">{data.total_score ?? '-'}/72</span>
+              </div>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">Dépistage:</span>
+              <span className={`font-bold text-lg ${data.screening_positive ? 'text-orange-700' : 'text-blue-700'}`}>
+                {data.screening_positive ? 'POSITIF' : 'Négatif'}
+              </span>
+            </div>
+            {data.screening_positive && (
+              <p className="text-xs text-gray-600 mt-1 pt-2 border-t">
+                Un résultat positif suggère des symptômes cohérents avec un TDAH chez l'adulte. Une évaluation clinique complète est recommandée.
+              </p>
+            )}
           </div>
         )}
 

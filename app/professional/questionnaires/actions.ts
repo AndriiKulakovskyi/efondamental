@@ -303,7 +303,7 @@ export async function submitProfessionalQuestionnaireAction(
         break;
 
       // Initial Evaluation - TRAITS
-      case 'ASRS':
+      case 'ASRS_FR':
         result = await saveAsrsResponse({
           visit_id: visitId,
           patient_id: patientId,

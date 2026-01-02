@@ -1415,38 +1415,51 @@ export const EPWORTH_DEFINITION: QuestionnaireDefinition = {
 
 // ASRS (Adult ADHD Self-Report Scale)
 export const ASRS_QUESTIONS: Question[] = [
-  // Part A (6 screening items)
-  { id: 'a1', text: "À quelle fréquence vous arrive-t-il d'avoir des difficultés à finaliser les détails d'un projet une fois que les parties les plus stimulantes ont été faites ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'a2', text: "À quelle fréquence vous arrive-t-il d'avoir des difficultés à mettre de l'ordre dans les choses ou dans votre vie quand vous devez faire quelque chose qui demande de l'organisation ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'a3', text: "À quelle fréquence avez-vous des difficultés à vous rappeler d'honorer des rendez-vous ou des obligations ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'a4', text: "Quand vous avez une tâche qui requiert beaucoup de réflexion, à quelle fréquence remettez-vous les choses à plus tard ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'a5', text: "À quelle fréquence vous arrive-t-il de remuer ou de vous tortiller avec les mains ou les pieds lorsque vous devez rester assis(e) pendant une longue période ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'a6', text: "À quelle fréquence vous sentez-vous trop actif(ve), obligé(e) d'agir comme si vous étiez « drivé(e) par un moteur » ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  // Part B (12 additional items)
-  { id: 'b7', text: "À quelle fréquence vous arrive-t-il de faire des fautes d'étourderie lorsque vous travaillez sur un projet ou une tâche qui demande de l'attention ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'b8', text: "À quelle fréquence vous arrive-t-il d'avoir des difficultés à vous concentrer lorsque vous faites un travail ennuyeux ou répétitif ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'b9', text: "À quelle fréquence vous arrive-t-il d'avoir des difficultés à vous concentrer sur les propos de votre interlocuteur, même s'il s'adresse directement à vous ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'b10', text: "À la maison ou au travail, à quelle fréquence vous arrive-t-il d'égarer des choses ou d'avoir des difficultés à les retrouver ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'b11', text: "À quelle fréquence vous arrive-t-il d'être distrait(e) par l'activité ou par le bruit autour de vous ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'b12', text: "À quelle fréquence vous arrive-t-il de quitter votre siège pendant des réunions ou d'autres situations où vous devez rester assis(e) ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'b13', text: "À quelle fréquence vous arrive-t-il d'avoir des difficultés à attendre votre tour ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'b14', text: "À quelle fréquence vous arrive-t-il d'interrompre les gens ou d'empiéter sur les activités des autres (par exemple : se mêler de ce que font d'autres gens) ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'b15', text: "À quelle fréquence vous arrive-t-il d'avoir des difficultés à vous détendre et à vous reposer ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'b16', text: "À quelle fréquence vous arrive-t-il d'achever la plupart des tâches que vous commencez ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'b17', text: "À quelle fréquence vous arrive-t-il d'éviter ou d'avoir du mal à commencer des tâches qui demandent un effort mental soutenu ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
-  { id: 'b18', text: "À quelle fréquence vous arrive-t-il de parler trop, plus que les autres ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Parfois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] }
+  // Part A: Screening items
+  {
+    id: 'section_part_a',
+    text: 'PARTIE A',
+    type: 'section',
+    required: false
+  },
+  { id: 'a1', section: 'PARTIE A', text: "1. A quelle fréquence vous arrive-t-il d'avoir des difficultés à finaliser les derniers détails d'un projet une fois que les parties les plus stimulantes ont été faites ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'a2', section: 'PARTIE A', text: "2. A quelle fréquence vous arrive-t-il d'avoir des difficultés à mettre les choses en ordre lorsque vous devez faire quelque chose qui demande de l'organisation ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'a3', section: 'PARTIE A', text: "3. A quelle fréquence vous arrive-t-il d'avoir des difficultés à vous rappeler vos rendez-vous ou vos obligations ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'a4', section: 'PARTIE A', text: "4. Quand vous devez faire quelque chose qui demande beaucoup de réflexion, à quelle fréquence vous arrive-t-il d'éviter de le faire ou de le remettre à plus tard ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'a5', section: 'PARTIE A', text: "5. A quelle fréquence vous arrive-t-il de remuer ou de tortiller les mains ou les pieds lorsque vous devez rester assis pendant une période prolongée ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'a6', section: 'PARTIE A', text: "6. A quelle fréquence vous arrive-t-il de vous sentir excessivement actif et contraint de faire quelque chose, comme si vous étiez entraîné malgré vous par un moteur ?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  // Part B: Additional symptom items
+  {
+    id: 'section_part_b',
+    text: 'PARTIE B',
+    type: 'section',
+    required: false
+  },
+  { id: 'b7', section: 'PARTIE B', text: "7. Avec quelle fréquence faites-vous des erreurs d'étourderie lorsque vous travaillez sur un projet ennuyeux ou difficile?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'b8', section: 'PARTIE B', text: "8. Avec quelle fréquence avez-vous des difficultés à rester attentif lorsque vous faites un travail ennuyeux ou répétitif?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'b9', section: 'PARTIE B', text: "9. A quelle fréquence vous arrive-t-il d'avoir des difficultés à vous concentrer sur les propos de votre interlocuteur, même s'il s'adresse directement à vous?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'b10', section: 'PARTIE B', text: "10. A la maison ou au travail, à quelle fréquence vous arrive-t-il d'égarer des choses ou d'avoir des difficultés à les retrouver?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'b11', section: 'PARTIE B', text: "11. Avec quelle fréquence êtes-vous distrait par de l'activité ou du bruit autour de vous?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'b12', section: 'PARTIE B', text: "12. A quelle fréquence vous arrive-t-il de quitter votre siège pendant des réunions ou d'autres situations ou vous devriez rester assis?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'b13', section: 'PARTIE B', text: "13. A quelle fréquence vous arrive-t-il d'avoir des difficultés à vous tenir tranquille?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'b14', section: 'PARTIE B', text: "14. Avec quelle fréquence avez-vous des difficultés à vous détendre et à vous reposer pendant votre temps libre?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'b15', section: 'PARTIE B', text: "15. A quelle fréquence vous arrive-t-il de parler de façon excessive à l'occasion de rencontres sociales?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'b16', section: 'PARTIE B', text: "16. Pendant une conversation, à quelle fréquence vous arrive-t-il de terminer les phrases de vos interlocuteurs avant que ces derniers aient le temps de les finir?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'b17', section: 'PARTIE B', text: "17. A quelle fréquence vous arrive-t-il d'avoir des difficultés à attendre votre tour lorsque vous devriez le faire?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] },
+  { id: 'b18', section: 'PARTIE B', text: "18. A quelle fréquence vous arrive-t-il d'interrompre les gens lorsqu'ils sont occupés?", type: 'single_choice', required: true, options: [{ code: 0, label: 'Jamais' }, { code: 1, label: 'Rarement' }, { code: 2, label: 'Quelquefois' }, { code: 3, label: 'Souvent' }, { code: 4, label: 'Très souvent' }] }
 ];
 
 export const ASRS_DEFINITION: QuestionnaireDefinition = {
   id: 'asrs',
-  code: 'ASRS',
-  title: 'ASRS v1.1',
-  description: 'Échelle d’autoévaluation du TDAH chez l’adulte',
+  code: 'ASRS_FR',
+  title: 'ASRS - Adult ADHD Self-Report Scale',
+  description: "Échelle d'auto-évaluation du trouble déficitaire de l'attention avec/sans hyperactivité chez l'adulte",
   questions: ASRS_QUESTIONS,
   metadata: {
     pathologies: ['bipolar'],
     target_role: 'patient',
-    part_a_thresholds: { a1: 2, a2: 2, a3: 2, a4: 3, a5: 3, a6: 3 }
+    part_a_thresholds: { a1: 2, a2: 2, a3: 2, a4: 3, a5: 3, a6: 3 },
+    instructions: "Cochez la case qui décrit le mieux ce que vous avez ressenti et comment vous vous êtes comporté au cours des 6 derniers mois. Veuillez remettre le questionnaire rempli à votre médecin ou un autre professionnel lors de votre prochain rendez-vous afin d'en discuter les résultats."
   }
 };
 
