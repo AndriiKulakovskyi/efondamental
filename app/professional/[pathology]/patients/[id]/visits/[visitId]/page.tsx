@@ -782,7 +782,7 @@ export default async function VisitDetailPage({
               // Add conditional questionnaires (WAIS-IV specific tests only)
               addConditionalQuestionnaire(WAIS4_LEARNING_DEFINITION, 'WAIS4_LEARNING_FR');
               addConditionalQuestionnaire(WAIS4_MATRICES_DEFINITION, 'WAIS4_MATRICES_FR');
-              addConditionalQuestionnaire(WAIS4_CODE_DEFINITION, 'WAIS4_CODE_FR');
+              addConditionalQuestionnaire(WAIS4_CODE_DEFINITION, 'WAIS_IV_CODE_SYMBOLES_IVT');
               addConditionalQuestionnaire(WAIS4_DIGIT_SPAN_DEFINITION, 'WAIS4_DIGIT_SPAN_FR');
               addConditionalQuestionnaire(WAIS4_SIMILITUDES_DEFINITION, 'WAIS4_SIMILITUDES_FR');
               
