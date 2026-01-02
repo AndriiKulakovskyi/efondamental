@@ -64,8 +64,7 @@ import {
   saveWais4SimilitudesResponse,
   saveTestCommissionsResponse,
   saveScipResponse,
-  // WAIS-III questionnaires
-  saveWais3CvltResponse,
+  // WAIS-III questionnaires (note: CVLT uses unified saveCvltResponse)
   saveWais3TmtResponse,
   saveWais3StroopResponse,
   saveWais3FluencesVerbalesResponse,
@@ -172,8 +171,7 @@ import {
   Wais4SimilitudesResponseInsert,
   TestCommissionsResponseInsert,
   ScipResponseInsert,
-  // WAIS-III types
-  Wais3CvltResponseInsert,
+  // WAIS-III types (note: CVLT uses unified CvltResponseInsert)
   Wais3TmtResponseInsert,
   Wais3StroopResponseInsert,
   Wais3FluencesVerbalesResponseInsert,
@@ -775,11 +773,11 @@ export async function submitProfessionalQuestionnaireAction(
 
       // WAIS-III Questionnaires
       case 'WAIS3_CVLT_FR':
-        result = await saveWais3CvltResponse({
+        result = await saveCvltResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as Wais3CvltResponseInsert);
+        } as CvltResponseInsert);
         break;
 
       case 'WAIS3_TMT_FR':

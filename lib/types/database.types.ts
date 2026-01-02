@@ -3619,71 +3619,13 @@ export interface ScipResponse {
 export type ScipResponseInsert = Omit<ScipResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'scipv01b' | 'scipv02b' | 'scipv03b' | 'scipv04b' | 'scipv05b'>;
 
 // ============================================================================
-// WAIS-III Questionnaires (Separate storage from WAIS-IV)
+// WAIS-III Questionnaires
 // ============================================================================
+// Note: WAIS-III and WAIS-IV CVLT are identical - they use the unified CvltResponse type
 
-// WAIS-III CVLT (California Verbal Learning Test)
-export interface Wais3CvltResponse {
-  id: string;
-  visit_id: string;
-  patient_id: string;
-  patient_age: number;
-  years_of_education: number;
-  patient_sex: 'F' | 'M';
-  trial_1: number;
-  trial_2: number;
-  trial_3: number;
-  trial_4: number;
-  trial_5: number;
-  total_1_5?: number;
-  list_b: number;
-  sdfr: number;
-  sdcr: number;
-  ldfr: number;
-  ldcr: number;
-  semantic_clustering?: number | null;
-  serial_clustering?: number | null;
-  perseverations?: number | null;
-  intrusions?: number | null;
-  recognition_hits?: number | null;
-  false_positives?: number | null;
-  discriminability?: number | null;
-  primacy?: number | null;
-  recency?: number | null;
-  response_bias?: number | null;
-  cvlt_delai?: number | null;
-  trial_1_std?: number | null;
-  trial_5_std?: string | null;
-  total_1_5_std?: number | null;
-  list_b_std?: number | null;
-  sdfr_std?: string | null;
-  sdcr_std?: string | null;
-  ldfr_std?: string | null;
-  ldcr_std?: string | null;
-  semantic_std?: string | null;
-  serial_std?: string | null;
-  persev_std?: string | null;
-  intru_std?: string | null;
-  recog_std?: string | null;
-  false_recog_std?: string | null;
-  discrim_std?: string | null;
-  primacy_std?: number | null;
-  recency_std?: number | null;
-  bias_std?: number | null;
-  completed_by?: string | null;
-  completed_at: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export type Wais3CvltResponseInsert = Omit<Wais3CvltResponse, 
-  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_1_5' | 
-  'trial_1_std' | 'trial_5_std' | 'total_1_5_std' | 'list_b_std' | 
-  'sdfr_std' | 'sdcr_std' | 'ldfr_std' | 'ldcr_std' | 
-  'semantic_std' | 'serial_std' | 'persev_std' | 'intru_std' | 
-  'recog_std' | 'false_recog_std' | 'discrim_std' | 
-  'primacy_std' | 'recency_std' | 'bias_std'
->;
+// WAIS-III CVLT - Aliases to unified CVLT types (same questions/scoring as WAIS-IV)
+export type Wais3CvltResponse = CvltResponse;
+export type Wais3CvltResponseInsert = CvltResponseInsert;
 
 // WAIS-III TMT (Trail Making Test)
 export interface Wais3TmtResponse {

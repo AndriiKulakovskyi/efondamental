@@ -1554,8 +1554,11 @@ export async function saveCvltResponse(
     response_bias: response.response_bias
   });
 
-  // Remove total_1_5 if present (it's a generated column)
-  const { total_1_5, ...responseWithoutGenerated } = response as any;
+  // Remove generated/incompatible fields before saving:
+  // - total_1_5: generated column in DB (computed from trial_1 + trial_2 + ... + trial_5)
+  // - trials_1_5_total: form field name (maps to total_1_5 in DB)
+  // - patient_gender: incompatible field (CVLT uses patient_sex instead)
+  const { total_1_5, trials_1_5_total, patient_gender, ...responseWithoutGenerated } = response as any;
 
   const { data, error } = await supabase
     .from('responses_cvlt')
@@ -2393,98 +2396,23 @@ export async function saveScipResponse(
 // ============================================================================
 // WAIS-III CVLT (California Verbal Learning Test)
 // ============================================================================
+// Note: WAIS-III and WAIS-IV CVLT are identical - they use the unified responses_cvlt table
+// These are alias functions for backwards compatibility
 
 export async function getWais3CvltResponse(
   visitId: string
 ): Promise<Wais3CvltResponse | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('responses_wais3_cvlt')
-    .select('*')
-    .eq('visit_id', visitId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') return null;
-    if (error.code === 'PGRST205') {
-      console.warn('Table responses_wais3_cvlt not found. Please run migrations.');
-      return null;
-    }
-    throw error;
-  }
-  return data;
+  // Delegate to unified CVLT function
+  return getCvltResponse(visitId);
 }
 
 export async function saveWais3CvltResponse(
   response: Wais3CvltResponseInsert
 ): Promise<Wais3CvltResponse> {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  // Calculate all standard scores (same as WAIS-IV CVLT)
-  const scores = calculateCvltScores({
-    patient_age: response.patient_age,
-    years_of_education: response.years_of_education,
-    patient_sex: response.patient_sex,
-    trial_1: response.trial_1,
-    trial_2: response.trial_2,
-    trial_3: response.trial_3,
-    trial_4: response.trial_4,
-    trial_5: response.trial_5,
-    list_b: response.list_b,
-    sdfr: response.sdfr,
-    sdcr: response.sdcr,
-    ldfr: response.ldfr,
-    ldcr: response.ldcr,
-    semantic_clustering: response.semantic_clustering,
-    serial_clustering: response.serial_clustering,
-    perseverations: response.perseverations,
-    intrusions: response.intrusions,
-    recognition_hits: response.recognition_hits,
-    false_positives: response.false_positives,
-    discriminability: response.discriminability,
-    primacy: response.primacy,
-    recency: response.recency,
-    response_bias: response.response_bias
-  });
-
-  const { data, error } = await supabase
-    .from('responses_wais3_cvlt')
-    .upsert({
-      visit_id: response.visit_id,
-      patient_id: response.patient_id,
-      patient_age: response.patient_age,
-      years_of_education: response.years_of_education,
-      patient_sex: response.patient_sex,
-      trial_1: response.trial_1,
-      trial_2: response.trial_2,
-      trial_3: response.trial_3,
-      trial_4: response.trial_4,
-      trial_5: response.trial_5,
-      list_b: response.list_b,
-      sdfr: response.sdfr,
-      sdcr: response.sdcr,
-      ldfr: response.ldfr,
-      ldcr: response.ldcr,
-      semantic_clustering: response.semantic_clustering,
-      serial_clustering: response.serial_clustering,
-      perseverations: response.perseverations,
-      intrusions: response.intrusions,
-      recognition_hits: response.recognition_hits,
-      false_positives: response.false_positives,
-      discriminability: response.discriminability,
-      primacy: response.primacy,
-      recency: response.recency,
-      response_bias: response.response_bias,
-      ...scores,
-      completed_by: user.data.user?.id
-    }, { onConflict: 'visit_id' })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+  // Delegate to unified CVLT function
+  return saveCvltResponse(response);
 }
+
 
 // ============================================================================
 // WAIS-III TMT (Trail Making Test)

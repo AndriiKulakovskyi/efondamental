@@ -8164,6 +8164,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement (somme des essais 1 a 5)'
   },
   {
@@ -8173,6 +8174,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement selon les normes'
   },
   {
@@ -8182,15 +8184,17 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement selon les normes (z-score ou percentile selon age)'
   },
   {
-    id: 'trials_1_5_total_std',
+    id: 'total_1_5_std',
     section: 'Rappel Liste A',
     text: 'Note Standard Lundi Total (1-5)',
     type: 'number',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement selon les normes'
   },
   
@@ -8217,6 +8221,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement selon les normes'
   },
   
@@ -8252,6 +8257,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement selon les normes (z-score ou percentile selon age)'
   },
   {
@@ -8261,6 +8267,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement selon les normes (z-score ou percentile selon age)'
   },
   
@@ -8296,6 +8303,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement selon les normes (z-score ou percentile selon age)'
   },
   {
@@ -8305,6 +8313,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement selon les normes (z-score ou percentile selon age)'
   },
   
@@ -8340,6 +8349,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement selon les normes'
   },
   {
@@ -8349,6 +8359,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement (percentile)'
   },
   
@@ -8384,6 +8395,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement (percentile)'
   },
   {
@@ -8393,6 +8405,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement (percentile)'
   },
   
@@ -8437,6 +8450,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement (percentile)'
   },
   {
@@ -8446,6 +8460,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement (percentile)'
   },
   {
@@ -8455,6 +8470,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'text',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement (percentile)'
   },
   
@@ -8499,6 +8515,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement selon les normes'
   },
   {
@@ -8508,6 +8525,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement selon les normes'
   },
   {
@@ -8517,6 +8535,7 @@ export const CVLT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     readonly: true,
+    indentLevel: 1,
     help: 'Calculé automatiquement selon les normes'
   },
   
@@ -8542,7 +8561,7 @@ export const CVLT_QUESTIONS: Question[] = [
 export const CVLT_DEFINITION: QuestionnaireDefinition = {
   id: 'cvlt',
   code: 'CVLT_FR',
-  title: 'WAIS-IV California Verbal Learning Test (CVLT)',
+  title: 'California Verbal Learning Test (CVLT)',
   description: 'Test d\'apprentissage verbal evaluant les strategies d\'encodage, de recuperation, et la memoire a court et long terme. Version francaise (Deweer et al., 2008).',
   questions: CVLT_QUESTIONS,
   metadata: {
@@ -11361,7 +11380,7 @@ export const WAIS3_CVLT_DEFINITION: QuestionnaireDefinition = {
   id: 'wais3_cvlt',
   code: 'WAIS3_CVLT_FR',
   title: 'WAIS-III - California Verbal Learning Test (CVLT)',
-  description: 'Test d\'apprentissage verbal - Version WAIS-III',
+  description: 'Test d\'apprentissage verbal - Version WAIS-III (uses same questions and scoring as WAIS-IV CVLT)',
   questions: CVLT_QUESTIONS,
   metadata: {
     singleColumn: true,
