@@ -131,6 +131,20 @@ export async function getPatientProfileData(
     const patient = data.patient as PatientFull;
     const stats = data.stats as PatientStats;
     const visits = (data.visits || []) as VisitWithCompletion[];
+    
+    // Debug: Log visit completion percentages from RPC
+    console.log('[getPatientProfileData] Visits from RPC:', visits.map(v => ({
+      id: v.id,
+      template_name: v.template_name,
+      completionPercentage: v.completionPercentage
+    })));
+    
+    // Debug: Also fetch directly from visits table to compare
+    const { data: directVisits } = await supabase
+      .from('visits')
+      .select('id, completion_percentage')
+      .eq('patient_id', patientId);
+    console.log('[getPatientProfileData] Direct visits table query:', directVisits);
     const riskLevel = (data.risk_level || 'none') as 'none' | 'low' | 'moderate' | 'high';
     const evaluations = (data.evaluations || []) as EvaluationSummary[];
     const moodTrend = (data.mood_trend || []) as MoodTrendData[];

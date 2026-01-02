@@ -1,5 +1,5 @@
 import { getVisitDetailData } from "@/lib/services/visit-detail.service";
-import { getVisitModules, VirtualModule } from "@/lib/services/visit.service";
+import { getVisitModules, VirtualModule, updateVisitCompletionStatus } from "@/lib/services/visit.service";
 import { getTobaccoResponse } from "@/lib/services/questionnaire-infirmier.service";
 import { getDsm5ComorbidResponse } from "@/lib/services/questionnaire-dsm5.service";
 import { getWais4CriteriaResponse, getWais3CriteriaResponse } from "@/lib/services/questionnaire-hetero.service";
@@ -1238,6 +1238,13 @@ export default async function VisitDetailPage({
       completionPercentage
     };
   })();
+
+  // Store the calculated completion status in the database
+  // This ensures the patient profile page shows the same accurate progress
+  // Await the update to ensure it completes before the page renders
+  console.log('[VisitPage] Saving completion status for visit:', visitId, completionStatus);
+  await updateVisitCompletionStatus(visitId, completionStatus);
+  console.log('[VisitPage] Completion status saved');
 
   return (
     <div className="max-w-7xl mx-auto px-8 space-y-8">

@@ -312,6 +312,56 @@ export async function deleteVisit(visitId: string): Promise<void> {
   }
 }
 
+/**
+ * Update the visit completion status (percentage, completed/total counts)
+ * This is called from the visit detail page after calculating accurate progress
+ * from the constructed modules, ensuring the stored value matches what's displayed.
+ */
+export async function updateVisitCompletionStatus(
+  visitId: string,
+  completionStatus: {
+    completionPercentage: number;
+    completedQuestionnaires: number;
+    totalQuestionnaires: number;
+  }
+): Promise<void> {
+  const supabase = await createClient();
+
+  console.log('[updateVisitCompletionStatus] Updating visit:', visitId, 'with:', completionStatus);
+
+  // First verify the visit exists and check current value
+  const { data: currentVisit, error: fetchError } = await supabase
+    .from('visits')
+    .select('id, completion_percentage, completed_questionnaires, total_questionnaires')
+    .eq('id', visitId)
+    .single();
+
+  if (fetchError) {
+    console.error('[updateVisitCompletionStatus] Failed to fetch visit:', fetchError);
+    return;
+  }
+  console.log('[updateVisitCompletionStatus] Current visit data:', currentVisit);
+
+  // Now update
+  const { data, error } = await supabase
+    .from('visits')
+    .update({
+      completion_percentage: completionStatus.completionPercentage,
+      completed_questionnaires: completionStatus.completedQuestionnaires,
+      total_questionnaires: completionStatus.totalQuestionnaires,
+      completion_updated_at: new Date().toISOString()
+    })
+    .eq('id', visitId)
+    .select('id, completion_percentage, completed_questionnaires, total_questionnaires')
+    .single();
+
+  if (error) {
+    console.error('[updateVisitCompletionStatus] Update failed:', error);
+  } else {
+    console.log('[updateVisitCompletionStatus] Update success:', data);
+  }
+}
+
 // ============================================================================
 // VISIT STATUS MANAGEMENT
 // ============================================================================
