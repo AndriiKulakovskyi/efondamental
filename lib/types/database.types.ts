@@ -3592,6 +3592,9 @@ export interface ScipResponse {
   visit_id: string;
   patient_id: string;
   
+  // Version selection
+  version: number; // 1, 2, or 3
+  
   // Raw scores (inputs)
   scipv01a: number; // Apprentissage Verbal Immediat
   scipv02a: number; // Memoire de Travail

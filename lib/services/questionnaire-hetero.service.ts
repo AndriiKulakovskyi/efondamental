@@ -2370,6 +2370,7 @@ export async function saveScipResponse(
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
+      version: response.version,
       scipv01a: response.scipv01a,
       scipv02a: response.scipv02a,
       scipv03a: response.scipv03a,

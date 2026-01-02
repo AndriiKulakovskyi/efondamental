@@ -11205,20 +11205,38 @@ export const TEST_COMMISSIONS_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 
 export const SCIP_QUESTIONS: Question[] = [
-  // Apprentissage Verbal Immediat
+  // Version Selection
+  {
+    id: 'section_version',
+    text: 'Version',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'version',
+    text: 'Select Version',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: "Version 1", score: 1 },
+      { code: 2, label: "Version 2", score: 2 },
+      { code: 3, label: "Version 3", score: 3 }
+    ]
+  },
+  // Apprentissage Verbal Immediat (VLT-I)
   {
     id: 'section_scipv01',
-    text: 'Apprentissage Verbal Immediat',
+    text: 'Verbal Learning Test - Immediate (VLT-I)',
     type: 'section',
     required: false
   },
   {
     id: 'scipv01a',
-    text: 'Score saisi (sum/24)',
+    text: 'Score saisi (0-30)',
     type: 'number',
     required: true,
     min: 0,
-    max: 24
+    max: 30
   },
   {
     id: 'scipv01b',
@@ -11228,20 +11246,20 @@ export const SCIP_QUESTIONS: Question[] = [
     required: false,
     readonly: true
   },
-  // Memoire de Travail
+  // Memoire de Travail (WMT)
   {
     id: 'section_scipv02',
-    text: 'Memoire de Travail',
+    text: 'Working Memory Test (WMT)',
     type: 'section',
     required: false
   },
   {
     id: 'scipv02a',
-    text: 'Score saisi (sum/24)',
+    text: 'Score saisi (0-30)',
     type: 'number',
     required: true,
     min: 0,
-    max: 24
+    max: 30
   },
   {
     id: 'scipv02b',
@@ -11251,16 +11269,16 @@ export const SCIP_QUESTIONS: Question[] = [
     required: false,
     readonly: true
   },
-  // Fluence Verbale
+  // Fluence Verbale (VFT)
   {
     id: 'section_scipv03',
-    text: 'Fluence Verbale',
+    text: 'Verbal Fluency Test (VFT)',
     type: 'section',
     required: false
   },
   {
     id: 'scipv03a',
-    text: 'Score saisi (sum/24)',
+    text: 'Score saisi (0-24)',
     type: 'number',
     required: true,
     min: 0,
@@ -11274,20 +11292,20 @@ export const SCIP_QUESTIONS: Question[] = [
     required: false,
     readonly: true
   },
-  // Rappel Verbal Differe
+  // Rappel Verbal Differe (VLT-D)
   {
     id: 'section_scipv04',
-    text: 'Rappel Verbal Differe',
+    text: 'Verbal Learning Test - Delayed (VLT-D)',
     type: 'section',
     required: false
   },
   {
     id: 'scipv04a',
-    text: 'Score saisi (sum/24)',
+    text: 'Score saisi (0-10)',
     type: 'number',
     required: true,
     min: 0,
-    max: 24
+    max: 10
   },
   {
     id: 'scipv04b',
@@ -11297,20 +11315,20 @@ export const SCIP_QUESTIONS: Question[] = [
     required: false,
     readonly: true
   },
-  // Capacites Visuomotrices
+  // Capacites Visuomotrices (PST)
   {
     id: 'section_scipv05',
-    text: 'Capacites Visuomotrices',
+    text: 'Processing Speed Test (PST)',
     type: 'section',
     required: false
   },
   {
     id: 'scipv05a',
-    text: 'Score saisi (sum/24)',
+    text: 'Score saisi (0-18)',
     type: 'number',
     required: true,
     min: 0,
-    max: 24
+    max: 18
   },
   {
     id: 'scipv05b',
