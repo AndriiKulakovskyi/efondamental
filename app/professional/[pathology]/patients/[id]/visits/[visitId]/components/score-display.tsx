@@ -57,6 +57,20 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return isPositive ? 'warning' : 'info';
     }
     
+    if (code === 'CTQ_FR') {
+      // CTQ: Check if any subscale is severe
+      const hasSevere = ['emotional_abuse_severity', 'physical_abuse_severity', 'sexual_abuse_severity', 
+                        'emotional_neglect_severity', 'physical_neglect_severity']
+        .some(key => data[key] === 'severe');
+      const hasModerate = ['emotional_abuse_severity', 'physical_abuse_severity', 'sexual_abuse_severity',
+                          'emotional_neglect_severity', 'physical_neglect_severity']
+        .some(key => data[key] === 'moderate');
+      
+      if (hasSevere) return 'error';
+      if (hasModerate) return 'warning';
+      return 'info';
+    }
+    
     if (code === 'ALDA') {
       // ALDA: Total score 7-10 = good responder, 4-6 = partial, 0-3 = non-responder
       if (data.alda_score >= 7) return 'success';
@@ -199,6 +213,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'QIDS_SR16_FR' && 'Score QIDS-SR16'}
               {code === 'MDQ_FR' && 'Résultat MDQ'}
               {code === 'ASRS_FR' && 'Résultat ASRS'}
+              {code === 'CTQ_FR' && 'Résultats CTQ'}
               {code === 'ALDA' && 'Score Alda'}
               {code === 'CGI' && 'Résultats CGI'}
               {code === 'WAIS4_MATRICES_FR' && 'Résultats WAIS-IV Matrices'}
@@ -214,6 +229,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.interpretation?.includes('Positif') ? 'POSITIF' : 'NÉGATIF')
                 : code === 'ASRS_FR'
                 ? (data.screening_positive ? 'POSITIF' : 'NÉGATIF')
+                : code === 'CTQ_FR'
+                ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'ALDA'
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
                 : code === 'CGI'
@@ -229,6 +246,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM_FR' && '/20'}
               {code === 'QIDS_SR16_FR' && '/27'}
+              {code === 'CTQ_FR' && '/125'}
               {code === 'ALDA' && '/10'}
               {code === 'CGI' && '/7'}
               {code === 'WAIS4_MATRICES_FR' && '/19'}
@@ -381,6 +399,70 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             {data.screening_positive && (
               <p className="text-xs text-gray-600 mt-1 pt-2 border-t">
                 Un résultat positif suggère des symptômes cohérents avec un TDAH chez l'adulte. Une évaluation clinique complète est recommandée.
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* CTQ Details */}
+        {code === 'CTQ_FR' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Abus émotionnel:</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">{data.emotional_abuse_score ?? '-'}/25</span>
+                  <Badge variant={data.emotional_abuse_severity === 'severe' ? 'destructive' : data.emotional_abuse_severity === 'moderate' ? 'warning' : 'secondary'} className="text-xs">
+                    {data.emotional_abuse_severity === 'no_trauma' ? 'Absent' : data.emotional_abuse_severity === 'low' ? 'Faible' : data.emotional_abuse_severity === 'moderate' ? 'Modéré' : data.emotional_abuse_severity === 'severe' ? 'Sévère' : '-'}
+                  </Badge>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Abus physique:</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">{data.physical_abuse_score ?? '-'}/25</span>
+                  <Badge variant={data.physical_abuse_severity === 'severe' ? 'destructive' : data.physical_abuse_severity === 'moderate' ? 'warning' : 'secondary'} className="text-xs">
+                    {data.physical_abuse_severity === 'no_trauma' ? 'Absent' : data.physical_abuse_severity === 'low' ? 'Faible' : data.physical_abuse_severity === 'moderate' ? 'Modéré' : data.physical_abuse_severity === 'severe' ? 'Sévère' : '-'}
+                  </Badge>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Abus sexuel:</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">{data.sexual_abuse_score ?? '-'}/25</span>
+                  <Badge variant={data.sexual_abuse_severity === 'severe' ? 'destructive' : data.sexual_abuse_severity === 'moderate' ? 'warning' : 'secondary'} className="text-xs">
+                    {data.sexual_abuse_severity === 'no_trauma' ? 'Absent' : data.sexual_abuse_severity === 'low' ? 'Faible' : data.sexual_abuse_severity === 'moderate' ? 'Modéré' : data.sexual_abuse_severity === 'severe' ? 'Sévère' : '-'}
+                  </Badge>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Négligence émotionnelle:</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">{data.emotional_neglect_score ?? '-'}/25</span>
+                  <Badge variant={data.emotional_neglect_severity === 'severe' ? 'destructive' : data.emotional_neglect_severity === 'moderate' ? 'warning' : 'secondary'} className="text-xs">
+                    {data.emotional_neglect_severity === 'no_trauma' ? 'Absent' : data.emotional_neglect_severity === 'low' ? 'Faible' : data.emotional_neglect_severity === 'moderate' ? 'Modéré' : data.emotional_neglect_severity === 'severe' ? 'Sévère' : '-'}
+                  </Badge>
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Négligence physique:</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">{data.physical_neglect_score ?? '-'}/25</span>
+                  <Badge variant={data.physical_neglect_severity === 'severe' ? 'destructive' : data.physical_neglect_severity === 'moderate' ? 'warning' : 'secondary'} className="text-xs">
+                    {data.physical_neglect_severity === 'no_trauma' ? 'Absent' : data.physical_neglect_severity === 'low' ? 'Faible' : data.physical_neglect_severity === 'moderate' ? 'Modéré' : data.physical_neglect_severity === 'severe' ? 'Sévère' : '-'}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">Déni/Minimisation:</span>
+              <span className={`font-bold ${data.denial_score > 0 ? 'text-orange-700' : 'text-green-700'}`}>
+                {data.denial_score ?? '-'}/3
+              </span>
+            </div>
+            {data.denial_score > 0 && (
+              <p className="text-xs text-orange-700 mt-1 pt-2 border-t">
+                Présence de déni ou minimisation détectée. Les résultats doivent être interprétés avec prudence.
               </p>
             )}
           </div>

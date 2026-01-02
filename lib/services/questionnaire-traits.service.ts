@@ -138,31 +138,51 @@ export async function saveCtqResponse(
   const sexualAbuseScore = scores[20] + scores[21] + scores[23] + scores[24] + scores[27];
   const emotionalNeglectScore = scores[5] + scores[7] + scores[13] + scores[19] + scores[28];
   const physicalNeglectScore = scores[1] + scores[2] + scores[4] + scores[6] + scores[26];
-  const denialScore = scores[10] + scores[16] + scores[22];
+  
+  // Calculate denial score - count items with value 5 (Très souvent)
+  const rawQ10 = response.q10 as number;
+  const rawQ16 = response.q16 as number;
+  const rawQ22 = response.q22 as number;
+  const denialScore = (rawQ10 === 5 ? 1 : 0) + (rawQ16 === 5 ? 1 : 0) + (rawQ22 === 5 ? 1 : 0);
 
-  // Determine severity levels
+  // Determine severity levels with corrected thresholds
   const getSeverity = (score: number, type: string): string => {
     const thresholds: Record<string, number[]> = {
-      emotional_abuse: [8, 12, 15],
-      physical_abuse: [7, 9, 12],
-      sexual_abuse: [5, 7, 12],
-      emotional_neglect: [9, 13, 17],
-      physical_neglect: [7, 9, 12]
+      emotional_abuse: [9, 13, 16],      // <9=none, 9-12=low, 13-15=moderate, >15=severe
+      physical_abuse: [8, 10, 13],       // <8=none, 8-9=low, 10-12=moderate, >12=severe
+      sexual_abuse: [6, 8, 13],          // <6=none, 6-7=low, 8-12=moderate, >12=severe
+      emotional_neglect: [10, 15, 18],   // <10=none, 10-14=low, 15-17=moderate, >17=severe
+      physical_neglect: [8, 10, 13]      // <8=none, 8-9=low, 10-12=moderate, >12=severe
     };
     
     const t = thresholds[type];
     if (!t) return 'unknown';
     
-    if (score <= t[0]) return 'none_minimal';
-    if (score <= t[1]) return 'low_moderate';
-    if (score <= t[2]) return 'moderate_severe';
-    return 'severe_extreme';
+    if (score < t[0]) return 'no_trauma';
+    if (score < t[1]) return 'low';
+    if (score < t[2]) return 'moderate';
+    return 'severe';
   };
 
   const totalScore = emotionalAbuseScore + physicalAbuseScore + sexualAbuseScore +
                      emotionalNeglectScore + physicalNeglectScore;
 
-  const interpretation = `Score total: ${totalScore}. Déni/Minimisation: ${denialScore}/15.`;
+  // Build detailed interpretation
+  const severities = {
+    ea: getSeverity(emotionalAbuseScore, 'emotional_abuse'),
+    pa: getSeverity(physicalAbuseScore, 'physical_abuse'),
+    sa: getSeverity(sexualAbuseScore, 'sexual_abuse'),
+    en: getSeverity(emotionalNeglectScore, 'emotional_neglect'),
+    pn: getSeverity(physicalNeglectScore, 'physical_neglect')
+  };
+
+  const interpretation = `Score total: ${totalScore}/125. ` +
+    `Abus émotionnel: ${emotionalAbuseScore}/25 (${severities.ea}), ` +
+    `Abus physique: ${physicalAbuseScore}/25 (${severities.pa}), ` +
+    `Abus sexuel: ${sexualAbuseScore}/25 (${severities.sa}), ` +
+    `Négligence émotionnelle: ${emotionalNeglectScore}/25 (${severities.en}), ` +
+    `Négligence physique: ${physicalNeglectScore}/25 (${severities.pn}). ` +
+    `Déni/Minimisation: ${denialScore}/3${denialScore > 0 ? ' (présent - interpréter avec prudence)' : ''}.`;
 
   const { data, error } = await supabase
     .from('responses_ctq')

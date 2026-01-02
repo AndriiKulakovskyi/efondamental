@@ -311,7 +311,7 @@ export async function submitProfessionalQuestionnaireAction(
         } as AsrsResponseInsert);
         break;
 
-      case 'CTQ':
+      case 'CTQ_FR':
         result = await saveCtqResponse({
           visit_id: visitId,
           patient_id: patientId,
