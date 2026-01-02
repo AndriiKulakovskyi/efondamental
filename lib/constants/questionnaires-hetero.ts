@@ -11373,60 +11373,23 @@ export const SCIP_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
-// WAIS-III Questionnaires (Separate storage from WAIS-IV, same questions)
+// Independent Neuropsychological Tests - Backward Compatibility Aliases
 // ============================================================================
+// These tests are IDENTICAL for WAIS-III and WAIS-IV protocols and now use
+// unified definitions. The aliases below maintain backward compatibility
+// with existing code that references the WAIS3 prefixed definitions.
 
-export const WAIS3_CVLT_DEFINITION: QuestionnaireDefinition = {
-  id: 'wais3_cvlt',
-  code: 'WAIS3_CVLT_FR',
-  title: 'WAIS-III - California Verbal Learning Test (CVLT)',
-  description: 'Test d\'apprentissage verbal - Version WAIS-III (uses same questions and scoring as WAIS-IV CVLT)',
-  questions: CVLT_QUESTIONS,
-  metadata: {
-    singleColumn: true,
-    pathologies: ['bipolar'],
-    target_role: 'healthcare_professional'
-  }
-};
+// WAIS-III CVLT - Alias to unified CVLT definition
+export const WAIS3_CVLT_DEFINITION = CVLT_DEFINITION;
 
-export const WAIS3_TMT_DEFINITION: QuestionnaireDefinition = {
-  id: 'wais3_tmt',
-  code: 'WAIS3_TMT_FR',
-  title: 'WAIS-III - Trail Making Test (TMT)',
-  description: 'Test de piste - Version WAIS-III',
-  questions: TMT_QUESTIONS,
-  metadata: {
-    singleColumn: true,
-    pathologies: ['bipolar'],
-    target_role: 'healthcare_professional'
-  }
-};
+// WAIS-III TMT - Alias to unified TMT definition
+export const WAIS3_TMT_DEFINITION = TMT_DEFINITION;
 
-export const WAIS3_STROOP_DEFINITION: QuestionnaireDefinition = {
-  id: 'wais3_stroop',
-  code: 'WAIS3_STROOP_FR',
-  title: 'WAIS-III - Test de Stroop',
-  description: 'Test d\'interference couleur-mot - Version WAIS-III',
-  questions: STROOP_QUESTIONS,
-  metadata: {
-    singleColumn: true,
-    pathologies: ['bipolar'],
-    target_role: 'healthcare_professional'
-  }
-};
+// WAIS-III Stroop - Alias to unified Stroop definition
+export const WAIS3_STROOP_DEFINITION = STROOP_DEFINITION;
 
-export const WAIS3_FLUENCES_VERBALES_DEFINITION: QuestionnaireDefinition = {
-  id: 'wais3_fluences_verbales',
-  code: 'WAIS3_FLUENCES_VERBALES_FR',
-  title: 'WAIS-III - Fluences Verbales',
-  description: 'Fluences verbales phonemique et semantique - Version WAIS-III',
-  questions: FLUENCES_VERBALES_QUESTIONS,
-  metadata: {
-    singleColumn: true,
-    pathologies: ['bipolar'],
-    target_role: 'healthcare_professional'
-  }
-};
+// WAIS-III Fluences Verbales - Alias to unified Fluences definition
+export const WAIS3_FLUENCES_VERBALES_DEFINITION = FLUENCES_VERBALES_DEFINITION;
 
 // ============================================================================
 // WAIS-III Clinical Criteria (Critères cliniques) - Reuses WAIS-IV questions
@@ -13418,11 +13381,12 @@ export const MEM3_SPATIAL_QUESTIONS: Question[] = [
   { id: 'mspatiale_total_cr', text: 'Deviation standard - Total', type: 'number', required: false, section: 'Scores Totaux', readonly: true, help: '(Note standard - 10) / 3' }
 ];
 
-export const WAIS3_MEM3_SPATIAL_DEFINITION: QuestionnaireDefinition = {
-  id: 'wais3_mem3_spatial',
-  code: 'WAIS3_MEM3_SPATIAL_FR',
+// Primary definition for MEM-III Spatial Memory (independent neuropsychological test)
+export const MEM3_SPATIAL_DEFINITION: QuestionnaireDefinition = {
+  id: 'mem3_spatial',
+  code: 'MEM3_SPATIAL_FR',
   title: 'MEM-III - Memoire Spatiale',
-  description: 'MEM-III (Wechsler Memory Scale - 3rd Edition) - Subtest Memoire Spatiale (Spatial Span). Adaptation francaise: Gregoire, J., Penhouet C. (2001). Ce subtest comprend les composantes Ordre Direct (Forward) et Ordre Inverse (Backward). Version WAIS-III avec les normes correspondantes.',
+  description: 'MEM-III (Wechsler Memory Scale - 3rd Edition) - Subtest Memoire Spatiale (Spatial Span). Adaptation francaise: Gregoire, J., Penhouet C. (2001). Ce subtest comprend les composantes Ordre Direct (Forward) et Ordre Inverse (Backward). Test neuropsychologique independant.',
   questions: MEM3_SPATIAL_QUESTIONS,
   metadata: {
     singleColumn: true,
@@ -13430,3 +13394,6 @@ export const WAIS3_MEM3_SPATIAL_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// Backward compatibility alias
+export const WAIS3_MEM3_SPATIAL_DEFINITION = MEM3_SPATIAL_DEFINITION;

@@ -3299,6 +3299,9 @@ export interface TmtResponse {
   tmt_b_a_err_z?: number | null; // Z-score for error difference
   tmt_b_a_err_pc?: string | null; // Percentile for error difference
   
+  // Protocol version tracking
+  questionnaire_version?: 'WAIS-III' | 'WAIS-IV' | null;
+  
   // Metadata
   completed_by?: string | null;
   completed_at: string;
@@ -3355,6 +3358,9 @@ export interface StroopResponse {
   stroop_interf_note_t?: number | null; // T-score
   stroop_interf_note_tz?: number | null; // Z-score
   
+  // Protocol version tracking
+  questionnaire_version?: 'WAIS-III' | 'WAIS-IV' | null;
+  
   // Metadata
   completed_by?: string | null;
   completed_at: string;
@@ -3402,6 +3408,9 @@ export interface FluencesVerbalesResponse {
   fv_anim_tot_rupregle?: number | null; // Total rule violations
   fv_anim_tot_correct_z?: number | null; // Z-score
   fv_anim_tot_correct_pc?: string | null; // Percentile (can be range like "25 - 50")
+  
+  // Protocol version tracking
+  questionnaire_version?: 'WAIS-III' | 'WAIS-IV' | null;
   
   // Metadata
   completed_by?: string | null;
@@ -3623,121 +3632,27 @@ export type ScipResponseInsert = Omit<ScipResponse, 'id' | 'created_at' | 'updat
 // ============================================================================
 // Note: WAIS-III and WAIS-IV CVLT are identical - they use the unified CvltResponse type
 
-// WAIS-III CVLT - Aliases to unified CVLT types (same questions/scoring as WAIS-IV)
+// ============================================================================
+// Independent Neuropsychological Tests - Backward Compatibility Aliases
+// ============================================================================
+// WAIS-III and WAIS-IV use identical tests for CVLT, TMT, Stroop, and Fluences.
+// These aliases ensure backward compatibility with existing code.
+
+// WAIS-III CVLT - Alias to unified CVLT types
 export type Wais3CvltResponse = CvltResponse;
 export type Wais3CvltResponseInsert = CvltResponseInsert;
 
-// WAIS-III TMT (Trail Making Test)
-export interface Wais3TmtResponse {
-  id: string;
-  visit_id: string;
-  patient_id: string;
-  patient_age: number;
-  years_of_education: number;
-  tmta_tps: number;
-  tmta_err: number;
-  tmta_cor?: number | null;
-  tmtb_tps: number;
-  tmtb_err: number;
-  tmtb_cor?: number | null;
-  tmtb_err_persev: number;
-  tmta_errtot?: number | null;
-  tmta_tps_z?: number | null;
-  tmta_tps_pc?: string | null;
-  tmta_errtot_z?: number | null;
-  tmta_errtot_pc?: string | null;
-  tmtb_errtot?: number | null;
-  tmtb_tps_z?: number | null;
-  tmtb_tps_pc?: string | null;
-  tmtb_errtot_z?: number | null;
-  tmtb_errtot_pc?: string | null;
-  tmtb_err_persev_z?: number | null;
-  tmtb_err_persev_pc?: string | null;
-  tmt_b_a_tps?: number | null;
-  tmt_b_a_tps_z?: number | null;
-  tmt_b_a_tps_pc?: string | null;
-  tmt_b_a_err?: number | null;
-  tmt_b_a_err_z?: number | null;
-  tmt_b_a_err_pc?: string | null;
-  completed_by?: string | null;
-  completed_at: string;
-  created_at: string;
-  updated_at: string;
-}
+// WAIS-III TMT - Alias to unified TMT types
+export type Wais3TmtResponse = TmtResponse;
+export type Wais3TmtResponseInsert = TmtResponseInsert;
 
-export type Wais3TmtResponseInsert = Omit<Wais3TmtResponse, 
-  'id' | 'created_at' | 'updated_at' | 'completed_at' | 
-  'tmta_errtot' | 'tmta_tps_z' | 'tmta_tps_pc' | 'tmta_errtot_z' | 'tmta_errtot_pc' |
-  'tmtb_errtot' | 'tmtb_tps_z' | 'tmtb_tps_pc' | 'tmtb_errtot_z' | 'tmtb_errtot_pc' |
-  'tmtb_err_persev_z' | 'tmtb_err_persev_pc' |
-  'tmt_b_a_tps' | 'tmt_b_a_tps_z' | 'tmt_b_a_tps_pc' | 'tmt_b_a_err' | 'tmt_b_a_err_z' | 'tmt_b_a_err_pc'
->;
+// WAIS-III Stroop - Alias to unified Stroop types
+export type Wais3StroopResponse = StroopResponse;
+export type Wais3StroopResponseInsert = StroopResponseInsert;
 
-// WAIS-III Stroop Test (Golden 1978)
-export interface Wais3StroopResponse {
-  id: string;
-  visit_id: string;
-  patient_id: string;
-  patient_age: number;
-  stroop_w_tot: number;
-  stroop_c_tot: number;
-  stroop_cw_tot: number;
-  stroop_w_tot_c?: number | null;
-  stroop_c_tot_c?: number | null;
-  stroop_cw_tot_c?: number | null;
-  stroop_interf?: number | null;
-  stroop_w_note_t?: number | null;
-  stroop_c_note_t?: number | null;
-  stroop_cw_note_t?: number | null;
-  stroop_interf_note_t?: number | null;
-  stroop_w_note_t_corrigee?: number | null;
-  stroop_c_note_t_corrigee?: number | null;
-  stroop_cw_note_t_corrigee?: number | null;
-  stroop_interf_note_tz?: number | null;
-  completed_by?: string | null;
-  completed_at: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export type Wais3StroopResponseInsert = Omit<Wais3StroopResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'stroop_w_tot_c' | 'stroop_c_tot_c' | 'stroop_cw_tot_c' | 'stroop_interf' | 'stroop_w_note_t' | 'stroop_c_note_t' | 'stroop_cw_note_t' | 'stroop_interf_note_t' | 'stroop_w_note_t_corrigee' | 'stroop_c_note_t_corrigee' | 'stroop_cw_note_t_corrigee' | 'stroop_interf_note_tz'>;
-
-// WAIS-III Fluences Verbales (Cardebat et al., 1990)
-export interface Wais3FluencesVerbalesResponse {
-  id: string;
-  visit_id: string;
-  patient_id: string;
-  patient_age: number;
-  years_of_education: number;
-  fv_p_tot_correct: number;
-  fv_p_persev?: number | null; // Perseverations
-  fv_p_deriv?: number | null;
-  fv_p_intrus?: number | null;
-  fv_p_propres?: number | null;
-  fv_p_cluster_tot?: number | null; // Number of clusters
-  fv_p_cluster_taille?: number | null; // Average cluster size (decimal)
-  fv_p_switch_tot?: number | null; // Number of switches
-  fv_p_tot_rupregle?: number | null;
-  fv_p_tot_correct_z?: number | null;
-  fv_p_tot_correct_pc?: string | null; // Changed to string for ranges
-  fv_anim_tot_correct: number;
-  fv_anim_persev?: number | null; // Perseverations
-  fv_anim_deriv?: number | null;
-  fv_anim_intrus?: number | null;
-  fv_anim_propres?: number | null;
-  fv_anim_cluster_tot?: number | null; // Number of clusters
-  fv_anim_cluster_taille?: number | null; // Average cluster size (decimal)
-  fv_anim_switch_tot?: number | null; // Number of switches
-  fv_anim_tot_rupregle?: number | null;
-  fv_anim_tot_correct_z?: number | null;
-  fv_anim_tot_correct_pc?: string | null; // Changed to string for ranges
-  completed_by?: string | null;
-  completed_at: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export type Wais3FluencesVerbalesResponseInsert = Omit<Wais3FluencesVerbalesResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'fv_p_tot_rupregle' | 'fv_p_tot_correct_z' | 'fv_p_tot_correct_pc' | 'fv_anim_tot_rupregle' | 'fv_anim_tot_correct_z' | 'fv_anim_tot_correct_pc'>;
+// WAIS-III Fluences Verbales - Alias to unified Fluences types
+export type Wais3FluencesVerbalesResponse = FluencesVerbalesResponse;
+export type Wais3FluencesVerbalesResponseInsert = FluencesVerbalesResponseInsert;
 
 // ============================================================================
 // WAIS-III Clinical Criteria (Critères cliniques)
@@ -4141,10 +4056,10 @@ export interface Wais3Cpt2Response {
 export type Wais3Cpt2ResponseInsert = Omit<Wais3Cpt2Response, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
-// MEM-III Spatial Span Response
+// MEM-III Spatial Span Response (Independent Neuropsychological Test)
 // ============================================================================
 
-export interface Wais3Mem3SpatialResponse {
+export interface Mem3SpatialResponse {
   id: string;
   visit_id: string;
   patient_id: string;
@@ -4188,5 +4103,9 @@ export interface Wais3Mem3SpatialResponse {
   updated_at?: string;
 }
 
-export type Wais3Mem3SpatialResponseInsert = Omit<Wais3Mem3SpatialResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'mspatiale_odirect_tot' | 'mspatiale_odirect_std' | 'mspatiale_odirect_cr' | 'mspatiale_inverse_tot' | 'mspatiale_inverse_std' | 'mspatiale_inverse_cr' | 'mspatiale_total_brut' | 'mspatiale_total_std' | 'mspatiale_total_cr'>;
+export type Mem3SpatialResponseInsert = Omit<Mem3SpatialResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'mspatiale_odirect_tot' | 'mspatiale_odirect_std' | 'mspatiale_odirect_cr' | 'mspatiale_inverse_tot' | 'mspatiale_inverse_std' | 'mspatiale_inverse_cr' | 'mspatiale_total_brut' | 'mspatiale_total_std' | 'mspatiale_total_cr'>;
+
+// Backward compatibility aliases
+export type Wais3Mem3SpatialResponse = Mem3SpatialResponse;
+export type Wais3Mem3SpatialResponseInsert = Mem3SpatialResponseInsert;
 

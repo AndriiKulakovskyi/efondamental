@@ -16,7 +16,7 @@ interface ExpandableModuleCardProps {
   totalModules: number;
 }
 
-// Safe helper to get all questionnaires from a module
+// Safe helper to get all questionnaires from a module (including both root-level and section questionnaires)
 function safeGetQuestionnaires(mod: unknown): any[] {
   // Validate input is an object
   if (!mod || typeof mod !== 'object') {
@@ -24,38 +24,37 @@ function safeGetQuestionnaires(mod: unknown): any[] {
   }
   
   const moduleObj = mod as Record<string, unknown>;
+  const allQuests: any[] = [];
   
-  // Handle sectioned modules
+  // First, get root-level questionnaires (independent tests)
+  if ('questionnaires' in moduleObj && moduleObj.questionnaires) {
+    const quests = moduleObj.questionnaires;
+    if (Array.isArray(quests)) {
+      for (let j = 0; j < quests.length; j++) {
+        allQuests.push(quests[j]);
+      }
+    }
+  }
+  
+  // Then, get questionnaires from sections
   if ('sections' in moduleObj && moduleObj.sections) {
     const sections = moduleObj.sections;
-    if (!Array.isArray(sections)) {
-      return [];
-    }
-    
-    const allQuests: any[] = [];
-    for (let i = 0; i < sections.length; i++) {
-      const section = sections[i];
-      if (section && typeof section === 'object' && 'questionnaires' in section) {
-        const quests = (section as Record<string, unknown>).questionnaires;
-        if (Array.isArray(quests)) {
-          for (let j = 0; j < quests.length; j++) {
-            allQuests.push(quests[j]);
+    if (Array.isArray(sections)) {
+      for (let i = 0; i < sections.length; i++) {
+        const section = sections[i];
+        if (section && typeof section === 'object' && 'questionnaires' in section) {
+          const quests = (section as Record<string, unknown>).questionnaires;
+          if (Array.isArray(quests)) {
+            for (let j = 0; j < quests.length; j++) {
+              allQuests.push(quests[j]);
+            }
           }
         }
       }
     }
-    return allQuests;
   }
   
-  // Handle flat questionnaires
-  if ('questionnaires' in moduleObj && moduleObj.questionnaires) {
-    const quests = moduleObj.questionnaires;
-    if (Array.isArray(quests)) {
-      return quests;
-    }
-  }
-  
-  return [];
+  return allQuests;
 }
 
 export function ExpandableModuleCard({ 
@@ -261,23 +260,27 @@ export function ExpandableModuleCard({
       >
         <div style={{ overflow: 'hidden' }}>
             <div className="space-y-3 mt-5">
-              {/* Render sections if present */}
-              {module.sections ? (
+              {/* Render root-level questionnaires first (independent tests) */}
+              {module.questionnaires && module.questionnaires.length > 0 && (
+                <>
+                  {module.questionnaires.map((questionnaire: any) => (
+                    <QuestionnaireItem 
+                      key={questionnaire.id}
+                      questionnaire={questionnaire}
+                      pathology={pathology}
+                      patientId={patientId}
+                      visitId={visitId}
+                    />
+                  ))}
+                </>
+              )}
+              
+              {/* Then render sections if present */}
+              {module.sections && module.sections.length > 0 && (
                 module.sections.map((section: any) => (
                   <CollapsibleSection
                     key={section.id}
                     section={section}
-                    pathology={pathology}
-                    patientId={patientId}
-                    visitId={visitId}
-                  />
-                ))
-              ) : (
-                /* Render flat questionnaires list */
-                module.questionnaires?.map((questionnaire: any) => (
-                  <QuestionnaireItem 
-                    key={questionnaire.id}
-                    questionnaire={questionnaire}
                     pathology={pathology}
                     patientId={patientId}
                     visitId={visitId}

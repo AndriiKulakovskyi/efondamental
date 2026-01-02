@@ -64,7 +64,7 @@ import {
   saveWais4SimilitudesResponse,
   saveTestCommissionsResponse,
   saveScipResponse,
-  // WAIS-III questionnaires (note: CVLT uses unified saveCvltResponse)
+  // WAIS-III questionnaires (note: CVLT, TMT, Stroop, Fluences use unified handlers)
   saveWais3TmtResponse,
   saveWais3StroopResponse,
   saveWais3FluencesVerbalesResponse,
@@ -75,7 +75,8 @@ import {
   saveWais3CodeSymbolesResponse,
   saveWais3DigitSpanResponse,
   saveWais3Cpt2Response,
-  saveWais3Mem3SpatialResponse
+  // MEM-III Spatial (independent test)
+  saveMem3SpatialResponse
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveSocialResponse
@@ -171,7 +172,7 @@ import {
   Wais4SimilitudesResponseInsert,
   TestCommissionsResponseInsert,
   ScipResponseInsert,
-  // WAIS-III types (note: CVLT uses unified CvltResponseInsert)
+  // WAIS-III types (note: CVLT, TMT, Stroop, Fluences use unified types)
   Wais3TmtResponseInsert,
   Wais3StroopResponseInsert,
   Wais3FluencesVerbalesResponseInsert,
@@ -182,7 +183,8 @@ import {
   Wais3CodeSymbolesResponseInsert,
   Wais3DigitSpanResponseInsert,
   Wais3Cpt2ResponseInsert,
-  Wais3Mem3SpatialResponseInsert
+  // MEM-III Spatial (independent test)
+  Mem3SpatialResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 import { requireUserContext } from '@/lib/rbac/middleware';
@@ -919,11 +921,12 @@ export async function submitProfessionalQuestionnaireAction(
         break;
       
       case 'WAIS3_MEM3_SPATIAL_FR':
-        result = await saveWais3Mem3SpatialResponse({
+      case 'MEM3_SPATIAL_FR':
+        result = await saveMem3SpatialResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses
-        } as Wais3Mem3SpatialResponseInsert);
+        } as Mem3SpatialResponseInsert);
         break;
         
       default:

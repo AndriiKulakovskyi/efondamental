@@ -74,19 +74,16 @@ import {
   WAIS4_SIMILITUDES_DEFINITION,
   TEST_COMMISSIONS_DEFINITION,
   SCIP_DEFINITION,
+  // Independent neuropsychological tests (shared by WAIS-III and WAIS-IV)
+  MEM3_SPATIAL_DEFINITION,
   // WAIS-III definitions
-  WAIS3_CVLT_DEFINITION,
-  WAIS3_TMT_DEFINITION,
-  WAIS3_STROOP_DEFINITION,
-  WAIS3_FLUENCES_VERBALES_DEFINITION,
   WAIS3_CRITERIA_DEFINITION,
   WAIS3_LEARNING_DEFINITION,
   WAIS3_VOCABULAIRE_DEFINITION,
   WAIS3_MATRICES_DEFINITION,
   WAIS3_CODE_SYMBOLES_DEFINITION,
   WAIS3_DIGIT_SPAN_DEFINITION,
-  WAIS3_CPT2_DEFINITION,
-  WAIS3_MEM3_SPATIAL_DEFINITION
+  WAIS3_CPT2_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
 import {
   SOCIAL_DEFINITION
@@ -604,7 +601,45 @@ export default async function VisitDetailPage({
       {
         id: 'mod_neuropsy',
         name: 'Evaluation Neuropsychologique',
-        description: 'Évaluation neuropsychologique (WAIS-III, WAIS-IV)',
+        description: 'Évaluation neuropsychologique (Tests indépendants, WAIS-III, WAIS-IV)',
+        // Root level: Independent tests shared by WAIS-III and WAIS-IV protocols
+        questionnaires: [
+          {
+            ...CVLT_DEFINITION,
+            id: CVLT_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['CVLT_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CVLT_FR']?.completed_at,
+          },
+          {
+            ...TMT_DEFINITION,
+            id: TMT_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['TMT_FR']?.completed || false,
+            completedAt: questionnaireStatuses['TMT_FR']?.completed_at,
+          },
+          {
+            ...STROOP_DEFINITION,
+            id: STROOP_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['STROOP_FR']?.completed || false,
+            completedAt: questionnaireStatuses['STROOP_FR']?.completed_at,
+          },
+          {
+            ...FLUENCES_VERBALES_DEFINITION,
+            id: FLUENCES_VERBALES_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['FLUENCES_VERBALES_FR']?.completed || false,
+            completedAt: questionnaireStatuses['FLUENCES_VERBALES_FR']?.completed_at,
+          },
+          {
+            ...MEM3_SPATIAL_DEFINITION,
+            id: MEM3_SPATIAL_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['MEM3_SPATIAL_FR']?.completed || false,
+            completedAt: questionnaireStatuses['MEM3_SPATIAL_FR']?.completed_at,
+          }
+        ],
         sections: [
           {
             id: 'wais3',
@@ -661,7 +696,7 @@ export default async function VisitDetailPage({
                 }
               };
               
-              // Add conditional questionnaires
+              // Add conditional questionnaires (WAIS-III specific tests only)
               addConditionalQuestionnaire(WAIS3_LEARNING_DEFINITION, 'WAIS3_LEARNING_FR');
               
               // Vocabulaire - not in the conditional list (always enabled)
@@ -685,12 +720,6 @@ export default async function VisitDetailPage({
                 completed: questionnaireStatuses['WAIS3_CPT2_FR']?.completed || false,
                 completedAt: questionnaireStatuses['WAIS3_CPT2_FR']?.completed_at,
               });
-              
-              addConditionalQuestionnaire(WAIS3_MEM3_SPATIAL_DEFINITION, 'WAIS3_MEM3_SPATIAL_FR');
-              addConditionalQuestionnaire(WAIS3_CVLT_DEFINITION, 'WAIS3_CVLT_FR');
-              addConditionalQuestionnaire(WAIS3_TMT_DEFINITION, 'WAIS3_TMT_FR');
-              addConditionalQuestionnaire(WAIS3_STROOP_DEFINITION, 'WAIS3_STROOP_FR');
-              addConditionalQuestionnaire(WAIS3_FLUENCES_VERBALES_DEFINITION, 'WAIS3_FLUENCES_VERBALES_FR');
               
               return wais3Questionnaires;
             })()
@@ -750,16 +779,12 @@ export default async function VisitDetailPage({
                 }
               };
               
-              // Add conditional questionnaires
+              // Add conditional questionnaires (WAIS-IV specific tests only)
               addConditionalQuestionnaire(WAIS4_LEARNING_DEFINITION, 'WAIS4_LEARNING_FR');
               addConditionalQuestionnaire(WAIS4_MATRICES_DEFINITION, 'WAIS4_MATRICES_FR');
-              addConditionalQuestionnaire(CVLT_DEFINITION, 'CVLT_FR');
               addConditionalQuestionnaire(WAIS4_CODE_DEFINITION, 'WAIS4_CODE_FR');
               addConditionalQuestionnaire(WAIS4_DIGIT_SPAN_DEFINITION, 'WAIS4_DIGIT_SPAN_FR');
               addConditionalQuestionnaire(WAIS4_SIMILITUDES_DEFINITION, 'WAIS4_SIMILITUDES_FR');
-              addConditionalQuestionnaire(TMT_DEFINITION, 'TMT_FR');
-              addConditionalQuestionnaire(STROOP_DEFINITION, 'STROOP_FR');
-              addConditionalQuestionnaire(FLUENCES_VERBALES_DEFINITION, 'FLUENCES_VERBALES_FR');
               
               // COBRA, CPT3, TEST_COMMISSIONS, SCIP - not in the conditional list (always enabled)
               wais4Questionnaires.push(

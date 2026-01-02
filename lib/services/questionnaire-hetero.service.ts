@@ -2415,199 +2415,48 @@ export async function saveWais3CvltResponse(
 
 
 // ============================================================================
-// WAIS-III TMT (Trail Making Test)
+// Independent Neuropsychological Tests - Backward Compatibility Aliases
 // ============================================================================
+// TMT, Stroop, and Fluences Verbales are now unified (same as WAIS-IV).
+// These alias functions maintain backward compatibility with existing code.
 
+// WAIS-III TMT - Delegates to unified TMT functions
 export async function getWais3TmtResponse(
   visitId: string
 ): Promise<Wais3TmtResponse | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('responses_wais3_tmt')
-    .select('*')
-    .eq('visit_id', visitId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') return null;
-    if (error.code === 'PGRST205') {
-      console.warn('Table responses_wais3_tmt not found. Please run migrations.');
-      return null;
-    }
-    throw error;
-  }
-  return data;
+  return getTmtResponse(visitId);
 }
 
 export async function saveWais3TmtResponse(
   response: Wais3TmtResponseInsert
 ): Promise<Wais3TmtResponse> {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  // Reuse existing TMT scoring logic
-  const scores = calculateTmtScores({
-    patient_age: response.patient_age,
-    years_of_education: response.years_of_education,
-    tmta_tps: response.tmta_tps,
-    tmta_err: response.tmta_err,
-    tmta_cor: response.tmta_cor || 0,
-    tmtb_tps: response.tmtb_tps,
-    tmtb_err: response.tmtb_err,
-    tmtb_cor: response.tmtb_cor || 0,
-    tmtb_err_persev: response.tmtb_err_persev
-  });
-
-  const { data, error } = await supabase
-    .from('responses_wais3_tmt')
-    .upsert({
-      visit_id: response.visit_id,
-      patient_id: response.patient_id,
-      patient_age: response.patient_age,
-      years_of_education: response.years_of_education,
-      tmta_tps: response.tmta_tps,
-      tmta_err: response.tmta_err,
-      tmta_cor: response.tmta_cor,
-      tmtb_tps: response.tmtb_tps,
-      tmtb_err: response.tmtb_err,
-      tmtb_cor: response.tmtb_cor,
-      tmtb_err_persev: response.tmtb_err_persev,
-      ...scores,
-      completed_by: user.data.user?.id
-    }, { onConflict: 'visit_id' })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+  return saveTmtResponse(response);
 }
 
-// ============================================================================
-// WAIS-III Stroop Test
-// ============================================================================
-
+// WAIS-III Stroop - Delegates to unified Stroop functions
 export async function getWais3StroopResponse(
   visitId: string
 ): Promise<Wais3StroopResponse | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('responses_wais3_stroop')
-    .select('*')
-    .eq('visit_id', visitId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') return null;
-    if (error.code === 'PGRST205') {
-      console.warn('Table responses_wais3_stroop not found. Please run migrations.');
-      return null;
-    }
-    throw error;
-  }
-  return data;
+  return getStroopResponse(visitId);
 }
 
 export async function saveWais3StroopResponse(
   response: Wais3StroopResponseInsert
 ): Promise<Wais3StroopResponse> {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  // Reuse existing Stroop scoring logic
-  const scores = calculateStroopScores({
-    patient_age: response.patient_age,
-    stroop_w_tot: response.stroop_w_tot,
-    stroop_c_tot: response.stroop_c_tot,
-    stroop_cw_tot: response.stroop_cw_tot
-  });
-
-  const { data, error } = await supabase
-    .from('responses_wais3_stroop')
-    .upsert({
-      visit_id: response.visit_id,
-      patient_id: response.patient_id,
-      patient_age: response.patient_age,
-      stroop_w_tot: response.stroop_w_tot,
-      stroop_c_tot: response.stroop_c_tot,
-      stroop_cw_tot: response.stroop_cw_tot,
-      ...scores,
-      completed_by: user.data.user?.id
-    }, { onConflict: 'visit_id' })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+  return saveStroopResponse(response);
 }
 
-// ============================================================================
-// WAIS-III Fluences Verbales
-// ============================================================================
-
+// WAIS-III Fluences Verbales - Delegates to unified Fluences functions
 export async function getWais3FluencesVerbalesResponse(
   visitId: string
 ): Promise<Wais3FluencesVerbalesResponse | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('responses_wais3_fluences_verbales')
-    .select('*')
-    .eq('visit_id', visitId)
-    .single();
-
-  if (error) {
-    if (error.code === 'PGRST116') return null;
-    if (error.code === 'PGRST205') {
-      console.warn('Table responses_wais3_fluences_verbales not found. Please run migrations.');
-      return null;
-    }
-    throw error;
-  }
-  return data;
+  return getFluencesVerbalesResponse(visitId);
 }
 
 export async function saveWais3FluencesVerbalesResponse(
   response: Wais3FluencesVerbalesResponseInsert
 ): Promise<Wais3FluencesVerbalesResponse> {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  // Reuse existing Fluences Verbales scoring logic
-  const scores = calculateFluencesVerbalesScores({
-    patient_age: response.patient_age,
-    years_of_education: response.years_of_education,
-    fv_p_tot_correct: response.fv_p_tot_correct,
-    fv_p_deriv: response.fv_p_deriv || 0,
-    fv_p_intrus: response.fv_p_intrus || 0,
-    fv_p_propres: response.fv_p_propres || 0,
-    fv_anim_tot_correct: response.fv_anim_tot_correct,
-    fv_anim_deriv: response.fv_anim_deriv || 0,
-    fv_anim_intrus: response.fv_anim_intrus || 0,
-    fv_anim_propres: response.fv_anim_propres || 0
-  });
-
-  const { data, error } = await supabase
-    .from('responses_wais3_fluences_verbales')
-    .upsert({
-      visit_id: response.visit_id,
-      patient_id: response.patient_id,
-      patient_age: response.patient_age,
-      years_of_education: response.years_of_education,
-      fv_p_tot_correct: response.fv_p_tot_correct,
-      fv_p_deriv: response.fv_p_deriv,
-      fv_p_intrus: response.fv_p_intrus,
-      fv_p_propres: response.fv_p_propres,
-      fv_anim_tot_correct: response.fv_anim_tot_correct,
-      fv_anim_deriv: response.fv_anim_deriv,
-      fv_anim_intrus: response.fv_anim_intrus,
-      fv_anim_propres: response.fv_anim_propres,
-      ...scores,
-      completed_by: user.data.user?.id
-    }, { onConflict: 'visit_id' })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+  return saveFluencesVerbalesResponse(response);
 }
 
 // ============================================================================
@@ -3215,16 +3064,16 @@ export async function saveWais3Cpt2Response(
 }
 
 // ============================================================================
-// MEM-III Spatial Span (Memoire Spatiale)
+// MEM-III Spatial Span (Memoire Spatiale) - Independent Neuropsychological Test
 // ============================================================================
 
 import { calculateMem3SpatialScores, Mem3SpatialInput } from './mem3-spatial-scoring';
-import type { Wais3Mem3SpatialResponse, Wais3Mem3SpatialResponseInsert } from '@/lib/types/database.types';
+import type { Mem3SpatialResponse, Mem3SpatialResponseInsert } from '@/lib/types/database.types';
 
-export async function getWais3Mem3SpatialResponse(visitId: string): Promise<Wais3Mem3SpatialResponse | null> {
+export async function getMem3SpatialResponse(visitId: string): Promise<Mem3SpatialResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_wais3_mem3_spatial')
+    .from('responses_mem3_spatial')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -3233,9 +3082,9 @@ export async function getWais3Mem3SpatialResponse(visitId: string): Promise<Wais
   return data;
 }
 
-export async function saveWais3Mem3SpatialResponse(
-  response: Wais3Mem3SpatialResponseInsert
-): Promise<Wais3Mem3SpatialResponse> {
+export async function saveMem3SpatialResponse(
+  response: Mem3SpatialResponseInsert
+): Promise<Mem3SpatialResponse> {
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
@@ -3279,7 +3128,7 @@ export async function saveWais3Mem3SpatialResponse(
   const scores = calculateMem3SpatialScores(input);
 
   const { data, error } = await supabase
-    .from('responses_wais3_mem3_spatial')
+    .from('responses_mem3_spatial')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -3324,4 +3173,15 @@ export async function saveWais3Mem3SpatialResponse(
 
   if (error) throw error;
   return data;
+}
+
+// Backward compatibility aliases
+export async function getWais3Mem3SpatialResponse(visitId: string): Promise<Mem3SpatialResponse | null> {
+  return getMem3SpatialResponse(visitId);
+}
+
+export async function saveWais3Mem3SpatialResponse(
+  response: Mem3SpatialResponseInsert
+): Promise<Mem3SpatialResponse> {
+  return saveMem3SpatialResponse(response);
 }
