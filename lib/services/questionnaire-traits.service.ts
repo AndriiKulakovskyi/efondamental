@@ -473,13 +473,15 @@ export async function saveAimResponse(
 }
 
 // WURS-25
+const WURS25_SELECT_FIELDS = 'id, visit_id, patient_id, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21, q22, q23, q24, q25, total_score, adhd_likely, interpretation, completed_by, completed_at, created_at, updated_at';
+
 export async function getWurs25Response(
   visitId: string
 ): Promise<Wurs25Response | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('responses_wurs25')
-    .select('*')
+    .select(WURS25_SELECT_FIELDS)
     .eq('visit_id', visitId)
     .single();
 
@@ -496,30 +498,55 @@ export async function saveWurs25Response(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Remove total_score if present (it's a generated column)
-  const { total_score, ...responseWithoutGeneratedFields } = response as any;
+  // Calculate total score for interpretation (DB also computes it as generated column)
+  const totalScore = response.q1 + response.q2 + response.q3 + response.q4 + response.q5 +
+                     response.q6 + response.q7 + response.q8 + response.q9 + response.q10 +
+                     response.q11 + response.q12 + response.q13 + response.q14 + response.q15 +
+                     response.q16 + response.q17 + response.q18 + response.q19 + response.q20 +
+                     response.q21 + response.q22 + response.q23 + response.q24 + response.q25;
 
-  // Total score is computed by database (generated column)
-  // Calculate total for interpretation
-  let totalScore = 0;
-  for (let i = 1; i <= 25; i++) {
-    totalScore += responseWithoutGeneratedFields[`q${i}` as keyof Wurs25ResponseInsert] as number;
-  }
-
-  const adhdLikely = totalScore >= 46;
+  // Clinical cutoff: Score >= 36 suggests childhood ADHD (86% sensitivity, 99% specificity)
+  const adhdLikely = totalScore >= 36;
   const interpretation = adhdLikely
-    ? `Score total: ${totalScore}/100. TDAH dans l'enfance probable (≥46).`
-    : `Score total: ${totalScore}/100. TDAH dans l'enfance peu probable (<46).`;
+    ? `Score total: ${totalScore}/100. TDAH dans l'enfance probable (score >= 36).`
+    : `Score total: ${totalScore}/100. TDAH dans l'enfance peu probable (score < 36).`;
 
+  // Only insert the fields that actually exist in the database
   const { data, error } = await supabase
     .from('responses_wurs25')
     .upsert({
-      ...responseWithoutGeneratedFields,
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      q1: response.q1,
+      q2: response.q2,
+      q3: response.q3,
+      q4: response.q4,
+      q5: response.q5,
+      q6: response.q6,
+      q7: response.q7,
+      q8: response.q8,
+      q9: response.q9,
+      q10: response.q10,
+      q11: response.q11,
+      q12: response.q12,
+      q13: response.q13,
+      q14: response.q14,
+      q15: response.q15,
+      q16: response.q16,
+      q17: response.q17,
+      q18: response.q18,
+      q19: response.q19,
+      q20: response.q20,
+      q21: response.q21,
+      q22: response.q22,
+      q23: response.q23,
+      q24: response.q24,
+      q25: response.q25,
       adhd_likely: adhdLikely,
       interpretation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
-    .select()
+    .select(WURS25_SELECT_FIELDS)
     .single();
 
   if (error) throw error;

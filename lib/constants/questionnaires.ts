@@ -1633,44 +1633,57 @@ export const AIM_DEFINITION: QuestionnaireDefinition = {
   }
 };
 
-// WURS-25 (Wender Utah Rating Scale)
+// WURS-25 (Wender Utah Rating Scale - Short Form)
+// Original WURS items mapping: 3,4,5,6,7,9,10,11,12,15,16,17,20,21,24,25,26,27,28,29,40,41,51,56,59
+const WURS25_OPTIONS = [
+  { code: 0, label: "Pas du tout, ou très légèrement" },
+  { code: 1, label: "Légèrement" },
+  { code: 2, label: "Modérément" },
+  { code: 3, label: "Assez" },
+  { code: 4, label: "Beaucoup" }
+];
+
 export const WURS25_QUESTIONS: Question[] = [
-  { id: 'q1', text: 'Des problèmes de concentration, facilement distrait(e)', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q2', text: 'Anxieux(se), se faisant du souci', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q3', text: 'Nerveux, ne tenant pas en place', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q4', text: 'Inattentif(ve), rêveur(se)', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q5', text: 'Facilement en colère, « soupe au lait »', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q6', text: "Des éclats d'humeur, des accès de colère", type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q7', text: "Des difficultés à me tenir aux choses, à mener mes projets jusqu'à la fin, à finir les choses commencées", type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q8', text: 'Têtu(e), obstiné(e)', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q9', text: 'Triste ou cafardeux(se), déprimé(e), malheureux(se)', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q10', text: 'Désobéissant(e) à mes parents, rebelle, effronté(e)', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q11', text: 'Une faible opinion de moi-même', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q12', text: 'Irritable', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q13', text: 'Colérique, ayant mauvais caractère', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q14', text: 'Agir sans réfléchir, impulsif(ve)', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q15', text: 'Tendance à être immature', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q16', text: 'Un sentiment de culpabilité, de regret', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q17', text: 'Perdre le contrôle de moi-même', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q18', text: 'Tendance à être ou à agir de façon irrationnelle', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q19', text: 'Impopulaire avec les autres enfants, je n’avais pas d’amis proches', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q20', text: 'Problèmes avec les autorités à l’école, visites chez le directeur', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q21', text: 'Mauvais résultats scolaires, n’étais pas bon(ne) à l’école', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q22', text: 'Des difficultés à s’arrêter et à réfléchir', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q23', text: 'Problèmes avec la police, activités illégales', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q24', text: 'Nerveux(se), agité(e)', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] },
-  { id: 'q25', text: 'Tendance à rêver éveillé(e)', type: 'single_choice', required: true, options: [{ code: 0, label: 'Pas du tout ou très peu' }, { code: 1, label: 'Un peu' }, { code: 2, label: 'Moyennement' }, { code: 3, label: 'Passablement' }, { code: 4, label: 'Beaucoup' }] }
+  { id: 'q1', text: "3. Des problèmes de concentration, facilement distrait (e)", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q2', text: "4. Anxieux (se), se faisant du souci", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q3', text: "5. Nerveux (se), ne tenant pas en place", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q4', text: "6. Inattentif (ve), rêveur (se)", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q5', text: "7. Facilement en colère, « soupe au lait »", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q6', text: "9. Des éclats d'humeur, des accès de colère", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q7', text: "10. Des difficultés à me tenir aux choses, à mener mes projets jusqu'à la fin, à finir les choses commencées", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q8', text: "11. Têtu (e), obstiné (e)", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q9', text: "12. Triste ou cafardeux (se), déprimé (e), malheureux (se)", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q10', text: "15. Désobéissant (e) à mes parents, rebelle, effronté (e)", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q11', text: "16. Une mauvaise opinion de moi-même", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q12', text: "17. Irritable", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q13', text: "20. D'humeur changeante, avec des hauts et des bas", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q14', text: "21. En colère", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q15', text: "24. Impulsif (ve), agissant sans réfléchir", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q16', text: "25. Tendance à être immature", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q17', text: "26. Culpabilisé (e), plein (e) de regrets", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q18', text: "27. Une perte du contrôle de moi-même", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q19', text: "28. Tendance à être ou à agir de façon irrationnelle", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q20', text: "29. Impopulaire auprès des autres enfants, ne gardant pas longtemps mes amis, ne m'entendant pas avec les autres enfants", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q21', text: "40. Du mal à voir les choses du point de vue de quelqu'un d'autre", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q22', text: "41. Des ennuis avec les autorités, l'école, convoqué (e) au bureau du proviseur", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q23', text: "51. Dans l'ensemble un (e) mauvais (e) élève, apprenant lentement", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q24', text: "56. Des difficultés en mathématiques ou avec les chiffres", type: 'single_choice', required: true, options: WURS25_OPTIONS },
+  { id: 'q25', text: "59. En dessous de son potentiel", type: 'single_choice', required: true, options: WURS25_OPTIONS }
 ];
 
 export const WURS25_DEFINITION: QuestionnaireDefinition = {
   id: 'wurs25',
   code: 'WURS25',
   title: 'WURS-25',
-  description: 'Wender Utah Rating Scale',
+  description: "Echelle de Wender Utah - Version courte (25 items)",
   questions: WURS25_QUESTIONS,
   metadata: {
     pathologies: ['bipolar'],
-    target_role: 'patient'
+    target_role: 'patient',
+    instructions: "Ce questionnaire porte sur votre enfance et adolescence. Pour chaque item, indiquez dans quelle mesure chaque description s'appliquait à vous avant l'âge de 12 ans.\n\nComme enfant j'étais (ou j'avais) :",
+    timeframe: "Avant l'âge de 12 ans",
+    cutoff_score: 36,
+    original_wurs_items: [3, 4, 5, 6, 7, 9, 10, 11, 12, 15, 16, 17, 20, 21, 24, 25, 26, 27, 28, 29, 40, 41, 51, 56, 59]
   }
 };
 

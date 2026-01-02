@@ -79,6 +79,12 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'info';
     }
     
+    if (code === 'WURS25') {
+      // WURS-25: Clinical cutoff >= 36 suggests childhood ADHD
+      if (data.adhd_likely || data.total_score >= 36) return 'warning';
+      return 'info';
+    }
+    
     if (code === 'ALDA') {
       // ALDA: Total score 7-10 = good responder, 4-6 = partial, 0-3 = non-responder
       if (data.alda_score >= 7) return 'success';
@@ -223,6 +229,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'ASRS_FR' && 'Résultat ASRS'}
               {code === 'CTQ_FR' && 'Résultats CTQ'}
               {code === 'BIS10_FR' && 'Résultats BIS-10'}
+              {code === 'WURS25' && 'Résultats WURS-25'}
               {code === 'ALDA' && 'Score Alda'}
               {code === 'CGI' && 'Résultats CGI'}
               {code === 'WAIS4_MATRICES_FR' && 'Résultats WAIS-IV Matrices'}
@@ -242,6 +249,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'BIS10_FR'
                 ? (data.overall_impulsivity !== undefined ? data.overall_impulsivity.toFixed(2) : '-')
+                : code === 'WURS25'
+                ? (data.adhd_likely ? 'POSITIF' : 'NÉGATIF')
                 : code === 'ALDA'
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
                 : code === 'CGI'
@@ -505,6 +514,36 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             {data.overall_impulsivity >= 2.5 && data.overall_impulsivity < 3.0 && (
               <p className="text-xs text-orange-700 mt-1 pt-2 border-t">
                 Niveau d'impulsivité modéré à élevé.
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* WURS-25 Details */}
+        {code === 'WURS25' && (
+          <div className="text-sm space-y-2 mt-2 pt-2 border-t">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Score total:</span>
+              <span className="font-semibold">{data.total_score ?? '-'}/100</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Seuil clinique:</span>
+              <span className="font-semibold">36</span>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">TDAH dans l'enfance:</span>
+              <span className={`font-bold text-lg ${data.adhd_likely ? 'text-orange-700' : 'text-blue-700'}`}>
+                {data.adhd_likely ? 'Probable' : 'Peu probable'}
+              </span>
+            </div>
+            {data.adhd_likely && (
+              <p className="text-xs text-orange-700 mt-1 pt-2 border-t">
+                Le score suggère la présence de symptômes de TDAH dans l'enfance (avant 12 ans). Une évaluation clinique complète est recommandée pour le diagnostic de TDAH chez l'adulte.
+              </p>
+            )}
+            {!data.adhd_likely && (
+              <p className="text-xs text-blue-700 mt-1 pt-2 border-t">
+                Le score ne suggère pas de symptômes significatifs de TDAH dans l'enfance.
               </p>
             )}
           </div>
