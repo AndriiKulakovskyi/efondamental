@@ -6554,6 +6554,24 @@ export const PATHO_DERMATO_QUESTIONS: Question[] = [
     indentLevel: 1,
     display_if: { '==': [{ var: 'q5_hair_loss' }, 'yes'] },
     options: YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'q5_5_hair_loss_triggered_valproate',
+    text: "Déclenché par l'acide valproïque",
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { '==': [{ var: 'q5_4_hair_loss_depakine' }, 'yes'] },
+    options: YES_NO_OPTIONS
+  },
+  {
+    id: 'q5_6_hair_loss_aggravated_valproate',
+    text: "Aggravé par l'acide valproïque",
+    type: 'single_choice',
+    required: false,
+    indentLevel: 2,
+    display_if: { '==': [{ var: 'q5_4_hair_loss_depakine' }, 'yes'] },
+    options: YES_NO_OPTIONS
   }
 ];
 

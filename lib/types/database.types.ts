@@ -2613,6 +2613,8 @@ export interface PathoDermatoResponse {
   q5_2_hair_loss_treated?: 'yes' | 'no' | null;
   q5_3_hair_loss_balanced?: 'yes' | 'no' | null;
   q5_4_hair_loss_depakine?: 'yes' | 'no' | 'unknown' | null;
+  q5_5_hair_loss_triggered_valproate?: 'yes' | 'no' | null;
+  q5_6_hair_loss_aggravated_valproate?: 'yes' | 'no' | null;
   
   // Metadata
   completed_at: string;
