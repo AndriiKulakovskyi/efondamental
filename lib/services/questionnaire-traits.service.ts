@@ -374,13 +374,15 @@ export async function saveAls18Response(
 }
 
 // AIM
+const AIM_SELECT_FIELDS = 'id, visit_id, patient_id, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, positive_affectivity_mean, negative_intensity_mean, reactivity_mean, total_mean, interpretation, completed_by, completed_at, created_at, updated_at';
+
 export async function getAimResponse(
   visitId: string
 ): Promise<AimResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('responses_aim')
-    .select('*')
+    .select(AIM_SELECT_FIELDS)
     .eq('visit_id', visitId)
     .single();
 
@@ -430,10 +432,32 @@ export async function saveAimResponse(
     `Intensité négative: ${negativeIntensityMean.toFixed(2)}, ` +
     `Réactivité: ${reactivityMean.toFixed(2)}.`;
 
+  // Only insert the fields that actually exist in the database
   const { data, error } = await supabase
     .from('responses_aim')
     .upsert({
-      ...response,
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      q1: response.q1,
+      q2: response.q2,
+      q3: response.q3,
+      q4: response.q4,
+      q5: response.q5,
+      q6: response.q6,
+      q7: response.q7,
+      q8: response.q8,
+      q9: response.q9,
+      q10: response.q10,
+      q11: response.q11,
+      q12: response.q12,
+      q13: response.q13,
+      q14: response.q14,
+      q15: response.q15,
+      q16: response.q16,
+      q17: response.q17,
+      q18: response.q18,
+      q19: response.q19,
+      q20: response.q20,
       positive_affectivity_mean: Number(positiveAffectivityMean.toFixed(2)),
       negative_intensity_mean: Number(negativeIntensityMean.toFixed(2)),
       reactivity_mean: Number(reactivityMean.toFixed(2)),
@@ -441,7 +465,7 @@ export async function saveAimResponse(
       interpretation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
-    .select()
+    .select(AIM_SELECT_FIELDS)
     .single();
 
   if (error) throw error;
