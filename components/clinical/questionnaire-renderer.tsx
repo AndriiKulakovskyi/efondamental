@@ -415,11 +415,12 @@ export function QuestionnaireRenderer({
       }
 
       // Compute COBRA total score (sum of q1-q16) - only for COBRA questionnaire
-      // Check if this is COBRA by verifying all 16 COBRA-specific fields exist
-      // This prevents conflict with other questionnaires that use q2, q3, etc. (like MDQ)
+      // Check if this is COBRA by verifying all 16 COBRA-specific fields exist AND q17 does NOT exist
+      // This prevents conflict with ALS18 (q1-q18) and other questionnaires
       const cobraFields = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9', 'q10', 'q11', 'q12', 'q13', 'q14', 'q15', 'q16'];
       const hasAllCobraFields = cobraFields.every(f => prev[f] !== undefined || prev[f] === 0);
-      if (hasAllCobraFields) {
+      const hasExtraQFields = prev['q17'] !== undefined || prev['q18'] !== undefined;
+      if (hasAllCobraFields && !hasExtraQFields) {
         const cobraValues = cobraFields.map(f => prev[f]).filter(v => v !== undefined && v !== '' && !isNaN(Number(v)));
         if (cobraValues.length > 0) {
           const cobraTotal = cobraValues.reduce((sum, v) => sum + Number(v), 0);

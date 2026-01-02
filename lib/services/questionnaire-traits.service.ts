@@ -295,7 +295,7 @@ export async function getAls18Response(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('responses_als18')
-    .select('*')
+    .select('id, visit_id, patient_id, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, anxiety_depression_mean, depression_elation_mean, anger_mean, total_mean, interpretation, completed_by, completed_at, created_at, updated_at')
     .eq('visit_id', visitId)
     .single();
 
@@ -335,10 +335,30 @@ export async function saveAls18Response(
     `Dépression-Élation: ${depressionElationMean.toFixed(2)}, ` +
     `Colère: ${angerMean.toFixed(2)}.`;
 
+  // Only insert the fields that actually exist in the database
   const { data, error } = await supabase
     .from('responses_als18')
     .upsert({
-      ...response,
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      q1: response.q1,
+      q2: response.q2,
+      q3: response.q3,
+      q4: response.q4,
+      q5: response.q5,
+      q6: response.q6,
+      q7: response.q7,
+      q8: response.q8,
+      q9: response.q9,
+      q10: response.q10,
+      q11: response.q11,
+      q12: response.q12,
+      q13: response.q13,
+      q14: response.q14,
+      q15: response.q15,
+      q16: response.q16,
+      q17: response.q17,
+      q18: response.q18,
       anxiety_depression_mean: Number(anxietyDepressionMean.toFixed(2)),
       depression_elation_mean: Number(depressionElationMean.toFixed(2)),
       anger_mean: Number(angerMean.toFixed(2)),
@@ -346,7 +366,7 @@ export async function saveAls18Response(
       interpretation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
-    .select()
+    .select('id, visit_id, patient_id, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, anxiety_depression_mean, depression_elation_mean, anger_mean, total_mean, interpretation, completed_by, completed_at, created_at, updated_at')
     .single();
 
   if (error) throw error;
