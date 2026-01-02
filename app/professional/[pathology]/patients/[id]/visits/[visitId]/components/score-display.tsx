@@ -433,7 +433,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 <span className="text-gray-600">Abus émotionnel:</span>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">{data.emotional_abuse_score ?? '-'}/25</span>
-                  <Badge variant={data.emotional_abuse_severity === 'severe' ? 'destructive' : data.emotional_abuse_severity === 'moderate' ? 'warning' : 'secondary'} className="text-xs">
+                  <Badge variant={data.emotional_abuse_severity === 'severe' ? 'destructive' : 'secondary'} className={`text-xs ${data.emotional_abuse_severity === 'moderate' ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
                     {data.emotional_abuse_severity === 'no_trauma' ? 'Absent' : data.emotional_abuse_severity === 'low' ? 'Faible' : data.emotional_abuse_severity === 'moderate' ? 'Modéré' : data.emotional_abuse_severity === 'severe' ? 'Sévère' : '-'}
                   </Badge>
                 </div>
@@ -442,7 +442,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 <span className="text-gray-600">Abus physique:</span>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">{data.physical_abuse_score ?? '-'}/25</span>
-                  <Badge variant={data.physical_abuse_severity === 'severe' ? 'destructive' : data.physical_abuse_severity === 'moderate' ? 'warning' : 'secondary'} className="text-xs">
+                  <Badge variant={data.physical_abuse_severity === 'severe' ? 'destructive' : 'secondary'} className={`text-xs ${data.physical_abuse_severity === 'moderate' ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
                     {data.physical_abuse_severity === 'no_trauma' ? 'Absent' : data.physical_abuse_severity === 'low' ? 'Faible' : data.physical_abuse_severity === 'moderate' ? 'Modéré' : data.physical_abuse_severity === 'severe' ? 'Sévère' : '-'}
                   </Badge>
                 </div>
@@ -451,7 +451,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 <span className="text-gray-600">Abus sexuel:</span>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">{data.sexual_abuse_score ?? '-'}/25</span>
-                  <Badge variant={data.sexual_abuse_severity === 'severe' ? 'destructive' : data.sexual_abuse_severity === 'moderate' ? 'warning' : 'secondary'} className="text-xs">
+                  <Badge variant={data.sexual_abuse_severity === 'severe' ? 'destructive' : 'secondary'} className={`text-xs ${data.sexual_abuse_severity === 'moderate' ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
                     {data.sexual_abuse_severity === 'no_trauma' ? 'Absent' : data.sexual_abuse_severity === 'low' ? 'Faible' : data.sexual_abuse_severity === 'moderate' ? 'Modéré' : data.sexual_abuse_severity === 'severe' ? 'Sévère' : '-'}
                   </Badge>
                 </div>
@@ -460,7 +460,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 <span className="text-gray-600">Négligence émotionnelle:</span>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">{data.emotional_neglect_score ?? '-'}/25</span>
-                  <Badge variant={data.emotional_neglect_severity === 'severe' ? 'destructive' : data.emotional_neglect_severity === 'moderate' ? 'warning' : 'secondary'} className="text-xs">
+                  <Badge variant={data.emotional_neglect_severity === 'severe' ? 'destructive' : 'secondary'} className={`text-xs ${data.emotional_neglect_severity === 'moderate' ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
                     {data.emotional_neglect_severity === 'no_trauma' ? 'Absent' : data.emotional_neglect_severity === 'low' ? 'Faible' : data.emotional_neglect_severity === 'moderate' ? 'Modéré' : data.emotional_neglect_severity === 'severe' ? 'Sévère' : '-'}
                   </Badge>
                 </div>
@@ -469,7 +469,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 <span className="text-gray-600">Négligence physique:</span>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">{data.physical_neglect_score ?? '-'}/25</span>
-                  <Badge variant={data.physical_neglect_severity === 'severe' ? 'destructive' : data.physical_neglect_severity === 'moderate' ? 'warning' : 'secondary'} className="text-xs">
+                  <Badge variant={data.physical_neglect_severity === 'severe' ? 'destructive' : 'secondary'} className={`text-xs ${data.physical_neglect_severity === 'moderate' ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
                     {data.physical_neglect_severity === 'no_trauma' ? 'Absent' : data.physical_neglect_severity === 'low' ? 'Faible' : data.physical_neglect_severity === 'moderate' ? 'Modéré' : data.physical_neglect_severity === 'severe' ? 'Sévère' : '-'}
                   </Badge>
                 </div>
