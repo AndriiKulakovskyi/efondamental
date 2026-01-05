@@ -633,6 +633,12 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
   if (visit.visit_type === 'biannual_followup' || visit.visit_type === 'annual_evaluation') {
     return [
       {
+        id: 'mod_nurse',
+        name: 'Infirmier',
+        description: 'Évaluation par l\'infirmier',
+        questionnaires: [TOBACCO_DEFINITION, FAGERSTROM_DEFINITION, PHYSICAL_PARAMS_DEFINITION, BLOOD_PRESSURE_DEFINITION, SLEEP_APNEA_DEFINITION, BIOLOGICAL_ASSESSMENT_DEFINITION]
+      },
+      {
         id: 'mod_thymic_eval',
         name: 'Evaluation état thymique et fonctionnement',
         description: 'Évaluation de l\'état thymique et du fonctionnement',
@@ -850,16 +856,27 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (wais4Matrices) completed++;
     if (wais4DigitSpan) completed++;
   } else if (visit.visit_type === 'biannual_followup' || visit.visit_type === 'annual_evaluation') {
-    // Follow-up visits: 5 thymic + 4 medical (DSM5 Comorbid, DIVA, CSSRS, ISA) + 5 auto etat = 14 total
-    // Note: DIVA is conditionally included based on DSM5 Comorbid response
-    total = 14;
-    totalModules = 3;
+    // Follow-up visits: 6 infirmier + 5 thymic + 4 medical (DSM5 Comorbid, DIVA, CSSRS, ISA) + 5 auto etat = 20 total
+    total = 20;
+    totalModules = 4;
 
     const [
+      // Infirmier questionnaires
+      tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biologicalAssessment,
+      // Thymic evaluation questionnaires
       madrs, ymrs, cgi, egf, fast,
+      // Medical evaluation questionnaires
       dsm5Comorbid, diva, cssrs, isa,
+      // Auto-questionnaires ETAT
       eq5d5l, asrm, qids, psqi, epworth
     ] = await Promise.all([
+      // Infirmier questionnaires
+      getTobaccoResponse(visitId),
+      getFagerstromResponse(visitId),
+      getPhysicalParamsResponse(visitId),
+      getBloodPressureResponse(visitId),
+      getSleepApneaResponse(visitId),
+      getBiologicalAssessmentResponse(visitId),
       // Thymic evaluation questionnaires
       getMadrsResponse(visitId),
       getYmrsResponse(visitId),
@@ -878,6 +895,14 @@ export async function getVisitCompletionStatus(visitId: string) {
       getPsqiResponse(visitId),
       getEpworthResponse(visitId)
     ]);
+
+    // Count infirmier questionnaires
+    if (tobacco) completed++;
+    if (fagerstrom) completed++;
+    if (physicalParams) completed++;
+    if (bloodPressure) completed++;
+    if (sleepApnea) completed++;
+    if (biologicalAssessment) completed++;
 
     // Count thymic evaluation
     if (madrs) completed++;

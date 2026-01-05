@@ -948,8 +948,99 @@ export default async function VisitDetailPage({
       }
     ];
   } else if (visit.visit_type === 'biannual_followup' || visit.visit_type === 'annual_evaluation') {
+    // Build nurse module questionnaires with conditional Fagerstrom for follow-up visits
+    const followupNurseQuestionnaires: any[] = [
+      {
+        ...TOBACCO_DEFINITION,
+        id: TOBACCO_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['TOBACCO_FR']?.completed || false,
+        completedAt: questionnaireStatuses['TOBACCO_FR']?.completed_at,
+      },
+    ];
+    
+    // Add Fagerstrom with conditional display properties (ALWAYS visible)
+    if (!tobaccoAnswered) {
+      followupNurseQuestionnaires.push({
+        ...FAGERSTROM_DEFINITION,
+        id: FAGERSTROM_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: false,
+        completedAt: null,
+        isConditional: true,
+        conditionMet: false,
+        conditionMessage: 'Complétez d\'abord l\'évaluation du tabagisme',
+      });
+    } else if (isFagerstromRequired) {
+      followupNurseQuestionnaires.push({
+        ...FAGERSTROM_DEFINITION,
+        id: FAGERSTROM_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['FAGERSTROM_FR']?.completed || false,
+        completedAt: questionnaireStatuses['FAGERSTROM_FR']?.completed_at,
+        isConditional: true,
+        conditionMet: true,
+      });
+    } else {
+      followupNurseQuestionnaires.push({
+        ...FAGERSTROM_DEFINITION,
+        id: FAGERSTROM_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: false,
+        completedAt: null,
+        isConditional: true,
+        conditionMet: false,
+        conditionMessage: 'Non applicable - le patient n\'est pas fumeur',
+      });
+    }
+    
+    // Add remaining nurse questionnaires
+    followupNurseQuestionnaires.push(
+      {
+        ...PHYSICAL_PARAMS_DEFINITION,
+        id: PHYSICAL_PARAMS_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['PHYSICAL_PARAMS_FR']?.completed || false,
+        completedAt: questionnaireStatuses['PHYSICAL_PARAMS_FR']?.completed_at,
+      },
+      {
+        ...BLOOD_PRESSURE_DEFINITION,
+        id: BLOOD_PRESSURE_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['BLOOD_PRESSURE_FR']?.completed || false,
+        completedAt: questionnaireStatuses['BLOOD_PRESSURE_FR']?.completed_at,
+      },
+      {
+        ...ECG_DEFINITION,
+        id: ECG_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['ECG_FR']?.completed || false,
+        completedAt: questionnaireStatuses['ECG_FR']?.completed_at,
+      },
+      {
+        ...SLEEP_APNEA_DEFINITION,
+        id: SLEEP_APNEA_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['SLEEP_APNEA_FR']?.completed || false,
+        completedAt: questionnaireStatuses['SLEEP_APNEA_FR']?.completed_at,
+      },
+      {
+        ...BIOLOGICAL_ASSESSMENT_DEFINITION,
+        id: BIOLOGICAL_ASSESSMENT_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['BIOLOGICAL_ASSESSMENT_FR']?.completed || false,
+        completedAt: questionnaireStatuses['BIOLOGICAL_ASSESSMENT_FR']?.completed_at,
+      }
+    );
+
     // Build follow-up visit modules with conditional DIVA
     modulesWithQuestionnaires = [
+      {
+        id: 'mod_nurse',
+        name: 'Infirmier',
+        description: 'Évaluation par l\'infirmier',
+        questionnaires: followupNurseQuestionnaires
+      },
       {
         id: 'mod_thymic_eval',
         name: 'Evaluation état thymique et fonctionnement',
