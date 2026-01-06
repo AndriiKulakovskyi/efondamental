@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Users, BarChart3, LayoutGrid, ArrowLeft } from "lucide-react";
+import * as LucideIcons from "lucide-react";
+
+const { Users, BarChart3, LayoutGrid, ArrowLeft } = LucideIcons;
 
 interface PathologyNavProps {
   pathology: string;
