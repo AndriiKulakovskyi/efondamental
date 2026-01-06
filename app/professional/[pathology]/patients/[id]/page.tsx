@@ -3,6 +3,7 @@ import { recordPatientAccess } from "@/lib/services/patient.service";
 import { getUserContext } from "@/lib/rbac/middleware";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertTriangle, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { notFound, redirect } from "next/navigation";
 import { formatRiskLevel } from "@/lib/utils/formatting";
@@ -118,17 +119,24 @@ export default async function PatientDetailPage({
               </div>
             </div>
           </div>
-          <QuickActionsMenu
-            patientId={id}
-            patientFirstName={patient.first_name}
-            patientLastName={patient.last_name}
-            currentEmail={patient.email}
-            currentAssignedTo={patient.assigned_to}
-            createdBy={patient.created_by}
-            currentUserId={context.user.id}
-            doctors={doctors}
-            pathology={pathology}
-          />
+          <div className="flex flex-col gap-3 items-end">
+            <QuickActionsMenu
+              patientId={id}
+              patientFirstName={patient.first_name}
+              patientLastName={patient.last_name}
+              currentEmail={patient.email}
+              currentAssignedTo={patient.assigned_to}
+              createdBy={patient.created_by}
+              currentUserId={context.user.id}
+              doctors={doctors}
+              pathology={pathology}
+            />
+            <Link href={`/professional/${pathology}/patients/${id}/treatment`} className="w-full">
+              <Button variant="outline" size="sm" className="w-full gap-2 bg-brand hover:bg-brand-dark text-white border-brand">
+                Traitement
+              </Button>
+            </Link>
+          </div>
           </div>
 
           {/* Risk Alert */}

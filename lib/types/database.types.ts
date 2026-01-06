@@ -4115,3 +4115,133 @@ export type Mem3SpatialResponseInsert = Omit<Mem3SpatialResponse, 'id' | 'create
 export type Wais3Mem3SpatialResponse = Mem3SpatialResponse;
 export type Wais3Mem3SpatialResponseInsert = Mem3SpatialResponseInsert;
 
+// ============================================================================
+// TREATMENT MANAGEMENT TYPES
+// ============================================================================
+
+// Patient Medications (psychotropic treatments per patient)
+export interface PatientMedication {
+  id: string;
+  patient_id: string;
+  medication_name: string;
+  start_date: string;
+  is_ongoing: boolean;
+  end_date: string | null;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+}
+
+export type PatientMedicationInsert = Omit<PatientMedication, 'id' | 'created_at' | 'updated_at'>;
+export type PatientMedicationUpdate = Partial<Omit<PatientMedication, 'id' | 'patient_id' | 'created_at'>>;
+
+// Psychotropes Lifetime Response (psychiatric medication history questionnaire)
+export interface PsychotropesLifetimeResponse {
+  id: string;
+  patient_id: string;
+  collection_date: string | null;
+  
+  // Antidepresseur
+  antidepresseur_status: 'yes' | 'no' | 'unknown' | null;
+  antidepresseur_start_date: string | null;
+  antidepresseur_months: number | null;
+  
+  // Neuroleptique classique
+  neuroleptique_status: 'yes' | 'no' | 'unknown' | null;
+  neuroleptique_start_date: string | null;
+  neuroleptique_months: number | null;
+  
+  // Antipsychotique atypique
+  antipsychotique_status: 'yes' | 'no' | 'unknown' | null;
+  antipsychotique_start_date: string | null;
+  antipsychotique_months: number | null;
+  
+  // Benzodiazepine / Hypnotique / Anxiolytique
+  benzodiazepine_status: 'yes' | 'no' | 'unknown' | null;
+  benzodiazepine_start_date: string | null;
+  benzodiazepine_months: number | null;
+  
+  // Lithium
+  lithium_status: 'yes' | 'no' | 'unknown' | null;
+  lithium_start_date: string | null;
+  lithium_months: number | null;
+  
+  // Thymoregulateur AC
+  thymoregulateur_status: 'yes' | 'no' | 'unknown' | null;
+  thymoregulateur_start_date: string | null;
+  thymoregulateur_months: number | null;
+  
+  completed_at?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type PsychotropesLifetimeResponseInsert = Omit<PsychotropesLifetimeResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// Somatic and Contraceptive Treatment Entry
+export interface SomaticContraceptiveEntry {
+  id: string;
+  patient_id: string;
+  medication_name: string;
+  start_date: string | null;
+  months_exposure: number | null;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+}
+
+export type SomaticContraceptiveEntryInsert = Omit<SomaticContraceptiveEntry, 'id' | 'created_at' | 'updated_at'>;
+
+// Non-Pharmacologic Response (non-drug therapy questionnaire)
+export interface NonPharmacologicResponse {
+  id: string;
+  patient_id: string;
+  global_screening: 'yes' | 'no' | 'unknown' | null;
+  
+  // Sismotherapie (ECT)
+  sismotherapie_status: 'yes' | 'no' | 'unknown' | null;
+  sismotherapie_sessions: number | null;
+  sismotherapie_start_date: string | null;
+  sismotherapie_end_date: string | null;
+  
+  // TMS
+  tms_status: 'yes' | 'no' | 'unknown' | null;
+  tms_sessions: number | null;
+  tms_start_date: string | null;
+  tms_end_date: string | null;
+  
+  // TCC (CBT)
+  tcc_status: 'yes' | 'no' | 'unknown' | null;
+  tcc_sessions: number | null;
+  tcc_start_date: string | null;
+  tcc_end_date: string | null;
+  
+  // Psychoeducation groups
+  psychoeducation_status: 'yes' | 'no' | 'unknown' | null;
+  psychoeducation_sessions: number | null;
+  psychoeducation_start_date: string | null;
+  psychoeducation_end_date: string | null;
+  
+  // IPSRT
+  ipsrt_status: 'yes' | 'no' | 'unknown' | null;
+  ipsrt_sessions: number | null;
+  ipsrt_start_date: string | null;
+  ipsrt_end_date: string | null;
+  ipsrt_group: boolean;
+  ipsrt_individual: boolean;
+  ipsrt_unknown_format: boolean;
+  
+  // Autre (Other)
+  autre_status: 'yes' | 'no' | 'unknown' | null;
+  autre_specify: string | null;
+  autre_sessions: number | null;
+  autre_start_date: string | null;
+  autre_end_date: string | null;
+  
+  completed_at?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type NonPharmacologicResponseInsert = Omit<NonPharmacologicResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
