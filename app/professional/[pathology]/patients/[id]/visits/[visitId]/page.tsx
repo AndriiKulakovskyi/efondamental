@@ -1262,49 +1262,7 @@ export default async function VisitDetailPage({
             }
           ]
         };
-      })(),
-      {
-        id: 'mod_auto_etat',
-        name: 'Autoquestionnaires - ETAT',
-        description: 'Questionnaires sur l\'état actuel du patient',
-        questionnaires: [
-          {
-            ...EQ5D5L_DEFINITION,
-            id: EQ5D5L_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['EQ5D5L_FR']?.completed || false,
-            completedAt: questionnaireStatuses['EQ5D5L_FR']?.completed_at,
-          },
-          {
-            ...ASRM_DEFINITION,
-            id: ASRM_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['ASRM_FR']?.completed || false,
-            completedAt: questionnaireStatuses['ASRM_FR']?.completed_at,
-          },
-          {
-            ...QIDS_DEFINITION,
-            id: QIDS_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['QIDS_SR16_FR']?.completed || false,
-            completedAt: questionnaireStatuses['QIDS_SR16_FR']?.completed_at,
-          },
-          {
-            ...PSQI_DEFINITION,
-            id: PSQI_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['PSQI_FR']?.completed || false,
-            completedAt: questionnaireStatuses['PSQI_FR']?.completed_at,
-          },
-          {
-            ...EPWORTH_DEFINITION,
-            id: EPWORTH_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['EPWORTH_FR']?.completed || false,
-            completedAt: questionnaireStatuses['EPWORTH_FR']?.completed_at,
-          }
-        ]
-      }
+      })()
     ];
   }
 

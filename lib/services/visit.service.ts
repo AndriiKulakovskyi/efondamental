@@ -663,18 +663,6 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           ISA_DEFINITION
         ]
       },
-      {
-        id: 'mod_auto_etat',
-        name: 'Autoquestionnaires - ETAT',
-        description: 'Questionnaires sur l\'état actuel du patient',
-        questionnaires: [
-          EQ5D5L_DEFINITION,
-          ASRM_DEFINITION,
-          QIDS_DEFINITION,
-          PSQI_DEFINITION,
-          EPWORTH_DEFINITION
-        ]
-      }
     ];
   }
 
