@@ -1041,62 +1041,6 @@ export default async function VisitDetailPage({
         description: 'Évaluation par l\'infirmier',
         questionnaires: followupNurseQuestionnaires
       },
-      {
-        id: 'mod_thymic_eval',
-        name: 'Evaluation état thymique et fonctionnement',
-        description: 'Évaluation de l\'état thymique et du fonctionnement',
-        questionnaires: [
-          {
-            ...MADRS_DEFINITION,
-            id: MADRS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['MADRS_FR']?.completed || false,
-            completedAt: questionnaireStatuses['MADRS_FR']?.completed_at,
-          },
-          {
-            ...YMRS_DEFINITION,
-            id: YMRS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['YMRS_FR']?.completed || false,
-            completedAt: questionnaireStatuses['YMRS_FR']?.completed_at,
-          },
-          {
-            ...CGI_DEFINITION,
-            id: CGI_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['CGI_FR']?.completed || false,
-            completedAt: questionnaireStatuses['CGI_FR']?.completed_at,
-          },
-          {
-            ...EGF_DEFINITION,
-            id: EGF_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['EGF_FR']?.completed || false,
-            completedAt: questionnaireStatuses['EGF_FR']?.completed_at,
-          },
-          {
-            ...ALDA_DEFINITION,
-            id: ALDA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ALDA_FR']?.completed || false,
-            completedAt: questionnaireStatuses['ALDA_FR']?.completed_at,
-          },
-          {
-            ...ETAT_PATIENT_DEFINITION,
-            id: ETAT_PATIENT_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ETAT_PATIENT_FR']?.completed || false,
-            completedAt: questionnaireStatuses['ETAT_PATIENT_FR']?.completed_at,
-          },
-          {
-            ...FAST_DEFINITION,
-            id: FAST_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['FAST_FR']?.completed || false,
-            completedAt: questionnaireStatuses['FAST_FR']?.completed_at,
-          }
-        ]
-      },
       // Build medical evaluation module with sections for follow-up visits
       (() => {
         // Build DSM5 section questionnaires with conditional DIVA
@@ -1262,7 +1206,63 @@ export default async function VisitDetailPage({
             }
           ]
         };
-      })()
+      })(),
+      {
+        id: 'mod_thymic_eval',
+        name: 'Evaluation état thymique et fonctionnement',
+        description: 'Évaluation de l\'état thymique et du fonctionnement',
+        questionnaires: [
+          {
+            ...MADRS_DEFINITION,
+            id: MADRS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['MADRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['MADRS_FR']?.completed_at,
+          },
+          {
+            ...YMRS_DEFINITION,
+            id: YMRS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['YMRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['YMRS_FR']?.completed_at,
+          },
+          {
+            ...CGI_DEFINITION,
+            id: CGI_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['CGI_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CGI_FR']?.completed_at,
+          },
+          {
+            ...EGF_DEFINITION,
+            id: EGF_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['EGF_FR']?.completed || false,
+            completedAt: questionnaireStatuses['EGF_FR']?.completed_at,
+          },
+          {
+            ...ALDA_DEFINITION,
+            id: ALDA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ALDA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ALDA_FR']?.completed_at,
+          },
+          {
+            ...ETAT_PATIENT_DEFINITION,
+            id: ETAT_PATIENT_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ETAT_PATIENT_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ETAT_PATIENT_FR']?.completed_at,
+          },
+          {
+            ...FAST_DEFINITION,
+            id: FAST_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['FAST_FR']?.completed || false,
+            completedAt: questionnaireStatuses['FAST_FR']?.completed_at,
+          }
+        ]
+      }
     ];
   }
 

@@ -639,6 +639,17 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         questionnaires: [TOBACCO_DEFINITION, FAGERSTROM_DEFINITION, PHYSICAL_PARAMS_DEFINITION, BLOOD_PRESSURE_DEFINITION, SLEEP_APNEA_DEFINITION, BIOLOGICAL_ASSESSMENT_DEFINITION]
       },
       {
+        id: 'mod_medical_eval',
+        name: 'Evaluation Médicale',
+        description: 'Évaluation médicale complète',
+        questionnaires: [
+          DSM5_COMORBID_DEFINITION,
+          DIVA_DEFINITION,
+          CSSRS_DEFINITION,
+          ISA_DEFINITION
+        ]
+      },
+      {
         id: 'mod_thymic_eval',
         name: 'Evaluation état thymique et fonctionnement',
         description: 'Évaluation de l\'état thymique et du fonctionnement',
@@ -650,17 +661,6 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           ALDA_DEFINITION,
           ETAT_PATIENT_DEFINITION,
           FAST_DEFINITION
-        ]
-      },
-      {
-        id: 'mod_medical_eval',
-        name: 'Evaluation Médicale',
-        description: 'Évaluation médicale complète',
-        questionnaires: [
-          DSM5_COMORBID_DEFINITION,
-          DIVA_DEFINITION,
-          CSSRS_DEFINITION,
-          ISA_DEFINITION
         ]
       },
     ];
