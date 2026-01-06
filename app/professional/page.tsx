@@ -1,10 +1,11 @@
 import { getUserContext } from "@/lib/rbac/middleware";
 import { getCenterPathologies } from "@/lib/services/center.service";
+import { getPathologyLandingStats } from "@/lib/services/analytics.service";
 import { PATHOLOGY_NAMES, PathologyType } from "@/lib/types/enums";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { UserProfileDropdown } from "@/components/user-profile-dropdown";
-import { Activity, ArrowRight } from "lucide-react";
+import { Activity, ArrowRight, UserPlus } from "lucide-react";
 
 export default async function ProfessionalLandingPage() {
   const context = await getUserContext();
@@ -13,7 +14,16 @@ export default async function ProfessionalLandingPage() {
     redirect("/auth/error?message=No center assigned");
   }
 
-  const pathologies = await getCenterPathologies(context.profile.center_id);
+  // Fetch pathologies and their statistics in parallel
+  const [pathologies, pathologyStats] = await Promise.all([
+    getCenterPathologies(context.profile.center_id),
+    getPathologyLandingStats(context.profile.center_id),
+  ]);
+
+  // Create a lookup map for quick access to stats by pathology type
+  const statsMap = new Map(
+    pathologyStats.map((stat) => [stat.pathologyType, stat])
+  );
 
   const getPathologyConfig = (index: number) => {
     const configs = [
@@ -102,6 +112,9 @@ export default async function ProfessionalLandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {pathologies.map((pathology, index) => {
                 const config = getPathologyConfig(index);
+                const stats = statsMap.get(pathology.type as PathologyType);
+                const activePatients = stats?.activePatients ?? 0;
+                const newPatientsThisMonth = stats?.newPatientsThisMonth ?? 0;
                 
                 return (
                   <Link
@@ -145,16 +158,17 @@ export default async function ProfessionalLandingPage() {
                         Patients actifs
                       </span>
                       <span className="text-lg font-bold text-slate-900">
-                        {Math.floor(Math.random() * 50 + 20)}
+                        {activePatients}
                       </span>
                               </div>
                     <div className="w-px h-8 bg-slate-100"></div>
                     <div className="flex flex-col">
-                      <span className="text-xs text-slate-400 font-medium uppercase tracking-wider">
-                        Dernière MAJ
+                      <span className="text-xs text-slate-400 font-medium uppercase tracking-wider flex items-center gap-1">
+                        <UserPlus className="w-3 h-3" />
+                        Nouvelles inclusions
                       </span>
-                      <span className="text-sm font-medium text-slate-600">
-                        Il y a {Math.floor(Math.random() * 5 + 1)}h
+                      <span className="text-lg font-bold text-slate-900">
+                        {newPatientsThisMonth}
                       </span>
                               </div>
                     <div className="ml-auto">

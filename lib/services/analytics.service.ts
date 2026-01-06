@@ -232,6 +232,71 @@ export async function getProfessionalPatientCount(professionalId: string) {
 }
 
 // ============================================================================
+// PATHOLOGY LANDING PAGE STATISTICS
+// ============================================================================
+
+export interface PathologyLandingStats {
+  pathologyType: PathologyType;
+  activePatients: number;
+  newPatientsThisMonth: number;
+}
+
+/**
+ * Fetches statistics for all pathologies in a center for the landing page.
+ * Returns active patient count and new patient enrollments this month per pathology.
+ */
+export async function getPathologyLandingStats(
+  centerId: string
+): Promise<PathologyLandingStats[]> {
+  const supabase = await createClient();
+
+  // Calculate first day of current month
+  const firstDayOfMonth = new Date();
+  firstDayOfMonth.setDate(1);
+  firstDayOfMonth.setHours(0, 0, 0, 0);
+  const firstDayISO = firstDayOfMonth.toISOString();
+
+  // Fetch all active patients with their pathology info in a single query
+  const { data: patients, error } = await supabase
+    .from('patients')
+    .select('pathology_id, created_at, pathologies(type)')
+    .eq('center_id', centerId)
+    .eq('active', true);
+
+  if (error) {
+    console.error('Error fetching pathology landing stats:', error);
+    return [];
+  }
+
+  // Group patients by pathology type
+  const statsMap = new Map<PathologyType, { active: number; newThisMonth: number }>();
+
+  patients?.forEach((patient: any) => {
+    const pathologyType = patient.pathologies?.type as PathologyType;
+    if (!pathologyType) return;
+
+    if (!statsMap.has(pathologyType)) {
+      statsMap.set(pathologyType, { active: 0, newThisMonth: 0 });
+    }
+
+    const stats = statsMap.get(pathologyType)!;
+    stats.active++;
+
+    // Check if patient was created this month
+    if (patient.created_at && patient.created_at >= firstDayISO) {
+      stats.newThisMonth++;
+    }
+  });
+
+  // Convert map to array
+  return Array.from(statsMap.entries()).map(([pathologyType, stats]) => ({
+    pathologyType,
+    activePatients: stats.active,
+    newPatientsThisMonth: stats.newThisMonth,
+  }));
+}
+
+// ============================================================================
 // PATHOLOGY-SPECIFIC ANALYTICS
 // ============================================================================
 
