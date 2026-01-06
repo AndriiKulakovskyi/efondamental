@@ -647,6 +647,8 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           YMRS_DEFINITION,
           CGI_DEFINITION,
           EGF_DEFINITION,
+          ALDA_DEFINITION,
+          ETAT_PATIENT_DEFINITION,
           FAST_DEFINITION
         ]
       },

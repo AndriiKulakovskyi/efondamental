@@ -1075,6 +1075,20 @@ export default async function VisitDetailPage({
             completedAt: questionnaireStatuses['EGF_FR']?.completed_at,
           },
           {
+            ...ALDA_DEFINITION,
+            id: ALDA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ALDA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ALDA_FR']?.completed_at,
+          },
+          {
+            ...ETAT_PATIENT_DEFINITION,
+            id: ETAT_PATIENT_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ETAT_PATIENT_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ETAT_PATIENT_FR']?.completed_at,
+          },
+          {
             ...FAST_DEFINITION,
             id: FAST_DEFINITION.code,
             target_role: 'healthcare_professional',
