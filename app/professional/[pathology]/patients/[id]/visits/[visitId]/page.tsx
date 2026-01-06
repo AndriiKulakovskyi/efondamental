@@ -1110,8 +1110,8 @@ export default async function VisitDetailPage({
           }
         ];
 
-        // Build Histoire somatique section questionnaires
-        const histoireSomatiqueQuestionnaires = [
+        // Build Histoire somatique section questionnaires (only for annual_evaluation, not biannual_followup)
+        const histoireSomatiqueQuestionnaires = visit.visit_type === 'annual_evaluation' ? [
           {
             ...PERINATALITE_DEFINITION,
             id: PERINATALITE_DEFINITION.code,
@@ -1182,29 +1182,36 @@ export default async function VisitDetailPage({
             completed: questionnaireStatuses['AUTRES_PATHO_FR']?.completed || false,
             completedAt: questionnaireStatuses['AUTRES_PATHO_FR']?.completed_at,
           }
+        ] : [];
+        
+        // Build sections array - include histoire_somatique only for annual_evaluation
+        const medicalSections = [
+          {
+            id: 'dsm5',
+            name: 'DSM5',
+            questionnaires: dsm5Questionnaires
+          },
+          {
+            id: 'suicide',
+            name: 'Suicide',
+            questionnaires: suicideQuestionnaires
+          }
         ];
+        
+        // Add Histoire somatique section only for annual_evaluation
+        if (visit.visit_type === 'annual_evaluation') {
+          medicalSections.push({
+            id: 'histoire_somatique',
+            name: 'Histoire somatique',
+            questionnaires: histoireSomatiqueQuestionnaires
+          });
+        }
         
         return {
           id: 'mod_medical_eval',
           name: 'Evaluation Médicale',
           description: 'Évaluation médicale complète',
-          sections: [
-            {
-              id: 'dsm5',
-              name: 'DSM5',
-              questionnaires: dsm5Questionnaires
-            },
-            {
-              id: 'suicide',
-              name: 'Suicide',
-              questionnaires: suicideQuestionnaires
-            },
-            {
-              id: 'histoire_somatique',
-              name: 'Histoire somatique',
-              questionnaires: histoireSomatiqueQuestionnaires
-            }
-          ]
+          sections: medicalSections
         };
       })(),
       {
