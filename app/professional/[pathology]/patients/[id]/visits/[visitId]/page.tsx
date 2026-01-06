@@ -947,9 +947,9 @@ export default async function VisitDetailPage({
         ]
       }
     ];
-  } else if (visit.visit_type === 'biannual_followup' || visit.visit_type === 'annual_evaluation') {
-    // Build nurse module questionnaires with conditional Fagerstrom for follow-up visits
-    const followupNurseQuestionnaires: any[] = [
+  } else if (visit.visit_type === 'biannual_followup') {
+    // Build nurse module questionnaires with conditional Fagerstrom for biannual follow-up
+    const biannualNurseQuestionnaires: any[] = [
       {
         ...TOBACCO_DEFINITION,
         id: TOBACCO_DEFINITION.code,
@@ -961,7 +961,7 @@ export default async function VisitDetailPage({
     
     // Add Fagerstrom with conditional display properties (ALWAYS visible)
     if (!tobaccoAnswered) {
-      followupNurseQuestionnaires.push({
+      biannualNurseQuestionnaires.push({
         ...FAGERSTROM_DEFINITION,
         id: FAGERSTROM_DEFINITION.code,
         target_role: 'healthcare_professional',
@@ -972,7 +972,7 @@ export default async function VisitDetailPage({
         conditionMessage: 'Complétez d\'abord l\'évaluation du tabagisme',
       });
     } else if (isFagerstromRequired) {
-      followupNurseQuestionnaires.push({
+      biannualNurseQuestionnaires.push({
         ...FAGERSTROM_DEFINITION,
         id: FAGERSTROM_DEFINITION.code,
         target_role: 'healthcare_professional',
@@ -982,7 +982,7 @@ export default async function VisitDetailPage({
         conditionMet: true,
       });
     } else {
-      followupNurseQuestionnaires.push({
+      biannualNurseQuestionnaires.push({
         ...FAGERSTROM_DEFINITION,
         id: FAGERSTROM_DEFINITION.code,
         target_role: 'healthcare_professional',
@@ -994,8 +994,8 @@ export default async function VisitDetailPage({
       });
     }
     
-    // Add remaining nurse questionnaires
-    followupNurseQuestionnaires.push(
+    // Add remaining nurse questionnaires for biannual
+    biannualNurseQuestionnaires.push(
       {
         ...PHYSICAL_PARAMS_DEFINITION,
         id: PHYSICAL_PARAMS_DEFINITION.code,
@@ -1033,15 +1033,15 @@ export default async function VisitDetailPage({
       }
     );
 
-    // Build follow-up visit modules with conditional DIVA
+    // Build biannual follow-up visit modules with conditional DIVA
     modulesWithQuestionnaires = [
       {
         id: 'mod_nurse',
         name: 'Infirmier',
         description: 'Évaluation par l\'infirmier',
-        questionnaires: followupNurseQuestionnaires
+        questionnaires: biannualNurseQuestionnaires
       },
-      // Build medical evaluation module with sections for follow-up visits
+      // Build medical evaluation module with sections for biannual follow-up
       (() => {
         // Build DSM5 section questionnaires with conditional DIVA
         const dsm5Questionnaires: any[] = [
@@ -1054,9 +1054,8 @@ export default async function VisitDetailPage({
           },
         ];
         
-        // Add DIVA with conditional display properties (ALWAYS visible, same logic as initial_evaluation)
+        // Add DIVA with conditional display properties
         if (!dsm5ComorbidAnswered) {
-          // DSM5 not yet completed - show DIVA as conditional/locked
           dsm5Questionnaires.push({
             ...DIVA_DEFINITION,
             id: DIVA_DEFINITION.code,
@@ -1068,7 +1067,6 @@ export default async function VisitDetailPage({
             conditionMessage: 'Complétez d\'abord l\'évaluation DSM5 - Troubles comorbides (Section 5)',
           });
         } else if (isDivaRequired) {
-          // DSM5 answered with "Oui" - show DIVA enabled
           dsm5Questionnaires.push({
             ...DIVA_DEFINITION,
             id: DIVA_DEFINITION.code,
@@ -1079,7 +1077,6 @@ export default async function VisitDetailPage({
             conditionMet: true,
           });
         } else {
-          // DSM5 answered with "Non" or "Ne sais pas" - show DIVA as locked/grayed (not applicable)
           dsm5Questionnaires.push({
             ...DIVA_DEFINITION,
             id: DIVA_DEFINITION.code,
@@ -1110,8 +1107,333 @@ export default async function VisitDetailPage({
           }
         ];
 
-        // Build Histoire somatique section questionnaires (only for annual_evaluation, not biannual_followup)
-        const histoireSomatiqueQuestionnaires = visit.visit_type === 'annual_evaluation' ? [
+        return {
+          id: 'mod_medical_eval',
+          name: 'Evaluation Médicale',
+          description: 'Évaluation médicale complète',
+          sections: [
+            {
+              id: 'dsm5',
+              name: 'DSM5',
+              questionnaires: dsm5Questionnaires
+            },
+            {
+              id: 'suicide',
+              name: 'Suicide',
+              questionnaires: suicideQuestionnaires
+            }
+          ]
+        };
+      })(),
+      {
+        id: 'mod_thymic_eval',
+        name: 'Evaluation état thymique et fonctionnement',
+        description: 'Évaluation de l\'état thymique et du fonctionnement',
+        questionnaires: [
+          {
+            ...MADRS_DEFINITION,
+            id: MADRS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['MADRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['MADRS_FR']?.completed_at,
+          },
+          {
+            ...YMRS_DEFINITION,
+            id: YMRS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['YMRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['YMRS_FR']?.completed_at,
+          },
+          {
+            ...CGI_DEFINITION,
+            id: CGI_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['CGI_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CGI_FR']?.completed_at,
+          },
+          {
+            ...EGF_DEFINITION,
+            id: EGF_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['EGF_FR']?.completed || false,
+            completedAt: questionnaireStatuses['EGF_FR']?.completed_at,
+          },
+          {
+            ...ALDA_DEFINITION,
+            id: ALDA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ALDA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ALDA_FR']?.completed_at,
+          },
+          {
+            ...ETAT_PATIENT_DEFINITION,
+            id: ETAT_PATIENT_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ETAT_PATIENT_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ETAT_PATIENT_FR']?.completed_at,
+          },
+          {
+            ...FAST_DEFINITION,
+            id: FAST_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['FAST_FR']?.completed || false,
+            completedAt: questionnaireStatuses['FAST_FR']?.completed_at,
+          }
+        ]
+      }
+    ];
+  } else if (visit.visit_type === 'annual_evaluation') {
+    // =====================================================================
+    // ANNUAL EVALUATION - Full evaluation with 4 modules
+    // =====================================================================
+    
+    // Build nurse module questionnaires with conditional Fagerstrom (same as initial, no ECG)
+    const annualNurseQuestionnaires: any[] = [
+      {
+        ...TOBACCO_DEFINITION,
+        id: TOBACCO_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['TOBACCO_FR']?.completed || false,
+        completedAt: questionnaireStatuses['TOBACCO_FR']?.completed_at,
+      },
+    ];
+    
+    // Add Fagerstrom with conditional display properties
+    if (!tobaccoAnswered) {
+      annualNurseQuestionnaires.push({
+        ...FAGERSTROM_DEFINITION,
+        id: FAGERSTROM_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: false,
+        completedAt: null,
+        isConditional: true,
+        conditionMet: false,
+        conditionMessage: 'Complétez d\'abord l\'évaluation du tabagisme',
+      });
+    } else if (isFagerstromRequired) {
+      annualNurseQuestionnaires.push({
+        ...FAGERSTROM_DEFINITION,
+        id: FAGERSTROM_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['FAGERSTROM_FR']?.completed || false,
+        completedAt: questionnaireStatuses['FAGERSTROM_FR']?.completed_at,
+        isConditional: true,
+        conditionMet: true,
+      });
+    } else {
+      annualNurseQuestionnaires.push({
+        ...FAGERSTROM_DEFINITION,
+        id: FAGERSTROM_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: false,
+        completedAt: null,
+        isConditional: true,
+        conditionMet: false,
+        conditionMessage: 'Non applicable - le patient n\'est pas fumeur',
+      });
+    }
+    
+    // Add remaining nurse questionnaires for annual (same as initial, no ECG)
+    annualNurseQuestionnaires.push(
+      {
+        ...PHYSICAL_PARAMS_DEFINITION,
+        id: PHYSICAL_PARAMS_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['PHYSICAL_PARAMS_FR']?.completed || false,
+        completedAt: questionnaireStatuses['PHYSICAL_PARAMS_FR']?.completed_at,
+      },
+      {
+        ...BLOOD_PRESSURE_DEFINITION,
+        id: BLOOD_PRESSURE_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['BLOOD_PRESSURE_FR']?.completed || false,
+        completedAt: questionnaireStatuses['BLOOD_PRESSURE_FR']?.completed_at,
+      },
+      {
+        ...SLEEP_APNEA_DEFINITION,
+        id: SLEEP_APNEA_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['SLEEP_APNEA_FR']?.completed || false,
+        completedAt: questionnaireStatuses['SLEEP_APNEA_FR']?.completed_at,
+      },
+      {
+        ...BIOLOGICAL_ASSESSMENT_DEFINITION,
+        id: BIOLOGICAL_ASSESSMENT_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['BIOLOGICAL_ASSESSMENT_FR']?.completed || false,
+        completedAt: questionnaireStatuses['BIOLOGICAL_ASSESSMENT_FR']?.completed_at,
+      }
+    );
+
+    // Build annual visit modules
+    modulesWithQuestionnaires = [
+      {
+        id: 'mod_nurse',
+        name: 'Infirmier',
+        description: 'Évaluation par l\'infirmier',
+        questionnaires: annualNurseQuestionnaires
+      },
+      {
+        id: 'mod_thymic_eval',
+        name: 'Evaluation état thymique et fonctionnement',
+        description: 'Évaluation de l\'état thymique et du fonctionnement',
+        questionnaires: [
+          {
+            ...MADRS_DEFINITION,
+            id: MADRS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['MADRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['MADRS_FR']?.completed_at,
+          },
+          {
+            ...ALDA_DEFINITION,
+            id: ALDA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ALDA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ALDA_FR']?.completed_at,
+          },
+          {
+            ...YMRS_DEFINITION,
+            id: YMRS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['YMRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['YMRS_FR']?.completed_at,
+          },
+          {
+            ...FAST_DEFINITION,
+            id: FAST_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['FAST_FR']?.completed || false,
+            completedAt: questionnaireStatuses['FAST_FR']?.completed_at,
+          },
+          {
+            ...CGI_DEFINITION,
+            id: CGI_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['CGI_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CGI_FR']?.completed_at,
+          },
+          {
+            ...EGF_DEFINITION,
+            id: EGF_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['EGF_FR']?.completed || false,
+            completedAt: questionnaireStatuses['EGF_FR']?.completed_at,
+          },
+          {
+            ...ETAT_PATIENT_DEFINITION,
+            id: ETAT_PATIENT_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ETAT_PATIENT_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ETAT_PATIENT_FR']?.completed_at,
+          }
+        ]
+      },
+      // Full Medical evaluation module (same as initial_evaluation)
+      (() => {
+        // Build DSM5 section questionnaires with conditional DIVA
+        const dsm5Questionnaires: any[] = [
+          {
+            ...DSM5_HUMEUR_DEFINITION,
+            id: DSM5_HUMEUR_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['DSM5_HUMEUR_FR']?.completed || false,
+            completedAt: questionnaireStatuses['DSM5_HUMEUR_FR']?.completed_at,
+          },
+          {
+            ...DSM5_PSYCHOTIC_DEFINITION,
+            id: DSM5_PSYCHOTIC_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['DSM5_PSYCHOTIC_FR']?.completed || false,
+            completedAt: questionnaireStatuses['DSM5_PSYCHOTIC_FR']?.completed_at,
+          },
+          {
+            ...DSM5_COMORBID_DEFINITION,
+            id: DSM5_COMORBID_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['DSM5_COMORBID_FR']?.completed || false,
+            completedAt: questionnaireStatuses['DSM5_COMORBID_FR']?.completed_at,
+          },
+        ];
+        
+        // Add DIVA with conditional display properties
+        if (!dsm5ComorbidAnswered) {
+          dsm5Questionnaires.push({
+            ...DIVA_DEFINITION,
+            id: DIVA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: false,
+            completedAt: null,
+            isConditional: true,
+            conditionMet: false,
+            conditionMessage: 'Complétez d\'abord l\'évaluation DSM5 - Troubles comorbides (Section 5)',
+          });
+        } else if (isDivaRequired) {
+          dsm5Questionnaires.push({
+            ...DIVA_DEFINITION,
+            id: DIVA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['DIVA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['DIVA_FR']?.completed_at,
+            isConditional: true,
+            conditionMet: true,
+          });
+        } else {
+          dsm5Questionnaires.push({
+            ...DIVA_DEFINITION,
+            id: DIVA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: false,
+            completedAt: null,
+            isConditional: true,
+            conditionMet: false,
+            conditionMessage: 'Non applicable - le patient n\'a pas été évalué avec la DIVA',
+          });
+        }
+        
+        // Add Family History
+        dsm5Questionnaires.push({
+          ...FAMILY_HISTORY_DEFINITION,
+          id: FAMILY_HISTORY_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['FAMILY_HISTORY_FR']?.completed || false,
+          completedAt: questionnaireStatuses['FAMILY_HISTORY_FR']?.completed_at,
+        });
+
+        // Build Suicide section questionnaires
+        const suicideQuestionnaires = [
+          {
+            ...CSSRS_DEFINITION,
+            id: CSSRS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['CSSRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CSSRS_FR']?.completed_at,
+          },
+          {
+            ...ISA_DEFINITION,
+            id: ISA_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ISA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ISA_FR']?.completed_at,
+          },
+          {
+            ...SIS_DEFINITION,
+            id: SIS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['SIS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['SIS_FR']?.completed_at,
+          },
+          {
+            ...SUICIDE_HISTORY_DEFINITION,
+            id: SUICIDE_HISTORY_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['SUICIDE_HISTORY_FR']?.completed || false,
+            completedAt: questionnaireStatuses['SUICIDE_HISTORY_FR']?.completed_at,
+          }
+        ];
+
+        // Build Histoire somatique section questionnaires
+        const histoireSomatiqueQuestionnaires = [
           {
             ...PERINATALITE_DEFINITION,
             id: PERINATALITE_DEFINITION.code,
@@ -1182,10 +1504,13 @@ export default async function VisitDetailPage({
             completed: questionnaireStatuses['AUTRES_PATHO_FR']?.completed || false,
             completedAt: questionnaireStatuses['AUTRES_PATHO_FR']?.completed_at,
           }
-        ] : [];
+        ];
         
-        // Build sections array - include histoire_somatique only for annual_evaluation
-        const medicalSections = [
+        return {
+          id: 'mod_medical_eval',
+          name: 'Evaluation Médicale',
+          description: 'Évaluation médicale complète',
+          sections: [
           {
             id: 'dsm5',
             name: 'DSM5',
@@ -1195,78 +1520,82 @@ export default async function VisitDetailPage({
             id: 'suicide',
             name: 'Suicide',
             questionnaires: suicideQuestionnaires
-          }
-        ];
-        
-        // Add Histoire somatique section only for annual_evaluation
-        if (visit.visit_type === 'annual_evaluation') {
-          medicalSections.push({
+            },
+            {
             id: 'histoire_somatique',
             name: 'Histoire somatique',
             questionnaires: histoireSomatiqueQuestionnaires
-          });
-        }
-        
-        return {
-          id: 'mod_medical_eval',
-          name: 'Evaluation Médicale',
-          description: 'Évaluation médicale complète',
-          sections: medicalSections
+            }
+          ]
         };
       })(),
       {
-        id: 'mod_thymic_eval',
-        name: 'Evaluation état thymique et fonctionnement',
-        description: 'Évaluation de l\'état thymique et du fonctionnement',
+        id: 'mod_auto_etat',
+        name: 'Autoquestionnaires - ETAT',
+        description: 'Questionnaires sur l\'état actuel du patient',
         questionnaires: [
           {
-            ...MADRS_DEFINITION,
-            id: MADRS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['MADRS_FR']?.completed || false,
-            completedAt: questionnaireStatuses['MADRS_FR']?.completed_at,
+            ...EQ5D5L_DEFINITION,
+            id: EQ5D5L_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['EQ5D5L_FR']?.completed || false,
+            completedAt: questionnaireStatuses['EQ5D5L_FR']?.completed_at,
           },
           {
-            ...YMRS_DEFINITION,
-            id: YMRS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['YMRS_FR']?.completed || false,
-            completedAt: questionnaireStatuses['YMRS_FR']?.completed_at,
+            ...PRISE_M_DEFINITION,
+            id: PRISE_M_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['PRISE_M_FR']?.completed || false,
+            completedAt: questionnaireStatuses['PRISE_M_FR']?.completed_at,
           },
           {
-            ...CGI_DEFINITION,
-            id: CGI_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['CGI_FR']?.completed || false,
-            completedAt: questionnaireStatuses['CGI_FR']?.completed_at,
+            ...STAI_YA_DEFINITION,
+            id: STAI_YA_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['STAI_YA_FR']?.completed || false,
+            completedAt: questionnaireStatuses['STAI_YA_FR']?.completed_at,
           },
           {
-            ...EGF_DEFINITION,
-            id: EGF_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['EGF_FR']?.completed || false,
-            completedAt: questionnaireStatuses['EGF_FR']?.completed_at,
+            ...MARS_DEFINITION,
+            id: MARS_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['MARS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['MARS_FR']?.completed_at,
           },
           {
-            ...ALDA_DEFINITION,
-            id: ALDA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ALDA_FR']?.completed || false,
-            completedAt: questionnaireStatuses['ALDA_FR']?.completed_at,
+            ...MATHYS_DEFINITION,
+            id: MATHYS_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['MATHYS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['MATHYS_FR']?.completed_at,
           },
           {
-            ...ETAT_PATIENT_DEFINITION,
-            id: ETAT_PATIENT_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ETAT_PATIENT_FR']?.completed || false,
-            completedAt: questionnaireStatuses['ETAT_PATIENT_FR']?.completed_at,
+            ...ASRM_DEFINITION,
+            id: ASRM_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['ASRM_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ASRM_FR']?.completed_at,
           },
           {
-            ...FAST_DEFINITION,
-            id: FAST_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['FAST_FR']?.completed || false,
-            completedAt: questionnaireStatuses['FAST_FR']?.completed_at,
+            ...QIDS_DEFINITION,
+            id: QIDS_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['QIDS_SR16_FR']?.completed || false,
+            completedAt: questionnaireStatuses['QIDS_SR16_FR']?.completed_at,
+          },
+          {
+            ...PSQI_DEFINITION,
+            id: PSQI_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['PSQI_FR']?.completed || false,
+            completedAt: questionnaireStatuses['PSQI_FR']?.completed_at,
+          },
+          {
+            ...EPWORTH_DEFINITION,
+            id: EPWORTH_DEFINITION.code,
+            target_role: 'patient',
+            completed: questionnaireStatuses['EPWORTH_FR']?.completed || false,
+            completedAt: questionnaireStatuses['EPWORTH_FR']?.completed_at,
           }
         ]
       }

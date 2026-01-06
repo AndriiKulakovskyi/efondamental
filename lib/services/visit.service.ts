@@ -630,7 +630,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
     ];
   }
 
-  if (visit.visit_type === 'biannual_followup' || visit.visit_type === 'annual_evaluation') {
+  if (visit.visit_type === 'biannual_followup') {
     return [
       {
         id: 'mod_nurse',
@@ -663,6 +663,53 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           FAST_DEFINITION
         ]
       },
+    ];
+  }
+
+  if (visit.visit_type === 'annual_evaluation') {
+    return [
+      {
+        id: 'mod_nurse',
+        name: 'Infirmier',
+        description: 'Évaluation par l\'infirmier',
+        questionnaires: [TOBACCO_DEFINITION, FAGERSTROM_DEFINITION, PHYSICAL_PARAMS_DEFINITION, BLOOD_PRESSURE_DEFINITION, SLEEP_APNEA_DEFINITION, BIOLOGICAL_ASSESSMENT_DEFINITION]
+      },
+      {
+        id: 'mod_thymic_eval',
+        name: 'Evaluation état thymique et fonctionnement',
+        description: 'Évaluation de l\'état thymique et du fonctionnement',
+        questionnaires: [
+          MADRS_DEFINITION,
+          ALDA_DEFINITION,
+          YMRS_DEFINITION,
+          FAST_DEFINITION,
+          CGI_DEFINITION,
+          EGF_DEFINITION,
+          ETAT_PATIENT_DEFINITION
+        ]
+      },
+      {
+        id: 'mod_medical_eval',
+        name: 'Evaluation Médicale',
+        description: 'Évaluation médicale complète',
+        questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION, DIVA_DEFINITION, FAMILY_HISTORY_DEFINITION, CSSRS_DEFINITION, ISA_DEFINITION, SIS_DEFINITION, SUICIDE_HISTORY_DEFINITION, PERINATALITE_DEFINITION, PATHO_NEURO_DEFINITION, PATHO_CARDIO_DEFINITION, PATHO_ENDOC_DEFINITION, PATHO_DERMATO_DEFINITION, PATHO_URINAIRE_DEFINITION, ANTECEDENTS_GYNECO_DEFINITION, PATHO_HEPATO_GASTRO_DEFINITION, PATHO_ALLERGIQUE_DEFINITION, AUTRES_PATHO_DEFINITION]
+      },
+      {
+        id: 'mod_auto_etat',
+        name: 'Autoquestionnaires - ETAT',
+        description: 'Questionnaires sur l\'état actuel du patient',
+        questionnaires: [
+          EQ5D5L_DEFINITION,
+          PRISE_M_DEFINITION,
+          STAI_YA_DEFINITION,
+          MARS_DEFINITION,
+          MATHYS_DEFINITION,
+          ASRM_DEFINITION,
+          QIDS_DEFINITION,
+          PSQI_DEFINITION,
+          EPWORTH_DEFINITION
+        ]
+      }
     ];
   }
 
@@ -845,20 +892,18 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (wais4Learning) completed++;
     if (wais4Matrices) completed++;
     if (wais4DigitSpan) completed++;
-  } else if (visit.visit_type === 'biannual_followup' || visit.visit_type === 'annual_evaluation') {
-    // Follow-up visits: 6 infirmier + 5 thymic + 4 medical (DSM5 Comorbid, DIVA, CSSRS, ISA) + 5 auto etat = 20 total
-    total = 20;
-    totalModules = 4;
+  } else if (visit.visit_type === 'biannual_followup') {
+    // Biannual follow-up: 6 infirmier + 7 thymic + 4 medical = 17 total
+    total = 17;
+    totalModules = 3;
 
     const [
       // Infirmier questionnaires
       tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biologicalAssessment,
       // Thymic evaluation questionnaires
-      madrs, ymrs, cgi, egf, fast,
+      madrs, ymrs, cgi, egf, alda, etatPatient, fast,
       // Medical evaluation questionnaires
-      dsm5Comorbid, diva, cssrs, isa,
-      // Auto-questionnaires ETAT
-      eq5d5l, asrm, qids, psqi, epworth
+      dsm5Comorbid, diva, cssrs, isa
     ] = await Promise.all([
       // Infirmier questionnaires
       getTobaccoResponse(visitId),
@@ -872,14 +917,95 @@ export async function getVisitCompletionStatus(visitId: string) {
       getYmrsResponse(visitId),
       getCgiResponse(visitId),
       getEgfResponse(visitId),
+      getAldaResponse(visitId),
+      getEtatPatientResponse(visitId),
       getFastResponse(visitId),
       // Medical evaluation questionnaires
       getDsm5ComorbidResponse(visitId),
       getDivaResponse(visitId),
       getCssrsResponse(visitId),
+      getIsaResponse(visitId)
+    ]);
+
+    // Count infirmier questionnaires
+    if (tobacco) completed++;
+    if (fagerstrom) completed++;
+    if (physicalParams) completed++;
+    if (bloodPressure) completed++;
+    if (sleepApnea) completed++;
+    if (biologicalAssessment) completed++;
+
+    // Count thymic evaluation
+    if (madrs) completed++;
+    if (ymrs) completed++;
+    if (cgi) completed++;
+    if (egf) completed++;
+    if (alda) completed++;
+    if (etatPatient) completed++;
+    if (fast) completed++;
+    
+    // Count medical evaluation
+    if (dsm5Comorbid) completed++;
+    if (diva) completed++;
+    if (cssrs) completed++;
+    if (isa) completed++;
+  } else if (visit.visit_type === 'annual_evaluation') {
+    // Annual evaluation: 6 infirmier + 7 thymic + 19 medical + 9 auto etat = 41 total
+    total = 41;
+    totalModules = 4;
+
+    const [
+      // Infirmier questionnaires (6)
+      tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biologicalAssessment,
+      // Thymic evaluation questionnaires (7)
+      madrs, alda, ymrs, fast, cgi, egf, etatPatient,
+      // Medical evaluation questionnaires (19)
+      dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs, isa, sis, suicideHistory,
+      perinatalite, pathoNeuro, pathoCardio, pathoEndoc, pathoDermato, pathoUrinaire, antecedentsGyneco, pathoHepatoGastro, pathoAllergique, autresPatho,
+      // Auto-questionnaires ETAT (9)
+      eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth
+    ] = await Promise.all([
+      // Infirmier questionnaires
+      getTobaccoResponse(visitId),
+      getFagerstromResponse(visitId),
+      getPhysicalParamsResponse(visitId),
+      getBloodPressureResponse(visitId),
+      getSleepApneaResponse(visitId),
+      getBiologicalAssessmentResponse(visitId),
+      // Thymic evaluation questionnaires
+      getMadrsResponse(visitId),
+      getAldaResponse(visitId),
+      getYmrsResponse(visitId),
+      getFastResponse(visitId),
+      getCgiResponse(visitId),
+      getEgfResponse(visitId),
+      getEtatPatientResponse(visitId),
+      // Medical evaluation questionnaires
+      getDsm5HumeurResponse(visitId),
+      getDsm5PsychoticResponse(visitId),
+      getDsm5ComorbidResponse(visitId),
+      getDivaResponse(visitId),
+      getFamilyHistoryResponse(visitId),
+      getCssrsResponse(visitId),
       getIsaResponse(visitId),
+      getSisResponse(visitId),
+      getSuicideHistoryResponse(visitId),
+      getPerinataliteResponse(visitId),
+      getPathoNeuroResponse(visitId),
+      getPathoCardioResponse(visitId),
+      getPathoEndocResponse(visitId),
+      getPathoDermatoResponse(visitId),
+      getPathoUrinaireResponse(visitId),
+      getAntecedentsGynecoResponse(visitId),
+      getPathoHepatoGastroResponse(visitId),
+      getPathoAllergiqueResponse(visitId),
+      getAutresPathoResponse(visitId),
       // Auto-questionnaires ETAT
       getEq5d5lResponse(visitId),
+      getPriseMResponse(visitId),
+      getStaiYaResponse(visitId),
+      getMarsResponse(visitId),
+      getMathysResponse(visitId),
       getAsrmResponse(visitId),
       getQidsResponse(visitId),
       getPsqiResponse(visitId),
@@ -896,19 +1022,40 @@ export async function getVisitCompletionStatus(visitId: string) {
 
     // Count thymic evaluation
     if (madrs) completed++;
+    if (alda) completed++;
     if (ymrs) completed++;
+    if (fast) completed++;
     if (cgi) completed++;
     if (egf) completed++;
-    if (fast) completed++;
+    if (etatPatient) completed++;
     
     // Count medical evaluation
+    if (dsm5Humeur) completed++;
+    if (dsm5Psychotic) completed++;
     if (dsm5Comorbid) completed++;
     if (diva) completed++;
+    if (familyHistory) completed++;
     if (cssrs) completed++;
     if (isa) completed++;
+    if (sis) completed++;
+    if (suicideHistory) completed++;
+    if (perinatalite) completed++;
+    if (pathoNeuro) completed++;
+    if (pathoCardio) completed++;
+    if (pathoEndoc) completed++;
+    if (pathoDermato) completed++;
+    if (pathoUrinaire) completed++;
+    if (antecedentsGyneco) completed++;
+    if (pathoHepatoGastro) completed++;
+    if (pathoAllergique) completed++;
+    if (autresPatho) completed++;
     
-    // Count auto-questionnaires
+    // Count auto-questionnaires ETAT
     if (eq5d5l) completed++;
+    if (priseM) completed++;
+    if (staiYa) completed++;
+    if (mars) completed++;
+    if (mathys) completed++;
     if (asrm) completed++;
     if (qids) completed++;
     if (psqi) completed++;
