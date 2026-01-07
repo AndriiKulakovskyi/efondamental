@@ -38,6 +38,23 @@ export interface Mem3SpatialScores {
   mspatiale_total_brut: number;
   mspatiale_total_std: number;
   mspatiale_total_cr: number;
+  // Item notes
+  odirect_1_note: number;
+  odirect_2_note: number;
+  odirect_3_note: number;
+  odirect_4_note: number;
+  odirect_5_note: number;
+  odirect_6_note: number;
+  odirect_7_note: number;
+  odirect_8_note: number;
+  inverse_1_note: number;
+  inverse_2_note: number;
+  inverse_3_note: number;
+  inverse_4_note: number;
+  inverse_5_note: number;
+  inverse_6_note: number;
+  inverse_7_note: number;
+  inverse_8_note: number;
 }
 
 // Forward (Ordre Direct) standard score norm tables
@@ -119,29 +136,32 @@ function findStandardScore(rawScore: number, norms: number[]): number {
 }
 
 export function calculateMem3SpatialScores(input: Mem3SpatialInput): Mem3SpatialScores {
+  // Calculate item notes
+  const odirect_1_note = input.odirect_1a + input.odirect_1b;
+  const odirect_2_note = input.odirect_2a + input.odirect_2b;
+  const odirect_3_note = input.odirect_3a + input.odirect_3b;
+  const odirect_4_note = input.odirect_4a + input.odirect_4b;
+  const odirect_5_note = input.odirect_5a + input.odirect_5b;
+  const odirect_6_note = input.odirect_6a + input.odirect_6b;
+  const odirect_7_note = input.odirect_7a + input.odirect_7b;
+  const odirect_8_note = input.odirect_8a + input.odirect_8b;
+
+  const inverse_1_note = input.inverse_1a + input.inverse_1b;
+  const inverse_2_note = input.inverse_2a + input.inverse_2b;
+  const inverse_3_note = input.inverse_3a + input.inverse_3b;
+  const inverse_4_note = input.inverse_4a + input.inverse_4b;
+  const inverse_5_note = input.inverse_5a + input.inverse_5b;
+  const inverse_6_note = input.inverse_6a + input.inverse_6b;
+  const inverse_7_note = input.inverse_7a + input.inverse_7b;
+  const inverse_8_note = input.inverse_8a + input.inverse_8b;
+
   // Calculate forward raw score
-  const mspatiale_odirect_tot = (
-    input.odirect_1a + input.odirect_1b +
-    input.odirect_2a + input.odirect_2b +
-    input.odirect_3a + input.odirect_3b +
-    input.odirect_4a + input.odirect_4b +
-    input.odirect_5a + input.odirect_5b +
-    input.odirect_6a + input.odirect_6b +
-    input.odirect_7a + input.odirect_7b +
-    input.odirect_8a + input.odirect_8b
-  );
+  const mspatiale_odirect_tot = odirect_1_note + odirect_2_note + odirect_3_note + odirect_4_note + 
+                                odirect_5_note + odirect_6_note + odirect_7_note + odirect_8_note;
   
   // Calculate backward raw score
-  const mspatiale_inverse_tot = (
-    input.inverse_1a + input.inverse_1b +
-    input.inverse_2a + input.inverse_2b +
-    input.inverse_3a + input.inverse_3b +
-    input.inverse_4a + input.inverse_4b +
-    input.inverse_5a + input.inverse_5b +
-    input.inverse_6a + input.inverse_6b +
-    input.inverse_7a + input.inverse_7b +
-    input.inverse_8a + input.inverse_8b
-  );
+  const mspatiale_inverse_tot = inverse_1_note + inverse_2_note + inverse_3_note + inverse_4_note + 
+                                inverse_5_note + inverse_6_note + inverse_7_note + inverse_8_note;
   
   // Total raw score
   const mspatiale_total_brut = mspatiale_odirect_tot + mspatiale_inverse_tot;
@@ -168,7 +188,10 @@ export function calculateMem3SpatialScores(input: Mem3SpatialInput): Mem3Spatial
     mspatiale_inverse_cr,
     mspatiale_total_brut,
     mspatiale_total_std,
-    mspatiale_total_cr
+    mspatiale_total_cr,
+    odirect_1_note, odirect_2_note, odirect_3_note, odirect_4_note,
+    odirect_5_note, odirect_6_note, odirect_7_note, odirect_8_note,
+    inverse_1_note, inverse_2_note, inverse_3_note, inverse_4_note,
+    inverse_5_note, inverse_6_note, inverse_7_note, inverse_8_note
   };
 }
-
