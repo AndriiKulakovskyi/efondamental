@@ -317,15 +317,15 @@ export function QuestionnaireRenderer({
       const NOTET_SCORET = [20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80];
       
       const lookupTScore = (rawScore: number, values: number[]) => {
-        if (rawScore <= values[0]) return NOTET_SCORET[0];
-        if (rawScore >= values[values.length - 1]) return NOTET_SCORET[NOTET_SCORET.length - 1];
-        for (let i = 0; i < values.length - 1; i++) {
-          if (rawScore >= values[i] && rawScore <= values[i + 1]) {
-            const ratio = (rawScore - values[i]) / (values[i + 1] - values[i]);
-            return Math.round(NOTET_SCORET[i] + ratio * (NOTET_SCORET[i + 1] - NOTET_SCORET[i]));
+        let foundIndex = 0;
+        for (let i = 0; i < values.length; i++) {
+          if (rawScore >= values[i]) {
+            foundIndex = i;
+          } else {
+            break;
           }
         }
-        return 50;
+        return NOTET_SCORET[foundIndex];
       };
       
       const tToZ = (t: number) => Number(((t - 50) / 10).toFixed(2));
