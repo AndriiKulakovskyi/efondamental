@@ -21,6 +21,7 @@ import {
 } from "@/lib/utils/questionnaire-logic";
 import { calculateTmtScores } from "@/lib/services/tmt-scoring";
 import { calculateStroopScores } from "@/lib/services/stroop-scoring";
+import { calculateMem3SpatialScores } from "@/lib/services/mem3-spatial-scoring";
 import { calculateWais3DigitSpanScores } from "@/lib/services/wais3-digit-span-scoring";
 import { Loader2, ChevronDown, Info } from "lucide-react";
 
@@ -297,6 +298,10 @@ export function QuestionnaireRenderer({
         }
       }
 
+      const isValidValue = (val: any) => {
+        return val !== undefined && val !== null && val !== '';
+      };
+
       // Compute Stroop scores progressively as fields are entered
       const stroopAge = Number(prev.patient_age);
       const stroopW = Number(prev.stroop_w_tot);
@@ -318,15 +323,15 @@ export function QuestionnaireRenderer({
       const NOTET_SCORET = [20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80];
       
       const lookupTScore = (rawScore: number, values: number[]) => {
-        if (rawScore <= values[0]) return NOTET_SCORET[0];
-        if (rawScore >= values[values.length - 1]) return NOTET_SCORET[NOTET_SCORET.length - 1];
-        for (let i = 0; i < values.length - 1; i++) {
-          if (rawScore >= values[i] && rawScore <= values[i + 1]) {
-            const ratio = (rawScore - values[i]) / (values[i + 1] - values[i]);
-            return Math.round(NOTET_SCORET[i] + ratio * (NOTET_SCORET[i + 1] - NOTET_SCORET[i]));
+        let foundIndex = 0;
+        for (let i = 0; i < values.length; i++) {
+          if (rawScore >= values[i]) {
+            foundIndex = i;
+          } else {
+            break;
           }
         }
-        return 50;
+        return NOTET_SCORET[foundIndex];
       };
       
       const tToZ = (t: number) => Number(((t - 50) / 10).toFixed(2));
@@ -415,6 +420,74 @@ export function QuestionnaireRenderer({
         }
       }
 
+      // Compute MEM-III Spatial Span scores
+      if (questionnaire?.code === 'MEM3_SPATIAL_FR') {
+        const mspatAge = Number(prev.patient_age);
+        
+        // Update item notes only when both trials are answered (independent of age)
+        for (let i = 1; i <= 8; i++) {
+          const dTrialA = prev[`odirect_${i}a`];
+          const dTrialB = prev[`odirect_${i}b`];
+          const iTrialA = prev[`inverse_${i}a`];
+          const iTrialB = prev[`inverse_${i}b`];
+
+          if (isValidValue(dTrialA) && isValidValue(dTrialB)) {
+            const dNoteVal = Number(dTrialA) + Number(dTrialB);
+            if (updated[`odirect_${i}_note`] !== dNoteVal) {
+              updated[`odirect_${i}_note`] = dNoteVal;
+              hasChanges = true;
+            }
+          }
+
+          if (isValidValue(iTrialA) && isValidValue(iTrialB)) {
+            const iNoteVal = Number(iTrialA) + Number(iTrialB);
+            if (updated[`inverse_${i}_note`] !== iNoteVal) {
+              updated[`inverse_${i}_note`] = iNoteVal;
+              hasChanges = true;
+            }
+          }
+        }
+
+        // Update summary scores (totals and standard scores) - requires valid age
+        if (!isNaN(mspatAge) && mspatAge > 0) {
+          const mspatInput = {
+            patient_age: mspatAge,
+            odirect_1a: Number(prev.odirect_1a || 0), odirect_1b: Number(prev.odirect_1b || 0),
+            odirect_2a: Number(prev.odirect_2a || 0), odirect_2b: Number(prev.odirect_2b || 0),
+            odirect_3a: Number(prev.odirect_3a || 0), odirect_3b: Number(prev.odirect_3b || 0),
+            odirect_4a: Number(prev.odirect_4a || 0), odirect_4b: Number(prev.odirect_4b || 0),
+            odirect_5a: Number(prev.odirect_5a || 0), odirect_5b: Number(prev.odirect_5b || 0),
+            odirect_6a: Number(prev.odirect_6a || 0), odirect_6b: Number(prev.odirect_6b || 0),
+            odirect_7a: Number(prev.odirect_7a || 0), odirect_7b: Number(prev.odirect_7b || 0),
+            odirect_8a: Number(prev.odirect_8a || 0), odirect_8b: Number(prev.odirect_8b || 0),
+            inverse_1a: Number(prev.inverse_1a || 0), inverse_1b: Number(prev.inverse_1b || 0),
+            inverse_2a: Number(prev.inverse_2a || 0), inverse_2b: Number(prev.inverse_2b || 0),
+            inverse_3a: Number(prev.inverse_3a || 0), inverse_3b: Number(prev.inverse_3b || 0),
+            inverse_4a: Number(prev.inverse_4a || 0), inverse_4b: Number(prev.inverse_4b || 0),
+            inverse_5a: Number(prev.inverse_5a || 0), inverse_5b: Number(prev.inverse_5b || 0),
+            inverse_6a: Number(prev.inverse_6a || 0), inverse_6b: Number(prev.inverse_6b || 0),
+            inverse_7a: Number(prev.inverse_7a || 0), inverse_7b: Number(prev.inverse_7b || 0),
+            inverse_8a: Number(prev.inverse_8a || 0), inverse_8b: Number(prev.inverse_8b || 0),
+          };
+
+          const mspatScores = calculateMem3SpatialScores(mspatInput);
+
+          const scoreFields = [
+            'mspatiale_odirect_tot', 'mspatiale_odirect_std', 'mspatiale_odirect_cr',
+            'mspatiale_inverse_tot', 'mspatiale_inverse_std', 'mspatiale_inverse_cr',
+            'mspatiale_total_brut', 'mspatiale_total_std', 'mspatiale_total_cr'
+          ];
+
+          scoreFields.forEach(field => {
+            const val = (mspatScores as any)[field];
+            if (updated[field] !== val) {
+              updated[field] = val;
+              hasChanges = true;
+            }
+          });
+        }
+      }
+
       // Compute COBRA total score (sum of q1-q16) - only for COBRA questionnaire
       // Check if this is COBRA by verifying all 16 COBRA-specific fields exist AND q17 does NOT exist
       // This prevents conflict with ALS18 (q1-q18) and other questionnaires
@@ -434,10 +507,6 @@ export function QuestionnaireRenderer({
 
       // Compute WAIS-IV Digit Span item scores (sum of trial 1 + trial 2)
       // This runs unconditionally - if fields don't exist, computation is skipped automatically
-      // Helper function to check if a value is valid (not undefined, null, or empty string)
-      const isValidValue = (val: any) => {
-        return val !== undefined && val !== null && val !== '';
-      };
       
       // Ordre Direct (Forward) - WAIS-IV uses wais4_ prefix
       const wais4DirectItems = [
@@ -1721,135 +1790,6 @@ export function QuestionnaireRenderer({
             updated.wais_mc_std = undefined;
             updated.wais_mc_cr = undefined;
             hasChanges = true;
-          }
-        }
-      }
-
-      // Compute MEM-III Spatial Span scores
-      const hasSpatialFields = prev.odirect_1a !== undefined || prev.inverse_1a !== undefined;
-      
-      if (hasSpatialFields) {
-        const spatialAge = Number(prev.patient_age);
-        const hasValidAge = !isNaN(spatialAge) && spatialAge >= 16 && spatialAge <= 90;
-        
-        // Calculate forward raw score
-        const forwardItems = [
-          prev.odirect_1a, prev.odirect_1b, prev.odirect_2a, prev.odirect_2b,
-          prev.odirect_3a, prev.odirect_3b, prev.odirect_4a, prev.odirect_4b,
-          prev.odirect_5a, prev.odirect_5b, prev.odirect_6a, prev.odirect_6b,
-          prev.odirect_7a, prev.odirect_7b, prev.odirect_8a, prev.odirect_8b
-        ];
-        const forwardSum = forwardItems.reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
-        const allForwardValid = forwardItems.every((v) => v !== undefined && !isNaN(Number(v)));
-        
-        // Calculate backward raw score
-        const backwardItems = [
-          prev.inverse_1a, prev.inverse_1b, prev.inverse_2a, prev.inverse_2b,
-          prev.inverse_3a, prev.inverse_3b, prev.inverse_4a, prev.inverse_4b,
-          prev.inverse_5a, prev.inverse_5b, prev.inverse_6a, prev.inverse_6b,
-          prev.inverse_7a, prev.inverse_7b, prev.inverse_8a, prev.inverse_8b
-        ];
-        const backwardSum = backwardItems.reduce((sum: number, val: any) => sum + (Number(val) || 0), 0);
-        const allBackwardValid = backwardItems.every((v) => v !== undefined && !isNaN(Number(v)));
-        
-        if (allForwardValid || allBackwardValid) {
-          hasChanges = true;
-          
-          if (allForwardValid) {
-            updated.mspatiale_odirect_tot = forwardSum;
-          }
-          if (allBackwardValid) {
-            updated.mspatiale_inverse_tot = backwardSum;
-          }
-          if (allForwardValid && allBackwardValid) {
-            const totalBrut = forwardSum + backwardSum;
-            updated.mspatiale_total_brut = totalBrut;
-            
-            // Calculate standard scores if age is valid
-            if (hasValidAge) {
-              const MEM3_ODIRECT_NORMS: Record<string, number[]> = {
-                '16-17': [3, 4, 5, 6, 0, 7, 0, 8, 0, 9, 0, 10, 0, 11, 12, 13, 14, 15, 16],
-                '18-19': [2, 3, 4, 5, 6, 0, 7, 8, 0, 9, 0, 10, 11, 0, 12, 13, 14, 15, 16],
-                '20-24': [1, 2, 3, 4, 5, 6, 7, 8, 0, 9, 0, 10, 11, 0, 12, 13, 14, 15, 16],
-                '25-29': [1, 2, 3, 4, 5, 6, 7, 8, 0, 9, 10, 11, 0, 12, 13, 14, 15, 0, 16],
-                '30-34': [1, 2, 3, 4, 5, 6, 7, 0, 8, 9, 0, 10, 11, 12, 13, 14, 0, 15, 16],
-                '35-44': [1, 2, 3, 4, 5, 6, 7, 0, 8, 9, 0, 10, 11, 12, 13, 14, 0, 15, 16],
-                '45-54': [1, 2, 3, 4, 0, 5, 6, 0, 7, 8, 9, 0, 10, 11, 12, 13, 14, 15, 16],
-                '55-64': [1, 2, 3, 4, 0, 5, 6, 0, 7, 8, 9, 0, 10, 0, 11, 12, 13, 14, 16],
-                '65-69': [1, 2, 3, 0, 4, 5, 0, 6, 0, 7, 0, 8, 9, 0, 10, 11, 12, 13, 16],
-                '70-74': [1, 2, 3, 0, 4, 5, 0, 6, 0, 7, 0, 8, 9, 0, 10, 11, 12, 13, 16],
-                '75-79': [0, 1, 2, 3, 0, 4, 5, 0, 6, 7, 0, 8, 0, 9, 10, 0, 11, 12, 16],
-                '80+': [0, 1, 2, 3, 0, 4, 5, 0, 6, 7, 0, 8, 0, 9, 10, 0, 11, 12, 16]
-              };
-              
-              const MEM3_INVERSE_NORMS: Record<string, number[]> = {
-                '16-17': [1, 2, 3, 4, 5, 6, 0, 7, 0, 8, 0, 9, 0, 10, 11, 12, 14, 15, 16],
-                '18-19': [1, 2, 3, 4, 5, 6, 0, 7, 0, 8, 9, 0, 10, 0, 11, 12, 14, 15, 16],
-                '20-24': [1, 2, 3, 0, 4, 5, 6, 7, 0, 8, 9, 0, 10, 11, 0, 12, 13, 14, 16],
-                '25-29': [1, 2, 3, 0, 4, 5, 6, 7, 0, 8, 9, 10, 0, 11, 0, 12, 13, 14, 16],
-                '30-34': [1, 2, 3, 0, 4, 5, 6, 7, 0, 8, 9, 10, 0, 11, 0, 12, 13, 14, 16],
-                '35-44': [1, 2, 3, 0, 4, 5, 6, 7, 0, 8, 9, 10, 0, 11, 12, 13, 14, 15, 16],
-                '45-54': [0, 1, 2, 3, 0, 4, 5, 6, 7, 0, 8, 9, 0, 10, 11, 12, 13, 14, 16],
-                '55-64': [0, 1, 2, 3, 0, 4, 5, 0, 6, 0, 7, 8, 9, 0, 10, 12, 13, 14, 16],
-                '65-69': [0, 0, 1, 2, 0, 3, 4, 5, 0, 6, 7, 8, 0, 9, 10, 11, 12, 13, 16],
-                '70-74': [0, 0, 0, 1, 2, 3, 4, 5, 0, 6, 7, 8, 0, 9, 10, 11, 12, 13, 16],
-                '75-79': [0, 0, 0, 0, 1, 2, 3, 0, 4, 5, 6, 7, 8, 0, 9, 10, 11, 12, 16],
-                '80+': [0, 0, 0, 0, 1, 2, 3, 0, 4, 5, 6, 7, 0, 8, 0, 9, 10, 11, 16]
-              };
-              
-              const MEM3_TOTAL_NORMS: Record<string, number[]> = {
-                '16-17': [9, 10, 11, 12, 0, 13, 14, 15, 16, 17, 18, 19, 0, 20, 22, 23, 24, 26, 32],
-                '18-19': [8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 0, 20, 21, 23, 24, 25, 26, 32],
-                '20-24': [7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 19, 0, 20, 22, 24, 25, 26, 27, 32],
-                '25-29': [7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 19, 20, 21, 23, 25, 26, 27, 28, 32],
-                '30-34': [6, 7, 8, 10, 11, 12, 13, 15, 16, 17, 18, 20, 21, 23, 25, 26, 27, 28, 32],
-                '35-44': [6, 7, 8, 10, 11, 12, 13, 15, 16, 17, 18, 20, 21, 23, 25, 26, 28, 0, 32],
-                '45-54': [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 21, 23, 24, 26, 27, 32],
-                '55-64': [6, 7, 8, 9, 10, 11, 12, 0, 13, 14, 15, 17, 18, 20, 21, 23, 24, 25, 32],
-                '65-69': [4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 22, 23, 24, 32],
-                '70-74': [2, 3, 4, 6, 7, 9, 10, 11, 12, 13, 14, 16, 17, 19, 20, 21, 22, 24, 32],
-                '75-79': [2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15, 16, 18, 19, 20, 21, 23, 32],
-                '80+': [2, 3, 4, 5, 6, 0, 8, 9, 10, 12, 13, 15, 16, 17, 18, 20, 21, 22, 32]
-              };
-              
-              const getAgeGroup = (age: number): string => {
-                if (age >= 16 && age <= 17) return '16-17';
-                if (age >= 18 && age <= 19) return '18-19';
-                if (age >= 20 && age <= 24) return '20-24';
-                if (age >= 25 && age <= 29) return '25-29';
-                if (age >= 30 && age <= 34) return '30-34';
-                if (age >= 35 && age <= 44) return '35-44';
-                if (age >= 45 && age <= 54) return '45-54';
-                if (age >= 55 && age <= 64) return '55-64';
-                if (age >= 65 && age <= 69) return '65-69';
-                if (age >= 70 && age <= 74) return '70-74';
-                if (age >= 75 && age <= 79) return '75-79';
-                return '80+';
-              };
-              
-              const findStdScore = (rawScore: number, norms: number[]): number => {
-                for (let i = 0; i < norms.length; i++) {
-                  const maxRaw = norms[i];
-                  if (maxRaw === 0) continue;
-                  if (rawScore <= maxRaw) return i + 1;
-                }
-                return 19;
-              };
-              
-              const ageGroup = getAgeGroup(spatialAge);
-              
-              const odirectStd = findStdScore(forwardSum, MEM3_ODIRECT_NORMS[ageGroup]);
-              updated.mspatiale_odirect_std = odirectStd;
-              updated.mspatiale_odirect_cr = Number(((odirectStd - 10) / 3).toFixed(2));
-              
-              const inverseStd = findStdScore(backwardSum, MEM3_INVERSE_NORMS[ageGroup]);
-              updated.mspatiale_inverse_std = inverseStd;
-              updated.mspatiale_inverse_cr = Number(((inverseStd - 10) / 3).toFixed(2));
-              
-              const totalStd = findStdScore(totalBrut, MEM3_TOTAL_NORMS[ageGroup]);
-              updated.mspatiale_total_std = totalStd;
-              updated.mspatiale_total_cr = Number(((totalStd - 10) / 3).toFixed(2));
-            }
           }
         }
       }

@@ -144,23 +144,33 @@ export function lookupTmtPercentile(
     return `< ${percentiles[percentiles.length - 1]}`;
   }
   
-  // Find exact match or range
+  // Find all matching indices for exact scores (handling plateaus)
+  const matches: number[] = [];
   for (let i = 0; i < thresholds.length; i++) {
     if (rawScore === thresholds[i]) {
-      return percentiles[i].toString();
+      matches.push(i);
     }
-    
+  }
+
+  if (matches.length > 0) {
+    if (matches.length === 1) {
+      return percentiles[matches[0]].toString();
+    }
+    // Return "> [lowest percentile]" for plateaus (e.g. "> 10")
+    const lowestP = percentiles[matches[matches.length - 1]];
+    return `> ${lowestP}`;
+  }
+  
+  // Find range for values between thresholds
+  for (let i = 0; i < thresholds.length; i++) {
     if (rawScore < thresholds[i]) {
-      // Score is between previous and current threshold
       if (i > 0) {
         return `${percentiles[i]} - ${percentiles[i - 1]}`;
       }
-      // Should not reach here as we checked < min above
       return `> ${percentiles[0]}`;
     }
   }
   
-  // Should not reach here as we checked > max above
   return `< ${percentiles[percentiles.length - 1]}`;
 }
 
