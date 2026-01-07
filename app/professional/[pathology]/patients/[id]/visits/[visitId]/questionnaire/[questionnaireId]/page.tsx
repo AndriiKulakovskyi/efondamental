@@ -489,9 +489,17 @@ export default async function ProfessionalQuestionnairePage({
   // For biological assessment, also fetch physical params for creatinine clearance computation
   if (code === BIOLOGICAL_ASSESSMENT_DEFINITION.code) {
     const physicalParams = await getPhysicalParamsResponse(visitId);
+    console.log('[Creatinine Debug] Physical params:', physicalParams);
+    console.log('[Creatinine Debug] Weight:', physicalParams?.weight_kg);
     if (physicalParams?.weight_kg) {
       initialResponses = { ...initialResponses, weight_kg: physicalParams.weight_kg };
+      console.log('[Creatinine Debug] Added weight_kg to initialResponses:', initialResponses.weight_kg);
     }
+    console.log('[Creatinine Debug] Final initialResponses for bio assessment:', {
+      patient_age: initialResponses.patient_age,
+      patient_gender: initialResponses.patient_gender,
+      weight_kg: initialResponses.weight_kg
+    });
   }
 
   return (

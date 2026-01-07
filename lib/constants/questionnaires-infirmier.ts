@@ -611,124 +611,146 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'sodium',
     text: 'Sodium (mmol/L)',
+    help: 'Valeurs acceptées: 120-170',
     type: 'number',
     required: false,
-    min: 20,
-    max: 500
+    min: 120,
+    max: 170
   },
   {
     id: 'potassium',
     text: 'Potassium (mmol/L)',
+    help: 'Valeurs acceptées: 2.0-7.0',
     type: 'number',
     required: false,
-    min: 1,
-    max: 30
+    min: 2.0,
+    max: 7.0
   },
   {
     id: 'chlore',
     text: 'Chlore (Chlorure) (mmol/L)',
+    help: 'Valeurs acceptées: 80-130',
     type: 'number',
     required: false,
-    min: 10,
-    max: 1000
+    min: 80,
+    max: 130
   },
   {
     id: 'bicarbonates',
     text: 'Bicarbonates (mmol/L)',
+    help: 'Valeurs acceptées: 10-40',
     type: 'number',
     required: false,
-    min: 3,
-    max: 300
+    min: 10,
+    max: 40
   },
   {
     id: 'protidemie',
     text: 'Protidémie (Protéines totales) (g/L)',
+    help: 'Valeurs acceptées: 50-90',
     type: 'number',
     required: false,
-    min: 10,
-    max: 600
+    min: 50,
+    max: 90
   },
   {
     id: 'albumine',
     text: 'Albumine (g/L)',
+    help: 'Valeurs acceptées: 30-55',
     type: 'number',
     required: false,
-    max: 50
+    min: 30,
+    max: 55
   },
   {
     id: 'uree',
     text: 'Urée (mmol/L)',
+    help: 'Valeurs acceptées: 1-20',
     type: 'number',
     required: false,
-    min: 10,
-    max: 1000
+    min: 1,
+    max: 20
   },
   {
     id: 'acide_urique',
     text: 'Acide urique (µmol/L)',
+    help: 'Valeurs acceptées: 100-500',
     type: 'number',
     required: false,
-    max: 50
+    min: 100,
+    max: 500
   },
   {
     id: 'creatinine',
     text: 'Créatinine (µmol/L)',
+    help: 'Valeurs acceptées: 30-400',
     type: 'number',
     required: false,
-    min: 10,
-    max: 1000
+    min: 30,
+    max: 400
   },
   {
     id: 'clairance_creatinine',
     text: 'Clairance de la créatinine (ml/min)',
-    help: 'Calculée automatiquement',
+    help: 'Calculée automatiquement (Cockroft-Gault). Normale: 95±20 (F), 120±20 (H). Modifiable.',
     type: 'number',
     required: false,
-    readonly: true,
-    max: 1000
+    min: 0,
+    max: 10000
   },
   {
     id: 'phosphore',
     text: 'Phosphore (mmol/L)',
+    help: 'Valeurs acceptées: 0.5-2.0',
     type: 'number',
     required: false,
-    max: 10
+    min: 0.5,
+    max: 2.0
   },
   {
     id: 'fer',
     text: 'Fer (µmol/L)',
+    help: 'Valeurs acceptées: 5-40',
     type: 'number',
     required: false,
-    min: 3,
-    max: 100
+    min: 5,
+    max: 40
   },
   {
     id: 'ferritine',
     text: 'Ferritine (µg/L)',
+    help: 'Valeurs acceptées: 5-1000',
     type: 'number',
-    required: false
+    required: false,
+    min: 5,
+    max: 1000
   },
   {
     id: 'calcemie',
     text: 'Calcémie (Calcium total) (mmol/L)',
+    help: 'Valeurs acceptées: 1.50-2.75',
     type: 'number',
     required: false,
-    min: 1,
-    max: 10
+    min: 1.50,
+    max: 2.75
   },
   {
     id: 'crp',
     text: 'CRP (mg/L)',
+    help: 'Valeurs acceptées: 0-50',
     type: 'number',
     required: false,
-    max: 100
+    min: 0,
+    max: 50
   },
   {
     id: 'glycemie_a_jeun',
     text: 'Glycémie à jeûn',
+    help: 'Valeurs acceptées: 0-50',
     type: 'number',
     required: false,
-    max: 40
+    min: 0,
+    max: 50
   },
   {
     id: 'glycemie_a_jeun_unit',
@@ -743,8 +765,10 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'hemoglobine_glyquee',
     text: 'Hémoglobine glyquée (%)',
+    help: 'Valeurs acceptées: 0-50',
     type: 'number',
     required: false,
+    min: 0,
     max: 50,
     display_if: {
       'or': [
@@ -814,6 +838,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'cholesterol_total',
     text: 'Cholestérol total (mmol/L)',
+    help: 'Valeurs acceptées: 1-15',
     type: 'number',
     required: false,
     min: 1,
@@ -822,6 +847,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'triglycerides',
     text: 'Triglycérides (mmol/L)',
+    help: 'Valeurs acceptées: 0.2-20',
     type: 'number',
     required: false,
     min: 0.2,
@@ -846,6 +872,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'pal',
     text: 'Phosphatases alcalines (PAL) (UI/L)',
+    help: 'Valeurs acceptées: 20-400',
     type: 'number',
     required: false,
     min: 20,
@@ -854,6 +881,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'asat',
     text: 'ASAT / TGO (UI/L)',
+    help: 'Valeurs acceptées: 5-500',
     type: 'number',
     required: false,
     min: 5,
@@ -862,6 +890,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'alat',
     text: 'ALAT / TGP (UI/L)',
+    help: 'Valeurs acceptées: 5-500',
     type: 'number',
     required: false,
     min: 5,
@@ -870,6 +899,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'ggt',
     text: 'Gamma-GT (UI/L)',
+    help: 'Valeurs acceptées: 5-1500',
     type: 'number',
     required: false,
     min: 5,
@@ -923,6 +953,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 't3_libre',
     text: 'T3 libre (pmol/L)',
+    help: 'Valeurs acceptées: 1-30',
     type: 'number',
     required: false,
     min: 1,
@@ -931,6 +962,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 't4_libre',
     text: 'T4 libre (pmol/L)',
+    help: 'Valeurs acceptées: 5-50',
     type: 'number',
     required: false,
     min: 5,
@@ -947,6 +979,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'leucocytes',
     text: 'Leucocytes (GB) (G/L)',
+    help: 'Valeurs acceptées: 0.5-200',
     type: 'number',
     required: false,
     min: 0.5,
@@ -955,6 +988,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'hematies',
     text: 'Hématies (GR) (T/L)',
+    help: 'Valeurs acceptées: 1-8',
     type: 'number',
     required: false,
     min: 1,
@@ -1001,6 +1035,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'neutrophiles',
     text: 'Neutrophiles (G/L)',
+    help: 'Valeurs acceptées: 0-50',
     type: 'number',
     required: false,
     min: 0,
@@ -1009,6 +1044,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'basophiles',
     text: 'Basophiles (G/L)',
+    help: 'Valeurs acceptées: 0-5',
     type: 'number',
     required: false,
     min: 0,
@@ -1017,6 +1053,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'eosinophiles',
     text: 'Éosinophiles (G/L)',
+    help: 'Valeurs acceptées: 0-10',
     type: 'number',
     required: false,
     min: 0,
@@ -1025,6 +1062,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'lymphocytes',
     text: 'Lymphocytes (G/L)',
+    help: 'Valeurs acceptées: 0-20',
     type: 'number',
     required: false,
     min: 0,
@@ -1033,6 +1071,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'monocytes',
     text: 'Monocytes (G/L)',
+    help: 'Valeurs acceptées: 0-5',
     type: 'number',
     required: false,
     min: 0,
@@ -1041,6 +1080,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'vgm',
     text: 'VGM (fL)',
+    help: 'Valeurs acceptées: 50-130',
     type: 'number',
     required: false,
     min: 50,
@@ -1088,6 +1128,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'plaquettes',
     text: 'Plaquettes (G/L)',
+    help: 'Valeurs acceptées: 10-1000',
     type: 'number',
     required: false,
     min: 10,

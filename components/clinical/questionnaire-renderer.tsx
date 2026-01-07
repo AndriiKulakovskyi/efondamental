@@ -150,43 +150,44 @@ export function QuestionnaireRenderer({
         hasChanges = true;
       }
 
-      // Compute clairance_creatinine if creatinine, weight, age, and gender are available
+      // Compute clairance_creatinine using Cockroft-Gault formula
+      // Formula: coefficient × Weight(kg) × (140 - Age) / Creatinine(µmol/L)
+      // coefficient: 1.23 for men, 1.04 for women
       // Note: weight comes from physical params questionnaire, age/gender from patient profile
-      // This will compute if weight is available in responses (e.g., from initialResponses that includes data from other questionnaires)
       if (prev.creatinine && prev.weight_kg && prev.patient_age && prev.patient_gender) {
         const creatinine = parseFloat(prev.creatinine);
         const weight = parseFloat(prev.weight_kg);
         const age = parseInt(prev.patient_age);
         const gender = prev.patient_gender?.toLowerCase();
         
-        if (creatinine > 0 && weight > 0 && age > 0) {
+        console.log('[Clearance Calc] Inputs:', { creatinine, weight, age, gender });
+        
+        if (creatinine > 0 && weight > 0 && age > 0 && age < 140) {
           const isMale = gender === 'male' || gender === 'm' || gender === 'homme';
-          const multiplier = isMale ? 1.23 : 1.04;
-          const clearance = (multiplier * weight * (140 - age)) / creatinine;
-          const roundedClearance = Math.round(clearance * 100) / 100;
+          const coefficient = isMale ? 1.23 : 1.04;
+          const clearance = (coefficient * weight * (140 - age)) / creatinine;
+          const roundedClearance = Math.round(clearance * 10) / 10; // Round to 1 decimal
           
-          if (roundedClearance >= 10 && roundedClearance <= 200) {
-            // Always update if value changed (recompute when creatinine changes)
+          console.log('[Clearance Calc] Result:', { coefficient, clearance, roundedClearance });
+          
+          // Accept any positive computed value (constraint widened to 0-10000)
+          if (roundedClearance > 0 && roundedClearance <= 10000) {
             if (updated.clairance_creatinine !== roundedClearance) {
               updated.clairance_creatinine = roundedClearance;
               hasChanges = true;
+              console.log('[Clearance Calc] Updated clairance_creatinine to:', roundedClearance);
             }
           } else {
-            // Clear if value is out of range
-            if (updated.clairance_creatinine !== undefined) {
-              delete updated.clairance_creatinine;
-              hasChanges = true;
-            }
-          }
-        } else {
-          // Clear if required values are invalid
-          if (updated.clairance_creatinine !== undefined && !prev.clairance_creatinine) {
-            // Only clear if it wasn't set server-side (keep server-side value if we can't compute)
+            console.log('[Clearance Calc] Value out of valid range:', roundedClearance);
           }
         }
-      } else if (prev.clairance_creatinine) {
-        // Keep server-side computed value if we don't have all required fields for client-side computation
-        // Don't clear it
+      } else {
+        console.log('[Clearance Calc] Missing dependencies:', {
+          creatinine: prev.creatinine,
+          weight_kg: prev.weight_kg,
+          patient_age: prev.patient_age,
+          patient_gender: prev.patient_gender
+        });
       }
 
       // Compute TMT scores if all required fields are available
