@@ -84,32 +84,18 @@ function lookupTScore(rawScore: number, column: 'mots' | 'couleur' | 'couleurmot
   const values = NOTET_TAB[column];
   const tScores = NOTET_TAB.scoret;
   
-  // Find the position in the lookup table
-  // For 'mots', 'couleur', 'couleurmot' - higher raw scores = higher T-scores
-  // For 'interference' - direct mapping
-  
-  // Handle values below minimum
-  if (rawScore <= values[0]) {
-    return tScores[0];
-  }
-  
-  // Handle values above maximum
-  if (rawScore >= values[values.length - 1]) {
-    return tScores[tScores.length - 1];
-  }
-  
-  // Find the bracket and interpolate
-  for (let i = 0; i < values.length - 1; i++) {
-    if (rawScore >= values[i] && rawScore <= values[i + 1]) {
-      // Linear interpolation
-      const ratio = (rawScore - values[i]) / (values[i + 1] - values[i]);
-      const tScore = tScores[i] + ratio * (tScores[i + 1] - tScores[i]);
-      return Math.round(tScore);
+  // Find index i such that values[i] is the largest value <= rawScore
+  let foundIndex = 0;
+  for (let i = 0; i < values.length; i++) {
+    if (rawScore >= values[i]) {
+      foundIndex = i;
+    } else {
+      // Since values are strictly increasing, we found our floor index
+      break;
     }
   }
   
-  // Fallback (should not reach here)
-  return 50;
+  return tScores[foundIndex];
 }
 
 /**
