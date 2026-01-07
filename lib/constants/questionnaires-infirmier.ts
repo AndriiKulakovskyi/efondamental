@@ -241,11 +241,11 @@ export const FAGERSTROM_DEFINITION: QuestionnaireDefinition = {
     singleColumn: true,
     pathologies: ['bipolar'],
     target_role: 'healthcare_professional',
-    // Only show Fagerstrom if patient is current smoker or ex-smoker
+    // Only show Fagerstrom if patient is current smoker (Fumeur actuel)
     conditional_on: {
       questionnaire_code: 'TOBACCO',
       field: 'smoking_status',
-      values: ['current_smoker', 'ex_smoker']
+      values: ['current_smoker']
     }
   }
 };

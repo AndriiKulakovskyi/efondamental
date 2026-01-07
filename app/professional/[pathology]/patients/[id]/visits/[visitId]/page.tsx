@@ -129,7 +129,8 @@ export default async function VisitDetailPage({
   // Show Fagerstrom only if patient is current_smoker or ex_smoker
   const tobaccoAnswered = !!tobaccoResponse;
   const smokingStatus = tobaccoResponse?.smoking_status;
-  const isFagerstromRequired = smokingStatus === 'current_smoker' || smokingStatus === 'ex_smoker';
+  // Fagerstrom is only required for current smokers (Fumeur actuel), not ex-smokers
+  const isFagerstromRequired = smokingStatus === 'current_smoker';
   
   // Fetch DSM5 Comorbidities response to determine if DIVA should be shown
   const dsm5ComorbidResponse = await getDsm5ComorbidResponse(visitId);

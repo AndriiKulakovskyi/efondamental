@@ -31,19 +31,41 @@ export async function getTobaccoResponse(
     throw error;
   }
 
+  if (!data) return null;
+
+  // Denormalize the data back to field names expected by the questionnaire UI
+  // The database stores normalized fields (pack_years, smoking_start_age, etc.)
+  // but the questionnaire has separate fields for current_smoker vs ex_smoker
+  const transformed: any = { ...data };
+  
   // Transform boolean values to 'yes'/'no' strings for UI compatibility
-  // This ensures the app works whether migration has been applied or not
-  if (data) {
-    const transformed: any = { ...data };
-    if (transformed.has_substitution === true) {
-      transformed.has_substitution = 'yes';
-    } else if (transformed.has_substitution === false) {
-      transformed.has_substitution = 'no';
-    }
-    return transformed;
+  const boolToYesNo = (value: boolean | null): string | null => {
+    if (value === true) return 'yes';
+    if (value === false) return 'no';
+    return null;
+  };
+
+  if (data.smoking_status === 'ex_smoker') {
+    // For ex_smoker: map normalized fields back to _ex suffix fields
+    transformed.pack_years_ex = data.pack_years;
+    transformed.smoking_start_age_ex = data.smoking_start_age;
+    transformed.smoking_end_age = data.smoking_end_age; // This field is same for both
+    transformed.has_substitution_ex = boolToYesNo(data.has_substitution);
+    transformed.substitution_methods_ex = data.substitution_methods;
+    // Clear the non-_ex fields to avoid confusion
+    delete transformed.pack_years;
+    delete transformed.smoking_start_age;
+    delete transformed.has_substitution;
+    delete transformed.substitution_methods;
+  } else if (data.smoking_status === 'current_smoker') {
+    // For current_smoker: keep normalized fields but transform has_substitution
+    transformed.has_substitution = boolToYesNo(data.has_substitution);
+  } else {
+    // For non_smoker or unknown: transform has_substitution if present
+    transformed.has_substitution = boolToYesNo(data.has_substitution);
   }
 
-  return data;
+  return transformed;
 }
 
 export async function saveTobaccoResponse(
