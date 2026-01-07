@@ -121,7 +121,7 @@ BEGIN
         'EGF_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_egf WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_egf WHERE visit_id = p_visit_id)),
         'ALDA_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_alda WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_alda WHERE visit_id = p_visit_id)),
         'ETAT_PATIENT_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_etat_patient WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_etat_patient WHERE visit_id = p_visit_id)),
-        'DSM5_EPISODES_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_dsm5_episodes WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_dsm5_episodes WHERE visit_id = p_visit_id)),
+        'DSM5_HUMEUR_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_dsm5_humeur WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_dsm5_humeur WHERE visit_id = p_visit_id)),
         'DSM5_COMORBID_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_dsm5_comorbid WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_dsm5_comorbid WHERE visit_id = p_visit_id)),
         'DIVA_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_diva WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_diva WHERE visit_id = p_visit_id)),
         'ATCD_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_atcd WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_atcd WHERE visit_id = p_visit_id)),
@@ -177,7 +177,7 @@ BEGIN
           (CASE WHEN EXISTS (SELECT 1 FROM responses_egf WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_alda WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_etat_patient WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
-          (CASE WHEN EXISTS (SELECT 1 FROM responses_dsm5_episodes WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
+          (CASE WHEN EXISTS (SELECT 1 FROM responses_dsm5_humeur WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_dsm5_comorbid WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN v_diva_required AND EXISTS (SELECT 1 FROM responses_diva WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_atcd WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
@@ -349,7 +349,7 @@ BEGIN
         'EGF_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_egf WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_egf WHERE visit_id = p_visit_id)),
         'ETAT_PATIENT_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_etat_patient WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_etat_patient WHERE visit_id = p_visit_id)),
         -- Medical Evaluation module (same as initial)
-        'DSM5_EPISODES_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_dsm5_episodes WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_dsm5_episodes WHERE visit_id = p_visit_id)),
+        'DSM5_HUMEUR_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_dsm5_humeur WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_dsm5_humeur WHERE visit_id = p_visit_id)),
         'DSM5_COMORBID_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_dsm5_comorbid WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_dsm5_comorbid WHERE visit_id = p_visit_id)),
         'DIVA_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_diva WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_diva WHERE visit_id = p_visit_id)),
         'ATCD_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_atcd WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_atcd WHERE visit_id = p_visit_id)),
@@ -398,7 +398,7 @@ BEGIN
           (CASE WHEN EXISTS (SELECT 1 FROM responses_egf WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_etat_patient WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           -- Medical Evaluation (7 base + 1 conditional DIVA)
-          (CASE WHEN EXISTS (SELECT 1 FROM responses_dsm5_episodes WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
+          (CASE WHEN EXISTS (SELECT 1 FROM responses_dsm5_humeur WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_dsm5_comorbid WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN v_diva_required AND EXISTS (SELECT 1 FROM responses_diva WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_atcd WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
