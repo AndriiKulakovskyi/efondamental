@@ -1614,24 +1614,40 @@ export default async function VisitDetailPage({
   // Calculate accurate completion status from constructed modules
   // This ensures consistency with individual module progress displays
   // Uses same filtering logic: exclude conditional questionnaires where conditionMet is false
+  // Includes both root-level questionnaires AND questionnaires inside sections
   const completionStatus = (() => {
     let totalQuestionnaires = 0;
     let completedQuestionnaires = 0;
 
+    // Helper function to count a questionnaire
+    const countQuestionnaire = (q: any) => {
+      if (!q) return;
+      
+      // Skip conditional questionnaires where condition is not met
+      // These are not required/visible, so don't count them
+      if (q.isConditional && q.conditionMet !== true) {
+        return;
+      }
+      
+      totalQuestionnaires++;
+      if (q.completed) {
+        completedQuestionnaires++;
+      }
+    };
+
     for (const module of modulesWithQuestionnaires) {
+      // Count root-level questionnaires
       const questionnaires = module.questionnaires || [];
       for (const q of questionnaires) {
-        if (!q) continue;
-        
-        // Skip conditional questionnaires where condition is not met
-        // These are not required/visible, so don't count them
-        if (q.isConditional && q.conditionMet !== true) {
-          continue;
-        }
-        
-        totalQuestionnaires++;
-        if (q.completed) {
-          completedQuestionnaires++;
+        countQuestionnaire(q);
+      }
+      
+      // Count questionnaires inside sections (e.g., mod_medical_eval, mod_neuropsy)
+      const sections = (module as any).sections || [];
+      for (const section of sections) {
+        const sectionQuestionnaires = section?.questionnaires || [];
+        for (const q of sectionQuestionnaires) {
+          countQuestionnaire(q);
         }
       }
     }
