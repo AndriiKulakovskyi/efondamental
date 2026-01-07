@@ -41,6 +41,7 @@ import {
   ISA_DEFINITION,
   SIS_DEFINITION,
   SUICIDE_HISTORY_DEFINITION,
+  SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
   PERINATALITE_DEFINITION,
   PATHO_NEURO_DEFINITION,
   PATHO_CARDIO_DEFINITION,
@@ -136,6 +137,7 @@ import {
   getIsaResponse,
   getSisResponse,
   getSuicideHistoryResponse,
+  getSuicideBehaviorFollowupResponse,
   getPerinataliteResponse,
   getPathoNeuroResponse,
   getPathoCardioResponse,
@@ -254,6 +256,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ISA_DEFINITION.code) questionnaire = ISA_DEFINITION;
   else if (code === SIS_DEFINITION.code) questionnaire = SIS_DEFINITION;
   else if (code === SUICIDE_HISTORY_DEFINITION.code) questionnaire = SUICIDE_HISTORY_DEFINITION;
+  else if (code === SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION.code) questionnaire = SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION;
   else if (code === PERINATALITE_DEFINITION.code) questionnaire = PERINATALITE_DEFINITION;
   else if (code === PATHO_NEURO_DEFINITION.code) questionnaire = PATHO_NEURO_DEFINITION;
   else if (code === PATHO_CARDIO_DEFINITION.code) questionnaire = PATHO_CARDIO_DEFINITION;
@@ -351,6 +354,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ISA_DEFINITION.code) existingResponse = await getIsaResponse(visitId);
   else if (code === SIS_DEFINITION.code) existingResponse = await getSisResponse(visitId);
   else if (code === SUICIDE_HISTORY_DEFINITION.code) existingResponse = await getSuicideHistoryResponse(visitId);
+  else if (code === SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION.code) existingResponse = await getSuicideBehaviorFollowupResponse(visitId);
   else if (code === PERINATALITE_DEFINITION.code) existingResponse = await getPerinataliteResponse(visitId);
   else if (code === PATHO_NEURO_DEFINITION.code) existingResponse = await getPathoNeuroResponse(visitId);
   else if (code === PATHO_CARDIO_DEFINITION.code) existingResponse = await getPathoCardioResponse(visitId);
