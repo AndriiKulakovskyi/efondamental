@@ -124,8 +124,8 @@ BEGIN
         'DSM5_HUMEUR_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_dsm5_humeur WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_dsm5_humeur WHERE visit_id = p_visit_id)),
         'DSM5_COMORBID_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_dsm5_comorbid WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_dsm5_comorbid WHERE visit_id = p_visit_id)),
         'DIVA_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_diva WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_diva WHERE visit_id = p_visit_id)),
-        'ATCD_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_atcd WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_atcd WHERE visit_id = p_visit_id)),
-        'ATCD_FAMILIAL_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_atcd_familial WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_atcd_familial WHERE visit_id = p_visit_id)),
+        'MEDICAL_DIAGNOSTIC_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_medical_diagnostic WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_medical_diagnostic WHERE visit_id = p_visit_id)),
+        'FAMILY_HISTORY_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_family_history WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_family_history WHERE visit_id = p_visit_id)),
         'MEDICATION_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_medication WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_medication WHERE visit_id = p_visit_id)),
         'FAST_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_fast WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_fast WHERE visit_id = p_visit_id)),
         'CSSRS_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_cssrs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_cssrs WHERE visit_id = p_visit_id)),
@@ -180,8 +180,8 @@ BEGIN
           (CASE WHEN EXISTS (SELECT 1 FROM responses_dsm5_humeur WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_dsm5_comorbid WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN v_diva_required AND EXISTS (SELECT 1 FROM responses_diva WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
-          (CASE WHEN EXISTS (SELECT 1 FROM responses_atcd WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
-          (CASE WHEN EXISTS (SELECT 1 FROM responses_atcd_familial WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
+          (CASE WHEN EXISTS (SELECT 1 FROM responses_medical_diagnostic WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
+          (CASE WHEN EXISTS (SELECT 1 FROM responses_family_history WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_medication WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_fast WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_cssrs WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
@@ -352,8 +352,8 @@ BEGIN
         'DSM5_HUMEUR_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_dsm5_humeur WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_dsm5_humeur WHERE visit_id = p_visit_id)),
         'DSM5_COMORBID_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_dsm5_comorbid WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_dsm5_comorbid WHERE visit_id = p_visit_id)),
         'DIVA_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_diva WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_diva WHERE visit_id = p_visit_id)),
-        'ATCD_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_atcd WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_atcd WHERE visit_id = p_visit_id)),
-        'ATCD_FAMILIAL_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_atcd_familial WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_atcd_familial WHERE visit_id = p_visit_id)),
+        'MEDICAL_DIAGNOSTIC_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_medical_diagnostic WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_medical_diagnostic WHERE visit_id = p_visit_id)),
+        'FAMILY_HISTORY_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_family_history WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_family_history WHERE visit_id = p_visit_id)),
         'MEDICATION_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_medication WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_medication WHERE visit_id = p_visit_id)),
         'CSSRS_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_cssrs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_cssrs WHERE visit_id = p_visit_id)),
         'ISA_FR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM responses_isa WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM responses_isa WHERE visit_id = p_visit_id)),
@@ -401,8 +401,8 @@ BEGIN
           (CASE WHEN EXISTS (SELECT 1 FROM responses_dsm5_humeur WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_dsm5_comorbid WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN v_diva_required AND EXISTS (SELECT 1 FROM responses_diva WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
-          (CASE WHEN EXISTS (SELECT 1 FROM responses_atcd WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
-          (CASE WHEN EXISTS (SELECT 1 FROM responses_atcd_familial WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
+          (CASE WHEN EXISTS (SELECT 1 FROM responses_medical_diagnostic WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
+          (CASE WHEN EXISTS (SELECT 1 FROM responses_family_history WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_medication WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_cssrs WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
           (CASE WHEN EXISTS (SELECT 1 FROM responses_isa WHERE visit_id = p_visit_id) THEN 1 ELSE 0 END) +
