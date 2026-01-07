@@ -50,6 +50,7 @@ import {
   ISA_DEFINITION,
   SIS_DEFINITION,
   SUICIDE_HISTORY_DEFINITION,
+  SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
   PERINATALITE_DEFINITION,
   PATHO_NEURO_DEFINITION,
   PATHO_CARDIO_DEFINITION,
@@ -1093,18 +1094,25 @@ export default async function VisitDetailPage({
         // Build Suicide section questionnaires
         const suicideQuestionnaires = [
           {
-            ...CSSRS_DEFINITION,
-            id: CSSRS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['CSSRS_FR']?.completed || false,
-            completedAt: questionnaireStatuses['CSSRS_FR']?.completed_at,
-          },
-          {
             ...ISA_DEFINITION,
             id: ISA_DEFINITION.code,
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['ISA_FR']?.completed || false,
             completedAt: questionnaireStatuses['ISA_FR']?.completed_at,
+          },
+          {
+            ...SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
+            id: SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['SUICIDE_BEHAVIOR_FOLLOWUP_FR']?.completed || false,
+            completedAt: questionnaireStatuses['SUICIDE_BEHAVIOR_FOLLOWUP_FR']?.completed_at,
+          },
+          {
+            ...CSSRS_DEFINITION,
+            id: CSSRS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['CSSRS_FR']?.completed || false,
+            completedAt: questionnaireStatuses['CSSRS_FR']?.completed_at,
           }
         ];
 

@@ -2394,6 +2394,34 @@ export interface SuicideHistoryResponse {
 
 export type SuicideHistoryResponseInsert = Omit<SuicideHistoryResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ===== Suicide Behavior Follow-up (Histoire des conduites suicidaires - Suivi semestriel) Response =====
+export interface SuicideBehaviorFollowupResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Q1: Self-harm behavior (0=No, 1=Yes)
+  q1_self_harm?: number | null;
+  
+  // Q2: Interrupted attempt (0=No, 1=Yes)
+  q2_interrupted?: number | null;
+  q2_1_interrupted_count?: number | null;
+  
+  // Q3: Aborted attempt (0=No, 1=Yes)
+  q3_aborted?: number | null;
+  q3_1_aborted_count?: number | null;
+  
+  // Q4: Preparations (0=No, 1=Yes)
+  q4_preparations?: number | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SuicideBehaviorFollowupResponseInsert = Omit<SuicideBehaviorFollowupResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
 // ===== Périnatalité (Perinatal History) Response =====
 export interface PerinataliteResponse {
   id: string;

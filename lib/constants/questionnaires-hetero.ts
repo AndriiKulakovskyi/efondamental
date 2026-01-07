@@ -5605,6 +5605,84 @@ export const SUICIDE_HISTORY_DEFINITION: QuestionnaireDefinition = {
 };
 
 // ============================================================================
+// Suicide Behavior Follow-up (Histoire des conduites suicidaires - Suivi semestriel)
+// ============================================================================
+
+export const SUICIDE_BEHAVIOR_FOLLOWUP_QUESTIONS: Question[] = [
+  {
+    id: 'q1_self_harm',
+    text: 'Le sujet a-t-il eu un comportement auto-agressif non suicidaire ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q2_interrupted',
+    text: 'Tentative interrompue : Interruption (par des facteurs extérieurs) de la mise en oeuvre par la personne d\'un acte potentiellement auto-agressif (sinon, une tentative avérée aurait eu lieu). Surdosage : la personne a des comprimés dans la main, mais quelqu\'un l\'empêche de les avaler. Si elle ingère un ou plusieurs comprimés, il s\'agit d\'une tentative avérée plutôt que d\'une tentative interrompue. Arme à feu : la personne pointe une arme vers elle, mais l\'arme lui est reprise par quelqu\'un ou quelque chose l\'empêche d\'appuyer sur la gâchette. Si elle appuie sur la gâchette et même si le coup ne part pas, il s\'agit d\'une tentative avérée. Saut dans le vide : la personne s\'apprête à sauter, mais quelqu\'un la retient et l\'éloigne du bord. Pendaison : la personne a une corde autour du cou mais ne s\'est pas encore pendue car quelqu\'un l\'en empêche.\n\nVous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais d\'en être empêché(e) par quelqu\'un ou quelque chose avant de véritablement passer à l\'acte ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q2_1_interrupted_count',
+    text: 'Nombre total de tentatives interrompues',
+    type: 'number',
+    required: false,
+    min: 0,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q2_interrupted' }, 1] }
+  },
+  {
+    id: 'q3_aborted',
+    text: 'Tentative avortée : La personne se prépare à se suicider, mais s\'interrompt d\'elle-même avant d\'avoir réellement eu un comportement autodestructeur. Les exemples sont similaires à ceux illustrant une tentative interrompue, si ce n\'est qu\'ici la personne interrompt d\'elle-même sa tentative au lieu d\'être interrompue par un facteur extérieur.\n\nVous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais de vous arrêter de vous-même avant de véritablement passer à l\'acte ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q3_1_aborted_count',
+    text: 'Nombre total de tentatives avortées',
+    type: 'number',
+    required: false,
+    min: 0,
+    indentLevel: 1,
+    display_if: { '==': [{ var: 'q3_aborted' }, 1] }
+  },
+  {
+    id: 'q4_preparations',
+    text: 'Préparatifs : Actes ou préparatifs en vue d\'une tentative de suicide imminente. Il peut s\'agir de tout ce qui dépasse le stade de la verbalisation ou de la pensée, comme l\'élaboration d\'une méthode spécifique (par ex. se procurer des comprimés ou une arme à feu) ou la prise de dispositions en vue de son suicide (par ex. dons d\'objets, rédaction d\'une lettre d\'adieu).\n\nAvez-vous pris certaines mesures pour faire une tentative de suicide ou pour préparer votre suicide (par ex. rassembler des comprimés, vous procurer une arme à feu, donner vos objets de valeur ou écrire une lettre d\'adieu) ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  }
+];
+
+export const SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION: QuestionnaireDefinition = {
+  id: 'suicide_behavior_followup',
+  code: 'SUICIDE_BEHAVIOR_FOLLOWUP_FR',
+  title: 'Histoire des conduites suicidaires (Suivi)',
+  description: 'Évaluation des comportements suicidaires pour le suivi semestriel : comportements auto-agressifs, tentatives interrompues, avortées et préparatifs.',
+  questions: SUICIDE_BEHAVIOR_FOLLOWUP_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
+// ============================================================================
 // Périnatalité (Perinatal History)
 // ============================================================================
 

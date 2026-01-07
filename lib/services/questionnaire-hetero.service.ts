@@ -29,6 +29,8 @@ import {
   SisResponseInsert,
   SuicideHistoryResponse,
   SuicideHistoryResponseInsert,
+  SuicideBehaviorFollowupResponse,
+  SuicideBehaviorFollowupResponseInsert,
   PerinataliteResponse,
   PerinataliteResponseInsert,
   PathoNeuroResponse,
@@ -971,6 +973,44 @@ export async function saveSuicideHistoryResponse(
 
   const { data, error } = await supabase
     .from('responses_suicide_history')
+    .upsert({
+      ...response
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Suicide Behavior Follow-up (Histoire des conduites suicidaires - Suivi semestriel)
+// ============================================================================
+
+export async function getSuicideBehaviorFollowupResponse(
+  visitId: string
+): Promise<SuicideBehaviorFollowupResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_suicide_behavior_followup')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveSuicideBehaviorFollowupResponse(
+  response: SuicideBehaviorFollowupResponseInsert
+): Promise<SuicideBehaviorFollowupResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_suicide_behavior_followup')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })

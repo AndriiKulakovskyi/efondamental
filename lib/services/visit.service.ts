@@ -48,6 +48,7 @@ import {
   getIsaResponse,
   getSisResponse,
   getSuicideHistoryResponse,
+  getSuicideBehaviorFollowupResponse,
   getPerinataliteResponse,
   getPathoNeuroResponse,
   getPathoCardioResponse,
@@ -119,6 +120,7 @@ import {
   ISA_DEFINITION,
   SIS_DEFINITION,
   SUICIDE_HISTORY_DEFINITION,
+  SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
   PERINATALITE_DEFINITION,
   PATHO_NEURO_DEFINITION,
   PATHO_CARDIO_DEFINITION,
@@ -645,8 +647,9 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         questionnaires: [
           DSM5_COMORBID_DEFINITION,
           DIVA_DEFINITION,
-          CSSRS_DEFINITION,
-          ISA_DEFINITION
+          ISA_DEFINITION,
+          SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
+          CSSRS_DEFINITION
         ]
       },
       {
@@ -893,8 +896,8 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (wais4Matrices) completed++;
     if (wais4DigitSpan) completed++;
   } else if (visit.visit_type === 'biannual_followup') {
-    // Biannual follow-up: 6 infirmier + 7 thymic + 4 medical = 17 total
-    total = 17;
+    // Biannual follow-up: 6 infirmier + 7 thymic + 5 medical = 18 total
+    total = 18;
     totalModules = 3;
 
     const [
@@ -903,7 +906,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       // Thymic evaluation questionnaires
       madrs, ymrs, cgi, egf, alda, etatPatient, fast,
       // Medical evaluation questionnaires
-      dsm5Comorbid, diva, cssrs, isa
+      dsm5Comorbid, diva, cssrs, isa, suicideBehaviorFollowup
     ] = await Promise.all([
       // Infirmier questionnaires
       getTobaccoResponse(visitId),
@@ -924,7 +927,8 @@ export async function getVisitCompletionStatus(visitId: string) {
       getDsm5ComorbidResponse(visitId),
       getDivaResponse(visitId),
       getCssrsResponse(visitId),
-      getIsaResponse(visitId)
+      getIsaResponse(visitId),
+      getSuicideBehaviorFollowupResponse(visitId)
     ]);
 
     // Count infirmier questionnaires
@@ -949,6 +953,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diva) completed++;
     if (cssrs) completed++;
     if (isa) completed++;
+    if (suicideBehaviorFollowup) completed++;
   } else if (visit.visit_type === 'annual_evaluation') {
     // Annual evaluation: 6 infirmier + 7 thymic + 19 medical + 9 auto etat = 41 total
     total = 41;
