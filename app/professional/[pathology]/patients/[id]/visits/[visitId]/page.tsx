@@ -106,7 +106,7 @@ import {
 export default async function VisitDetailPage({
   params,
 }: {
-  params: { pathology: string; id: string; visitId: string };
+  params: Promise<{ pathology: string; id: string; visitId: string }>;
 }) {
   const { pathology, id: patientId, visitId } = await params;
   const context = await getUserContext();

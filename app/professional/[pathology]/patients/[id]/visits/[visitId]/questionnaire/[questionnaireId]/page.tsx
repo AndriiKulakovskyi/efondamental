@@ -205,7 +205,7 @@ import {
 export default async function ProfessionalQuestionnairePage({
   params,
 }: {
-  params: { pathology: string; id: string; visitId: string; questionnaireId: string };
+  params: Promise<{ pathology: string; id: string; visitId: string; questionnaireId: string }>;
 }) {
   const { pathology, id: patientId, visitId, questionnaireId: code } = await params;
   const context = await getUserContext();
