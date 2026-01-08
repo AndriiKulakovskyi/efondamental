@@ -1066,49 +1066,7 @@ export default async function VisitDetailPage({
             completed: questionnaireStatuses['DIAG_PSY_SEM_PSYCHOTIQUES']?.completed || false,
             completedAt: questionnaireStatuses['DIAG_PSY_SEM_PSYCHOTIQUES']?.completed_at,
           },
-          {
-            ...DSM5_COMORBID_DEFINITION,
-            id: DSM5_COMORBID_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['DSM5_COMORBID_FR']?.completed || false,
-            completedAt: questionnaireStatuses['DSM5_COMORBID_FR']?.completed_at,
-          },
         ];
-        
-        // Add DIVA with conditional display properties
-        if (!dsm5ComorbidAnswered) {
-          dsm5Questionnaires.push({
-            ...DIVA_DEFINITION,
-            id: DIVA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: false,
-            completedAt: null,
-            isConditional: true,
-            conditionMet: false,
-            conditionMessage: 'Complétez d\'abord l\'évaluation DSM5 - Troubles comorbides (Section 5)',
-          });
-        } else if (isDivaRequired) {
-          dsm5Questionnaires.push({
-            ...DIVA_DEFINITION,
-            id: DIVA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['DIVA_FR']?.completed || false,
-            completedAt: questionnaireStatuses['DIVA_FR']?.completed_at,
-            isConditional: true,
-            conditionMet: true,
-          });
-        } else {
-          dsm5Questionnaires.push({
-            ...DIVA_DEFINITION,
-            id: DIVA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: false,
-            completedAt: null,
-            isConditional: true,
-            conditionMet: false,
-            conditionMessage: 'Non applicable - le patient n\'a pas été évalué avec la DIVA',
-          });
-        }
 
         // Build Suicide section questionnaires
         const suicideQuestionnaires = [

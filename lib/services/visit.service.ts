@@ -654,8 +654,6 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION,
           DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION,
           DIAG_PSY_SEM_PSYCHOTIQUES_DEFINITION,
-          DSM5_COMORBID_DEFINITION,
-          DIVA_DEFINITION,
           ISA_DEFINITION,
           SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
           CSSRS_DEFINITION
@@ -905,8 +903,8 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (wais4Matrices) completed++;
     if (wais4DigitSpan) completed++;
   } else if (visit.visit_type === 'biannual_followup') {
-    // Biannual follow-up: 6 infirmier + 7 thymic + 8 medical = 21 total
-    total = 21;
+    // Biannual follow-up: 6 infirmier + 7 thymic + 6 medical = 19 total
+    total = 19;
     totalModules = 3;
 
     const [
@@ -915,7 +913,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       // Thymic evaluation questionnaires
       madrs, ymrs, cgi, egf, alda, etatPatient, fast,
       // Medical evaluation questionnaires
-      diagPsySemHumeurActuels, diagPsySemHumeurDepuisVisite, diagPsySemPsychotiques, dsm5Comorbid, diva, cssrs, isa, suicideBehaviorFollowup
+      diagPsySemHumeurActuels, diagPsySemHumeurDepuisVisite, diagPsySemPsychotiques, cssrs, isa, suicideBehaviorFollowup
     ] = await Promise.all([
       // Infirmier questionnaires
       getTobaccoResponse(visitId),
@@ -936,8 +934,6 @@ export async function getVisitCompletionStatus(visitId: string) {
       getDiagPsySemHumeurActuelsResponse(visitId),
       getDiagPsySemHumeurDepuisVisiteResponse(visitId),
       getDiagPsySemPsychotiquesResponse(visitId),
-      getDsm5ComorbidResponse(visitId),
-      getDivaResponse(visitId),
       getCssrsResponse(visitId),
       getIsaResponse(visitId),
       getSuicideBehaviorFollowupResponse(visitId)
@@ -964,8 +960,6 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diagPsySemHumeurActuels) completed++;
     if (diagPsySemHumeurDepuisVisite) completed++;
     if (diagPsySemPsychotiques) completed++;
-    if (dsm5Comorbid) completed++;
-    if (diva) completed++;
     if (cssrs) completed++;
     if (isa) completed++;
     if (suicideBehaviorFollowup) completed++;
