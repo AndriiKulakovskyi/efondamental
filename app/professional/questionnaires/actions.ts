@@ -101,7 +101,8 @@ import {
 } from '@/lib/services/questionnaire-dsm5.service';
 import { 
   getVisitCompletionStatus,
-  completeVisit
+  completeVisit,
+  getVisitById
 } from '@/lib/services/visit.service';
 import { 
   AsrmResponseInsert, 
@@ -974,11 +975,22 @@ export async function submitProfessionalQuestionnaireAction(
     }
     
     // Check if visit is now 100% complete and auto-complete it
+    // Use the stored completion_percentage from the database (calculated accurately by the visit detail page)
+    // as a fallback, also check with getVisitCompletionStatus
     try {
+      // First check the stored completion percentage (most accurate, set by visit detail page)
+      const visit = await getVisitById(visitId);
+      const storedCompletion = visit?.completion_percentage ?? 0;
+      
+      // Also check with the service function
       const completionStatus = await getVisitCompletionStatus(visitId);
-      if (completionStatus.completionPercentage === 100) {
-        await completeVisit(visitId);
-        console.log(`Visit ${visitId} automatically completed (100% questionnaires filled)`);
+      
+      // Auto-complete if either the stored value or calculated value is 100%
+      if (storedCompletion === 100 || completionStatus.completionPercentage === 100) {
+        if (visit?.status !== 'completed') {
+          await completeVisit(visitId);
+          console.log(`Visit ${visitId} automatically completed (100% questionnaires filled)`);
+        }
       }
     } catch (error) {
       // Log but don't fail the questionnaire submission if auto-complete fails

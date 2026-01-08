@@ -753,7 +753,8 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diag) completed++;
     if (orient) completed++;
   } else if (visit.visit_type === 'initial_evaluation') {
-    total = 61; // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 7 INFIRMIER + 12 Medical + 18 Neuropsy (14 WAIS-IV + 4 WAIS-III)
+    // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 6 INFIRMIER + 4 DSM5 + 1 Family + 4 Suicide + 10 Histoire Somatique + 4 WAIS-4 = 55
+    total = 55;
     totalModules = 7;
 
     const [

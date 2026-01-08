@@ -28,12 +28,16 @@ interface VisitCardsProps {
 }
 
 export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
-  const [selectedFilters, setSelectedFilters] = useState<Set<string>>(new Set(['upcoming']));
+  const [selectedFilters, setSelectedFilters] = useState<Set<string>>(new Set(['all']));
+
+  // Helper to determine if a visit is completed (status OR 100% completion)
+  const isVisitCompleted = (v: VisitWithCompletion) => v.status === 'completed' || v.completionPercentage === 100;
+  const isVisitUpcoming = (v: VisitWithCompletion) => !isVisitCompleted(v) && (v.status === 'scheduled' || v.status === 'in_progress');
 
   // Calculate visit counts
   const allCount = visits.length;
-  const upcomingCount = visits.filter(v => v.status === 'scheduled' || v.status === 'in_progress').length;
-  const completedCount = visits.filter(v => v.status === 'completed').length;
+  const upcomingCount = visits.filter(isVisitUpcoming).length;
+  const completedCount = visits.filter(isVisitCompleted).length;
 
   // Handle filter toggle
   const handleFilterToggle = (filterType: string) => {
@@ -52,11 +56,8 @@ export function VisitCards({ visits, pathology, patientId }: VisitCardsProps) {
     
     if (selectedFilters.has('all')) return true;
     
-    const isUpcoming = visit.status === 'scheduled' || visit.status === 'in_progress';
-    const isCompleted = visit.status === 'completed';
-    
-    if (selectedFilters.has('upcoming') && isUpcoming) return true;
-    if (selectedFilters.has('completed') && isCompleted) return true;
+    if (selectedFilters.has('upcoming') && isVisitUpcoming(visit)) return true;
+    if (selectedFilters.has('completed') && isVisitCompleted(visit)) return true;
     
     return false;
   });

@@ -122,6 +122,10 @@ export interface Visit {
   created_by: string;
   created_at: string;
   updated_at: string;
+  completion_percentage: number | null;
+  completed_questionnaires: number | null;
+  total_questionnaires: number | null;
+  completion_updated_at: string | null;
 }
 
 export interface VisitFull extends Visit {
@@ -135,7 +139,7 @@ export interface VisitFull extends Visit {
   conducted_by_last_name: string | null;
 }
 
-export type VisitInsert = Omit<Visit, 'id' | 'created_at' | 'updated_at'>;
+export type VisitInsert = Omit<Visit, 'id' | 'created_at' | 'updated_at' | 'completion_percentage' | 'completed_questionnaires' | 'total_questionnaires' | 'completion_updated_at'>;
 export type VisitUpdate = Partial<Omit<Visit, 'id' | 'created_at' | 'updated_at'>>;
 
 export interface AuditLog {
