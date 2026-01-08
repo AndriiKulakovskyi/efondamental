@@ -695,10 +695,20 @@ export async function submitProfessionalQuestionnaireAction(
         break;
 
       case 'CVLT_FR':
+        // Filter out computed score fields - backend will recalculate them
+        const {
+          trial_1_std, trial_5_std, total_1_5_std, list_b_std,
+          sdfr_std, sdcr_std, ldfr_std, ldcr_std,
+          semantic_std, serial_std, persev_std, intru_std,
+          recog_std, false_recog_std, discrim_std,
+          primacy_std, recency_std, bias_std,
+          ...cvltRawData
+        } = responses as any;
+        
         result = await saveCvltResponse({
           visit_id: visitId,
           patient_id: patientId,
-          ...responses as any
+          ...cvltRawData
         } as CvltResponseInsert);
         break;
 
@@ -785,10 +795,20 @@ export async function submitProfessionalQuestionnaireAction(
 
       // WAIS-III Questionnaires
       case 'WAIS3_CVLT_FR':
+        // Filter out computed score fields - backend will recalculate them
+        const {
+          trial_1_std: w3_trial_1_std, trial_5_std: w3_trial_5_std, total_1_5_std: w3_total_1_5_std, list_b_std: w3_list_b_std,
+          sdfr_std: w3_sdfr_std, sdcr_std: w3_sdcr_std, ldfr_std: w3_ldfr_std, ldcr_std: w3_ldcr_std,
+          semantic_std: w3_semantic_std, serial_std: w3_serial_std, persev_std: w3_persev_std, intru_std: w3_intru_std,
+          recog_std: w3_recog_std, false_recog_std: w3_false_recog_std, discrim_std: w3_discrim_std,
+          primacy_std: w3_primacy_std, recency_std: w3_recency_std, bias_std: w3_bias_std,
+          ...wais3CvltRawData
+        } = responses as any;
+        
         result = await saveCvltResponse({
           visit_id: visitId,
           patient_id: patientId,
-          ...responses as any
+          ...wais3CvltRawData
         } as CvltResponseInsert);
         break;
 
