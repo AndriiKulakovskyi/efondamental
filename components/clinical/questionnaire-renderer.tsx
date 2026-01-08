@@ -25,6 +25,7 @@ import { calculateMem3SpatialScores } from "@/lib/services/mem3-spatial-scoring"
 import { calculateWais3DigitSpanScores } from "@/lib/services/wais3-digit-span-scoring";
 import { calculateWais3VocabulaireScores } from "@/lib/services/wais3-vocabulaire-scoring";
 import { Loader2, ChevronDown, Info } from "lucide-react";
+import { calculateCvltScores } from "@/lib/services/cvlt-scoring";
 
 interface QuestionnaireRendererProps {
   questionnaire: QuestionnaireDefinition;
@@ -1703,31 +1704,65 @@ export function QuestionnaireRenderer({
         }
       }
 
-      // Compute CVLT scores (simple calculations only, complex scoring done on backend)
-      const hasCvltFields = prev.trial_1 !== undefined || prev.trial_2 !== undefined;
+      // Compute CVLT scores
+      const hasCvltInputs = 
+        prev.trial_1 !== undefined && prev.trial_2 !== undefined && 
+        prev.trial_3 !== undefined && prev.trial_4 !== undefined && 
+        prev.trial_5 !== undefined && prev.list_b !== undefined &&
+        prev.sdfr !== undefined && prev.sdcr !== undefined &&
+        prev.ldfr !== undefined && prev.ldcr !== undefined &&
+        prev.patient_age !== undefined && prev.years_of_education !== undefined &&
+        prev.patient_sex !== undefined;
       
-      if (hasCvltFields) {
-        // Calculate Lundi Total (sum of trials 1-5)
-        if (prev.trial_1 !== undefined && prev.trial_2 !== undefined && 
-            prev.trial_3 !== undefined && prev.trial_4 !== undefined && 
-            prev.trial_5 !== undefined) {
-          const trial1 = Number(prev.trial_1) || 0;
-          const trial2 = Number(prev.trial_2) || 0;
-          const trial3 = Number(prev.trial_3) || 0;
-          const trial4 = Number(prev.trial_4) || 0;
-          const trial5 = Number(prev.trial_5) || 0;
-          
-          const lundiTotal = trial1 + trial2 + trial3 + trial4 + trial5;
-          
-          if (updated.trials_1_5_total !== lundiTotal) {
-            updated.trials_1_5_total = lundiTotal;
+      if (hasCvltInputs) {
+        // 1. Calculate Lundi Total (sum of trials 1-5)
+        const trial1 = Number(prev.trial_1) || 0;
+        const trial2 = Number(prev.trial_2) || 0;
+        const trial3 = Number(prev.trial_3) || 0;
+        const trial4 = Number(prev.trial_4) || 0;
+        const trial5 = Number(prev.trial_5) || 0;
+        
+        const lundiTotal = trial1 + trial2 + trial3 + trial4 + trial5;
+        
+        if (updated.trials_1_5_total !== lundiTotal) {
+          updated.trials_1_5_total = lundiTotal;
+          hasChanges = true;
+        }
+
+        // 2. Calculate full CVLT standard scores
+        const cvltScores = calculateCvltScores({
+          patient_age: Number(prev.patient_age),
+          years_of_education: Number(prev.years_of_education),
+          patient_sex: prev.patient_sex as 'F' | 'M',
+          trial_1: trial1,
+          trial_2: trial2,
+          trial_3: trial3,
+          trial_4: trial4,
+          trial_5: trial5,
+          list_b: Number(prev.list_b) || 0,
+          sdfr: Number(prev.sdfr) || 0,
+          sdcr: Number(prev.sdcr) || 0,
+          ldfr: Number(prev.ldfr) || 0,
+          ldcr: Number(prev.ldcr) || 0,
+          semantic_clustering: prev.semantic_clustering !== undefined ? Number(prev.semantic_clustering) : null,
+          serial_clustering: prev.serial_clustering !== undefined ? Number(prev.serial_clustering) : null,
+          perseverations: prev.perseverations !== undefined ? Number(prev.perseverations) : null,
+          intrusions: prev.intrusions !== undefined ? Number(prev.intrusions) : null,
+          recognition_hits: prev.recognition_hits !== undefined ? Number(prev.recognition_hits) : null,
+          false_positives: prev.false_positives !== undefined ? Number(prev.false_positives) : null,
+          discriminability: prev.discriminability !== undefined ? Number(prev.discriminability) : null,
+          primacy: prev.primacy !== undefined ? Number(prev.primacy) : null,
+          recency: prev.recency !== undefined ? Number(prev.recency) : null,
+          response_bias: prev.response_bias !== undefined ? Number(prev.response_bias) : null,
+        });
+
+        // Update each computed score field if it changed
+        Object.entries(cvltScores).forEach(([key, value]) => {
+          if (updated[key] !== value) {
+            updated[key] = value;
             hasChanges = true;
           }
-        }
-        
-        // Note: Standard scores (trial_1_std, trial_5_std, etc.) and percentile calculations
-        // are computed on the backend using complex regression formulas and lookup tables.
-        // See the scoring JSON specification for details.
+        });
       }
 
       return hasChanges ? updated : prev;
@@ -1834,6 +1869,11 @@ export function QuestionnaireRenderer({
     responses.inverse_7a, responses.inverse_7b, responses.inverse_8a, responses.inverse_8b,
     // CVLT fields
     responses.trial_1, responses.trial_2, responses.trial_3, responses.trial_4, responses.trial_5,
+    responses.list_b, responses.sdfr, responses.sdcr, responses.ldfr, responses.ldcr,
+    responses.semantic_clustering, responses.serial_clustering, responses.perseverations, 
+    responses.intrusions, responses.recognition_hits, responses.false_positives, 
+    responses.discriminability, responses.primacy, responses.recency, responses.response_bias,
+    responses.patient_sex,
     // MATHYS items
     responses.q1, responses.q2, responses.q3, responses.q4, responses.q5,
     responses.q6, responses.q7, responses.q8, responses.q9, responses.q10,
