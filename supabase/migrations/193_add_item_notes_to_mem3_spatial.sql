@@ -1,5 +1,5 @@
 -- Add item notes to MEM-III Spatial Span responses table
-ALTER TABLE responses_wais3_mem3_spatial 
+ALTER TABLE responses_mem3_spatial 
 ADD COLUMN IF NOT EXISTS odirect_1_note INTEGER,
 ADD COLUMN IF NOT EXISTS odirect_2_note INTEGER,
 ADD COLUMN IF NOT EXISTS odirect_3_note INTEGER,
