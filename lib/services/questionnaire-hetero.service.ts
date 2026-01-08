@@ -507,17 +507,20 @@ export async function saveEtatPatientResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
+  // Remove any fields that don't exist in the database table
+  const { total_score, ...cleanedResponse } = response as any;
+
   // Count depressive symptoms (Q1-Q9) where value is 1 (Oui)
   const depressiveQuestions = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9'];
   const depressionCount = depressiveQuestions.reduce((count, key) => {
-    const value = response[key as keyof EtatPatientResponseInsert];
+    const value = cleanedResponse[key as keyof typeof cleanedResponse];
     return count + (value === 1 ? 1 : 0);
   }, 0);
 
   // Count manic symptoms (Q10-Q18) where value is 1 (Oui)
   const manicQuestions = ['q10', 'q11', 'q12', 'q13', 'q14', 'q15', 'q16', 'q17', 'q18'];
   const maniaCount = manicQuestions.reduce((count, key) => {
-    const value = response[key as keyof EtatPatientResponseInsert];
+    const value = cleanedResponse[key as keyof typeof cleanedResponse];
     return count + (value === 1 ? 1 : 0);
   }, 0);
 
@@ -534,14 +537,14 @@ export async function saveEtatPatientResponse(
   }
 
   // Alert if suicidal ideation is present
-  if (response.q9 === 1) {
+  if (cleanedResponse.q9 === 1) {
     interpretation += ' - ALERTE: Idéation suicidaire présente';
   }
 
   const { data, error } = await supabase
     .from('responses_etat_patient')
     .upsert({
-      ...response,
+      ...cleanedResponse,
       depression_count: depressionCount,
       mania_count: maniaCount,
       interpretation,
