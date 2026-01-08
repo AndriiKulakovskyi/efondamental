@@ -573,44 +573,54 @@ export default async function VisitDetailPage({
         id: 'mod_neuropsy',
         name: 'Evaluation Neuropsychologique',
         description: 'Évaluation neuropsychologique (Tests indépendants, WAIS-III, WAIS-IV)',
-        // Root level: Independent tests shared by WAIS-III and WAIS-IV protocols
-        questionnaires: [
-          {
-            ...CVLT_DEFINITION,
-            id: CVLT_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['CVLT_FR']?.completed || false,
-            completedAt: questionnaireStatuses['CVLT_FR']?.completed_at,
-          },
-          {
-            ...TMT_DEFINITION,
-            id: TMT_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['TMT_FR']?.completed || false,
-            completedAt: questionnaireStatuses['TMT_FR']?.completed_at,
-          },
-          {
-            ...STROOP_DEFINITION,
-            id: STROOP_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['STROOP_FR']?.completed || false,
-            completedAt: questionnaireStatuses['STROOP_FR']?.completed_at,
-          },
-          {
-            ...FLUENCES_VERBALES_DEFINITION,
-            id: FLUENCES_VERBALES_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['FLUENCES_VERBALES_FR']?.completed || false,
-            completedAt: questionnaireStatuses['FLUENCES_VERBALES_FR']?.completed_at,
-          },
-          {
-            ...MEM3_SPATIAL_DEFINITION,
-            id: MEM3_SPATIAL_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['MEM3_SPATIAL_FR']?.completed || false,
-            completedAt: questionnaireStatuses['MEM3_SPATIAL_FR']?.completed_at,
-          }
-        ],
+        questionnaires: (() => {
+          const independentTests = [
+            { def: CVLT_DEFINITION, code: 'CVLT_FR' },
+            { def: TMT_DEFINITION, code: 'TMT_FR' },
+            { def: STROOP_DEFINITION, code: 'STROOP_FR' },
+            { def: FLUENCES_VERBALES_DEFINITION, code: 'FLUENCES_VERBALES_FR' },
+            { def: MEM3_SPATIAL_DEFINITION, code: 'MEM3_SPATIAL_FR' }
+          ];
+          
+          return independentTests.map(({ def, code }) => {
+            const isAnswered = wais3CriteriaAnswered || wais4CriteriaAnswered;
+            const isAccepted = wais3Accepted || wais4Accepted;
+            
+            if (!isAnswered) {
+              return {
+                ...def,
+                id: def.code,
+                target_role: 'healthcare_professional',
+                completed: false,
+                completedAt: null,
+                isConditional: true,
+                conditionMet: false,
+                conditionMessage: 'Complétez d\'abord les Critères cliniques (WAIS-III ou WAIS-IV)',
+              };
+            } else if (isAccepted) {
+              return {
+                ...def,
+                id: def.code,
+                target_role: 'healthcare_professional',
+                completed: questionnaireStatuses[code]?.completed || false,
+                completedAt: questionnaireStatuses[code]?.completed_at,
+                isConditional: true,
+                conditionMet: true,
+              };
+            } else {
+              return {
+                ...def,
+                id: def.code,
+                target_role: 'healthcare_professional',
+                completed: false,
+                completedAt: null,
+                isConditional: true,
+                conditionMet: false,
+                conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
+              };
+            }
+          });
+        })(),
         sections: [
           {
             id: 'wais3',
@@ -667,30 +677,13 @@ export default async function VisitDetailPage({
                 }
               };
               
-              // Add conditional questionnaires (WAIS-III specific tests only)
+              // Add conditional questionnaires (WAIS-III specific tests)
               addConditionalQuestionnaire(WAIS3_LEARNING_DEFINITION, 'WAIS3_LEARNING_FR');
-              
-              // Vocabulaire - not in the conditional list (always enabled)
-              wais3Questionnaires.push({
-                ...WAIS3_VOCABULAIRE_DEFINITION,
-                id: WAIS3_VOCABULAIRE_DEFINITION.code,
-                target_role: 'healthcare_professional',
-                completed: questionnaireStatuses['WAIS3_VOCABULAIRE_FR']?.completed || false,
-                completedAt: questionnaireStatuses['WAIS3_VOCABULAIRE_FR']?.completed_at,
-              });
-              
+              addConditionalQuestionnaire(WAIS3_VOCABULAIRE_DEFINITION, 'WAIS3_VOCABULAIRE_FR');
               addConditionalQuestionnaire(WAIS3_MATRICES_DEFINITION, 'WAIS3_MATRICES_FR');
               addConditionalQuestionnaire(WAIS3_CODE_SYMBOLES_DEFINITION, 'WAIS3_CODE_SYMBOLES_FR');
               addConditionalQuestionnaire(WAIS3_DIGIT_SPAN_DEFINITION, 'WAIS3_DIGIT_SPAN_FR');
-              
-              // CPT2 - not in the conditional list (always enabled)
-              wais3Questionnaires.push({
-                ...WAIS3_CPT2_DEFINITION,
-                id: WAIS3_CPT2_DEFINITION.code,
-                target_role: 'healthcare_professional',
-                completed: questionnaireStatuses['WAIS3_CPT2_FR']?.completed || false,
-                completedAt: questionnaireStatuses['WAIS3_CPT2_FR']?.completed_at,
-              });
+              addConditionalQuestionnaire(WAIS3_CPT2_DEFINITION, 'WAIS3_CPT2_FR');
               
               return wais3Questionnaires;
             })()
@@ -707,6 +700,41 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['WAIS4_CRITERIA_FR']?.completed || false,
                   completedAt: questionnaireStatuses['WAIS4_CRITERIA_FR']?.completed_at,
+                },
+                {
+                  ...COBRA_DEFINITION,
+                  id: COBRA_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['COBRA_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['COBRA_FR']?.completed_at,
+                },
+                {
+                  ...CPT3_DEFINITION,
+                  id: CPT3_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['CPT3_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['CPT3_FR']?.completed_at,
+                },
+                {
+                  ...TEST_COMMISSIONS_DEFINITION,
+                  id: TEST_COMMISSIONS_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['TEST_COMMISSIONS_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['TEST_COMMISSIONS_FR']?.completed_at,
+                },
+                {
+                  ...SCIP_DEFINITION,
+                  id: SCIP_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['SCIP_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['SCIP_FR']?.completed_at,
+                },
+                {
+                  ...WAIS4_SIMILITUDES_DEFINITION,
+                  id: WAIS4_SIMILITUDES_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['WAIS4_SIMILITUDES_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['WAIS4_SIMILITUDES_FR']?.completed_at,
                 }
               ];
               
@@ -755,39 +783,6 @@ export default async function VisitDetailPage({
               addConditionalQuestionnaire(WAIS4_MATRICES_DEFINITION, 'WAIS4_MATRICES_FR');
               addConditionalQuestionnaire(WAIS4_CODE_DEFINITION, 'WAIS_IV_CODE_SYMBOLES_IVT');
               addConditionalQuestionnaire(WAIS4_DIGIT_SPAN_DEFINITION, 'WAIS4_DIGIT_SPAN_FR');
-              addConditionalQuestionnaire(WAIS4_SIMILITUDES_DEFINITION, 'WAIS4_SIMILITUDES_FR');
-              
-              // COBRA, CPT3, TEST_COMMISSIONS, SCIP - not in the conditional list (always enabled)
-              wais4Questionnaires.push(
-                {
-                  ...COBRA_DEFINITION,
-                  id: COBRA_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['COBRA_FR']?.completed || false,
-                  completedAt: questionnaireStatuses['COBRA_FR']?.completed_at,
-                },
-                {
-                  ...CPT3_DEFINITION,
-                  id: CPT3_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['CPT3_FR']?.completed || false,
-                  completedAt: questionnaireStatuses['CPT3_FR']?.completed_at,
-                },
-                {
-                  ...TEST_COMMISSIONS_DEFINITION,
-                  id: TEST_COMMISSIONS_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['TEST_COMMISSIONS_FR']?.completed || false,
-                  completedAt: questionnaireStatuses['TEST_COMMISSIONS_FR']?.completed_at,
-                },
-                {
-                  ...SCIP_DEFINITION,
-                  id: SCIP_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['SCIP_FR']?.completed || false,
-                  completedAt: questionnaireStatuses['SCIP_FR']?.completed_at,
-                }
-              );
               
               return wais4Questionnaires;
             })()

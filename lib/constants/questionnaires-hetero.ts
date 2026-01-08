@@ -11526,9 +11526,9 @@ export const WAIS3_LEARNING_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 
 const WAIS3_VOCABULAIRE_OPTIONS: QuestionOption[] = [
-  { code: 0, label: 'Réponse incorrecte ou absence de réponse', score: 0 },
-  { code: 1, label: 'Réponse partielle', score: 1 },
-  { code: 2, label: 'Réponse correcte', score: 2 }
+  { code: 0, label: '0', score: 0 },
+  { code: 1, label: '1', score: 1 },
+  { code: 2, label: '2', score: 2 }
 ];
 
 export const WAIS3_VOCABULAIRE_QUESTIONS: Question[] = [
