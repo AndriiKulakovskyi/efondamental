@@ -95,7 +95,8 @@ import {
   saveDsm5HumeurResponse,
   saveDsm5PsychoticResponse,
   saveDsm5ComorbidResponse,
-  saveDiagPsySemHumeurActuelsResponse
+  saveDiagPsySemHumeurActuelsResponse,
+  saveDiagPsySemHumeurDepuisVisiteResponse
 } from '@/lib/services/questionnaire-dsm5.service';
 import { 
   getVisitCompletionStatus,
@@ -162,6 +163,7 @@ import {
   Dsm5PsychoticResponseInsert,
   Dsm5ComorbidResponseInsert,
   DiagPsySemHumeurActuelsResponseInsert,
+  DiagPsySemHumeurDepuisVisiteResponseInsert,
   Wais4CriteriaResponseInsert,
   Wais4LearningResponseInsert,
   Wais4MatricesResponseInsert,
@@ -666,6 +668,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as DiagPsySemHumeurActuelsResponseInsert);
+        break;
+
+      case 'DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE':
+        result = await saveDiagPsySemHumeurDepuisVisiteResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as DiagPsySemHumeurDepuisVisiteResponseInsert);
         break;
 
       case 'WAIS4_CRITERIA_FR':

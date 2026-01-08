@@ -10,7 +10,9 @@ import {
   Dsm5ComorbidResponse,
   Dsm5ComorbidResponseInsert,
   DiagPsySemHumeurActuelsResponse,
-  DiagPsySemHumeurActuelsResponseInsert
+  DiagPsySemHumeurActuelsResponseInsert,
+  DiagPsySemHumeurDepuisVisiteResponse,
+  DiagPsySemHumeurDepuisVisiteResponseInsert
 } from '@/lib/types/database.types';
 
 // ============================================================================
@@ -193,6 +195,42 @@ export async function saveDiagPsySemHumeurActuelsResponse(
 
   const { data, error } = await supabase
     .from('responses_diag_psy_sem_humeur_actuels')
+    .upsert(response, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Semi-Annual DSM5 Episodes Since Last Visit (Troubles de l'humeur depuis la dernière visite)
+// ============================================================================
+
+export async function getDiagPsySemHumeurDepuisVisiteResponse(
+  visitId: string
+): Promise<DiagPsySemHumeurDepuisVisiteResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_diag_psy_sem_humeur_depuis_visite')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveDiagPsySemHumeurDepuisVisiteResponse(
+  response: DiagPsySemHumeurDepuisVisiteResponseInsert
+): Promise<DiagPsySemHumeurDepuisVisiteResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_diag_psy_sem_humeur_depuis_visite')
     .upsert(response, { onConflict: 'visit_id' })
     .select()
     .single();

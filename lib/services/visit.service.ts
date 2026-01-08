@@ -79,7 +79,8 @@ import {
   getDsm5HumeurResponse,
   getDsm5PsychoticResponse,
   getDsm5ComorbidResponse,
-  getDiagPsySemHumeurActuelsResponse
+  getDiagPsySemHumeurActuelsResponse,
+  getDiagPsySemHumeurDepuisVisiteResponse
 } from './questionnaire-dsm5.service';
 import {
   ASRM_DEFINITION,
@@ -172,7 +173,8 @@ import {
   DSM5_HUMEUR_DEFINITION,
   DSM5_PSYCHOTIC_DEFINITION,
   DSM5_COMORBID_DEFINITION,
-  DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION
+  DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION,
+  DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION
 } from '../constants/questionnaires-dsm5';
 
 // ============================================================================
@@ -648,6 +650,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         description: 'Évaluation médicale complète',
         questionnaires: [
           DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION,
+          DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION,
           DSM5_COMORBID_DEFINITION,
           DIVA_DEFINITION,
           ISA_DEFINITION,
@@ -899,8 +902,8 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (wais4Matrices) completed++;
     if (wais4DigitSpan) completed++;
   } else if (visit.visit_type === 'biannual_followup') {
-    // Biannual follow-up: 6 infirmier + 7 thymic + 6 medical = 19 total
-    total = 19;
+    // Biannual follow-up: 6 infirmier + 7 thymic + 7 medical = 20 total
+    total = 20;
     totalModules = 3;
 
     const [
@@ -909,7 +912,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       // Thymic evaluation questionnaires
       madrs, ymrs, cgi, egf, alda, etatPatient, fast,
       // Medical evaluation questionnaires
-      diagPsySemHumeurActuels, dsm5Comorbid, diva, cssrs, isa, suicideBehaviorFollowup
+      diagPsySemHumeurActuels, diagPsySemHumeurDepuisVisite, dsm5Comorbid, diva, cssrs, isa, suicideBehaviorFollowup
     ] = await Promise.all([
       // Infirmier questionnaires
       getTobaccoResponse(visitId),
@@ -928,6 +931,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       getFastResponse(visitId),
       // Medical evaluation questionnaires
       getDiagPsySemHumeurActuelsResponse(visitId),
+      getDiagPsySemHumeurDepuisVisiteResponse(visitId),
       getDsm5ComorbidResponse(visitId),
       getDivaResponse(visitId),
       getCssrsResponse(visitId),
@@ -954,6 +958,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     
     // Count medical evaluation
     if (diagPsySemHumeurActuels) completed++;
+    if (diagPsySemHumeurDepuisVisite) completed++;
     if (dsm5Comorbid) completed++;
     if (diva) completed++;
     if (cssrs) completed++;

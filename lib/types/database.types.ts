@@ -4314,3 +4314,52 @@ export interface DiagPsySemHumeurActuelsResponse {
 }
 
 export type DiagPsySemHumeurActuelsResponseInsert = Omit<DiagPsySemHumeurActuelsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
+// Semi-Annual DSM5: Episodes Since Last Visit (Troubles de l'humeur depuis la dernière visite)
+// ============================================================================
+
+export interface DiagPsySemHumeurDepuisVisiteResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Screening Section
+  // Primary screening: Presence of at least one thymic episode since last visit
+  rad_tb_hum_epthyman?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  
+  // Total number of episodes (computed)
+  rad_tb_hum_epthyman_nb?: string | null;
+  
+  // EDM (Major Depressive Episode) Section
+  rad_tb_hum_nbepdep?: string | null;
+  date_prem_edm?: string | null;
+  rad_tb_hum_nbepdeppsy?: string | null;
+  rad_tb_hum_nbepdepmixt?: string | null;
+  
+  // Manie (Manic Episodes) Section
+  rad_tb_hum_nbepmanan?: string | null;
+  date_prem_man?: string | null;
+  rad_tb_hum_nbepmanpsy?: string | null;
+  rad_tb_hum_nbepmanmixt?: string | null;
+  
+  // Hypomanie (Hypomanic Episodes) Section
+  rad_tb_hum_nbephypoman?: string | null;
+  date_prem_hypo?: string | null;
+  
+  // Enchaînement (Episode Sequence) Section
+  rad_tb_hum_type_plus_recent?: 'Episode Dépressif Majeur' | 'Hypomaniaque' | 'Maniaque' | 'Episode Non spécifié' | 'Ne sais pas' | null;
+  enchainement?: string | null;
+  
+  // Hospitalisations Section (always visible)
+  rad_tb_hum_nb_hospi?: string | null;
+  rad_tb_hum_duree_hospi?: string | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type DiagPsySemHumeurDepuisVisiteResponseInsert = Omit<DiagPsySemHumeurDepuisVisiteResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;

@@ -2679,3 +2679,322 @@ export const DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION: QuestionnaireDefinition = {
     singleColumn: true
   }
 };
+
+// ============================================================================
+// Semi-Annual DSM5: Episodes Since Last Visit (Troubles de l'humeur depuis la dernière visite)
+// ============================================================================
+
+// Helper function to generate episode count options (0 to >20)
+const generateEpisodeCountOptions = () => [
+  { code: 'Ne sais pas', label: 'Ne sais pas' },
+  { code: '0', label: '0' },
+  { code: '1', label: '1' },
+  { code: '2', label: '2' },
+  { code: '3', label: '3' },
+  { code: '4', label: '4' },
+  { code: '5', label: '5' },
+  { code: '6', label: '6' },
+  { code: '7', label: '7' },
+  { code: '8', label: '8' },
+  { code: '9', label: '9' },
+  { code: '10', label: '10' },
+  { code: '11', label: '11' },
+  { code: '12', label: '12' },
+  { code: '13', label: '13' },
+  { code: '14', label: '14' },
+  { code: '15', label: '15' },
+  { code: '16', label: '16' },
+  { code: '17', label: '17' },
+  { code: '18', label: '18' },
+  { code: '19', label: '19' },
+  { code: '20', label: '20' },
+  { code: '>20', label: '>20' }
+];
+
+// Condition for showing fields when at least 1 episode is reported
+const atLeastOneEpisodeCondition = (fieldName: string) => ({
+  'in': [
+    { var: fieldName },
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '>20']
+  ]
+});
+
+export const DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_QUESTIONS: Question[] = [
+  // ========================================================================
+  // Screening Section
+  // ========================================================================
+  
+  // Instruction text (always visible)
+  {
+    id: 'titre_onglet_ep',
+    text: 'Dans cet onglet, renseignez les épisodes survenus depuis la dernière visite, en ne comptant pas l\'épisode actuel s\'il y en a eu un',
+    type: 'instruction',
+    required: false
+  },
+  
+  // Primary screening question
+  {
+    id: 'rad_tb_hum_epthyman',
+    text: 'Présence d\'au moins un épisode thymique depuis la dernière visite',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' },
+      { code: 'Ne sais pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  // Total number of episodes (computed, shows when Oui)
+  {
+    id: 'rad_tb_hum_epthyman_nb',
+    text: 'Nombre d\'épisodes total',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'rad_tb_hum_epthyman' }, 'Oui'] },
+    options: generateEpisodeCountOptions(),
+    metadata: {
+      helpText: 'Attention ce nombre doit être égal à la somme de tous les épisodes depuis la dernière visite'
+    }
+  },
+  
+  // ========================================================================
+  // EDM (Major Depressive Episode) Section
+  // ========================================================================
+  
+  {
+    id: 'section_edm',
+    text: 'EDM',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ var: 'rad_tb_hum_epthyman' }, 'Oui'] }
+  },
+  
+  // Number of MDE
+  {
+    id: 'rad_tb_hum_nbepdep',
+    text: 'Nombre d\'EDM',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'rad_tb_hum_epthyman' }, 'Oui'] },
+    options: generateEpisodeCountOptions()
+  },
+  
+  // Date of first MDE since last visit
+  {
+    id: 'date_prem_edm',
+    text: 'Date du premier épisode EDM depuis la dernière visite',
+    type: 'date',
+    required: false,
+    display_if: atLeastOneEpisodeCondition('rad_tb_hum_nbepdep')
+  },
+  
+  // Number of MDE with psychotic features
+  {
+    id: 'rad_tb_hum_nbepdeppsy',
+    text: 'Nombre d\'EDM avec caractéristiques psychotiques',
+    type: 'single_choice',
+    required: false,
+    display_if: atLeastOneEpisodeCondition('rad_tb_hum_nbepdep'),
+    options: generateEpisodeCountOptions()
+  },
+  
+  // Number of MDE with mixed features
+  {
+    id: 'rad_tb_hum_nbepdepmixt',
+    text: 'Nombre d\'EDM avec caractéristiques mixtes',
+    type: 'single_choice',
+    required: false,
+    display_if: atLeastOneEpisodeCondition('rad_tb_hum_nbepdep'),
+    options: generateEpisodeCountOptions()
+  },
+  
+  // ========================================================================
+  // Manie (Manic Episodes) Section
+  // ========================================================================
+  
+  {
+    id: 'section_manie',
+    text: 'Manie',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ var: 'rad_tb_hum_epthyman' }, 'Oui'] }
+  },
+  
+  // Number of manic episodes
+  {
+    id: 'rad_tb_hum_nbepmanan',
+    text: 'Nombre d\'épisodes maniaques',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'rad_tb_hum_epthyman' }, 'Oui'] },
+    options: generateEpisodeCountOptions()
+  },
+  
+  // Date of first manic episode since last visit
+  {
+    id: 'date_prem_man',
+    text: 'Date du premier épisode maniaque depuis la dernière visite',
+    type: 'date',
+    required: false,
+    display_if: atLeastOneEpisodeCondition('rad_tb_hum_nbepmanan')
+  },
+  
+  // Number of manic episodes with psychotic features
+  {
+    id: 'rad_tb_hum_nbepmanpsy',
+    text: 'Nombre d\'épisodes maniaques avec caractéristiques psychotiques',
+    type: 'single_choice',
+    required: false,
+    display_if: atLeastOneEpisodeCondition('rad_tb_hum_nbepmanan'),
+    options: generateEpisodeCountOptions()
+  },
+  
+  // Number of manic episodes with mixed features
+  {
+    id: 'rad_tb_hum_nbepmanmixt',
+    text: 'Nombre d\'épisodes maniaques avec caractéristiques mixtes',
+    type: 'single_choice',
+    required: false,
+    display_if: atLeastOneEpisodeCondition('rad_tb_hum_nbepmanan'),
+    options: generateEpisodeCountOptions()
+  },
+  
+  // ========================================================================
+  // Hypomanie (Hypomanic Episodes) Section
+  // ========================================================================
+  
+  {
+    id: 'section_hypomanie',
+    text: 'Hypomanie',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ var: 'rad_tb_hum_epthyman' }, 'Oui'] }
+  },
+  
+  // Number of hypomanic episodes
+  {
+    id: 'rad_tb_hum_nbephypoman',
+    text: 'Nombre d\'épisodes hypomaniaques',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'rad_tb_hum_epthyman' }, 'Oui'] },
+    options: generateEpisodeCountOptions()
+  },
+  
+  // Date of first hypomanic episode since last visit
+  {
+    id: 'date_prem_hypo',
+    text: 'Date du premier épisode hypomane depuis la dernière visite',
+    type: 'date',
+    required: false,
+    display_if: atLeastOneEpisodeCondition('rad_tb_hum_nbephypoman')
+  },
+  
+  // ========================================================================
+  // Enchaînement (Episode Sequence) Section
+  // ========================================================================
+  
+  {
+    id: 'section_enchainement',
+    text: 'Enchaînement',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ var: 'rad_tb_hum_epthyman' }, 'Oui'] }
+  },
+  
+  // Type of most recent episode
+  {
+    id: 'rad_tb_hum_type_plus_recent',
+    text: 'Type de l\'épisode le plus récent',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'rad_tb_hum_epthyman' }, 'Oui'] },
+    options: [
+      { code: 'Episode Dépressif Majeur', label: 'Episode Dépressif Majeur' },
+      { code: 'Hypomaniaque', label: 'Hypomaniaque' },
+      { code: 'Maniaque', label: 'Maniaque' },
+      { code: 'Episode Non spécifié', label: 'Episode Non spécifié' },
+      { code: 'Ne sais pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  // Episode sequence (free text)
+  {
+    id: 'enchainement',
+    text: 'Enchaînement des épisodes',
+    type: 'textarea',
+    required: false,
+    display_if: { '==': [{ var: 'rad_tb_hum_epthyman' }, 'Oui'] },
+    metadata: {
+      helpText: 'Placer dans l\'ordre les épisodes: D dépression; H hypomanie; M manie; Mx mixte; Ns non-spécifié'
+    }
+  },
+  
+  // ========================================================================
+  // Hospitalisations Section (always visible)
+  // ========================================================================
+  
+  {
+    id: 'section_hospitalisations',
+    text: 'Hospitalisations',
+    type: 'section',
+    required: false
+  },
+  
+  // Number of hospitalizations
+  {
+    id: 'rad_tb_hum_nb_hospi',
+    text: 'Nombre d\'hospitalisations',
+    type: 'single_choice',
+    required: false,
+    options: generateEpisodeCountOptions()
+  },
+  
+  // Total duration of hospitalizations (in months)
+  {
+    id: 'rad_tb_hum_duree_hospi',
+    text: 'Durée totale des hospitalisations (en mois)',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Ne sais pas', label: 'Ne sais pas' },
+      { code: '0', label: '0' },
+      { code: '1/4', label: '1/4' },
+      { code: '1/2', label: '1/2' },
+      { code: '3/4', label: '3/4' },
+      { code: '1', label: '1' },
+      { code: '2', label: '2' },
+      { code: '3', label: '3' },
+      { code: '4', label: '4' },
+      { code: '5', label: '5' },
+      { code: '6', label: '6' },
+      { code: '7', label: '7' },
+      { code: '8', label: '8' },
+      { code: '9', label: '9' },
+      { code: '10', label: '10' },
+      { code: '11', label: '11' },
+      { code: '12', label: '12' },
+      { code: '13', label: '13' },
+      { code: '14', label: '14' },
+      { code: '15', label: '15' },
+      { code: '16', label: '16' },
+      { code: '17', label: '17' },
+      { code: '18', label: '18' },
+      { code: '19', label: '19' },
+      { code: '20', label: '20' },
+      { code: '>20', label: '>20' }
+    ]
+  }
+];
+
+export const DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION: QuestionnaireDefinition = {
+  id: 'diag_psy_sem_humeur_depuis_visite',
+  code: 'DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE',
+  title: 'Troubles de l\'humeur depuis la dernière visite',
+  description: 'Évaluation des épisodes thymiques survenus depuis la dernière visite pour le suivi semestriel du trouble bipolaire',
+  questions: DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_QUESTIONS,
+  metadata: {
+    singleColumn: true
+  }
+};
