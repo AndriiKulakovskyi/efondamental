@@ -4273,3 +4273,44 @@ export interface NonPharmacologicResponse {
 
 export type NonPharmacologicResponseInsert = Omit<NonPharmacologicResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ===== Semi-Annual DSM5 Current Mood Disorders (Troubles de l'humeur actuels) Response =====
+export interface DiagPsySemHumeurActuelsResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Q1: Presence of a current episode
+  rad_epactuel?: 'Oui' | 'Non' | null;
+  
+  // Q2: Start date of current episode
+  date_trouble_actuel_debut?: string | null;
+  
+  // Q3: Episode type
+  rad_epactuel_type?: 'Episode Dépressif Majeur' | 'Hypomaniaque' | 'Maniaque' | 'Episode Non spécifié' | 'Ne sais pas' | null;
+  
+  // Q4: Current MDE episode type (only for Episode Dépressif Majeur)
+  rad_epactuel_edmtype?: 'Sans caractéristique mélancolique atypique catatonique ou mixte' | 'Mélancolique' | 'Atypique' | 'Catatonique' | 'Mixte' | null;
+  
+  // Q5: Catatonic episode? (for Maniaque or Episode Non spécifié)
+  rad_epactuel_mixttyp?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  
+  // Q6: Mixed episode? (for Maniaque or Episode Non spécifié)
+  rad_epactuel_mixttyp2?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  
+  // Q7: Episode severity (for EDM, Maniaque, or Episode Non spécifié)
+  rad_epactuel_sever?: 'Léger' | 'Modéré' | 'Sévère sans caractéristique psychotique' | 'Sévère avec caractéristiques psychotiques non congruentes' | 'Sévère avec caractéristiques psychotiques congruentes' | null;
+  
+  // Q8: Episode chronicity (only for Episode Dépressif Majeur)
+  rad_epactuel_chron?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  
+  // Q9: Postpartum onset (for all episode types except empty and 'Ne sais pas')
+  rad_postpartum_actuel?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type DiagPsySemHumeurActuelsResponseInsert = Omit<DiagPsySemHumeurActuelsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;

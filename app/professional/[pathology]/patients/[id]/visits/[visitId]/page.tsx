@@ -101,7 +101,8 @@ import {
 import {
   DSM5_HUMEUR_DEFINITION,
   DSM5_PSYCHOTIC_DEFINITION,
-  DSM5_COMORBID_DEFINITION
+  DSM5_COMORBID_DEFINITION,
+  DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION
 } from "@/lib/constants/questionnaires-dsm5";
 
 export default async function VisitDetailPage({
@@ -1042,6 +1043,13 @@ export default async function VisitDetailPage({
       (() => {
         // Build DSM5 section questionnaires with conditional DIVA
         const dsm5Questionnaires: any[] = [
+          {
+            ...DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION,
+            id: DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['DIAG_PSY_SEM_HUMEUR_ACTUELS']?.completed || false,
+            completedAt: questionnaireStatuses['DIAG_PSY_SEM_HUMEUR_ACTUELS']?.completed_at,
+          },
           {
             ...DSM5_COMORBID_DEFINITION,
             id: DSM5_COMORBID_DEFINITION.code,

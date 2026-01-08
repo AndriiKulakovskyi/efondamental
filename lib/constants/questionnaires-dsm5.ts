@@ -2535,3 +2535,147 @@ export const DSM5_COMORBID_DEFINITION: QuestionnaireDefinition = {
     singleColumn: true
   }
 };
+
+// ============================================================================
+// DSM5 - Troubles de l'humeur actuels (Semi-Annual Follow-up)
+// Current Mood Disorders for semi-annual follow-up visits
+// ============================================================================
+
+export const DIAG_PSY_SEM_HUMEUR_ACTUELS_QUESTIONS: Question[] = [
+  // Primary screening question
+  {
+    id: 'rad_epactuel',
+    text: 'Présence d\'un épisode actuel',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ]
+  },
+  
+  // Date of episode start - shows when rad_epactuel = 'Oui'
+  {
+    id: 'date_trouble_actuel_debut',
+    text: 'Date de début',
+    type: 'date',
+    required: false,
+    display_if: { '==': [{ var: 'rad_epactuel' }, 'Oui'] },
+    metadata: { default: 'today' }
+  },
+  
+  // Episode type - shows when rad_epactuel = 'Oui'
+  {
+    id: 'rad_epactuel_type',
+    text: 'Type d\'épisode',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'rad_epactuel' }, 'Oui'] },
+    options: [
+      { code: 'Episode Dépressif Majeur', label: 'Episode Dépressif Majeur' },
+      { code: 'Hypomaniaque', label: 'Hypomaniaque' },
+      { code: 'Maniaque', label: 'Maniaque' },
+      { code: 'Episode Non spécifié', label: 'Episode Non spécifié' },
+      { code: 'Ne sais pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  // EDM type - shows only for Episode Dépressif Majeur
+  {
+    id: 'rad_epactuel_edmtype',
+    text: 'Type d\'épisode EDM actuel',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'rad_epactuel_type' }, 'Episode Dépressif Majeur'] },
+    options: [
+      { code: 'Sans caractéristique mélancolique atypique catatonique ou mixte', label: 'Sans caractéristique mélancolique atypique catatonique ou mixte' },
+      { code: 'Mélancolique', label: 'Mélancolique' },
+      { code: 'Atypique', label: 'Atypique' },
+      { code: 'Catatonique', label: 'Catatonique' },
+      { code: 'Mixte', label: 'Mixte' }
+    ]
+  },
+  
+  // Catatonic episode? - shows for Maniaque or Episode Non spécifié
+  {
+    id: 'rad_epactuel_mixttyp',
+    text: 'Episode Catatonique ?',
+    type: 'single_choice',
+    required: false,
+    display_if: { 'in': [{ var: 'rad_epactuel_type' }, ['Maniaque', 'Episode Non spécifié']] },
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' },
+      { code: 'Ne sais pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  // Mixed episode? - shows for Maniaque or Episode Non spécifié
+  {
+    id: 'rad_epactuel_mixttyp2',
+    text: 'Episode Mixte?',
+    type: 'single_choice',
+    required: false,
+    display_if: { 'in': [{ var: 'rad_epactuel_type' }, ['Maniaque', 'Episode Non spécifié']] },
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' },
+      { code: 'Ne sais pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  // Episode severity - shows for EDM, Maniaque, or Episode Non spécifié
+  {
+    id: 'rad_epactuel_sever',
+    text: 'Sévérité de l\'épisode',
+    type: 'single_choice',
+    required: false,
+    display_if: { 'in': [{ var: 'rad_epactuel_type' }, ['Episode Dépressif Majeur', 'Maniaque', 'Episode Non spécifié']] },
+    options: [
+      { code: 'Léger', label: 'Léger' },
+      { code: 'Modéré', label: 'Modéré' },
+      { code: 'Sévère sans caractéristique psychotique', label: 'Sévère sans caractéristique psychotique' },
+      { code: 'Sévère avec caractéristiques psychotiques non congruentes', label: 'Sévère avec caractéristiques psychotiques non congruentes' },
+      { code: 'Sévère avec caractéristiques psychotiques congruentes', label: 'Sévère avec caractéristiques psychotiques congruentes' }
+    ]
+  },
+  
+  // Episode chronicity - shows only for Episode Dépressif Majeur
+  {
+    id: 'rad_epactuel_chron',
+    text: 'Chronicité de l\'épisode',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'rad_epactuel_type' }, 'Episode Dépressif Majeur'] },
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' },
+      { code: 'Ne sais pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  // Postpartum onset - shows for all episode types except empty and 'Ne sais pas'
+  {
+    id: 'rad_postpartum_actuel',
+    text: 'Survenue en post-partum',
+    type: 'single_choice',
+    required: false,
+    display_if: { 'in': [{ var: 'rad_epactuel_type' }, ['Episode Dépressif Majeur', 'Hypomaniaque', 'Maniaque', 'Episode Non spécifié']] },
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' },
+      { code: 'Ne sais pas', label: 'Ne sais pas' }
+    ]
+  }
+];
+
+export const DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION: QuestionnaireDefinition = {
+  id: 'diag_psy_sem_humeur_actuels',
+  code: 'DIAG_PSY_SEM_HUMEUR_ACTUELS',
+  title: 'Troubles de l\'humeur actuels',
+  description: 'Évaluation des troubles de l\'humeur actuels pour le suivi semestriel du trouble bipolaire',
+  questions: DIAG_PSY_SEM_HUMEUR_ACTUELS_QUESTIONS,
+  metadata: {
+    singleColumn: true
+  }
+};

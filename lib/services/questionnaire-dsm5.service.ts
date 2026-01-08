@@ -8,7 +8,9 @@ import {
   Dsm5PsychoticResponse,
   Dsm5PsychoticResponseInsert,
   Dsm5ComorbidResponse,
-  Dsm5ComorbidResponseInsert
+  Dsm5ComorbidResponseInsert,
+  DiagPsySemHumeurActuelsResponse,
+  DiagPsySemHumeurActuelsResponseInsert
 } from '@/lib/types/database.types';
 
 // ============================================================================
@@ -163,3 +165,38 @@ export async function saveDsm5ComorbidResponse(
   return data;
 }
 
+// ============================================================================
+// Semi-Annual DSM5 Current Mood Disorders (Troubles de l'humeur actuels)
+// ============================================================================
+
+export async function getDiagPsySemHumeurActuelsResponse(
+  visitId: string
+): Promise<DiagPsySemHumeurActuelsResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_diag_psy_sem_humeur_actuels')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveDiagPsySemHumeurActuelsResponse(
+  response: DiagPsySemHumeurActuelsResponseInsert
+): Promise<DiagPsySemHumeurActuelsResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_diag_psy_sem_humeur_actuels')
+    .upsert(response, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
