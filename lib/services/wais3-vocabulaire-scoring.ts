@@ -88,7 +88,6 @@ export function calculateStandardizedValue(standardScore: number): number {
  */
 export function calculateWais3VocabulaireScores(input: VocabulaireInput): VocabulaireScores {
   const { patient_age, total_raw_score } = input;
-
   // Validate inputs
   if (patient_age < 16 || patient_age > 120) {
     throw new Error(`Invalid patient age: ${patient_age}. Age must be between 16 and 120.`);

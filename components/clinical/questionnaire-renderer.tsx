@@ -23,6 +23,7 @@ import { calculateTmtScores } from "@/lib/services/tmt-scoring";
 import { calculateStroopScores } from "@/lib/services/stroop-scoring";
 import { calculateMem3SpatialScores } from "@/lib/services/mem3-spatial-scoring";
 import { calculateWais3DigitSpanScores } from "@/lib/services/wais3-digit-span-scoring";
+import { calculateWais3VocabulaireScores } from "@/lib/services/wais3-vocabulaire-scoring";
 import { Loader2, ChevronDown, Info } from "lucide-react";
 
 interface QuestionnaireRendererProps {
@@ -837,84 +838,6 @@ export function QuestionnaireRenderer({
         }
       }
 
-      // Compute WAIS4 Similitudes scores
-      const simiAge = Number(prev.patient_age);
-      const simiItems = ['item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'item7', 'item8', 'item9',
-                         'item10', 'item11', 'item12', 'item13', 'item14', 'item15', 'item16', 'item17', 'item18'];
-      const simiValues = simiItems.map(f => prev[f]).filter(v => v !== undefined && v !== '' && !isNaN(Number(v)));
-      
-      if (simiValues.length > 0) {
-        const simiRawTotal = simiValues.reduce((sum, v) => sum + Number(v), 0);
-        if (updated.total_raw_score !== simiRawTotal) {
-          updated.total_raw_score = simiRawTotal;
-          hasChanges = true;
-        }
-        
-        // If we have age, calculate standard score and standardized value
-        if (!isNaN(simiAge) && simiAge >= 16 && simiAge <= 90) {
-          // Age-based norm tables for Similitudes
-          const SIMI_TAB: Record<string, string[]> = {
-            age_16: ["0-4", "5-6", "7-8", "9-10", "11-12", "13-14", "15-16", "17", "18-19", "20-21", "22", "23", "24-25", "26", "27", "28-29", "30-31", "32-33", "34-36"],
-            age_18: ["0-4", "5-6", "7-8", "9-10", "11-12", "13-14", "15-16", "17", "18-19", "20-21", "22", "23", "24-25", "26", "27", "28-29", "30-31", "32-33", "34-36"],
-            age_20: ["0-9", "10-11", "12", "13", "14", "15-16", "17", "18-19", "20-21", "22", "23", "24-25", "26", "27-28", "29-30", "31-32", "33", "34-35", "36"],
-            age_25: ["0-8", "9", "10", "11", "12", "13-15", "16-17", "18", "19-20", "21-22", "23", "24-25", "26", "27-28", "29-30", "31-32", "33", "34-35", "36"],
-            age_30: ["0-8", "9", "10", "11", "12", "13-15", "16-17", "18", "19-20", "21-22", "23", "24-25", "26", "27", "28", "29-30", "31-32", "33", "34-36"],
-            age_35: ["0-8", "9", "10", "11", "12", "13-15", "16-17", "18", "19-20", "21-22", "23", "24-25", "26", "27", "28", "29-30", "31-32", "33", "34-36"],
-            age_45: ["0-1", "2-3", "4-6", "7-9", "10-11", "12-13", "14-15", "16-17", "18-19", "20", "21-22", "23-24", "25", "26", "27", "28", "29-30", "31-32", "33-36"],
-            age_55: ["0-1", "2-3", "4-6", "7-9", "10-11", "12-13", "14-15", "16-17", "18-19", "20", "21-22", "23-24", "25", "26", "27", "28", "29-30", "31-32", "33-36"],
-            age_65: ["0-1", "2-3", "4-6", "7-9", "10", "11-12", "13-14", "15", "16-17", "18-19", "20-21", "22", "23-24", "25-26", "27", "28", "29-30", "31", "32-36"],
-            age_70: ["0-1", "2-3", "4-6", "7-9", "10", "11-12", "13-14", "15", "16-17", "18-19", "20-21", "22", "23", "24", "25", "26-27", "28", "29", "30-36"],
-            age_75: ["0", "1", "2", "3", "4-6", "7-9", "10-12", "13-15", "16-17", "18-19", "20", "21", "22", "23-24", "25", "26-27", "28", "29", "30-36"]
-          };
-          
-          const getSimiAgeCategory = (age: number) => {
-            if (age >= 16 && age <= 17) return 'age_16';
-            if (age >= 18 && age <= 19) return 'age_18';
-            if (age >= 20 && age <= 24) return 'age_20';
-            if (age >= 25 && age <= 29) return 'age_25';
-            if (age >= 30 && age <= 34) return 'age_30';
-            if (age >= 35 && age <= 44) return 'age_35';
-            if (age >= 45 && age <= 54) return 'age_45';
-            if (age >= 55 && age <= 64) return 'age_55';
-            if (age >= 65 && age <= 69) return 'age_65';
-            if (age >= 70 && age <= 74) return 'age_70';
-            return 'age_75';
-          };
-          
-          const isInRange = (rawScore: number, rangeStr: string): boolean => {
-            if (rangeStr.includes('-')) {
-              const [min, max] = rangeStr.split('-').map(Number);
-              return rawScore >= min && rawScore <= max;
-            }
-            return rawScore === Number(rangeStr);
-          };
-          
-          const ageCat = getSimiAgeCategory(simiAge);
-          const normTable = SIMI_TAB[ageCat];
-          
-          if (normTable) {
-            let stdScore = 1;
-            for (let i = 0; i < normTable.length; i++) {
-              if (isInRange(simiRawTotal, normTable[i])) {
-                stdScore = i + 1;
-                break;
-              }
-            }
-            if (simiRawTotal > 36) stdScore = 19;
-            
-            if (updated.standard_score !== stdScore) {
-              updated.standard_score = stdScore;
-              hasChanges = true;
-            }
-            
-            const stdValue = Number(((stdScore - 10) / 3).toFixed(2));
-            if (updated.standardized_value !== stdValue) {
-              updated.standardized_value = stdValue;
-              hasChanges = true;
-            }
-          }
-        }
-      }
 
       // Compute MATHYS sums progressively as fields are entered
       const isMathys = questionnaire.code === 'MATHYS';
@@ -1228,96 +1151,82 @@ export function QuestionnaireRenderer({
       }
       } // End Fluences Verbales calculations
 
-      // Compute WAIS-III Vocabulaire total score (sum of item1 to item33)
-      const vocabItems = [
-        'item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'item7', 'item8', 'item9', 'item10',
-        'item11', 'item12', 'item13', 'item14', 'item15', 'item16', 'item17', 'item18', 'item19', 'item20',
-        'item21', 'item22', 'item23', 'item24', 'item25', 'item26', 'item27', 'item28', 'item29', 'item30',
-        'item31', 'item32', 'item33'
-      ];
-      const vocabValues = vocabItems.map(f => prev[f]).filter(v => v !== undefined && v !== '' && !isNaN(Number(v)));
-      
-      if (vocabValues.length > 0) {
-        const vocabRawTotal = vocabValues.reduce((sum, v) => sum + Number(v), 0);
-        if (updated.total_raw_score !== vocabRawTotal) {
-          updated.total_raw_score = vocabRawTotal;
-          hasChanges = true;
-        }
-      }
 
-      // Compute WAIS-III Matrices scores (for questionnaire with item_01 to item_26)
-      const matricesAge = Number(prev.patient_age);
-      const matricesItems = [
-        'item_01', 'item_02', 'item_03', 'item_04', 'item_05', 'item_06', 'item_07', 'item_08', 'item_09', 'item_10',
-        'item_11', 'item_12', 'item_13', 'item_14', 'item_15', 'item_16', 'item_17', 'item_18', 'item_19', 'item_20',
-        'item_21', 'item_22', 'item_23', 'item_24', 'item_25', 'item_26'
-      ];
-      const matricesValues = matricesItems.map(f => prev[f]).filter(v => v !== undefined && v !== '' && !isNaN(Number(v)));
-      
-      // Only process if all 26 items are filled in
-      if (matricesValues.length === 26 && !isNaN(matricesAge) && matricesAge >= 16) {
-        const matricesRawTotal = matricesValues.reduce((sum, v) => sum + Number(v), 0);
-        if (updated.total_raw_score !== matricesRawTotal) {
-          updated.total_raw_score = matricesRawTotal;
-          hasChanges = true;
-        }
+      // Compute WAIS-III Matrices scores - FIXED: Use guard condition to prevent ID collisions
+      if (questionnaire?.code === 'WAIS3_MATRICES_FR') {
+        const matricesAge = Number(prev.patient_age);
+        const matricesItems = [
+          'item_01', 'item_02', 'item_03', 'item_04', 'item_05', 'item_06', 'item_07', 'item_08', 'item_09', 'item_10',
+          'item_11', 'item_12', 'item_13', 'item_14', 'item_15', 'item_16', 'item_17', 'item_18', 'item_19', 'item_20',
+          'item_21', 'item_22', 'item_23', 'item_24', 'item_25', 'item_26'
+        ];
+        const matricesValues = matricesItems.map(f => prev[f]).filter(v => v !== undefined && v !== '' && !isNaN(Number(v)));
         
-        // WAIS-III Matrices norm table (different from WAIS-IV)
-        const WAIS3_MATRICES_NORMS: Record<string, number[]> = {
-          '16-17': [7, 9, 10, 11, 13, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 0, 26, 0, 0],
-          '18-19': [7, 9, 11, 13, 15, 17, 18, 19, 20, 21, 22, 23, 24, 0, 25, 0, 26, 0, 0],
-          '20-24': [7, 8, 10, 12, 14, 16, 18, 20, 21, 22, 23, 0, 24, 0, 25, 0, 26, 0, 0],
-          '25-29': [7, 9, 10, 12, 13, 15, 17, 19, 20, 21, 22, 23, 24, 0, 25, 0, 26, 0, 0],
-          '30-34': [7, 9, 10, 12, 13, 14, 16, 18, 19, 20, 21, 22, 23, 24, 25, 0, 26, 0, 0],
-          '35-44': [5, 6, 7, 9, 12, 14, 16, 18, 19, 20, 21, 22, 23, 24, 0, 25, 26, 0, 0],
-          '45-54': [2, 4, 5, 6, 7, 9, 13, 15, 17, 19, 20, 21, 23, 24, 25, 0, 26, 0, 0],
-          '55-64': [2, 3, 4, 5, 6, 8, 11, 14, 16, 17, 19, 21, 22, 0, 23, 24, 25, 26, 0],
-          '65-69': [1, 2, 3, 4, 5, 6, 7, 11, 13, 16, 19, 20, 21, 22, 23, 24, 25, 26, 0],
-          '70-74': [1, 2, 3, 4, 5, 6, 7, 9, 11, 13, 15, 17, 18, 19, 20, 21, 23, 24, 26],
-          '75-79': [1, 2, 3, 4, 0, 5, 6, 7, 8, 10, 12, 14, 16, 17, 19, 20, 21, 22, 26],
-          '80+': [0, 1, 2, 0, 3, 4, 0, 5, 6, 8, 10, 12, 14, 16, 19, 20, 21, 22, 26]
-        };
-        
-        const getMatricesAgeGroup = (age: number): string => {
-          if (age >= 16 && age <= 17) return '16-17';
-          if (age >= 18 && age <= 19) return '18-19';
-          if (age >= 20 && age <= 24) return '20-24';
-          if (age >= 25 && age <= 29) return '25-29';
-          if (age >= 30 && age <= 34) return '30-34';
-          if (age >= 35 && age <= 44) return '35-44';
-          if (age >= 45 && age <= 54) return '45-54';
-          if (age >= 55 && age <= 64) return '55-64';
-          if (age >= 65 && age <= 69) return '65-69';
-          if (age >= 70 && age <= 74) return '70-74';
-          if (age >= 75 && age <= 79) return '75-79';
-          return '80+';
-        };
-        
-        const findMatricesStandardScore = (rawScore: number, ageGroup: string): number => {
-          const norms = WAIS3_MATRICES_NORMS[ageGroup];
-          if (!norms) return 10;
-          
-          for (let i = 0; i < norms.length; i++) {
-            const maxRaw = norms[i];
-            const ss = i + 1; // Standard scores 1-19
-            if (maxRaw === 0) continue; // Skip invalid entries
-            if (rawScore <= maxRaw) return ss;
+        // Only process if all 26 items are filled in
+        if (matricesValues.length === 26 && !isNaN(matricesAge) && matricesAge >= 16) {
+          const matricesRawTotal = matricesValues.reduce((sum, v) => sum + Number(v), 0);
+          if (updated.total_raw_score !== matricesRawTotal) {
+            updated.total_raw_score = matricesRawTotal;
+            hasChanges = true;
           }
-          return 19; // If exceeded all thresholds
-        };
-        
-        const matAgeGroup = getMatricesAgeGroup(matricesAge);
-        const matStdScore = findMatricesStandardScore(matricesRawTotal, matAgeGroup);
-        
-        if (updated.standard_score !== matStdScore) {
-          updated.standard_score = matStdScore;
-          hasChanges = true;
-        }
-        
-        const matStdValue = Number(((matStdScore - 10) / 3).toFixed(2));
-        if (updated.standardized_value !== matStdValue) {
-          updated.standardized_value = matStdValue;
-          hasChanges = true;
+          
+          // WAIS-III Matrices norm table (different from WAIS-IV)
+          const WAIS3_MATRICES_NORMS: Record<string, number[]> = {
+            '16-17': [7, 9, 10, 11, 13, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 0, 26, 0, 0],
+            '18-19': [7, 9, 11, 13, 15, 17, 18, 19, 20, 21, 22, 23, 24, 0, 25, 0, 26, 0, 0],
+            '20-24': [7, 8, 10, 12, 14, 16, 18, 20, 21, 22, 23, 0, 24, 0, 25, 0, 26, 0, 0],
+            '25-29': [7, 9, 10, 12, 13, 15, 17, 19, 20, 21, 22, 23, 24, 0, 25, 0, 26, 0, 0],
+            '30-34': [7, 9, 10, 12, 13, 14, 16, 18, 19, 20, 21, 22, 23, 24, 25, 0, 26, 0, 0],
+            '35-44': [5, 6, 7, 9, 12, 14, 16, 18, 19, 20, 21, 22, 23, 24, 0, 25, 26, 0, 0],
+            '45-54': [2, 4, 5, 6, 7, 9, 13, 15, 17, 19, 20, 21, 23, 24, 25, 0, 26, 0, 0],
+            '55-64': [2, 3, 4, 5, 6, 8, 11, 14, 16, 17, 19, 21, 22, 0, 23, 24, 25, 26, 0],
+            '65-69': [1, 2, 3, 4, 5, 6, 7, 11, 13, 16, 19, 20, 21, 22, 23, 24, 25, 26, 0],
+            '70-74': [1, 2, 3, 4, 5, 6, 7, 9, 11, 13, 15, 17, 18, 19, 20, 21, 23, 24, 26],
+            '75-79': [1, 2, 3, 4, 0, 5, 6, 7, 8, 10, 12, 14, 16, 17, 19, 20, 21, 22, 26],
+            '80+': [0, 1, 2, 0, 3, 4, 0, 5, 6, 8, 10, 12, 14, 16, 19, 20, 21, 22, 26]
+          };
+          
+          const getMatricesAgeGroup = (age: number): string => {
+            if (age >= 16 && age <= 17) return '16-17';
+            if (age >= 18 && age <= 19) return '18-19';
+            if (age >= 20 && age <= 24) return '20-24';
+            if (age >= 25 && age <= 29) return '25-29';
+            if (age >= 30 && age <= 34) return '30-34';
+            if (age >= 35 && age <= 44) return '35-44';
+            if (age >= 45 && age <= 54) return '45-54';
+            if (age >= 55 && age <= 64) return '55-64';
+            if (age >= 65 && age <= 69) return '65-69';
+            if (age >= 70 && age <= 74) return '70-74';
+            if (age >= 75 && age <= 79) return '75-79';
+            return '80+';
+          };
+          
+          const findMatricesStandardScore = (rawScore: number, ageGroup: string): number => {
+            const norms = WAIS3_MATRICES_NORMS[ageGroup];
+            if (!norms) return 10;
+            
+            for (let i = 0; i < norms.length; i++) {
+              const maxRaw = norms[i];
+              const ss = i + 1; // Standard scores 1-19
+              if (maxRaw === 0) continue; // Skip invalid entries
+              if (rawScore <= maxRaw) return ss;
+            }
+            return 19; // If exceeded all thresholds
+          };
+          
+          const matAgeGroup = getMatricesAgeGroup(matricesAge);
+          const matStdScore = findMatricesStandardScore(matricesRawTotal, matAgeGroup);
+          
+          if (updated.standard_score !== matStdScore) {
+            updated.standard_score = matStdScore;
+            hasChanges = true;
+          }
+          
+          const matStdValue = Number(((matStdScore - 10) / 3).toFixed(2));
+          if (updated.standardized_value !== matStdValue) {
+            updated.standardized_value = matStdValue;
+            hasChanges = true;
+          }
         }
       }
 
@@ -1875,25 +1784,6 @@ export function QuestionnaireRenderer({
     responses.q14,
     responses.q15,
     responses.q16,
-    // WAIS4 Similitudes fields
-    responses.item1,
-    responses.item2,
-    responses.item3,
-    responses.item4,
-    responses.item5,
-    responses.item6,
-    responses.item7,
-    responses.item8,
-    responses.item9,
-    responses.item10,
-    responses.item11,
-    responses.item12,
-    responses.item13,
-    responses.item14,
-    responses.item15,
-    responses.item16,
-    responses.item17,
-    responses.item18,
     // Test des Commissions fields
     responses.nsc,
     responses.com01,
@@ -1906,33 +1796,6 @@ export function QuestionnaireRenderer({
     responses.scipv03a,
     responses.scipv04a,
     responses.scipv05a,
-    // WAIS-III Matrices fields
-    responses.item_01,
-    responses.item_02,
-    responses.item_03,
-    responses.item_04,
-    responses.item_05,
-    responses.item_06,
-    responses.item_07,
-    responses.item_08,
-    responses.item_09,
-    responses.item_10,
-    responses.item_11,
-    responses.item_12,
-    responses.item_13,
-    responses.item_14,
-    responses.item_15,
-    responses.item_16,
-    responses.item_17,
-    responses.item_18,
-    responses.item_19,
-    responses.item_20,
-    responses.item_21,
-    responses.item_22,
-    responses.item_23,
-    responses.item_24,
-    responses.item_25,
-    responses.item_26,
     // WAIS-III Code, Symboles & IVT fields
     responses.wais_cod_tot,
     responses.wais_cod_err,
@@ -2018,6 +1881,223 @@ export function QuestionnaireRenderer({
   useEffect(() => {
     onResponseChangeRef.current = onResponseChange;
   }, [onResponseChange]);
+
+  // Dedicated scoring for WAIS-III Vocabulaire (Wechsler, 1997)
+  useEffect(() => {
+    if (questionnaire?.code !== 'WAIS3_VOCABULAIRE_FR') return;
+    
+    setResponses((prev) => {
+      const vocabItems = [
+        'item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'item7', 'item8', 'item9', 'item10',
+        'item11', 'item12', 'item13', 'item14', 'item15', 'item16', 'item17', 'item18', 'item19', 'item20',
+        'item21', 'item22', 'item23', 'item24', 'item25', 'item26', 'item27', 'item28', 'item29', 'item30',
+        'item31', 'item32', 'item33'
+      ];
+      
+      const values = vocabItems
+        .map(id => prev[id])
+        .filter(v => v !== undefined && v !== null && v !== '' && !isNaN(Number(v)));
+      
+      if (values.length === 0) return prev;
+      
+      const rawTotal = values.reduce((sum, v) => sum + Number(v), 0);
+      const age = Number(prev.patient_age);
+      
+      let updated = { ...prev };
+      let hasChanges = false;
+      
+      if (updated.total_raw_score !== rawTotal) {
+        updated.total_raw_score = rawTotal;
+        hasChanges = true;
+      }
+      
+      if (!isNaN(age) && age >= 16) {
+        try {
+          const results = calculateWais3VocabulaireScores({
+            patient_age: age,
+            total_raw_score: rawTotal
+          });
+          
+          if (updated.standard_score !== results.standard_score) {
+            updated.standard_score = results.standard_score;
+            hasChanges = true;
+          }
+          if (updated.standardized_value !== results.standardized_value) {
+            updated.standardized_value = results.standardized_value;
+            hasChanges = true;
+          }
+        } catch (e) {
+          // Ignore validation errors
+        }
+      }
+      return hasChanges ? updated : prev;
+    });
+  }, [
+    questionnaire.code,
+    responses.patient_age,
+    responses.item1, responses.item2, responses.item3, responses.item4, responses.item5, responses.item6,
+    responses.item7, responses.item8, responses.item9, responses.item10, responses.item11, responses.item12,
+    responses.item13, responses.item14, responses.item15, responses.item16, responses.item17, responses.item18,
+    responses.item19, responses.item20, responses.item21, responses.item22, responses.item23, responses.item24,
+    responses.item25, responses.item26, responses.item27, responses.item28, responses.item29, responses.item30,
+    responses.item31, responses.item32, responses.item33
+  ]);
+
+  // Dedicated scoring for WAIS-IV Similitudes
+  useEffect(() => {
+    if (questionnaire?.code !== 'WAIS4_SIMILITUDES_FR') return;
+    
+    setResponses((prev) => {
+      const simiItems = ['item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'item7', 'item8', 'item9',
+                        'item10', 'item11', 'item12', 'item13', 'item14', 'item15', 'item16', 'item17', 'item18'];
+      const values = simiItems.map(id => prev[id]).filter(v => v !== undefined && v !== null && v !== '' && !isNaN(Number(v)));
+      
+      if (values.length === 0) return prev;
+      
+      const rawTotal = values.reduce((sum, v) => sum + Number(v), 0);
+      const age = Number(prev.patient_age);
+      
+      let updated = { ...prev };
+      let hasChanges = false;
+      
+      if (updated.total_raw_score !== rawTotal) {
+        updated.total_raw_score = rawTotal;
+        hasChanges = true;
+      }
+      
+      if (!isNaN(age) && age >= 16 && age <= 90) {
+        const SIMI_TAB: Record<string, string[]> = {
+          age_16: ["0-4", "5-6", "7-8", "9-10", "11-12", "13-14", "15-16", "17", "18-19", "20-21", "22", "23", "24-25", "26", "27", "28-29", "30-31", "32-33", "34-36"],
+          age_18: ["0-4", "5-6", "7-8", "9-10", "11-12", "13-14", "15-16", "17", "18-19", "20-21", "22", "23", "24-25", "26", "27", "28-29", "30-31", "32-33", "34-36"],
+          age_20: ["0-9", "10-11", "12", "13", "14", "15-16", "17", "18-19", "20-21", "22", "23", "24-25", "26", "27-28", "29-30", "31-32", "33", "34-35", "36"],
+          age_25: ["0-8", "9", "10", "11", "12", "13-15", "16-17", "18", "19-20", "21-22", "23", "24-25", "26", "27-28", "29-30", "31-32", "33", "34-35", "36"],
+          age_30: ["0-8", "9", "10", "11", "12", "13-15", "16-17", "18", "19-20", "21-22", "23", "24-25", "26", "27", "28", "29-30", "31-32", "33", "34-36"],
+          age_35: ["0-8", "9", "10", "11", "12", "13-15", "16-17", "18", "19-20", "21-22", "23", "24-25", "26", "27", "28", "29-30", "31-32", "33", "34-36"],
+          age_45: ["0-1", "2-3", "4-6", "7-9", "10-11", "12-13", "14-15", "16-17", "18-19", "20", "21-22", "23-24", "25", "26", "27", "28", "29-30", "31-32", "33-36"],
+          age_55: ["0-1", "2-3", "4-6", "7-9", "10-11", "12-13", "14-15", "16-17", "18-19", "20", "21-22", "23-24", "25", "26", "27", "28", "29-30", "31-32", "33-36"],
+          age_65: ["0-1", "2-3", "4-6", "7-9", "10", "11-12", "13-14", "15", "16-17", "18-19", "20-21", "22", "23-24", "25-26", "27", "28", "29-30", "31", "32-36"],
+          age_70: ["0-1", "2-3", "4-6", "7-9", "10", "11-12", "13-14", "15", "16-17", "18-19", "20-21", "22", "23", "24", "25", "26-27", "28", "29", "30-36"],
+          age_75: ["0", "1", "2", "3", "4-6", "7-9", "10-12", "13-15", "16-17", "18-19", "20", "21", "22", "23-24", "25", "26-27", "28", "29", "30-36"]
+        };
+        
+        const getSimiAgeCategory = (ageNum: number) => {
+          if (ageNum >= 16 && ageNum <= 17) return 'age_16';
+          if (ageNum >= 18 && ageNum <= 19) return 'age_18';
+          if (ageNum >= 20 && ageNum <= 24) return 'age_20';
+          if (ageNum >= 25 && ageNum <= 29) return 'age_25';
+          if (ageNum >= 30 && ageNum <= 34) return 'age_30';
+          if (ageNum >= 35 && ageNum <= 44) return 'age_35';
+          if (ageNum >= 45 && ageNum <= 54) return 'age_45';
+          if (ageNum >= 55 && ageNum <= 64) return 'age_55';
+          if (ageNum >= 65 && ageNum <= 69) return 'age_65';
+          if (ageNum >= 70 && ageNum <= 74) return 'age_70';
+          return 'age_75';
+        };
+        
+        const ageCat = getSimiAgeCategory(age);
+        const normTable = SIMI_TAB[ageCat];
+        
+        if (normTable) {
+          let stdScore = 1;
+          for (let i = 0; i < normTable.length; i++) {
+            const range = normTable[i];
+            let matched = false;
+            if (range.includes('-')) {
+              const [min, max] = range.split('-').map(Number);
+              if (rawTotal >= min && rawTotal <= max) matched = true;
+            } else if (rawTotal === Number(range)) {
+              matched = true;
+            }
+            if (matched) { stdScore = i + 1; break; }
+          }
+          
+          if (updated.standard_score !== stdScore) {
+            updated.standard_score = stdScore;
+            hasChanges = true;
+          }
+          const standardizedValue = Number(((stdScore - 10) / 3).toFixed(2));
+          if (updated.standardized_value !== standardizedValue) {
+            updated.standardized_value = standardizedValue;
+            hasChanges = true;
+          }
+        }
+      }
+      return hasChanges ? updated : prev;
+    });
+  }, [
+    questionnaire.code,
+    responses.patient_age,
+    responses.item1, responses.item2, responses.item3, responses.item4, responses.item5, responses.item6,
+    responses.item7, responses.item8, responses.item9, responses.item10, responses.item11, responses.item12,
+    responses.item13, responses.item14, responses.item15, responses.item16, responses.item17, responses.item18
+  ]);
+
+  // Dedicated scoring for WAIS-III Matrices
+  useEffect(() => {
+    if (questionnaire?.code !== 'WAIS3_MATRICES_FR') return;
+    
+    setResponses((prev) => {
+      const items = Array.from({ length: 26 }, (_, i) => `item_${(i + 1).toString().padStart(2, '0')}`);
+      const values = items.map(id => prev[id]).filter(v => v !== undefined && v !== null && v !== '' && !isNaN(Number(v)));
+      
+      if (values.length === 0) return prev;
+      
+      const rawTotal = values.reduce((sum, v) => sum + Number(v), 0);
+      const age = Number(prev.patient_age);
+      
+      let updated = { ...prev };
+      let hasChanges = false;
+      
+      if (updated.total_raw_score !== rawTotal) {
+        updated.total_raw_score = rawTotal;
+        hasChanges = true;
+      }
+      
+      if (values.length === 26 && !isNaN(age) && age >= 16) {
+        const MAT_TAB: Record<string, string[]> = {
+          age_16: ["0-3", "4-5", "6-7", "8-9", "10-11", "12-13", "14-15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "26"],
+          age_20: ["0-2", "3-4", "5-6", "7-8", "9-10", "11-12", "13-14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26"]
+        };
+        const ageCat = age < 20 ? 'age_16' : 'age_20';
+        const normTable = MAT_TAB[ageCat];
+        
+        if (normTable) {
+          let stdScore = 1;
+          for (let i = 0; i < normTable.length; i++) {
+            const range = normTable[i];
+            let matched = false;
+            if (range.includes('-')) {
+              const [min, max] = range.split('-').map(Number);
+              if (rawTotal >= min && rawTotal <= max) matched = true;
+            } else if (rawTotal === Number(range)) {
+              matched = true;
+            }
+            if (matched) { stdScore = i + 1; break; }
+          }
+          if (updated.standard_score !== stdScore) {
+            updated.standard_score = stdScore;
+            hasChanges = true;
+          }
+          const stdValue = Number(((stdScore - 10) / 3).toFixed(2));
+          if (updated.standardized_value !== stdValue) {
+            updated.standardized_value = stdValue;
+            hasChanges = true;
+          }
+        }
+      }
+      return hasChanges ? updated : prev;
+    });
+  }, [
+    questionnaire.code,
+    responses.patient_age,
+    // Hardcoded item IDs for robustness
+    responses.item_01, responses.item_02, responses.item_03, responses.item_04, responses.item_05,
+    responses.item_06, responses.item_07, responses.item_08, responses.item_09, responses.item_10,
+    responses.item_11, responses.item_12, responses.item_13, responses.item_14, responses.item_15,
+    responses.item_16, responses.item_17, responses.item_18, responses.item_19, responses.item_20,
+    responses.item_21, responses.item_22, responses.item_23, responses.item_24, responses.item_25,
+    responses.item_26
+  ]);
   
   const handleResponseChange = (questionId: string, value: any) => {
     setResponses((prev) => {
