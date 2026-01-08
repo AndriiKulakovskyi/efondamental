@@ -97,7 +97,8 @@ import {
   DSM5_PSYCHOTIC_DEFINITION,
   DSM5_COMORBID_DEFINITION,
   DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION,
-  DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION
+  DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION,
+  DIAG_PSY_SEM_PSYCHOTIQUES_DEFINITION
 } from "@/lib/constants/questionnaires-dsm5";
 import { 
   getAsrmResponse, 
@@ -195,7 +196,8 @@ import {
   getDsm5PsychoticResponse,
   getDsm5ComorbidResponse,
   getDiagPsySemHumeurActuelsResponse,
-  getDiagPsySemHumeurDepuisVisiteResponse
+  getDiagPsySemHumeurDepuisVisiteResponse,
+  getDiagPsySemPsychotiquesResponse
 } from "@/lib/services/questionnaire-dsm5.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -315,6 +317,7 @@ export default async function ProfessionalQuestionnairePage({
   // Semi-annual follow-up DSM5 questionnaires
   else if (code === DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION.code) questionnaire = DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION;
   else if (code === DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION.code) questionnaire = DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION;
+  else if (code === DIAG_PSY_SEM_PSYCHOTIQUES_DEFINITION.code) questionnaire = DIAG_PSY_SEM_PSYCHOTIQUES_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -416,6 +419,7 @@ export default async function ProfessionalQuestionnairePage({
   // Semi-annual follow-up DSM5 questionnaires
   else if (code === DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION.code) existingResponse = await getDiagPsySemHumeurActuelsResponse(visitId);
   else if (code === DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION.code) existingResponse = await getDiagPsySemHumeurDepuisVisiteResponse(visitId);
+  else if (code === DIAG_PSY_SEM_PSYCHOTIQUES_DEFINITION.code) existingResponse = await getDiagPsySemPsychotiquesResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

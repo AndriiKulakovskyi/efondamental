@@ -2923,7 +2923,7 @@ export const DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_QUESTIONS: Question[] = [
   {
     id: 'enchainement',
     text: 'Enchaînement des épisodes',
-    type: 'textarea',
+    type: 'text',
     required: false,
     display_if: { '==': [{ var: 'rad_tb_hum_epthyman' }, 'Oui'] },
     metadata: {
@@ -2994,6 +2994,80 @@ export const DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION: QuestionnaireDefiniti
   title: 'Troubles de l\'humeur depuis la dernière visite',
   description: 'Évaluation des épisodes thymiques survenus depuis la dernière visite pour le suivi semestriel du trouble bipolaire',
   questions: DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_QUESTIONS,
+  metadata: {
+    singleColumn: true
+  }
+};
+
+// ============================================================================
+// Semi-Annual DSM5: Psychotic Disorders (Troubles psychotiques)
+// ============================================================================
+
+export const DIAG_PSY_SEM_PSYCHOTIQUES_QUESTIONS: Question[] = [
+  // Primary screening question
+  {
+    id: 'rad_tb_psychos',
+    text: 'Le patient a t\'il un trouble psychotique',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' },
+      { code: 'Ne sais pas', label: 'Ne sais pas' }
+    ]
+  },
+  
+  // Date of psychotic disorder onset - shows when rad_tb_psychos = 'Oui'
+  {
+    id: 'date_tb_psychos_date',
+    text: 'Date de survenue du trouble psychotique',
+    type: 'date',
+    required: false,
+    display_if: { '==': [{ var: 'rad_tb_psychos' }, 'Oui'] },
+    metadata: { default: 'today' }
+  },
+  
+  // Type of psychotic disorder - shows when rad_tb_psychos = 'Oui'
+  {
+    id: 'rad_tb_psychos_type',
+    text: 'Type de trouble',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'rad_tb_psychos' }, 'Oui'] },
+    options: [
+      { code: 'Schizophrénie', label: 'Schizophrénie' },
+      { code: 'Trouble schizophréniforme', label: 'Trouble schizophréniforme' },
+      { code: 'Trouble schizo-affectif', label: 'Trouble schizo-affectif' },
+      { code: 'Troubles délirants', label: 'Troubles délirants' },
+      { code: 'Trouble psychotique bref', label: 'Trouble psychotique bref' },
+      { code: 'Trouble psychotique partagé', label: 'Trouble psychotique partagé' },
+      { code: 'Trouble psychotique induit par une affection médicale générale', label: 'Trouble psychotique induit par une affection médicale générale' },
+      { code: 'Trouble psychotique induit par une substance', label: 'Trouble psychotique induit par une substance' },
+      { code: 'Trouble psychotique non spécifié', label: 'Trouble psychotique non spécifié' }
+    ]
+  },
+  
+  // Presence of symptoms in the past month - shows when rad_tb_psychos = 'Oui'
+  {
+    id: 'rad_tb_psychos_lastmonth',
+    text: 'Présence de symptômes le mois écoulé',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'rad_tb_psychos' }, 'Oui'] },
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' },
+      { code: 'Ne sais pas', label: 'Ne sais pas' }
+    ]
+  }
+];
+
+export const DIAG_PSY_SEM_PSYCHOTIQUES_DEFINITION: QuestionnaireDefinition = {
+  id: 'diag_psy_sem_psychotiques',
+  code: 'DIAG_PSY_SEM_PSYCHOTIQUES',
+  title: 'Troubles psychotiques',
+  description: 'Évaluation des troubles psychotiques pour le suivi semestriel du trouble bipolaire',
+  questions: DIAG_PSY_SEM_PSYCHOTIQUES_QUESTIONS,
   metadata: {
     singleColumn: true
   }

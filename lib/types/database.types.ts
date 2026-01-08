@@ -4363,3 +4363,43 @@ export interface DiagPsySemHumeurDepuisVisiteResponse {
 }
 
 export type DiagPsySemHumeurDepuisVisiteResponseInsert = Omit<DiagPsySemHumeurDepuisVisiteResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
+// Semi-Annual DSM5: Psychotic Disorders (Troubles psychotiques)
+// ============================================================================
+
+export interface DiagPsySemPsychotiquesResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Primary screening: Does the patient have a psychotic disorder
+  rad_tb_psychos?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  
+  // Date of psychotic disorder onset
+  date_tb_psychos_date?: string | null;
+  
+  // Type of psychotic disorder
+  rad_tb_psychos_type?: 
+    | 'Schizophrénie'
+    | 'Trouble schizophréniforme'
+    | 'Trouble schizo-affectif'
+    | 'Troubles délirants'
+    | 'Trouble psychotique bref'
+    | 'Trouble psychotique partagé'
+    | 'Trouble psychotique induit par une affection médicale générale'
+    | 'Trouble psychotique induit par une substance'
+    | 'Trouble psychotique non spécifié'
+    | null;
+  
+  // Presence of symptoms in the past month
+  rad_tb_psychos_lastmonth?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type DiagPsySemPsychotiquesResponseInsert = Omit<DiagPsySemPsychotiquesResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
