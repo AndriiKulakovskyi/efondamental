@@ -333,46 +333,76 @@ function lookupPercentile(
   direction: 'higher_is_better' | 'lower_is_better'
 ): string {
   const { thresholds, percentiles } = table;
+  const isAscending = thresholds[0] < thresholds[thresholds.length - 1];
 
   if (direction === 'higher_is_better') {
-    // Thresholds are in descending order for "higher is better"
-    // Higher scores are better, so we compare from highest to lowest
-    for (let i = 0; i < thresholds.length; i++) {
-      if (rawScore >= thresholds[i]) {
-        // Exact match
-        if (rawScore === thresholds[i]) {
-          return percentiles[i].toString();
+    // Determine min/max thresholds
+    const minThreshold = isAscending ? thresholds[0] : thresholds[thresholds.length - 1];
+    const maxThreshold = isAscending ? thresholds[thresholds.length - 1] : thresholds[0];
+    const minPercentile = isAscending ? percentiles[0] : percentiles[percentiles.length - 1];
+    const maxPercentile = isAscending ? percentiles[percentiles.length - 1] : percentiles[0];
+
+    // Check boundaries
+    if (rawScore < minThreshold) return `< ${minPercentile}`;
+    if (rawScore > maxThreshold) return `> ${maxPercentile}`;
+
+    // Find interval (iterate from best to worst to find the first threshold met)
+    if (isAscending) {
+      for (let i = thresholds.length - 1; i >= 0; i--) {
+        if (rawScore >= thresholds[i]) {
+          if (rawScore === thresholds[i]) return percentiles[i].toString();
+          // Between thresholds[i] and thresholds[i+1]
+          if (i < thresholds.length - 1) {
+            return `${percentiles[i]} - ${percentiles[i + 1]}`;
+          }
+          return `> ${percentiles[i]}`;
         }
-        // Score is between this threshold and the previous one
-        if (i > 0) {
-          return `${percentiles[i]} - ${percentiles[i - 1]}`;
+      }
+    } else {
+      // Descending
+      for (let i = 0; i < thresholds.length; i++) {
+        if (rawScore >= thresholds[i]) {
+          if (rawScore === thresholds[i]) return percentiles[i].toString();
+          if (i > 0) return `${percentiles[i]} - ${percentiles[i - 1]}`;
+          return `> ${percentiles[0]}`;
         }
-        // Score is above the highest threshold
-        return `> ${percentiles[0]}`;
       }
     }
-    // Score is below the lowest threshold
-    return `< ${percentiles[percentiles.length - 1]}`;
   } else {
-    // Lower is better: thresholds are in ascending order
-    // Lower scores are better, so we compare from lowest to highest
-    for (let i = 0; i < thresholds.length; i++) {
-      if (rawScore <= thresholds[i]) {
-        // Exact match
-        if (rawScore === thresholds[i]) {
-          return percentiles[i].toString();
+    // lower_is_better (e.g., Errors)
+    const minThreshold = isAscending ? thresholds[0] : thresholds[thresholds.length - 1];
+    const maxThreshold = isAscending ? thresholds[thresholds.length - 1] : thresholds[0];
+    const bestPercentile = isAscending ? percentiles[0] : percentiles[percentiles.length - 1];
+    const worstPercentile = isAscending ? percentiles[percentiles.length - 1] : percentiles[0];
+
+    if (rawScore <= minThreshold) {
+      return rawScore === minThreshold ? bestPercentile.toString() : `> ${bestPercentile}`;
+    }
+    if (rawScore >= maxThreshold) {
+      return rawScore === maxThreshold ? worstPercentile.toString() : `< ${worstPercentile}`;
+    }
+
+    if (isAscending) {
+      for (let i = 0; i < thresholds.length; i++) {
+        if (rawScore <= thresholds[i]) {
+          if (rawScore === thresholds[i]) return percentiles[i].toString();
+          if (i > 0) return `${percentiles[i]} - ${percentiles[i - 1]}`;
+          return `> ${percentiles[0]}`;
         }
-        // Score is between this threshold and the previous one
-        if (i > 0) {
-          return `${percentiles[i]} - ${percentiles[i - 1]}`;
+      }
+    } else {
+      // Descending
+      for (let i = thresholds.length - 1; i >= 0; i--) {
+        if (rawScore <= thresholds[i]) {
+          if (rawScore === thresholds[i]) return percentiles[i].toString();
+          if (i < thresholds.length - 1) return `${percentiles[i]} - ${percentiles[i + 1]}`;
+          return `> ${percentiles[i]}`;
         }
-        // Score is below the lowest threshold (best performance)
-        return `> ${percentiles[0]}`;
       }
     }
-    // Score is above the highest threshold (worst performance)
-    return `< ${percentiles[percentiles.length - 1]}`;
   }
+
+  return '-';
 }
 
 /**
