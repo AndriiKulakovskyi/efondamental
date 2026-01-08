@@ -11,7 +11,7 @@ export interface Question {
   id: string;
   section_id: string;
   text: string;
-  type: 'single_choice' | 'multiple_choice' | 'text' | 'number' | 'scale' | 'boolean' | 'date';
+  type: 'single_choice' | 'multiple_choice' | 'text' | 'number' | 'scale' | 'boolean' | 'date' | 'instruction';
   required: boolean;
   options?: QuestionOption[];
   constraints?: {

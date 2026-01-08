@@ -2587,19 +2587,6 @@ export function QuestionnaireRenderer({
             className="bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand"
           />
         )}
-
-        {question.type === "textarea" && (
-          <textarea
-            id={question.id}
-            value={value || ""}
-            onChange={(e) => handleResponseChange(question.id, e.target.value)}
-            disabled={readonly}
-            required={isRequired}
-            rows={4}
-            placeholder={question.metadata?.placeholder || ""}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand focus:outline-none resize-y min-h-[100px]"
-          />
-        )}
       </div>
     );
   };

@@ -165,7 +165,7 @@ export interface QuestionOption {
 export interface Question {
   id: string;
   text: string;
-  type: 'single_choice' | 'multiple_choice' | 'text' | 'number' | 'scale' | 'boolean' | 'date' | 'section';
+  type: 'single_choice' | 'multiple_choice' | 'text' | 'number' | 'scale' | 'boolean' | 'date' | 'section' | 'instruction';
   required: boolean;
   readonly?: boolean;
   section?: string;
