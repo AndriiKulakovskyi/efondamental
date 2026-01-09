@@ -1443,14 +1443,23 @@ export default async function VisitDetailPage({
           });
         }
         
-        // Add Family History
-        dsm5Questionnaires.push({
-          ...FAMILY_HISTORY_DEFINITION,
-          id: FAMILY_HISTORY_DEFINITION.code,
-          target_role: 'healthcare_professional',
-          completed: questionnaireStatuses['FAMILY_HISTORY_FR']?.completed || false,
-          completedAt: questionnaireStatuses['FAMILY_HISTORY_FR']?.completed_at,
-        });
+        // Build Antécédents section questionnaires
+        const antecedentsQuestionnaires = [
+          {
+            ...FAMILY_HISTORY_DEFINITION,
+            id: FAMILY_HISTORY_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['FAMILY_HISTORY_FR']?.completed || false,
+            completedAt: questionnaireStatuses['FAMILY_HISTORY_FR']?.completed_at,
+          },
+          {
+            ...PERINATALITE_DEFINITION,
+            id: PERINATALITE_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['PERINATALITE_FR']?.completed || false,
+            completedAt: questionnaireStatuses['PERINATALITE_FR']?.completed_at,
+          }
+        ];
 
         // Build Suicide section questionnaires
         const suicideQuestionnaires = [
@@ -1486,13 +1495,6 @@ export default async function VisitDetailPage({
 
         // Build Histoire somatique section questionnaires
         const histoireSomatiqueQuestionnaires = [
-          {
-            ...PERINATALITE_DEFINITION,
-            id: PERINATALITE_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['PERINATALITE_FR']?.completed || false,
-            completedAt: questionnaireStatuses['PERINATALITE_FR']?.completed_at,
-          },
           {
             ...PATHO_NEURO_DEFINITION,
             id: PATHO_NEURO_DEFINITION.code,
@@ -1609,25 +1611,30 @@ export default async function VisitDetailPage({
           name: 'Evaluation Médicale',
           description: 'Évaluation médicale complète',
           sections: [
-          {
-            id: 'dsm5',
-            name: 'DSM5',
-            questionnaires: dsm5Questionnaires
-          },
-          {
-            id: 'suicide',
-            name: 'Suicide',
-            questionnaires: suicideQuestionnaires
+            {
+              id: 'dsm5',
+              name: 'DSM5',
+              questionnaires: dsm5Questionnaires
             },
             {
-            id: 'histoire_somatique',
-            name: 'Histoire somatique',
-            questionnaires: histoireSomatiqueQuestionnaires
+              id: 'antecedents',
+              name: 'Antécédents',
+              questionnaires: antecedentsQuestionnaires
             },
             {
-            id: 'soin_suivi',
-            name: 'Soin, suivi et arrêt de travail',
-            questionnaires: soinSuiviQuestionnaires
+              id: 'suicide',
+              name: 'Suicide',
+              questionnaires: suicideQuestionnaires
+            },
+            {
+              id: 'histoire_somatique',
+              name: 'Histoire somatique',
+              questionnaires: histoireSomatiqueQuestionnaires
+            },
+            {
+              id: 'soin_suivi',
+              name: 'Soin, suivi et arrêt de travail',
+              questionnaires: soinSuiviQuestionnaires
             }
           ]
         };
