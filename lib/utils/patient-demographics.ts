@@ -73,7 +73,9 @@ export const QUESTIONNAIRES_REQUIRING_DEMOGRAPHICS: string[] = [
   // WAIS-IV questionnaires
   'WAIS4_CRITERIA_FR',
   'WAIS4_MATRICES_FR',
+  'WAIS4_MATRICES_FR',
   'WAIS4_CODE_FR',
+  'WAIS_IV_CODE_SYMBOLES_IVT', // Added missing code for Code, Symboles & IVT
   'WAIS4_DIGIT_SPAN_FR',
   'WAIS4_SIMILITUDES_FR',
   

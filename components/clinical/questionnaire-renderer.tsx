@@ -28,6 +28,7 @@ import {
   calculatePercentileRank, 
   calculateDeviationFromMean 
 } from "@/lib/services/wais4-matrices-scoring";
+import { calculateWais4CodeSymbolesScores } from "@/lib/services/wais4-code-scoring";
 import { Loader2, ChevronDown, Info } from "lucide-react";
 
 interface QuestionnaireRendererProps {
@@ -1381,70 +1382,47 @@ export function QuestionnaireRenderer({
       // Only for WAIS4_CODE_FR questionnaire or WAIS_IV_CODE_SYMBOLES_IVT
       if (questionnaire?.code === 'WAIS4_CODE_FR' || questionnaire?.code === 'WAIS_IV_CODE_SYMBOLES_IVT') {
         const wais4Age = Number(prev.patient_age);
-        const wais4CodTot = Number(prev.wais_cod_tot);
-        const wais4CodErr = Number(prev.wais_cod_err);
+        const wais4CodTot = prev.wais_cod_tot !== undefined && prev.wais_cod_tot !== '' ? Number(prev.wais_cod_tot) : undefined;
         
-        const hasWais4Age = !isNaN(wais4Age) && wais4Age >= 16 && wais4Age <= 90;
-        const hasWais4CodTot = prev.wais_cod_tot !== undefined && prev.wais_cod_tot !== '' && !isNaN(wais4CodTot) && wais4CodTot >= 0;
-        const hasWais4CodErr = prev.wais_cod_err !== undefined && prev.wais_cod_err !== '' && !isNaN(wais4CodErr) && wais4CodErr >= 0;
+        // Check for Symboles inputs
+        const wais4SymbTot = prev.wais_symb_tot !== undefined && prev.wais_symb_tot !== '' ? Number(prev.wais_symb_tot) : undefined;
         
-        // Only compute scores if BOTH fields are filled
-        if (hasWais4Age && hasWais4CodTot && hasWais4CodErr) {
-          // WAIS-IV Code norm tables
-          const WAIS4_CODE_NORMS: Record<string, number[]> = {
-            age_16: [32, 36, 40, 45, 51, 55, 58, 61, 64, 68, 72, 76, 81, 86, 92, 98, 101, 104, 135],
-            age_18: [36, 40, 44, 48, 52, 56, 61, 66, 69, 72, 76, 81, 85, 90, 95, 98, 101, 104, 135],
-            age_20: [38, 42, 46, 50, 54, 58, 64, 70, 74, 78, 81, 87, 92, 95, 98, 101, 104, 107, 135],
-            age_25: [32, 36, 41, 46, 52, 56, 62, 68, 74, 78, 84, 88, 92, 98, 102, 106, 110, 114, 135],
-            age_30: [31, 35, 40, 46, 52, 55, 59, 68, 73, 78, 83, 89, 94, 98, 102, 106, 110, 113, 135],
-            age_35: [28, 32, 36, 42, 47, 52, 56, 61, 66, 72, 78, 82, 86, 90, 97, 103, 107, 110, 135],
-            age_45: [22, 26, 30, 35, 43, 46, 50, 60, 66, 70, 73, 77, 81, 87, 93, 98, 104, 108, 135],
-            age_55: [15, 20, 25, 29, 36, 41, 45, 50, 55, 62, 66, 71, 77, 82, 90, 96, 102, 106, 135],
-            age_65: [14, 19, 23, 27, 32, 37, 42, 46, 49, 57, 63, 69, 73, 78, 88, 93, 97, 101, 135],
-            age_70: [13, 17, 20, 23, 25, 28, 31, 37, 43, 47, 53, 58, 62, 67, 71, 74, 79, 85, 135],
-            age_75: [10, 13, 16, 19, 22, 26, 30, 33, 37, 43, 48, 53, 57, 60, 67, 72, 77, 82, 135]
-          };
+        const isValidAge = !isNaN(wais4Age) && wais4Age >= 16 && wais4Age <= 120;
+        
+        // Only compute if we have age and at least one subtest total
+        if (isValidAge && (wais4CodTot !== undefined || wais4SymbTot !== undefined)) {
+          // Prepare safely parsed inputs
+          const codErrVal = Number(prev.wais_cod_err);
+          const symbErrVal = Number(prev.wais_symb_err);
           
-          const getWais4AgeGroup = (age: number): string => {
-            if (age >= 75) return 'age_75';
-            if (age > 70) return 'age_70';
-            if (age > 65) return 'age_65';
-            if (age > 55) return 'age_55';
-            if (age > 45) return 'age_45';
-            if (age > 35) return 'age_35';
-            if (age > 30) return 'age_30';
-            if (age > 25) return 'age_25';
-            if (age >= 20) return 'age_20';
-            if (age >= 18) return 'age_18';
-            return 'age_16';
-          };
-          
-          // Raw score = total correct (errors not subtracted in WAIS-IV)
-          const wais4CodBrut = wais4CodTot;
-          updated.wais_cod_brut = wais4CodBrut;
-          
-          // Find standard score
-          const ageGroup = getWais4AgeGroup(wais4Age);
-          const norms = WAIS4_CODE_NORMS[ageGroup];
-          let k = 0;
-          while (k < 18 && wais4CodBrut > norms[k]) {
-            k++;
+          const scores = calculateWais4CodeSymbolesScores({
+            patient_age: wais4Age,
+            wais_cod_tot: wais4CodTot !== undefined ? wais4CodTot : 0, // Fallback if only Symboles filled (though Code usually required)
+            wais_cod_err: !isNaN(codErrVal) ? codErrVal : undefined,
+            wais_symb_tot: wais4SymbTot,
+            wais_symb_err: !isNaN(symbErrVal) ? symbErrVal : undefined
+          });
+
+          // Update Code Scores
+          if (wais4CodTot !== undefined) {
+            if (updated.wais_cod_brut !== scores.wais_cod_brut) { updated.wais_cod_brut = scores.wais_cod_brut; hasChanges = true; }
+            if (updated.wais_cod_std !== scores.wais_cod_std) { updated.wais_cod_std = scores.wais_cod_std; hasChanges = true; }
+            if (updated.wais_cod_cr !== scores.wais_cod_cr) { updated.wais_cod_cr = scores.wais_cod_cr; hasChanges = true; }
           }
-          const wais4CodStd = k + 1;
-          updated.wais_cod_std = wais4CodStd;
+
+          // Update Symboles Scores
+          if (wais4SymbTot !== undefined && scores.wais_symb_std !== undefined) {
+             if (updated.wais_symb_brut !== scores.wais_symb_brut) { updated.wais_symb_brut = scores.wais_symb_brut; hasChanges = true; }
+             if (updated.wais_symb_std !== scores.wais_symb_std) { updated.wais_symb_std = scores.wais_symb_std; hasChanges = true; }
+             if (updated.wais_symb_cr !== scores.wais_symb_cr) { updated.wais_symb_cr = scores.wais_symb_cr; hasChanges = true; }
+          }
           
-          // Calculate standardized value (z-score)
-          const wais4CodCr = Number(((wais4CodStd - 10) / 3).toFixed(2));
-          updated.wais_cod_cr = wais4CodCr;
-          
-          hasChanges = true;
-        } else {
-          // Clear computed values if inputs are missing
-          if (prev.wais_cod_brut !== undefined) {
-            updated.wais_cod_brut = undefined;
-            updated.wais_cod_std = undefined;
-            updated.wais_cod_cr = undefined;
-            hasChanges = true;
+          // Update IVT Scores (only if available)
+          if (scores.wais_ivt !== undefined) {
+            if (updated.wais_somme_ivt !== scores.wais_somme_ivt) { updated.wais_somme_ivt = scores.wais_somme_ivt; hasChanges = true; }
+            if (updated.wais_ivt !== scores.wais_ivt) { updated.wais_ivt = scores.wais_ivt; hasChanges = true; }
+            if (updated.wais_ivt_rang !== scores.wais_ivt_rang) { updated.wais_ivt_rang = scores.wais_ivt_rang; hasChanges = true; }
+            if (updated.wais_ivt_95 !== scores.wais_ivt_95) { updated.wais_ivt_95 = scores.wais_ivt_95; hasChanges = true; }
           }
         }
       }
