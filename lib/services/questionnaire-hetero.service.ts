@@ -1785,7 +1785,14 @@ export async function saveWais4DigitSpanResponse(
   });
 
   // Remove fields that don't exist in the database table
-  const { patient_gender, years_of_education, ...dbResponse } = response as any;
+  const { 
+    patient_gender, 
+    years_of_education, 
+    total_raw_score,
+    standard_score,
+    standardized_value,
+    ...dbResponse 
+  } = response as any;
   
   const { data, error } = await supabase
     .from('responses_wais4_digit_span')
