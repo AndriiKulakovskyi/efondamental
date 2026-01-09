@@ -9006,8 +9006,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9017,8 +9017,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9038,8 +9038,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9049,8 +9049,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9070,8 +9070,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9081,8 +9081,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9102,8 +9102,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9113,8 +9113,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9134,8 +9134,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9145,8 +9145,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9166,8 +9166,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9177,8 +9177,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9198,8 +9198,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9209,8 +9209,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9230,8 +9230,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9241,8 +9241,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9272,8 +9272,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9283,8 +9283,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9304,8 +9304,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9315,8 +9315,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9336,8 +9336,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9347,8 +9347,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9368,8 +9368,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9379,8 +9379,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9400,8 +9400,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9411,8 +9411,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9432,8 +9432,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9443,8 +9443,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9464,8 +9464,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9475,8 +9475,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9496,8 +9496,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9507,8 +9507,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9538,8 +9538,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9549,8 +9549,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: true,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9570,8 +9570,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9581,8 +9581,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9602,8 +9602,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9613,8 +9613,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9634,8 +9634,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9645,8 +9645,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9666,8 +9666,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9677,8 +9677,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9698,8 +9698,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9709,8 +9709,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9730,8 +9730,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9741,8 +9741,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9762,8 +9762,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {
@@ -9773,8 +9773,8 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 0, label: 'Incorrect', score: 0 },
-      { code: 1, label: 'Correct', score: 1 }
+      { code: 0, label: '0', score: 0 },
+      { code: 1, label: '1', score: 1 }
     ]
   },
   {

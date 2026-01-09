@@ -30,6 +30,7 @@ import {
   calculateDeviationFromMean
 } from "@/lib/services/wais4-matrices-scoring";
 import { calculateWais4CodeSymbolesScores } from "@/lib/services/wais4-code-scoring";
+import { calculateDigitSpanScores } from "@/lib/services/wais4-digit-span-scoring";
 import { Loader2, ChevronDown, Info } from "lucide-react";
 import { calculateCvltScores } from "@/lib/services/cvlt-scoring";
 
@@ -1334,6 +1335,71 @@ export function QuestionnaireRenderer({
             if (updated.wais_ivt_rang !== scores.wais_ivt_rang) { updated.wais_ivt_rang = scores.wais_ivt_rang; hasChanges = true; }
             if (updated.wais_ivt_95 !== scores.wais_ivt_95) { updated.wais_ivt_95 = scores.wais_ivt_95; hasChanges = true; }
           }
+        }
+      }
+
+      // WAIS-IV Digit Span Scoring
+      if (questionnaire?.code === 'WAIS4_DIGIT_SPAN_FR') {
+        const wais4Age = Number(prev.patient_age);
+        
+        if (!isNaN(wais4Age)) {
+          const getN = (k: string) => prev[k] !== undefined && prev[k] !== '' ? Number(prev[k]) : null;
+          
+          // Build input object from 48 fields
+          const input: any = { patient_age: wais4Age };
+          const types = ['d', 'i', 'c']; // Direct, Inverse, Croissant
+          
+          types.forEach(type => {
+             for (let i = 1; i <= 8; i++) {
+               const keyA = `wais4_mco${type}_${i}a`;
+               const keyB = `wais4_mco${type}_${i}b`;
+               input[keyA] = getN(keyA);
+               input[keyB] = getN(keyB);
+             }
+          });
+          
+          const scores = calculateDigitSpanScores(input);
+          
+          const update = (key: string, val: any) => {
+             // Compare with previous value to avoid redundant updates
+             if (prev[key] !== val) {
+                updated[key] = val;
+                hasChanges = true;
+             }
+          };
+          
+          // Update Item Scores
+          types.forEach(type => {
+             for (let i = 1; i <= 8; i++) {
+                const key = `wais_mco${type}_${i}`;
+                if (scores[key as keyof typeof scores] !== undefined) {
+                    update(key, scores[key as keyof typeof scores]);
+                }
+             }
+          });
+          
+          // Update Section Totals
+          update('wais_mcod_tot', scores.wais_mcod_tot);
+          update('wais_mcoi_tot', scores.wais_mcoi_tot);
+          update('wais_mcoc_tot', scores.wais_mcoc_tot);
+          
+          // Empan (Span)
+          update('wais_mc_end', scores.wais_mc_end);
+          update('wais_mc_env', scores.wais_mc_env);
+          update('wais_mc_cro', scores.wais_mc_cro);
+          
+          // Empan Z-Scores
+          update('wais_mc_end_std', scores.wais_mc_end_std);
+          update('wais_mc_env_std', scores.wais_mc_env_std);
+          update('wais_mc_cro_std', scores.wais_mc_cro_std);
+          
+          // Differences
+          update('wais_mc_emp', scores.wais_mc_emp);
+          
+          // Global Scores
+          update('total_raw_score', scores.wais_mc_tot);
+          update('standard_score', scores.wais_mc_std);
+          update('standardized_value', scores.wais_mc_cr);
         }
       }
 
