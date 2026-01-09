@@ -12,7 +12,7 @@ import { Calendar, Eye, Download } from "lucide-react";
 const createColumns = (pathology: string): ColumnDef<PatientFull>[] => [
   {
     accessorKey: "last_name",
-    header: "Name",
+    header: "Nom",
     cell: ({ row }) => (
       <Link
         href={`/professional/${pathology}/patients/${row.original.id}`}
@@ -24,7 +24,7 @@ const createColumns = (pathology: string): ColumnDef<PatientFull>[] => [
   },
   {
     accessorKey: "medical_record_number",
-    header: "MRN",
+    header: "NRM",
     cell: ({ row }) => (
       <span className="font-mono text-sm">{row.original.medical_record_number}</span>
     ),
@@ -32,16 +32,16 @@ const createColumns = (pathology: string): ColumnDef<PatientFull>[] => [
   {
     accessorKey: "date_of_birth",
     header: "Age",
-    cell: ({ row }) => `${calculateAge(row.original.date_of_birth)} years`,
+    cell: ({ row }) => `${calculateAge(row.original.date_of_birth)} ans`,
   },
   {
     accessorKey: "gender",
-    header: "Gender",
-    cell: ({ row }) => row.original.gender || "Not specified",
+    header: "Sexe",
+    cell: ({ row }) => row.original.gender || "Non specifie",
   },
   {
     accessorKey: "active",
-    header: "Status",
+    header: "Statut",
     cell: ({ row }) => (
       <span
         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -50,7 +50,7 @@ const createColumns = (pathology: string): ColumnDef<PatientFull>[] => [
             : "bg-slate-100 text-slate-800"
         }`}
       >
-        {row.original.active ? "Active" : "Inactive"}
+        {row.original.active ? "Actif" : "Inactif"}
       </span>
     ),
   },
@@ -83,13 +83,13 @@ export function EnhancedPatientsTable({ patients, pathology }: EnhancedPatientsT
   const columns = useMemo(() => createColumns(pathology), [pathology]);
 
   const exportToCSV = () => {
-    const headers = ["Name", "MRN", "Age", "Gender", "Status"];
+    const headers = ["Nom", "NRM", "Age", "Sexe", "Statut"];
     const rows = patients.map(p => [
       `${p.first_name} ${p.last_name}`,
       p.medical_record_number,
       calculateAge(p.date_of_birth),
       p.gender || "",
-      p.active ? "Active" : "Inactive",
+      p.active ? "Actif" : "Inactif",
     ]);
 
     const csvContent = [
@@ -116,7 +116,7 @@ export function EnhancedPatientsTable({ patients, pathology }: EnhancedPatientsT
         </div>
         <Button variant="outline" size="sm" onClick={exportToCSV}>
           <Download className="h-4 w-4 mr-2" />
-          Export to CSV
+          Exporter en CSV
         </Button>
       </div>
       
@@ -125,7 +125,7 @@ export function EnhancedPatientsTable({ patients, pathology }: EnhancedPatientsT
         data={patients}
         searchable
         searchColumn="last_name"
-        searchPlaceholder="Filter by name..."
+        searchPlaceholder="Filtrer par nom..."
         paginated
         pageSize={20}
       />

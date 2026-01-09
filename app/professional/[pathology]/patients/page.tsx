@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import { PatientsTableWithSearch } from "./components/patients-table-with-search";
+import { Users, UserPlus } from "lucide-react";
 
 export default async function PatientsListPage({
   params,
@@ -27,22 +28,35 @@ export default async function PatientsListPage({
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold text-slate-900">Patients</h2>
-          <p className="text-slate-600">{pathologyData?.name}</p>
+    <main className="flex-1 overflow-y-auto p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-brand/10 text-brand flex items-center justify-center shrink-0">
+              <Users className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-slate-900">Patients</h2>
+              <p className="text-slate-500 mt-1">
+                {pathologyData?.name} - Gestion et suivi des patients
+              </p>
+            </div>
+          </div>
+          <Link href={`/professional/${pathology}/patients/new`}>
+            <Button className="flex items-center gap-2">
+              <UserPlus className="w-4 h-4" />
+              Nouveau patient
+            </Button>
+          </Link>
         </div>
-        <Link href={`/professional/${pathology}/patients/new`}>
-          <Button>New Patient</Button>
-        </Link>
-      </div>
 
-      <PatientsTableWithSearch 
-        patients={patients} 
-        pathology={pathology} 
-      />
-    </div>
+        <PatientsTableWithSearch 
+          patients={patients} 
+          pathology={pathology} 
+        />
+      </div>
+    </main>
   );
 }
 

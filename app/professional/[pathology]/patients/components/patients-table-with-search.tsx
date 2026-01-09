@@ -21,7 +21,7 @@ export function PatientsTableWithSearch({ patients, pathology }: PatientsTableWi
         onFilterChange={setFilteredPatients}
       />
       
-      <div className="bg-white rounded-lg border border-slate-200 p-6">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
         <EnhancedPatientsTable patients={filteredPatients} pathology={pathology} />
       </div>
     </div>

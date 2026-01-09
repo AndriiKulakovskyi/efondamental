@@ -147,7 +147,7 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
               type="text"
-              placeholder="Search patients by name or MRN..."
+              placeholder="Rechercher par nom ou NRM..."
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
               onFocus={() => {
@@ -169,7 +169,7 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
             <div className="absolute z-50 w-full mt-1 bg-white rounded-lg border border-slate-200 shadow-lg max-h-96 overflow-y-auto">
               <div className="p-2">
                 <div className="text-xs text-slate-500 px-2 py-1 font-medium">
-                  Search Results ({searchResults.length})
+                  Resultats de recherche ({searchResults.length})
                 </div>
                 {searchResults.map((patient) => (
                   <Link
@@ -189,7 +189,7 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-slate-600">
-                          {calculateAge(patient.date_of_birth)} years
+                          {calculateAge(patient.date_of_birth)} ans
                         </p>
                         <p className="text-xs text-slate-500 capitalize">
                           {patient.gender || "N/A"}
@@ -204,7 +204,7 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
 
           {isSearching && (
             <div className="absolute z-50 w-full mt-1 bg-white rounded-lg border border-slate-200 shadow-lg p-4">
-              <p className="text-sm text-slate-600 text-center">Searching...</p>
+              <p className="text-sm text-slate-600 text-center">Recherche en cours...</p>
             </div>
           )}
         </div>
@@ -221,10 +221,10 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
       {showFilters && (
         <div className="bg-slate-50 rounded-lg border border-slate-200 p-4 space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="font-semibold text-slate-900">Filters</h3>
+            <h3 className="font-semibold text-slate-900">Filtres</h3>
             {hasActiveFilters && (
               <Button variant="ghost" size="sm" onClick={clearFilters}>
-                Clear All
+                Effacer tout
               </Button>
             )}
           </div>
@@ -232,7 +232,7 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">
-                Risk Level
+                Niveau de risque
               </label>
               <Select
                 value={filters.riskLevel}
@@ -241,21 +241,21 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="All levels" />
+                  <SelectValue placeholder="Tous les niveaux" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All levels</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="moderate">Moderate</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="">Tous les niveaux</SelectItem>
+                  <SelectItem value="high">Eleve</SelectItem>
+                  <SelectItem value="moderate">Modere</SelectItem>
+                  <SelectItem value="low">Faible</SelectItem>
+                  <SelectItem value="none">Aucun</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">
-                Min Age
+                Age min
               </label>
               <Input
                 type="number"
@@ -271,7 +271,7 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">
-                Max Age
+                Age max
               </label>
               <Input
                 type="number"
@@ -287,7 +287,7 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">
-                Upcoming Visit
+                Visite a venir
               </label>
               <Select
                 value={filters.hasUpcomingVisit}
@@ -296,12 +296,12 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Any" />
+                  <SelectValue placeholder="Tous" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any</SelectItem>
-                  <SelectItem value="yes">Has upcoming visit</SelectItem>
-                  <SelectItem value="no">No upcoming visit</SelectItem>
+                  <SelectItem value="">Tous</SelectItem>
+                  <SelectItem value="yes">Avec visite prevue</SelectItem>
+                  <SelectItem value="no">Sans visite prevue</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -311,7 +311,7 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
             <div className="flex gap-2 flex-wrap">
               {filters.riskLevel && (
                 <Badge variant="secondary">
-                  Risk: {filters.riskLevel}
+                  Risque : {filters.riskLevel}
                   <button
                     onClick={() => setFilters({ ...filters, riskLevel: "" })}
                     className="ml-1"
@@ -322,7 +322,7 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
               )}
               {filters.ageMin && (
                 <Badge variant="secondary">
-                  Min Age: {filters.ageMin}
+                  Age min : {filters.ageMin}
                   <button
                     onClick={() => setFilters({ ...filters, ageMin: "" })}
                     className="ml-1"
@@ -333,7 +333,7 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
               )}
               {filters.ageMax && (
                 <Badge variant="secondary">
-                  Max Age: {filters.ageMax}
+                  Age max : {filters.ageMax}
                   <button
                     onClick={() => setFilters({ ...filters, ageMax: "" })}
                     className="ml-1"
@@ -344,7 +344,7 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
               )}
               {filters.hasUpcomingVisit && (
                 <Badge variant="secondary">
-                  {filters.hasUpcomingVisit === "yes" ? "Has" : "No"} upcoming visit
+                  {filters.hasUpcomingVisit === "yes" ? "Avec" : "Sans"} visite prevue
                   <button
                     onClick={() => setFilters({ ...filters, hasUpcomingVisit: "" })}
                     className="ml-1"
