@@ -560,7 +560,8 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     id: 'collection_date',
     text: 'Date de prélèvement',
     type: 'date',
-    required: true
+    required: true,
+    metadata: { default: 'today' }
   },
   {
     id: 'collection_location',
