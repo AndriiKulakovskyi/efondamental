@@ -707,6 +707,31 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION, DIVA_DEFINITION, FAMILY_HISTORY_DEFINITION, CSSRS_DEFINITION, ISA_DEFINITION, SIS_DEFINITION, SUICIDE_HISTORY_DEFINITION, PERINATALITE_DEFINITION, PATHO_NEURO_DEFINITION, PATHO_CARDIO_DEFINITION, PATHO_ENDOC_DEFINITION, PATHO_DERMATO_DEFINITION, PATHO_URINAIRE_DEFINITION, ANTECEDENTS_GYNECO_DEFINITION, PATHO_HEPATO_GASTRO_DEFINITION, PATHO_ALLERGIQUE_DEFINITION, AUTRES_PATHO_DEFINITION]
       },
       {
+        id: 'mod_neuropsy',
+        name: 'Evaluation Neuropsychologique',
+        description: 'Évaluation neuropsychologique',
+        // Root level: Independent tests shared by WAIS-III and WAIS-IV protocols
+        questionnaires: [
+          CVLT_DEFINITION,
+          TMT_DEFINITION,
+          STROOP_DEFINITION,
+          FLUENCES_VERBALES_DEFINITION,
+          MEM3_SPATIAL_DEFINITION
+        ],
+        sections: [
+          {
+            id: 'wais3',
+            name: 'WAIS-III',
+            questionnaires: [WAIS3_CRITERIA_DEFINITION, WAIS3_LEARNING_DEFINITION, WAIS3_VOCABULAIRE_DEFINITION, WAIS3_MATRICES_DEFINITION, WAIS3_CODE_SYMBOLES_DEFINITION, WAIS3_DIGIT_SPAN_DEFINITION, WAIS3_CPT2_DEFINITION]
+          },
+          {
+            id: 'wais4',
+            name: 'WAIS-IV',
+            questionnaires: [WAIS4_CRITERIA_DEFINITION, WAIS4_LEARNING_DEFINITION, WAIS4_MATRICES_DEFINITION, WAIS4_CODE_DEFINITION, WAIS4_DIGIT_SPAN_DEFINITION, WAIS4_SIMILITUDES_DEFINITION, COBRA_DEFINITION, CPT3_DEFINITION, TEST_COMMISSIONS_DEFINITION, SCIP_DEFINITION]
+          }
+        ]
+      },
+      {
         id: 'mod_auto_etat',
         name: 'Autoquestionnaires - ETAT',
         description: 'Questionnaires sur l\'état actuel du patient',

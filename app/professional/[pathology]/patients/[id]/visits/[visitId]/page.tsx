@@ -1522,6 +1522,227 @@ export default async function VisitDetailPage({
           ]
         };
       })(),
+      // Neuropsychological evaluation module (same structure as initial_evaluation)
+      {
+        id: 'mod_neuropsy',
+        name: 'Evaluation Neuropsychologique',
+        description: 'Évaluation neuropsychologique (Tests indépendants, WAIS-III, WAIS-IV)',
+        questionnaires: (() => {
+          const independentTests = [
+            { def: CVLT_DEFINITION, code: 'CVLT_FR' },
+            { def: TMT_DEFINITION, code: 'TMT_FR' },
+            { def: STROOP_DEFINITION, code: 'STROOP_FR' },
+            { def: FLUENCES_VERBALES_DEFINITION, code: 'FLUENCES_VERBALES_FR' },
+            { def: MEM3_SPATIAL_DEFINITION, code: 'MEM3_SPATIAL_FR' }
+          ];
+          
+          return independentTests.map(({ def, code }) => {
+            const isAnswered = wais3CriteriaAnswered || wais4CriteriaAnswered;
+            const isAccepted = wais3Accepted || wais4Accepted;
+            
+            if (!isAnswered) {
+              return {
+                ...def,
+                id: def.code,
+                target_role: 'healthcare_professional',
+                completed: false,
+                completedAt: null,
+                isConditional: true,
+                conditionMet: false,
+                conditionMessage: 'Complétez d\'abord les Critères cliniques (WAIS-III ou WAIS-IV)',
+              };
+            } else if (isAccepted) {
+              return {
+                ...def,
+                id: def.code,
+                target_role: 'healthcare_professional',
+                completed: questionnaireStatuses[code]?.completed || false,
+                completedAt: questionnaireStatuses[code]?.completed_at,
+                isConditional: true,
+                conditionMet: true,
+              };
+            } else {
+              return {
+                ...def,
+                id: def.code,
+                target_role: 'healthcare_professional',
+                completed: false,
+                completedAt: null,
+                isConditional: true,
+                conditionMet: false,
+                conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
+              };
+            }
+          });
+        })(),
+        sections: [
+          {
+            id: 'wais3',
+            name: 'WAIS-III',
+            questionnaires: (() => {
+              const wais3Questionnaires: any[] = [
+                // Criteria questionnaire - always enabled
+                {
+                  ...WAIS3_CRITERIA_DEFINITION,
+                  id: WAIS3_CRITERIA_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['WAIS3_CRITERIA_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['WAIS3_CRITERIA_FR']?.completed_at,
+                }
+              ];
+              
+              // Helper function to add conditional questionnaire
+              const addConditionalQuestionnaire = (definition: any, code: string) => {
+                if (!wais3CriteriaAnswered) {
+                  // Criteria not yet completed - show as conditional/locked
+                  wais3Questionnaires.push({
+                    ...definition,
+                    id: definition.code,
+                    target_role: 'healthcare_professional',
+                    completed: false,
+                    completedAt: null,
+                    isConditional: true,
+                    conditionMet: false,
+                    conditionMessage: 'Complétez d\'abord les Critères cliniques',
+                  });
+                } else if (wais3Accepted) {
+                  // Patient accepted - show enabled
+                  wais3Questionnaires.push({
+                    ...definition,
+                    id: definition.code,
+                    target_role: 'healthcare_professional',
+                    completed: questionnaireStatuses[code]?.completed || false,
+                    completedAt: questionnaireStatuses[code]?.completed_at,
+                    isConditional: true,
+                    conditionMet: true,
+                  });
+                } else {
+                  // Patient not accepted - show as locked/not applicable
+                  wais3Questionnaires.push({
+                    ...definition,
+                    id: definition.code,
+                    target_role: 'healthcare_professional',
+                    completed: false,
+                    completedAt: null,
+                    isConditional: true,
+                    conditionMet: false,
+                    conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
+                  });
+                }
+              };
+              
+              // Add conditional questionnaires (WAIS-III specific tests)
+              addConditionalQuestionnaire(WAIS3_LEARNING_DEFINITION, 'WAIS3_LEARNING_FR');
+              addConditionalQuestionnaire(WAIS3_VOCABULAIRE_DEFINITION, 'WAIS3_VOCABULAIRE_FR');
+              addConditionalQuestionnaire(WAIS3_MATRICES_DEFINITION, 'WAIS3_MATRICES_FR');
+              addConditionalQuestionnaire(WAIS3_CODE_SYMBOLES_DEFINITION, 'WAIS3_CODE_SYMBOLES_FR');
+              addConditionalQuestionnaire(WAIS3_DIGIT_SPAN_DEFINITION, 'WAIS3_DIGIT_SPAN_FR');
+              addConditionalQuestionnaire(WAIS3_CPT2_DEFINITION, 'WAIS3_CPT2_FR');
+              
+              return wais3Questionnaires;
+            })()
+          },
+          {
+            id: 'wais4',
+            name: 'WAIS-IV',
+            questionnaires: (() => {
+              const wais4Questionnaires: any[] = [
+                // Criteria questionnaire - always enabled
+                {
+                  ...WAIS4_CRITERIA_DEFINITION,
+                  id: WAIS4_CRITERIA_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['WAIS4_CRITERIA_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['WAIS4_CRITERIA_FR']?.completed_at,
+                },
+                {
+                  ...COBRA_DEFINITION,
+                  id: COBRA_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['COBRA_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['COBRA_FR']?.completed_at,
+                },
+                {
+                  ...CPT3_DEFINITION,
+                  id: CPT3_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['CPT3_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['CPT3_FR']?.completed_at,
+                },
+                {
+                  ...TEST_COMMISSIONS_DEFINITION,
+                  id: TEST_COMMISSIONS_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['TEST_COMMISSIONS_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['TEST_COMMISSIONS_FR']?.completed_at,
+                },
+                {
+                  ...SCIP_DEFINITION,
+                  id: SCIP_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['SCIP_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['SCIP_FR']?.completed_at,
+                },
+                {
+                  ...WAIS4_SIMILITUDES_DEFINITION,
+                  id: WAIS4_SIMILITUDES_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['WAIS4_SIMILITUDES_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['WAIS4_SIMILITUDES_FR']?.completed_at,
+                }
+              ];
+              
+              // Helper function to add conditional questionnaire
+              const addConditionalQuestionnaire = (definition: any, code: string) => {
+                if (!wais4CriteriaAnswered) {
+                  // Criteria not yet completed - show as conditional/locked
+                  wais4Questionnaires.push({
+                    ...definition,
+                    id: definition.code,
+                    target_role: 'healthcare_professional',
+                    completed: false,
+                    completedAt: null,
+                    isConditional: true,
+                    conditionMet: false,
+                    conditionMessage: 'Complétez d\'abord les Critères cliniques',
+                  });
+                } else if (wais4Accepted) {
+                  // Patient accepted - show enabled
+                  wais4Questionnaires.push({
+                    ...definition,
+                    id: definition.code,
+                    target_role: 'healthcare_professional',
+                    completed: questionnaireStatuses[code]?.completed || false,
+                    completedAt: questionnaireStatuses[code]?.completed_at,
+                    isConditional: true,
+                    conditionMet: true,
+                  });
+                } else {
+                  // Patient not accepted - show as locked/not applicable
+                  wais4Questionnaires.push({
+                    ...definition,
+                    id: definition.code,
+                    target_role: 'healthcare_professional',
+                    completed: false,
+                    completedAt: null,
+                    isConditional: true,
+                    conditionMet: false,
+                    conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
+                  });
+                }
+              };
+              
+              // Add conditional questionnaires (WAIS-IV specific tests only)
+              addConditionalQuestionnaire(WAIS4_LEARNING_DEFINITION, 'WAIS4_LEARNING_FR');
+              addConditionalQuestionnaire(WAIS4_MATRICES_DEFINITION, 'WAIS4_MATRICES_FR');
+              addConditionalQuestionnaire(WAIS4_CODE_DEFINITION, 'WAIS_IV_CODE_SYMBOLES_IVT');
+              addConditionalQuestionnaire(WAIS4_DIGIT_SPAN_DEFINITION, 'WAIS4_DIGIT_SPAN_FR');
+              
+              return wais4Questionnaires;
+            })()
+          }
+        ]
+      },
       {
         id: 'mod_auto_etat',
         name: 'Autoquestionnaires - ETAT',
