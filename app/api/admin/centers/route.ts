@@ -4,8 +4,23 @@ import {
   createCenter,
   setCenterPathologies,
   getAllPathologies,
+  getActiveCenters,
 } from "@/lib/services/center.service";
 import { logAuditEvent } from "@/lib/services/audit.service";
+
+export async function GET() {
+  try {
+    await requireAdmin();
+    const centers = await getActiveCenters();
+    return NextResponse.json({ centers });
+  } catch (error) {
+    console.error("Failed to fetch centers:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch centers" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {

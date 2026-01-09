@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { Building2, Settings, Users, BarChart3, Shield } from "lucide-react";
+import { Building2, Settings, Users, BarChart3, Shield, Upload } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { UserProfileDropdown } from "@/components/user-profile-dropdown";
@@ -92,6 +92,13 @@ export default async function AdminLayout({
               >
                 <Shield className="h-5 w-5" />
                 GDPR & Security
+              </Link>
+              <Link
+                href="/admin/import"
+                className="flex items-center gap-3 px-4 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <Upload className="h-5 w-5" />
+                Importer les données
               </Link>
             </nav>
           </aside>
