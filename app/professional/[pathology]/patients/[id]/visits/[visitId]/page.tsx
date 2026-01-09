@@ -7,7 +7,7 @@ import { getUserContext } from "@/lib/rbac/middleware";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDateTime } from "@/lib/utils/date";
 import { notFound, redirect } from "next/navigation";
-import { Calendar, User } from "lucide-react";
+import { Calendar } from "lucide-react";
 import VisitActions from "./components/visit-actions";
 import { ExpandableModuleCard } from "./components/expandable-module-card";
 import { VisitQuickStats } from "./components/visit-quick-stats";
@@ -114,6 +114,7 @@ import {
   SOMATIQUE_CONTRACEPTIF_DEFINITION,
   STATUT_PROFESSIONNEL_DEFINITION
 } from "@/lib/constants/questionnaires-followup";
+import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
 export default async function VisitDetailPage({
   params,
@@ -2007,9 +2008,8 @@ export default async function VisitDetailPage({
                 {visit.template_name}
               </h2>
               <div className="flex items-center gap-4 text-sm text-slate-600 mb-3">
-                <span className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  {visit.patient_first_name} {visit.patient_last_name}
+                <span className="font-medium text-slate-700">
+                  {VISIT_TYPE_NAMES[visit.visit_type as VisitType] || visit.visit_type}
                 </span>
                 <span className="text-slate-400">•</span>
                 <span className="flex items-center gap-2">
