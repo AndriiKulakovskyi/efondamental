@@ -2991,6 +2991,7 @@ export interface Wais4MatricesResponse {
   raw_score?: number; // Sum of items 1-26 (generated column)
   standardized_score?: number | null; // 1-19 based on age
   percentile_rank?: number | null; // Percentile
+  deviation_from_mean?: number | null; // (standardized_score - 10) / 3
   
   // Metadata
   completed_by?: string | null;

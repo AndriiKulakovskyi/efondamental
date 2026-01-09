@@ -8135,6 +8135,47 @@ const generateMatrixItems = (): Question[] => {
     });
   }
   
+  // Add computed score fields
+  items.push({
+    id: 'raw_score',
+    section: 'Scores Calculés',
+    text: 'Note brute à la WAIS MATRICE',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Somme des items 1-26 (calculé automatiquement)'
+  });
+  
+  items.push({
+    id: 'standardized_score',
+    section: 'Scores Calculés',
+    text: 'Note standard à la WAIS MATRICE',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Score standardisé (1-19) basé sur l\'âge et la note brute'
+  });
+  
+  items.push({
+    id: 'deviation_from_mean',
+    section: 'Scores Calculés',
+    text: 'Déviation par rapport à la moyenne et l\'écart type ((WAIS_VOC_STD - 10) /3)',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Z-score: (Note Standard - 10) / 3'
+  });
+  
+  items.push({
+    id: 'percentile_rank',
+    section: 'Scores Calculés',
+    text: 'Rang percentile',
+    type: 'number',
+    required: false,
+    readonly: true,
+    help: 'Rang percentile calculé à partir de la note standardisée'
+  });
+  
   return items;
 };
 
@@ -11341,7 +11382,7 @@ export const SCIP_QUESTIONS: Question[] = [
   // Apprentissage Verbal Immediat (VLT-I)
   {
     id: 'section_scipv01',
-    text: 'Verbal Learning Test - Immediate (VLT-I)',
+    text: 'Q1 : Mémoire verbale',
     type: 'section',
     required: false
   },
@@ -11364,7 +11405,7 @@ export const SCIP_QUESTIONS: Question[] = [
   // Memoire de Travail (WMT)
   {
     id: 'section_scipv02',
-    text: 'Working Memory Test (WMT)',
+    text: 'Q2 : Mémoire de travail',
     type: 'section',
     required: false
   },
@@ -11387,7 +11428,7 @@ export const SCIP_QUESTIONS: Question[] = [
   // Fluence Verbale (VFT)
   {
     id: 'section_scipv03',
-    text: 'Verbal Fluency Test (VFT)',
+    text: 'Q3 : Fluence verbale',
     type: 'section',
     required: false
   },
@@ -11410,7 +11451,7 @@ export const SCIP_QUESTIONS: Question[] = [
   // Rappel Verbal Differe (VLT-D)
   {
     id: 'section_scipv04',
-    text: 'Verbal Learning Test - Delayed (VLT-D)',
+    text: 'Q4 : Rappel verbal différé',
     type: 'section',
     required: false
   },
@@ -11433,7 +11474,7 @@ export const SCIP_QUESTIONS: Question[] = [
   // Capacites Visuomotrices (PST)
   {
     id: 'section_scipv05',
-    text: 'Processing Speed Test (PST)',
+    text: 'Q5 : Capacités visuomotrices',
     type: 'section',
     required: false
   },

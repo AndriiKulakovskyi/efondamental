@@ -44,19 +44,28 @@ export function calculateStandardizedScore(rawScore: number, age: number): numbe
   else if (age < 75) lookupTable = AGE_LOOKUP_TABLES.age_70;
   else lookupTable = AGE_LOOKUP_TABLES.age_75;
   
-  // JavaScript algorithm: var k = 0; while(rawScore > lookupTable[k]) k++; score = k+1
-  let k = 0;
-  while (k < lookupTable.length && rawScore > lookupTable[k] && lookupTable[k] !== 0) {
-    k++;
-  }
-  
-  // Standardized score is k+1, capped at 19
-  const standardizedScore = Math.min(k + 1, 19);
-  
   // Handle edge case: if raw score is 0, standardized score should be 1
   if (rawScore === 0) return 1;
   
-  return standardizedScore;
+  // Find the standardized score by iterating through the lookup table
+  // The table contains minimum raw scores needed for each standardized score (1-19)
+  // Index i corresponds to standardized score i+1
+  // A value of 0 means that standardized score is not achievable for this age group
+  
+  for (let i = lookupTable.length - 1; i >= 0; i--) {
+    const threshold = lookupTable[i];
+    
+    // Skip entries marked as 0 (not achievable)
+    if (threshold === 0) continue;
+    
+    // If raw score meets or exceeds this threshold, return the corresponding standardized score
+    if (rawScore >= threshold) {
+      return Math.min(i + 1, 19);
+    }
+  }
+  
+  // If we get here, raw score is below all thresholds, return 1
+  return 1;
 }
 
 
@@ -75,4 +84,17 @@ export function calculatePercentileRank(standardizedScore: number): number {
   return Math.round(percentileRank * 100) / 100;
 }
 
+/**
+ * Calculate deviation from mean (z-score)
+ * Formula: (standardized_score - 10) / 3
+ * This represents how many standard deviations the score is from the population mean
+ * @param standardizedScore - Standardized score (1-19)
+ * @returns Deviation from mean (z-score)
+ */
+export function calculateDeviationFromMean(standardizedScore: number): number {
+  const deviation = (standardizedScore - 10) / 3;
+  
+  // Round to 2 decimal places
+  return Math.round(deviation * 100) / 100;
+}
 
