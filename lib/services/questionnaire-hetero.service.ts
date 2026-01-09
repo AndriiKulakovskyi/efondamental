@@ -85,7 +85,7 @@ import {
   Wais3FluencesVerbalesResponse,
   Wais3FluencesVerbalesResponseInsert
 } from '@/lib/types/database.types';
-import { calculateStandardizedScore, calculatePercentileRank } from './wais4-matrices-scoring';
+import { calculateStandardizedScore, calculatePercentileRank, calculateDeviationFromMean } from './wais4-matrices-scoring';
 import { calculateTmtScores } from './tmt-scoring';
 import { calculateStroopScores } from './stroop-scoring';
 import { calculateFluencesVerbalesScores } from './fluences-verbales-scoring';
@@ -1519,9 +1519,20 @@ export async function saveWais4MatricesResponse(
   
   // Calculate percentile rank
   const percentileRank = calculatePercentileRank(standardizedScore);
+  
+  // Calculate deviation from mean (z-score)
+  const deviationFromMean = calculateDeviationFromMean(standardizedScore);
 
-  // Remove raw_score if present (it's a generated column, cannot be inserted)
-  const { raw_score, ...responseWithoutRawScore } = response as any;
+  // Remove raw_score, patient_gender and WAIS-III specific fields that might leak from frontend
+  const { 
+    raw_score, 
+    patient_gender, 
+    standard_score, 
+    total_raw_score, 
+    standardized_value, 
+    years_of_education,
+    ...responseWithoutRawScore 
+  } = response as any;
 
   const { data, error } = await supabase
     .from('responses_wais4_matrices')
@@ -1529,6 +1540,7 @@ export async function saveWais4MatricesResponse(
       ...responseWithoutRawScore,
       standardized_score: standardizedScore,
       percentile_rank: percentileRank,
+      // deviation_from_mean: deviationFromMean, // Column missing in DB
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

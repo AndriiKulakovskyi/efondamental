@@ -687,10 +687,13 @@ export async function submitProfessionalQuestionnaireAction(
         break;
 
       case 'WAIS4_MATRICES_FR':
+        // Filter out computed score fields - backend will recalculate them
+        const { raw_score, standardized_score, percentile_rank, deviation_from_mean, ...matricesRawData } = responses as any;
+        
         result = await saveWais4MatricesResponse({
           visit_id: visitId,
           patient_id: patientId,
-          ...responses as any
+          ...matricesRawData
         } as Wais4MatricesResponseInsert);
         break;
 

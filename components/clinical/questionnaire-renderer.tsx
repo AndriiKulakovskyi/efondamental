@@ -23,6 +23,11 @@ import { calculateTmtScores } from "@/lib/services/tmt-scoring";
 import { calculateStroopScores } from "@/lib/services/stroop-scoring";
 import { calculateMem3SpatialScores } from "@/lib/services/mem3-spatial-scoring";
 import { calculateWais3DigitSpanScores } from "@/lib/services/wais3-digit-span-scoring";
+import { 
+  calculateStandardizedScore, 
+  calculatePercentileRank, 
+  calculateDeviationFromMean 
+} from "@/lib/services/wais4-matrices-scoring";
 import { Loader2, ChevronDown, Info } from "lucide-react";
 
 interface QuestionnaireRendererProps {
@@ -913,6 +918,57 @@ export function QuestionnaireRenderer({
               hasChanges = true;
             }
           }
+        }
+      }
+
+      // Compute WAIS-IV Matrices scores
+      if (questionnaire?.code === 'WAIS4_MATRICES_FR') {
+        let rawScore = 0;
+        let answeredCount = 0;
+        
+        // Check all 26 items
+        for (let i = 1; i <= 26; i++) {
+          const key = `item_${String(i).padStart(2, '0')}`;
+          const val = prev[key];
+          // Check if value is a valid number (0 or 1)
+          if (val !== undefined && val !== '' && !isNaN(Number(val))) {
+            rawScore += Number(val);
+            answeredCount++;
+          }
+        }
+        
+        // scores calculation should only happen if all 26 items are answered
+        if (answeredCount === 26) {
+          // Update raw_score
+          if (updated.raw_score !== rawScore) {
+            updated.raw_score = rawScore;
+            hasChanges = true;
+          }
+          
+          const age = Number(prev.patient_age);
+          if (!isNaN(age) && age >= 16) {
+             const std = calculateStandardizedScore(rawScore, age);
+             if (updated.standardized_score !== std) {
+                updated.standardized_score = std;
+                hasChanges = true;
+             }
+             const pct = calculatePercentileRank(std);
+             if (updated.percentile_rank !== pct) {
+                updated.percentile_rank = pct;
+                hasChanges = true;
+             }
+             const dev = calculateDeviationFromMean(std);
+             if (updated.deviation_from_mean !== dev) {
+                updated.deviation_from_mean = dev;
+                hasChanges = true;
+             }
+          }
+        } else {
+          // Clear scores if not all items are answered
+          if (updated.raw_score !== undefined) { updated.raw_score = undefined; hasChanges = true; }
+          if (updated.standardized_score !== undefined) { updated.standardized_score = undefined; hasChanges = true; }
+          if (updated.percentile_rank !== undefined) { updated.percentile_rank = undefined; hasChanges = true; }
+          if (updated.deviation_from_mean !== undefined) { updated.deviation_from_mean = undefined; hasChanges = true; }
         }
       }
 
