@@ -214,11 +214,10 @@ async function logLoginAttempt(
   failureReason?: string
 ): Promise<void> {
   try {
-    const supabase = createBrowserClient();
-
     // Get user ID if successful
     let userId: string | null = null;
     if (success) {
+      const supabase = createBrowserClient();
       const { data: profile } = await supabase
         .from('user_profiles')
         .select('id')
@@ -227,17 +226,19 @@ async function logLoginAttempt(
       userId = profile?.id || null;
     }
 
-    // Note: In a real implementation, we'd get IP address and user agent from request headers
-    // For browser client, we can get user agent from navigator
-    const userAgent =
-      typeof navigator !== 'undefined' ? navigator.userAgent : null;
-
-    await supabase.from('login_history').insert({
-      user_id: userId,
-      success,
-      method,
-      user_agent: userAgent,
-      failure_reason: failureReason || null,
+    // Use server API route to log attempt (bypasses RLS using admin client)
+    await fetch('/api/auth/log-attempt', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        success,
+        method,
+        failureReason,
+        userId,
+      }),
     });
   } catch (error) {
     // Silent fail - don't interrupt login flow

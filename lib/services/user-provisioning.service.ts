@@ -175,13 +175,15 @@ export interface AcceptInvitationResult {
 export async function acceptInvitation(
   request: AcceptInvitationRequest
 ): Promise<AcceptInvitationResult> {
+  // Use admin client throughout since this is called before user is authenticated
+  const adminClient = createAdminClient();
   const supabase = await createClient();
 
   try {
     console.log('[ACCEPT INVITATION SERVICE] Validating invitation...');
     
-    // Validate invitation
-    const { data: invitation } = await supabase
+    // Validate invitation (using admin client to bypass RLS)
+    const { data: invitation } = await adminClient
       .from('user_invitations')
       .select('*')
       .eq('token', request.token)
@@ -199,7 +201,7 @@ export async function acceptInvitation(
 
     // Check expiration
     if (new Date(invitation.expires_at) < new Date()) {
-      await supabase
+      await adminClient
         .from('user_invitations')
         .update({ status: InvitationStatus.EXPIRED })
         .eq('id', invitation.id);
@@ -211,8 +213,7 @@ export async function acceptInvitation(
     }
 
     // Create auth user (using admin client with service role key)
-    console.log('[ACCEPT INVITATION SERVICE] Creating admin client...');
-    const adminClient = createAdminClient();
+    console.log('[ACCEPT INVITATION SERVICE] Creating auth user...');
     
     console.log('[ACCEPT INVITATION SERVICE] Creating auth user for:', invitation.email);
     const { data: authUser, error: authError } =
@@ -740,9 +741,10 @@ function generateTemporaryPassword(): string {
 // ============================================================================
 
 export async function getInvitation(token: string) {
-  const supabase = await createClient();
+  // Use admin client to bypass RLS since this is called before user is authenticated
+  const adminClient = createAdminClient();
 
-  const { data } = await supabase
+  const { data } = await adminClient
     .from('user_invitations')
     .select('*')
     .eq('token', token)
