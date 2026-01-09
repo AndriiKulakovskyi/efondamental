@@ -106,6 +106,14 @@ import {
   DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION,
   DIAG_PSY_SEM_PSYCHOTIQUES_DEFINITION
 } from "@/lib/constants/questionnaires-dsm5";
+import {
+  SUIVI_RECOMMANDATIONS_DEFINITION,
+  RECOURS_AUX_SOINS_DEFINITION,
+  TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION,
+  ARRETS_DE_TRAVAIL_DEFINITION,
+  SOMATIQUE_CONTRACEPTIF_DEFINITION,
+  STATUT_PROFESSIONNEL_DEFINITION
+} from "@/lib/constants/questionnaires-followup";
 
 export default async function VisitDetailPage({
   params,
@@ -1093,6 +1101,52 @@ export default async function VisitDetailPage({
           }
         ];
 
+        // Build Soin, suivi et arrêt de travail section questionnaires
+        const soinSuiviQuestionnaires = [
+          {
+            ...SUIVI_RECOMMANDATIONS_DEFINITION,
+            id: SUIVI_RECOMMANDATIONS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['SUIVI_RECOMMANDATIONS']?.completed || false,
+            completedAt: questionnaireStatuses['SUIVI_RECOMMANDATIONS']?.completed_at,
+          },
+          {
+            ...RECOURS_AUX_SOINS_DEFINITION,
+            id: RECOURS_AUX_SOINS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['RECOURS_AUX_SOINS']?.completed || false,
+            completedAt: questionnaireStatuses['RECOURS_AUX_SOINS']?.completed_at,
+          },
+          {
+            ...TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION,
+            id: TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['TRAITEMENT_NON_PHARMACOLOGIQUE']?.completed || false,
+            completedAt: questionnaireStatuses['TRAITEMENT_NON_PHARMACOLOGIQUE']?.completed_at,
+          },
+          {
+            ...ARRETS_DE_TRAVAIL_DEFINITION,
+            id: ARRETS_DE_TRAVAIL_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ARRETS_DE_TRAVAIL']?.completed || false,
+            completedAt: questionnaireStatuses['ARRETS_DE_TRAVAIL']?.completed_at,
+          },
+          {
+            ...SOMATIQUE_CONTRACEPTIF_DEFINITION,
+            id: SOMATIQUE_CONTRACEPTIF_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['SOMATIQUE_ET_CONTRACEPTIF']?.completed || false,
+            completedAt: questionnaireStatuses['SOMATIQUE_ET_CONTRACEPTIF']?.completed_at,
+          },
+          {
+            ...STATUT_PROFESSIONNEL_DEFINITION,
+            id: STATUT_PROFESSIONNEL_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['STATUT_PROFESSIONNEL']?.completed || false,
+            completedAt: questionnaireStatuses['STATUT_PROFESSIONNEL']?.completed_at,
+          }
+        ];
+
         return {
           id: 'mod_medical_eval',
           name: 'Evaluation Médicale',
@@ -1107,6 +1161,11 @@ export default async function VisitDetailPage({
               id: 'suicide',
               name: 'Suicide',
               questionnaires: suicideQuestionnaires
+            },
+            {
+              id: 'soin_suivi',
+              name: 'Soin, suivi et arrêt de travail',
+              questionnaires: soinSuiviQuestionnaires
             }
           ]
         };
@@ -1498,6 +1557,52 @@ export default async function VisitDetailPage({
             completedAt: questionnaireStatuses['AUTRES_PATHO_FR']?.completed_at,
           }
         ];
+
+        // Build Soin, suivi et arrêt de travail section questionnaires
+        const soinSuiviQuestionnaires = [
+          {
+            ...SUIVI_RECOMMANDATIONS_DEFINITION,
+            id: SUIVI_RECOMMANDATIONS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['SUIVI_RECOMMANDATIONS']?.completed || false,
+            completedAt: questionnaireStatuses['SUIVI_RECOMMANDATIONS']?.completed_at,
+          },
+          {
+            ...RECOURS_AUX_SOINS_DEFINITION,
+            id: RECOURS_AUX_SOINS_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['RECOURS_AUX_SOINS']?.completed || false,
+            completedAt: questionnaireStatuses['RECOURS_AUX_SOINS']?.completed_at,
+          },
+          {
+            ...TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION,
+            id: TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['TRAITEMENT_NON_PHARMACOLOGIQUE']?.completed || false,
+            completedAt: questionnaireStatuses['TRAITEMENT_NON_PHARMACOLOGIQUE']?.completed_at,
+          },
+          {
+            ...ARRETS_DE_TRAVAIL_DEFINITION,
+            id: ARRETS_DE_TRAVAIL_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['ARRETS_DE_TRAVAIL']?.completed || false,
+            completedAt: questionnaireStatuses['ARRETS_DE_TRAVAIL']?.completed_at,
+          },
+          {
+            ...SOMATIQUE_CONTRACEPTIF_DEFINITION,
+            id: SOMATIQUE_CONTRACEPTIF_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['SOMATIQUE_ET_CONTRACEPTIF']?.completed || false,
+            completedAt: questionnaireStatuses['SOMATIQUE_ET_CONTRACEPTIF']?.completed_at,
+          },
+          {
+            ...STATUT_PROFESSIONNEL_DEFINITION,
+            id: STATUT_PROFESSIONNEL_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['STATUT_PROFESSIONNEL']?.completed || false,
+            completedAt: questionnaireStatuses['STATUT_PROFESSIONNEL']?.completed_at,
+          }
+        ];
         
         return {
           id: 'mod_medical_eval',
@@ -1518,6 +1623,11 @@ export default async function VisitDetailPage({
             id: 'histoire_somatique',
             name: 'Histoire somatique',
             questionnaires: histoireSomatiqueQuestionnaires
+            },
+            {
+            id: 'soin_suivi',
+            name: 'Soin, suivi et arrêt de travail',
+            questionnaires: soinSuiviQuestionnaires
             }
           ]
         };

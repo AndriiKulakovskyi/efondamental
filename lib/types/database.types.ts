@@ -4407,3 +4407,146 @@ export interface DiagPsySemPsychotiquesResponse {
 }
 
 export type DiagPsySemPsychotiquesResponseInsert = Omit<DiagPsySemPsychotiquesResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
+// Psy Traitement Semestriel (Follow-up Care Module)
+// Module: Soin, suivi et arret de travail
+// ============================================================================
+
+export interface PsyTraitementSemestrielResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // ========================================================================
+  // SUIVI DES RECOMMANDATIONS
+  // ========================================================================
+  
+  rad_suivi_recom_medicamenteux?: 'Complètement suivi' | 'Partiellement suivi' | 'Non suivi' | null;
+  rad_suivi_recom_medicamenteux_non?: 'Refus du patient' | 'Désaccord du médecin pratiquant le suivi' | 'Problème de tolérance' | 'Problème de rechute' | 'Autres' | null;
+  rad_suivi_recom_non_medicamenteux?: 'Complètement suivi' | 'Partiellement suivi' | 'Non suivi' | null;
+  rad_suivi_recom_non_medicamenteux_non?: 'Refus du patient' | 'Désaccord avec le médecin pratiquant le suivi' | 'Impossible à mettre en place' | 'Autres' | null;
+  
+  // ========================================================================
+  // RECOURS AUX SOINS - Suivi habituel
+  // ========================================================================
+  
+  rad_recours_soin_psy?: 'Oui' | 'Non' | null;
+  
+  rad_recours_soin_psy_generaliste?: 'Oui' | 'Non' | null;
+  recours_soin_psy_generaliste_nb?: number | null;
+  
+  rad_recours_soin_psy_psychiatre?: 'Oui' | 'Non' | null;
+  recours_soin_psy_psychiatre_nb?: number | null;
+  
+  rad_recours_soin_psy_psychologue?: 'Oui' | 'Non' | null;
+  recours_soin_psy_psychologue_nb?: number | null;
+  
+  rad_recours_soin_psy_plusieurs?: 'Oui' | 'Non' | null;
+  recours_soin_psy_plusieurs_nb?: number | null;
+  
+  rad_recours_soin_psy_autres?: 'Oui' | 'Non' | null;
+  recours_soin_psy_autres_nb?: number | null;
+  
+  // ========================================================================
+  // RECOURS AUX SOINS - Urgence
+  // ========================================================================
+  
+  rad_recours_soin_urgence?: 'Oui' | 'Non' | null;
+  
+  rad_recours_soin_urgence_sans_hosp?: 'Oui' | 'Non' | null;
+  recours_soin_urgence_sans_hosp_nb?: number | null;
+  
+  rad_recours_soin_urgence_generaliste?: 'Oui' | 'Non' | null;
+  recours_soin_urgence_generaliste_nb?: number | null;
+  
+  rad_recours_soin_urgence_psychiatre?: 'Oui' | 'Non' | null;
+  recours_soin_urgence_psychiatre_nb?: number | null;
+  
+  rad_recours_soin_urgence_psychologue?: 'Oui' | 'Non' | null;
+  recours_soin_urgence_psychologue_nb?: number | null;
+  
+  rad_recours_soin_urgence_plusieurs?: 'Oui' | 'Non' | null;
+  recours_soin_urgence_plusieurs_nb?: number | null;
+  
+  rad_recours_soin_urgence_autres?: 'Oui' | 'Non' | null;
+  recours_soin_urgence_autres_nb?: number | null;
+  
+  // ========================================================================
+  // TRAITEMENT NON-PHARMACOLOGIQUE
+  // ========================================================================
+  
+  rad_non_pharmacologique?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  
+  // Sismotherapie
+  rad_non_pharmacologique_sismo?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  non_pharmacologique_sismo_nb?: number | null;
+  date_non_pharmacologique_sismo_debut?: string | null;
+  date_non_pharmacologique_sismo_fin?: string | null;
+  
+  // TMS
+  rad_non_pharmacologique_tms?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  non_pharmacologique_tms_nb?: number | null;
+  date_non_pharmacologique_tms_debut?: string | null;
+  date_non_pharmacologique_tms_fin?: string | null;
+  
+  // TCC
+  rad_non_pharmacologique_tcc?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  non_pharmacologique_tcc_nb?: number | null;
+  date_non_pharmacologique_tcc_debut?: string | null;
+  date_non_pharmacologique_tcc_fin?: string | null;
+  
+  // Psychoeducation
+  rad_non_pharmacologique_psychoed?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  non_pharmacologique_psychoed_nb?: number | null;
+  date_non_pharmacologique_psychoed_debut?: string | null;
+  date_non_pharmacologique_psychoed_fin?: string | null;
+  
+  // IPSRT
+  rad_non_pharmacologique_ipsrt?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  non_pharmacologique_ipsrt_nb?: number | null;
+  chk_non_pharmacologique_ipsrt_precisez?: string[] | null;
+  date_non_pharmacologique_ipsrt_debut?: string | null;
+  date_non_pharmacologique_ipsrt_fin?: string | null;
+  
+  // Autre
+  rad_non_pharmacologique_autre?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  non_pharmacologique_autre_precisez?: string | null;
+  non_pharmacologique_autre_nb?: number | null;
+  date_non_pharmacologique_autre_debut?: string | null;
+  date_non_pharmacologique_autre_fin?: string | null;
+  
+  // ========================================================================
+  // ARRETS DE TRAVAIL
+  // ========================================================================
+  
+  rad_arret_travail?: 'Oui' | 'Non' | 'Non applicable' | null;
+  arret_travail_nb?: number | null;
+  arret_travail_duree?: number | null;
+  
+  // ========================================================================
+  // SOMATIQUE ET CONTRACEPTIF
+  // ========================================================================
+  
+  fckedit_somatique_contraceptif?: string | null;
+  
+  // ========================================================================
+  // STATUT PROFESSIONNEL
+  // ========================================================================
+  
+  rad_changement_statut?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_statut_actuel?: 'Sans emploi' | 'Actif' | 'Retraité' | 'Etudiant' | 'Pension' | 'Au foyer' | 'Autres' | null;
+  statut_actuel_autre?: string | null;
+  rad_social_stprof_class?: string | null;
+  
+  // ========================================================================
+  // Metadata
+  // ========================================================================
+  
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type PsyTraitementSemestrielResponseInsert = Omit<PsyTraitementSemestrielResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;

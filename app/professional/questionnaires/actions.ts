@@ -99,6 +99,14 @@ import {
   saveDiagPsySemHumeurDepuisVisiteResponse,
   saveDiagPsySemPsychotiquesResponse
 } from '@/lib/services/questionnaire-dsm5.service';
+import {
+  saveSuiviRecommandationsResponse,
+  saveRecoursAuxSoinsResponse,
+  saveTraitementNonPharmacologiqueResponse,
+  saveArretsTravailResponse,
+  saveSomatiqueContraceptifResponse,
+  saveStatutProfessionnelResponse
+} from '@/lib/services/questionnaire-followup.service';
 import { 
   getVisitCompletionStatus,
   completeVisit,
@@ -193,7 +201,9 @@ import {
   Wais3DigitSpanResponseInsert,
   Wais3Cpt2ResponseInsert,
   // MEM-III Spatial (independent test)
-  Mem3SpatialResponseInsert
+  Mem3SpatialResponseInsert,
+  // Follow-up care module
+  PsyTraitementSemestrielResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 import { requireUserContext } from '@/lib/rbac/middleware';
@@ -988,6 +998,55 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses
         } as Mem3SpatialResponseInsert);
+        break;
+
+      // Follow-up care module questionnaires
+      case 'SUIVI_RECOMMANDATIONS':
+        result = await saveSuiviRecommandationsResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as PsyTraitementSemestrielResponseInsert);
+        break;
+
+      case 'RECOURS_AUX_SOINS':
+        result = await saveRecoursAuxSoinsResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as PsyTraitementSemestrielResponseInsert);
+        break;
+
+      case 'TRAITEMENT_NON_PHARMACOLOGIQUE':
+        result = await saveTraitementNonPharmacologiqueResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as PsyTraitementSemestrielResponseInsert);
+        break;
+
+      case 'ARRETS_DE_TRAVAIL':
+        result = await saveArretsTravailResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as PsyTraitementSemestrielResponseInsert);
+        break;
+
+      case 'SOMATIQUE_ET_CONTRACEPTIF':
+        result = await saveSomatiqueContraceptifResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as PsyTraitementSemestrielResponseInsert);
+        break;
+
+      case 'STATUT_PROFESSIONNEL':
+        result = await saveStatutProfessionnelResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as PsyTraitementSemestrielResponseInsert);
         break;
         
       default:

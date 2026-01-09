@@ -180,6 +180,17 @@ import {
   DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION,
   DIAG_PSY_SEM_PSYCHOTIQUES_DEFINITION
 } from '../constants/questionnaires-dsm5';
+import {
+  SUIVI_RECOMMANDATIONS_DEFINITION,
+  RECOURS_AUX_SOINS_DEFINITION,
+  TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION,
+  ARRETS_DE_TRAVAIL_DEFINITION,
+  SOMATIQUE_CONTRACEPTIF_DEFINITION,
+  STATUT_PROFESSIONNEL_DEFINITION
+} from '../constants/questionnaires-followup';
+import {
+  getPsyTraitementSemestrielResponse
+} from './questionnaire-followup.service';
 
 // ============================================================================
 // VISIT CRUD
@@ -652,13 +663,37 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_medical_eval',
         name: 'Evaluation Médicale',
         description: 'Évaluation médicale complète',
-        questionnaires: [
-          DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION,
-          DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION,
-          DIAG_PSY_SEM_PSYCHOTIQUES_DEFINITION,
-          ISA_DEFINITION,
-          SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
-          CSSRS_DEFINITION
+        sections: [
+          {
+            id: 'dsm5',
+            name: 'DSM5',
+            questionnaires: [
+              DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION,
+              DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION,
+              DIAG_PSY_SEM_PSYCHOTIQUES_DEFINITION
+            ]
+          },
+          {
+            id: 'suicide',
+            name: 'Suicide',
+            questionnaires: [
+              ISA_DEFINITION,
+              SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
+              CSSRS_DEFINITION
+            ]
+          },
+          {
+            id: 'soin_suivi',
+            name: 'Soin, suivi et arrêt de travail',
+            questionnaires: [
+              SUIVI_RECOMMANDATIONS_DEFINITION,
+              RECOURS_AUX_SOINS_DEFINITION,
+              TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION,
+              ARRETS_DE_TRAVAIL_DEFINITION,
+              SOMATIQUE_CONTRACEPTIF_DEFINITION,
+              STATUT_PROFESSIONNEL_DEFINITION
+            ]
+          }
         ]
       },
       {
@@ -704,7 +739,63 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_medical_eval',
         name: 'Evaluation Médicale',
         description: 'Évaluation médicale complète',
-        questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION, DIVA_DEFINITION, FAMILY_HISTORY_DEFINITION, CSSRS_DEFINITION, ISA_DEFINITION, SIS_DEFINITION, SUICIDE_HISTORY_DEFINITION, PERINATALITE_DEFINITION, PATHO_NEURO_DEFINITION, PATHO_CARDIO_DEFINITION, PATHO_ENDOC_DEFINITION, PATHO_DERMATO_DEFINITION, PATHO_URINAIRE_DEFINITION, ANTECEDENTS_GYNECO_DEFINITION, PATHO_HEPATO_GASTRO_DEFINITION, PATHO_ALLERGIQUE_DEFINITION, AUTRES_PATHO_DEFINITION]
+        sections: [
+          {
+            id: 'dsm5',
+            name: 'DSM5',
+            questionnaires: [
+              DSM5_HUMEUR_DEFINITION,
+              DSM5_PSYCHOTIC_DEFINITION,
+              DSM5_COMORBID_DEFINITION,
+              DIVA_DEFINITION
+            ]
+          },
+          {
+            id: 'antecedents',
+            name: 'Antécédents',
+            questionnaires: [
+              FAMILY_HISTORY_DEFINITION,
+              PERINATALITE_DEFINITION
+            ]
+          },
+          {
+            id: 'suicide',
+            name: 'Suicide',
+            questionnaires: [
+              CSSRS_DEFINITION,
+              ISA_DEFINITION,
+              SIS_DEFINITION,
+              SUICIDE_HISTORY_DEFINITION
+            ]
+          },
+          {
+            id: 'histoire_somatique',
+            name: 'Histoire somatique',
+            questionnaires: [
+              PATHO_NEURO_DEFINITION,
+              PATHO_CARDIO_DEFINITION,
+              PATHO_ENDOC_DEFINITION,
+              PATHO_DERMATO_DEFINITION,
+              PATHO_URINAIRE_DEFINITION,
+              ANTECEDENTS_GYNECO_DEFINITION,
+              PATHO_HEPATO_GASTRO_DEFINITION,
+              PATHO_ALLERGIQUE_DEFINITION,
+              AUTRES_PATHO_DEFINITION
+            ]
+          },
+          {
+            id: 'soin_suivi',
+            name: 'Soin, suivi et arrêt de travail',
+            questionnaires: [
+              SUIVI_RECOMMANDATIONS_DEFINITION,
+              RECOURS_AUX_SOINS_DEFINITION,
+              TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION,
+              ARRETS_DE_TRAVAIL_DEFINITION,
+              SOMATIQUE_CONTRACEPTIF_DEFINITION,
+              STATUT_PROFESSIONNEL_DEFINITION
+            ]
+          }
+        ]
       },
       {
         id: 'mod_neuropsy',
@@ -931,8 +1022,8 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (wais4Matrices) completed++;
     if (wais4DigitSpan) completed++;
   } else if (visit.visit_type === 'biannual_followup') {
-    // Biannual follow-up: 6 infirmier + 7 thymic + 6 medical = 19 total
-    total = 19;
+    // Biannual follow-up: 6 infirmier + 7 thymic + 12 medical (6 original + 6 soin_suivi) = 25 total
+    total = 25;
     totalModules = 3;
 
     const [
@@ -941,7 +1032,9 @@ export async function getVisitCompletionStatus(visitId: string) {
       // Thymic evaluation questionnaires
       madrs, ymrs, cgi, egf, alda, etatPatient, fast,
       // Medical evaluation questionnaires
-      diagPsySemHumeurActuels, diagPsySemHumeurDepuisVisite, diagPsySemPsychotiques, cssrs, isa, suicideBehaviorFollowup
+      diagPsySemHumeurActuels, diagPsySemHumeurDepuisVisite, diagPsySemPsychotiques, cssrs, isa, suicideBehaviorFollowup,
+      // Soin, suivi et arret de travail questionnaires (shared table)
+      psyTraitementSemestriel
     ] = await Promise.all([
       // Infirmier questionnaires
       getTobaccoResponse(visitId),
@@ -964,7 +1057,9 @@ export async function getVisitCompletionStatus(visitId: string) {
       getDiagPsySemPsychotiquesResponse(visitId),
       getCssrsResponse(visitId),
       getIsaResponse(visitId),
-      getSuicideBehaviorFollowupResponse(visitId)
+      getSuicideBehaviorFollowupResponse(visitId),
+      // Soin, suivi et arret de travail (shared table)
+      getPsyTraitementSemestrielResponse(visitId)
     ]);
 
     // Count infirmier questionnaires
@@ -991,10 +1086,13 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (cssrs) completed++;
     if (isa) completed++;
     if (suicideBehaviorFollowup) completed++;
+    
+    // Count soin, suivi et arret de travail (6 questionnaires share 1 table)
+    if (psyTraitementSemestriel) completed += 6;
   } else if (visit.visit_type === 'annual_evaluation') {
-    // Annual evaluation: 7 infirmier + 7 thymic + 19 medical + 9 auto etat = 42 total
-    total = 42;
-    totalModules = 4;
+    // Annual evaluation: 7 infirmier + 7 thymic + 19 medical + 9 auto etat + 6 soin_suivi = 48 total
+    total = 48;
+    totalModules = 5;
 
     const [
       // Infirmier questionnaires (7)
@@ -1005,7 +1103,9 @@ export async function getVisitCompletionStatus(visitId: string) {
       dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs, isa, sis, suicideHistory,
       perinatalite, pathoNeuro, pathoCardio, pathoEndoc, pathoDermato, pathoUrinaire, antecedentsGyneco, pathoHepatoGastro, pathoAllergique, autresPatho,
       // Auto-questionnaires ETAT (9)
-      eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth
+      eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,
+      // Soin, suivi et arret de travail questionnaires (shared table)
+      psyTraitementSemestriel
     ] = await Promise.all([
       // Infirmier questionnaires
       getTobaccoResponse(visitId),
@@ -1052,7 +1152,9 @@ export async function getVisitCompletionStatus(visitId: string) {
       getAsrmResponse(visitId),
       getQidsResponse(visitId),
       getPsqiResponse(visitId),
-      getEpworthResponse(visitId)
+      getEpworthResponse(visitId),
+      // Soin, suivi et arret de travail (shared table)
+      getPsyTraitementSemestrielResponse(visitId)
     ]);
 
     // Count infirmier questionnaires
@@ -1104,6 +1206,9 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (qids) completed++;
     if (psqi) completed++;
     if (epworth) completed++;
+    
+    // Count soin, suivi et arret de travail (6 questionnaires share 1 table)
+    if (psyTraitementSemestriel) completed += 6;
   }
 
   return {
