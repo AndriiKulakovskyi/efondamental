@@ -11382,7 +11382,7 @@ export const SCIP_QUESTIONS: Question[] = [
   // Apprentissage Verbal Immediat (VLT-I)
   {
     id: 'section_scipv01',
-    text: 'Verbal Learning Test - Immediate (VLT-I)',
+    text: 'Q1 : Mémoire verbale',
     type: 'section',
     required: false
   },
@@ -11405,7 +11405,7 @@ export const SCIP_QUESTIONS: Question[] = [
   // Memoire de Travail (WMT)
   {
     id: 'section_scipv02',
-    text: 'Working Memory Test (WMT)',
+    text: 'Q2 : Mémoire de travail',
     type: 'section',
     required: false
   },
@@ -11428,7 +11428,7 @@ export const SCIP_QUESTIONS: Question[] = [
   // Fluence Verbale (VFT)
   {
     id: 'section_scipv03',
-    text: 'Verbal Fluency Test (VFT)',
+    text: 'Q3 : Fluence verbale',
     type: 'section',
     required: false
   },
@@ -11451,7 +11451,7 @@ export const SCIP_QUESTIONS: Question[] = [
   // Rappel Verbal Differe (VLT-D)
   {
     id: 'section_scipv04',
-    text: 'Verbal Learning Test - Delayed (VLT-D)',
+    text: 'Q4 : Rappel verbal différé',
     type: 'section',
     required: false
   },
@@ -11474,7 +11474,7 @@ export const SCIP_QUESTIONS: Question[] = [
   // Capacites Visuomotrices (PST)
   {
     id: 'section_scipv05',
-    text: 'Processing Speed Test (PST)',
+    text: 'Q5 : Capacités visuomotrices',
     type: 'section',
     required: false
   },
