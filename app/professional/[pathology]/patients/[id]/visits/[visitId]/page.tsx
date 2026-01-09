@@ -1173,7 +1173,7 @@ export default async function VisitDetailPage({
     // ANNUAL EVALUATION - Full evaluation with 4 modules
     // =====================================================================
     
-    // Build nurse module questionnaires with conditional Fagerstrom (same as initial, no ECG)
+    // Build nurse module questionnaires with conditional Fagerstrom
     const annualNurseQuestionnaires: any[] = [
       {
         ...TOBACCO_DEFINITION,
@@ -1219,7 +1219,7 @@ export default async function VisitDetailPage({
       });
     }
     
-    // Add remaining nurse questionnaires for annual (same as initial, no ECG)
+    // Add remaining nurse questionnaires for annual
     annualNurseQuestionnaires.push(
       {
         ...PHYSICAL_PARAMS_DEFINITION,
@@ -1234,6 +1234,13 @@ export default async function VisitDetailPage({
         target_role: 'healthcare_professional',
         completed: questionnaireStatuses['BLOOD_PRESSURE_FR']?.completed || false,
         completedAt: questionnaireStatuses['BLOOD_PRESSURE_FR']?.completed_at,
+      },
+      {
+        ...ECG_DEFINITION,
+        id: ECG_DEFINITION.code,
+        target_role: 'healthcare_professional',
+        completed: questionnaireStatuses['ECG_FR']?.completed || false,
+        completedAt: questionnaireStatuses['ECG_FR']?.completed_at,
       },
       {
         ...SLEEP_APNEA_DEFINITION,

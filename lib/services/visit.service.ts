@@ -72,6 +72,7 @@ import {
   getFagerstromResponse,
   getPhysicalParamsResponse,
   getBloodPressureResponse,
+  getEcgResponse,
   getSleepApneaResponse,
   getBiologicalAssessmentResponse
 } from './questionnaire-infirmier.service';
@@ -168,7 +169,8 @@ import {
   PHYSICAL_PARAMS_DEFINITION,
   BLOOD_PRESSURE_DEFINITION,
   SLEEP_APNEA_DEFINITION,
-  BIOLOGICAL_ASSESSMENT_DEFINITION
+  BIOLOGICAL_ASSESSMENT_DEFINITION,
+  ECG_DEFINITION
 } from '../constants/questionnaires-infirmier';
 import {
   DSM5_HUMEUR_DEFINITION,
@@ -682,7 +684,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_nurse',
         name: 'Infirmier',
         description: 'Évaluation par l\'infirmier',
-        questionnaires: [TOBACCO_DEFINITION, FAGERSTROM_DEFINITION, PHYSICAL_PARAMS_DEFINITION, BLOOD_PRESSURE_DEFINITION, SLEEP_APNEA_DEFINITION, BIOLOGICAL_ASSESSMENT_DEFINITION]
+        questionnaires: [TOBACCO_DEFINITION, FAGERSTROM_DEFINITION, PHYSICAL_PARAMS_DEFINITION, BLOOD_PRESSURE_DEFINITION, ECG_DEFINITION, SLEEP_APNEA_DEFINITION, BIOLOGICAL_ASSESSMENT_DEFINITION]
       },
       {
         id: 'mod_thymic_eval',
@@ -965,13 +967,13 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (isa) completed++;
     if (suicideBehaviorFollowup) completed++;
   } else if (visit.visit_type === 'annual_evaluation') {
-    // Annual evaluation: 6 infirmier + 7 thymic + 19 medical + 9 auto etat = 41 total
-    total = 41;
+    // Annual evaluation: 7 infirmier + 7 thymic + 19 medical + 9 auto etat = 42 total
+    total = 42;
     totalModules = 4;
 
     const [
-      // Infirmier questionnaires (6)
-      tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biologicalAssessment,
+      // Infirmier questionnaires (7)
+      tobacco, fagerstrom, physicalParams, bloodPressure, ecg, sleepApnea, biologicalAssessment,
       // Thymic evaluation questionnaires (7)
       madrs, alda, ymrs, fast, cgi, egf, etatPatient,
       // Medical evaluation questionnaires (19)
@@ -985,6 +987,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       getFagerstromResponse(visitId),
       getPhysicalParamsResponse(visitId),
       getBloodPressureResponse(visitId),
+      getEcgResponse(visitId),
       getSleepApneaResponse(visitId),
       getBiologicalAssessmentResponse(visitId),
       // Thymic evaluation questionnaires
@@ -1032,6 +1035,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (fagerstrom) completed++;
     if (physicalParams) completed++;
     if (bloodPressure) completed++;
+    if (ecg) completed++;
     if (sleepApnea) completed++;
     if (biologicalAssessment) completed++;
 
