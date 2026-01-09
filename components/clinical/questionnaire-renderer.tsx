@@ -1378,8 +1378,8 @@ export function QuestionnaireRenderer({
       }
 
       // Compute WAIS-IV Code scores (WAIS-IV uses different norms than WAIS-III)
-      // Only for WAIS4_CODE_FR questionnaire
-      if (questionnaire?.code === 'WAIS4_CODE_FR') {
+      // Only for WAIS4_CODE_FR questionnaire or WAIS_IV_CODE_SYMBOLES_IVT
+      if (questionnaire?.code === 'WAIS4_CODE_FR' || questionnaire?.code === 'WAIS_IV_CODE_SYMBOLES_IVT') {
         const wais4Age = Number(prev.patient_age);
         const wais4CodTot = Number(prev.wais_cod_tot);
         const wais4CodErr = Number(prev.wais_cod_err);
@@ -1452,8 +1452,9 @@ export function QuestionnaireRenderer({
       // Compute WAIS-III Code, Symboles & IVT scores
       // Check if this questionnaire has the Code/Symboles fields
       const hasCodeSymbFields = prev.wais_cod_tot !== undefined || prev.wais_symb_tot !== undefined;
+      const isWais4Code = questionnaire?.code === 'WAIS4_CODE_FR' || questionnaire?.code === 'WAIS_IV_CODE_SYMBOLES_IVT';
       
-      if (hasCodeSymbFields) {
+      if (hasCodeSymbFields && !isWais4Code) {
         const codeSymbAge = Number(prev.patient_age);
         const codeTot = Number(prev.wais_cod_tot);
         const codeErr = Number(prev.wais_cod_err || 0);
