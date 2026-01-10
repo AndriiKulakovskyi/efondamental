@@ -4638,3 +4638,40 @@ export interface ScreeningSzOrientationResponse {
 }
 
 export type ScreeningSzOrientationResponseInsert = Omit<ScreeningSzOrientationResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'eligibility_result'>;
+
+// ============================================================================
+// Schizophrenia Dossier Infirmier (Initial Evaluation - Nurse Assessment)
+// ============================================================================
+
+export interface DossierInfirmierSzResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Section 1: Physical Parameters
+  taille?: number | null; // Height in cm
+  poids?: number | null; // Weight in kg
+  bmi?: number | null; // Computed: poids / (taille/100)^2
+  peri_abdo?: number | null; // Abdominal circumference in cm
+  
+  // Section 2: Blood Pressure - Lying Down
+  psc?: number | null; // Systolic pressure lying (mmHg)
+  pdc?: number | null; // Diastolic pressure lying (mmHg)
+  tensionc?: string | null; // Combined tension lying
+  
+  // Section 3: ECG
+  rad_electrocardiogramme?: 'Oui' | 'Non' | null; // ECG performed?
+  mesqt?: number | null; // QT measurement in seconds
+  elec_rr?: number | null; // RR interval in seconds
+  elec_qtc?: number | null; // Computed: QT / sqrt(RR)
+  rad_electrocardiogramme_envoi?: 'Oui' | 'Non' | null; // ECG sent to cardiologist?
+  rad_electrocardiogramme_valide?: 'Oui' | 'Non' | null; // Consultation request to cardiologist?
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type DossierInfirmierSzResponseInsert = Omit<DossierInfirmierSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'bmi' | 'elec_qtc'>;

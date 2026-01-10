@@ -110,7 +110,8 @@ import {
 } from "@/lib/constants/questionnaires-followup";
 import {
   SZ_DIAGNOSTIC_DEFINITION,
-  SZ_ORIENTATION_DEFINITION
+  SZ_ORIENTATION_DEFINITION,
+  SZ_DOSSIER_INFIRMIER_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { 
   getAsrmResponse, 
@@ -216,7 +217,8 @@ import {
 } from "@/lib/services/questionnaire-followup.service";
 import {
   getScreeningSzDiagnosticResponse,
-  getScreeningSzOrientationResponse
+  getScreeningSzOrientationResponse,
+  getDossierInfirmierSzResponse
 } from "@/lib/services/questionnaire-schizophrenia.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -347,6 +349,8 @@ export default async function ProfessionalQuestionnairePage({
   // Schizophrenia screening questionnaires
   else if (code === SZ_DIAGNOSTIC_DEFINITION.code) questionnaire = SZ_DIAGNOSTIC_DEFINITION;
   else if (code === SZ_ORIENTATION_DEFINITION.code) questionnaire = SZ_ORIENTATION_DEFINITION;
+  // Schizophrenia initial evaluation questionnaires
+  else if (code === SZ_DOSSIER_INFIRMIER_DEFINITION.code) questionnaire = SZ_DOSSIER_INFIRMIER_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -459,6 +463,8 @@ export default async function ProfessionalQuestionnairePage({
   // Schizophrenia screening questionnaires
   else if (code === SZ_DIAGNOSTIC_DEFINITION.code) existingResponse = await getScreeningSzDiagnosticResponse(visitId);
   else if (code === SZ_ORIENTATION_DEFINITION.code) existingResponse = await getScreeningSzOrientationResponse(visitId);
+  // Schizophrenia initial evaluation questionnaires
+  else if (code === SZ_DOSSIER_INFIRMIER_DEFINITION.code) existingResponse = await getDossierInfirmierSzResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

@@ -103,9 +103,14 @@ export function QuestionnaireRenderer({
       let hasChanges = false;
 
       // Compute BMI if height and weight are available
-      if (prev.height_cm && prev.weight_kg) {
-        const heightInMeters = prev.height_cm / 100;
-        const calculatedBMI = prev.weight_kg / (heightInMeters * heightInMeters);
+      // Support both field naming conventions:
+      // - height_cm/weight_kg (bipolar physical params)
+      // - taille/poids (schizophrenia dossier infirmier)
+      const height = prev.height_cm || prev.taille;
+      const weight = prev.weight_kg || prev.poids;
+      if (height && weight) {
+        const heightInMeters = height / 100;
+        const calculatedBMI = weight / (heightInMeters * heightInMeters);
         const bmiRounded = Math.round(calculatedBMI * 100) / 100; // Round to 2 decimals
         if (updated.bmi !== bmiRounded) {
           updated.bmi = bmiRounded;
@@ -143,20 +148,51 @@ export function QuestionnaireRenderer({
 
       // Compute QTc (ECG) if QT and RR are available
       // Formula: QTc = QT / √RR (Bazett's formula)
-      if (prev.qt_measured && prev.rr_measured) {
-        const qtMeasured = parseFloat(prev.qt_measured);
-        const rrMeasured = parseFloat(prev.rr_measured);
+      // Support both field naming conventions:
+      // - qt_measured/rr_measured/qtc_calculated (bipolar ECG)
+      // - mesqt/elec_rr/elec_qtc (schizophrenia dossier infirmier)
+      const qtValue = prev.qt_measured || prev.mesqt;
+      const rrValue = prev.rr_measured || prev.elec_rr;
+      if (qtValue && rrValue) {
+        const qtMeasured = parseFloat(qtValue);
+        const rrMeasured = parseFloat(rrValue);
         if (qtMeasured > 0 && rrMeasured > 0) {
           const qtcCalculated = qtMeasured / Math.sqrt(rrMeasured);
           const qtcRounded = Math.round(qtcCalculated * 1000) / 1000; // Round to 3 decimals
-          if (updated.qtc_calculated !== qtcRounded) {
-            updated.qtc_calculated = qtcRounded;
-            hasChanges = true;
+          // Update the appropriate field based on which naming convention is used
+          if (prev.mesqt !== undefined || prev.elec_rr !== undefined) {
+            if (updated.elec_qtc !== qtcRounded) {
+              updated.elec_qtc = qtcRounded;
+              hasChanges = true;
+            }
+          } else {
+            if (updated.qtc_calculated !== qtcRounded) {
+              updated.qtc_calculated = qtcRounded;
+              hasChanges = true;
+            }
           }
         }
-      } else if (prev.qtc_calculated) {
+      } else {
         // Clear QTc if QT or RR is missing
-        delete updated.qtc_calculated;
+        if (prev.qtc_calculated) {
+          delete updated.qtc_calculated;
+          hasChanges = true;
+        }
+        if (prev.elec_qtc) {
+          delete updated.elec_qtc;
+          hasChanges = true;
+        }
+      }
+      
+      // Compute tensionc (lying blood pressure) for schizophrenia questionnaire
+      if (prev.psc && prev.pdc) {
+        const tensionc = `${prev.psc}/${prev.pdc}`;
+        if (updated.tensionc !== tensionc) {
+          updated.tensionc = tensionc;
+          hasChanges = true;
+        }
+      } else if (prev.tensionc) {
+        delete updated.tensionc;
         hasChanges = true;
       }
 
@@ -1871,6 +1907,14 @@ export function QuestionnaireRenderer({
   }, [
     responses.height_cm,
     responses.weight_kg,
+    // Schizophrenia dossier infirmier field names
+    responses.taille,
+    responses.poids,
+    responses.psc,
+    responses.pdc,
+    responses.mesqt,
+    responses.elec_rr,
+    // Bipolar field names
     responses.bp_lying_systolic,
     responses.bp_lying_diastolic,
     responses.bp_standing_systolic,

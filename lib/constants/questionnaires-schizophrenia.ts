@@ -289,3 +289,195 @@ export const SZ_ORIENTATION_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// SCHIZOPHRENIA DOSSIER INFIRMIER (INITIAL EVALUATION - NURSE ASSESSMENT)
+// ============================================================================
+// Captures physical parameters, blood pressure, and ECG data for schizophrenia
+// initial evaluation visits.
+
+export const SZ_DOSSIER_INFIRMIER_QUESTIONS: Question[] = [
+  // ========================================================================
+  // Section 1: Physical Parameters (Parametres physiques)
+  // ========================================================================
+  {
+    id: 'section_physical_params',
+    text: 'Parametres physiques',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'taille',
+    text: 'Taille en cm',
+    type: 'number',
+    required: false,
+    min: 50,
+    max: 250
+  },
+  {
+    id: 'poids',
+    text: 'Poids en kg',
+    type: 'number',
+    required: false,
+    min: 20,
+    max: 300
+  },
+  {
+    id: 'bmi',
+    text: 'BMI',
+    help: '18,5 a 25 : normal\n25 a 30 : surpoids\n30 a 35 : obesite\nAu-dela de 40 : obesite morbide',
+    type: 'number',
+    required: false,
+    readonly: true,
+    min: 5,
+    max: 100
+  },
+  {
+    id: 'peri_abdo',
+    text: 'Perimetre abdominal en cm',
+    help: 'A mesurer au niveau de l\'ombilic',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 250
+  },
+
+  // ========================================================================
+  // Section 2: Blood Pressure & Heart Rate - Lying Down
+  // ========================================================================
+  {
+    id: 'section_bp_lying',
+    text: 'Pression Arterielle Couche en mm de Mercure',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'psc',
+    text: 'Pression Systolique',
+    type: 'number',
+    required: false,
+    min: 40,
+    max: 300
+  },
+  {
+    id: 'pdc',
+    text: 'Pression Diastolique',
+    type: 'number',
+    required: false,
+    min: 30,
+    max: 300
+  },
+  {
+    id: 'tensionc',
+    text: 'Tension couche',
+    type: 'text',
+    required: false,
+    min: 10,
+    max: 400
+  },
+
+  // ========================================================================
+  // Section 3: ECG (Electrocardiogramme)
+  // ========================================================================
+  {
+    id: 'section_ecg',
+    text: 'ECG',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'rad_electrocardiogramme',
+    text: 'ECG realise',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ]
+  },
+  {
+    id: 'mesqt',
+    text: 'Mesure du QT (en seconde)',
+    help: 'Valeur typique entre 0.30 et 0.50 secondes',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 2,
+    display_if: {
+      '==': [{ var: 'rad_electrocardiogramme' }, 'Oui']
+    }
+  },
+  {
+    id: 'elec_rr',
+    text: 'Mesure du RR (en seconde)',
+    help: 'Intervalle de temps separant 2 ondes R consecutives, mesure directement sur l\'ECG ou calcule en divisant la frequence cardiaque du patient par 60. Valeur typique entre 0.6 et 1.2 secondes.',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 3,
+    display_if: {
+      '==': [{ var: 'rad_electrocardiogramme' }, 'Oui']
+    }
+  },
+  {
+    id: 'elec_qtc',
+    text: 'QT calcule',
+    help: 'Si le QTc est inferieur a 0.35 secondes, il faut rechercher une hypercalcemie ou une impregnation digitalique.\nUn QTc compris entre 0.35 et 0.43 chez l\'homme est normal.\nUn QTc compris entre 0.35 et 0.48 chez la femme est normal.\nChez l\'homme, un QTc superieur a 0.43 est long, superieur a 0.468 est long menacant.\nChez la femme, un QTc superieur a 0.48 est long, superieur a 0.528 est long menacant.',
+    type: 'number',
+    required: false,
+    readonly: true,
+    min: 0,
+    max: 1,
+    display_if: {
+      '==': [{ var: 'rad_electrocardiogramme' }, 'Oui']
+    }
+  },
+  {
+    id: 'rad_electrocardiogramme_envoi',
+    text: 'ECG envoye a un cardiologue',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      '==': [{ var: 'rad_electrocardiogramme' }, 'Oui']
+    }
+  },
+  {
+    id: 'rad_electrocardiogramme_valide',
+    text: 'Demande de consultation ou d\'avis aupres d\'un cardiologue',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      '==': [{ var: 'rad_electrocardiogramme' }, 'Oui']
+    }
+  },
+  {
+    id: 'titre_cardio',
+    text: 'Veuillez indiquer les coordonnees du cardiologue dans la section Carnet d\'adresses',
+    type: 'instruction',
+    required: false,
+    display_if: {
+      '==': [{ var: 'rad_electrocardiogramme_valide' }, 'Oui']
+    }
+  }
+];
+
+export const SZ_DOSSIER_INFIRMIER_DEFINITION: QuestionnaireDefinition = {
+  id: 'sz_dossier_infirmier',
+  code: 'INF_DOSSIER_INFIRMIER',
+  title: 'Dossier infirmier',
+  description: 'Questionnaire de recueil des parametres physiques, pression arterielle et ECG pour l\'evaluation initiale schizophrenie',
+  questions: SZ_DOSSIER_INFIRMIER_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['schizophrenia'],
+    target_role: 'healthcare_professional'
+  }
+};

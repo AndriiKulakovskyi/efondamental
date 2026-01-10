@@ -190,7 +190,8 @@ import {
 } from '../constants/questionnaires-followup';
 import {
   SZ_DIAGNOSTIC_DEFINITION,
-  SZ_ORIENTATION_DEFINITION
+  SZ_ORIENTATION_DEFINITION,
+  SZ_DOSSIER_INFIRMIER_DEFINITION
 } from '../constants/questionnaires-schizophrenia';
 import {
   getPsyTraitementSemestrielResponse
@@ -584,6 +585,23 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
   }
 
   if (visit.visit_type === 'initial_evaluation') {
+    // Get patient to determine pathology-specific modules
+    const patient = await getPatientById(visit.patient_id);
+    const pathologyType = patient?.pathology_type;
+    
+    // Schizophrenia initial evaluation - uses Dossier Infirmier questionnaire in nurse module
+    if (pathologyType === 'schizophrenia') {
+      return [
+        {
+          id: 'mod_nurse',
+          name: 'Infirmier',
+          description: 'Evaluation par l\'infirmier',
+          questionnaires: [SZ_DOSSIER_INFIRMIER_DEFINITION]
+        }
+      ];
+    }
+    
+    // Default (bipolar and others) initial evaluation
     return [
       {
         id: 'mod_nurse',

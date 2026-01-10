@@ -116,7 +116,8 @@ import {
 } from "@/lib/constants/questionnaires-followup";
 import {
   SZ_DIAGNOSTIC_DEFINITION,
-  SZ_ORIENTATION_DEFINITION
+  SZ_ORIENTATION_DEFINITION,
+  SZ_DOSSIER_INFIRMIER_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -256,6 +257,27 @@ export default async function VisitDetailPage({
       ];
     }
   } else if (visit.visit_type === 'initial_evaluation') {
+    // Check if this is a schizophrenia initial evaluation
+    if (pathology === 'schizophrenia') {
+      // Schizophrenia initial evaluation - only Dossier Infirmier questionnaire
+      modulesWithQuestionnaires = [
+        {
+          id: 'mod_nurse',
+          name: 'Infirmier',
+          description: 'Evaluation par l\'infirmier',
+          questionnaires: [
+            {
+              ...SZ_DOSSIER_INFIRMIER_DEFINITION,
+              id: SZ_DOSSIER_INFIRMIER_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['INF_DOSSIER_INFIRMIER']?.completed || false,
+              completedAt: questionnaireStatuses['INF_DOSSIER_INFIRMIER']?.completed_at,
+            }
+          ]
+        }
+      ];
+    } else {
+    // Bipolar and other pathologies - full initial evaluation
     // Build nurse module questionnaires with conditional Fagerstrom
     const nurseQuestionnaires: any[] = [
       {
@@ -988,6 +1010,7 @@ export default async function VisitDetailPage({
         ]
       }
     ];
+    }
   } else if (visit.visit_type === 'biannual_followup') {
     // Build nurse module questionnaires with conditional Fagerstrom for biannual follow-up
     const biannualNurseQuestionnaires: any[] = [
