@@ -86,6 +86,38 @@ export const VISIT_TYPE_NAMES: Record<VisitType, string> = {
   [VisitType.OFF_SCHEDULE]: 'Visite Hors Programme',
 };
 
+// Pathology-specific visit types configuration
+// This documents which visit types are available for each pathology
+// The actual enforcement is done via visit_templates table (active flag)
+export const PATHOLOGY_VISIT_TYPES: Record<PathologyType, VisitType[]> = {
+  [PathologyType.BIPOLAR]: [
+    VisitType.SCREENING,
+    VisitType.INITIAL_EVALUATION,
+    VisitType.BIANNUAL_FOLLOWUP,
+    VisitType.ANNUAL_EVALUATION,
+    VisitType.OFF_SCHEDULE,
+  ],
+  [PathologyType.SCHIZOPHRENIA]: [
+    VisitType.SCREENING,
+    VisitType.INITIAL_EVALUATION,
+    VisitType.ANNUAL_EVALUATION,
+  ],
+  [PathologyType.ASD_ASPERGER]: [
+    VisitType.SCREENING,
+    VisitType.INITIAL_EVALUATION,
+    VisitType.BIANNUAL_FOLLOWUP,
+    VisitType.ANNUAL_EVALUATION,
+    VisitType.OFF_SCHEDULE,
+  ],
+  [PathologyType.DEPRESSION]: [
+    VisitType.SCREENING,
+    VisitType.INITIAL_EVALUATION,
+    VisitType.BIANNUAL_FOLLOWUP,
+    VisitType.ANNUAL_EVALUATION,
+    VisitType.OFF_SCHEDULE,
+  ],
+};
+
 // Permission categories
 export enum PermissionCategory {
   PATIENT_MANAGEMENT = 'patient_management',

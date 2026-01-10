@@ -4551,3 +4551,90 @@ export interface PsyTraitementSemestrielResponse {
 }
 
 export type PsyTraitementSemestrielResponseInsert = Omit<PsyTraitementSemestrielResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
+// Schizophrenia Screening Diagnostic
+// ============================================================================
+
+export interface ScreeningSzDiagnosticResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Q1: Date de recueil des informations
+  date_screening: string;
+  
+  // Q2: Nom du medecin evaluateur
+  screening_diag_nommed?: string | null;
+  
+  // Q3: Diagnostic de trouble schizophrenique pose prealablement
+  rad_screening_diag_sz_prealable?: 'oui' | 'non' | 'ne_sais_pas' | null;
+  
+  // Q4: Si oui, preciser
+  rad_screening_diag_sz_prealable_preciser?: 'schizophrenie' | 'trouble_schizophreniforme' | 'trouble_schizo_affectif' | 'trouble_psychotique_bref' | null;
+  
+  // Q5: Diagnostic de trouble schizophrenique evoque au terme du screening
+  rad_screening_diag_sz_evoque?: 'oui' | 'non' | 'differe' | null;
+  
+  // Q6: Si diagnostic recuse, preciser
+  rad_screening_diag_nonsz?: 'borderline' | 'autres_troubles_personnalite' | 'trouble_bipolaire' | 'edm_unipolaire' | 'addiction' | 'autres' | 'ne_sais_pas' | null;
+  
+  // Q7: Preciser (si autres)
+  screening_diag_nonsz_preciser?: string | null;
+  
+  // Q8: Preciser (si differe)
+  screening_diag_differe_preciser?: string | null;
+  
+  // Q9: Bilan programme
+  rad_screening_diag_bilan_programme?: 'oui' | 'non' | null;
+  
+  // Q10: Si non, preciser
+  rad_screening_diag_bilan_programme_non?: 'diagnostic_recuse' | 'etat_clinique_non_compatible' | 'consultation_suffisante' | 'patient_non_disponible' | 'refus_patient' | 'autre' | null;
+  
+  // Q11: Date de l'evaluation en Centre Expert
+  date_screening_diag_bilan_programme?: string | null;
+  
+  // Q12: Lettre d'information remise au patient
+  rad_screening_diag_lettre_info?: 'oui' | 'non' | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type ScreeningSzDiagnosticResponseInsert = Omit<ScreeningSzDiagnosticResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
+// Schizophrenia Screening Orientation Centre Expert
+// ============================================================================
+
+export interface ScreeningSzOrientationResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Q1: Patient souffrant d'un trouble evocateur d'une schizophrenie
+  rad_screening_orientation_sz?: 'oui' | 'non' | null;
+  
+  // Q2: Etat psychique compatible avec l'evaluation
+  rad_screening_orientation_psychique?: 'oui' | 'non' | null;
+  
+  // Q3: Prise en charge a 100% ou accord du patient pour assumer les frais
+  rad_screening_orientation_priseencharge?: 'oui' | 'non' | null;
+  
+  // Q4: Accord du patient pour une evaluation dans le cadre du centre expert
+  rad_screening_orientation_accord_patient?: 'oui' | 'non' | null;
+  
+  // Computed eligibility result (all must be 'oui')
+  eligibility_result?: boolean | null;
+  
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type ScreeningSzOrientationResponseInsert = Omit<ScreeningSzOrientationResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'eligibility_result'>;

@@ -107,6 +107,10 @@ import {
   saveSomatiqueContraceptifResponse,
   saveStatutProfessionnelResponse
 } from '@/lib/services/questionnaire-followup.service';
+import {
+  saveScreeningSzDiagnosticResponse,
+  saveScreeningSzOrientationResponse
+} from '@/lib/services/questionnaire-schizophrenia.service';
 import { 
   getVisitCompletionStatus,
   completeVisit,
@@ -203,7 +207,10 @@ import {
   // MEM-III Spatial (independent test)
   Mem3SpatialResponseInsert,
   // Follow-up care module
-  PsyTraitementSemestrielResponseInsert
+  PsyTraitementSemestrielResponseInsert,
+  // Schizophrenia screening
+  ScreeningSzDiagnosticResponseInsert,
+  ScreeningSzOrientationResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 import { requireUserContext } from '@/lib/rbac/middleware';
@@ -262,6 +269,23 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as OrientationResponseInsert);
+        break;
+
+      // Schizophrenia Screening Questionnaires
+      case 'SCREENING_DIAGNOSTIC_SZ':
+        result = await saveScreeningSzDiagnosticResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as ScreeningSzDiagnosticResponseInsert);
+        break;
+
+      case 'SCREENING_ORIENTATION_SZ':
+        result = await saveScreeningSzOrientationResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as ScreeningSzOrientationResponseInsert);
         break;
 
       // Initial Evaluation - ETAT

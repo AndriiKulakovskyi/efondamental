@@ -108,6 +108,10 @@ import {
   SOMATIQUE_CONTRACEPTIF_DEFINITION,
   STATUT_PROFESSIONNEL_DEFINITION
 } from "@/lib/constants/questionnaires-followup";
+import {
+  SZ_DIAGNOSTIC_DEFINITION,
+  SZ_ORIENTATION_DEFINITION
+} from "@/lib/constants/questionnaires-schizophrenia";
 import { 
   getAsrmResponse, 
   getQidsResponse, 
@@ -210,6 +214,10 @@ import {
 import {
   getPsyTraitementSemestrielResponse
 } from "@/lib/services/questionnaire-followup.service";
+import {
+  getScreeningSzDiagnosticResponse,
+  getScreeningSzOrientationResponse
+} from "@/lib/services/questionnaire-schizophrenia.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
 import { QuestionnairePageClient } from "./page-client";
@@ -336,6 +344,9 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ARRETS_DE_TRAVAIL_DEFINITION.code) questionnaire = ARRETS_DE_TRAVAIL_DEFINITION;
   else if (code === SOMATIQUE_CONTRACEPTIF_DEFINITION.code) questionnaire = SOMATIQUE_CONTRACEPTIF_DEFINITION;
   else if (code === STATUT_PROFESSIONNEL_DEFINITION.code) questionnaire = STATUT_PROFESSIONNEL_DEFINITION;
+  // Schizophrenia screening questionnaires
+  else if (code === SZ_DIAGNOSTIC_DEFINITION.code) questionnaire = SZ_DIAGNOSTIC_DEFINITION;
+  else if (code === SZ_ORIENTATION_DEFINITION.code) questionnaire = SZ_ORIENTATION_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -445,6 +456,9 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ARRETS_DE_TRAVAIL_DEFINITION.code) existingResponse = await getPsyTraitementSemestrielResponse(visitId);
   else if (code === SOMATIQUE_CONTRACEPTIF_DEFINITION.code) existingResponse = await getPsyTraitementSemestrielResponse(visitId);
   else if (code === STATUT_PROFESSIONNEL_DEFINITION.code) existingResponse = await getPsyTraitementSemestrielResponse(visitId);
+  // Schizophrenia screening questionnaires
+  else if (code === SZ_DIAGNOSTIC_DEFINITION.code) existingResponse = await getScreeningSzDiagnosticResponse(visitId);
+  else if (code === SZ_ORIENTATION_DEFINITION.code) existingResponse = await getScreeningSzOrientationResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).
@@ -543,6 +557,17 @@ export default async function ProfessionalQuestionnairePage({
       patient_gender: initialResponses.patient_gender,
       weight_kg: initialResponses.weight_kg
     });
+  }
+
+  // For schizophrenia diagnostic questionnaire, pre-populate the physician name
+  if (code === SZ_DIAGNOSTIC_DEFINITION.code && !initialResponses.screening_diag_nommed) {
+    const patient = await getPatientById(patientId);
+    if (patient && patient.assigned_to_first_name && patient.assigned_to_last_name) {
+      initialResponses = { 
+        ...initialResponses, 
+        screening_diag_nommed: `Dr. ${patient.assigned_to_first_name} ${patient.assigned_to_last_name}` 
+      };
+    }
   }
 
   return (

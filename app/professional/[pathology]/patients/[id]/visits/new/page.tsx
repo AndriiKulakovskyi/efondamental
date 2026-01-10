@@ -153,9 +153,9 @@ export default function NewVisitPage() {
                       <SelectValue placeholder="Sélectionner le type de visite" />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(VISIT_TYPE_NAMES).map(([value, label]) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
+                      {visitTemplates.map((template) => (
+                        <SelectItem key={template.visit_type} value={template.visit_type}>
+                          {VISIT_TYPE_NAMES[template.visit_type as VisitType] || template.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

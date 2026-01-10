@@ -114,6 +114,10 @@ import {
   SOMATIQUE_CONTRACEPTIF_DEFINITION,
   STATUT_PROFESSIONNEL_DEFINITION
 } from "@/lib/constants/questionnaires-followup";
+import {
+  SZ_DIAGNOSTIC_DEFINITION,
+  SZ_ORIENTATION_DEFINITION
+} from "@/lib/constants/questionnaires-schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
 export default async function VisitDetailPage({
@@ -172,57 +176,85 @@ export default async function VisitDetailPage({
   let modulesWithQuestionnaires: VirtualModule[] = [];
 
   if (visit.visit_type === 'screening') {
-    modulesWithQuestionnaires = [
-      {
-        id: 'mod_auto',
-        name: 'Autoquestionnaires',
-        description: 'Questionnaires à remplir par le patient',
-        questionnaires: [
-          {
-            ...ASRM_DEFINITION,
-            id: ASRM_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['ASRM_FR']?.completed || false,
-            completedAt: questionnaireStatuses['ASRM_FR']?.completed_at,
-          },
-          {
-            ...QIDS_DEFINITION,
-            id: QIDS_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['QIDS_SR16_FR']?.completed || false,
-            completedAt: questionnaireStatuses['QIDS_SR16_FR']?.completed_at,
-          },
-          {
-            ...MDQ_DEFINITION,
-            id: MDQ_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['MDQ_FR']?.completed || false,
-            completedAt: questionnaireStatuses['MDQ_FR']?.completed_at,
-          }
-        ]
-      },
-      {
-        id: 'mod_medical',
-        name: 'Partie médicale',
-        description: 'Évaluation clinique par le professionnel de santé',
-        questionnaires: [
-          {
-            ...DIAGNOSTIC_DEFINITION,
-            id: DIAGNOSTIC_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['MEDICAL_DIAGNOSTIC_FR']?.completed || false,
-            completedAt: questionnaireStatuses['MEDICAL_DIAGNOSTIC_FR']?.completed_at,
-          },
-          {
-            ...ORIENTATION_DEFINITION,
-            id: ORIENTATION_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['BIPOLAR_ORIENTATION_FR']?.completed || false,
-            completedAt: questionnaireStatuses['BIPOLAR_ORIENTATION_FR']?.completed_at,
-          }
-        ]
-      }
-    ];
+    // Check if this is a schizophrenia screening (no autoquestionnaires)
+    if (pathology === 'schizophrenia') {
+      modulesWithQuestionnaires = [
+        {
+          id: 'mod_medical',
+          name: 'Partie medicale',
+          description: 'Evaluation clinique par le professionnel de sante',
+          questionnaires: [
+            {
+              ...SZ_DIAGNOSTIC_DEFINITION,
+              id: SZ_DIAGNOSTIC_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SCREENING_DIAGNOSTIC_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['SCREENING_DIAGNOSTIC_SZ']?.completed_at,
+            },
+            {
+              ...SZ_ORIENTATION_DEFINITION,
+              id: SZ_ORIENTATION_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SCREENING_ORIENTATION_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['SCREENING_ORIENTATION_SZ']?.completed_at,
+            }
+          ]
+        }
+      ];
+    } else {
+      // Bipolar and other pathologies - include autoquestionnaires
+      modulesWithQuestionnaires = [
+        {
+          id: 'mod_auto',
+          name: 'Autoquestionnaires',
+          description: 'Questionnaires a remplir par le patient',
+          questionnaires: [
+            {
+              ...ASRM_DEFINITION,
+              id: ASRM_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['ASRM_FR']?.completed || false,
+              completedAt: questionnaireStatuses['ASRM_FR']?.completed_at,
+            },
+            {
+              ...QIDS_DEFINITION,
+              id: QIDS_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['QIDS_SR16_FR']?.completed || false,
+              completedAt: questionnaireStatuses['QIDS_SR16_FR']?.completed_at,
+            },
+            {
+              ...MDQ_DEFINITION,
+              id: MDQ_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['MDQ_FR']?.completed || false,
+              completedAt: questionnaireStatuses['MDQ_FR']?.completed_at,
+            }
+          ]
+        },
+        {
+          id: 'mod_medical',
+          name: 'Partie medicale',
+          description: 'Evaluation clinique par le professionnel de sante',
+          questionnaires: [
+            {
+              ...DIAGNOSTIC_DEFINITION,
+              id: DIAGNOSTIC_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['MEDICAL_DIAGNOSTIC_FR']?.completed || false,
+              completedAt: questionnaireStatuses['MEDICAL_DIAGNOSTIC_FR']?.completed_at,
+            },
+            {
+              ...ORIENTATION_DEFINITION,
+              id: ORIENTATION_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['BIPOLAR_ORIENTATION_FR']?.completed || false,
+              completedAt: questionnaireStatuses['BIPOLAR_ORIENTATION_FR']?.completed_at,
+            }
+          ]
+        }
+      ];
+    }
   } else if (visit.visit_type === 'initial_evaluation') {
     // Build nurse module questionnaires with conditional Fagerstrom
     const nurseQuestionnaires: any[] = [

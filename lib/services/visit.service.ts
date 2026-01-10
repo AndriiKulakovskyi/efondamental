@@ -189,8 +189,17 @@ import {
   STATUT_PROFESSIONNEL_DEFINITION
 } from '../constants/questionnaires-followup';
 import {
+  SZ_DIAGNOSTIC_DEFINITION,
+  SZ_ORIENTATION_DEFINITION
+} from '../constants/questionnaires-schizophrenia';
+import {
   getPsyTraitementSemestrielResponse
 } from './questionnaire-followup.service';
+import {
+  getScreeningSzDiagnosticResponse,
+  getScreeningSzOrientationResponse
+} from './questionnaire-schizophrenia.service';
+import { getPatientById } from './patient.service';
 
 // ============================================================================
 // VISIT CRUD
@@ -541,17 +550,34 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
   if (!visit) throw new Error('Visit not found');
 
   if (visit.visit_type === 'screening') {
+    // Get patient to determine pathology-specific modules
+    const patient = await getPatientById(visit.patient_id);
+    const pathologyType = patient?.pathology?.type;
+    
+    // Schizophrenia screening - only medical questionnaires (no autoquestionnaires)
+    if (pathologyType === 'schizophrenia') {
+      return [
+        {
+          id: 'mod_medical',
+          name: 'Partie medicale',
+          description: 'Evaluation clinique par le professionnel de sante',
+          questionnaires: [SZ_DIAGNOSTIC_DEFINITION, SZ_ORIENTATION_DEFINITION]
+        }
+      ];
+    }
+    
+    // Default (bipolar and others) screening
     return [
       {
         id: 'mod_auto',
         name: 'Autoquestionnaires',
-        description: 'Questionnaires à remplir par le patient',
+        description: 'Questionnaires a remplir par le patient',
         questionnaires: [ASRM_DEFINITION, QIDS_DEFINITION, MDQ_DEFINITION]
       },
       {
         id: 'mod_medical',
-        name: 'Partie médicale',
-        description: 'Évaluation clinique par le professionnel de santé',
+        name: 'Partie medicale',
+        description: 'Evaluation clinique par le professionnel de sante',
         questionnaires: [DIAGNOSTIC_DEFINITION, ORIENTATION_DEFINITION]
       }
     ];
@@ -854,22 +880,41 @@ export async function getVisitCompletionStatus(visitId: string) {
   let totalModules = 0;
 
   if (visit.visit_type === 'screening') {
-    total = 5; // ASRM, QIDS, MDQ, Diag, Orient
-    totalModules = 2;
+    // Get patient to determine pathology-specific completion tracking
+    const patient = await getPatientById(visit.patient_id);
+    const pathologyType = patient?.pathology?.type;
+    
+    if (pathologyType === 'schizophrenia') {
+      // Schizophrenia screening: 2 questionnaires (Diagnostic, Orientation)
+      total = 2;
+      totalModules = 1;
+      
+      const [szDiag, szOrient] = await Promise.all([
+        getScreeningSzDiagnosticResponse(visitId),
+        getScreeningSzOrientationResponse(visitId)
+      ]);
+      
+      if (szDiag) completed++;
+      if (szOrient) completed++;
+    } else {
+      // Bipolar and others: 5 questionnaires (ASRM, QIDS, MDQ, Diag, Orient)
+      total = 5;
+      totalModules = 2;
 
-    const [asrm, qids, mdq, diag, orient] = await Promise.all([
-      getAsrmResponse(visitId),
-      getQidsResponse(visitId),
-      getMdqResponse(visitId),
-      getDiagnosticResponse(visitId),
-      getOrientationResponse(visitId)
-    ]);
+      const [asrm, qids, mdq, diag, orient] = await Promise.all([
+        getAsrmResponse(visitId),
+        getQidsResponse(visitId),
+        getMdqResponse(visitId),
+        getDiagnosticResponse(visitId),
+        getOrientationResponse(visitId)
+      ]);
 
-    if (asrm) completed++;
-    if (qids) completed++;
-    if (mdq) completed++;
-    if (diag) completed++;
-    if (orient) completed++;
+      if (asrm) completed++;
+      if (qids) completed++;
+      if (mdq) completed++;
+      if (diag) completed++;
+      if (orient) completed++;
+    }
   } else if (visit.visit_type === 'initial_evaluation') {
     // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 6 INFIRMIER + 4 DSM5 + 1 Family + 4 Suicide + 10 Histoire Somatique + 4 WAIS-4 = 55
     total = 55;
