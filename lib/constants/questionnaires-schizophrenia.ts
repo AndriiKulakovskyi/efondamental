@@ -1,7 +1,7 @@
 // eFondaMental Platform - Schizophrenia Questionnaire Definitions
 // Questionnaires for schizophrenia screening visits
 
-import { Question } from '@/lib/questionnaires/types';
+import { Question } from '@/lib/types/database.types';
 import { QuestionnaireDefinition } from './questionnaires';
 
 // ============================================================================
@@ -15,7 +15,7 @@ export const SZ_DIAGNOSTIC_QUESTIONS: Question[] = [
     text: 'Date de recueil des informations',
     type: 'date',
     required: true,
-    section_id: 'diagnostic',
+    section: 'diagnostic',
     metadata: { default: 'today' }
   },
   
@@ -25,7 +25,7 @@ export const SZ_DIAGNOSTIC_QUESTIONS: Question[] = [
     text: 'Nom du medecin evaluateur',
     type: 'text',
     required: false,
-    section_id: 'diagnostic'
+    section: 'diagnostic'
   },
   
   // Q3: Diagnostic de trouble schizophrenique pose prealablement
@@ -34,7 +34,7 @@ export const SZ_DIAGNOSTIC_QUESTIONS: Question[] = [
     text: 'Diagnostic de trouble schizophrenique pose prealablement',
     type: 'single_choice',
     required: false,
-    section_id: 'diagnostic',
+    section: 'diagnostic',
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -48,7 +48,7 @@ export const SZ_DIAGNOSTIC_QUESTIONS: Question[] = [
     text: 'Si oui, preciser',
     type: 'single_choice',
     required: false,
-    section_id: 'diagnostic',
+    section: 'diagnostic',
     indentLevel: 1,
     display_if: {
       "==": [{ "var": "answers.rad_screening_diag_sz_prealable" }, "oui"]
@@ -70,7 +70,7 @@ export const SZ_DIAGNOSTIC_QUESTIONS: Question[] = [
     text: 'Diagnostic de trouble schizophrenique evoque au terme du screening',
     type: 'single_choice',
     required: false,
-    section_id: 'diagnostic',
+    section: 'diagnostic',
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' },
@@ -84,7 +84,7 @@ export const SZ_DIAGNOSTIC_QUESTIONS: Question[] = [
     text: 'Si diagnostic recuse lors du screening, preciser le diagnostic le plus probable',
     type: 'single_choice',
     required: false,
-    section_id: 'diagnostic',
+    section: 'diagnostic',
     indentLevel: 1,
     display_if: {
       "==": [{ "var": "answers.rad_screening_diag_sz_evoque" }, "non"]
@@ -109,7 +109,7 @@ export const SZ_DIAGNOSTIC_QUESTIONS: Question[] = [
     text: 'Preciser',
     type: 'text',
     required: false,
-    section_id: 'diagnostic',
+    section: 'diagnostic',
     indentLevel: 2,
     display_if: {
       "and": [
@@ -131,7 +131,7 @@ export const SZ_DIAGNOSTIC_QUESTIONS: Question[] = [
     text: 'Preciser',
     type: 'text',
     required: false,
-    section_id: 'diagnostic',
+    section: 'diagnostic',
     indentLevel: 1,
     display_if: {
       "==": [{ "var": "answers.rad_screening_diag_sz_evoque" }, "differe"]
@@ -147,7 +147,7 @@ export const SZ_DIAGNOSTIC_QUESTIONS: Question[] = [
     text: 'Bilan programme',
     type: 'single_choice',
     required: false,
-    section_id: 'diagnostic',
+    section: 'diagnostic',
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -160,7 +160,7 @@ export const SZ_DIAGNOSTIC_QUESTIONS: Question[] = [
     text: 'Si non, preciser',
     type: 'single_choice',
     required: false,
-    section_id: 'diagnostic',
+    section: 'diagnostic',
     indentLevel: 1,
     display_if: {
       "==": [{ "var": "answers.rad_screening_diag_bilan_programme" }, "non"]
@@ -184,7 +184,7 @@ export const SZ_DIAGNOSTIC_QUESTIONS: Question[] = [
     text: "Date de l'evaluation en Centre Expert",
     type: 'date',
     required: false,
-    section_id: 'diagnostic',
+    section: 'diagnostic',
     indentLevel: 1,
     display_if: {
       "==": [{ "var": "answers.rad_screening_diag_bilan_programme" }, "oui"]
@@ -200,7 +200,7 @@ export const SZ_DIAGNOSTIC_QUESTIONS: Question[] = [
     text: "Lettre d'information remise au patient",
     type: 'single_choice',
     required: false,
-    section_id: 'diagnostic',
+    section: 'diagnostic',
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -231,7 +231,7 @@ export const SZ_ORIENTATION_QUESTIONS: Question[] = [
     text: "Patient souffrant d'un trouble evocateur d'une schizophrenie",
     type: 'single_choice',
     required: true,
-    section_id: 'orientation',
+    section: 'orientation',
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -244,7 +244,7 @@ export const SZ_ORIENTATION_QUESTIONS: Question[] = [
     text: "Etat psychique compatible avec l'evaluation",
     type: 'single_choice',
     required: true,
-    section_id: 'orientation',
+    section: 'orientation',
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -257,7 +257,7 @@ export const SZ_ORIENTATION_QUESTIONS: Question[] = [
     text: 'Prise en charge a 100% ou accord du patient pour assumer les frais',
     type: 'single_choice',
     required: true,
-    section_id: 'orientation',
+    section: 'orientation',
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }
@@ -270,7 +270,7 @@ export const SZ_ORIENTATION_QUESTIONS: Question[] = [
     text: 'Accord du patient pour une evaluation dans le cadre du centre expert',
     type: 'single_choice',
     required: true,
-    section_id: 'orientation',
+    section: 'orientation',
     options: [
       { code: 'oui', label: 'Oui' },
       { code: 'non', label: 'Non' }

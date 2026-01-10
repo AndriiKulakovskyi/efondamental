@@ -552,7 +552,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
   if (visit.visit_type === 'screening') {
     // Get patient to determine pathology-specific modules
     const patient = await getPatientById(visit.patient_id);
-    const pathologyType = patient?.pathology?.type;
+    const pathologyType = patient?.pathology_type;
     
     // Schizophrenia screening - only medical questionnaires (no autoquestionnaires)
     if (pathologyType === 'schizophrenia') {
@@ -882,7 +882,7 @@ export async function getVisitCompletionStatus(visitId: string) {
   if (visit.visit_type === 'screening') {
     // Get patient to determine pathology-specific completion tracking
     const patient = await getPatientById(visit.patient_id);
-    const pathologyType = patient?.pathology?.type;
+    const pathologyType = patient?.pathology_type;
     
     if (pathologyType === 'schizophrenia') {
       // Schizophrenia screening: 2 questionnaires (Diagnostic, Orientation)
