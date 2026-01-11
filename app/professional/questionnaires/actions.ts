@@ -110,7 +110,8 @@ import {
 import {
   saveScreeningSzDiagnosticResponse,
   saveScreeningSzOrientationResponse,
-  saveDossierInfirmierSzResponse
+  saveDossierInfirmierSzResponse,
+  saveBilanBiologiqueSzResponse
 } from '@/lib/services/questionnaire-schizophrenia.service';
 import { 
   getVisitCompletionStatus,
@@ -213,7 +214,8 @@ import {
   ScreeningSzDiagnosticResponseInsert,
   ScreeningSzOrientationResponseInsert,
   // Schizophrenia initial evaluation
-  DossierInfirmierSzResponseInsert
+  DossierInfirmierSzResponseInsert,
+  BilanBiologiqueSzResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 import { requireUserContext } from '@/lib/rbac/middleware';
@@ -298,6 +300,15 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as DossierInfirmierSzResponseInsert);
+        break;
+
+      // Schizophrenia Initial Evaluation - Bilan Biologique
+      case 'INF_BILAN_BIOLOGIQUE_SZ':
+        result = await saveBilanBiologiqueSzResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as BilanBiologiqueSzResponseInsert);
         break;
 
       // Initial Evaluation - ETAT

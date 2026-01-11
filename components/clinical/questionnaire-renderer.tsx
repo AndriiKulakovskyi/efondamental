@@ -2290,6 +2290,33 @@ export function QuestionnaireRenderer({
         ...prev,
         [questionId]: value,
       };
+      
+      // Calculate computed fields when their dependencies change
+      questionnaire.questions.forEach((q) => {
+        if (q.computed && q.computed.dependencies.includes(questionId)) {
+          const { dependencies } = q.computed;
+          const allDepsHaveValues = dependencies.every(
+            (dep) => updated[dep] !== undefined && updated[dep] !== null && updated[dep] !== ''
+          );
+          
+          if (allDepsHaveValues) {
+            // Parse formula and calculate
+            // Currently supports: "field1 / field2"
+            if (q.computed.formula.includes('/')) {
+              const [numerator, denominator] = q.computed.formula.split('/').map(s => s.trim());
+              const numValue = parseFloat(updated[numerator]);
+              const denValue = parseFloat(updated[denominator]);
+              if (denValue !== 0 && !isNaN(numValue) && !isNaN(denValue)) {
+                updated[q.id] = Math.round((numValue / denValue) * 100) / 100;
+              }
+            }
+          } else {
+            // Clear computed field if dependencies are not all filled
+            updated[q.id] = '';
+          }
+        }
+      });
+      
       return updated;
     });
     setErrors([]);
@@ -2893,22 +2920,24 @@ export function QuestionnaireRenderer({
                     }
 
                     const isUnitField = question.id.endsWith('_unit');
+                    const isInlineField = question.inline === true;
 
-                    // Skip unit fields - they're rendered with their base field
-                    if (isUnitField) {
+                    // Skip unit/inline fields - they're rendered with their base field
+                    if (isUnitField || isInlineField) {
                       return null;
                     }
 
-                    // Check if next question is the unit field for this question
+                    // Check if next question is an inline/unit field for this question
                     const nextQuestion = qIndex < visibleGroupQuestions.length - 1 ? visibleGroupQuestions[qIndex + 1] : null;
                     const isNextQuestionUnit = nextQuestion?.id === `${question.id}_unit`;
+                    const isNextQuestionInline = nextQuestion?.inline === true;
 
-                    // If next question is the unit field, render them together
-                    if (isNextQuestionUnit && nextQuestion) {
+                    // If next question is the unit/inline field, render them together
+                    if ((isNextQuestionUnit || isNextQuestionInline) && nextQuestion) {
                       rendered.add(question.id);
                       rendered.add(nextQuestion.id);
                       return (
-                        <div key={`grouped-${question.id}`} className="grid grid-cols-3 gap-4">
+                        <div key={`grouped-${question.id}`} className="grid grid-cols-3 gap-4 items-end">
                           <div className="col-span-2">
                             {renderQuestion(question, true)}
                           </div>

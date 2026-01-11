@@ -117,7 +117,8 @@ import {
 import {
   SZ_DIAGNOSTIC_DEFINITION,
   SZ_ORIENTATION_DEFINITION,
-  SZ_DOSSIER_INFIRMIER_DEFINITION
+  SZ_DOSSIER_INFIRMIER_DEFINITION,
+  SZ_BILAN_BIOLOGIQUE_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -259,7 +260,7 @@ export default async function VisitDetailPage({
   } else if (visit.visit_type === 'initial_evaluation') {
     // Check if this is a schizophrenia initial evaluation
     if (pathology === 'schizophrenia') {
-      // Schizophrenia initial evaluation - only Dossier Infirmier questionnaire
+      // Schizophrenia initial evaluation - Dossier Infirmier and Bilan Biologique questionnaires
       modulesWithQuestionnaires = [
         {
           id: 'mod_nurse',
@@ -272,6 +273,13 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['INF_DOSSIER_INFIRMIER']?.completed || false,
               completedAt: questionnaireStatuses['INF_DOSSIER_INFIRMIER']?.completed_at,
+            },
+            {
+              ...SZ_BILAN_BIOLOGIQUE_DEFINITION,
+              id: SZ_BILAN_BIOLOGIQUE_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['INF_BILAN_BIOLOGIQUE_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['INF_BILAN_BIOLOGIQUE_SZ']?.completed_at,
             }
           ]
         }

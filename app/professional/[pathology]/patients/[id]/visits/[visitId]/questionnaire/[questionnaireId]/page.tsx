@@ -111,7 +111,8 @@ import {
 import {
   SZ_DIAGNOSTIC_DEFINITION,
   SZ_ORIENTATION_DEFINITION,
-  SZ_DOSSIER_INFIRMIER_DEFINITION
+  SZ_DOSSIER_INFIRMIER_DEFINITION,
+  SZ_BILAN_BIOLOGIQUE_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { 
   getAsrmResponse, 
@@ -218,7 +219,8 @@ import {
 import {
   getScreeningSzDiagnosticResponse,
   getScreeningSzOrientationResponse,
-  getDossierInfirmierSzResponse
+  getDossierInfirmierSzResponse,
+  getBilanBiologiqueSzResponse
 } from "@/lib/services/questionnaire-schizophrenia.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -351,6 +353,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === SZ_ORIENTATION_DEFINITION.code) questionnaire = SZ_ORIENTATION_DEFINITION;
   // Schizophrenia initial evaluation questionnaires
   else if (code === SZ_DOSSIER_INFIRMIER_DEFINITION.code) questionnaire = SZ_DOSSIER_INFIRMIER_DEFINITION;
+  else if (code === SZ_BILAN_BIOLOGIQUE_DEFINITION.code) questionnaire = SZ_BILAN_BIOLOGIQUE_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -465,6 +468,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === SZ_ORIENTATION_DEFINITION.code) existingResponse = await getScreeningSzOrientationResponse(visitId);
   // Schizophrenia initial evaluation questionnaires
   else if (code === SZ_DOSSIER_INFIRMIER_DEFINITION.code) existingResponse = await getDossierInfirmierSzResponse(visitId);
+  else if (code === SZ_BILAN_BIOLOGIQUE_DEFINITION.code) existingResponse = await getBilanBiologiqueSzResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

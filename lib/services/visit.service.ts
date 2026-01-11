@@ -191,7 +191,8 @@ import {
 import {
   SZ_DIAGNOSTIC_DEFINITION,
   SZ_ORIENTATION_DEFINITION,
-  SZ_DOSSIER_INFIRMIER_DEFINITION
+  SZ_DOSSIER_INFIRMIER_DEFINITION,
+  SZ_BILAN_BIOLOGIQUE_DEFINITION
 } from '../constants/questionnaires-schizophrenia';
 import {
   getPsyTraitementSemestrielResponse
@@ -596,7 +597,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           id: 'mod_nurse',
           name: 'Infirmier',
           description: 'Evaluation par l\'infirmier',
-          questionnaires: [SZ_DOSSIER_INFIRMIER_DEFINITION]
+          questionnaires: [SZ_DOSSIER_INFIRMIER_DEFINITION, SZ_BILAN_BIOLOGIQUE_DEFINITION]
         }
       ];
     }

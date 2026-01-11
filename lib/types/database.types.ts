@@ -191,6 +191,11 @@ export interface Question {
   metadata?: Record<string, any>;
   indentLevel?: number; // For visual indentation of branching questions
   is_label?: boolean; // Custom property to indicate if it's a label rather than an input
+  inline?: boolean; // Display this field inline with the previous field (e.g., unit selectors)
+  computed?: { // Computed field that calculates its value from other fields
+    formula: string;
+    dependencies: string[];
+  };
 }
 
 // ============================================================================
@@ -4675,3 +4680,72 @@ export interface DossierInfirmierSzResponse {
 }
 
 export type DossierInfirmierSzResponseInsert = Omit<DossierInfirmierSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'bmi' | 'elec_qtc'>;
+
+// ============================================================================
+// BILAN BIOLOGIQUE SCHIZOPHRENIA (Biological Assessment for Initial Evaluation)
+// ============================================================================
+
+export interface BilanBiologiqueSzResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  completed_by?: string | null;
+
+  // Date Section
+  collection_date?: string | null;
+
+  // BIOCHIMIE
+  rad_prelevement_lieu?: 'Sur site' | 'Hors site' | null;
+  acide_urique?: number | null;
+  crp?: number | null;
+  glycemie?: number | null;
+  rad_glycemie?: 'mmol_L' | 'g_L' | null;
+  hb_gly?: number | null;
+  vitd25oh?: number | null;
+
+  // BILAN LIPIDIQUE
+  chol_hdl?: number | null;
+  rad_chol_hdl?: 'mmol/L' | 'g/L' | null;
+  chol_ldl?: number | null;
+  rad_chol_ldl?: 'mmol/L' | 'g/L' | null;
+  chol_total?: number | null;
+  chol_rapport_hdltot?: number | null;
+  triglycerides?: number | null;
+
+  // NFS (NUMERATION FORMULE SANGUINE)
+  gb?: number | null;
+  gr?: number | null;
+  hb?: number | null;
+  rad_hb?: 'g/dL' | 'mmol/L' | null;
+  neutrophile?: number | null;
+  eosinophile?: number | null;
+  vgm?: number | null;
+  plaquettes?: number | null;
+
+  // DOSAGES HORMONAUX
+  prolactine?: number | null;
+  rad_prolacti?: 'mg/L' | 'mUI/L' | 'ng/ml' | null;
+
+  // DOSAGE DES PSYCHOTROPES
+  rad_trt_visite?: 'Oui' | 'Non' | null;
+  rad_prisetraitement?: 'Oui' | 'Non' | null;
+  rad_clozapine?: 'Oui' | 'Non' | null;
+  clozapine?: number | null;
+
+  // VITAMINE D
+  radhtml_vitd_ext?: '1' | '2' | '3' | '4' | null;
+  radhtml_vitd_cutane?: '1' | '2' | '3' | '4' | '5' | '6' | null;
+
+  // SEROLOGIE TOXOPLASMOSE
+  rad_toxo?: 'Oui' | 'Non' | null;
+  rad_igm_statut?: 'Oui' | 'Non' | null;
+  rad_igg_statut?: 'Oui' | 'Non' | null;
+  toxo_igg?: number | null;
+
+  // Timestamps
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type BilanBiologiqueSzResponseInsert = Omit<BilanBiologiqueSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'chol_rapport_hdltot'>;
