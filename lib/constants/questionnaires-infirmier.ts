@@ -284,6 +284,19 @@ export const PHYSICAL_PARAMS_QUESTIONS: Question[] = [
     required: false,
     min: 40,
     max: 160
+  },
+  {
+    id: 'pregnant',
+    text: 'Femme enceinte',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      '!=': [{ var: 'patient_gender' }, 'M']
+    }
   }
 ];
 
