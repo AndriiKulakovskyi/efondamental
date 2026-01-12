@@ -327,13 +327,17 @@ export const BLOOD_PRESSURE_QUESTIONS: Question[] = [
     id: 'bp_lying_systolic',
     text: 'Pression Systolique (mmHg)',
     type: 'number',
-    required: false
+    required: false,
+    min: 80,
+    max: 220
   },
   {
     id: 'bp_lying_diastolic',
     text: 'Pression Diastolique (mmHg)',
     type: 'number',
-    required: false
+    required: false,
+    min: 40,
+    max: 140
   },
   {
     id: 'tension_lying',
@@ -347,7 +351,9 @@ export const BLOOD_PRESSURE_QUESTIONS: Question[] = [
     id: 'heart_rate_lying',
     text: 'Fréquence cardiaque couché (battements par minute)',
     type: 'number',
-    required: false
+    required: false,
+    min: 40,
+    max: 220
   },
   
   // Blood Pressure & Heart Rate - Standing Section
@@ -361,13 +367,17 @@ export const BLOOD_PRESSURE_QUESTIONS: Question[] = [
     id: 'bp_standing_systolic',
     text: 'Pression Systolique (mmHg)',
     type: 'number',
-    required: false
+    required: false,
+    min: 80,
+    max: 220
   },
   {
     id: 'bp_standing_diastolic',
     text: 'Pression Diastolique (mmHg)',
     type: 'number',
-    required: false
+    required: false,
+    min: 40,
+    max: 140
   },
   {
     id: 'tension_standing',
@@ -381,7 +391,9 @@ export const BLOOD_PRESSURE_QUESTIONS: Question[] = [
     id: 'heart_rate_standing',
     text: 'Fréquence cardiaque debout (battements par minute)',
     type: 'number',
-    required: false
+    required: false,
+    min: 40,
+    max: 220
   }
 ];
 
