@@ -165,6 +165,28 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       if (total > 6) return 'warning';    // Depressive syndrome present
       return 'success';                   // No significant depressive syndrome
     }
+
+    if (code === 'BARS') {
+      // BARS: Adherence percentage 0-100%
+      const score = data.adherence_score;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 91) return 'success';  // Bonne observance
+      if (score >= 76) return 'info';     // Observance acceptable
+      if (score >= 51) return 'warning';  // Observance partielle
+      return 'error';                     // Observance tres faible
+    }
+
+    if (code === 'SUMD') {
+      // SUMD: Insight scale - lower is better (1=conscient, 3=inconscient)
+      // Check global awareness items (1-3)
+      const c1 = data.conscience1;
+      const c2 = data.conscience2;
+      const c3 = data.conscience3;
+      if (c1 === null && c2 === null && c3 === null) return 'info';
+      // If any global awareness item shows lack of insight (3), warn
+      if (c1 === 3 || c2 === 3 || c3 === 3) return 'warning';
+      return 'info';
+    }
     
     return 'info';
   };
@@ -274,6 +296,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && 'Résultats WAIS-IV Code, Symboles & IVT'}
               {code === 'PANSS' && 'Résultats PANSS'}
               {code === 'CDSS' && 'Résultats CDSS - Échelle de Calgary'}
+              {code === 'BARS' && 'Résultats BARS - Échelle d\'observance'}
+              {code === 'SUMD' && 'Résultats SUMD - Conscience de la maladie'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -309,6 +333,10 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'CDSS'
                 ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'BARS'
+                ? (data.adherence_score !== undefined ? data.adherence_score : '-')
+                : code === 'SUMD'
+                ? 'Voir details'
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM_FR' && '/20'}
               {code === 'QIDS_SR16_FR' && '/27'}
@@ -324,6 +352,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && (data.wais_ivt !== undefined && data.wais_ivt !== null ? '/150' : '/19')}
               {code === 'PANSS' && '/210'}
               {code === 'CDSS' && '/27'}
+              {code === 'BARS' && '%'}
+              {code === 'SUMD' && ''}
             </span>
           </div>
         </div>
@@ -1084,6 +1114,206 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="flex justify-between pt-2 border-t">
               <span className="text-gray-600 font-medium">Score Total:</span>
               <span className="font-bold text-lg">{data.total_score ?? '-'}/27</span>
+            </div>
+          </div>
+        )}
+
+        {/* BARS Details */}
+        {code === 'BARS' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Clinical Interpretation */}
+            <div className={`p-3 rounded-lg ${
+              data.adherence_score !== undefined && data.adherence_score !== null
+                ? data.adherence_score >= 91
+                  ? 'bg-green-50 border border-green-200'
+                  : data.adherence_score >= 76
+                  ? 'bg-blue-50 border border-blue-200'
+                  : data.adherence_score >= 51
+                  ? 'bg-amber-50 border border-amber-200'
+                  : 'bg-red-50 border border-red-200'
+                : 'bg-gray-50 border border-gray-200'
+            }`}>
+              <div className="text-center">
+                <span className="font-medium">
+                  {data.interpretation ?? 'Questionnaire incomplet'}
+                </span>
+              </div>
+            </div>
+
+            {/* Item Details */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Details des reponses</h5>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Doses prescrites par jour:</span>
+                  <span className="font-medium">{data.q1 ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Jours sans traitement (30 derniers jours):</span>
+                  <span className="font-medium">{data.q2 ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Jours avec dose reduite (30 derniers jours):</span>
+                  <span className="font-medium">{data.q3 ?? '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Adherence Score */}
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">Estimation de l'observance:</span>
+              <span className="font-bold text-lg">{data.adherence_score ?? '-'}%</span>
+            </div>
+          </div>
+        )}
+
+        {/* SUMD Details */}
+        {code === 'SUMD' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Global Awareness (Items 1-3) */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Conscience globale (Items 1-3)</h5>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">1. Trouble mental:</span>
+                  <span className={`font-medium ${data.conscience1 === 3 ? 'text-amber-600' : data.conscience1 === 1 ? 'text-green-600' : ''}`}>
+                    {data.conscience1 === 0 ? 'Non cotable' : data.conscience1 === 1 ? 'Conscient' : data.conscience1 === 2 ? 'Partiel' : data.conscience1 === 3 ? 'Inconscient' : '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">2. Consequences du trouble:</span>
+                  <span className={`font-medium ${data.conscience2 === 3 ? 'text-amber-600' : data.conscience2 === 1 ? 'text-green-600' : ''}`}>
+                    {data.conscience2 === 0 ? 'Non cotable' : data.conscience2 === 1 ? 'Conscient' : data.conscience2 === 2 ? 'Partiel' : data.conscience2 === 3 ? 'Inconscient' : '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">3. Effets du traitement:</span>
+                  <span className={`font-medium ${data.conscience3 === 3 ? 'text-amber-600' : data.conscience3 === 1 ? 'text-green-600' : ''}`}>
+                    {data.conscience3 === 0 ? 'Non cotable' : data.conscience3 === 1 ? 'Conscient' : data.conscience3 === 2 ? 'Partiel' : data.conscience3 === 3 ? 'Inconscient' : '-'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Symptom-specific Awareness (Items 4-9) */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Conscience des symptomes (Items 4-9)</h5>
+              <div className="space-y-3">
+                {/* Item 4: Hallucinations */}
+                <div className="border-l-2 border-gray-200 pl-3">
+                  <div className="font-medium text-gray-700 mb-1">4. Experience hallucinatoire</div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Conscience:</span>
+                      <span className={data.conscience4 === 3 ? 'text-amber-600' : data.conscience4 === 1 ? 'text-green-600' : ''}>
+                        {data.conscience4 === 0 ? 'NC' : data.conscience4 === 1 ? 'Oui' : data.conscience4 === 2 ? 'Partiel' : data.conscience4 === 3 ? 'Non' : '-'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Attribution:</span>
+                      <span className={data.attribu4 === 3 ? 'text-amber-600' : data.attribu4 === 1 ? 'text-green-600' : ''}>
+                        {data.attribu4 === 0 ? 'NC' : data.attribu4 === 1 ? 'Correcte' : data.attribu4 === 2 ? 'Partielle' : data.attribu4 === 3 ? 'Incorrecte' : '-'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                {/* Item 5: Delire */}
+                <div className="border-l-2 border-gray-200 pl-3">
+                  <div className="font-medium text-gray-700 mb-1">5. Delire</div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Conscience:</span>
+                      <span className={data.conscience5 === 3 ? 'text-amber-600' : data.conscience5 === 1 ? 'text-green-600' : ''}>
+                        {data.conscience5 === 0 ? 'NC' : data.conscience5 === 1 ? 'Oui' : data.conscience5 === 2 ? 'Partiel' : data.conscience5 === 3 ? 'Non' : '-'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Attribution:</span>
+                      <span className={data.attribu5 === 3 ? 'text-amber-600' : data.attribu5 === 1 ? 'text-green-600' : ''}>
+                        {data.attribu5 === 0 ? 'NC' : data.attribu5 === 1 ? 'Correcte' : data.attribu5 === 2 ? 'Partielle' : data.attribu5 === 3 ? 'Incorrecte' : '-'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                {/* Item 6: Trouble de la pensee */}
+                <div className="border-l-2 border-gray-200 pl-3">
+                  <div className="font-medium text-gray-700 mb-1">6. Trouble de la pensee</div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Conscience:</span>
+                      <span className={data.conscience6 === 3 ? 'text-amber-600' : data.conscience6 === 1 ? 'text-green-600' : ''}>
+                        {data.conscience6 === 0 ? 'NC' : data.conscience6 === 1 ? 'Oui' : data.conscience6 === 2 ? 'Partiel' : data.conscience6 === 3 ? 'Non' : '-'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Attribution:</span>
+                      <span className={data.attribu6 === 3 ? 'text-amber-600' : data.attribu6 === 1 ? 'text-green-600' : ''}>
+                        {data.attribu6 === 0 ? 'NC' : data.attribu6 === 1 ? 'Correcte' : data.attribu6 === 2 ? 'Partielle' : data.attribu6 === 3 ? 'Incorrecte' : '-'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                {/* Item 7: Emoussement affectif */}
+                <div className="border-l-2 border-gray-200 pl-3">
+                  <div className="font-medium text-gray-700 mb-1">7. Emoussement affectif</div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Conscience:</span>
+                      <span className={data.conscience7 === 3 ? 'text-amber-600' : data.conscience7 === 1 ? 'text-green-600' : ''}>
+                        {data.conscience7 === 0 ? 'NC' : data.conscience7 === 1 ? 'Oui' : data.conscience7 === 2 ? 'Partiel' : data.conscience7 === 3 ? 'Non' : '-'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Attribution:</span>
+                      <span className={data.attribu7 === 3 ? 'text-amber-600' : data.attribu7 === 1 ? 'text-green-600' : ''}>
+                        {data.attribu7 === 0 ? 'NC' : data.attribu7 === 1 ? 'Correcte' : data.attribu7 === 2 ? 'Partielle' : data.attribu7 === 3 ? 'Incorrecte' : '-'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                {/* Item 8: Anhedonie */}
+                <div className="border-l-2 border-gray-200 pl-3">
+                  <div className="font-medium text-gray-700 mb-1">8. Anhedonie</div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Conscience:</span>
+                      <span className={data.conscience8 === 3 ? 'text-amber-600' : data.conscience8 === 1 ? 'text-green-600' : ''}>
+                        {data.conscience8 === 0 ? 'NC' : data.conscience8 === 1 ? 'Oui' : data.conscience8 === 2 ? 'Partiel' : data.conscience8 === 3 ? 'Non' : '-'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Attribution:</span>
+                      <span className={data.attribu8 === 3 ? 'text-amber-600' : data.attribu8 === 1 ? 'text-green-600' : ''}>
+                        {data.attribu8 === 0 ? 'NC' : data.attribu8 === 1 ? 'Correcte' : data.attribu8 === 2 ? 'Partielle' : data.attribu8 === 3 ? 'Incorrecte' : '-'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                {/* Item 9: Asociabilite */}
+                <div className="border-l-2 border-gray-200 pl-3">
+                  <div className="font-medium text-gray-700 mb-1">9. Asociabilite</div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Conscience:</span>
+                      <span className={data.conscience9 === 3 ? 'text-amber-600' : data.conscience9 === 1 ? 'text-green-600' : ''}>
+                        {data.conscience9 === 0 ? 'NC' : data.conscience9 === 1 ? 'Oui' : data.conscience9 === 2 ? 'Partiel' : data.conscience9 === 3 ? 'Non' : '-'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Attribution:</span>
+                      <span className={data.attribu9 === 3 ? 'text-amber-600' : data.attribu9 === 1 ? 'text-green-600' : ''}>
+                        {data.attribu9 === 0 ? 'NC' : data.attribu9 === 1 ? 'Correcte' : data.attribu9 === 2 ? 'Partielle' : data.attribu9 === 3 ? 'Incorrecte' : '-'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p>NC = Non cotable | Conscience: 1=Conscient, 2=Partiel, 3=Inconscient</p>
+              <p>Attribution: 1=Correcte, 2=Partielle, 3=Incorrecte</p>
             </div>
           </div>
         )}

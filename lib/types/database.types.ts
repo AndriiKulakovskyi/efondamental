@@ -4864,3 +4864,67 @@ export interface CdssResponse {
 }
 
 export type CdssResponseInsert = Omit<CdssResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score' | 'has_depressive_syndrome' | 'interpretation'>;
+
+// ============================================================================
+// BARS (Brief Adherence Rating Scale) - Schizophrenia Hetero-questionnaire
+// ============================================================================
+
+export interface BarsResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // Items
+  q1?: number | null; // Prescribed doses per day (informational)
+  q2?: number | null; // Days without treatment (0-31)
+  q3?: number | null; // Days with reduced dose (0-31)
+
+  // Computed scores
+  adherence_score?: number | null; // 0-100%
+  interpretation?: string | null;
+
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type BarsResponseInsert = Omit<BarsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'adherence_score' | 'interpretation'>;
+
+// ============================================================================
+// SUMD (Scale to Assess Unawareness of Mental Disorder) - Schizophrenia Hetero-questionnaire
+// ============================================================================
+
+export interface SumdResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // Domain 1-3: Global awareness (conscience only)
+  conscience1?: number | null; // 0-3
+  conscience2?: number | null;
+  conscience3?: number | null;
+
+  // Domain 4-9: Symptom-specific (conscience + attribution)
+  conscience4?: number | null;
+  attribu4?: number | null;
+  conscience5?: number | null;
+  attribu5?: number | null;
+  conscience6?: number | null;
+  attribu6?: number | null;
+  conscience7?: number | null;
+  attribu7?: number | null;
+  conscience8?: number | null;
+  attribu8?: number | null;
+  conscience9?: number | null;
+  attribu9?: number | null;
+
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type SumdResponseInsert = Omit<SumdResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;

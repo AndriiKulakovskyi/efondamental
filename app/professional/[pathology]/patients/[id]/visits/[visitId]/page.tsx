@@ -120,7 +120,9 @@ import {
   SZ_DOSSIER_INFIRMIER_DEFINITION,
   SZ_BILAN_BIOLOGIQUE_DEFINITION,
   PANSS_DEFINITION,
-  CDSS_DEFINITION
+  CDSS_DEFINITION,
+  BARS_DEFINITION,
+  SUMD_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -324,6 +326,20 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['EGF_FR']?.completed || false,
               completedAt: questionnaireStatuses['EGF_FR']?.completed_at,
+            },
+            {
+              ...BARS_DEFINITION,
+              id: BARS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['BARS']?.completed || false,
+              completedAt: questionnaireStatuses['BARS']?.completed_at,
+            },
+            {
+              ...SUMD_DEFINITION,
+              id: SUMD_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SUMD']?.completed || false,
+              completedAt: questionnaireStatuses['SUMD']?.completed_at,
             }
           ]
         }

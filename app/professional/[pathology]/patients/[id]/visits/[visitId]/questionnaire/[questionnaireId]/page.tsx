@@ -114,7 +114,9 @@ import {
   SZ_DOSSIER_INFIRMIER_DEFINITION,
   SZ_BILAN_BIOLOGIQUE_DEFINITION,
   PANSS_DEFINITION,
-  CDSS_DEFINITION
+  CDSS_DEFINITION,
+  BARS_DEFINITION,
+  SUMD_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { 
   getAsrmResponse, 
@@ -224,7 +226,9 @@ import {
   getDossierInfirmierSzResponse,
   getBilanBiologiqueSzResponse,
   getPanssResponse,
-  getCdssResponse
+  getCdssResponse,
+  getBarsResponse,
+  getSumdResponse
 } from "@/lib/services/questionnaire-schizophrenia.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -361,6 +365,8 @@ export default async function ProfessionalQuestionnairePage({
   // Schizophrenia hetero-questionnaires
   else if (code === PANSS_DEFINITION.code) questionnaire = PANSS_DEFINITION;
   else if (code === CDSS_DEFINITION.code) questionnaire = CDSS_DEFINITION;
+  else if (code === BARS_DEFINITION.code) questionnaire = BARS_DEFINITION;
+  else if (code === SUMD_DEFINITION.code) questionnaire = SUMD_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -479,6 +485,8 @@ export default async function ProfessionalQuestionnairePage({
   // Schizophrenia hetero-questionnaires
   else if (code === PANSS_DEFINITION.code) existingResponse = await getPanssResponse(visitId);
   else if (code === CDSS_DEFINITION.code) existingResponse = await getCdssResponse(visitId);
+  else if (code === BARS_DEFINITION.code) existingResponse = await getBarsResponse(visitId);
+  else if (code === SUMD_DEFINITION.code) existingResponse = await getSumdResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

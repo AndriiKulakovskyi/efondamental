@@ -1597,3 +1597,309 @@ export const CDSS_DEFINITION: QuestionnaireDefinition = {
     language: 'fr-FR'
   }
 };
+
+// ============================================================================
+// BARS (Brief Adherence Rating Scale)
+// ============================================================================
+// 3-item clinician-administered scale designed to assess medication adherence
+// in psychiatric patients. Estimates the percentage of prescribed doses taken
+// over the past month.
+// Original authors: Byerly MJ, Nakonezny PA, Rush AJ (2008)
+// Scoring: ((30 - days_missed - days_reduced) / 30) x 100
+
+export const BARS_QUESTIONS: Question[] = [
+  {
+    id: 'bars_instructions',
+    text: 'Instructions',
+    help: 'Administrer les trois questions au patient concernant sa prise de traitement au cours du mois dernier (30 derniers jours). Le score calcule le pourcentage d\'observance sur la base des reponses aux trois questions.',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q1',
+    text: '1. Nombre de doses prescrites par jour',
+    help: 'Quel est le nombre de doses prescrites par jour (connaissance qu\'en a le patient)',
+    type: 'number',
+    required: false,
+    validation: {
+      min: 0
+    }
+  },
+  {
+    id: 'q2',
+    text: '2. Jours sans traitement',
+    help: 'Nombre de jours le mois dernier pendant lesquels il n\'a pas pris le traitement prescrit',
+    type: 'number',
+    required: false,
+    validation: {
+      min: 0,
+      max: 31
+    }
+  },
+  {
+    id: 'q3',
+    text: '3. Jours avec dose reduite',
+    help: 'Nombre de jours le mois dernier pendant lesquels le patient a pris moins que la dose de traitement prescrite',
+    type: 'number',
+    required: false,
+    validation: {
+      min: 0,
+      max: 31
+    }
+  }
+];
+
+export const BARS_DEFINITION: QuestionnaireDefinition = {
+  id: 'bars',
+  code: 'BARS',
+  title: 'BARS - Echelle breve d\'evaluation de l\'observance',
+  description: 'Echelle a 3 items administree par le clinicien pour evaluer l\'observance medicamenteuse chez les patients psychiatriques. Elle estime le pourcentage de doses prescrites prises au cours du mois dernier. Auteurs originaux: Byerly MJ, Nakonezny PA, Rush AJ (2008).',
+  questions: BARS_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['schizophrenia'],
+    target_role: 'healthcare_professional',
+    version: 'Original (Byerly et al., 2008)',
+    language: 'fr-FR'
+  }
+};
+
+// ============================================================================
+// SUMD (Scale to Assess Unawareness of Mental Disorder)
+// ============================================================================
+// Semi-structured interview assessing awareness (insight) of mental illness
+// across 9 domains. Domains 1-3 are global awareness (conscience only).
+// Domains 4-9 have both conscience AND attribution items.
+// Key rule: If conscience = 0 or 3, attribution is automatically 0.
+// Original authors: Amador XF, Strauss DH, Yale SA, et al. (1993)
+
+const SUMD_CONSCIENCE_OPTIONS = [
+  { code: 0, label: 'Non cotable', score: 0 },
+  { code: 1, label: 'Conscient', score: 1 },
+  { code: 2, label: 'En partie conscient/inconscient', score: 2 },
+  { code: 3, label: 'Inconscient', score: 3 }
+];
+
+const SUMD_ATTRIBUTION_OPTIONS = [
+  { code: 0, label: 'Non cotable', score: 0 },
+  { code: 1, label: 'Attribution correcte - Le symptome est du a un trouble mental', score: 1 },
+  { code: 2, label: 'Attribution partielle - Incertain, mais peut en accepter l\'idee', score: 2 },
+  { code: 3, label: 'Attribution incorrecte - Le symptome n\'est pas en lien avec un trouble mental', score: 3 }
+];
+
+export const SUMD_QUESTIONS: Question[] = [
+  {
+    id: 'sumd_instructions',
+    text: 'Instructions',
+    help: 'L\'echelle evalue la conscience (insight) du patient concernant son trouble mental a travers differents domaines. Pour chaque domaine, evaluer d\'abord le niveau de conscience, puis l\'attribution des symptomes (si applicable). Note: Si le patient est "Non cotable" (0) ou "Inconscient" (3) sur un item de Conscience, l\'item Attribution correspondant devient automatiquement "Non cotable" (0).',
+    type: 'section',
+    required: false
+  },
+  // Domain 1: Conscience d'un trouble mental (global, no attribution)
+  {
+    id: 'section_domain1',
+    text: '1. Conscience d\'un trouble mental',
+    help: 'D\'une maniere generale, le patient croit-il presenter un trouble mental ?',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'conscience1',
+    text: '1. Conscience du trouble',
+    help: 'D\'une maniere generale, le patient croit-il presenter un trouble mental ?',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_CONSCIENCE_OPTIONS
+  },
+  // Domain 2: Conscience des consequences du trouble (global, no attribution)
+  {
+    id: 'section_domain2',
+    text: '2. Conscience des consequences de ce trouble',
+    help: 'Quelles sont les croyances du sujet concernant les raisons pour lesquelles il se retrouve hospitalise, renvoye de son travail, blesse, endette... etc... ?',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'conscience2',
+    text: '2. Conscience du trouble',
+    help: 'Quelles sont les croyances du sujet concernant les raisons pour lesquelles il se retrouve hospitalise, renvoye de son travail, blesse, endette... etc... ?',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_CONSCIENCE_OPTIONS
+  },
+  // Domain 3: Conscience des effets du traitement (global, no attribution)
+  {
+    id: 'section_domain3',
+    text: '3. Conscience des effets du traitement',
+    help: 'Le sujet croit-il que les traitements ont diminue la severite de ses symptomes ?',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'conscience3',
+    text: '3. Conscience du trouble',
+    help: 'Le sujet croit-il que les traitements ont diminue la severite de ses symptomes ?',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_CONSCIENCE_OPTIONS
+  },
+  // Domain 4: Conscience d'une experience hallucinatoire (+ attribution)
+  {
+    id: 'section_domain4',
+    text: '4. Conscience d\'une experience hallucinatoire',
+    help: 'Le sujet reconnait-il ses hallucinations en tant que telles ? Il s\'agit de coter sa capacite a interpreter son experience hallucinatoire comme primaire.',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'conscience4',
+    text: '4. Conscience du trouble',
+    help: 'Le sujet reconnait-il ses hallucinations en tant que telles ?',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_CONSCIENCE_OPTIONS
+  },
+  {
+    id: 'attribu4',
+    text: '4. Attribution des symptomes',
+    help: 'Si conscience = 0 ou 3, l\'attribution est automatiquement "Non cotable".',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_ATTRIBUTION_OPTIONS
+  },
+  // Domain 5: Conscience du delire (+ attribution)
+  {
+    id: 'section_domain5',
+    text: '5. Conscience du delire',
+    help: 'Le sujet reconnait-il son delire en tant que production interne de croyances erronees ? Coter la conscience du caractere non plausible de ses croyances.',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'conscience5',
+    text: '5. Conscience du trouble',
+    help: 'Le sujet reconnait-il son delire en tant que production interne de croyances erronees ?',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_CONSCIENCE_OPTIONS
+  },
+  {
+    id: 'attribu5',
+    text: '5. Attribution des symptomes',
+    help: 'Si conscience = 0 ou 3, l\'attribution est automatiquement "Non cotable".',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_ATTRIBUTION_OPTIONS
+  },
+  // Domain 6: Conscience d'un trouble de la pensee (+ attribution)
+  {
+    id: 'section_domain6',
+    text: '6. Conscience d\'un trouble de la pensee',
+    help: 'Le sujet croit-il que ses communications avec les autres sont perturbees ?',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'conscience6',
+    text: '6. Conscience du trouble',
+    help: 'Le sujet croit-il que ses communications avec les autres sont perturbees ?',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_CONSCIENCE_OPTIONS
+  },
+  {
+    id: 'attribu6',
+    text: '6. Attribution des symptomes',
+    help: 'Si conscience = 0 ou 3, l\'attribution est automatiquement "Non cotable".',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_ATTRIBUTION_OPTIONS
+  },
+  // Domain 7: Conscience d'un emoussement affectif (+ attribution)
+  {
+    id: 'section_domain7',
+    text: '7. Conscience d\'un emoussement affectif',
+    help: 'Le sujet a-t-il conscience de ses affects communiques par le biais de ses expressions, sa voix, sa gesticulation... etc... Ne pas coter son evaluation de sa thymie.',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'conscience7',
+    text: '7. Conscience du trouble',
+    help: 'Le sujet a-t-il conscience de ses affects communiques par le biais de ses expressions, sa voix, sa gesticulation ?',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_CONSCIENCE_OPTIONS
+  },
+  {
+    id: 'attribu7',
+    text: '7. Attribution des symptomes',
+    help: 'Si conscience = 0 ou 3, l\'attribution est automatiquement "Non cotable".',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_ATTRIBUTION_OPTIONS
+  },
+  // Domain 8: Conscience de l'anhedonie (+ attribution)
+  {
+    id: 'section_domain8',
+    text: '8. Conscience de l\'anhedonie',
+    help: 'Le sujet est-il conscient que son attitude renvoie une apparente diminution de son plaisir a participer a des activites suscitant normalement le plaisir ?',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'conscience8',
+    text: '8. Conscience du trouble',
+    help: 'Le sujet est-il conscient que son attitude renvoie une apparente diminution de son plaisir a participer a des activites suscitant normalement le plaisir ?',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_CONSCIENCE_OPTIONS
+  },
+  {
+    id: 'attribu8',
+    text: '8. Attribution des symptomes',
+    help: 'Si conscience = 0 ou 3, l\'attribution est automatiquement "Non cotable".',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_ATTRIBUTION_OPTIONS
+  },
+  // Domain 9: Conscience de l'asociabilite (+ attribution)
+  {
+    id: 'section_domain9',
+    text: '9. Conscience de l\'asociabilite',
+    help: 'Le patient est-il conscient qu\'il ne montre pas d\'interet pour les relations sociales ?',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'conscience9',
+    text: '9. Conscience du trouble',
+    help: 'Le patient est-il conscient qu\'il ne montre pas d\'interet pour les relations sociales ?',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_CONSCIENCE_OPTIONS
+  },
+  {
+    id: 'attribu9',
+    text: '9. Attribution des symptomes',
+    help: 'Si conscience = 0 ou 3, l\'attribution est automatiquement "Non cotable".',
+    type: 'single_choice',
+    required: false,
+    options: SUMD_ATTRIBUTION_OPTIONS
+  }
+];
+
+export const SUMD_DEFINITION: QuestionnaireDefinition = {
+  id: 'sumd',
+  code: 'SUMD',
+  title: 'SUMD - Echelle d\'evaluation de la conscience de la maladie',
+  description: 'Entretien semi-structure evaluant la conscience (insight) de la maladie mentale a travers 9 domaines. Les domaines 1-3 evaluent la conscience globale, les domaines 4-9 evaluent la conscience et l\'attribution des symptomes specifiques. Auteurs originaux: Amador XF, Strauss DH, Yale SA, et al. (1993).',
+  questions: SUMD_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['schizophrenia'],
+    target_role: 'healthcare_professional',
+    version: 'Original (Amador et al., 1993)',
+    language: 'fr-FR'
+  }
+};

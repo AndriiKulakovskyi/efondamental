@@ -113,7 +113,9 @@ import {
   saveDossierInfirmierSzResponse,
   saveBilanBiologiqueSzResponse,
   savePanssResponse,
-  saveCdssResponse
+  saveCdssResponse,
+  saveBarsResponse,
+  saveSumdResponse
 } from '@/lib/services/questionnaire-schizophrenia.service';
 import { 
   getVisitCompletionStatus,
@@ -219,7 +221,9 @@ import {
   DossierInfirmierSzResponseInsert,
   BilanBiologiqueSzResponseInsert,
   PanssResponseInsert,
-  CdssResponseInsert
+  CdssResponseInsert,
+  BarsResponseInsert,
+  SumdResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 import { requireUserContext } from '@/lib/rbac/middleware';
@@ -330,6 +334,22 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as CdssResponseInsert);
+        break;
+
+      case 'BARS':
+        result = await saveBarsResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as BarsResponseInsert);
+        break;
+
+      case 'SUMD':
+        result = await saveSumdResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as SumdResponseInsert);
         break;
 
       // Initial Evaluation - ETAT

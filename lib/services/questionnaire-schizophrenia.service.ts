@@ -15,6 +15,10 @@ import {
   PanssResponseInsert,
   CdssResponse,
   CdssResponseInsert,
+  BarsResponse,
+  BarsResponseInsert,
+  SumdResponse,
+  SumdResponseInsert,
 } from '../types/database.types';
 
 // ============================================================================
@@ -448,6 +452,179 @@ export async function saveCdssResponse(
       total_score,
       has_depressive_syndrome,
       interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// BARS (Brief Adherence Rating Scale) - SCHIZOPHRENIA HETERO-QUESTIONNAIRE
+// ============================================================================
+// 3-item clinician-administered scale for assessing medication adherence
+// Scoring: ((30 - days_missed - days_reduced) / 30) x 100 = adherence percentage
+
+export async function getBarsResponse(
+  visitId: string
+): Promise<BarsResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_bars')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No rows found
+    if (error.code === 'PGRST205') {
+      console.warn('Table responses_bars not found. Please run migrations.');
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveBarsResponse(
+  response: BarsResponseInsert
+): Promise<BarsResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    bars_instructions,
+    ...responseData
+  } = response as any;
+
+  // Extract item values
+  const q1 = responseData.q1 ?? null;
+  const q2 = responseData.q2 ?? null;
+  const q3 = responseData.q3 ?? null;
+
+  // Calculate adherence score
+  // Formula: ((30 - days_missed - days_reduced) / 30) x 100
+  // Clamp to 0 if q2 + q3 > 30
+  let adherence_score: number | null = null;
+  let interpretation: string | null = null;
+
+  if (q2 !== null && q3 !== null) {
+    const missedDays = q2 + q3;
+    adherence_score = Math.max(0, Math.round(((30 - missedDays) / 30) * 100));
+    
+    // Clinical interpretation based on score
+    if (adherence_score >= 91) {
+      interpretation = 'Bonne observance (91-100%)';
+    } else if (adherence_score >= 76) {
+      interpretation = 'Observance acceptable (76-90%)';
+    } else if (adherence_score >= 51) {
+      interpretation = 'Observance partielle (51-75%)';
+    } else {
+      interpretation = 'Observance tres faible (0-50%)';
+    }
+  }
+
+  const { data, error } = await supabase
+    .from('responses_bars')
+    .upsert({
+      ...responseData,
+      adherence_score,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// SUMD (Scale to Assess Unawareness of Mental Disorder) - SCHIZOPHRENIA HETERO-QUESTIONNAIRE
+// ============================================================================
+// 9-domain scale assessing awareness (insight) of mental illness
+// Key rule: If conscience = 0 or 3, attribution must be 0
+
+export async function getSumdResponse(
+  visitId: string
+): Promise<SumdResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_sumd')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No rows found
+    if (error.code === 'PGRST205') {
+      console.warn('Table responses_sumd not found. Please run migrations.');
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveSumdResponse(
+  response: SumdResponseInsert
+): Promise<SumdResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    sumd_instructions,
+    section_domain1,
+    section_domain2,
+    section_domain3,
+    section_domain4,
+    section_domain5,
+    section_domain6,
+    section_domain7,
+    section_domain8,
+    section_domain9,
+    ...responseData
+  } = response as any;
+
+  // Extract conscience values
+  const conscience4 = responseData.conscience4 ?? null;
+  const conscience5 = responseData.conscience5 ?? null;
+  const conscience6 = responseData.conscience6 ?? null;
+  const conscience7 = responseData.conscience7 ?? null;
+  const conscience8 = responseData.conscience8 ?? null;
+  const conscience9 = responseData.conscience9 ?? null;
+
+  // Apply attribution dependency rule:
+  // If conscience = 0 (Non cotable) or 3 (Inconscient), attribution must be 0 (Non cotable)
+  const applyAttributionRule = (conscienceValue: number | null, attributionValue: number | null): number | null => {
+    if (conscienceValue === 0 || conscienceValue === 3) {
+      return 0; // Force attribution to Non cotable
+    }
+    return attributionValue;
+  };
+
+  // Apply rules to all attribution items
+  const attribu4 = applyAttributionRule(conscience4, responseData.attribu4 ?? null);
+  const attribu5 = applyAttributionRule(conscience5, responseData.attribu5 ?? null);
+  const attribu6 = applyAttributionRule(conscience6, responseData.attribu6 ?? null);
+  const attribu7 = applyAttributionRule(conscience7, responseData.attribu7 ?? null);
+  const attribu8 = applyAttributionRule(conscience8, responseData.attribu8 ?? null);
+  const attribu9 = applyAttributionRule(conscience9, responseData.attribu9 ?? null);
+
+  const { data, error } = await supabase
+    .from('responses_sumd')
+    .upsert({
+      ...responseData,
+      attribu4,
+      attribu5,
+      attribu6,
+      attribu7,
+      attribu8,
+      attribu9,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
