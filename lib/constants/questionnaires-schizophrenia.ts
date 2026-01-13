@@ -2085,3 +2085,118 @@ export const AIMS_DEFINITION: QuestionnaireDefinition = {
     language: 'fr-FR'
   }
 };
+
+// ============================================================================
+// Barnes Akathisia Rating Scale
+// ============================================================================
+// 4-item clinician-rated scale for assessing drug-induced akathisia,
+// a common side effect of antipsychotic medications.
+// Original author: T. R. E. Barnes (1989)
+
+const BARNES_OBJECTIVE_OPTIONS = [
+  { code: 0, label: 'Normal - Impatiences des membres occasionnelles', score: 0 },
+  { code: 1, label: 'Leger - Mouvements caracteristiques presents moins de la moitie du temps', score: 1 },
+  { code: 2, label: 'Modere - Mouvements presents au moins la moitie du temps', score: 2 },
+  { code: 3, label: 'Severe - Mouvements constants, incapacite de rester assis ou debout', score: 3 }
+];
+
+const BARNES_AGITATION_OPTIONS = [
+  { code: 0, label: 'Absence - Pas d\'impatience subjective', score: 0 },
+  { code: 1, label: 'Leger - Impression non specifique d\'agitation interieure', score: 1 },
+  { code: 2, label: 'Modere - Conscience d\'incapacite a garder les jambes au repos', score: 2 },
+  { code: 3, label: 'Severe - Besoin compulsif intense de bouger la plupart du temps', score: 3 }
+];
+
+const BARNES_DISTRESS_OPTIONS = [
+  { code: 0, label: 'Pas de detresse', score: 0 },
+  { code: 1, label: 'Legere', score: 1 },
+  { code: 2, label: 'Moyenne', score: 2 },
+  { code: 3, label: 'Grave', score: 3 }
+];
+
+const BARNES_GLOBAL_OPTIONS = [
+  { code: 0, label: 'Absence - Pas d\'akathisie', score: 0 },
+  { code: 1, label: 'Douteux - Tension interieure non specifique', score: 1 },
+  { code: 2, label: 'Legere - Conscience d\'impatiences, peu de gene', score: 2 },
+  { code: 3, label: 'Moyenne - Agitation avec mouvements caracteristiques, gene', score: 3 },
+  { code: 4, label: 'Marquee - Desir compulsif de marcher, eprouvant', score: 4 },
+  { code: 5, label: 'Severe - Besoin compulsif constant, detresse intense', score: 5 }
+];
+
+export const BARNES_QUESTIONS: Question[] = [
+  {
+    id: 'barnes_instructions',
+    text: 'Instructions',
+    help: 'Le patient doit etre observe assis, puis debout, engage dans une conversation neutre (1 a 2 minutes dans chaque position). Les symptomes observes dans d\'autres situations peuvent egalement etre cotes.',
+    type: 'section',
+    required: false
+  },
+  // Objective rating
+  {
+    id: 'section_objective',
+    text: 'Cotation objective',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q1',
+    text: 'Cotation objective',
+    help: 'Evaluation des manifestations motrices observables de l\'akathisie: frottement, pietinement, balancement d\'une jambe assis et/ou balancement d\'un pied sur l\'autre ou pietinement debout.',
+    type: 'single_choice',
+    required: false,
+    options: BARNES_OBJECTIVE_OPTIONS
+  },
+  // Subjective rating
+  {
+    id: 'section_subjective',
+    text: 'Cotation subjective',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q2',
+    text: 'Conscience de l\'agitation',
+    help: 'Evaluation de la perception subjective d\'agitation interieure.',
+    type: 'single_choice',
+    required: false,
+    options: BARNES_AGITATION_OPTIONS
+  },
+  {
+    id: 'q3',
+    text: 'Detresse relative aux impatiences',
+    help: 'Evaluation du niveau de detresse causee par les symptomes.',
+    type: 'single_choice',
+    required: false,
+    options: BARNES_DISTRESS_OPTIONS
+  },
+  // Global evaluation
+  {
+    id: 'section_global',
+    text: 'Evaluation globale de l\'akathisie',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q4',
+    text: 'Evaluation globale de l\'akathisie',
+    help: 'Evaluation clinique globale integrant les observations objectives et subjectives. Note: La presence de mouvements caracteristiques d\'akathisie en l\'absence d\'impression subjective d\'agitation doit etre consideree comme une pseudo-akathisie (score = 0).',
+    type: 'single_choice',
+    required: false,
+    options: BARNES_GLOBAL_OPTIONS
+  }
+];
+
+export const BARNES_DEFINITION: QuestionnaireDefinition = {
+  id: 'barnes',
+  code: 'BARNES',
+  title: 'BARNES - Echelle d\'akathisie de Barnes',
+  description: 'Echelle a 4 items administree par le clinicien pour evaluer l\'akathisie induite par les medicaments, un effet secondaire frequent des antipsychotiques caracterise par une agitation subjective et des manifestations motrices objectives. Auteur: T. R. E. Barnes (1989).',
+  questions: BARNES_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['schizophrenia'],
+    target_role: 'healthcare_professional',
+    version: 'Original (Barnes, 1989)',
+    language: 'fr-FR'
+  }
+};

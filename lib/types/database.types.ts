@@ -4972,3 +4972,38 @@ export interface AimsResponse {
 }
 
 export type AimsResponseInsert = Omit<AimsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'movement_score' | 'interpretation'>;
+
+// ============================================================================
+// Barnes Akathisia Rating Scale - Schizophrenia Hetero-questionnaire
+// ============================================================================
+
+export interface BarnesResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // Item 1: Objective rating (0-3)
+  q1?: number | null;
+
+  // Item 2: Awareness of agitation (0-3)
+  q2?: number | null;
+
+  // Item 3: Distress related to restlessness (0-3)
+  q3?: number | null;
+
+  // Item 4: Global evaluation of akathisia (0-5)
+  q4?: number | null;
+
+  // Computed scores
+  objective_subjective_score?: number | null; // Sum of items 1-3 (0-9)
+  global_score?: number | null;               // Direct copy of item 4 (0-5)
+  interpretation?: string | null;
+
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type BarnesResponseInsert = Omit<BarnesResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'objective_subjective_score' | 'global_score' | 'interpretation'>;

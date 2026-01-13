@@ -21,6 +21,8 @@ import {
   SumdResponseInsert,
   AimsResponse,
   AimsResponseInsert,
+  BarnesResponse,
+  BarnesResponseInsert,
 } from '../types/database.types';
 
 // ============================================================================
@@ -724,6 +726,108 @@ export async function saveAimsResponse(
     .upsert({
       ...responseData,
       movement_score,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// BARNES AKATHISIA RATING SCALE - SCHIZOPHRENIA HETERO-QUESTIONNAIRE
+// ============================================================================
+// 4-item scale for assessing drug-induced akathisia
+// - Objective/Subjective score = sum of items 1-3 (0-9)
+// - Global score = item 4 (0-5)
+
+export async function getBarnesResponse(
+  visitId: string
+): Promise<BarnesResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_barnes')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No rows found
+    if (error.code === 'PGRST205') {
+      console.warn('Table responses_barnes not found. Please run migrations.');
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveBarnesResponse(
+  response: BarnesResponseInsert
+): Promise<BarnesResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    barnes_instructions,
+    section_objective,
+    section_subjective,
+    section_global,
+    ...responseData
+  } = response as any;
+
+  const q1 = responseData.q1 ?? null; // Objective
+  const q2 = responseData.q2 ?? null; // Agitation awareness
+  const q3 = responseData.q3 ?? null; // Distress
+  const q4 = responseData.q4 ?? null; // Global evaluation
+
+  let objective_subjective_score: number | null = null;
+  let global_score: number | null = null;
+  let interpretation: string | null = null;
+
+  // Calculate objective/subjective score (sum of items 1-3)
+  if (q1 !== null || q2 !== null || q3 !== null) {
+    objective_subjective_score = (q1 ?? 0) + (q2 ?? 0) + (q3 ?? 0);
+  }
+
+  // Global score is direct copy of item 4
+  if (q4 !== null) {
+    global_score = q4;
+
+    // Clinical interpretation based on global score
+    switch (q4) {
+      case 0:
+        interpretation = 'Absence - Pas d\'akathisie';
+        break;
+      case 1:
+        interpretation = 'Douteux - Akathisie questionnable';
+        break;
+      case 2:
+        interpretation = 'Legere - Akathisie legere, peu de gene';
+        break;
+      case 3:
+        interpretation = 'Moyenne - Akathisie moderee, genante';
+        break;
+      case 4:
+        interpretation = 'Marquee - Akathisie significative, eprouvante';
+        break;
+      case 5:
+        interpretation = 'Severe - Akathisie severe avec detresse intense';
+        break;
+      default:
+        interpretation = 'Score invalide';
+    }
+  }
+
+  const { data, error } = await supabase
+    .from('responses_barnes')
+    .upsert({
+      ...responseData,
+      objective_subjective_score,
+      global_score,
       interpretation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })

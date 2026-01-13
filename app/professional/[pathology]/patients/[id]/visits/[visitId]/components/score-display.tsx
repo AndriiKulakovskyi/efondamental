@@ -197,6 +197,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       if (score > 0) return 'info';      // Minimal movements
       return 'success';                  // No abnormal movements
     }
+
+    if (code === 'BARNES') {
+      // Barnes: Global score 0-5, higher = more severe akathisia
+      const score = data.global_score;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 4) return 'error';    // Marked/Severe akathisia
+      if (score >= 3) return 'warning';  // Moderate akathisia
+      if (score >= 1) return 'info';     // Questionable/Mild
+      return 'success';                  // No akathisia
+    }
     
     return 'info';
   };
@@ -309,6 +319,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'BARS' && 'Résultats BARS - Échelle d\'observance'}
               {code === 'SUMD' && 'Résultats SUMD - Conscience de la maladie'}
               {code === 'AIMS' && 'Résultats AIMS - Mouvements involontaires'}
+              {code === 'BARNES' && 'Résultats BARNES - Akathisie'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -350,6 +361,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? 'Voir details'
                 : code === 'AIMS'
                 ? (data.movement_score !== undefined ? data.movement_score : '-')
+                : code === 'BARNES'
+                ? (data.global_score !== undefined ? data.global_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM_FR' && '/20'}
               {code === 'QIDS_SR16_FR' && '/27'}
@@ -368,6 +381,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'BARS' && '%'}
               {code === 'SUMD' && ''}
               {code === 'AIMS' && '/28'}
+              {code === 'BARNES' && '/5'}
             </span>
           </div>
         </div>
@@ -1455,6 +1469,82 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             {/* Legend */}
             <div className="text-xs text-gray-500 pt-2 border-t">
               <p>Echelle de severite: 0=Aucun, 1=Minime, 2=Leger, 3=Moyen, 4=Grave</p>
+            </div>
+          </div>
+        )}
+
+        {/* BARNES Details */}
+        {code === 'BARNES' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg text-center font-medium ${
+                data.global_score !== null && data.global_score >= 4
+                  ? 'bg-red-50 border border-red-200 text-red-800'
+                  : data.global_score !== null && data.global_score >= 3
+                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                  : data.global_score !== null && data.global_score >= 1
+                  ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : 'bg-green-50 border border-green-200 text-green-800'
+              }`}>
+                {data.interpretation}
+              </div>
+            )}
+
+            {/* Objective Rating */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Cotation objective</h5>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Manifestations motrices:</span>
+                <span className={`font-medium ${
+                  data.q1 !== null && data.q1 >= 2 ? 'text-amber-600' : data.q1 === 0 ? 'text-green-600' : ''
+                }`}>
+                  {data.q1 === 0 ? 'Normal' : data.q1 === 1 ? 'Leger' : data.q1 === 2 ? 'Modere' : data.q1 === 3 ? 'Severe' : '-'}
+                </span>
+              </div>
+            </div>
+
+            {/* Subjective Rating */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Cotation subjective</h5>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Conscience de l'agitation:</span>
+                  <span className={`font-medium ${
+                    data.q2 !== null && data.q2 >= 2 ? 'text-amber-600' : data.q2 === 0 ? 'text-green-600' : ''
+                  }`}>
+                    {data.q2 === 0 ? 'Absence' : data.q2 === 1 ? 'Leger' : data.q2 === 2 ? 'Modere' : data.q2 === 3 ? 'Severe' : '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Detresse:</span>
+                  <span className={`font-medium ${
+                    data.q3 !== null && data.q3 >= 2 ? 'text-amber-600' : data.q3 === 0 ? 'text-green-600' : ''
+                  }`}>
+                    {data.q3 === 0 ? 'Pas de detresse' : data.q3 === 1 ? 'Legere' : data.q3 === 2 ? 'Moyenne' : data.q3 === 3 ? 'Grave' : '-'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Scores */}
+            <div className="pt-2 border-t">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Score obj+subj (items 1-3):</span>
+                  <span className="font-bold">{data.objective_subjective_score ?? '-'}/9</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Score global (item 4):</span>
+                  <span className="font-bold text-lg">{data.global_score ?? '-'}/5</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p>Score global: 0=Absence, 1=Douteux, 2=Legere, 3=Moyenne, 4=Marquee, 5=Severe</p>
+              <p className="mt-1">Note: Mouvements sans agitation subjective = pseudo-akathisie (score 0)</p>
             </div>
           </div>
         )}
