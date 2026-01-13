@@ -3009,7 +3009,7 @@ export const TROUBLES_PSYCHOTIQUES_QUESTIONS: Question[] = [
   // ==================== SECTION: DISORDER CLASSIFICATION ====================
   {
     id: 'section_disorder_classification',
-    text: 'TROUBLE PSYCHOTIQUE VIE ENTIERE',
+    text: 'Trouble psychotique vie entiere',
     type: 'section',
     required: false
   },
@@ -3151,108 +3151,385 @@ export const TROUBLES_PSYCHOTIQUES_QUESTIONS: Question[] = [
     display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
   },
 
-  // ==================== SECTION: EPISODE HISTORY ====================
-  {
-    id: 'section_episode_history',
-    text: 'Historique des episodes psychotiques',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
-  },
-  ...generateEpisodeQuestions(),
-
   // ==================== SECTION: LIFETIME SYMPTOMS ====================
   {
     id: 'section_lifetime_symptoms',
-    text: 'SYMPTOMES VIE ENTIERE',
+    text: 'Symptomes vie entiere',
     type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+    required: false
   },
-
-  // Delusions subsection
   {
-    id: 'section_delusions',
-    text: 'Delires',
-    type: 'section',
+    id: 'rad_symptomesvie_persecution',
+    text: 'Delire de persecution',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] },
-    is_subsection: true
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
   },
-  ...generateSymptomQuestion('persecution', 'Delire de persecution'),
-  ...generateSymptomQuestion('grandeur', 'Delire de grandeur'),
-  ...generateSymptomQuestion('somatique', 'Delire somatique'),
-  ...generateSymptomQuestion('mystique', 'Delire mystique'),
-  ...generateSymptomQuestion('culpabilite', 'Delire de culpabilite'),
-  ...generateSymptomQuestion('jalousie', 'Delire de jalousie'),
-  ...generateSymptomQuestion('erotomaniaque', 'Delire erotomaniaque'),
-  ...generateSymptomQuestion('etrecontrole', 'Delire d\'etre controle'),
-  ...generateSymptomQuestion('volpensee', 'Delire de vol de la pensee'),
-  ...generateSymptomQuestion('bizarre', 'Delire bizarre'),
-  ...generateSymptomQuestion('idreferences', 'Idees de references'),
-
-  // Hallucinations subsection
   {
-    id: 'section_hallucinations',
-    text: 'Hallucinations',
-    type: 'section',
+    id: 'rad_symptomesvie_persecution_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] },
-    is_subsection: true
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_persecution' }, 'Oui'] },
+    indentLevel: 1
   },
-  ...generateSymptomQuestion('halluintrapsy', 'Hallucinations auditives intrapsychiques'),
-  ...generateSymptomQuestion('hallusenso', 'Hallucinations auditives sensorielles'),
-  ...generateSymptomQuestion('halluvisu', 'Hallucinations visuelles'),
-  ...generateSymptomQuestion('hallucenesthe', 'Hallucinations cenesthesiques'),
-
-  // Disorganization subsection
   {
-    id: 'section_disorganization',
-    text: 'Desorganisation',
-    type: 'section',
+    id: 'rad_symptomesvie_grandeur',
+    text: 'Delire de grandeur',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] },
-    is_subsection: true
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
   },
-  ...generateSymptomQuestion('catatonie', 'Catatonie'),
-  ...generateSymptomQuestion('compodesorg', 'Comportement desorganise'),
-  ...generateSymptomQuestion('gestdiscord', 'Gestuelle discordante'),
-  ...generateSymptomQuestion('discdesorg', 'Discours desorganise'),
-
-  // Negative symptoms subsection
   {
-    id: 'section_negative_symptoms',
-    text: 'Symptomes negatifs',
-    type: 'section',
+    id: 'rad_symptomesvie_grandeur_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
     required: false,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] },
-    is_subsection: true
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_grandeur' }, 'Oui'] },
+    indentLevel: 1
   },
-  ...generateSymptomQuestion('avolition', 'Avolition'),
-  ...generateSymptomQuestion('alogie', 'Alogie'),
-  ...generateSymptomQuestion('emousaffec', 'Emoussement affectif'),
+  {
+    id: 'rad_symptomesvie_somatique',
+    text: 'Delire somatique',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_somatique_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_somatique' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_mystique',
+    text: 'Delire mystique',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_mystique_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_mystique' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_culpabilite',
+    text: 'Delire de culpabilite',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_culpabilite_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_culpabilite' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_jalousie',
+    text: 'Delire de jalousie',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_jalousie_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_jalousie' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_erotomaniaque',
+    text: 'Delire erotomaniaque',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_erotomaniaque_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_erotomaniaque' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_etrecontrole',
+    text: 'Delire d\'etre controle',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_etrecontrole_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_etrecontrole' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_volpensee',
+    text: 'Delire de vol de la pensee',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_volpensee_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_volpensee' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_bizarre',
+    text: 'Delire bizarre',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_bizarre_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_bizarre' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_idreferences',
+    text: 'Idees de references',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_idreferences_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_idreferences' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_halluintrapsy',
+    text: 'Hallucinations auditives intrapsychiques',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_halluintrapsy_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_halluintrapsy' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_hallusenso',
+    text: 'Hallucination auditives sensorielles',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_hallusenso_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_hallusenso' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_halluvisu',
+    text: 'Hallucinations visuelles',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_halluvisu_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_halluvisu' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_hallucenesthe',
+    text: 'Hallucinations cenesthesiques',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_hallucenesthe_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_hallucenesthe' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_catatonie',
+    text: 'Catatonie',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_catatonie_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_catatonie' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_compodesorg',
+    text: 'Comportement desorganise',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_compodesorg_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_compodesorg' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_gestdiscord',
+    text: 'Gestuelle discordante',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_gestdiscord_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_gestdiscord' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_discdesorg',
+    text: 'Discours desorganise',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_discdesorg_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_discdesorg' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_avolition',
+    text: 'Avolition',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_avolition_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_avolition' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_alogie',
+    text: 'Alogie',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_alogie_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_alogie' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_symptomesvie_emousaffec',
+    text: 'Emoussement affectif',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+  },
+  {
+    id: 'rad_symptomesvie_emousaffec_mois',
+    text: 'Presence lors du dernier mois',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_symptomesvie_emousaffec' }, 'Oui'] },
+    indentLevel: 1
+  },
 
   // ==================== SECTION: EVOLUTIONARY MODE ====================
   {
     id: 'section_evolutionary_mode',
-    text: 'MODE EVOLUTIF DE LA SYMPTOMATOLOGIE',
+    text: 'Mode evolutif de la symptomatologie',
     type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+    required: false
   },
   {
     id: 'rad_symptomeevo_mode',
     text: 'Mode evolutif',
     type: 'single_choice',
     required: false,
-    options: EVOLUTIONARY_MODE_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+    options: EVOLUTIONARY_MODE_OPTIONS
   },
 
   // ==================== SECTION: ANNUAL CHARACTERISTICS ====================
   {
     id: 'section_annual_characteristics',
-    text: 'CARACTERISTIQUES DU TROUBLE AU COURS DES 12 DERNIERS MOIS',
+    text: 'Caracteristiques du trouble au cours des 12 derniers mois',
     type: 'section',
     required: false,
     display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
