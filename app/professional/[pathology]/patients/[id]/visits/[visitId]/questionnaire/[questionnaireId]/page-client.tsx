@@ -122,7 +122,7 @@ export function QuestionnairePageClient({
         'WAIS4_MATRICES_FR', 'WAIS4_CRITERIA_FR', 'WAIS4_LEARNING_FR', 'CVLT_FR', 'WAIS4_CODE_FR',
         'SOCIAL',
         'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA',
-        'PANSS', 'CDSS', 'BARS', 'SUMD'
+        'PANSS', 'CDSS', 'BARS', 'SUMD', 'AIMS'
       ].includes(questionnaire.code);
 
       if (!hasScoring) {

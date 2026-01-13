@@ -116,7 +116,8 @@ import {
   PANSS_DEFINITION,
   CDSS_DEFINITION,
   BARS_DEFINITION,
-  SUMD_DEFINITION
+  SUMD_DEFINITION,
+  AIMS_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { 
   getAsrmResponse, 
@@ -228,7 +229,8 @@ import {
   getPanssResponse,
   getCdssResponse,
   getBarsResponse,
-  getSumdResponse
+  getSumdResponse,
+  getAimsResponse
 } from "@/lib/services/questionnaire-schizophrenia.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -367,6 +369,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === CDSS_DEFINITION.code) questionnaire = CDSS_DEFINITION;
   else if (code === BARS_DEFINITION.code) questionnaire = BARS_DEFINITION;
   else if (code === SUMD_DEFINITION.code) questionnaire = SUMD_DEFINITION;
+  else if (code === AIMS_DEFINITION.code) questionnaire = AIMS_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -487,6 +490,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === CDSS_DEFINITION.code) existingResponse = await getCdssResponse(visitId);
   else if (code === BARS_DEFINITION.code) existingResponse = await getBarsResponse(visitId);
   else if (code === SUMD_DEFINITION.code) existingResponse = await getSumdResponse(visitId);
+  else if (code === AIMS_DEFINITION.code) existingResponse = await getAimsResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

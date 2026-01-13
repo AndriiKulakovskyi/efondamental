@@ -187,6 +187,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       if (c1 === 3 || c2 === 3 || c3 === 3) return 'warning';
       return 'info';
     }
+
+    if (code === 'AIMS') {
+      // AIMS: Movement score 0-28, higher = more severe dyskinesia
+      const score = data.movement_score;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 14) return 'error';   // Severe dyskinesia
+      if (score >= 7) return 'warning';  // Moderate dyskinesia
+      if (score > 0) return 'info';      // Minimal movements
+      return 'success';                  // No abnormal movements
+    }
     
     return 'info';
   };
@@ -298,6 +308,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'CDSS' && 'Résultats CDSS - Échelle de Calgary'}
               {code === 'BARS' && 'Résultats BARS - Échelle d\'observance'}
               {code === 'SUMD' && 'Résultats SUMD - Conscience de la maladie'}
+              {code === 'AIMS' && 'Résultats AIMS - Mouvements involontaires'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -337,6 +348,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.adherence_score !== undefined ? data.adherence_score : '-')
                 : code === 'SUMD'
                 ? 'Voir details'
+                : code === 'AIMS'
+                ? (data.movement_score !== undefined ? data.movement_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM_FR' && '/20'}
               {code === 'QIDS_SR16_FR' && '/27'}
@@ -354,6 +367,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'CDSS' && '/27'}
               {code === 'BARS' && '%'}
               {code === 'SUMD' && ''}
+              {code === 'AIMS' && '/28'}
             </span>
           </div>
         </div>
@@ -1314,6 +1328,133 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="text-xs text-gray-500 pt-2 border-t">
               <p>NC = Non cotable | Conscience: 1=Conscient, 2=Partiel, 3=Inconscient</p>
               <p>Attribution: 1=Correcte, 2=Partielle, 3=Incorrecte</p>
+            </div>
+          </div>
+        )}
+
+        {/* AIMS Details */}
+        {code === 'AIMS' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg text-center font-medium ${
+                data.movement_score !== null && data.movement_score >= 14
+                  ? 'bg-red-50 border border-red-200 text-red-800'
+                  : data.movement_score !== null && data.movement_score >= 7
+                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                  : data.movement_score !== null && data.movement_score > 0
+                  ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : 'bg-green-50 border border-green-200 text-green-800'
+              }`}>
+                {data.interpretation}
+              </div>
+            )}
+
+            {/* Orofacial Movements */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Mouvements orofaciaux</h5>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">1. Muscles faciaux:</span>
+                  <span className={`font-medium ${data.q1 !== null && data.q1 >= 3 ? 'text-amber-600' : data.q1 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q1 ?? '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">2. Levres:</span>
+                  <span className={`font-medium ${data.q2 !== null && data.q2 >= 3 ? 'text-amber-600' : data.q2 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q2 ?? '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">3. Machoires:</span>
+                  <span className={`font-medium ${data.q3 !== null && data.q3 >= 3 ? 'text-amber-600' : data.q3 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q3 ?? '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">4. Langue:</span>
+                  <span className={`font-medium ${data.q4 !== null && data.q4 >= 3 ? 'text-amber-600' : data.q4 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q4 ?? '-'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Extremity and Trunk Movements */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Extremites et tronc</h5>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">5. Membres sup:</span>
+                  <span className={`font-medium ${data.q5 !== null && data.q5 >= 3 ? 'text-amber-600' : data.q5 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q5 ?? '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">6. Membres inf:</span>
+                  <span className={`font-medium ${data.q6 !== null && data.q6 >= 3 ? 'text-amber-600' : data.q6 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q6 ?? '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between col-span-2">
+                  <span className="text-gray-600">7. Cou/epaules/hanches:</span>
+                  <span className={`font-medium ${data.q7 !== null && data.q7 >= 3 ? 'text-amber-600' : data.q7 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q7 ?? '-'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Global Judgments */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Jugements globaux</h5>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">8. Gravite globale:</span>
+                  <span className={`font-medium ${data.q8 !== null && data.q8 >= 3 ? 'text-amber-600' : data.q8 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q8 === 0 ? 'Aucun' : data.q8 === 1 ? 'Minime' : data.q8 === 2 ? 'Leger' : data.q8 === 3 ? 'Moyen' : data.q8 === 4 ? 'Grave' : '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">9. Incapacite:</span>
+                  <span className={`font-medium ${data.q9 !== null && data.q9 >= 3 ? 'text-amber-600' : data.q9 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q9 === 0 ? 'Aucune' : data.q9 === 1 ? 'Minime' : data.q9 === 2 ? 'Legere' : data.q9 === 3 ? 'Moderee' : data.q9 === 4 ? 'Grave' : '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">10. Conscience du patient:</span>
+                  <span className="font-medium">
+                    {data.q10 === 0 ? 'Aucune' : data.q10 === 1 ? 'Pas de gene' : data.q10 === 2 ? 'Gene legere' : data.q10 === 3 ? 'Gene moderee' : data.q10 === 4 ? 'Detresse grave' : '-'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Dental Status */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Etat dentaire</h5>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">11. Problemes dentaires:</span>
+                  <span className="font-medium">{data.q11 === 0 ? 'Oui' : data.q11 === 1 ? 'Non' : '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">12. Porte prothese:</span>
+                  <span className="font-medium">{data.q12 === 0 ? 'Oui' : data.q12 === 1 ? 'Non' : '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Movement Score */}
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">Score de mouvement (items 1-7):</span>
+              <span className="font-bold text-lg">{data.movement_score ?? '-'}/28</span>
+            </div>
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p>Echelle de severite: 0=Aucun, 1=Minime, 2=Leger, 3=Moyen, 4=Grave</p>
             </div>
           </div>
         )}

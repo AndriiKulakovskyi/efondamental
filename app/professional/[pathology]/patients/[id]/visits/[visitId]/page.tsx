@@ -122,7 +122,8 @@ import {
   PANSS_DEFINITION,
   CDSS_DEFINITION,
   BARS_DEFINITION,
-  SUMD_DEFINITION
+  SUMD_DEFINITION,
+  AIMS_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -340,6 +341,13 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['SUMD']?.completed || false,
               completedAt: questionnaireStatuses['SUMD']?.completed_at,
+            },
+            {
+              ...AIMS_DEFINITION,
+              id: AIMS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['AIMS']?.completed || false,
+              completedAt: questionnaireStatuses['AIMS']?.completed_at,
             }
           ]
         }

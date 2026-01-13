@@ -4928,3 +4928,47 @@ export interface SumdResponse {
 }
 
 export type SumdResponseInsert = Omit<SumdResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
+// AIMS (Abnormal Involuntary Movement Scale) - Schizophrenia Hetero-questionnaire
+// ============================================================================
+
+export interface AimsResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // Orofacial movements (items 1-4)
+  q1?: number | null;  // Facial muscles
+  q2?: number | null;  // Lips/perioral
+  q3?: number | null;  // Jaw
+  q4?: number | null;  // Tongue
+
+  // Extremity movements (items 5-6)
+  q5?: number | null;  // Upper limbs
+  q6?: number | null;  // Lower limbs
+
+  // Trunk movements (item 7)
+  q7?: number | null;  // Neck/shoulders/hips
+
+  // Global judgments (items 8-10)
+  q8?: number | null;  // Severity
+  q9?: number | null;  // Incapacitation
+  q10?: number | null; // Patient awareness
+
+  // Dental status (items 11-12)
+  q11?: number | null; // Current dental problems
+  q12?: number | null; // Wears dentures
+
+  // Computed scores
+  movement_score?: number | null; // Sum of items 1-7 (0-28)
+  interpretation?: string | null;
+
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type AimsResponseInsert = Omit<AimsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'movement_score' | 'interpretation'>;

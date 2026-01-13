@@ -1903,3 +1903,185 @@ export const SUMD_DEFINITION: QuestionnaireDefinition = {
     language: 'fr-FR'
   }
 };
+
+// ============================================================================
+// AIMS (Abnormal Involuntary Movement Scale)
+// ============================================================================
+// 12-item clinician-rated scale for assessing tardive dyskinesia and other
+// abnormal involuntary movements associated with antipsychotic medications.
+// Source: National Institute of Mental Health (NIMH), 1976
+
+const AIMS_MOVEMENT_OPTIONS = [
+  { code: 0, label: 'Aucun', score: 0 },
+  { code: 1, label: 'Minime: peut-etre normal', score: 1 },
+  { code: 2, label: 'Leger', score: 2 },
+  { code: 3, label: 'Moyen', score: 3 },
+  { code: 4, label: 'Grave', score: 4 }
+];
+
+const AIMS_AWARENESS_OPTIONS = [
+  { code: 0, label: 'Aucune conscience', score: 0 },
+  { code: 1, label: 'Conscience: pas de gene', score: 1 },
+  { code: 2, label: 'Conscience: gene legere', score: 2 },
+  { code: 3, label: 'Conscience: gene moderee', score: 3 },
+  { code: 4, label: 'Conscience: detresse grave', score: 4 }
+];
+
+const AIMS_BINARY_OPTIONS = [
+  { code: 0, label: 'Oui', score: 0 },
+  { code: 1, label: 'Non', score: 1 }
+];
+
+export const AIMS_QUESTIONS: Question[] = [
+  {
+    id: 'aims_instructions',
+    text: 'Instructions',
+    help: 'Veuillez observer le patient dans differentes positions et situations standardisees conformement au protocole d\'examen AIMS. Evaluer la severite des mouvements involontaires anormaux.',
+    type: 'section',
+    required: false
+  },
+  // Orofacial movements (items 1-4)
+  {
+    id: 'section_orofacial',
+    text: 'Mouvements orofaciaux',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q1',
+    text: '1. Muscles d\'expression faciale',
+    help: 'Par exemple: mouvements du front, des sourcils, de la region peri orbitale, des joues; inclure le froncement des sourcils, le clignement des paupieres, le sourire et les grimaces.',
+    type: 'single_choice',
+    required: false,
+    options: AIMS_MOVEMENT_OPTIONS
+  },
+  {
+    id: 'q2',
+    text: '2. Levres et region peri orale',
+    help: 'Par exemple: plissement, avancement des levres, moue, claquement des levres.',
+    type: 'single_choice',
+    required: false,
+    options: AIMS_MOVEMENT_OPTIONS
+  },
+  {
+    id: 'q3',
+    text: '3. Machoires',
+    help: 'Par exemple: mordre, serrer les dents, machonnement, ouverture de la bouche, mouvement lateraux.',
+    type: 'single_choice',
+    required: false,
+    options: AIMS_MOVEMENT_OPTIONS
+  },
+  {
+    id: 'q4',
+    text: '4. Langue',
+    help: 'N\'evaluer que l\'augmentation du mouvement a l\'interieur et a l\'exterieur de la bouche et NON l\'incapacite de maintenir le mouvement.',
+    type: 'single_choice',
+    required: false,
+    options: AIMS_MOVEMENT_OPTIONS
+  },
+  // Extremity movements (items 5-6)
+  {
+    id: 'section_extremities',
+    text: 'Mouvements des extremites',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q5',
+    text: '5. Membres superieurs',
+    help: 'Bras, poignet, main, doigts. Inclure les mouvements choreiques (c.a.d. rapides, sans but objectif, irreguliers, spontanes), les mouvements athetoïdes.',
+    type: 'single_choice',
+    required: false,
+    options: AIMS_MOVEMENT_OPTIONS
+  },
+  {
+    id: 'q6',
+    text: '6. Membres inferieurs',
+    help: 'Jambes, genoux, chevilles, doigts de pied. Par exemple mouvements lateraux des genoux, tapotement du pied, frapper du talon, inversion et eversion du pied, enroulement du pied.',
+    type: 'single_choice',
+    required: false,
+    options: AIMS_MOVEMENT_OPTIONS
+  },
+  // Trunk movements (item 7)
+  {
+    id: 'section_trunk',
+    text: 'Mouvements du tronc',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q7',
+    text: '7. Cou, epaules, hanches',
+    help: 'Par exemple: dandinement, balancement, tortillement, rotation pelvienne, torsion.',
+    type: 'single_choice',
+    required: false,
+    options: AIMS_MOVEMENT_OPTIONS
+  },
+  // Global judgments (items 8-10)
+  {
+    id: 'section_global',
+    text: 'Jugements globaux',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q8',
+    text: '8. Gravite des mouvements anormaux',
+    help: 'Evaluation globale de la severite des mouvements anormaux observes.',
+    type: 'single_choice',
+    required: false,
+    options: AIMS_MOVEMENT_OPTIONS
+  },
+  {
+    id: 'q9',
+    text: '9. Incapacite due a des mouvements anormaux',
+    help: 'Evaluation du degre d\'incapacite fonctionnelle causee par les mouvements.',
+    type: 'single_choice',
+    required: false,
+    options: AIMS_MOVEMENT_OPTIONS
+  },
+  {
+    id: 'q10',
+    text: '10. Conscience du malade des mouvements anormaux',
+    help: 'N\'evaluer que ce que rapporte le malade.',
+    type: 'single_choice',
+    required: false,
+    options: AIMS_AWARENESS_OPTIONS
+  },
+  // Dental status (items 11-12)
+  {
+    id: 'section_dental',
+    text: 'Etat de la dentition',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q11',
+    text: '11. Problemes actuels des dents et/ou de protheses dentaires',
+    type: 'single_choice',
+    required: false,
+    options: AIMS_BINARY_OPTIONS
+  },
+  {
+    id: 'q12',
+    text: '12. Le malade porte-t-il generalement des protheses dentaires',
+    type: 'single_choice',
+    required: false,
+    options: AIMS_BINARY_OPTIONS
+  }
+];
+
+export const AIMS_DEFINITION: QuestionnaireDefinition = {
+  id: 'aims',
+  code: 'AIMS',
+  title: 'AIMS - Echelle des mouvements involontaires anormaux',
+  description: 'Echelle a 12 items administree par le clinicien pour evaluer les dyskinesies tardives et autres mouvements involontaires anormaux associes aux medicaments antipsychotiques. Evalue les mouvements orofaciaux, des extremites et du tronc, ainsi que les jugements globaux. Source: NIMH (1976).',
+  questions: AIMS_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['schizophrenia'],
+    target_role: 'healthcare_professional',
+    version: 'Original (NIMH, 1976)',
+    language: 'fr-FR'
+  }
+};

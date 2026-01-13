@@ -19,6 +19,8 @@ import {
   BarsResponseInsert,
   SumdResponse,
   SumdResponseInsert,
+  AimsResponse,
+  AimsResponseInsert,
 } from '../types/database.types';
 
 // ============================================================================
@@ -625,6 +627,104 @@ export async function saveSumdResponse(
       attribu7,
       attribu8,
       attribu9,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// AIMS (Abnormal Involuntary Movement Scale) - SCHIZOPHRENIA HETERO-QUESTIONNAIRE
+// ============================================================================
+// 12-item scale for assessing tardive dyskinesia and movement disorders
+// Movement score = sum of items 1-7 (0-28)
+
+export async function getAimsResponse(
+  visitId: string
+): Promise<AimsResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_aims')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No rows found
+    if (error.code === 'PGRST205') {
+      console.warn('Table responses_aims not found. Please run migrations.');
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveAimsResponse(
+  response: AimsResponseInsert
+): Promise<AimsResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    aims_instructions,
+    section_orofacial,
+    section_extremities,
+    section_trunk,
+    section_global,
+    section_dental,
+    ...responseData
+  } = response as any;
+
+  // Calculate movement score (sum of items 1-7)
+  const q1 = responseData.q1 ?? null;
+  const q2 = responseData.q2 ?? null;
+  const q3 = responseData.q3 ?? null;
+  const q4 = responseData.q4 ?? null;
+  const q5 = responseData.q5 ?? null;
+  const q6 = responseData.q6 ?? null;
+  const q7 = responseData.q7 ?? null;
+
+  let movement_score: number | null = null;
+  let interpretation: string | null = null;
+
+  // Calculate if at least one movement item is answered
+  const movementItems = [q1, q2, q3, q4, q5, q6, q7];
+  const answeredItems = movementItems.filter(item => item !== null);
+
+  if (answeredItems.length > 0) {
+    movement_score = movementItems.reduce((sum, item) => sum + (item ?? 0), 0);
+
+    // Clinical interpretation based on movement score and individual items
+    // Probable TD: score >= 2 on at least 2 body regions, OR score >= 3 on 1 region
+    const hasModerateOrSevere = movementItems.some(item => item !== null && item >= 3);
+    const lightOrMoreCount = movementItems.filter(item => item !== null && item >= 2).length;
+
+    if (hasModerateOrSevere || lightOrMoreCount >= 2) {
+      if (movement_score >= 14) {
+        interpretation = 'Dyskinesie severe - Surveillance etroite recommandee';
+      } else if (movement_score >= 7) {
+        interpretation = 'Dyskinesie moderee - Evaluation du traitement conseillee';
+      } else {
+        interpretation = 'Dyskinesie probable - A surveiller';
+      }
+    } else if (movement_score > 0) {
+      interpretation = 'Mouvements minimes - Surveillance de routine';
+    } else {
+      interpretation = 'Pas de mouvement anormal detecte';
+    }
+  }
+
+  const { data, error } = await supabase
+    .from('responses_aims')
+    .upsert({
+      ...responseData,
+      movement_score,
+      interpretation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
