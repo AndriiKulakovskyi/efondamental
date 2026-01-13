@@ -303,6 +303,27 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['CDSS']?.completed || false,
               completedAt: questionnaireStatuses['CDSS']?.completed_at,
+            },
+            {
+              ...YMRS_DEFINITION,
+              id: YMRS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['YMRS_FR']?.completed || false,
+              completedAt: questionnaireStatuses['YMRS_FR']?.completed_at,
+            },
+            {
+              ...CGI_DEFINITION,
+              id: CGI_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['CGI_FR']?.completed || false,
+              completedAt: questionnaireStatuses['CGI_FR']?.completed_at,
+            },
+            {
+              ...EGF_DEFINITION,
+              id: EGF_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['EGF_FR']?.completed || false,
+              completedAt: questionnaireStatuses['EGF_FR']?.completed_at,
             }
           ]
         }
