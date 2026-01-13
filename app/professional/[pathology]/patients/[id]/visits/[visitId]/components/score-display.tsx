@@ -156,6 +156,15 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       if (total >= 59) return 'warning';  // Moderate
       return 'info';                      // Mild (30-58)
     }
+
+    if (code === 'CDSS') {
+      // CDSS: Total score range 0-27
+      // Clinical cutoff: >6 indicates depressive syndrome
+      const total = data.total_score;
+      if (total === null || total === undefined) return 'info';
+      if (total > 6) return 'warning';    // Depressive syndrome present
+      return 'success';                   // No significant depressive syndrome
+    }
     
     return 'info';
   };
@@ -264,6 +273,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'WAIS4_CODE_FR' && 'Résultats WAIS-IV Code'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && 'Résultats WAIS-IV Code, Symboles & IVT'}
               {code === 'PANSS' && 'Résultats PANSS'}
+              {code === 'CDSS' && 'Résultats CDSS - Échelle de Calgary'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -297,6 +307,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.wais_ivt !== undefined && data.wais_ivt !== null ? data.wais_ivt : (data.wais_cod_std !== undefined ? data.wais_cod_std : '-'))
                 : code === 'PANSS'
                 ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'CDSS'
+                ? (data.total_score !== undefined ? data.total_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM_FR' && '/20'}
               {code === 'QIDS_SR16_FR' && '/27'}
@@ -311,6 +323,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'WAIS4_CODE_FR' && '/19'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && (data.wais_ivt !== undefined && data.wais_ivt !== null ? '/150' : '/19')}
               {code === 'PANSS' && '/210'}
+              {code === 'CDSS' && '/27'}
             </span>
           </div>
         </div>
@@ -1001,6 +1014,76 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                   <span className="font-medium">{data.vandergaag_depressed ?? '-'}/28</span>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* CDSS Details */}
+        {code === 'CDSS' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Clinical Interpretation */}
+            <div className={`p-3 rounded-lg ${
+              data.has_depressive_syndrome 
+                ? 'bg-amber-50 border border-amber-200' 
+                : 'bg-green-50 border border-green-200'
+            }`}>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">
+                  {data.has_depressive_syndrome 
+                    ? 'Syndrome depressif present' 
+                    : 'Pas de syndrome depressif significatif'}
+                </span>
+                <span className="text-xs text-gray-500">(Seuil clinique: {'>'}6)</span>
+              </div>
+            </div>
+
+            {/* Item Scores */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Scores par item</h5>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">1. Depression:</span>
+                  <span className="font-medium">{data.q1 ?? '-'}/3</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">2. Desespoir:</span>
+                  <span className="font-medium">{data.q2 ?? '-'}/3</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">3. Auto-depreciation:</span>
+                  <span className="font-medium">{data.q3 ?? '-'}/3</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">4. Idees de reference:</span>
+                  <span className="font-medium">{data.q4 ?? '-'}/3</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">5. Culpabilite pathologique:</span>
+                  <span className="font-medium">{data.q5 ?? '-'}/3</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">6. Depression matinale:</span>
+                  <span className="font-medium">{data.q6 ?? '-'}/3</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">7. Eveil precoce:</span>
+                  <span className="font-medium">{data.q7 ?? '-'}/3</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">8. Suicide:</span>
+                  <span className="font-medium">{data.q8 ?? '-'}/3</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">9. Depression observee:</span>
+                  <span className="font-medium">{data.q9 ?? '-'}/3</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Total Score */}
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">Score Total:</span>
+              <span className="font-bold text-lg">{data.total_score ?? '-'}/27</span>
             </div>
           </div>
         )}

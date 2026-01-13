@@ -4830,3 +4830,37 @@ export interface PanssResponse {
 }
 
 export type PanssResponseInsert = Omit<PanssResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'positive_score' | 'negative_score' | 'general_score' | 'total_score' | 'wallwork_positive' | 'wallwork_negative' | 'wallwork_disorganized' | 'wallwork_excited' | 'wallwork_depressed' | 'lancon_positive' | 'lancon_negative' | 'lancon_disorganized' | 'lancon_excited' | 'lancon_depressed' | 'vandergaag_positive' | 'vandergaag_negative' | 'vandergaag_disorganized' | 'vandergaag_excited' | 'vandergaag_depressed'>;
+
+// ============================================================================
+// CDSS (Calgary Depression Scale for Schizophrenia) - Schizophrenia Hetero-questionnaire
+// ============================================================================
+
+export interface CdssResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // Items (0-3 scale each)
+  q1?: number | null; // Depression
+  q2?: number | null; // Hopelessness
+  q3?: number | null; // Self-depreciation
+  q4?: number | null; // Guilty ideas of reference
+  q5?: number | null; // Pathological guilt
+  q6?: number | null; // Morning depression
+  q7?: number | null; // Early wakening
+  q8?: number | null; // Suicide
+  q9?: number | null; // Observed depression
+
+  // Computed scores
+  total_score?: number | null; // 0-27
+  has_depressive_syndrome?: boolean | null; // true if total_score > 6
+  interpretation?: string | null;
+
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type CdssResponseInsert = Omit<CdssResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score' | 'has_depressive_syndrome' | 'interpretation'>;

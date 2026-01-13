@@ -113,7 +113,8 @@ import {
   SZ_ORIENTATION_DEFINITION,
   SZ_DOSSIER_INFIRMIER_DEFINITION,
   SZ_BILAN_BIOLOGIQUE_DEFINITION,
-  PANSS_DEFINITION
+  PANSS_DEFINITION,
+  CDSS_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { 
   getAsrmResponse, 
@@ -222,7 +223,8 @@ import {
   getScreeningSzOrientationResponse,
   getDossierInfirmierSzResponse,
   getBilanBiologiqueSzResponse,
-  getPanssResponse
+  getPanssResponse,
+  getCdssResponse
 } from "@/lib/services/questionnaire-schizophrenia.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -358,6 +360,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === SZ_BILAN_BIOLOGIQUE_DEFINITION.code) questionnaire = SZ_BILAN_BIOLOGIQUE_DEFINITION;
   // Schizophrenia hetero-questionnaires
   else if (code === PANSS_DEFINITION.code) questionnaire = PANSS_DEFINITION;
+  else if (code === CDSS_DEFINITION.code) questionnaire = CDSS_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -475,6 +478,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === SZ_BILAN_BIOLOGIQUE_DEFINITION.code) existingResponse = await getBilanBiologiqueSzResponse(visitId);
   // Schizophrenia hetero-questionnaires
   else if (code === PANSS_DEFINITION.code) existingResponse = await getPanssResponse(visitId);
+  else if (code === CDSS_DEFINITION.code) existingResponse = await getCdssResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

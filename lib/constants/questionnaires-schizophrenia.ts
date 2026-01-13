@@ -1436,3 +1436,164 @@ export const PANSS_DEFINITION: QuestionnaireDefinition = {
     language: 'fr-FR'
   }
 };
+
+// ============================================================================
+// CDSS (Calgary Depression Scale for Schizophrenia)
+// ============================================================================
+// 9-item clinician-rated scale specifically designed to assess depression
+// in schizophrenia patients, distinguishing depressive symptoms from
+// negative symptoms and extrapyramidal side effects.
+// Original authors: Addington D, Addington J (1990)
+// French translation: Bernard D, Lancon C, Auquier P (1998)
+// All items rated 0-3: 0=Absent, 1=Mild, 2=Moderate, 3=Severe
+// Total score range: 0-27, Clinical cutoff: >6 indicates depressive syndrome
+
+// Standard 4-point response options for all CDSS items
+const CDSS_RESPONSE_OPTIONS = [
+  { code: 0, label: 'ABSENTE', score: 0 },
+  { code: 1, label: 'LEGERE', score: 1 },
+  { code: 2, label: 'MODEREE', score: 2 },
+  { code: 3, label: 'SEVERE', score: 3 }
+];
+
+export const CDSS_QUESTIONS: Question[] = [
+  {
+    id: 'cdss_instructions',
+    text: 'Instructions',
+    help: 'Poser la premiere question telle qu\'elle est ecrite. Par la suite, vous pouvez utiliser d\'autres questions d\'exploration ou d\'autres questions pertinentes a votre discretion. Le cadre temporel concerne les deux dernieres semaines a moins qu\'il ne soit stipule autrement. Le dernier item (9) se base sur des observations fondees sur l\'ensemble de l\'entretien.',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q1',
+    text: '1. DEPRESSION',
+    help: 'Comment pourriez-vous decrire votre humeur durant les deux dernieres semaines : avez-vous pu demeurer raisonnablement gai ou est ce que vous avez ete tres deprime ou plutot triste ces derniers temps ? Durant les deux dernieres semaines, combien de fois vous etes-vous senti ainsi, tous les jours? Toute la journee?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'ABSENTE - Definition non applicable.', score: 0 },
+      { code: 1, label: 'LEGERE - Le sujet exprime une certaine tristesse ou un certain decouragement lorsqu\'il est questionne.', score: 1 },
+      { code: 2, label: 'MODEREE - Humeur depressive distinctive est presente tous les jours.', score: 2 },
+      { code: 3, label: 'SEVERE - Humeur depressive marquee persistant tous les jours, plus de la moitie du temps, affectant le fonctionnement normal, psychomoteur et social.', score: 3 }
+    ]
+  },
+  {
+    id: 'q2',
+    text: '2. DESESPOIR',
+    help: 'Comment entrevoyez-vous le futur pour vous-meme? Est ce que vous pouvez envisager un avenir pour vous? Ou est-ce que la vie vous parait plutot sans espoir? Est ce que vous avez tout laisse tomber ou est ce qu\'il vous parait y avoir encore des raisons d\'essayer?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'ABSENT - Definition non applicable.', score: 0 },
+      { code: 1, label: 'LEGER - A certains moments, le sujet s\'est senti sans espoir au cours de la derniere semaine mais il a encore un certain degre d\'espoir pour l\'avenir.', score: 1 },
+      { code: 2, label: 'MODERE - Perception persistante mais moderee de desespoir au cours de la derniere semaine. On peut cependant persuader le sujet d\'acquiescer a la possibilite que les choses peuvent s\'ameliorer.', score: 2 },
+      { code: 3, label: 'SEVERE - Sentiment persistant et eprouvant de desespoir.', score: 3 }
+    ]
+  },
+  {
+    id: 'q3',
+    text: '3. AUTO-DEPRECIATION',
+    help: 'Quelle est votre opinion de vous-meme, en comparaison avec d\'autres personnes? Est ce que vous vous sentez meilleur ou moins bon, ou a peu pres comparable aux autres personnes en general ? Vous sentez-vous inferieur ou meme sans aucune valeur?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'ABSENTE - Definition non applicable.', score: 0 },
+      { code: 1, label: 'LEGERE - Legere inferiorite ; n\'atteint pas le degre de se sentir sans valeur.', score: 1 },
+      { code: 2, label: 'MODEREE - Le sujet se sent sans valeur mais moins de 50 % du temps.', score: 2 },
+      { code: 3, label: 'SEVERE - Le sujet se sent sans valeur plus de 50 % du temps. Il peut etre mis au defi de reconnaitre un autre point de vue.', score: 3 }
+    ]
+  },
+  {
+    id: 'q4',
+    text: '4. IDEES DE REFERENCE ASSOCIEES A LA CULPABILITE',
+    help: 'Avez-vous l\'impression que l\'on vous blame pour certaines choses ou meme qu\'on vous accuse sans raison? A propos de quoi? (ne pas inclure ici des blames ou des accusations justifies. Exclure les delires de culpabilite)',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'ABSENTE - Definition non applicable.', score: 0 },
+      { code: 1, label: 'LEGERE - Le sujet se sent blame mais non accuse, moins de 50 % du temps.', score: 1 },
+      { code: 2, label: 'MODEREE - Sentiment persistant d\'etre blame et/ou sentiment occasionnel d\'etre accuse.', score: 2 },
+      { code: 3, label: 'SEVERE - Sentiment persistant d\'etre accuse. Lorsqu\'on le contredit, le sujet reconnait que cela n\'est pas vrai.', score: 3 }
+    ]
+  },
+  {
+    id: 'q5',
+    text: '5. CULPABILITE PATHOLOGIQUE',
+    help: 'Avez-vous tendance a vous blamer vous-meme pour des petites choses que vous pourriez avoir faites dans le passe? Pensez-vous que vous meritez d\'etre aussi preoccupe de cela?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'ABSENTE - Definition non applicable.', score: 0 },
+      { code: 1, label: 'LEGERE - Le sujet se sent coupable de certaines peccadilles mais moins de 50 % du temps.', score: 1 },
+      { code: 2, label: 'MODEREE - Le sujet se sent coupable habituellement (plus de 50 % du temps) a propos d\'actes dont il exagere la signification.', score: 2 },
+      { code: 3, label: 'SEVERE - Le sujet se sent habituellement qu\'il est a blamer pour tout ce qui va mal meme lorsque ce n\'est pas de sa faute.', score: 3 }
+    ]
+  },
+  {
+    id: 'q6',
+    text: '6. DEPRESSION MATINALE',
+    help: 'Lorsque vous vous etes senti deprime au cours des deux dernieres semaines, avez-vous remarque que la depression etait pire a certains moments de la journee?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'ABSENTE - Definition non applicable.', score: 0 },
+      { code: 1, label: 'LEGERE - Depression presente mais sans variation diurne.', score: 1 },
+      { code: 2, label: 'MODEREE - Le sujet mentionne spontanement que la depression est pire le matin.', score: 2 },
+      { code: 3, label: 'SEVERE - La depression est, de facon marquee, pire le matin, avec un fonctionnement perturbe qui s\'ameliore l\'apres-midi.', score: 3 }
+    ]
+  },
+  {
+    id: 'q7',
+    text: '7. EVEIL PRECOCE',
+    help: 'Vous reveillez-vous plus tot le matin qu\'a l\'accoutumee? Combien de fois par semaine cela vous arrive-t-il?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'ABSENT - Pas de reveil precoce.', score: 0 },
+      { code: 1, label: 'LEGER - A l\'occasion s\'eveille (jusqu\'a 2 fois par semaine) une heure ou plus avant le moment normal de s\'eveiller ou l\'heure fixee a son reveille-matin.', score: 1 },
+      { code: 2, label: 'MODERE - S\'eveille frequemment de facon hative (jusqu\'a 5 fois par semaine) une heure ou plus avant son heure habituelle d\'eveil ou l\'heure fixee par son reveille-matin.', score: 2 },
+      { code: 3, label: 'SEVERE - S\'eveille tous les jours une heure ou plus avant l\'heure normale d\'eveil.', score: 3 }
+    ]
+  },
+  {
+    id: 'q8',
+    text: '8. SUICIDE',
+    help: 'Avez-vous deja eu l\'impression que la vie ne valait pas la peine d\'etre vecue? Avez-vous deja pense mettre fin a tout cela? Qu\'est ce que vous pensez que vous auriez pu faire? Avez-vous effectivement essaye?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'ABSENT - Definition non applicable.', score: 0 },
+      { code: 1, label: 'LEGER - Le sujet a l\'idee qu\'il serait mieux mort ou des idees occupationnelles de suicide.', score: 1 },
+      { code: 2, label: 'MODERE - Il a envisage deliberement le suicide avec un projet mais sans faire de tentative.', score: 2 },
+      { code: 3, label: 'SEVERE - Tentative de suicide apparemment concue pour se terminer par la mort (c\'est-a-dire de decouverte accidentelle ou par un moyen qui s\'est avere inefficace).', score: 3 }
+    ]
+  },
+  {
+    id: 'q9',
+    text: '9. DEPRESSION OBSERVEE',
+    help: 'Basee sur les observations de l\'interviewer durant l\'entretien complet. La question "est-ce que vous ressentez une envie de pleurer?" utilisee a des moments appropries durant l\'entretien peut susciter l\'emergence d\'informations utiles a cette observation.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'ABSENTE - Definition non applicable.', score: 0 },
+      { code: 1, label: 'LEGERE - Le sujet apparait triste et sur le point de pleurer meme durant des parties de l\'entretien touchant des sujets effectivement neutres.', score: 1 },
+      { code: 2, label: 'MODEREE - Le sujet apparait triste, pres des larmes durant tout l\'entretien avec une voix monotone et melancolique, exteriorise des larmes ou est pres des larmes a certains moments.', score: 2 },
+      { code: 3, label: 'SEVERE - Le patient s\'etrangle lorsqu\'il evoque des sujets generant de la detresse, soupire profondement, frequemment et pleure ouvertement, ou est de facon persistante dans un etat de souffrance figee.', score: 3 }
+    ]
+  }
+];
+
+export const CDSS_DEFINITION: QuestionnaireDefinition = {
+  id: 'cdss',
+  code: 'CDSS',
+  title: 'CDSS - Echelle de depression de Calgary',
+  description: 'Echelle a 9 items specifiquement concue pour evaluer la depression chez les patients schizophrenes, distinguant les symptomes depressifs des symptomes negatifs et des effets secondaires extrapyramidaux. Auteurs originaux: Addington D, Addington J (1990). Traduction francaise: Bernard D, Lancon C, Auquier P (1998).',
+  questions: CDSS_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['schizophrenia'],
+    target_role: 'healthcare_professional',
+    version: 'French Version (Bernard et al., 1998)',
+    language: 'fr-FR'
+  }
+};

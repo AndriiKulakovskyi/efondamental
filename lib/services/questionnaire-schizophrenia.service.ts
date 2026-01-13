@@ -13,6 +13,8 @@ import {
   BilanBiologiqueSzResponseInsert,
   PanssResponse,
   PanssResponseInsert,
+  CdssResponse,
+  CdssResponseInsert,
 } from '../types/database.types';
 
 // ============================================================================
@@ -363,6 +365,89 @@ export async function savePanssResponse(
       vandergaag_excited,
       vandergaag_depressed,
       // Metadata
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// CDSS (Calgary Depression Scale for Schizophrenia) - SCHIZOPHRENIA HETERO-QUESTIONNAIRE
+// ============================================================================
+// 9-item clinician-rated scale for assessing depression in schizophrenia patients
+// Scoring: Total score range 0-27, Clinical cutoff >6 indicates depressive syndrome
+
+export async function getCdssResponse(
+  visitId: string
+): Promise<CdssResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_cdss')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No rows found
+    if (error.code === 'PGRST205') {
+      console.warn('Table responses_cdss not found. Please run migrations.');
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveCdssResponse(
+  response: CdssResponseInsert
+): Promise<CdssResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    cdss_instructions,
+    ...responseData
+  } = response as any;
+
+  // Extract item values
+  const q1 = responseData.q1 ?? null;
+  const q2 = responseData.q2 ?? null;
+  const q3 = responseData.q3 ?? null;
+  const q4 = responseData.q4 ?? null;
+  const q5 = responseData.q5 ?? null;
+  const q6 = responseData.q6 ?? null;
+  const q7 = responseData.q7 ?? null;
+  const q8 = responseData.q8 ?? null;
+  const q9 = responseData.q9 ?? null;
+
+  // Calculate total score (sum of all items, 0-27)
+  const items = [q1, q2, q3, q4, q5, q6, q7, q8, q9];
+  const allAnswered = items.every(item => item !== null);
+  
+  let total_score: number | null = null;
+  let has_depressive_syndrome: boolean | null = null;
+  let interpretation: string | null = null;
+
+  if (allAnswered) {
+    total_score = items.reduce((sum, item) => sum + (item as number), 0);
+    // Clinical cutoff: >6 indicates depressive syndrome
+    has_depressive_syndrome = total_score > 6;
+    interpretation = has_depressive_syndrome 
+      ? 'Presence d\'un syndrome depressif (score > 6)'
+      : 'Absence de syndrome depressif significatif (score <= 6)';
+  }
+
+  const { data, error } = await supabase
+    .from('responses_cdss')
+    .upsert({
+      ...responseData,
+      total_score,
+      has_depressive_syndrome,
+      interpretation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

@@ -119,7 +119,8 @@ import {
   SZ_ORIENTATION_DEFINITION,
   SZ_DOSSIER_INFIRMIER_DEFINITION,
   SZ_BILAN_BIOLOGIQUE_DEFINITION,
-  PANSS_DEFINITION
+  PANSS_DEFINITION,
+  CDSS_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -295,6 +296,13 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['PANSS']?.completed || false,
               completedAt: questionnaireStatuses['PANSS']?.completed_at,
+            },
+            {
+              ...CDSS_DEFINITION,
+              id: CDSS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['CDSS']?.completed || false,
+              completedAt: questionnaireStatuses['CDSS']?.completed_at,
             }
           ]
         }

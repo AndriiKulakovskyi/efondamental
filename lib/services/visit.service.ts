@@ -193,7 +193,8 @@ import {
   SZ_ORIENTATION_DEFINITION,
   SZ_DOSSIER_INFIRMIER_DEFINITION,
   SZ_BILAN_BIOLOGIQUE_DEFINITION,
-  PANSS_DEFINITION
+  PANSS_DEFINITION,
+  CDSS_DEFINITION
 } from '../constants/questionnaires-schizophrenia';
 import {
   getPsyTraitementSemestrielResponse
@@ -201,7 +202,8 @@ import {
 import {
   getScreeningSzDiagnosticResponse,
   getScreeningSzOrientationResponse,
-  getPanssResponse
+  getPanssResponse,
+  getCdssResponse
 } from './questionnaire-schizophrenia.service';
 import { getPatientById } from './patient.service';
 
@@ -606,7 +608,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           id: 'mod_hetero',
           name: 'Hetero-questionnaires',
           description: 'Questionnaires d\'evaluation clinique',
-          questionnaires: [PANSS_DEFINITION]
+          questionnaires: [PANSS_DEFINITION, CDSS_DEFINITION]
         }
       ];
     }
