@@ -2085,7 +2085,19 @@ export function QuestionnaireRenderer({
     questionnaire,
     responses
   );
-
+  
+  // Debug visibility and state
+  useEffect(() => {
+    if (questionnaire.code === 'SLEEP_APNEA') {
+      console.log('--- [SLEEP_APNEA DEBUG] ---');
+      console.log('Diagnosed Sleep Apnea:', responses.diagnosed_sleep_apnea);
+      console.log('Patient Gender:', responses.patient_gender);
+      console.log('Male Gender Value:', responses.male_gender);
+      console.log('Visible Question IDs:', visibleQuestions);
+      console.log('Is male_gender in visibleQuestions?', visibleQuestions.includes('male_gender'));
+      console.log('---------------------------');
+    }
+  }, [responses, visibleQuestions, questionnaire.code]);
   // Track previous responses to detect actual changes
   const prevResponsesRef = useRef<Record<string, any>>(stableInitialResponses);
   const isFirstRender = useRef(true);
