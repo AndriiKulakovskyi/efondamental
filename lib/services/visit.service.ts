@@ -198,7 +198,9 @@ import {
   BARS_DEFINITION,
   SUMD_DEFINITION,
   AIMS_DEFINITION,
-  BARNES_DEFINITION
+  BARNES_DEFINITION,
+  SAS_DEFINITION,
+  PSP_DEFINITION
 } from '../constants/questionnaires-schizophrenia';
 import {
   getPsyTraitementSemestrielResponse
@@ -612,7 +614,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           id: 'mod_hetero',
           name: 'Hetero-questionnaires',
           description: 'Questionnaires d\'evaluation clinique',
-          questionnaires: [PANSS_DEFINITION, CDSS_DEFINITION, BARS_DEFINITION, SUMD_DEFINITION, AIMS_DEFINITION, BARNES_DEFINITION]
+          questionnaires: [PANSS_DEFINITION, CDSS_DEFINITION, BARS_DEFINITION, SUMD_DEFINITION, AIMS_DEFINITION, BARNES_DEFINITION, SAS_DEFINITION, PSP_DEFINITION]
         }
       ];
     }

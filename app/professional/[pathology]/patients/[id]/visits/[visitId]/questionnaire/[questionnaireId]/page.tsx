@@ -118,7 +118,9 @@ import {
   BARS_DEFINITION,
   SUMD_DEFINITION,
   AIMS_DEFINITION,
-  BARNES_DEFINITION
+  BARNES_DEFINITION,
+  SAS_DEFINITION,
+  PSP_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { 
   getAsrmResponse, 
@@ -232,7 +234,9 @@ import {
   getBarsResponse,
   getSumdResponse,
   getAimsResponse,
-  getBarnesResponse
+  getBarnesResponse,
+  getSasResponse,
+  getPspResponse
 } from "@/lib/services/questionnaire-schizophrenia.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -373,6 +377,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === SUMD_DEFINITION.code) questionnaire = SUMD_DEFINITION;
   else if (code === AIMS_DEFINITION.code) questionnaire = AIMS_DEFINITION;
   else if (code === BARNES_DEFINITION.code) questionnaire = BARNES_DEFINITION;
+  else if (code === SAS_DEFINITION.code) questionnaire = SAS_DEFINITION;
+  else if (code === PSP_DEFINITION.code) questionnaire = PSP_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -495,6 +501,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === SUMD_DEFINITION.code) existingResponse = await getSumdResponse(visitId);
   else if (code === AIMS_DEFINITION.code) existingResponse = await getAimsResponse(visitId);
   else if (code === BARNES_DEFINITION.code) existingResponse = await getBarnesResponse(visitId);
+  else if (code === SAS_DEFINITION.code) existingResponse = await getSasResponse(visitId);
+  else if (code === PSP_DEFINITION.code) existingResponse = await getPspResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

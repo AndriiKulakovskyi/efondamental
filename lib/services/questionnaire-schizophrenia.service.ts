@@ -23,6 +23,10 @@ import {
   AimsResponseInsert,
   BarnesResponse,
   BarnesResponseInsert,
+  SasResponse,
+  SasResponseInsert,
+  PspResponse,
+  PspResponseInsert,
 } from '../types/database.types';
 
 // ============================================================================
@@ -830,6 +834,182 @@ export async function saveBarnesResponse(
       ...responseData,
       objective_subjective_score,
       global_score,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// SIMPSON-ANGUS SCALE (SAS) - EXTRAPYRAMIDAL SIDE EFFECTS
+// ============================================================================
+// 10-item scale for assessing drug-induced parkinsonism and EPS
+// Score: Mean of all 10 items (0.0 - 4.0)
+
+export async function getSasResponse(
+  visitId: string
+): Promise<SasResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_sas')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No rows found
+    if (error.code === 'PGRST205') {
+      console.warn('Table responses_sas not found. Please run migrations.');
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function saveSasResponse(
+  response: SasResponseInsert
+): Promise<SasResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    sas_instructions,
+    ...responseData
+  } = response as any;
+
+  const items = [
+    responseData.q1,
+    responseData.q2,
+    responseData.q3,
+    responseData.q4,
+    responseData.q5,
+    responseData.q6,
+    responseData.q7,
+    responseData.q8,
+    responseData.q9,
+    responseData.q10
+  ];
+
+  let mean_score: number | null = null;
+  let interpretation: string | null = null;
+
+  // Calculate mean score only if all items are answered
+  const allAnswered = items.every(item => item !== null && item !== undefined);
+
+  if (allAnswered) {
+    const sum = items.reduce<number>((acc, item) => acc + (item as number), 0);
+    const score = sum / 10;
+    mean_score = Math.round(score * 100) / 100; // Round to 2 decimal places
+
+    // Clinical interpretation based on score
+    if (score === 0) {
+      interpretation = 'Absence de symptomes extrapyramidaux';
+    } else if (score <= 0.3) {
+      interpretation = 'Symptomes extrapyramidaux minimaux';
+    } else if (score <= 1.0) {
+      interpretation = 'Symptomes extrapyramidaux legers - Cliniquement significatifs';
+    } else if (score <= 2.0) {
+      interpretation = 'Symptomes extrapyramidaux moderes - Ajustement du traitement conseille';
+    } else {
+      interpretation = 'Symptomes extrapyramidaux severes - Intervention requise';
+    }
+  }
+
+  const { data, error } = await supabase
+    .from('responses_sas')
+    .upsert({
+      ...responseData,
+      mean_score,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// PERSONAL AND SOCIAL PERFORMANCE SCALE (PSP)
+// ============================================================================
+// Clinician-rated scale assessing personal and social functioning
+// Score: 1-100 (clinician-determined via 3-step process)
+
+export async function getPspResponse(
+  visitId: string
+): Promise<PspResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_psp')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No rows found
+    if (error.code === 'PGRST205') {
+      console.warn('Table responses_psp not found. Please run migrations.');
+      return null;
+    }
+    throw error;
+  }
+  return data;
+}
+
+export async function savePspResponse(
+  response: PspResponseInsert
+): Promise<PspResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    psp_instructions,
+    step1_header,
+    step2_header,
+    step3_header,
+    ...responseData
+  } = response as any;
+
+  const finalScore = responseData.final_score;
+  let interpretation: string | null = null;
+
+  // Generate interpretation based on final score
+  if (finalScore !== null && finalScore !== undefined) {
+    if (finalScore >= 91) {
+      interpretation = 'Tres bon fonctionnement - Excellent dans tous les domaines';
+    } else if (finalScore >= 81) {
+      interpretation = 'Bon fonctionnement - Difficultes courantes seulement';
+    } else if (finalScore >= 71) {
+      interpretation = 'Difficultes legeres - Dans au moins un domaine';
+    } else if (finalScore >= 61) {
+      interpretation = 'Difficultes manifestes - Notables mais pas invalidantes';
+    } else if (finalScore >= 51) {
+      interpretation = 'Difficultes marquees - Significatives dans un domaine';
+    } else if (finalScore >= 41) {
+      interpretation = 'Difficultes marquees multiples ou severes - Fonctionnement substantiellement altere';
+    } else if (finalScore >= 31) {
+      interpretation = 'Difficultes severes combinees - Alteration severe du fonctionnement';
+    } else if (finalScore >= 21) {
+      interpretation = 'Difficultes severes majeures - Aide professionnelle necessaire';
+    } else if (finalScore >= 11) {
+      interpretation = 'Difficultes severes generalisees - Incapacite majeure';
+    } else {
+      interpretation = 'Absence d\'autonomie - Risque vital possible';
+    }
+  }
+
+  const { data, error } = await supabase
+    .from('responses_psp')
+    .upsert({
+      ...responseData,
       interpretation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })

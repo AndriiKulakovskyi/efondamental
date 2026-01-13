@@ -2189,3 +2189,303 @@ export const BARNES_DEFINITION: QuestionnaireDefinition = {
     language: 'fr-FR'
   }
 };
+
+// ============================================================================
+// Simpson-Angus Scale (SAS) - Extrapyramidal Side Effects
+// ============================================================================
+// 10-item clinician-rated scale for assessing drug-induced parkinsonism
+// and extrapyramidal symptoms (EPS) associated with antipsychotic medications.
+// Original authors: Simpson GM, Angus JWS (1970)
+
+const SAS_RESPONSE_OPTIONS = [
+  { code: 0, label: 'Normal (0)', score: 0 },
+  { code: 1, label: 'Leger (1)', score: 1 },
+  { code: 2, label: 'Modere (2)', score: 2 },
+  { code: 3, label: 'Important (3)', score: 3 },
+  { code: 4, label: 'Severe (4)', score: 4 }
+];
+
+export const SAS_QUESTIONS: Question[] = [
+  {
+    id: 'sas_instructions',
+    text: 'Instructions',
+    help: 'L\'examinateur effectue une serie de tests physiques et d\'observations pour evaluer les signes extrapyramidaux. Le score total est la moyenne des 10 items (somme / 10).',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q1',
+    text: '1. Demarche',
+    help: 'Le patient est examine pendant qu\'il marche dans la salle d\'examen. Sa demarche, le ballant de ses bras, sa posture generale permettent de coter cet item.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Normal', score: 0 },
+      { code: 1, label: 'Diminution du ballant des bras a la marche', score: 1 },
+      { code: 2, label: 'Diminution importante du ballant des bras avec une evidente rigidite des bras', score: 2 },
+      { code: 3, label: 'Demarche raide, les bras maintenus de maniere rigide devant l\'abdomen', score: 3 },
+      { code: 4, label: 'Demarche voutee, traine les pieds. Progresse par propulsion et retropulsion', score: 4 }
+    ]
+  },
+  {
+    id: 'q2',
+    text: '2. Chute des bras',
+    help: 'Le patient et l\'examinateur levent tous les deux les bras jusqu\'a la hauteur des epaules et les laissent tomber sur les cotes. Chez le sujet normal un claquement net est entendu quand les bras frappent les cotes.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Normal. Chute libre avec fort claquement et rebond', score: 0 },
+      { code: 1, label: 'Chute legerement ralentie avec contact moins audible et petit rebond', score: 1 },
+      { code: 2, label: 'Chute ralentie. Pas de rebond', score: 2 },
+      { code: 3, label: 'Chute tres ralentie. Pas de claquement du tout', score: 3 },
+      { code: 4, label: 'Les bras tombent comme une resistance. Comme a travers de la colle', score: 4 }
+    ]
+  },
+  {
+    id: 'q3',
+    text: '3. Mouvements passifs de l\'epaule',
+    help: 'Les coudes sont maintenus flechis a angle droit et les bras sont pris l\'un apres l\'autre par l\'examinateur. Le bras du sujet est pousse et tire pendant que l\'humerus subit un mouvement de rotation externe.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Normal', score: 0 },
+      { code: 1, label: 'Rigidite et resistance legeres', score: 1 },
+      { code: 2, label: 'Resistance et rigidite moyennes', score: 2 },
+      { code: 3, label: 'Rigidite importante. Mouvements passifs difficiles', score: 3 },
+      { code: 4, label: 'Resistance et rigidite extremes avec une epaule presque gelee', score: 4 }
+    ]
+  },
+  {
+    id: 'q4',
+    text: '4. Rigidite du coude',
+    help: 'Les deux articulations du coude sont maintenues l\'une apres l\'autre a angle droit puis etendues, flechies d\'une maniere passive. Le biceps du patient est alors observe et palpe en meme temps.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Normal', score: 0 },
+      { code: 1, label: 'Rigidite et resistance legeres', score: 1 },
+      { code: 2, label: 'Resistance et rigidite moyennes', score: 2 },
+      { code: 3, label: 'Rigidite importante. Mouvements passifs difficiles', score: 3 },
+      { code: 4, label: 'Resistance et rigidite extremes', score: 4 }
+    ]
+  },
+  {
+    id: 'q5',
+    text: '5. Maintien des attitudes ou rigidite du poignet',
+    help: 'Le poignet est tenu d\'une main et les doigts sont tenus par l\'autre main de l\'examinateur. Le poignet est mobilise en flexion, en extension, en deplacement radial et cubital.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Normal', score: 0 },
+      { code: 1, label: 'Rigidite et resistance legeres', score: 1 },
+      { code: 2, label: 'Resistance et rigidite moyennes', score: 2 },
+      { code: 3, label: 'Rigidite importante. Mouvements passifs difficiles', score: 3 },
+      { code: 4, label: 'Resistance et rigidite extremes', score: 4 }
+    ]
+  },
+  {
+    id: 'q6',
+    text: '6. Mouvement pendulaire de la jambe',
+    help: 'Le patient s\'assoit sur une table avec les jambes pendantes et bougeant librement. La cheville est attrapee par l\'examinateur et elevee jusqu\'a ce que le genou soit partiellement etendu. On laisse ensuite la jambe tomber.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'La jambe balance librement', score: 0 },
+      { code: 1, label: 'Legere diminution du ballant des jambes', score: 1 },
+      { code: 2, label: 'Resistance au ballant moyenne', score: 2 },
+      { code: 3, label: 'Resistance et limitation du ballant importantes', score: 3 },
+      { code: 4, label: 'Absence complete de ballant', score: 4 }
+    ]
+  },
+  {
+    id: 'q7',
+    text: '7. Chute de la tete',
+    help: 'Le patient s\'allonge sur une table d\'examen bien rembourree et l\'examinateur souleve la tete du patient avec sa main. La main est ensuite relachee et on laisse la tete retomber.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'La tete tombe completement avec un bruit distinct quand elle touche la table', score: 0 },
+      { code: 1, label: 'Leger ralentissement dans la chute de la tete, surtout observe par l\'absence de claquement', score: 1 },
+      { code: 2, label: 'Ralentissement modere de la chute, presque visible a l\'oeil nu', score: 2 },
+      { code: 3, label: 'La tete tombe avec resistance et lentement', score: 3 },
+      { code: 4, label: 'La tete n\'atteint pas la table d\'examen', score: 4 }
+    ]
+  },
+  {
+    id: 'q8',
+    text: '8. Percussion de la glabelle (reflexe naso-palpebral)',
+    help: 'On demande au sujet d\'ouvrir grand les yeux et de ne pas cligner des yeux. La glabelle est tapee doucement a une vitesse rapide et reguliere. Le nombre de fois de suite ou le patient cligne des yeux est note.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: '0-5 clignements', score: 0 },
+      { code: 1, label: '6-10 clignements', score: 1 },
+      { code: 2, label: '11-15 clignements', score: 2 },
+      { code: 3, label: '16-20 clignements', score: 3 },
+      { code: 4, label: '21 clignements et plus', score: 4 }
+    ]
+  },
+  {
+    id: 'q9',
+    text: '9. Tremblement',
+    help: 'Le patient est observe lorsqu\'il entre dans la salle d\'examen puis il est reexamine pour cet item.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Normal', score: 0 },
+      { code: 1, label: 'Leger tremblement des doigts, evident a la vue et au toucher', score: 1 },
+      { code: 2, label: 'Tremblement de la main ou du bras apparaissant de facon intermittente', score: 2 },
+      { code: 3, label: 'Tremblements persistant d\'un ou de plusieurs membres', score: 3 },
+      { code: 4, label: 'Tremblements de tout le corps', score: 4 }
+    ]
+  },
+  {
+    id: 'q10',
+    text: '10. Salivation',
+    help: 'Le patient est observe quand il parle. On lui demande d\'ouvrir la bouche et de soulever la langue.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: 'Normal', score: 0 },
+      { code: 1, label: 'Salivation excessive au point qu\'une flaque apparait si la bouche est ouverte et la langue levee', score: 1 },
+      { code: 2, label: 'L\'exces de salivation est present et peut parfois gener la parole', score: 2 },
+      { code: 3, label: 'Parole difficile en raison d\'un exces de salivation', score: 3 },
+      { code: 4, label: 'Franc bavage', score: 4 }
+    ]
+  }
+];
+
+export const SAS_DEFINITION: QuestionnaireDefinition = {
+  id: 'sas',
+  code: 'SAS',
+  title: 'SAS - Echelle des effets secondaires extrapyramidaux',
+  description: 'Echelle a 10 items administree par le clinicien pour evaluer le parkinsonisme medicamenteux et les effets secondaires extrapyramidaux (EPS) associes aux antipsychotiques. Evalue la rigidite, le tremblement, la demarche et autres symptomes moteurs. Auteurs: Simpson GM, Angus JWS (1970).',
+  questions: SAS_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['schizophrenia'],
+    target_role: 'healthcare_professional',
+    version: 'Original (Simpson & Angus, 1970)',
+    language: 'fr-FR'
+  }
+};
+
+// ============================================================================
+// Personal and Social Performance Scale (PSP)
+// ============================================================================
+// Clinician-rated scale assessing personal and social functioning across 4 domains
+// Score: 1-100 (clinician-determined via 3-step process)
+// Original authors: Morosini PL, Magliano L, Brambilla L, Ugolini S, Pioli R (2000)
+
+const PSP_SEVERITY_OPTIONS = [
+  { code: 'Absent', label: 'Absent - Pas de difficulte', score: 0 },
+  { code: 'Leger', label: 'Leger - Difficultes connues seulement d\'une personne familiere', score: 1 },
+  { code: 'Manifeste', label: 'Manifeste - Difficultes remarquees mais n\'interferant pas substantiellement', score: 2 },
+  { code: 'Marque', label: 'Marque - Difficultes interferant lourdement', score: 3 },
+  { code: 'Severe', label: 'Severe - Incapable sans aide professionnelle', score: 4 },
+  { code: 'Tres_severe', label: 'Tres severe - Difficultes mettant en danger la survie', score: 5 }
+];
+
+export const PSP_QUESTIONS: Question[] = [
+  {
+    id: 'psp_instructions',
+    text: 'Instructions',
+    help: 'Evaluez le fonctionnement du patient au cours du mois dernier selon un processus en 3 etapes: (1) Evaluer chaque domaine, (2) Choisir un intervalle de 10 points, (3) Ajuster le score final.',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'step1_header',
+    text: 'Etape 1: Evaluer le niveau de fonctionnement dans les 4 domaines',
+    help: 'Pour chaque domaine, evaluez le moins bon fonctionnement du sous-domaine le plus pertinent.',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'domain_a',
+    text: '(a) Activites socialement utiles',
+    help: 'Incluant le travail et les etudes. Les activites socialement utiles incluent la cooperation pour le maintien du domicile, le travail volontaire, les passe-temps utiles comme le jardinage.',
+    type: 'single_choice',
+    required: false,
+    options: PSP_SEVERITY_OPTIONS
+  },
+  {
+    id: 'domain_b',
+    text: '(b) Relations personnelles et sociales',
+    help: 'Les relations incluent les relations avec un partenaire (pour les personnes ayant un partenaire) ou avec des proches, ainsi que les relations sociales.',
+    type: 'single_choice',
+    required: false,
+    options: PSP_SEVERITY_OPTIONS
+  },
+  {
+    id: 'domain_c',
+    text: '(c) Souci de soi',
+    help: 'Le souci de soi inclut l\'hygiene personnelle, l\'apparence, l\'habillement.',
+    type: 'single_choice',
+    required: false,
+    options: PSP_SEVERITY_OPTIONS
+  },
+  {
+    id: 'domain_d',
+    text: '(d) Comportements perturbateurs et agressifs',
+    help: 'Frequent = comportement survenu plus d\'une fois ou pouvant probablement survenir dans les 6 mois. Si non frequent, la severite peut etre diminuee d\'un niveau.',
+    type: 'single_choice',
+    required: false,
+    options: PSP_SEVERITY_OPTIONS
+  },
+  {
+    id: 'step2_header',
+    text: 'Etape 2: Choisir un intervalle de 10 points',
+    help: 'Les criteres de chaque intervalle sont bases sur differentes combinaisons des severites des 4 domaines.',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'interval_selection',
+    text: 'Intervalle de 10 points',
+    help: 'Selectionnez l\'intervalle correspondant au profil de severite du patient.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '91-100: Tres bon fonctionnement dans les 4 domaines', score: 1 },
+      { code: 2, label: '81-90: Bon fonctionnement, difficultes courantes seulement', score: 2 },
+      { code: 3, label: '71-80: Difficultes legeres dans au moins un domaine (a)-(c)', score: 3 },
+      { code: 4, label: '61-70: Difficultes manifestes dans (a)-(c) ou legeres dans (d)', score: 4 },
+      { code: 5, label: '51-60: Difficultes marquees dans 1 domaine (a)-(c) ou manifestes dans (d)', score: 5 },
+      { code: 6, label: '41-50: Marquees dans 2+ domaines (a)-(c) ou severes dans 1 domaine', score: 6 },
+      { code: 7, label: '31-40: Severes dans 1 domaine + marquees dans 1+ autres ou marquees dans (d)', score: 7 },
+      { code: 8, label: '21-30: Severes dans 2 domaines (a)-(c) ou severes dans (d)', score: 8 },
+      { code: 9, label: '11-20: Severes dans tous domaines ou tres severes dans (d)', score: 9 },
+      { code: 10, label: '1-10: Absence d\'autonomie, comportements extremes', score: 10 }
+    ]
+  },
+  {
+    id: 'step3_header',
+    text: 'Etape 3: Ajuster le score final',
+    help: 'Ajustez le score dans l\'intervalle en tenant compte d\'autres domaines: sante, logement, activites menageres, relations intimes, soins aux enfants, reseau social, regles sociales, interets, gestion financiere, transports, capacite a affronter les crises.',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'final_score',
+    text: 'Score PSP final (1-100)',
+    help: 'Entrez le score final entre 1 et 100 en fonction de l\'intervalle selectionne et des ajustements cliniques.',
+    type: 'number',
+    required: false
+  }
+];
+
+export const PSP_DEFINITION: QuestionnaireDefinition = {
+  id: 'psp',
+  code: 'PSP',
+  title: 'PSP - Echelle de fonctionnement personnel et social',
+  description: 'Echelle administree par le clinicien evaluant le fonctionnement personnel et social des patients atteints de schizophrenie dans 4 domaines principaux. Fournit un score global de 1-100 refletant le niveau de fonctionnement du patient au cours du mois dernier. Auteurs: Morosini PL et al. (2000).',
+  questions: PSP_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['schizophrenia'],
+    target_role: 'healthcare_professional',
+    version: 'Original (Morosini et al., 2000)',
+    language: 'fr-FR'
+  }
+};

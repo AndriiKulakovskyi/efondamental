@@ -5007,3 +5007,90 @@ export interface BarnesResponse {
 }
 
 export type BarnesResponseInsert = Omit<BarnesResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'objective_subjective_score' | 'global_score' | 'interpretation'>;
+
+// ============================================================================
+// Simpson-Angus Scale (SAS) - Extrapyramidal Side Effects
+// ============================================================================
+
+export interface SasResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // Item 1: Gait
+  q1?: number | null;
+
+  // Item 2: Arm dropping
+  q2?: number | null;
+
+  // Item 3: Shoulder shaking
+  q3?: number | null;
+
+  // Item 4: Elbow rigidity
+  q4?: number | null;
+
+  // Item 5: Wrist rigidity
+  q5?: number | null;
+
+  // Item 6: Leg pendulousness
+  q6?: number | null;
+
+  // Item 7: Head dropping
+  q7?: number | null;
+
+  // Item 8: Glabella tap
+  q8?: number | null;
+
+  // Item 9: Tremor
+  q9?: number | null;
+
+  // Item 10: Salivation
+  q10?: number | null;
+
+  // Computed scores
+  mean_score?: number | null; // Mean of all 10 items (0.0-4.0)
+  interpretation?: string | null;
+
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type SasResponseInsert = Omit<SasResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'mean_score' | 'interpretation'>;
+
+// ============================================================================
+// Personal and Social Performance Scale (PSP)
+// ============================================================================
+
+export type PspDomainRating = 'Absent' | 'Leger' | 'Manifeste' | 'Marque' | 'Severe' | 'Tres_severe' | null;
+
+export interface PspResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // Domain ratings
+  domain_a?: PspDomainRating; // Socially useful activities
+  domain_b?: PspDomainRating; // Personal and social relationships
+  domain_c?: PspDomainRating; // Self-care
+  domain_d?: PspDomainRating; // Disturbing and aggressive behaviors
+
+  // Step 2: 10-point interval selection (1=91-100, 10=1-10)
+  interval_selection?: number | null;
+
+  // Step 3: Final score (1-100)
+  final_score?: number | null;
+
+  // Interpretation
+  interpretation?: string | null;
+
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type PspResponseInsert = Omit<PspResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'interpretation'>;

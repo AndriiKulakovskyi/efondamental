@@ -124,7 +124,9 @@ import {
   BARS_DEFINITION,
   SUMD_DEFINITION,
   AIMS_DEFINITION,
-  BARNES_DEFINITION
+  BARNES_DEFINITION,
+  SAS_DEFINITION,
+  PSP_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -356,6 +358,20 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['BARNES']?.completed || false,
               completedAt: questionnaireStatuses['BARNES']?.completed_at,
+            },
+            {
+              ...SAS_DEFINITION,
+              id: SAS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SAS']?.completed || false,
+              completedAt: questionnaireStatuses['SAS']?.completed_at,
+            },
+            {
+              ...PSP_DEFINITION,
+              id: PSP_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['PSP']?.completed || false,
+              completedAt: questionnaireStatuses['PSP']?.completed_at,
             }
           ]
         }

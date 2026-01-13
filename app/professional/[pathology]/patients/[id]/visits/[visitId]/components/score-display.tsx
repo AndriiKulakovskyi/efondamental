@@ -207,6 +207,27 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       if (score >= 1) return 'info';     // Questionable/Mild
       return 'success';                  // No akathisia
     }
+
+    if (code === 'SAS') {
+      // SAS: Mean score 0.0-4.0, higher = more severe EPS
+      const score = data.mean_score;
+      if (score === null || score === undefined) return 'info';
+      if (score > 2.0) return 'error';    // Severe symptoms
+      if (score > 1.0) return 'warning';  // Moderate symptoms
+      if (score > 0.3) return 'info';     // Mild/clinically significant
+      if (score > 0) return 'info';       // Minimal symptoms
+      return 'success';                   // No symptoms
+    }
+
+    if (code === 'PSP') {
+      // PSP: Score 1-100, higher = better functioning
+      const score = data.final_score;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 71) return 'success';  // Good to excellent functioning
+      if (score >= 51) return 'info';     // Moderate difficulties
+      if (score >= 31) return 'warning';  // Marked to severe difficulties
+      return 'error';                     // Very severe / no autonomy
+    }
     
     return 'info';
   };
@@ -320,6 +341,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'SUMD' && 'Résultats SUMD - Conscience de la maladie'}
               {code === 'AIMS' && 'Résultats AIMS - Mouvements involontaires'}
               {code === 'BARNES' && 'Résultats BARNES - Akathisie'}
+              {code === 'SAS' && 'Résultats SAS - Effets extrapyramidaux'}
+              {code === 'PSP' && 'Résultats PSP - Fonctionnement personnel et social'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -363,6 +386,10 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.movement_score !== undefined ? data.movement_score : '-')
                 : code === 'BARNES'
                 ? (data.global_score !== undefined ? data.global_score : '-')
+                : code === 'SAS'
+                ? (data.mean_score !== undefined && data.mean_score !== null ? data.mean_score.toFixed(2) : '-')
+                : code === 'PSP'
+                ? (data.final_score !== undefined && data.final_score !== null ? data.final_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM_FR' && '/20'}
               {code === 'QIDS_SR16_FR' && '/27'}
@@ -382,6 +409,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'SUMD' && ''}
               {code === 'AIMS' && '/28'}
               {code === 'BARNES' && '/5'}
+              {code === 'SAS' && '/4.0'}
+              {code === 'PSP' && '/100'}
             </span>
           </div>
         </div>
@@ -1545,6 +1574,219 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="text-xs text-gray-500 pt-2 border-t">
               <p>Score global: 0=Absence, 1=Douteux, 2=Legere, 3=Moyenne, 4=Marquee, 5=Severe</p>
               <p className="mt-1">Note: Mouvements sans agitation subjective = pseudo-akathisie (score 0)</p>
+            </div>
+          </div>
+        )}
+
+        {/* SAS Details */}
+        {code === 'SAS' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg text-center font-medium ${
+                data.mean_score !== null && data.mean_score > 2.0
+                  ? 'bg-red-50 border border-red-200 text-red-800'
+                  : data.mean_score !== null && data.mean_score > 1.0
+                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                  : data.mean_score !== null && data.mean_score > 0.3
+                  ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : data.mean_score !== null && data.mean_score > 0
+                  ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : 'bg-green-50 border border-green-200 text-green-800'
+              }`}>
+                {data.interpretation}
+              </div>
+            )}
+
+            {/* Item scores */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Items individuels</h5>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">1. Demarche:</span>
+                  <span className={`font-medium ${data.q1 >= 2 ? 'text-amber-600' : data.q1 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q1 ?? '-'}/4
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">2. Chute des bras:</span>
+                  <span className={`font-medium ${data.q2 >= 2 ? 'text-amber-600' : data.q2 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q2 ?? '-'}/4
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">3. Epaule:</span>
+                  <span className={`font-medium ${data.q3 >= 2 ? 'text-amber-600' : data.q3 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q3 ?? '-'}/4
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">4. Coude:</span>
+                  <span className={`font-medium ${data.q4 >= 2 ? 'text-amber-600' : data.q4 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q4 ?? '-'}/4
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">5. Poignet:</span>
+                  <span className={`font-medium ${data.q5 >= 2 ? 'text-amber-600' : data.q5 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q5 ?? '-'}/4
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">6. Jambe:</span>
+                  <span className={`font-medium ${data.q6 >= 2 ? 'text-amber-600' : data.q6 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q6 ?? '-'}/4
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">7. Tete:</span>
+                  <span className={`font-medium ${data.q7 >= 2 ? 'text-amber-600' : data.q7 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q7 ?? '-'}/4
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">8. Glabelle:</span>
+                  <span className={`font-medium ${data.q8 >= 2 ? 'text-amber-600' : data.q8 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q8 ?? '-'}/4
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">9. Tremblement:</span>
+                  <span className={`font-medium ${data.q9 >= 2 ? 'text-amber-600' : data.q9 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q9 ?? '-'}/4
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">10. Salivation:</span>
+                  <span className={`font-medium ${data.q10 >= 2 ? 'text-amber-600' : data.q10 === 0 ? 'text-green-600' : ''}`}>
+                    {data.q10 ?? '-'}/4
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Mean score */}
+            <div className="pt-2 border-t flex justify-between items-center">
+              <span className="text-gray-600 font-medium">Score moyen (somme / 10):</span>
+              <span className={`font-bold text-lg ${
+                data.mean_score > 2.0 ? 'text-red-600' : 
+                data.mean_score > 1.0 ? 'text-amber-600' : 
+                data.mean_score > 0.3 ? 'text-blue-600' : 
+                data.mean_score > 0 ? 'text-blue-600' : 'text-green-600'
+              }`}>
+                {data.mean_score !== undefined && data.mean_score !== null ? data.mean_score.toFixed(2) : '-'}/4.0
+              </span>
+            </div>
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p>Score: 0 = Normal, 1 = Leger, 2 = Modere, 3 = Important, 4 = Severe</p>
+              <p className="mt-1">Seuil clinique: Score moyen &gt; 0.3 = EPS significatifs</p>
+            </div>
+          </div>
+        )}
+
+        {/* PSP Details */}
+        {code === 'PSP' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg text-center font-medium ${
+                data.final_score !== null && data.final_score >= 71
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : data.final_score !== null && data.final_score >= 51
+                  ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : data.final_score !== null && data.final_score >= 31
+                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                {data.interpretation}
+              </div>
+            )}
+
+            {/* Domain ratings */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Evaluation des 4 domaines</h5>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">(a) Activites socialement utiles:</span>
+                  <span className={`font-medium ${
+                    data.domain_a === 'Severe' || data.domain_a === 'Tres_severe' ? 'text-red-600' :
+                    data.domain_a === 'Marque' ? 'text-amber-600' :
+                    data.domain_a === 'Absent' ? 'text-green-600' : ''
+                  }`}>
+                    {data.domain_a?.replace('_', ' ') || '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">(b) Relations personnelles et sociales:</span>
+                  <span className={`font-medium ${
+                    data.domain_b === 'Severe' || data.domain_b === 'Tres_severe' ? 'text-red-600' :
+                    data.domain_b === 'Marque' ? 'text-amber-600' :
+                    data.domain_b === 'Absent' ? 'text-green-600' : ''
+                  }`}>
+                    {data.domain_b?.replace('_', ' ') || '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">(c) Souci de soi:</span>
+                  <span className={`font-medium ${
+                    data.domain_c === 'Severe' || data.domain_c === 'Tres_severe' ? 'text-red-600' :
+                    data.domain_c === 'Marque' ? 'text-amber-600' :
+                    data.domain_c === 'Absent' ? 'text-green-600' : ''
+                  }`}>
+                    {data.domain_c?.replace('_', ' ') || '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">(d) Comportements perturbateurs:</span>
+                  <span className={`font-medium ${
+                    data.domain_d === 'Severe' || data.domain_d === 'Tres_severe' ? 'text-red-600' :
+                    data.domain_d === 'Marque' ? 'text-amber-600' :
+                    data.domain_d === 'Absent' ? 'text-green-600' : ''
+                  }`}>
+                    {data.domain_d?.replace('_', ' ') || '-'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Interval and final score */}
+            <div className="pt-2 border-t">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Intervalle selectionne:</span>
+                  <span className="font-medium">
+                    {data.interval_selection ? 
+                      data.interval_selection === 1 ? '91-100' :
+                      data.interval_selection === 2 ? '81-90' :
+                      data.interval_selection === 3 ? '71-80' :
+                      data.interval_selection === 4 ? '61-70' :
+                      data.interval_selection === 5 ? '51-60' :
+                      data.interval_selection === 6 ? '41-50' :
+                      data.interval_selection === 7 ? '31-40' :
+                      data.interval_selection === 8 ? '21-30' :
+                      data.interval_selection === 9 ? '11-20' :
+                      '1-10' : '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 font-medium">Score final:</span>
+                  <span className={`font-bold text-lg ${
+                    data.final_score >= 71 ? 'text-green-600' :
+                    data.final_score >= 51 ? 'text-blue-600' :
+                    data.final_score >= 31 ? 'text-amber-600' : 'text-red-600'
+                  }`}>
+                    {data.final_score ?? '-'}/100
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p>Score: 91-100 = Tres bon, 71-90 = Bon, 51-70 = Modere, 31-50 = Altere, 1-30 = Severement altere</p>
+              <p className="mt-1">Periode d'evaluation: Le mois dernier (30 derniers jours)</p>
             </div>
           </div>
         )}
