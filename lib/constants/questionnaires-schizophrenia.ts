@@ -2083,17 +2083,17 @@ export const AIMS_DEFINITION: QuestionnaireDefinition = {
 // Original author: T. R. E. Barnes (1989)
 
 const BARNES_OBJECTIVE_OPTIONS = [
-  { code: 0, label: 'Normal - Impatiences des membres occasionnelles', score: 0 },
-  { code: 1, label: 'Leger - Mouvements caracteristiques presents moins de la moitie du temps', score: 1 },
-  { code: 2, label: 'Modere - Mouvements presents au moins la moitie du temps', score: 2 },
-  { code: 3, label: 'Severe - Mouvements constants, incapacite de rester assis ou debout', score: 3 }
+  { code: 0, label: 'Normal. Impatiences des membres occasionnelles.', score: 0 },
+  { code: 1, label: 'Presence de mouvements caracteristiques d\'impatience : frottement, pietinement, balancement d\'une jambe lorsqu\'il est assis et/ou balancement d\'un pied sur l\'autre ou pietinement sur place lorsqu\'il est debout mais les mouvements sont presents moins de la moitie du temps d\'observation.', score: 1 },
+  { code: 2, label: 'Phenomenes decrits ci-dessus presents au moins la moitie du temps d\'observation.', score: 2 },
+  { code: 3, label: 'Le patient a constamment des mouvements d\'agitation caracteristique et/ou est dans l\'incapacite de rester assis ou debout sans marcher ou sans pietiner.', score: 3 }
 ];
 
 const BARNES_AGITATION_OPTIONS = [
-  { code: 0, label: 'Absence - Pas d\'impatience subjective', score: 0 },
-  { code: 1, label: 'Leger - Impression non specifique d\'agitation interieure', score: 1 },
-  { code: 2, label: 'Modere - Conscience d\'incapacite a garder les jambes au repos', score: 2 },
-  { code: 3, label: 'Severe - Besoin compulsif intense de bouger la plupart du temps', score: 3 }
+  { code: 0, label: 'Absence d\'impatience subjective.', score: 0 },
+  { code: 1, label: 'Impression non specifique d\'agitation interieure.', score: 1 },
+  { code: 2, label: 'Le patient a conscience d\'une incapacite a garder ses jambes au repos ou ressent le besoin de bouger ses jambes et/ou se plaint d\'une agitation interieure aggravee specifiquement lorsqu\'on lui demande de rester tranquille.', score: 2 },
+  { code: 3, label: 'Conscience d\'un besoin compulsif intense de bouger la plupart du temps et/ou rapporte une forte envie de marcher ou pietiner la plupart du temps.', score: 3 }
 ];
 
 const BARNES_DISTRESS_OPTIONS = [
@@ -2104,12 +2104,12 @@ const BARNES_DISTRESS_OPTIONS = [
 ];
 
 const BARNES_GLOBAL_OPTIONS = [
-  { code: 0, label: 'Absence - Pas d\'akathisie', score: 0 },
-  { code: 1, label: 'Douteux - Tension interieure non specifique', score: 1 },
-  { code: 2, label: 'Legere - Conscience d\'impatiences, peu de gene', score: 2 },
-  { code: 3, label: 'Moyenne - Agitation avec mouvements caracteristiques, gene', score: 3 },
-  { code: 4, label: 'Marquee - Desir compulsif de marcher, eprouvant', score: 4 },
-  { code: 5, label: 'Severe - Besoin compulsif constant, detresse intense', score: 5 }
+  { code: 0, label: 'Absence ; Pas de sensation d\'agitation ou d\'impatience. La presence de mouvements caracteristiques d\'akathisie en l\'absence d\'impression subjective d\'agitation interieure ou de besoin compulsif de bouger les jambes doit etre consideree comme une pseudo-akathisie.', score: 0 },
+  { code: 1, label: 'Douteux. Tension interieure et agitation non specifiques.', score: 1 },
+  { code: 2, label: 'Legere. Conscience d\'impatiences dans les jambes et/ou sensation d\'agitation interieure aggravee lors de la station debout au repos. L\'agitation est presente mais les mouvements caracteristiques peuvent manquer. Occasionne peu ou pas de gene.', score: 2 },
+  { code: 3, label: 'Moyenne. Conscience d\'une agitation associee a des mouvements caracteristiques comme le balancement d\'un pied sur l\'autre en station debout. Responsable d\'une gene chez le patient.', score: 3 },
+  { code: 4, label: 'Akathisie marquee. Impression subjective d\'agitation avec le desir compulsif de marcher ou pietiner. Le patient peut neanmoins rester assis au moins 5 minutes. Manifestement eprouvante pour le patient.', score: 4 },
+  { code: 5, label: 'Akathisie severe. Le patient rapporte un besoin compulsif de faire les cents pas la plupart du temps; Incapable de rester assis ou allonge plus de quelques minutes. Agitation permanente associee a une detresse intense et une insomnie.', score: 5 }
 ];
 
 export const BARNES_QUESTIONS: Question[] = [
