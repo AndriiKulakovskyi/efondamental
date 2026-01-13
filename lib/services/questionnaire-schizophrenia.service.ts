@@ -302,7 +302,7 @@ export async function savePanssResponse(
   // Helper function to sum values, returns null if any value is null
   const sumIfComplete = (values: (number | null)[]): number | null => {
     if (values.some(v => v === null)) return null;
-    return values.reduce((sum, v) => sum + (v as number), 0);
+    return values.reduce<number>((sum, v) => sum + (v as number), 0);
   };
 
   // Calculate Traditional Subscale Scores
@@ -441,9 +441,10 @@ export async function saveCdssResponse(
   let interpretation: string | null = null;
 
   if (allAnswered) {
-    total_score = items.reduce((sum, item) => sum + (item as number), 0);
+    const score = items.reduce<number>((sum, item) => sum + (item as number), 0);
+    total_score = score;
     // Clinical cutoff: >6 indicates depressive syndrome
-    has_depressive_syndrome = total_score > 6;
+    has_depressive_syndrome = score > 6;
     interpretation = has_depressive_syndrome 
       ? 'Presence d\'un syndrome depressif (score > 6)'
       : 'Absence de syndrome depressif significatif (score <= 6)';
@@ -699,7 +700,8 @@ export async function saveAimsResponse(
   const answeredItems = movementItems.filter(item => item !== null);
 
   if (answeredItems.length > 0) {
-    movement_score = movementItems.reduce((sum, item) => sum + (item ?? 0), 0);
+    const score = movementItems.reduce<number>((sum, item) => sum + (item ?? 0), 0);
+    movement_score = score;
 
     // Clinical interpretation based on movement score and individual items
     // Probable TD: score >= 2 on at least 2 body regions, OR score >= 3 on 1 region
@@ -707,14 +709,14 @@ export async function saveAimsResponse(
     const lightOrMoreCount = movementItems.filter(item => item !== null && item >= 2).length;
 
     if (hasModerateOrSevere || lightOrMoreCount >= 2) {
-      if (movement_score >= 14) {
+      if (score >= 14) {
         interpretation = 'Dyskinesie severe - Surveillance etroite recommandee';
-      } else if (movement_score >= 7) {
+      } else if (score >= 7) {
         interpretation = 'Dyskinesie moderee - Evaluation du traitement conseillee';
       } else {
         interpretation = 'Dyskinesie probable - A surveiller';
       }
-    } else if (movement_score > 0) {
+    } else if (score > 0) {
       interpretation = 'Mouvements minimes - Surveillance de routine';
     } else {
       interpretation = 'Pas de mouvement anormal detecte';

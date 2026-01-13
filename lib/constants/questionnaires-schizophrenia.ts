@@ -1620,32 +1620,21 @@ export const BARS_QUESTIONS: Question[] = [
     text: '1. Nombre de doses prescrites par jour',
     help: 'Quel est le nombre de doses prescrites par jour (connaissance qu\'en a le patient)',
     type: 'number',
-    required: false,
-    validation: {
-      min: 0
-    }
+    required: false
   },
   {
     id: 'q2',
     text: '2. Jours sans traitement',
     help: 'Nombre de jours le mois dernier pendant lesquels il n\'a pas pris le traitement prescrit',
     type: 'number',
-    required: false,
-    validation: {
-      min: 0,
-      max: 31
-    }
+    required: false
   },
   {
     id: 'q3',
     text: '3. Jours avec dose reduite',
     help: 'Nombre de jours le mois dernier pendant lesquels le patient a pris moins que la dose de traitement prescrite',
     type: 'number',
-    required: false,
-    validation: {
-      min: 0,
-      max: 31
-    }
+    required: false
   }
 ];
 
