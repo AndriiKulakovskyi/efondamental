@@ -2907,7 +2907,11 @@ export function QuestionnaireRenderer({
 
         return (
           <div key={group.section?.id || `group-${groupIndex}`}>
-            {group.section && renderSection(group.section, questionnaire.questions, groupIndex + 1)}
+            {group.section && renderSection(
+              group.section, 
+              questionnaire.questions, 
+              questionnaire.questions.filter(q => q.type === 'section').findIndex(q => q.id === group.section?.id) + 1
+            )}
 
             {isSectionExpanded && visibleGroupQuestions.length > 0 && (
               <div className="p-6 pt-2 border-t border-slate-100 space-y-8">

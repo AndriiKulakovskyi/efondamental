@@ -1461,7 +1461,7 @@ export const CDSS_QUESTIONS: Question[] = [
     id: 'cdss_instructions',
     text: 'Instructions',
     help: 'Poser la premiere question telle qu\'elle est ecrite. Par la suite, vous pouvez utiliser d\'autres questions d\'exploration ou d\'autres questions pertinentes a votre discretion. Le cadre temporel concerne les deux dernieres semaines a moins qu\'il ne soit stipule autrement. Le dernier item (9) se base sur des observations fondees sur l\'ensemble de l\'entretien.',
-    type: 'section',
+    type: 'instruction',
     required: false
   },
   {
@@ -1612,7 +1612,7 @@ export const BARS_QUESTIONS: Question[] = [
     id: 'bars_instructions',
     text: 'Instructions',
     help: 'Administrer les trois questions au patient concernant sa prise de traitement au cours du mois dernier (30 derniers jours). Le score calcule le pourcentage d\'observance sur la base des reponses aux trois questions.',
-    type: 'section',
+    type: 'instruction',
     required: false
   },
   {
@@ -1926,7 +1926,7 @@ export const AIMS_QUESTIONS: Question[] = [
     id: 'aims_instructions',
     text: 'Instructions',
     help: 'Veuillez observer le patient dans differentes positions et situations standardisees conformement au protocole d\'examen AIMS. Evaluer la severite des mouvements involontaires anormaux.',
-    type: 'section',
+    type: 'instruction',
     required: false
   },
   // Orofacial movements (items 1-4)
@@ -2117,7 +2117,7 @@ export const BARNES_QUESTIONS: Question[] = [
     id: 'barnes_instructions',
     text: 'Instructions',
     help: 'Le patient doit etre observe assis, puis debout, engage dans une conversation neutre (1 a 2 minutes dans chaque position). Les symptomes observes dans d\'autres situations peuvent egalement etre cotes.',
-    type: 'section',
+    type: 'instruction',
     required: false
   },
   // Objective rating
@@ -2210,7 +2210,7 @@ export const SAS_QUESTIONS: Question[] = [
     id: 'sas_instructions',
     text: 'Instructions',
     help: 'L\'examinateur effectue une serie de tests physiques et d\'observations pour evaluer les signes extrapyramidaux. Le score total est la moyenne des 10 items (somme / 10).',
-    type: 'section',
+    type: 'instruction',
     required: false
   },
   {
@@ -2391,7 +2391,7 @@ export const PSP_QUESTIONS: Question[] = [
     id: 'psp_instructions',
     text: 'Instructions',
     help: 'Evaluez le fonctionnement du patient au cours du mois dernier selon un processus en 3 etapes: (1) Evaluer chaque domaine, (2) Choisir un intervalle de 10 points, (3) Ajuster le score final.',
-    type: 'section',
+    type: 'instruction',
     required: false
   },
   {
