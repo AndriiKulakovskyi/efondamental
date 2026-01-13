@@ -1,7 +1,7 @@
 // eFondaMental Platform - Schizophrenia Questionnaire Definitions
 // Questionnaires for schizophrenia screening visits
 
-import { Question } from '@/lib/types/database.types';
+import { Question, QuestionOption } from '@/lib/types/database.types';
 import { QuestionnaireDefinition } from './questionnaires';
 
 // ============================================================================
@@ -2776,6 +2776,665 @@ export const ECV_DEFINITION: QuestionnaireDefinition = {
   questions: ECV_QUESTIONS,
   metadata: {
     singleColumn: true,
+    pathologies: ['schizophrenia'],
+    target_role: 'healthcare_professional',
+    version: '1.0',
+    language: 'fr-FR'
+  }
+};
+
+// ============================================================================
+// TROUBLES PSYCHOTIQUES - Comprehensive diagnostic questionnaire
+// ============================================================================
+
+// Common options - use string codes to match display_if conditions
+const TROUBLES_PSYCHOTIQUES_YES_NO_OPTIONS: QuestionOption[] = [
+  { code: 'Oui', label: 'Oui' },
+  { code: 'Non', label: 'Non' }
+];
+
+const TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS: QuestionOption[] = [
+  { code: 'Oui', label: 'Oui' },
+  { code: 'Non', label: 'Non' },
+  { code: 'Ne sais pas', label: 'Ne sais pas' }
+];
+
+// Disorder type options (when patient HAS psychotic spectrum disorder)
+// Use string codes ('1', '2', etc.) to match display_if conditions
+const TROUBLES_PSYCHOTIQUES_TYPE_OPTIONS: QuestionOption[] = [
+  { code: '1', label: 'Schizophrenie (incluant psychose hallucinatoire chronique et paraphrenie tardive)' },
+  { code: '2', label: 'Trouble schizo-affectif' },
+  { code: '3', label: 'Personnalite schizoide (selon le DSM-IV)' },
+  { code: '4', label: 'Personnalite schizotypique (selon le DSM-IV)' },
+  { code: '5', label: 'Trouble psychotique bref (/aigu et transitoire)' },
+  { code: '6', label: 'Trouble schizophreniforme (entre 1 et 6 mois)' },
+  { code: '7', label: 'Trouble psychotique induit par une substance (pharmacopsychose)' },
+  { code: '8', label: 'Trouble delirant persistant non schizophrenique' },
+  { code: '9', label: 'Trouble psychotique du a une affection medicale generale' },
+  { code: '10', label: 'Autre' }
+];
+
+// Alternative diagnosis options (when patient does NOT have psychotic spectrum disorder)
+// Use string codes to match display_if conditions
+const TROUBLES_PSYCHOTIQUES_NON_OPTIONS: QuestionOption[] = [
+  { code: '1', label: 'Trouble bipolaire de l\'humeur de type 1' },
+  { code: '2', label: 'Trouble bipolaire de l\'humeur de type 2' },
+  { code: '3', label: 'Trouble depressif avec caracteristiques psychotiques' },
+  { code: '4', label: 'Trouble obsessionnel compulsif' },
+  { code: '5', label: 'Trouble de personnalite borderline' },
+  { code: '6', label: 'Maladie de Nieman-Pick de type C' },
+  { code: '7', label: 'Autre trouble genetique' },
+  { code: '8', label: 'Syndrome TDAH' },
+  { code: '9', label: 'Syndrome d\'Asperger' },
+  { code: '10', label: 'Trouble du spectre autistique hors Asperger' },
+  { code: '11', label: 'Maladie de Wilson' },
+  { code: '12', label: 'Troubles lies a une affection neurologique' },
+  { code: '13', label: 'Deficience intellectuelle' }
+];
+
+// Age options (generate <5, 5-89, >89, Ne sais pas)
+// Use string codes to match display_if conditions
+const generateAgeOptions = (includeNoHosp = false, includeNone = false): QuestionOption[] => {
+  const options: QuestionOption[] = [];
+  if (includeNone) {
+    options.push({ code: 'Aucun', label: 'Aucun' });
+  }
+  if (includeNoHosp) {
+    options.push({ code: 'Pas d\'hospitalisations', label: 'Pas d\'hospitalisations' });
+  }
+  options.push({ code: '<5', label: '<5' });
+  for (let i = 5; i <= 89; i++) {
+    options.push({ code: String(i), label: String(i) });
+  }
+  options.push({ code: '>89', label: '>89' });
+  options.push({ code: 'Ne sais pas', label: 'Ne sais pas' });
+  return options;
+};
+
+// Count options (0-20, >20, Ne sais pas)
+// Use string codes to match display_if conditions
+const generateCountOptions = (includeNone = false): QuestionOption[] => {
+  const options: QuestionOption[] = [];
+  if (includeNone) {
+    options.push({ code: 'Aucun', label: 'Aucun' });
+  }
+  for (let i = 0; i <= 20; i++) {
+    options.push({ code: String(i), label: String(i) });
+  }
+  options.push({ code: '>20', label: '>20' });
+  options.push({ code: 'Ne sais pas', label: 'Ne sais pas' });
+  return options;
+};
+
+// Month duration options (0-30, >30, Ne sais pas)
+// Use string codes
+const generateMonthOptions = (): QuestionOption[] => {
+  const options: QuestionOption[] = [];
+  for (let i = 0; i <= 30; i++) {
+    options.push({ code: String(i), label: String(i) });
+  }
+  options.push({ code: '>30', label: '>30' });
+  options.push({ code: 'Ne sais pas', label: 'Ne sais pas' });
+  return options;
+};
+
+// Week duration options (0-52, Ne sais pas)
+// Use string codes
+const generateWeekOptions = (): QuestionOption[] => {
+  const options: QuestionOption[] = [];
+  for (let i = 0; i <= 52; i++) {
+    options.push({ code: String(i), label: String(i) });
+  }
+  options.push({ code: 'Ne sais pas', label: 'Ne sais pas' });
+  return options;
+};
+
+// Episode type options - use string codes (no empty string allowed by Radix Select)
+const EPISODE_TYPE_OPTIONS: QuestionOption[] = [
+  { code: 'Paranoide', label: 'Paranoide' },
+  { code: 'Indifferencie', label: 'Indifferencie' },
+  { code: 'Desorganise', label: 'Desorganise' },
+  { code: 'Catatonique', label: 'Catatonique' },
+  { code: 'Schizo-affectif depressif', label: 'Schizo-affectif depressif' },
+  { code: 'Schizo-affectif mixte', label: 'Schizo-affectif mixte' },
+  { code: 'Schizo-affectif maniaque', label: 'Schizo-affectif maniaque' }
+];
+
+// Evolutionary mode options - use string codes matching database values
+const EVOLUTIONARY_MODE_OPTIONS: QuestionOption[] = [
+  { code: 'Episodique avec symptomes residuels entre les episodes et avec presence de symptomes negatifs', label: 'Episodique avec symptomes residuels + symptomes negatifs' },
+  { code: 'Episodique avec symptomes residuels entre les episodes et sans symptomes negatifs', label: 'Episodique avec symptomes residuels sans symptomes negatifs' },
+  { code: 'Episodique sans symptomes residuels entre les episodes', label: 'Episodique sans symptomes residuels' },
+  { code: 'Continu avec symptomes negatifs prononces', label: 'Continu avec symptomes negatifs prononces' },
+  { code: 'Continu', label: 'Continu' },
+  { code: 'Episode isole avec symptomes negatifs prononces', label: 'Episode isole avec symptomes negatifs prononces' },
+  { code: 'Episode isole en remission partielle', label: 'Episode isole en remission partielle' },
+  { code: 'Episode isole en remission complete', label: 'Episode isole en remission complete' },
+  { code: 'Autre cours evolutif', label: 'Autre cours evolutif' }
+];
+
+// Hospitalization reason options - use string codes
+const HOSPITALIZATION_REASON_OPTIONS: QuestionOption[] = [
+  { code: 'Episode psychotique', label: 'Episode psychotique' },
+  { code: 'Episode thymique', label: 'Episode thymique' },
+  { code: 'Tentative de suicide', label: 'Tentative de suicide' },
+  { code: 'Destabilisation de l\'environnement', label: 'Destabilisation de l\'environnement' },
+  { code: 'Recrudescence anxieuse', label: 'Recrudescence anxieuse' },
+  { code: 'Autres', label: 'Autres' }
+];
+
+// Treatment support options - use string codes for checkbox/contains conditions
+const TREATMENT_SUPPORT_OPTIONS: QuestionOption[] = [
+  { code: 'Autonome', label: 'Autonome' },
+  { code: 'Aide familiale', label: 'Aide familiale' },
+  { code: 'Aide au CMP ou a l\'hopital', label: 'Aide au CMP ou a l\'hopital' },
+  { code: 'IDE au domicile', label: 'IDE au domicile' }
+];
+
+// Periodicity options - use string codes
+const PERIODICITY_OPTIONS: QuestionOption[] = [
+  { code: 'Quotidienne', label: 'Quotidienne' },
+  { code: 'Hebdomadaire', label: 'Hebdomadaire' },
+  { code: 'Bimensuelle', label: 'Bimensuelle' },
+  { code: 'Mensuelle', label: 'Mensuelle' }
+];
+
+// Non-pharmacological treatment change options - use string codes
+const TREATMENT_CHANGE_OPTIONS: QuestionOption[] = [
+  { code: 'Debut', label: 'Debut' },
+  { code: 'Fin', label: 'Fin' }
+];
+
+// Helper function to generate episode questions
+const generateEpisodeQuestions = (): Question[] => {
+  const questions: Question[] = [];
+  for (let i = 1; i <= 20; i++) {
+    questions.push(
+      {
+        id: `rad_tbpsychovie_ep${i}_type`,
+        text: `Type de l'episode ${i}`,
+        type: 'single_choice',
+        required: false,
+        options: EPISODE_TYPE_OPTIONS
+      },
+      {
+        id: `tbpsychovie_ep${i}_debut`,
+        text: `Date de debut de l'episode ${i}`,
+        type: 'text',
+        required: false
+      },
+      {
+        id: `rad_tbpsychovie_ep${i}_hosp`,
+        text: `Hospitalisation pour l'episode ${i}`,
+        type: 'single_choice',
+        required: false,
+        options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+      },
+      {
+        id: `tbpsychovie_ep${i}_hospduree`,
+        text: `Duree d'hospitalisation pour l'episode ${i} (semaines)`,
+        type: 'text',
+        required: false,
+        display_if: { '==': [{ 'var': `rad_tbpsychovie_ep${i}_hosp` }, 'Oui'] },
+        indentLevel: 1
+      }
+    );
+  }
+  return questions;
+};
+
+// Helper function to generate symptom questions with "last month" follow-up
+const generateSymptomQuestion = (id: string, label: string): Question[] => {
+  return [
+    {
+      id: `rad_symptomesvie_${id}`,
+      text: label,
+      type: 'single_choice',
+      required: false,
+      options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
+    },
+    {
+      id: `rad_symptomesvie_${id}_mois`,
+      text: 'Presence lors du dernier mois',
+      type: 'single_choice',
+      required: false,
+      options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+      display_if: { '==': [{ 'var': `rad_symptomesvie_${id}` }, 'Oui'] },
+      indentLevel: 1
+    }
+  ];
+};
+
+export const TROUBLES_PSYCHOTIQUES_QUESTIONS: Question[] = [
+  // ==================== SECTION: DISORDER CLASSIFICATION ====================
+  {
+    id: 'section_disorder_classification',
+    text: 'TROUBLE PSYCHOTIQUE VIE ENTIERE',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'rad_tbpsychovie',
+    text: 'Le patient presente-t-il un trouble appartenant au spectre psychotique ou schizophrenique?',
+    type: 'single_choice',
+    required: true,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_OPTIONS
+  },
+  {
+    id: 'radhtml_tbpsychovie_type',
+    text: 'Type de trouble',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_TYPE_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'radhtml_tbpsychovie_non',
+    text: 'Type de trouble (si non psychotique)',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_NON_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Non'] },
+    indentLevel: 1
+  },
+  {
+    id: 'tbpsychovie_non_autre',
+    text: 'Autre trouble (preciser)',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ 'var': 'radhtml_tbpsychovie_non' }, '7'] },
+    indentLevel: 2
+  },
+
+  // ==================== SECTION: LIFETIME CHARACTERISTICS ====================
+  {
+    id: 'section_lifetime_characteristics',
+    text: 'Caracteristiques du trouble vie entiere',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'rad_tbpsychovie_premierep_age',
+    text: 'Age du 1er episode psychotique',
+    type: 'single_choice',
+    required: false,
+    options: generateAgeOptions(),
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+  {
+    id: 'rad_tbpsychovie_premiertrait_age',
+    text: 'Age du 1er traitement antipsychotique',
+    type: 'single_choice',
+    required: false,
+    options: generateAgeOptions(),
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+  {
+    id: 'tbpsychovie_premiertrait_duree',
+    text: 'Duree de psychose non traitee (mois)',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+  {
+    id: 'rad_tbpsychovie_premierhosp_age',
+    text: 'Age de la 1ere hospitalisation en psychiatrie pour trouble psychotique',
+    type: 'single_choice',
+    required: false,
+    options: generateAgeOptions(true),
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+  {
+    id: 'tbduree',
+    text: 'Duree en semaines',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 50,
+    display_if: {
+      'and': [
+        { '!=': [{ 'var': 'rad_tbpsychovie_premierhosp_age' }, ''] },
+        { '!=': [{ 'var': 'rad_tbpsychovie_premierhosp_age' }, 'Pas d\'hospitalisations'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'tbdureetot',
+    text: 'Duree totale des hospitalisations pour le 1er episode psychotique (semaines)',
+    type: 'number',
+    required: false,
+    max: 50,
+    display_if: {
+      'and': [
+        { '!=': [{ 'var': 'rad_tbpsychovie_premierhosp_age' }, ''] },
+        { '!=': [{ 'var': 'rad_tbpsychovie_premierhosp_age' }, 'Pas d\'hospitalisations'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_tbpsychovie_hospit_nb',
+    text: 'Nombre d\'hospitalisations en psychiatrie sur la vie entiere',
+    type: 'single_choice',
+    required: false,
+    options: generateCountOptions(),
+    display_if: {
+      'and': [
+        { '!=': [{ 'var': 'rad_tbpsychovie_premierhosp_age' }, ''] },
+        { '!=': [{ 'var': 'rad_tbpsychovie_premierhosp_age' }, 'Pas d\'hospitalisations'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_tbpsychovie_hospit_dureetot',
+    text: 'Duree totale des hospitalisations en psychiatrie sur la vie entiere (mois)',
+    type: 'single_choice',
+    required: false,
+    options: generateMonthOptions(),
+    display_if: {
+      'and': [
+        { '!=': [{ 'var': 'rad_tbpsychovie_premierhosp_age' }, ''] },
+        { '!=': [{ 'var': 'rad_tbpsychovie_premierhosp_age' }, 'Pas d\'hospitalisations'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_tbpsychovie_nb',
+    text: 'Nombre d\'episodes psychotiques',
+    type: 'single_choice',
+    required: false,
+    options: generateCountOptions(true),
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+
+  // ==================== SECTION: EPISODE HISTORY ====================
+  {
+    id: 'section_episode_history',
+    text: 'Historique des episodes psychotiques',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+  ...generateEpisodeQuestions(),
+
+  // ==================== SECTION: LIFETIME SYMPTOMS ====================
+  {
+    id: 'section_lifetime_symptoms',
+    text: 'SYMPTOMES VIE ENTIERE',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+
+  // Delusions subsection
+  {
+    id: 'section_delusions',
+    text: 'Delires',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] },
+    is_subsection: true
+  },
+  ...generateSymptomQuestion('persecution', 'Delire de persecution'),
+  ...generateSymptomQuestion('grandeur', 'Delire de grandeur'),
+  ...generateSymptomQuestion('somatique', 'Delire somatique'),
+  ...generateSymptomQuestion('mystique', 'Delire mystique'),
+  ...generateSymptomQuestion('culpabilite', 'Delire de culpabilite'),
+  ...generateSymptomQuestion('jalousie', 'Delire de jalousie'),
+  ...generateSymptomQuestion('erotomaniaque', 'Delire erotomaniaque'),
+  ...generateSymptomQuestion('etrecontrole', 'Delire d\'etre controle'),
+  ...generateSymptomQuestion('volpensee', 'Delire de vol de la pensee'),
+  ...generateSymptomQuestion('bizarre', 'Delire bizarre'),
+  ...generateSymptomQuestion('idreferences', 'Idees de references'),
+
+  // Hallucinations subsection
+  {
+    id: 'section_hallucinations',
+    text: 'Hallucinations',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] },
+    is_subsection: true
+  },
+  ...generateSymptomQuestion('halluintrapsy', 'Hallucinations auditives intrapsychiques'),
+  ...generateSymptomQuestion('hallusenso', 'Hallucinations auditives sensorielles'),
+  ...generateSymptomQuestion('halluvisu', 'Hallucinations visuelles'),
+  ...generateSymptomQuestion('hallucenesthe', 'Hallucinations cenesthesiques'),
+
+  // Disorganization subsection
+  {
+    id: 'section_disorganization',
+    text: 'Desorganisation',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] },
+    is_subsection: true
+  },
+  ...generateSymptomQuestion('catatonie', 'Catatonie'),
+  ...generateSymptomQuestion('compodesorg', 'Comportement desorganise'),
+  ...generateSymptomQuestion('gestdiscord', 'Gestuelle discordante'),
+  ...generateSymptomQuestion('discdesorg', 'Discours desorganise'),
+
+  // Negative symptoms subsection
+  {
+    id: 'section_negative_symptoms',
+    text: 'Symptomes negatifs',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] },
+    is_subsection: true
+  },
+  ...generateSymptomQuestion('avolition', 'Avolition'),
+  ...generateSymptomQuestion('alogie', 'Alogie'),
+  ...generateSymptomQuestion('emousaffec', 'Emoussement affectif'),
+
+  // ==================== SECTION: EVOLUTIONARY MODE ====================
+  {
+    id: 'section_evolutionary_mode',
+    text: 'MODE EVOLUTIF DE LA SYMPTOMATOLOGIE',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+  {
+    id: 'rad_symptomeevo_mode',
+    text: 'Mode evolutif',
+    type: 'single_choice',
+    required: false,
+    options: EVOLUTIONARY_MODE_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+
+  // ==================== SECTION: ANNUAL CHARACTERISTICS ====================
+  {
+    id: 'section_annual_characteristics',
+    text: 'CARACTERISTIQUES DU TROUBLE AU COURS DES 12 DERNIERS MOIS',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+
+  // Annual episodes
+  {
+    id: 'rad_tbpsychoan',
+    text: 'Presence d\'au moins un episode psychotique au cours de l\'annee',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+
+  // Annual hospitalizations
+  {
+    id: 'section_annual_hospitalization',
+    text: 'Hospitalisation au cours de l\'annee ecoulee',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+  {
+    id: 'rad_tbpsychoan_hospi_tpscomplet',
+    text: 'Hospitalisations a temps complet au cours de l\'annee ecoulee',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+  {
+    id: 'rad_tbpsychoan_hospi_tpscomplet_nb',
+    text: 'Nombre d\'hospitalisations au cours de l\'annee ecoulee',
+    type: 'single_choice',
+    required: false,
+    options: generateCountOptions(),
+    display_if: { '==': [{ 'var': 'rad_tbpsychoan_hospi_tpscomplet' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_tbpsychoan_hospi_tpscomplet_duree',
+    text: 'Duree totale des hospitalisations sur l\'annee ecoulee (semaines)',
+    type: 'single_choice',
+    required: false,
+    options: generateWeekOptions(),
+    display_if: { '==': [{ 'var': 'rad_tbpsychoan_hospi_tpscomplet' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_tbpsychoan_hospi_tpscomplet_motif',
+    text: 'Motif d\'hospitalisation',
+    type: 'single_choice',
+    required: false,
+    options: HOSPITALIZATION_REASON_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_tbpsychoan_hospi_tpscomplet' }, 'Oui'] },
+    indentLevel: 1
+  },
+
+  // Non-pharmacological treatment changes
+  {
+    id: 'section_non_pharmacological',
+    text: 'Changement de prise en charge non medicamenteuse',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+  {
+    id: 'rad_tbpsychoan_modpec_nonmed',
+    text: 'Changement de prise en charge non medicamenteuse',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+  {
+    id: 'chk_tbpsychoan_modpec_nonmed_tcc',
+    text: 'Approche TCC',
+    type: 'multiple_choice',
+    required: false,
+    options: TREATMENT_CHANGE_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_tbpsychoan_modpec_nonmed' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'chk_tbpsychoan_modpec_nonmed_remed',
+    text: 'Remediation des fonctions cognitives',
+    type: 'multiple_choice',
+    required: false,
+    options: TREATMENT_CHANGE_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_tbpsychoan_modpec_nonmed' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'chk_tbpsychoan_modpec_nonmed_psychody',
+    text: 'Approche psychodynamique',
+    type: 'multiple_choice',
+    required: false,
+    options: TREATMENT_CHANGE_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_tbpsychoan_modpec_nonmed' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'chk_tbpsychoan_modpec_nonmed_fam',
+    text: 'Approche familiale',
+    type: 'multiple_choice',
+    required: false,
+    options: TREATMENT_CHANGE_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_tbpsychoan_modpec_nonmed' }, 'Oui'] },
+    indentLevel: 1
+  },
+  {
+    id: 'tbpsychoan_modpec_nonmed_autre',
+    text: 'Autres (preciser)',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_tbpsychoan_modpec_nonmed' }, 'Oui'] },
+    indentLevel: 1
+  },
+
+  // Treatment support
+  {
+    id: 'section_treatment_support',
+    text: 'Aide a la prise de traitement',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+  {
+    id: 'chk_aide_prise_tt',
+    text: 'Aide a la prise de traitement',
+    type: 'multiple_choice',
+    required: false,
+    options: TREATMENT_SUPPORT_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+  {
+    id: 'rad_aide_prise_tt_hospi',
+    text: 'Periodicite',
+    type: 'single_choice',
+    required: false,
+    options: PERIODICITY_OPTIONS,
+    display_if: { 'in': ['IDE au domicile', { 'var': 'chk_aide_prise_tt' }] },
+    indentLevel: 1
+  },
+
+  // Suicide attempts
+  {
+    id: 'section_suicide_attempts',
+    text: 'Tentatives de suicide',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+  {
+    id: 'rad_tbpsychoan_ts',
+    text: 'Presence de tentatives de suicide au cours de l\'annee ecoulee',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+  },
+  {
+    id: 'rad_tbpsychoan_ts_nb',
+    text: 'Nombre de tentatives de suicide au cours de l\'annee ecoulee',
+    type: 'single_choice',
+    required: false,
+    options: generateCountOptions(),
+    display_if: { '==': [{ 'var': 'rad_tbpsychoan_ts' }, 'Oui'] },
+    indentLevel: 1
+  }
+];
+
+export const TROUBLES_PSYCHOTIQUES_DEFINITION: QuestionnaireDefinition = {
+  id: 'troubles_psychotiques',
+  code: 'TROUBLES_PSYCHOTIQUES',
+  title: 'Troubles psychotiques',
+  description: 'Evaluation complete des troubles psychotiques incluant la classification des troubles, les caracteristiques vie entiere, l\'inventaire des symptomes (positifs et negatifs), l\'historique des episodes (jusqu\'a 20 episodes), les hospitalisations, le mode evolutif et le suivi annuel. Ce questionnaire est l\'outil diagnostique central pour les troubles du spectre schizophrenique.',
+  instructions: 'Ce questionnaire doit etre administre par un clinicien forme. Evaluer systematiquement chaque section. Periode de reference: Vie entiere et 12 derniers mois. Ce questionnaire est descriptif et ne produit pas de scores calcules.',
+  questions: TROUBLES_PSYCHOTIQUES_QUESTIONS,
+  metadata: {
+    singleColumn: false,
     pathologies: ['schizophrenia'],
     target_role: 'healthcare_professional',
     version: '1.0',

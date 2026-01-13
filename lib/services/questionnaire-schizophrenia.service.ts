@@ -1065,3 +1065,64 @@ export async function saveEcvResponse(
   if (error) throw error;
   return data;
 }
+
+// ============================================================================
+// TROUBLES PSYCHOTIQUES (Psychotic Disorders)
+// ============================================================================
+
+import {
+  TroublesPsychotiquesResponse,
+  TroublesPsychotiquesResponseInsert
+} from '../types/database.types';
+
+export async function getTroublesPsychotiquesResponse(
+  visitId: string
+): Promise<TroublesPsychotiquesResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_troubles_psychotiques')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return data || null;
+}
+
+export async function saveTroublesPsychotiquesResponse(
+  response: TroublesPsychotiquesResponseInsert
+): Promise<TroublesPsychotiquesResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    section_disorder_classification,
+    section_lifetime_characteristics,
+    section_episode_history,
+    section_lifetime_symptoms,
+    section_delusions,
+    section_hallucinations,
+    section_disorganization,
+    section_negative_symptoms,
+    section_evolutionary_mode,
+    section_annual_characteristics,
+    section_annual_hospitalization,
+    section_non_pharmacological,
+    section_treatment_support,
+    section_suicide_attempts,
+    ...responseData
+  } = response as any;
+
+  const { data, error } = await supabase
+    .from('responses_troubles_psychotiques')
+    .upsert({
+      ...responseData,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}

@@ -193,6 +193,10 @@ export function evaluateCondition(
     return condition['or'].some((cond: any) => evaluateCondition(cond, answers));
   }
 
+  if (condition['!']) {
+    return !evaluateCondition(condition['!'], answers);
+  }
+
   return true;
 }
 

@@ -191,6 +191,7 @@ export interface Question {
   metadata?: Record<string, any>;
   indentLevel?: number; // For visual indentation of branching questions
   is_label?: boolean; // Custom property to indicate if it's a label rather than an input
+  is_subsection?: boolean; // For section type: renders as a smaller sub-section header
   inline?: boolean; // Display this field inline with the previous field (e.g., unit selectors)
   computed?: { // Computed field that calculates its value from other fields
     formula: string;
@@ -5142,3 +5143,224 @@ export interface EcvResponse {
 }
 
 export type EcvResponseInsert = Omit<EcvResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
+// Troubles Psychotiques (Psychotic Disorders) Response Types
+// ============================================================================
+
+export interface TroublesPsychotiquesResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // ==================== SECTION 1: DISORDER CLASSIFICATION ====================
+  rad_tbpsychovie?: string | null; // Primary gating: 'Oui' | 'Non'
+  radhtml_tbpsychovie_type?: string | null; // Psychotic types 1-10 (when Oui)
+  radhtml_tbpsychovie_non?: string | null; // Non-psychotic types 1-13 (when Non)
+  tbpsychovie_non_autre?: string | null; // Other genetic disorder (when type=6)
+
+  // ==================== SECTION 2: LIFETIME CHARACTERISTICS ====================
+  rad_tbpsychovie_premierep_age?: string | null;
+  rad_tbpsychovie_premiertrait_age?: string | null;
+  tbpsychovie_premiertrait_duree?: string | null;
+  rad_tbpsychovie_premierhosp_age?: string | null;
+  tbduree?: string | null;
+  tbdureetot?: string | null;
+  rad_tbpsychovie_hospit_nb?: string | null;
+  rad_tbpsychovie_hospit_dureetot?: string | null;
+  rad_tbpsychovie_nb?: string | null;
+
+  // ==================== EPISODE HISTORY (20 episodes x 4 fields) ====================
+  // Episode 1
+  rad_tbpsychovie_ep1_type?: string | null;
+  tbpsychovie_ep1_debut?: string | null;
+  rad_tbpsychovie_ep1_hosp?: string | null;
+  tbpsychovie_ep1_hospduree?: string | null;
+  // Episode 2
+  rad_tbpsychovie_ep2_type?: string | null;
+  tbpsychovie_ep2_debut?: string | null;
+  rad_tbpsychovie_ep2_hosp?: string | null;
+  tbpsychovie_ep2_hospduree?: string | null;
+  // Episode 3
+  rad_tbpsychovie_ep3_type?: string | null;
+  tbpsychovie_ep3_debut?: string | null;
+  rad_tbpsychovie_ep3_hosp?: string | null;
+  tbpsychovie_ep3_hospduree?: string | null;
+  // Episode 4
+  rad_tbpsychovie_ep4_type?: string | null;
+  tbpsychovie_ep4_debut?: string | null;
+  rad_tbpsychovie_ep4_hosp?: string | null;
+  tbpsychovie_ep4_hospduree?: string | null;
+  // Episode 5
+  rad_tbpsychovie_ep5_type?: string | null;
+  tbpsychovie_ep5_debut?: string | null;
+  rad_tbpsychovie_ep5_hosp?: string | null;
+  tbpsychovie_ep5_hospduree?: string | null;
+  // Episode 6
+  rad_tbpsychovie_ep6_type?: string | null;
+  tbpsychovie_ep6_debut?: string | null;
+  rad_tbpsychovie_ep6_hosp?: string | null;
+  tbpsychovie_ep6_hospduree?: string | null;
+  // Episode 7
+  rad_tbpsychovie_ep7_type?: string | null;
+  tbpsychovie_ep7_debut?: string | null;
+  rad_tbpsychovie_ep7_hosp?: string | null;
+  tbpsychovie_ep7_hospduree?: string | null;
+  // Episode 8
+  rad_tbpsychovie_ep8_type?: string | null;
+  tbpsychovie_ep8_debut?: string | null;
+  rad_tbpsychovie_ep8_hosp?: string | null;
+  tbpsychovie_ep8_hospduree?: string | null;
+  // Episode 9
+  rad_tbpsychovie_ep9_type?: string | null;
+  tbpsychovie_ep9_debut?: string | null;
+  rad_tbpsychovie_ep9_hosp?: string | null;
+  tbpsychovie_ep9_hospduree?: string | null;
+  // Episode 10
+  rad_tbpsychovie_ep10_type?: string | null;
+  tbpsychovie_ep10_debut?: string | null;
+  rad_tbpsychovie_ep10_hosp?: string | null;
+  tbpsychovie_ep10_hospduree?: string | null;
+  // Episode 11
+  rad_tbpsychovie_ep11_type?: string | null;
+  tbpsychovie_ep11_debut?: string | null;
+  rad_tbpsychovie_ep11_hosp?: string | null;
+  tbpsychovie_ep11_hospduree?: string | null;
+  // Episode 12
+  rad_tbpsychovie_ep12_type?: string | null;
+  tbpsychovie_ep12_debut?: string | null;
+  rad_tbpsychovie_ep12_hosp?: string | null;
+  tbpsychovie_ep12_hospduree?: string | null;
+  // Episode 13
+  rad_tbpsychovie_ep13_type?: string | null;
+  tbpsychovie_ep13_debut?: string | null;
+  rad_tbpsychovie_ep13_hosp?: string | null;
+  tbpsychovie_ep13_hospduree?: string | null;
+  // Episode 14
+  rad_tbpsychovie_ep14_type?: string | null;
+  tbpsychovie_ep14_debut?: string | null;
+  rad_tbpsychovie_ep14_hosp?: string | null;
+  tbpsychovie_ep14_hospduree?: string | null;
+  // Episode 15
+  rad_tbpsychovie_ep15_type?: string | null;
+  tbpsychovie_ep15_debut?: string | null;
+  rad_tbpsychovie_ep15_hosp?: string | null;
+  tbpsychovie_ep15_hospduree?: string | null;
+  // Episode 16
+  rad_tbpsychovie_ep16_type?: string | null;
+  tbpsychovie_ep16_debut?: string | null;
+  rad_tbpsychovie_ep16_hosp?: string | null;
+  tbpsychovie_ep16_hospduree?: string | null;
+  // Episode 17
+  rad_tbpsychovie_ep17_type?: string | null;
+  tbpsychovie_ep17_debut?: string | null;
+  rad_tbpsychovie_ep17_hosp?: string | null;
+  tbpsychovie_ep17_hospduree?: string | null;
+  // Episode 18
+  rad_tbpsychovie_ep18_type?: string | null;
+  tbpsychovie_ep18_debut?: string | null;
+  rad_tbpsychovie_ep18_hosp?: string | null;
+  tbpsychovie_ep18_hospduree?: string | null;
+  // Episode 19
+  rad_tbpsychovie_ep19_type?: string | null;
+  tbpsychovie_ep19_debut?: string | null;
+  rad_tbpsychovie_ep19_hosp?: string | null;
+  tbpsychovie_ep19_hospduree?: string | null;
+  // Episode 20
+  rad_tbpsychovie_ep20_type?: string | null;
+  tbpsychovie_ep20_debut?: string | null;
+  rad_tbpsychovie_ep20_hosp?: string | null;
+  tbpsychovie_ep20_hospduree?: string | null;
+
+  // ==================== LIFETIME SYMPTOMS - DELUSIONS ====================
+  rad_symptomesvie_persecution?: string | null;
+  rad_symptomesvie_persecution_mois?: string | null;
+  rad_symptomesvie_grandeur?: string | null;
+  rad_symptomesvie_grandeur_mois?: string | null;
+  rad_symptomesvie_somatique?: string | null;
+  rad_symptomesvie_somatique_mois?: string | null;
+  rad_symptomesvie_mystique?: string | null;
+  rad_symptomesvie_mystique_mois?: string | null;
+  rad_symptomesvie_culpabilite?: string | null;
+  rad_symptomesvie_culpabilite_mois?: string | null;
+  rad_symptomesvie_jalousie?: string | null;
+  rad_symptomesvie_jalousie_mois?: string | null;
+  rad_symptomesvie_erotomaniaque?: string | null;
+  rad_symptomesvie_erotomaniaque_mois?: string | null;
+  rad_symptomesvie_etrecontrole?: string | null;
+  rad_symptomesvie_etrecontrole_mois?: string | null;
+  rad_symptomesvie_volpensee?: string | null;
+  rad_symptomesvie_volpensee_mois?: string | null;
+  rad_symptomesvie_bizarre?: string | null;
+  rad_symptomesvie_bizarre_mois?: string | null;
+  rad_symptomesvie_idreferences?: string | null;
+  rad_symptomesvie_idreferences_mois?: string | null;
+
+  // ==================== LIFETIME SYMPTOMS - HALLUCINATIONS ====================
+  rad_symptomesvie_halluintrapsy?: string | null;
+  rad_symptomesvie_halluintrapsy_mois?: string | null;
+  rad_symptomesvie_hallusenso?: string | null;
+  rad_symptomesvie_hallusenso_mois?: string | null;
+  rad_symptomesvie_halluvisu?: string | null;
+  rad_symptomesvie_halluvisu_mois?: string | null;
+  rad_symptomesvie_hallucenesthe?: string | null;
+  rad_symptomesvie_hallucenesthe_mois?: string | null;
+
+  // ==================== LIFETIME SYMPTOMS - DISORGANIZATION ====================
+  rad_symptomesvie_catatonie?: string | null;
+  rad_symptomesvie_catatonie_mois?: string | null;
+  rad_symptomesvie_compodesorg?: string | null;
+  rad_symptomesvie_compodesorg_mois?: string | null;
+  rad_symptomesvie_gestdiscord?: string | null;
+  rad_symptomesvie_gestdiscord_mois?: string | null;
+  rad_symptomesvie_discdesorg?: string | null;
+  rad_symptomesvie_discdesorg_mois?: string | null;
+
+  // ==================== LIFETIME SYMPTOMS - NEGATIVE SYMPTOMS ====================
+  rad_symptomesvie_avolition?: string | null;
+  rad_symptomesvie_avolition_mois?: string | null;
+  rad_symptomesvie_alogie?: string | null;
+  rad_symptomesvie_alogie_mois?: string | null;
+  rad_symptomesvie_emousaffec?: string | null;
+  rad_symptomesvie_emousaffec_mois?: string | null;
+
+  // ==================== EVOLUTIONARY MODE ====================
+  rad_symptomeevo_mode?: string | null;
+
+  // ==================== ANNUAL CHARACTERISTICS ====================
+  // Episodes this year
+  rad_tbpsychoan?: string | null;
+
+  // Hospitalizations
+  rad_tbpsychoan_hospi_tpscomplet?: string | null;
+  rad_tbpsychoan_hospi_tpscomplet_nb?: string | null;
+  rad_tbpsychoan_hospi_tpscomplet_duree?: string | null;
+  rad_tbpsychoan_hospi_tpscomplet_motif?: string | null;
+
+  // Non-pharmacological treatment changes
+  rad_tbpsychoan_modpec_nonmed?: string | null;
+  chk_tbpsychoan_modpec_nonmed_tcc?: string[] | null;
+  chk_tbpsychoan_modpec_nonmed_remed?: string[] | null;
+  chk_tbpsychoan_modpec_nonmed_psychody?: string[] | null;
+  chk_tbpsychoan_modpec_nonmed_fam?: string[] | null;
+  tbpsychoan_modpec_nonmed_autre?: string | null;
+
+  // Treatment adherence support
+  chk_aide_prise_tt?: string[] | null;
+  rad_aide_prise_tt_hospi?: string | null;
+
+  // Suicide attempts
+  rad_tbpsychoan_ts?: string | null;
+  rad_tbpsychoan_ts_nb?: string | null;
+
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type TroublesPsychotiquesResponseInsert = Omit<
+  TroublesPsychotiquesResponse,
+  'id' | 'created_at' | 'updated_at' | 'completed_at'
+>;

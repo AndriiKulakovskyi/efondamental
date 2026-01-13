@@ -121,7 +121,8 @@ import {
   BARNES_DEFINITION,
   SAS_DEFINITION,
   PSP_DEFINITION,
-  ECV_DEFINITION
+  ECV_DEFINITION,
+  TROUBLES_PSYCHOTIQUES_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { 
   getAsrmResponse, 
@@ -238,7 +239,8 @@ import {
   getBarnesResponse,
   getSasResponse,
   getPspResponse,
-  getEcvResponse
+  getEcvResponse,
+  getTroublesPsychotiquesResponse
 } from "@/lib/services/questionnaire-schizophrenia.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -383,6 +385,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === PSP_DEFINITION.code) questionnaire = PSP_DEFINITION;
   // Schizophrenia medical evaluation
   else if (code === ECV_DEFINITION.code) questionnaire = ECV_DEFINITION;
+  else if (code === TROUBLES_PSYCHOTIQUES_DEFINITION.code) questionnaire = TROUBLES_PSYCHOTIQUES_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -509,6 +512,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === PSP_DEFINITION.code) existingResponse = await getPspResponse(visitId);
   // Schizophrenia medical evaluation
   else if (code === ECV_DEFINITION.code) existingResponse = await getEcvResponse(visitId);
+  else if (code === TROUBLES_PSYCHOTIQUES_DEFINITION.code) existingResponse = await getTroublesPsychotiquesResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

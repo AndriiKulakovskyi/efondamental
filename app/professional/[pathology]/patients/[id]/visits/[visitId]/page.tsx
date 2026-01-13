@@ -127,7 +127,8 @@ import {
   BARNES_DEFINITION,
   SAS_DEFINITION,
   PSP_DEFINITION,
-  ECV_DEFINITION
+  ECV_DEFINITION,
+  TROUBLES_PSYCHOTIQUES_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -387,6 +388,21 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['ECV']?.completed || false,
               completedAt: questionnaireStatuses['ECV']?.completed_at,
+            }
+          ],
+          sections: [
+            {
+              id: 'dsm5',
+              name: 'DSM5',
+              questionnaires: [
+                {
+                  ...TROUBLES_PSYCHOTIQUES_DEFINITION,
+                  id: TROUBLES_PSYCHOTIQUES_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['TROUBLES_PSYCHOTIQUES']?.completed || false,
+                  completedAt: questionnaireStatuses['TROUBLES_PSYCHOTIQUES']?.completed_at,
+                }
+              ]
             }
           ]
         }

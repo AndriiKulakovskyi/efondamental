@@ -2407,7 +2407,52 @@ export function QuestionnaireRenderer({
     const isExpanded = expandedSections.has(question.id);
     const completion = getSectionCompletion(question.id, questions);
     const hasHelp = !!question.help;
+    const isSubsection = question.is_subsection === true;
 
+    // Render sub-section with lighter styling
+    if (isSubsection) {
+      return (
+        <details
+          key={question.id}
+          open={isExpanded}
+          className={`group bg-slate-50/50 border rounded-xl mb-4 overflow-hidden transition-all duration-300 ${
+            isExpanded ? 'border-slate-300' : 'border-slate-200'
+          }`}
+        >
+          <summary
+            className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-slate-100/50 transition select-none list-none"
+            onClick={(e) => {
+              e.preventDefault();
+              toggleSection(question.id);
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <h4 className={`text-base font-semibold transition-colors ${isExpanded ? 'text-slate-800' : 'text-slate-600'}`}>
+                {question.text}
+              </h4>
+            </div>
+            <div className="flex items-center gap-3">
+              {completion > 0 && (
+                <div className="flex items-center gap-2">
+                  <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-slate-500 transition-all"
+                      style={{ width: `${completion}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-medium text-slate-500 min-w-[2.5rem] text-right">
+                    {completion}%
+                  </span>
+                </div>
+              )}
+              <ChevronDown className={`w-4 h-4 text-slate-400 transform transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+            </div>
+          </summary>
+        </details>
+      );
+    }
+
+    // Render main section with full styling
     return (
       <details
         key={question.id}
@@ -2479,10 +2524,12 @@ export function QuestionnaireRenderer({
 
     // Handle section rendering
     if (question.type === 'section') {
-      // Calculate section number based on position in questions array
-      const sectionNumber = questionnaire.questions
-        .filter(q => q.type === 'section')
-        .findIndex(q => q.id === question.id) + 1;
+      // Calculate section number based on position in questions array (exclude subsections from numbering)
+      const sectionNumber = question.is_subsection 
+        ? 0 // Subsections don't get numbered
+        : questionnaire.questions
+            .filter(q => q.type === 'section' && !q.is_subsection)
+            .findIndex(q => q.id === question.id) + 1;
       return renderSection(question, questionnaire.questions, sectionNumber);
     }
 
@@ -2910,7 +2957,9 @@ export function QuestionnaireRenderer({
             {group.section && renderSection(
               group.section, 
               questionnaire.questions, 
-              questionnaire.questions.filter(q => q.type === 'section').findIndex(q => q.id === group.section?.id) + 1
+              group.section.is_subsection 
+                ? 0 // Subsections don't get numbered
+                : questionnaire.questions.filter(q => q.type === 'section' && !q.is_subsection).findIndex(q => q.id === group.section?.id) + 1
             )}
 
             {isSectionExpanded && visibleGroupQuestions.length > 0 && (
