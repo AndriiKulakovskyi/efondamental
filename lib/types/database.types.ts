@@ -4749,3 +4749,84 @@ export interface BilanBiologiqueSzResponse {
 }
 
 export type BilanBiologiqueSzResponseInsert = Omit<BilanBiologiqueSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'chol_rapport_hdltot'>;
+
+// ============================================================================
+// PANSS (Positive and Negative Syndrome Scale) - Schizophrenia Hetero-questionnaire
+// ============================================================================
+
+export interface PanssResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // Positive Subscale (P1-P7) - Each item 1-7
+  p1?: number | null; // Delusions
+  p2?: number | null; // Conceptual disorganization
+  p3?: number | null; // Hallucinatory behavior
+  p4?: number | null; // Excitement
+  p5?: number | null; // Grandiosity
+  p6?: number | null; // Suspiciousness/persecution
+  p7?: number | null; // Hostility
+
+  // Negative Subscale (N1-N7) - Each item 1-7
+  n1?: number | null; // Blunted affect
+  n2?: number | null; // Emotional withdrawal
+  n3?: number | null; // Poor rapport
+  n4?: number | null; // Passive/apathetic social withdrawal
+  n5?: number | null; // Difficulty in abstract thinking
+  n6?: number | null; // Lack of spontaneity and flow of conversation
+  n7?: number | null; // Stereotyped thinking
+
+  // General Psychopathology Subscale (G1-G16) - Each item 1-7
+  g1?: number | null; // Somatic concern
+  g2?: number | null; // Anxiety
+  g3?: number | null; // Guilt feelings
+  g4?: number | null; // Tension
+  g5?: number | null; // Mannerisms and posturing
+  g6?: number | null; // Depression
+  g7?: number | null; // Motor retardation
+  g8?: number | null; // Uncooperativeness
+  g9?: number | null; // Unusual thought content
+  g10?: number | null; // Disorientation
+  g11?: number | null; // Poor attention
+  g12?: number | null; // Lack of judgment and insight
+  g13?: number | null; // Disturbance of volition
+  g14?: number | null; // Poor impulse control
+  g15?: number | null; // Preoccupation
+  g16?: number | null; // Active social avoidance
+
+  // Traditional Subscale Scores
+  positive_score?: number | null; // P1-P7 sum (7-49)
+  negative_score?: number | null; // N1-N7 sum (7-49)
+  general_score?: number | null; // G1-G16 sum (16-112)
+  total_score?: number | null; // Total (30-210)
+
+  // Wallwork 2012 Five-Factor Model
+  wallwork_positive?: number | null; // P1+P3+P5+G9 (4-28)
+  wallwork_negative?: number | null; // N1+N2+N3+N4+N6+G7 (6-42)
+  wallwork_disorganized?: number | null; // P2+N5+G11 (3-21)
+  wallwork_excited?: number | null; // P4+P7+G8+G14 (4-28)
+  wallwork_depressed?: number | null; // G2+G3+G6 (3-21)
+
+  // Lancon 1998 Five-Factor Model
+  lancon_positive?: number | null; // P1+P3+G9+P5+P6 (5-35)
+  lancon_negative?: number | null; // N1+N2+N3+N4+N6+G7+G16 (7-49)
+  lancon_disorganized?: number | null; // G10+N5+P2 (3-21)
+  lancon_excited?: number | null; // G4+P4+G14+P7+G8 (5-35)
+  lancon_depressed?: number | null; // G1+G3+G6+G2 (4-28)
+
+  // Van der Gaag 2006 Five-Factor Model
+  vandergaag_positive?: number | null; // P1+P3+G9+P6+P5 (5-35)
+  vandergaag_negative?: number | null; // N6+N1+N2+N4+G7+N3+G16+G8 (8-56)
+  vandergaag_disorganized?: number | null; // N7+G11+G10+P2+N5+G5+G12+G13 (8-56)
+  vandergaag_excited?: number | null; // G14+P4+P7+G8 (4-28)
+  vandergaag_depressed?: number | null; // G2+G6+G3+G4 (4-28)
+
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type PanssResponseInsert = Omit<PanssResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'positive_score' | 'negative_score' | 'general_score' | 'total_score' | 'wallwork_positive' | 'wallwork_negative' | 'wallwork_disorganized' | 'wallwork_excited' | 'wallwork_depressed' | 'lancon_positive' | 'lancon_negative' | 'lancon_disorganized' | 'lancon_excited' | 'lancon_depressed' | 'vandergaag_positive' | 'vandergaag_negative' | 'vandergaag_disorganized' | 'vandergaag_excited' | 'vandergaag_depressed'>;

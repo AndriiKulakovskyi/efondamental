@@ -1016,3 +1016,423 @@ export const SZ_BILAN_BIOLOGIQUE_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// PANSS (Positive and Negative Syndrome Scale)
+// ============================================================================
+// 30-item clinician-rated scale for measuring symptom severity of schizophrenia
+// Original authors: Kay SR, Fiszbein A, Opler LA (1986)
+// French translation: Lepine JP (1989)
+// All items rated 1-7:
+//   1=Absent, 2=Minimal, 3=Mild, 4=Moderate, 5=Moderate-Severe, 6=Severe, 7=Extreme
+
+// Standard 7-point response options for all PANSS items
+// Response options for General Psychopathology subscale (G1-G16)
+const PANSS_RESPONSE_OPTIONS = [
+  { code: 1, label: 'ABSENT', score: 1 },
+  { code: 2, label: 'MINIME', score: 2 },
+  { code: 3, label: 'LEGER', score: 3 },
+  { code: 4, label: 'MOYEN', score: 4 },
+  { code: 5, label: 'MODEREMENT SEVERE', score: 5 },
+  { code: 6, label: 'SEVERE', score: 6 },
+  { code: 7, label: 'EXTREME', score: 7 }
+];
+
+export const PANSS_QUESTIONS: Question[] = [
+  // ========================================================================
+  // Section 1: Positive Subscale (P1-P7)
+  // ========================================================================
+  {
+    id: 'section_positive',
+    text: 'Sous-score positif',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'p1',
+    text: 'P1. DELIRE',
+    help: 'Croyances qui sont non fondees, irrealistes et idiosyncratiques. Evaluation basee sur le contenu de la pensee exprime lors de l\'interview et son influence sur les relations sociales et le comportement.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - NEANT: Definition non applicable.', score: 1 },
+      { code: 2, label: '2 - MINIME: Pathologie discutable; eventuellement a l\'extreme limite de la norme.', score: 2 },
+      { code: 3, label: '3 - FAIBLE: Presence d\'une ou deux idees delirantes assez vagues, ni rigides, ni tenaces. Ces idees n\'interferent ni dans la pensee, ni dans les relations sociales, ni dans le comportement.', score: 3 },
+      { code: 4, label: '4 - MODERE: Presence d\'un eventail kaleidoscopique d\'idees delirantes peu formees ou instables, ou de quelques idees plus developpees qui interferent occasionnellement dans la pensee, les relations sociales ou le comportement.', score: 4 },
+      { code: 5, label: '5 - MODERE, PRONONCE: Presence de nombreuses idees delirantes tres developpees et tres tenaces qui interferent occasionnellement dans la pensee, les relations sociales ou le comportement.', score: 5 },
+      { code: 6, label: '6 - PRONONCE: Presence d\'un ensemble stable d\'idees delirantes qui sont cristallisees, eventuellement systematisees, tres tenaces, et qui interferent de maniere non dissimulee dans la pensee, les relations sociales et le comportement.', score: 6 },
+      { code: 7, label: '7 - EXTREME: Presence d\'un ensemble stable d\'idees delirantes qui sont, soit tres systematisees, soit tres nombreuses et qui dominent les aspects principaux de la vie du patient.', score: 7 }
+    ]
+  },
+  {
+    id: 'p2',
+    text: 'P2. TROUBLES DE LA PENSEE',
+    help: 'Processus desorganise de la pensee, caracterise par un dereglement du cheminement finalise (circonstancialite, tangentialite, associations vagues, incoherences, illogisme grossier ou blocage de la pensee). Evaluation basee sur le processus cognitif et verbal examine lors de l\'interview.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - NEANT: Definition non applicable.', score: 1 },
+      { code: 2, label: '2 - MINIME: Pathologie discutable; eventuellement a l\'extreme limite de la norme.', score: 2 },
+      { code: 3, label: '3 - FAIBLE: La pensee est circonstancielle, tangentielle ou paralogique. Presence de problemes lors de tensions psychiques.', score: 3 },
+      { code: 4, label: '4 - MODERE: Capable de concentrer ses pensees lorsque les echanges sont brefs, mais perd sa precision lorsque la communication se fait plus complexe.', score: 4 },
+      { code: 5, label: '5 - MODERE, PRONONCE: En general, le patient connait des difficultes pour organiser ses pensees, ce qui se traduit par des actes insenses ou incoherents frequents.', score: 5 },
+      { code: 6, label: '6 - PRONONCE: La pensee est serieusement perturbee et intrinsequement inconsequente ce qui entraine des pertes grossieres du sens de l\'a propos.', score: 6 },
+      { code: 7, label: '7 - EXTREME: Les pensees sont dereglees au point que le patient devient tout a fait incoherent.', score: 7 }
+    ]
+  },
+  {
+    id: 'p3',
+    text: 'P3. COMPORTEMENT HALLUCINATOIRE',
+    help: 'Rapport verbal ou perceptions comportementales qui ne sont pas provoquees par des stimuli externes (auditif, visuel, olfactif ou somatique). Evaluation basee sur le rapport verbal et manifestations physiques pendant l\'interview et rapports du personnel hospitalier ou de membres de la famille.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - NEANT: Definition non applicable.', score: 1 },
+      { code: 2, label: '2 - MINIME: Pathologie discutable; eventuellement a l\'extreme limite de la norme.', score: 2 },
+      { code: 3, label: '3 - FAIBLE: Une ou deux hallucinations clairement developpees mais peu frequentes.', score: 3 },
+      { code: 4, label: '4 - MODERE: Les hallucinations se font frequemment, mais ne sont pas continues.', score: 4 },
+      { code: 5, label: '5 - MODERE, PRONONCE: Hallucinations frequentes qui peuvent impliquer plusieurs modalites sensorielles.', score: 5 },
+      { code: 6, label: '6 - PRONONCE: Les hallucinations sont presque constamment presentes, provoquant un dereglement important de la pensee et du comportement.', score: 6 },
+      { code: 7, label: '7 - EXTREME: Le patient est presque totalement preoccupe par ses hallucinations qui dominent presque completement sa pensee et son comportement.', score: 7 }
+    ]
+  },
+  {
+    id: 'p4',
+    text: 'P4. EXCITATION',
+    help: 'Hyperactivite qui se traduit par un comportement moteur accelere, un taux de reponse aux stimulis plus eleve, une hypervigilance ou une labilite d\'humeur excessive. Evaluation basee sur les manifestations comportementales lors de l\'interview et rapports du personnel hospitalier ou de membres de la famille.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - NEANT: Definition non applicable.', score: 1 },
+      { code: 2, label: '2 - MINIME: Pathologie discutable; eventuellement a l\'extreme limite de la norme.', score: 2 },
+      { code: 3, label: '3 - FAIBLE: Tendance a se montrer legerement agite, hypervigilant ou legerement enerve.', score: 3 },
+      { code: 4, label: '4 - MODERE: Agitation ou excitation evidente au cours de l\'interview.', score: 4 },
+      { code: 5, label: '5 - MODERE, PRONONCE: Hyperactivite evidente ou nombreuses augmentations de l\'activite motrice.', score: 5 },
+      { code: 6, label: '6 - PRONONCE: Une excitation evidente domine toute l\'interview, limite l\'attention du patient.', score: 6 },
+      { code: 7, label: '7 - EXTREME: Excitation evidente qui interfere serieusement dans l\'alimentation et le sommeil.', score: 7 }
+    ]
+  },
+  {
+    id: 'p5',
+    text: 'P5. MEGALOMANIE',
+    help: 'Opinion de soi exageree et convictions de superiorite irrealistes, qui peuvent aller jusqu\'au delire. Evaluation basee sur le contenu de la pensee exprime lors de l\'interview et ses influences sur le comportement.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - NEANT: Definition non applicable.', score: 1 },
+      { code: 2, label: '2 - MINIME: Pathologie discutable; eventuellement a l\'extreme limite de la norme.', score: 2 },
+      { code: 3, label: '3 - FAIBLE: Vantardise et exces d\'orgueil evidents, mais pas vraiment de delire megalomaniaque.', score: 3 },
+      { code: 4, label: '4 - MODERE: Se sent de maniere claire et irrealiste superieur aux autres.', score: 4 },
+      { code: 5, label: '5 - MODERE, PRONONCE: Idees delirantes tres precises a propos de facultes extraordinaires, d\'un statut ou d\'une puissance remarquables.', score: 5 },
+      { code: 6, label: '6 - PRONONCE: Idees delirantes tres precises a propos d\'une superiorite tres nette sur plusieurs parametres.', score: 6 },
+      { code: 7, label: '7 - EXTREME: La pensee, les relations interpersonnelles et le comportement sont domines par de nombreuses idees delirantes.', score: 7 }
+    ]
+  },
+  {
+    id: 'p6',
+    text: 'P6. MEFIANCE/COMPLEXE DE PERSECUTION',
+    help: 'Impressions irrealistes ou exagerees de persecution qui se refletent dans une certaine circonspection, une attitude mefiante, une hypervigilance soupconneuse ou de veritables idees delirantes. Evaluation basee sur le contenu de la pensee exprime lors de l\'interview et ses influences sur le comportement.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - NEANT: Definition non applicable.', score: 1 },
+      { code: 2, label: '2 - MINIME: Pathologie discutable; eventuellement a l\'extreme limite de la norme.', score: 2 },
+      { code: 3, label: '3 - FAIBLE: Attitude reservee, voire franchement mefiante, mais les pensees, interactions et comportement ne sont que tres peu affectes.', score: 3 },
+      { code: 4, label: '4 - MODERE: Mefiance evidente et interfere sur le comportement lors de l\'interview.', score: 4 },
+      { code: 5, label: '5 - MODERE, PRONONCE: Le patient fait preuve d\'une mefiance tres marquee, qui peut conduire a un dereglement majeur des relations interpersonnelles.', score: 5 },
+      { code: 6, label: '6 - PRONONCE: Delire de persecution profond qui peut etre systematise et qui interfere de maniere notable dans les relations interpersonnelles.', score: 6 },
+      { code: 7, label: '7 - EXTREME: La pensee, les relations sociales et le comportement du patient sont domines par un reseau d\'idees delirantes persecutrices prononcees et systematisees.', score: 7 }
+    ]
+  },
+  {
+    id: 'p7',
+    text: 'P7. HOSTILITE',
+    help: 'Expression verbale et non verbale de colere et de ressentiment, voire meme de sarcasme, comportement passif-agressif, insultes et violence. Evaluation basee sur le comportement interpersonnel observe lors de l\'interview et rapports du personnel hospitalier ou de membres de la famille.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - NEANT: Definition non applicable.', score: 1 },
+      { code: 2, label: '2 - MINIME: Pathologie discutable; eventuellement a l\'extreme limite de la norme.', score: 2 },
+      { code: 3, label: '3 - FAIBLE: Expression indirecte ou retenue de colere: sarcasme, manque de respect, expressions hostiles et irritabilite occasionnelle.', score: 3 },
+      { code: 4, label: '4 - MODERE: Fait montre d\'une attitude clairement hostile, d\'irritabilite frequente.', score: 4 },
+      { code: 5, label: '5 - MODERE, PRONONCE: Le patient est tres irritable et peut se montrer injurieux voire menacant.', score: 5 },
+      { code: 6, label: '6 - PRONONCE: Manque de cooperation et insultes ou menaces qui ont une influence notable sur le deroulement de l\'interview.', score: 6 },
+      { code: 7, label: '7 - EXTREME: Colere prononcee qui debouche sur un manque total de cooperation ou sur une agressivite physique episodique vis a vis des autres.', score: 7 }
+    ]
+  },
+
+  // ========================================================================
+  // Section 2: Negative Subscale (N1-N7)
+  // ========================================================================
+  {
+    id: 'section_negative',
+    text: 'Sous-score negatif',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'n1',
+    text: 'N1. AFFECT EMOUSSE',
+    help: 'Reponse emotionnelle diminuee qui se caracterise par une reduction de la mimique faciale, de la modulation des sentiments et des gestes de communication. Evaluation basee sur l\'observation des manifestations physiques du ton affectif et de la reponse emotionnelle lors de l\'interview.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - NEANT: Definition non applicable.', score: 1 },
+      { code: 2, label: '2 - MINIME: Pathologie discutable; eventuellement a l\'extreme limite de la norme.', score: 2 },
+      { code: 3, label: '3 - FAIBLE: Les changements d\'expression faciale et les gestes communicatifs semblent artificiels, forces, guindes.', score: 3 },
+      { code: 4, label: '4 - MODERE: Une gamme d\'expressions faciales reduite donnent au patient un air deprime.', score: 4 },
+      { code: 5, label: '5 - MODERE, PRONONCE: L\'affect est generalement plat, avec quelques changements occasionnels de l\'expression faciale.', score: 5 },
+      { code: 6, label: '6 - PRONONCE: Manque de relief et deficience des emotions prononcees la plupart du temps.', score: 6 },
+      { code: 7, label: '7 - EXTREME: Absence presque totale de changement dans l\'expression faciale et de trace de gestes de communication.', score: 7 }
+    ]
+  },
+  {
+    id: 'n2',
+    text: 'N2. RETRAIT EMOTIONNEL',
+    help: 'Manque d\'interet, d\'implication et d\'engagement affectif vis-a-vis des evenements de la vie quotidienne. Evaluation basee sur les rapports sur le fonctionnement provenant du personnel hospitalier ou de la famille et observation du comportement interpersonnel lors de l\'interview.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - NEANT: Definition non applicable.', score: 1 },
+      { code: 2, label: '2 - MINIME: Pathologie discutable; eventuellement a l\'extreme limite de la norme.', score: 2 },
+      { code: 3, label: '3 - FAIBLE: Manque habituellement d\'initiative et peut eventuellement faire preuve d\'un interet deficient.', score: 3 },
+      { code: 4, label: '4 - MODERE: Le patient est en general emotionnellement eloigne de son milieu et de ses problemes.', score: 4 },
+      { code: 5, label: '5 - MODERE, PRONONCE: Le patient est tout a fait detache, sur le plan emotionnel, des personnes et evenements de son milieu.', score: 5 },
+      { code: 6, label: '6 - PRONONCE: Un manque d\'interet et d\'engagement emotionnel prononce entraine une conversation limitee.', score: 6 },
+      { code: 7, label: '7 - EXTREME: Le patient est presque totalement retire, ne communique presque plus et neglige ses besoins personnels.', score: 7 }
+    ]
+  },
+  {
+    id: 'n3',
+    text: 'N3. CONTACT FAIBLE',
+    help: 'Manque d\'ouverture interpersonnelle dans la conversation, manque de contact, d\'interet ou d\'implication vis-a-vis de l\'intervieweur. Evaluation basee sur le comportement interpersonnel pendant l\'interview.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - NEANT: Definition non applicable.', score: 1 },
+      { code: 2, label: '2 - MINIME: Pathologie discutable; eventuellement a l\'extreme limite de la norme.', score: 2 },
+      { code: 3, label: '3 - FAIBLE: La conversation est caracterisee par un ton emprunt, contraint ou artificiel.', score: 3 },
+      { code: 4, label: '4 - MODERE: Le patient est tres reserve et montre une distance interpersonnelle tres marquee.', score: 4 },
+      { code: 5, label: '5 - MODERE, PRONONCE: Le desinteret est evident au point d\'empecher l\'interview d\'etre productive.', score: 5 },
+      { code: 6, label: '6 - PRONONCE: Le patient apparait excessivement indifferent et montre une distance interpersonnelle tres marquee.', score: 6 },
+      { code: 7, label: '7 - EXTREME: Le patient reste tout a fait hermetique face a l\'intervieweur.', score: 7 }
+    ]
+  },
+  {
+    id: 'n4',
+    text: 'N4. RETRAIT SOCIAL PASSIF/APATHIQUE',
+    help: 'Amoindrissement de l\'interet et de l\'initiative dans les interactions sociales du a la passivite, a l\'apathie, l\'anergie ou la perte de la volonte. Evaluation basee sur les rapports concernant le comportement social qui proviennent du personnel hospitalier ou de la famille.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - NEANT: Definition non applicable.', score: 1 },
+      { code: 2, label: '2 - MINIME: Pathologie discutable; eventuellement a l\'extreme limite de la norme.', score: 2 },
+      { code: 3, label: '3 - FAIBLE: Le patient manifeste un interet occasionnel pour des activites sociales mais ne fait preuve que de peu d\'initiatives.', score: 3 },
+      { code: 4, label: '4 - MODERE: Suit de maniere passive la plupart des activites sociales, mais d\'une maniere desinteressee ou mecanique.', score: 4 },
+      { code: 5, label: '5 - MODERE, PRONONCE: Participe de maniere passive a un minimum d\'activites et ne montre quasi aucun interet ni initiative.', score: 5 },
+      { code: 6, label: '6 - PRONONCE: Tendance a l\'apathie et a l\'isolement, ne participe que rarement a des activites sociales.', score: 6 },
+      { code: 7, label: '7 - EXTREME: Profondement apathique, isole sur le plan social, et tres negligeant vis-a-vis de lui-meme.', score: 7 }
+    ]
+  },
+  {
+    id: 'n5',
+    text: 'N5. DIFFICULTE DE RAISONNER DANS L\'ABSTRAIT',
+    help: 'Deterioration du mode de pensee abstrait-symbolique, qui se traduit par des difficultes pour etablir un classement, une generalisation ou pour depasser la pensee concrete. Evaluation basee sur les reponses aux questions sur les similitudes et l\'interpretation de proverbes.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - NEANT: Definition non applicable.', score: 1 },
+      { code: 2, label: '2 - MINIME: Pathologie discutable; eventuellement a l\'extreme limite de la norme.', score: 2 },
+      { code: 3, label: '3 - FAIBLE: Le patient a tendance a donner une interpretation litterale ou personnelle aux proverbes les plus difficiles.', score: 3 },
+      { code: 4, label: '4 - MODERE: Le patient a souvent recours au mode concret.', score: 4 },
+      { code: 5, label: '5 - MODERE, PRONONCE: Travaille essentiellement en mode concret et eprouve des problemes avec la plupart des proverbes.', score: 5 },
+      { code: 6, label: '6 - PRONONCE: Incapable de saisir le sens abstrait du moindre proverbe ou expression metaphorique.', score: 6 },
+      { code: 7, label: '7 - EXTREME: Le patient ne peut utiliser que les modes concrets de pensee.', score: 7 }
+    ]
+  },
+  {
+    id: 'n6',
+    text: 'N6. MANQUE DE SPONTANEITE ET FLOT DE CONVERSATION',
+    help: 'Reduction du flot normal de communication combinee a une certaine apathie, perte de la volonte, mefiance, ou a un deficit de la connaissance. Evaluation basee sur le processus verbal et de la connaissance observe lors de l\'interview.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - NEANT: Definition non applicable.', score: 1 },
+      { code: 2, label: '2 - MINIME: Pathologie discutable; eventuellement a l\'extreme limite de la norme.', score: 2 },
+      { code: 3, label: '3 - FAIBLE: La conversation ne releve que peu d\'initiatives. Les reponses ont tendance a etre breves.', score: 3 },
+      { code: 4, label: '4 - MODERE: La conversation manque de fluidite et semble inegale, voire chaotique.', score: 4 },
+      { code: 5, label: '5 - MODERE, PRONONCE: Le patient fait preuve d\'un manque de spontaneite et d\'ouverture evident.', score: 5 },
+      { code: 6, label: '6 - PRONONCE: Les reponses du patient sont essentiellement limitees a quelques mots ou a de courtes phrases.', score: 6 },
+      { code: 7, label: '7 - EXTREME: L\'expression verbale est limitee tout au plus a quelques mots episodiques.', score: 7 }
+    ]
+  },
+  {
+    id: 'n7',
+    text: 'N7. PENSEE STEREOTYPEE',
+    help: 'Diminution de la fluidite, spontaneite et flexibilite de la pensee, qui se traduit par un contenu de la pensee rigide, repetitif, voire sterile. Evaluation basee sur le processus verbal et de la connaissance observe lors de l\'interview.',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1 - NEANT: Definition non applicable.', score: 1 },
+      { code: 2, label: '2 - MINIME: Pathologie discutable; eventuellement a l\'extreme limite de la norme.', score: 2 },
+      { code: 3, label: '3 - FAIBLE: Une certaine rigidite dans les attitudes ou les croyances.', score: 3 },
+      { code: 4, label: '4 - MODERE: La conversation tourne autour d\'un theme recurrent.', score: 4 },
+      { code: 5, label: '5 - MODERE, PRONONCE: La pensee est rigide et repetitive a un point tel que la conversation est limitee a deux ou trois sujets.', score: 5 },
+      { code: 6, label: '6 - PRONONCE: Repetition non controlee de demandes, d\'affirmations, d\'idees ou de questions.', score: 6 },
+      { code: 7, label: '7 - EXTREME: La pensee, le comportement et la conversation sont domines par une repetition constante d\'idees fixes.', score: 7 }
+    ]
+  },
+
+  // ========================================================================
+  // Section 3: General Psychopathology Subscale (G1-G16)
+  // ========================================================================
+  {
+    id: 'section_general',
+    text: 'Sous-score general',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'g1',
+    text: 'G1. PREOCCUPATIONS SOMATIQUES',
+    help: 'Plaintes physiques ou croyances relatives a une maladie ou un dysfonctionnement somatique.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g2',
+    text: 'G2. ANXIETE',
+    help: 'Experience subjective de nervosire, inquietude, apprehension ou agitation.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g3',
+    text: 'G3. SENTIMENTS DE CULPABILITE',
+    help: 'Sentiment de remords ou d\'auto-accusation pour des mefaits reels ou imaginaires.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g4',
+    text: 'G4. TENSION',
+    help: 'Manifestations physiques claires de peur, d\'anxiete et d\'agitation.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g5',
+    text: 'G5. MANIERISME ET TROUBLES DE LA POSTURE',
+    help: 'Mouvements ou postures non naturels qui rendent les actes quotidiens maladroits.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g6',
+    text: 'G6. DEPRESSION',
+    help: 'Sentiments de tristesse, de decouragement, d\'impuissance et de pessimisme.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g7',
+    text: 'G7. RALENTISSEMENT PSYCHOMOTEUR',
+    help: 'Reduction de l\'activite motrice qui se traduit par un ralentissement ou une diminution des mouvements et du discours.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g8',
+    text: 'G8. MANQUE DE COOPERATION',
+    help: 'Refus actif de se conformer a la volonte des personnes significatives.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g9',
+    text: 'G9. CONTENU INHABITUEL DE LA PENSEE',
+    help: 'Contenu de la pensee caracterise par des idees etranges, fantaisistes ou bizarres.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g10',
+    text: 'G10. DESORIENTATION',
+    help: 'Manque de conscience de ses relations avec l\'environnement, y compris les personnes, le lieu et le temps.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g11',
+    text: 'G11. MANQUE D\'ATTENTION',
+    help: 'Echec de l\'attention focalisee, caracterise par une faible concentration.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g12',
+    text: 'G12. MANQUE DE JUGEMENT ET DE PRISE DE CONSCIENCE',
+    help: 'Alteration de la conscience ou de la comprehension de sa propre situation psychiatrique.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g13',
+    text: 'G13. TROUBLES DE LA VOLITION',
+    help: 'Trouble de l\'initiation, du maintien et du controle volontaire des pensees, du comportement, des mouvements et du discours.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g14',
+    text: 'G14. MAUVAIS CONTROLE PULSIONNEL',
+    help: 'Regulation et controle defaillants de l\'action sur les impulsions interieures.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g15',
+    text: 'G15. PREOCCUPATION EXCESSIVE DE SOI',
+    help: 'Preoccupation avec ses propres pensees et sentiments et avec les experiences de son propre corps.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  },
+  {
+    id: 'g16',
+    text: 'G16. EVITEMENT SOCIAL ACTIF',
+    help: 'Diminution de l\'implication sociale associee a une peur, une hostilite ou une mefiance injustifiees.',
+    type: 'single_choice',
+    required: false,
+    options: PANSS_RESPONSE_OPTIONS
+  }
+];
+
+export const PANSS_DEFINITION: QuestionnaireDefinition = {
+  id: 'panss',
+  code: 'PANSS',
+  title: 'PANSS - Echelle des syndromes positifs et negatifs',
+  description: 'Echelle d\'evaluation de la severite des symptomes de la schizophrenie a 30 items. Auteurs originaux: Kay SR, Fiszbein A, Opler LA (1986). Traduction francaise: Lepine JP (1989).',
+  questions: PANSS_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['schizophrenia'],
+    target_role: 'healthcare_professional',
+    version: 'French Version (Lepine, 1989)',
+    language: 'fr-FR'
+  }
+};

@@ -192,14 +192,16 @@ import {
   SZ_DIAGNOSTIC_DEFINITION,
   SZ_ORIENTATION_DEFINITION,
   SZ_DOSSIER_INFIRMIER_DEFINITION,
-  SZ_BILAN_BIOLOGIQUE_DEFINITION
+  SZ_BILAN_BIOLOGIQUE_DEFINITION,
+  PANSS_DEFINITION
 } from '../constants/questionnaires-schizophrenia';
 import {
   getPsyTraitementSemestrielResponse
 } from './questionnaire-followup.service';
 import {
   getScreeningSzDiagnosticResponse,
-  getScreeningSzOrientationResponse
+  getScreeningSzOrientationResponse,
+  getPanssResponse
 } from './questionnaire-schizophrenia.service';
 import { getPatientById } from './patient.service';
 
@@ -591,6 +593,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
     const pathologyType = patient?.pathology_type;
     
     // Schizophrenia initial evaluation - uses Dossier Infirmier questionnaire in nurse module
+    // and PANSS in hetero-questionnaires module
     if (pathologyType === 'schizophrenia') {
       return [
         {
@@ -598,6 +601,12 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           name: 'Infirmier',
           description: 'Evaluation par l\'infirmier',
           questionnaires: [SZ_DOSSIER_INFIRMIER_DEFINITION, SZ_BILAN_BIOLOGIQUE_DEFINITION]
+        },
+        {
+          id: 'mod_hetero',
+          name: 'Hetero-questionnaires',
+          description: 'Questionnaires d\'evaluation clinique',
+          questionnaires: [PANSS_DEFINITION]
         }
       ];
     }

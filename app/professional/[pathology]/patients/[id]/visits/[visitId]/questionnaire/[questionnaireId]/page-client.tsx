@@ -121,7 +121,8 @@ export function QuestionnairePageClient({
         'MADRS', 'YMRS', 'CGI', 'EGF', 'ALDA', 'ETAT_PATIENT', 'FAST',
         'WAIS4_MATRICES_FR', 'WAIS4_CRITERIA_FR', 'WAIS4_LEARNING_FR', 'CVLT_FR', 'WAIS4_CODE_FR',
         'SOCIAL',
-        'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA'
+        'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA',
+        'PANSS'
       ].includes(questionnaire.code);
 
       if (!hasScoring) {

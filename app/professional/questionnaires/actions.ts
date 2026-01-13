@@ -111,7 +111,8 @@ import {
   saveScreeningSzDiagnosticResponse,
   saveScreeningSzOrientationResponse,
   saveDossierInfirmierSzResponse,
-  saveBilanBiologiqueSzResponse
+  saveBilanBiologiqueSzResponse,
+  savePanssResponse
 } from '@/lib/services/questionnaire-schizophrenia.service';
 import { 
   getVisitCompletionStatus,
@@ -215,7 +216,8 @@ import {
   ScreeningSzOrientationResponseInsert,
   // Schizophrenia initial evaluation
   DossierInfirmierSzResponseInsert,
-  BilanBiologiqueSzResponseInsert
+  BilanBiologiqueSzResponseInsert,
+  PanssResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 import { requireUserContext } from '@/lib/rbac/middleware';
@@ -309,6 +311,15 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as BilanBiologiqueSzResponseInsert);
+        break;
+
+      // Schizophrenia Hetero-questionnaire
+      case 'PANSS':
+        result = await savePanssResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as PanssResponseInsert);
         break;
 
       // Initial Evaluation - ETAT

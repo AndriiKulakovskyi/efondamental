@@ -146,6 +146,17 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
+    if (code === 'PANSS') {
+      // PANSS: Total score range 30-210
+      // Severity based on total score thresholds
+      const total = data.total_score;
+      if (total === null || total === undefined) return 'info';
+      if (total >= 96) return 'error';    // Severe
+      if (total >= 76) return 'warning';  // Marked
+      if (total >= 59) return 'warning';  // Moderate
+      return 'info';                      // Mild (30-58)
+    }
+    
     return 'info';
   };
 
@@ -252,6 +263,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'CVLT_FR' && 'Résultats CVLT'}
               {code === 'WAIS4_CODE_FR' && 'Résultats WAIS-IV Code'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && 'Résultats WAIS-IV Code, Symboles & IVT'}
+              {code === 'PANSS' && 'Résultats PANSS'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -283,6 +295,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.wais_cod_std !== undefined ? data.wais_cod_std : '-')
                 : code === 'WAIS_IV_CODE_SYMBOLES_IVT'
                 ? (data.wais_ivt !== undefined && data.wais_ivt !== null ? data.wais_ivt : (data.wais_cod_std !== undefined ? data.wais_cod_std : '-'))
+                : code === 'PANSS'
+                ? (data.total_score !== undefined ? data.total_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM_FR' && '/20'}
               {code === 'QIDS_SR16_FR' && '/27'}
@@ -296,6 +310,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'CVLT_FR' && '/80'}
               {code === 'WAIS4_CODE_FR' && '/19'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && (data.wais_ivt !== undefined && data.wais_ivt !== null ? '/150' : '/19')}
+              {code === 'PANSS' && '/210'}
             </span>
           </div>
         </div>
@@ -876,6 +891,115 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <div className="flex justify-between">
                 <span className="text-gray-600">Age du patient:</span>
                 <span className="font-semibold">{data.patient_age ?? '-'} ans</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PANSS Details */}
+        {code === 'PANSS' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Core PANSS Scores */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Scores canoniques PANSS</h5>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Symptomes positifs (P1-P7):</span>
+                  <span className="font-semibold">{data.positive_score ?? '-'}/49</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Symptomes negatifs (N1-N7):</span>
+                  <span className="font-semibold">{data.negative_score ?? '-'}/49</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Psychopathologie generale (G1-G16):</span>
+                  <span className="font-semibold">{data.general_score ?? '-'}/112</span>
+                </div>
+                <div className="flex justify-between items-center pt-2 border-t">
+                  <span className="text-gray-600 font-medium">Score Total PANSS:</span>
+                  <span className="font-bold text-lg">{data.total_score ?? '-'}/210</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Wallwork 2012 Five-Factor Model */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Modele a 5 facteurs - Wallwork 2012</h5>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Positif:</span>
+                  <span className="font-medium">{data.wallwork_positive ?? '-'}/28</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Negatif:</span>
+                  <span className="font-medium">{data.wallwork_negative ?? '-'}/42</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Desorganise:</span>
+                  <span className="font-medium">{data.wallwork_disorganized ?? '-'}/21</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Excite:</span>
+                  <span className="font-medium">{data.wallwork_excited ?? '-'}/28</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Depressif:</span>
+                  <span className="font-medium">{data.wallwork_depressed ?? '-'}/21</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Lancon 1998 Five-Factor Model */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Modele a 5 facteurs - Lancon 1998</h5>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Positif:</span>
+                  <span className="font-medium">{data.lancon_positive ?? '-'}/35</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Negatif:</span>
+                  <span className="font-medium">{data.lancon_negative ?? '-'}/49</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Desorganise:</span>
+                  <span className="font-medium">{data.lancon_disorganized ?? '-'}/21</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Excite:</span>
+                  <span className="font-medium">{data.lancon_excited ?? '-'}/35</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Depressif:</span>
+                  <span className="font-medium">{data.lancon_depressed ?? '-'}/28</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Van der Gaag 2006 Five-Factor Model */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Modele a 5 facteurs - Van der Gaag 2006</h5>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Positif:</span>
+                  <span className="font-medium">{data.vandergaag_positive ?? '-'}/35</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Negatif:</span>
+                  <span className="font-medium">{data.vandergaag_negative ?? '-'}/56</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Desorganise:</span>
+                  <span className="font-medium">{data.vandergaag_disorganized ?? '-'}/56</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Excite:</span>
+                  <span className="font-medium">{data.vandergaag_excited ?? '-'}/28</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Depressif:</span>
+                  <span className="font-medium">{data.vandergaag_depressed ?? '-'}/28</span>
+                </div>
               </div>
             </div>
           </div>
