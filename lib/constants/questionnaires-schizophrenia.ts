@@ -2945,6 +2945,24 @@ const TREATMENT_CHANGE_OPTIONS: QuestionOption[] = [
   { code: 'Fin', label: 'Fin' }
 ];
 
+// Care type change options (for checkboxes) - use string codes
+const CARE_TYPE_CHANGE_OPTIONS: QuestionOption[] = [
+  { code: 'Debut', label: 'Debut' },
+  { code: 'Augmente', label: 'Augmente' },
+  { code: 'Diminue', label: 'Diminue' },
+  { code: 'Fin', label: 'Fin' }
+];
+
+// Substance type options - use string codes for checkbox
+const SUBSTANCE_TYPE_OPTIONS: QuestionOption[] = [
+  { code: 'Alcool', label: 'Alcool' },
+  { code: 'Cannabis', label: 'Cannabis' },
+  { code: 'Opiaces', label: 'Opiaces' },
+  { code: 'Cocaine', label: 'Cocaine' },
+  { code: 'Hallucinogene', label: 'Hallucinogene' },
+  { code: 'Autres', label: 'Autres' }
+];
+
 // Helper function to generate episode questions
 const generateEpisodeQuestions = (): Question[] => {
   const questions: Question[] = [];
@@ -3531,35 +3549,33 @@ export const TROUBLES_PSYCHOTIQUES_QUESTIONS: Question[] = [
     id: 'section_annual_characteristics',
     text: 'Caracteristiques du trouble au cours des 12 derniers mois',
     type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+    required: false
   },
 
-  // Annual episodes
+  // Psychotic episode during the year
   {
     id: 'rad_tbpsychoan',
     text: 'Presence d\'au moins un episode psychotique au cours de l\'annee',
     type: 'single_choice',
     required: false,
-    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
   },
 
-  // Annual hospitalizations
+  // Subsection: Hospitalization
   {
     id: 'section_annual_hospitalization',
     text: 'Hospitalisation au cours de l\'annee ecoulee',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+    type: 'instruction',
+    required: false
   },
+  
+  // Full-time hospitalizations
   {
     id: 'rad_tbpsychoan_hospi_tpscomplet',
     text: 'Hospitalisations a temps complet au cours de l\'annee ecoulee',
     type: 'single_choice',
     required: false,
-    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
   },
   {
     id: 'rad_tbpsychoan_hospi_tpscomplet_nb',
@@ -3588,22 +3604,27 @@ export const TROUBLES_PSYCHOTIQUES_QUESTIONS: Question[] = [
     display_if: { '==': [{ 'var': 'rad_tbpsychoan_hospi_tpscomplet' }, 'Oui'] },
     indentLevel: 1
   },
-
-  // Non-pharmacological treatment changes
   {
-    id: 'section_non_pharmacological',
-    text: 'Changement de prise en charge non medicamenteuse',
-    type: 'section',
+    id: 'tbpsychoan_hospi_tpscomplet_motifautre',
+    text: 'Autre motif (preciser)',
+    type: 'text',
     required: false,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_tbpsychoan_hospi_tpscomplet' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_tbpsychoan_hospi_tpscomplet_motif' }, 'Autres'] }
+      ]
+    },
+    indentLevel: 2
   },
+  
+  // Non-pharmacological treatment change
   {
     id: 'rad_tbpsychoan_modpec_nonmed',
     text: 'Changement de prise en charge non medicamenteuse',
     type: 'single_choice',
     required: false,
-    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
   },
   {
     id: 'chk_tbpsychoan_modpec_nonmed_tcc',
@@ -3650,21 +3671,13 @@ export const TROUBLES_PSYCHOTIQUES_QUESTIONS: Question[] = [
     indentLevel: 1
   },
 
-  // Treatment support
-  {
-    id: 'section_treatment_support',
-    text: 'Aide a la prise de traitement',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
-  },
+  // Treatment adherence support
   {
     id: 'chk_aide_prise_tt',
     text: 'Aide a la prise de traitement',
     type: 'multiple_choice',
     required: false,
-    options: TREATMENT_SUPPORT_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+    options: TREATMENT_SUPPORT_OPTIONS
   },
   {
     id: 'rad_aide_prise_tt_hospi',
@@ -3672,25 +3685,17 @@ export const TROUBLES_PSYCHOTIQUES_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: PERIODICITY_OPTIONS,
-    display_if: { 'in': ['IDE au domicile', { 'var': 'chk_aide_prise_tt' }] },
+    display_if: { 'in': ['Aide au CMP ou a l\'hopital', { 'var': 'chk_aide_prise_tt' }] },
     indentLevel: 1
   },
 
   // Suicide attempts
   {
-    id: 'section_suicide_attempts',
-    text: 'Tentatives de suicide',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
-  },
-  {
     id: 'rad_tbpsychoan_ts',
     text: 'Presence de tentatives de suicide au cours de l\'annee ecoulee',
     type: 'single_choice',
     required: false,
-    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_tbpsychovie' }, 'Oui'] }
+    options: TROUBLES_PSYCHOTIQUES_YES_NO_UNKNOWN_OPTIONS
   },
   {
     id: 'rad_tbpsychoan_ts_nb',

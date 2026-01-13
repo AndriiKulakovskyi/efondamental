@@ -1,0 +1,88 @@
+-- Migration: Cleanup Troubles Psychotiques - Remove unused fields
+-- Date: 2026-01-13
+-- Description: This migration documents the analysis of removed questionnaire fields.
+--              No actual database changes needed as the removed fields were never in the schema.
+
+-- =====================================================
+-- ANALYSIS SUMMARY
+-- =====================================================
+-- 
+-- The following fields were REMOVED from the questionnaire frontend but were
+-- NEVER PRESENT in the database schema (migration 234):
+--
+-- 1. Day Hospitalizations (5 fields) - NEVER EXISTED IN DB
+--    - rad_tbpsychoan_hospi_jour
+--    - rad_tbpsychoan_hospi_jour_nb
+--    - rad_tbpsychoan_hospi_jour_duree
+--    - rad_tbpsychoan_hospi_jour_motif
+--    - tbpsychoan_hospi_jour_motifautre
+--
+-- 2. Care Type Changes (7 fields) - NEVER EXISTED IN DB
+--    - rad_tbpsychoan_modpec (main gating question)
+--    - section_care_type_change (section header)
+--    - chk_tbpsychoan_modpec_cmp
+--    - chk_tbpsychoan_modpec_rythme
+--    - chk_tbpsychoan_modpec_hp
+--    - chk_tbpsychoan_modpec_cattp
+--    - tbpsychoan_modpec_autre
+--    - rad_tbpsychoan_modpec_med
+--
+-- 3. Substance Use Tracking (23+ fields) - NEVER EXISTED IN DB
+--    - rad_tbpsychoan_substance
+--    - chk_tbpsychoan_substance_type
+--    - Alcohol subsection (3 fields)
+--    - Cannabis subsection (3 fields)
+--    - Opioids subsection (3 fields)
+--    - Cocaine subsection (3 fields)
+--    - Hallucinogen subsection (3 fields)
+--    - tbpsychoan_substance_autre
+--
+-- =====================================================
+-- FIELDS THAT REMAIN IN DATABASE (Still in use)
+-- =====================================================
+--
+-- Section 1-3: All episode tracking fields KEPT (episodes 1-20)
+-- Section 4: All symptom fields KEPT (22 symptoms × 2 questions each)
+-- Section 5: Evolutionary mode KEPT
+-- Section 6: Annual characteristics:
+--   ✓ rad_tbpsychoan (psychotic episode presence)
+--   ✓ rad_tbpsychoan_hospi_tpscomplet (full-time hospitalization)
+--   ✓ rad_tbpsychoan_hospi_tpscomplet_nb
+--   ✓ rad_tbpsychoan_hospi_tpscomplet_duree
+--   ✓ rad_tbpsychoan_hospi_tpscomplet_motif
+--   ✓ rad_tbpsychoan_modpec_nonmed (non-pharmacological treatment)
+--   ✓ chk_tbpsychoan_modpec_nonmed_tcc
+--   ✓ chk_tbpsychoan_modpec_nonmed_remed
+--   ✓ chk_tbpsychoan_modpec_nonmed_psychody
+--   ✓ chk_tbpsychoan_modpec_nonmed_fam
+--   ✓ tbpsychoan_modpec_nonmed_autre
+--   ✓ chk_aide_prise_tt (treatment adherence)
+--   ✓ rad_aide_prise_tt_hospi
+--   ✓ rad_tbpsychoan_ts (suicide attempts)
+--   ✓ rad_tbpsychoan_ts_nb
+--
+-- =====================================================
+-- MISSING DATABASE FIELD
+-- =====================================================
+--
+-- The following field IS in the questionnaire but MISSING from DB:
+--   ❌ tbpsychoan_hospi_tpscomplet_motifautre (text field for "other reason")
+--
+-- This field should be added if "Autres" option is used in motif field.
+
+-- Add the missing field for "other" hospitalization reason
+ALTER TABLE responses_troubles_psychotiques 
+ADD COLUMN IF NOT EXISTS tbpsychoan_hospi_tpscomplet_motifautre VARCHAR(100);
+
+-- Add comment to document this field
+COMMENT ON COLUMN responses_troubles_psychotiques.tbpsychoan_hospi_tpscomplet_motifautre IS 
+'Text field for specifying "other" hospitalization reason when rad_tbpsychoan_hospi_tpscomplet_motif = ''Autres''';
+
+-- =====================================================
+-- CONCLUSION
+-- =====================================================
+-- 
+-- ✅ No fields need to be DROPPED (removed fields never existed in DB)
+-- ✅ Added 1 missing field: tbpsychoan_hospi_tpscomplet_motifautre
+-- ✅ Database schema is now aligned with questionnaire frontend
+-- ✅ All existing data preserved
