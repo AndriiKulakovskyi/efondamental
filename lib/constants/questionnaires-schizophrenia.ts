@@ -1677,17 +1677,17 @@ const SUMD_ATTRIBUTION_OPTIONS = [
 ];
 
 export const SUMD_QUESTIONS: Question[] = [
-  {
-    id: 'sumd_instructions',
-    text: 'Instructions',
-    help: 'L\'echelle evalue la conscience (insight) du patient concernant son trouble mental a travers differents domaines. Pour chaque domaine, evaluer d\'abord le niveau de conscience, puis l\'attribution des symptomes (si applicable). Note: Si le patient est "Non cotable" (0) ou "Inconscient" (3) sur un item de Conscience, l\'item Attribution correspondant devient automatiquement "Non cotable" (0).',
-    type: 'section',
-    required: false
-  },
+  // {
+  //   id: 'sumd_instructions',
+  //   text: 'Instructions',
+  //   help: 'L\'echelle evalue la conscience (insight) du patient concernant son trouble mental a travers differents domaines. Pour chaque domaine, evaluer d\'abord le niveau de conscience, puis l\'attribution des symptomes (si applicable). Note: Si le patient est "Non cotable" (0) ou "Inconscient" (3) sur un item de Conscience, l\'item Attribution correspondant devient automatiquement "Non cotable" (0).',
+  //   type: 'instruction',
+  //   required: false
+  // },
   // Domain 1: Conscience d'un trouble mental (global, no attribution)
   {
     id: 'section_domain1',
-    text: '1. Conscience d\'un trouble mental',
+    text: 'Conscience d\'un trouble mental',
     help: 'D\'une maniere generale, le patient croit-il presenter un trouble mental ?',
     type: 'section',
     required: false
@@ -1703,7 +1703,7 @@ export const SUMD_QUESTIONS: Question[] = [
   // Domain 2: Conscience des consequences du trouble (global, no attribution)
   {
     id: 'section_domain2',
-    text: '2. Conscience des consequences de ce trouble',
+    text: 'Conscience des consequences de ce trouble',
     help: 'Quelles sont les croyances du sujet concernant les raisons pour lesquelles il se retrouve hospitalise, renvoye de son travail, blesse, endette... etc... ?',
     type: 'section',
     required: false
@@ -1719,7 +1719,7 @@ export const SUMD_QUESTIONS: Question[] = [
   // Domain 3: Conscience des effets du traitement (global, no attribution)
   {
     id: 'section_domain3',
-    text: '3. Conscience des effets du traitement',
+    text: 'Conscience des effets du traitement',
     help: 'Le sujet croit-il que les traitements ont diminue la severite de ses symptomes ?',
     type: 'section',
     required: false
@@ -1735,14 +1735,14 @@ export const SUMD_QUESTIONS: Question[] = [
   // Domain 4: Conscience d'une experience hallucinatoire (+ attribution)
   {
     id: 'section_domain4',
-    text: '4. Conscience d\'une experience hallucinatoire',
+    text: 'Conscience d\'une experience hallucinatoire',
     help: 'Le sujet reconnait-il ses hallucinations en tant que telles ? Il s\'agit de coter sa capacite a interpreter son experience hallucinatoire comme primaire.',
     type: 'section',
     required: false
   },
   {
     id: 'conscience4',
-    text: '4. Conscience du trouble',
+    text: '4.1. Conscience du trouble',
     help: 'Le sujet reconnait-il ses hallucinations en tant que telles ?',
     type: 'single_choice',
     required: false,
@@ -1750,7 +1750,7 @@ export const SUMD_QUESTIONS: Question[] = [
   },
   {
     id: 'attribu4',
-    text: '4. Attribution des symptomes',
+    text: '4.2. Attribution des symptomes',
     help: 'Si conscience = 0 ou 3, l\'attribution est automatiquement "Non cotable".',
     type: 'single_choice',
     required: false,
@@ -1759,14 +1759,14 @@ export const SUMD_QUESTIONS: Question[] = [
   // Domain 5: Conscience du delire (+ attribution)
   {
     id: 'section_domain5',
-    text: '5. Conscience du delire',
+    text: 'Conscience du delire',
     help: 'Le sujet reconnait-il son delire en tant que production interne de croyances erronees ? Coter la conscience du caractere non plausible de ses croyances.',
     type: 'section',
     required: false
   },
   {
     id: 'conscience5',
-    text: '5. Conscience du trouble',
+    text: '5.1. Conscience du trouble',
     help: 'Le sujet reconnait-il son delire en tant que production interne de croyances erronees ?',
     type: 'single_choice',
     required: false,
@@ -1774,7 +1774,7 @@ export const SUMD_QUESTIONS: Question[] = [
   },
   {
     id: 'attribu5',
-    text: '5. Attribution des symptomes',
+    text: '5.2. Attribution des symptomes',
     help: 'Si conscience = 0 ou 3, l\'attribution est automatiquement "Non cotable".',
     type: 'single_choice',
     required: false,
@@ -1783,14 +1783,14 @@ export const SUMD_QUESTIONS: Question[] = [
   // Domain 6: Conscience d'un trouble de la pensee (+ attribution)
   {
     id: 'section_domain6',
-    text: '6. Conscience d\'un trouble de la pensee',
+    text: 'Conscience d\'un trouble de la pensee',
     help: 'Le sujet croit-il que ses communications avec les autres sont perturbees ?',
     type: 'section',
     required: false
   },
   {
     id: 'conscience6',
-    text: '6. Conscience du trouble',
+    text: '6.1. Conscience du trouble',
     help: 'Le sujet croit-il que ses communications avec les autres sont perturbees ?',
     type: 'single_choice',
     required: false,
@@ -1798,7 +1798,7 @@ export const SUMD_QUESTIONS: Question[] = [
   },
   {
     id: 'attribu6',
-    text: '6. Attribution des symptomes',
+    text: '6.2. Attribution des symptomes',
     help: 'Si conscience = 0 ou 3, l\'attribution est automatiquement "Non cotable".',
     type: 'single_choice',
     required: false,
@@ -1807,14 +1807,14 @@ export const SUMD_QUESTIONS: Question[] = [
   // Domain 7: Conscience d'un emoussement affectif (+ attribution)
   {
     id: 'section_domain7',
-    text: '7. Conscience d\'un emoussement affectif',
+    text: 'Conscience d\'un emoussement affectif',
     help: 'Le sujet a-t-il conscience de ses affects communiques par le biais de ses expressions, sa voix, sa gesticulation... etc... Ne pas coter son evaluation de sa thymie.',
     type: 'section',
     required: false
   },
   {
     id: 'conscience7',
-    text: '7. Conscience du trouble',
+    text: '7.1. Conscience du trouble',
     help: 'Le sujet a-t-il conscience de ses affects communiques par le biais de ses expressions, sa voix, sa gesticulation ?',
     type: 'single_choice',
     required: false,
@@ -1822,7 +1822,7 @@ export const SUMD_QUESTIONS: Question[] = [
   },
   {
     id: 'attribu7',
-    text: '7. Attribution des symptomes',
+    text: '7.2. Attribution des symptomes',
     help: 'Si conscience = 0 ou 3, l\'attribution est automatiquement "Non cotable".',
     type: 'single_choice',
     required: false,
@@ -1831,14 +1831,14 @@ export const SUMD_QUESTIONS: Question[] = [
   // Domain 8: Conscience de l'anhedonie (+ attribution)
   {
     id: 'section_domain8',
-    text: '8. Conscience de l\'anhedonie',
+    text: 'Conscience de l\'anhedonie',
     help: 'Le sujet est-il conscient que son attitude renvoie une apparente diminution de son plaisir a participer a des activites suscitant normalement le plaisir ?',
     type: 'section',
     required: false
   },
   {
     id: 'conscience8',
-    text: '8. Conscience du trouble',
+    text: '8.1. Conscience du trouble',
     help: 'Le sujet est-il conscient que son attitude renvoie une apparente diminution de son plaisir a participer a des activites suscitant normalement le plaisir ?',
     type: 'single_choice',
     required: false,
@@ -1846,7 +1846,7 @@ export const SUMD_QUESTIONS: Question[] = [
   },
   {
     id: 'attribu8',
-    text: '8. Attribution des symptomes',
+    text: '8.2. Attribution des symptomes',
     help: 'Si conscience = 0 ou 3, l\'attribution est automatiquement "Non cotable".',
     type: 'single_choice',
     required: false,
@@ -1855,14 +1855,14 @@ export const SUMD_QUESTIONS: Question[] = [
   // Domain 9: Conscience de l'asociabilite (+ attribution)
   {
     id: 'section_domain9',
-    text: '9. Conscience de l\'asociabilite',
+    text: 'Conscience de l\'asociabilite',
     help: 'Le patient est-il conscient qu\'il ne montre pas d\'interet pour les relations sociales ?',
     type: 'section',
     required: false
   },
   {
     id: 'conscience9',
-    text: '9. Conscience du trouble',
+    text: '9.1. Conscience du trouble',
     help: 'Le patient est-il conscient qu\'il ne montre pas d\'interet pour les relations sociales ?',
     type: 'single_choice',
     required: false,
@@ -1870,7 +1870,7 @@ export const SUMD_QUESTIONS: Question[] = [
   },
   {
     id: 'attribu9',
-    text: '9. Attribution des symptomes',
+    text: '9.2. Attribution des symptomes',
     help: 'Si conscience = 0 ou 3, l\'attribution est automatiquement "Non cotable".',
     type: 'single_choice',
     required: false,
@@ -1882,7 +1882,7 @@ export const SUMD_DEFINITION: QuestionnaireDefinition = {
   id: 'sumd',
   code: 'SUMD',
   title: 'SUMD - Echelle d\'evaluation de la conscience de la maladie',
-  description: 'Entretien semi-structure evaluant la conscience (insight) de la maladie mentale a travers 9 domaines. Les domaines 1-3 evaluent la conscience globale, les domaines 4-9 evaluent la conscience et l\'attribution des symptomes specifiques. Auteurs originaux: Amador XF, Strauss DH, Yale SA, et al. (1993).',
+  description: 'Entretien semi-structure evaluant la conscience (insight) de la maladie mentale a travers 9 domaines. Les domaines 1-3 evaluent la conscience globale, les domaines 4-9 evaluent la conscience et l\'attribution des symptomes specifiques. Auteurs originaux: Amador XF, Strauss DH, Yale SA, et al. (1993). L\'echelle evalue la conscience (insight) du patient concernant son trouble mental a travers differents domaines. Pour chaque domaine, evaluer d\'abord le niveau de conscience, puis l\'attribution des symptomes (si applicable). Note: Si le patient est "Non cotable" (0) ou "Inconscient" (3) sur un item de Conscience, l\'item Attribution correspondant devient automatiquement "Non cotable" (0).',
   questions: SUMD_QUESTIONS,
   metadata: {
     singleColumn: true,
