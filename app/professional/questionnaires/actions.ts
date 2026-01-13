@@ -119,7 +119,8 @@ import {
   saveAimsResponse,
   saveBarnesResponse,
   saveSasResponse,
-  savePspResponse
+  savePspResponse,
+  saveEcvResponse
 } from '@/lib/services/questionnaire-schizophrenia.service';
 import { 
   getVisitCompletionStatus,
@@ -231,7 +232,8 @@ import {
   AimsResponseInsert,
   BarnesResponseInsert,
   SasResponseInsert,
-  PspResponseInsert
+  PspResponseInsert,
+  EcvResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 import { requireUserContext } from '@/lib/rbac/middleware';
@@ -390,6 +392,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as PspResponseInsert);
+        break;
+
+      case 'ECV':
+        result = await saveEcvResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as EcvResponseInsert);
         break;
 
       // Initial Evaluation - ETAT

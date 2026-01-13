@@ -126,7 +126,8 @@ import {
   AIMS_DEFINITION,
   BARNES_DEFINITION,
   SAS_DEFINITION,
-  PSP_DEFINITION
+  PSP_DEFINITION,
+  ECV_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -372,6 +373,20 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['PSP']?.completed || false,
               completedAt: questionnaireStatuses['PSP']?.completed_at,
+            }
+          ]
+        },
+        {
+          id: 'mod_medical_eval',
+          name: 'Evaluation Medicale',
+          description: 'Evaluation medicale',
+          questionnaires: [
+            {
+              ...ECV_DEFINITION,
+              id: ECV_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['ECV']?.completed || false,
+              completedAt: questionnaireStatuses['ECV']?.completed_at,
             }
           ]
         }

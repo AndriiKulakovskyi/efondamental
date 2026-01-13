@@ -27,6 +27,8 @@ import {
   SasResponseInsert,
   PspResponse,
   PspResponseInsert,
+  EcvResponse,
+  EcvResponseInsert,
 } from '../types/database.types';
 
 // ============================================================================
@@ -1011,6 +1013,50 @@ export async function savePspResponse(
     .upsert({
       ...responseData,
       interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// ECV - Evaluation des comportements violents
+// ============================================================================
+
+export async function getEcvResponse(visitId: string): Promise<EcvResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_ecv')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return data || null;
+}
+
+export async function saveEcvResponse(
+  response: EcvResponseInsert
+): Promise<EcvResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    section_verbal,
+    section_physical,
+    section_sexual,
+    section_property,
+    ...responseData
+  } = response as any;
+
+  const { data, error } = await supabase
+    .from('responses_ecv')
+    .upsert({
+      ...responseData,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

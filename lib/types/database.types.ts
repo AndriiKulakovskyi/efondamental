@@ -5094,3 +5094,51 @@ export interface PspResponse {
 }
 
 export type PspResponseInsert = Omit<PspResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'interpretation'>;
+
+// ECV - Evaluation des comportements violents
+export interface EcvResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // Violence verbale (Verbal violence)
+  rad_ecv_vv1?: string | null; // Has the subject exhibited verbal violence?
+  chk_ecv_vv2?: string[] | null; // Type: Intrafamiliale, Extrafamiliale
+  rad_ecv_vv3?: string | null; // Police intervention
+  rad_ecv_vv4?: string | null; // Conviction
+  chk_ecv_vv5?: string[] | null; // Conviction type: Amende, Sursis, Prison
+
+  // Violence physique (Physical violence)
+  rad_ecv_vp1?: string | null; // Physical violence
+  rad_ecv_vp2?: string | null; // Assault and battery
+  chk_ecv_vp3?: string[] | null; // Weapon used: Sans arme, Arme blanche, Arme a feu
+  rad_ecv_vp4?: string | null; // Resulting in medical care for victim
+  rad_ecv_vp5?: string | null; // Homicide
+  chk_ecv_vp6?: string[] | null; // Type: Intrafamiliale, Extrafamiliale
+  rad_ecv_vp7?: string | null; // Police intervention
+  rad_ecv_vp8?: string | null; // Conviction
+  chk_ecv_vp9?: string[] | null; // Conviction type: Amende, Sursis, Prison
+
+  // Violence sexuelle (Sexual violence)
+  rad_ecv_vs1?: string | null; // Sexual violence
+  chk_ecv_vs2?: string[] | null; // Type: Viol, Attouchements
+  chk_ecv_vs3?: string[] | null; // Type: Intrafamiliale, Extrafamiliale
+  rad_ecv_vs4?: string | null; // Police intervention
+  rad_ecv_vs5?: string | null; // Conviction
+  chk_ecv_vs6?: string[] | null; // Conviction type: Amende, Sursis, Prison
+
+  // Bris d'objet (Property damage)
+  rad_ecv_vo1?: string | null; // Property damage
+  chk_ecv_vo2?: string[] | null; // Type: Intrafamiliale, Extrafamiliale
+  rad_ecv_vo3?: string | null; // Police intervention
+  rad_ecv_vo4?: string | null; // Conviction
+  chk_ecv_vo5?: string[] | null; // Conviction type: Amende, Sursis, Prison
+
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type EcvResponseInsert = Omit<EcvResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
