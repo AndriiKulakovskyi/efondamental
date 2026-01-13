@@ -546,12 +546,9 @@ export const SLEEP_APNEA_QUESTIONS: Question[] = [
   {
     id: 'male_gender',
     text: 'Sexe = Masculin ?',
-    type: 'single_choice',
+    type: 'text',
     required: true,
-    options: [
-      { code: 'yes', label: 'Oui' },
-      { code: 'no', label: 'Non' }
-    ],
+    readonly: true,
     display_if: {
       'in': [{ var: 'diagnosed_sleep_apnea' }, ['no', 'unknown']]
     }

@@ -103,6 +103,7 @@ export const QUESTIONNAIRES_REQUIRING_DEMOGRAPHICS: string[] = [
   // Infirmier questionnaires
   'BIOLOGICAL_ASSESSMENT',
   'PHYSICAL_PARAMS',
+  'SLEEP_APNEA',
   
   // Patient questionnaires requiring gender
   'PRISE_M',

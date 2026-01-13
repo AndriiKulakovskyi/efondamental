@@ -65,6 +65,19 @@ export function QuestionnaireRenderer({
         initialized[q.id] = new Date().toISOString().split('T')[0];
       }
     });
+    
+    // Auto-populate male_gender field for sleep apnea questionnaire
+    console.log('[Male Gender Init] stableInitialResponses:', stableInitialResponses);
+    if (initialized.patient_gender) {
+      console.log('[Male Gender Init] patient_gender:', initialized.patient_gender);
+      const gender = initialized.patient_gender?.toLowerCase();
+      const isMale = gender === 'male' || gender === 'm' || gender === 'homme';
+      initialized.male_gender = isMale ? 'Oui' : 'Non';
+      console.log('[Male Gender Init] Set male_gender to:', initialized.male_gender);
+    } else {
+      console.log('[Male Gender Init] No patient_gender found in initialized responses');
+    }
+    
     return initialized;
   }, [stableInitialResponses, questionnaire.questions]);
 
@@ -194,6 +207,22 @@ export function QuestionnaireRenderer({
       } else if (prev.tensionc) {
         delete updated.tensionc;
         hasChanges = true;
+      }
+
+      // Auto-populate male_gender field for sleep apnea questionnaire based on patient_gender
+      if (prev.patient_gender) {
+        console.log('[Male Gender Update] patient_gender:', prev.patient_gender);
+        const gender = prev.patient_gender?.toLowerCase();
+        const isMale = gender === 'male' || gender === 'm' || gender === 'homme';
+        const maleGenderValue = isMale ? 'Oui' : 'Non';
+        console.log('[Male Gender Update] Calculated value:', maleGenderValue, 'Current value:', updated.male_gender);
+        if (updated.male_gender !== maleGenderValue) {
+          updated.male_gender = maleGenderValue;
+          hasChanges = true;
+          console.log('[Male Gender Update] Updated male_gender to:', maleGenderValue);
+        }
+      } else {
+        console.log('[Male Gender Update] No patient_gender in prev');
       }
 
       // Compute clairance_creatinine using Cockroft-Gault formula
@@ -2562,6 +2591,7 @@ export function QuestionnaireRenderer({
           <div className="space-y-1">
             <Input
               id={question.id}
+              name={question.id}
               type="text"
               value={value || ""}
               onChange={(e) => {
@@ -2669,6 +2699,7 @@ export function QuestionnaireRenderer({
               <>
                 <Input
                   id={question.id}
+                  name={question.id}
                   type="range"
                   value={value}
                   onChange={(e) =>
@@ -2718,7 +2749,10 @@ export function QuestionnaireRenderer({
             disabled={readonly || question.readonly}
             required={isRequired}
           >
-            <SelectTrigger className="bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand">
+            <SelectTrigger 
+              id={question.id} 
+              className="bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand"
+            >
               <SelectValue placeholder="Sélectionnez une option" />
             </SelectTrigger>
             <SelectContent>
@@ -2791,6 +2825,7 @@ export function QuestionnaireRenderer({
         {question.type === "date" && (
           <Input
             id={question.id}
+            name={question.id}
             type="date"
             value={value || ""}
             onChange={(e) => handleResponseChange(question.id, e.target.value)}
