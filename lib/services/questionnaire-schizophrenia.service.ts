@@ -29,6 +29,8 @@ import {
   PspResponseInsert,
   EcvResponse,
   EcvResponseInsert,
+  TroublesComorbidesSzResponse,
+  TroublesComorbidesSzResponseInsert,
 } from '../types/database.types';
 
 // ============================================================================
@@ -1126,3 +1128,51 @@ export async function saveTroublesPsychotiquesResponse(
   if (error) throw error;
   return data;
 }
+
+// ============================================================================
+// TROUBLES COMORBIDES (Comorbid Disorders for Schizophrenia)
+// ============================================================================
+
+export async function getTroublesComorbidesSzResponse(
+  visitId: string
+): Promise<TroublesComorbidesSzResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_troubles_comorbides_sz')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return data || null;
+}
+
+export async function saveTroublesComorbidesSzResponse(
+  response: TroublesComorbidesSzResponseInsert
+): Promise<TroublesComorbidesSzResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section/title fields that shouldn't be saved to DB
+  const {
+    section_mood_disorders,
+    section_anxiety_disorders,
+    section_adhd,
+    titre_diag_tdah,
+    section_eating_disorders,
+    ...responseData
+  } = response as any;
+
+  const { data, error } = await supabase
+    .from('responses_troubles_comorbides_sz')
+    .upsert({
+      ...responseData,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+

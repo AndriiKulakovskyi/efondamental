@@ -124,6 +124,7 @@ import {
   ECV_DEFINITION,
   TROUBLES_PSYCHOTIQUES_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
+import { TROUBLES_COMORBIDES_SZ_DEFINITION } from "@/lib/constants/questionnaires-schizophrenia-comorbid";
 import { 
   getAsrmResponse, 
   getQidsResponse, 
@@ -240,7 +241,8 @@ import {
   getSasResponse,
   getPspResponse,
   getEcvResponse,
-  getTroublesPsychotiquesResponse
+  getTroublesPsychotiquesResponse,
+  getTroublesComorbidesSzResponse
 } from "@/lib/services/questionnaire-schizophrenia.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -386,6 +388,7 @@ export default async function ProfessionalQuestionnairePage({
   // Schizophrenia medical evaluation
   else if (code === ECV_DEFINITION.code) questionnaire = ECV_DEFINITION;
   else if (code === TROUBLES_PSYCHOTIQUES_DEFINITION.code) questionnaire = TROUBLES_PSYCHOTIQUES_DEFINITION;
+  else if (code === TROUBLES_COMORBIDES_SZ_DEFINITION.code) questionnaire = TROUBLES_COMORBIDES_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -513,6 +516,7 @@ export default async function ProfessionalQuestionnairePage({
   // Schizophrenia medical evaluation
   else if (code === ECV_DEFINITION.code) existingResponse = await getEcvResponse(visitId);
   else if (code === TROUBLES_PSYCHOTIQUES_DEFINITION.code) existingResponse = await getTroublesPsychotiquesResponse(visitId);
+  else if (code === TROUBLES_COMORBIDES_SZ_DEFINITION.code) existingResponse = await getTroublesComorbidesSzResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

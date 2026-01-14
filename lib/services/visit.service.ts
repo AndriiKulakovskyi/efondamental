@@ -200,8 +200,10 @@ import {
   AIMS_DEFINITION,
   BARNES_DEFINITION,
   SAS_DEFINITION,
-  PSP_DEFINITION
+  PSP_DEFINITION,
+  TROUBLES_PSYCHOTIQUES_DEFINITION
 } from '../constants/questionnaires-schizophrenia';
+import { TROUBLES_COMORBIDES_SZ_DEFINITION } from '../constants/questionnaires-schizophrenia-comorbid';
 import {
   getPsyTraitementSemestrielResponse
 } from './questionnaire-followup.service';
@@ -615,6 +617,18 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           name: 'Hetero-questionnaires',
           description: 'Questionnaires d\'evaluation clinique',
           questionnaires: [PANSS_DEFINITION, CDSS_DEFINITION, BARS_DEFINITION, SUMD_DEFINITION, AIMS_DEFINITION, BARNES_DEFINITION, SAS_DEFINITION, PSP_DEFINITION]
+        },
+        {
+          id: 'mod_medical_eval',
+          name: 'Evaluation Médicale',
+          description: 'Évaluation médicale complète',
+          sections: [
+            {
+              id: 'dsm5',
+              name: 'DSM5',
+              questionnaires: [TROUBLES_PSYCHOTIQUES_DEFINITION, TROUBLES_COMORBIDES_SZ_DEFINITION]
+            }
+          ]
         }
       ];
     }

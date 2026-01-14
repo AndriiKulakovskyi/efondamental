@@ -4752,6 +4752,86 @@ export interface BilanBiologiqueSzResponse {
 export type BilanBiologiqueSzResponseInsert = Omit<BilanBiologiqueSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'chol_rapport_hdltot'>;
 
 // ============================================================================
+// TROUBLES COMORBIDES (Schizophrenia Comorbid Disorders Assessment)
+// ============================================================================
+
+export interface TroublesComorbidesSzResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // Section 1: Mood Disorders (outside psychotic episodes)
+  rad_tb_thy_episode_dep_maj?: string | null;
+  rad_tb_thy_age_debut?: string | null;
+  rad_tb_thy_nb_episode?: string | null;
+
+  // Section 2: Anxiety Disorders
+  rad_tb_anx?: string | null;
+
+  // Panic Disorder
+  rad_attaq_paniq?: string | null;
+  rad_trouble_panique?: string | null;
+  chk_anxieux_trouble_panique_type?: string[] | null;
+  rad_anxieux_trouble_panique_sansagora_mois?: string | null;
+  rad_anxieux_trouble_panique_agora_mois?: string | null;
+
+  // Agoraphobia without Panic Disorder
+  rad_peur_agoraphobie?: string | null;
+  rad_agoraphobie?: string | null;
+  rad_anxieux_agoraphobie_symptome_mois_ecoule?: string | null;
+
+  // Social Phobia
+  rad_peur_sociale?: string | null;
+  rad_phobie_sociale?: string | null;
+  rad_anxieux_phobie_sociale_symptome_mois_ecoule?: string | null;
+
+  // Specific Phobia
+  rad_peur_specifique?: string | null;
+  rad_phobie_specifique?: string | null;
+  rad_anxieux_phobie_specfique_symptome_mois_ecoule?: string | null;
+
+  // Obsessive-Compulsive Disorder (OCD)
+  rad_peur_obsessionnel?: string | null;
+  rad_trouble_obsessionnel?: string | null;
+  rad_peur_compulsif?: string | null;
+  rad_trouble_compulsif?: string | null;
+  rad_anxieux_toc_symptome_mois_ecoule?: string | null;
+
+  // Post-Traumatic Stress Disorder (PTSD)
+  rad_anxieux_post_trauma_titre?: string | null;
+  rad_anxieux_post_trauma_symptome_mois_ecoule?: string | null;
+
+  // Generalized Anxiety Disorder (GAD)
+  rad_anxieux?: string | null;
+  rad_anxieux_generalise_titre?: string | null;
+  rad_anxieux_generalise_symptome_mois_ecoule?: string | null;
+
+  // Anxiety due to General Medical Condition
+  anxieux_affection_medicale?: string | null;
+  rad_anxieux_affection_medicale_symptome_mois_ecoule?: string | null;
+
+  // Anxiety Disorder Not Otherwise Specified
+  rad_anxieux_non_specifie_titre?: string | null;
+  rad_anxieux_non_specifie_symptome_mois_ecoule?: string | null;
+
+  // Section 3: ADHD
+  rad_diag_tdah?: string | null;
+
+  // Section 4: Eating Disorders
+  rad_tb_alim?: string | null;
+  rad_conduites_alimentaires_symptomes_mois_ecoule?: string | null;
+  rad_conduites_alimentaires_type?: string | null;
+
+  // Metadata
+  completed_by?: string | null;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type TroublesComorbidesSzResponseInsert = Omit<TroublesComorbidesSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
 // PANSS (Positive and Negative Syndrome Scale) - Schizophrenia Hetero-questionnaire
 // ============================================================================
 

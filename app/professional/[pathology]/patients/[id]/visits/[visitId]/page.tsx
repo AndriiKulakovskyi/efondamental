@@ -130,6 +130,7 @@ import {
   ECV_DEFINITION,
   TROUBLES_PSYCHOTIQUES_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
+import { TROUBLES_COMORBIDES_SZ_DEFINITION } from "@/lib/constants/questionnaires-schizophrenia-comorbid";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
 export default async function VisitDetailPage({
@@ -401,6 +402,13 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['TROUBLES_PSYCHOTIQUES']?.completed || false,
                   completedAt: questionnaireStatuses['TROUBLES_PSYCHOTIQUES']?.completed_at,
+                },
+                {
+                  ...TROUBLES_COMORBIDES_SZ_DEFINITION,
+                  id: TROUBLES_COMORBIDES_SZ_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['TROUBLES_COMORBIDES_SZ']?.completed || false,
+                  completedAt: questionnaireStatuses['TROUBLES_COMORBIDES_SZ']?.completed_at,
                 }
               ]
             }
