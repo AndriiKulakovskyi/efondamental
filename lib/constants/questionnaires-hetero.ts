@@ -679,37 +679,15 @@ export const ETAT_PATIENT_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'q1a',
-    text: 'Impression subjective d\'hyper-réactivité émotionnelle',
+    id: 'q1_subjective',
+    text: 'Impression subjective de :',
     type: 'single_choice',
     required: false,
-    display_if: { 
-      'and': [
-        { '==': [{ 'var': 'answers.q1' }, 1] },
-        { '!=': [{ 'var': 'answers.q1b' }, 1] }
-      ]
-    },
+    display_if: { '==': [{ 'var': 'answers.q1' }, 1] },
     options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
-    ]
-  },
-  {
-    id: 'q1b',
-    text: 'Impression subjective d\'hypo-réactivité ou d\'anesthésie',
-    type: 'single_choice',
-    required: false,
-    display_if: { 
-      'and': [
-        { '==': [{ 'var': 'answers.q1' }, 1] },
-        { '!=': [{ 'var': 'answers.q1a' }, 1] }
-      ]
-    },
-    options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
+      { code: 1, label: 'Hyper-réactivité émotionnelle', score: 1 },
+      { code: 2, label: 'Hypo-réactivité ou d’anesthésie', score: 2 },
+      { code: 0, label: 'Aucune des deux', score: 0 }
     ]
   },
   {
@@ -735,37 +713,14 @@ export const ETAT_PATIENT_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'q3a',
-    text: 'Perte de poids',
+    id: 'q3_type',
+    text: 'préciser :',
     type: 'single_choice',
     required: false,
-    display_if: { 
-      'and': [
-        { '==': [{ 'var': 'answers.q3' }, 1] },
-        { '!=': [{ 'var': 'answers.q3b' }, 1] }
-      ]
-    },
+    display_if: { '==': [{ 'var': 'answers.q3' }, 1] },
     options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
-    ]
-  },
-  {
-    id: 'q3b',
-    text: 'Gain de poids',
-    type: 'single_choice',
-    required: false,
-    display_if: { 
-      'and': [
-        { '==': [{ 'var': 'answers.q3' }, 1] },
-        { '!=': [{ 'var': 'answers.q3a' }, 1] }
-      ]
-    },
-    options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
+      { code: 1, label: 'Perte', score: 1 },
+      { code: 2, label: 'Gain', score: 2 }
     ]
   },
   {
@@ -780,27 +735,14 @@ export const ETAT_PATIENT_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'q4a',
-    text: 'Insomnie',
+    id: 'q4_type',
+    text: 'Préciser :',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ 'var': 'answers.q4' }, 1] },
     options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
-    ]
-  },
-  {
-    id: 'q4b',
-    text: 'Hypersomnie',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ 'var': 'answers.q4' }, 1] },
-    options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
+      { code: 1, label: 'Insomnie', score: 1 },
+      { code: 2, label: 'Hypersomnie', score: 2 }
     ]
   },
   {
@@ -815,27 +757,14 @@ export const ETAT_PATIENT_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'q5a',
-    text: 'Agitation',
+    id: 'q5_type',
+    text: 'Préciser :',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ 'var': 'answers.q5' }, 1] },
     options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
-    ]
-  },
-  {
-    id: 'q5b',
-    text: 'Ralentissement',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ 'var': 'answers.q5' }, 1] },
-    options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
+      { code: 1, label: 'Agitation', score: 1 },
+      { code: 2, label: 'Ralentissement', score: 2 }
     ]
   },
   {
@@ -872,27 +801,14 @@ export const ETAT_PATIENT_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'q8a',
-    text: 'Impression d\'accélération idéïque',
+    id: 'q8_type',
+    text: 'Impression de :',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ 'var': 'answers.q8' }, 1] },
     options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
-    ]
-  },
-  {
-    id: 'q8b',
-    text: 'Impression de ralentissement idéïque',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ 'var': 'answers.q8' }, 1] },
-    options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
+      { code: 1, label: 'Accélération idéïque', score: 1 },
+      { code: 2, label: 'Ralentissement idéïque', score: 2 }
     ]
   },
   {

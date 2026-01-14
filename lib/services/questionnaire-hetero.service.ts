@@ -592,49 +592,66 @@ export async function saveFastResponse(
   const user = await supabase.auth.getUser();
 
   // Calculate domain scores
-  const autonomyScore = (response.q1 ?? 0) + (response.q2 ?? 0) + 
-                       (response.q3 ?? 0) + (response.q4 ?? 0);
+  // If any question in a domain is missing (null/undefined), the domain score is null
+  const calcScore = (items: (number | null | undefined)[]) => {
+    if (items.some(i => i === null || i === undefined)) return null;
+    return items.reduce((sum: number, i) => sum + (i ?? 0), 0);
+  };
+
+  const autonomyScore = calcScore([response.q1, response.q2, response.q3, response.q4]);
   
-  const occupationalScore = (response.q5 ?? 0) + (response.q6 ?? 0) + 
-                           (response.q7 ?? 0) + (response.q8 ?? 0) + 
-                           (response.q9 ?? 0);
+  const occupationalScore = calcScore([
+    response.q5, response.q6, response.q7, response.q8, response.q9
+  ]);
   
-  const cognitiveScore = (response.q10 ?? 0) + (response.q11 ?? 0) + 
-                        (response.q12 ?? 0) + (response.q13 ?? 0) + 
-                        (response.q14 ?? 0);
+  const cognitiveScore = calcScore([
+    response.q10, response.q11, response.q12, response.q13, response.q14
+  ]);
   
-  const financialScore = (response.q15 ?? 0) + (response.q16 ?? 0);
+  const financialScore = calcScore([response.q15, response.q16]);
   
-  const interpersonalScore = (response.q17 ?? 0) + (response.q18 ?? 0) + 
-                            (response.q19 ?? 0) + (response.q20 ?? 0) + 
-                            (response.q21 ?? 0) + (response.q22 ?? 0);
+  const interpersonalScore = calcScore([
+    response.q17, response.q18, response.q19, response.q20, 
+    response.q21, response.q22
+  ]);
   
-  const leisureScore = (response.q23 ?? 0) + (response.q24 ?? 0);
+  const leisureScore = calcScore([response.q23, response.q24]);
 
   // Calculate total score
-  const totalScore = autonomyScore + occupationalScore + cognitiveScore + 
-                    financialScore + interpersonalScore + leisureScore;
+  // If any domain score is null, total score is null
+  const domainScores = [
+    autonomyScore, occupationalScore, cognitiveScore, 
+    financialScore, interpersonalScore, leisureScore
+  ];
+  
+  const totalScore = domainScores.some(s => s === null) 
+    ? null 
+    : domainScores.reduce((sum: number, s) => sum + (s ?? 0), 0);
 
   // Determine interpretation
   let interpretation = '';
-  if (totalScore <= 11) {
-    interpretation = 'Pas de déficit fonctionnel';
-  } else if (totalScore <= 20) {
-    interpretation = 'Déficit fonctionnel léger';
-  } else if (totalScore <= 40) {
-    interpretation = 'Déficit fonctionnel modéré';
+  if (totalScore !== null) {
+    if (totalScore <= 11) {
+      interpretation = 'Pas de déficit fonctionnel';
+    } else if (totalScore <= 20) {
+      interpretation = 'Déficit fonctionnel léger';
+    } else if (totalScore <= 40) {
+      interpretation = 'Déficit fonctionnel modéré';
+    } else {
+      interpretation = 'Déficit fonctionnel sévère';
+    }
   } else {
-    interpretation = 'Déficit fonctionnel sévère';
+    interpretation = 'Questionnaire incomplet';
   }
 
-  // Add domain-specific interpretations
+  // Add domain-specific interpretations only if valid
   const domainInterpretations = [];
-  if (autonomyScore > 6) domainInterpretations.push('Autonomie altérée');
-  if (occupationalScore > 7) domainInterpretations.push('Fonctionnement professionnel altéré');
-  if (cognitiveScore > 7) domainInterpretations.push('Fonctionnement cognitif altéré');
-  if (financialScore > 3) domainInterpretations.push('Gestion financière altérée');
-  if (interpersonalScore > 9) domainInterpretations.push('Relations interpersonnelles altérées');
-  if (leisureScore > 3) domainInterpretations.push('Loisirs altérés');
+  if (autonomyScore !== null && autonomyScore > 6) domainInterpretations.push('Autonomie altérée');
+  if (occupationalScore !== null && occupationalScore > 7) domainInterpretations.push('Fonctionnement professionnel altéré');
+  if (cognitiveScore !== null && cognitiveScore > 7) domainInterpretations.push('Fonctionnement cognitif altéré');
+  if (financialScore !== null && financialScore > 3) domainInterpretations.push('Gestion financière altérée');
+  if (interpersonalScore !== null && interpersonalScore > 9) domainInterpretations.push('Relations interpersonnelles altérées');
+  if (leisureScore !== null && leisureScore > 3) domainInterpretations.push('Loisirs altérés');
 
   if (domainInterpretations.length > 0) {
     interpretation += '. Domaines affectés: ' + domainInterpretations.join(', ');

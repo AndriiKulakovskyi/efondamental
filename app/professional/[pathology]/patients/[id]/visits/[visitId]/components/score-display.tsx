@@ -145,6 +145,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       if (data.wais_cod_std >= 8) return 'info';
       return 'warning';
     }
+
+    if (code === 'FAST') {
+      // FAST: Total Score interpretation
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score > 40) return 'error'; // Severe
+      if (score > 20) return 'warning'; // Moderate
+      if (score > 11) return 'warning'; // Mild
+      return 'success'; // No deficit
+    }
     
     return 'info';
   };
@@ -877,6 +887,57 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 <span className="text-gray-600">Age du patient:</span>
                 <span className="font-semibold">{data.patient_age ?? '-'} ans</span>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* FAST Details */}
+        {code === 'FAST' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Autonomie:</span>
+                <span className={`font-semibold ${data.autonomy_score === null ? 'text-orange-600' : ''}`}>
+                  {data.autonomy_score !== null && data.autonomy_score !== undefined ? `${data.autonomy_score}/12` : 'Questionnaire incomplet'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Activité pro.:</span>
+                <span className={`font-semibold ${data.occupational_score === null ? 'text-orange-600' : ''}`}>
+                  {data.occupational_score !== null && data.occupational_score !== undefined ? `${data.occupational_score}/15` : 'Questionnaire incomplet'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Cognitif:</span>
+                <span className={`font-semibold ${data.cognitive_score === null ? 'text-orange-600' : ''}`}>
+                  {data.cognitive_score !== null && data.cognitive_score !== undefined ? `${data.cognitive_score}/15` : 'Questionnaire incomplet'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Finances:</span>
+                <span className={`font-semibold ${data.financial_score === null ? 'text-orange-600' : ''}`}>
+                  {data.financial_score !== null && data.financial_score !== undefined ? `${data.financial_score}/6` : 'Questionnaire incomplet'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Relations:</span>
+                <span className={`font-semibold ${data.interpersonal_score === null ? 'text-orange-600' : ''}`}>
+                  {data.interpersonal_score !== null && data.interpersonal_score !== undefined ? `${data.interpersonal_score}/18` : 'Questionnaire incomplet'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Loisirs:</span>
+                <span className={`font-semibold ${data.leisure_score === null ? 'text-orange-600' : ''}`}>
+                  {data.leisure_score !== null && data.leisure_score !== undefined ? `${data.leisure_score}/6` : 'Questionnaire incomplet'}
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">Score Total:</span>
+              <span className={`font-bold text-lg`}>
+                {data.total_score !== null && data.total_score !== undefined ? `${data.total_score}/72` : 'Questionnaire incomplet'}
+              </span>
             </div>
           </div>
         )}
