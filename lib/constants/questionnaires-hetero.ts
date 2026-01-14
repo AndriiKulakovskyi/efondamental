@@ -4894,7 +4894,11 @@ export const CSSRS_QUESTIONS: Question[] = [
   },
   {
     id: 'q1_wish_dead',
-    text: '1. Désir d\'être mort(e) : Avez-vous souhaité être mort(e) ou de vous endormir et de ne jamais vous réveiller ?',
+    text: `1. Désir d’être mort(e)
+Le sujet souscrit à des pensées concernant le désir de mourir ou de ne plus être en vie, ou le désir de s’endormir et de ne pas se réveiller
+
+
+**Avez-vous souhaité être mort(e) ou de vous endormir et de ne jamais vous réveiller ?**`,
     help: 'Si la réponse aux questions 1 et 2 est "non", passez à la fin du questionnaire.',
     type: 'single_choice',
     required: true,
@@ -4905,7 +4909,11 @@ export const CSSRS_QUESTIONS: Question[] = [
   },
   {
     id: 'q2_non_specific',
-    text: '2. Pensées suicidaires actives non spécifiques : Avez-vous réellement pensé à vous suicider ?',
+    text: `2. Pensées suicidaires actives non spécifiques
+Pensées d’ordre général non spécifiques autour de la volonté de mettre fin à ses jours/ se suicider (par ex « j’ai pensé à me suicider »), non associées à des pensées sur les manières permettant de se suicider/méthodes associées, ni à une intention ou à un scénario, au cours de la période d’évaluation.
+
+
+**Avez-vous réellement pensé à vous suicider ?** `,
     help: 'Si la réponse est "oui", posez les questions 3, 4 et 5.',
     type: 'single_choice',
     required: true,
@@ -4916,7 +4924,11 @@ export const CSSRS_QUESTIONS: Question[] = [
   },
   {
     id: 'q3_method_no_intent',
-    text: '3. Idéation suicidaire active avec la définition des méthodes (sans scénario), sans intention de passage à l\'acte : Avez-vous pensé à la manière dont vous vous y prendriez ?',
+    text: `3. Idéation suicidaire active avec la définition des méthodes (sans scénario), sans intention de passage à l’acte :
+Le sujet pense au suicide et a envisagé au moins une méthode pour y parvenir au cours de la période d’évaluation. Il ne s’agit pas ici de l’élaboration d’un scénario spécifique comprenant le moment, le lieu ou la méthode (par ex. le sujet a pensé à une méthode pour se suicider mais ne dispose pas d’un scénario précis) Il s’agit par exemple d’une personne déclarant « J’ai pensé à avaler des médicaments, mais je n’ai pas de scénario précis sur le moment, le lieu ou la manière dont je le ferais…et je n’irai jamais jusque là ».
+
+
+**Avez-vous pensé à la manière dont vous vous y prendriez ?**`,
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'q2_non_specific' }, 1] },
@@ -4927,7 +4939,11 @@ export const CSSRS_QUESTIONS: Question[] = [
   },
   {
     id: 'q4_intent_no_plan',
-    text: '4. Idéation suicidaire active avec intention de passage à l\'acte, sans scénario précis : Avez-vous eu des pensées de ce genre et l\'intention de passer à l\'acte ?',
+    text: `4. Idéation suicidaire active avec intention de passage à l’acte, sans scénario précis
+Pensées suicidaires actives, le sujet exprime une intention plus ou moins forte de passer à l’acte et ne se contente pas de déclarer « J’ai des pensées suicidaires, mais je ne ferai jamais rien pour les mettre en œuvre ».
+
+
+**Avez-vous eu des pensées de ce genre et l’intention de passer à l’acte ?**`,
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'q2_non_specific' }, 1] },
@@ -4938,7 +4954,11 @@ export const CSSRS_QUESTIONS: Question[] = [
   },
   {
     id: 'q5_plan_intent',
-    text: '5. Idéation suicidaire active avec scénario précis et intention de passer à l\'acte : Avez-vous commencé ou fini d\'élaborer un scénario détaillé sur la manière dont vous voulez vous suicider ? Et avez-vous l\'intention de mettre ce scénario à exécution ?',
+    text: `5. Idéation suicidaire active avec scénario précis et intention de passser à l’acte
+Pensées suicidaires associées à l’élaboration complète ou partielle d’un scénario détaillé ; le sujet exprime une intention plus ou moins forte de mettre ce scénario à exécution
+
+
+**Avez-vous commencé ou fini d’élaborer un scénario détaillé sur la manière dont vous voulez vous suicider ? Avez-vous l’intention de mettre ce scénario à exécution ?**`,
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'q2_non_specific' }, 1] },
