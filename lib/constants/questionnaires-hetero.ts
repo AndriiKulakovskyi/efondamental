@@ -422,8 +422,8 @@ export const CGI_QUESTIONS: Question[] = [
   },
   {
     id: 'therapeutic_effect',
-    text: 'Effet thérapeutique',
-    help: 'Important = amélioration marquée : disparition complète ou presque complète de tous les symptômes. Modéré = amélioration nette : disparition partielle des symptômes. Minime = très légère amélioration qui ne modifie pas le fonctionnement du patient.',
+    text: 'Index thérapeutique :',
+    help: 'Evaluer cet item uniquement en fonction de l\'effet du médicament. Choisissez les termes qui décrivent le mieux les degrés d\'efficacité thérapeutique et d\'effets secondaires et entourez le nombre qui se trouve à l\'intersection. Exemple : l\'effet thérapeutique est évalué comme "modéré" et les effets secondaires sont jugés comme "n\'interférant pas significativement avec le fonctionnement du patient" entourez 06.',
     type: 'single_choice',
     required: false,
     options: [
