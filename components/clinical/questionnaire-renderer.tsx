@@ -21,7 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { QuestionnaireDefinition } from "@/lib/constants/questionnaires";
-import { Question } from "@/lib/types/database.types";
+import { Question, QuestionOption } from "@/lib/types/database.types";
 import {
   evaluateConditionalLogic,
   validateQuestionnaireResponse,
@@ -2426,6 +2426,47 @@ export function QuestionnaireRenderer({
     responses.item_16, responses.item_17, responses.item_18, responses.item_19, responses.item_20,
     responses.item_21, responses.item_22, responses.item_23, responses.item_24, responses.item_25,
     responses.item_26
+  ]);
+
+  // Dedicated calculation for Mood Episodes Total since last visit
+  useEffect(() => {
+    if (questionnaire?.code !== 'DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE') return;
+
+    setResponses((prev) => {
+      // Helper to get score from option code for a field
+      const getScore = (fieldId: string) => {
+        const question = questionnaire.questions.find(q => q.id === fieldId);
+        if (!question || !question.options) return 0;
+        const responseValue = prev[fieldId];
+        // Use loose equality (==) to handle string/number comparison
+        const option = (question.options as QuestionOption[]).find(opt => opt.code == responseValue);
+        return typeof option?.score === 'number' ? option.score : 0;
+      };
+
+      const nbEdm = getScore('rad_tb_hum_nbepdep');
+      const nbManie = getScore('rad_tb_hum_nbepmanan');
+      const nbHypomanie = getScore('rad_tb_hum_nbephypoman');
+
+      const totalScore = nbEdm + nbManie + nbHypomanie;
+      
+      let totalCode = totalScore.toString();
+      if (totalScore > 20) totalCode = '>20';
+      
+      let updated = { ...prev };
+      let hasChanges = false;
+
+      if (updated.rad_tb_hum_epthyman_nb !== totalCode) {
+        updated.rad_tb_hum_epthyman_nb = totalCode;
+        hasChanges = true;
+      }
+
+      return hasChanges ? updated : prev;
+    });
+  }, [
+    questionnaire.code,
+    responses.rad_tb_hum_nbepdep,
+    responses.rad_tb_hum_nbepmanan,
+    responses.rad_tb_hum_nbephypoman
   ]);
 
   const handleResponseChange = (questionId: string, value: any) => {

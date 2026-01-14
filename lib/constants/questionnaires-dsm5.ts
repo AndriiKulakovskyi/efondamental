@@ -2687,36 +2687,33 @@ export const DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION: QuestionnaireDefinition = {
 // Helper function to generate episode count options (0 to >20)
 const generateEpisodeCountOptions = () => [
   { code: 'Ne sais pas', label: 'Ne sais pas' },
-  { code: '0', label: '0' },
-  { code: '1', label: '1' },
-  { code: '2', label: '2' },
-  { code: '3', label: '3' },
-  { code: '4', label: '4' },
-  { code: '5', label: '5' },
-  { code: '6', label: '6' },
-  { code: '7', label: '7' },
-  { code: '8', label: '8' },
-  { code: '9', label: '9' },
-  { code: '10', label: '10' },
-  { code: '11', label: '11' },
-  { code: '12', label: '12' },
-  { code: '13', label: '13' },
-  { code: '14', label: '14' },
-  { code: '15', label: '15' },
-  { code: '16', label: '16' },
-  { code: '17', label: '17' },
-  { code: '18', label: '18' },
-  { code: '19', label: '19' },
-  { code: '20', label: '20' },
-  { code: '>20', label: '>20' }
+  { code: '0', label: '0', score: 0 },
+  { code: '1', label: '1', score: 1 },
+  { code: '2', label: '2', score: 2 },
+  { code: '3', label: '3', score: 3 },
+  { code: '4', label: '4', score: 4 },
+  { code: '5', label: '5', score: 5 },
+  { code: '6', label: '6', score: 6 },
+  { code: '7', label: '7', score: 7 },
+  { code: '8', label: '8', score: 8 },
+  { code: '9', label: '9', score: 9 },
+  { code: '10', label: '10', score: 10 },
+  { code: '11', label: '11', score: 11 },
+  { code: '12', label: '12', score: 12 },
+  { code: '13', label: '13', score: 13 },
+  { code: '14', label: '14', score: 14 },
+  { code: '15', label: '15', score: 15 },
+  { code: '16', label: '16', score: 16 },
+  { code: '17', label: '17', score: 17 },
+  { code: '18', label: '18', score: 18 },
+  { code: '19', label: '19', score: 19 },
+  { code: '20', label: '20', score: 20 },
+  { code: '>20', label: '>20', score: 21 }
 ];
 
 // Condition for showing fields when at least 1 episode is reported
 const atLeastOneEpisodeCondition = (fieldName: string) => ({
-  'in': [
-    { var: fieldName },
-    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '>20']
-  ]
+  '>=': [{ var: fieldName }, 1]
 });
 
 export const DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_QUESTIONS: Question[] = [
@@ -2751,6 +2748,7 @@ export const DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_QUESTIONS: Question[] = [
     text: 'Nombre d\'épisodes total',
     type: 'single_choice',
     required: false,
+    readonly: true,
     display_if: { '==': [{ var: 'rad_tb_hum_epthyman' }, 'Oui'] },
     options: generateEpisodeCountOptions(),
     metadata: {
