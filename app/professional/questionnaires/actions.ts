@@ -38,6 +38,7 @@ import {
   saveFamilyHistoryResponse,
   saveCssrsResponse,
   saveIsaResponse,
+  saveIsaSuiviResponse,
   saveSisResponse,
   saveSuicideHistoryResponse,
   saveSuicideBehaviorFollowupResponse,
@@ -154,6 +155,7 @@ import {
   FamilyHistoryResponseInsert,
   CssrsResponseInsert,
   IsaResponseInsert,
+  IsaSuiviResponseInsert,
   SisResponseInsert,
   SuicideHistoryResponseInsert,
   SuicideBehaviorFollowupResponseInsert,
@@ -528,6 +530,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as IsaResponseInsert);
+        break;
+        
+      case 'ISA_FOLLOWUP_FR':
+        result = await saveIsaSuiviResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as IsaSuiviResponseInsert);
         break;
 
       case 'SIS_FR':

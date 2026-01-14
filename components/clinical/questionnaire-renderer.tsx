@@ -57,7 +57,7 @@ const EMPTY_RESPONSES: Record<string, any> = {};
 /**
  * A very simple markdown-like renderer to handle bold text and tables in questionnaire text/help.
  */
-const MarkdownContent = ({ content }: { content: string }) => {
+const MarkdownContent = ({ content, className }: { content: string, className?: string }) => {
   if (!content) return null;
 
   const lines = content.split('\n');
@@ -146,7 +146,7 @@ const MarkdownContent = ({ content }: { content: string }) => {
 
   flushTable(lines.length);
 
-  return <div className="markdown-content">{elements}</div>;
+  return <div className={`markdown-content ${className || ''}`}>{elements}</div>;
 };
 
 export function QuestionnaireRenderer({
@@ -2716,7 +2716,10 @@ export function QuestionnaireRenderer({
           <MarkdownContent content={question.text} />
         ) : (
           <Label htmlFor={question.id} className={`text-base font-semibold ${question.readonly ? 'text-indigo-700' : 'text-slate-800'}`}>
-            {question.text}
+            <MarkdownContent 
+              content={question.text} 
+              className={question.text.includes('\n') || question.text.includes('**') ? 'font-normal' : ''}
+            />
             {isRequired && <span className="text-brand ml-1">*</span>}
             {question.readonly && (
               <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 border border-indigo-200">

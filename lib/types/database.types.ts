@@ -2297,6 +2297,40 @@ export interface IsaResponse {
 
 export type IsaResponseInsert = Omit<IsaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
+// ===== ISA Suivi (Intentionnalité Suicidaire Actuelle Suivi) Response =====
+export interface IsaSuiviResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Question 1: Life not worth living
+  q1_life_worth?: number | null; // 0 or 1
+  q1_time?: 'last_week' | 'since_last_visit' | null;
+  
+  // Question 2: Wish to die
+  q2_wish_death?: number | null; // 0 or 1
+  q2_time?: 'last_week' | 'since_last_visit' | null;
+  
+  // Question 3: Thoughts of suicide
+  q3_thoughts?: number | null; // 0 or 1
+  q3_time?: 'last_week' | 'since_last_visit' | null;
+  
+  // Question 4: Plan/serious consideration
+  q4_plan?: number | null; // 0 or 1
+  q4_time?: 'last_week' | 'since_last_visit' | null;
+  
+  // Question 5: Attempt
+  q5_attempt?: number | null; // 0 or 1
+  q5_time?: 'last_week' | 'since_last_visit' | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type IsaSuiviResponseInsert = Omit<IsaSuiviResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
 // ===== SIS (Suicide Intent Scale) Response =====
 export interface SisResponse {
   id: string;

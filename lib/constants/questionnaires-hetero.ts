@@ -5233,6 +5233,137 @@ export const ISA_DEFINITION: QuestionnaireDefinition = {
   }
 };
 
+export const ISA_FOLLOWUP_QUESTIONS: Question[] = [
+  {
+    id: 'q1_life_worth',
+    text: '1. Avez-vous déjà eu l\'impression que la vie ne vaut pas la peine d\'être vécue ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q1_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q1_life_worth' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: 'since_last_visit', label: 'Il y a entre une semaine et la dernière visite', score: 0 }
+    ]
+  },
+  {
+    id: 'q2_wish_death',
+    text: '2. Avez-vous déjà souhaité mourir, par exemple, de vous coucher et de ne pas vous réveiller ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q2_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q2_wish_death' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: 'since_last_visit', label: 'Il y a entre une semaine et la dernière visite', score: 0 }
+    ]
+  },
+  {
+    id: 'q3_thoughts',
+    text: '3. Avez-vous déjà pensé à vous donner la mort, même si vous ne le feriez jamais ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q3_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q3_thoughts' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: 'since_last_visit', label: 'Il y a entre une semaine et la dernière visite', score: 0 }
+    ]
+  },
+  {
+    id: 'q4_plan',
+    text: '4. Avez-vous déjà sérieusement envisagé de vous donner la mort ou planifié la façon de vous y prendre ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q4_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q4_plan' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: 'since_last_visit', label: 'Il y a entre une semaine et la dernière visite', score: 0 }
+    ]
+  },
+  {
+    id: 'q5_attempt',
+    text: '5. Avez-vous déjà essayé de vous donner la mort ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q5_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q5_attempt' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: 'since_last_visit', label: 'Il y a entre une semaine et la dernière visite', score: 0 }
+    ]
+  }
+];
+
+export const ISA_FOLLOWUP_DEFINITION: QuestionnaireDefinition = {
+  id: 'isa_followup',
+  code: 'ISA_FOLLOWUP_FR',
+  title: 'Intentionnalité Suicidaire Actuelle (suivi)',
+  description: 'Échelle évaluant les pensées, désirs et tentatives de suicide depuis la dernière visite.',
+  questions: ISA_FOLLOWUP_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
 // ============================================================================
 // SIS (Suicide Intent Scale) - Beck
 // ============================================================================
@@ -5497,7 +5628,10 @@ export const SUICIDE_HISTORY_QUESTIONS: Question[] = [
   },
   {
     id: 'q6_interrupted',
-    text: 'Q6. Tentative interrompue : Interruption (par des facteurs extérieurs) de la mise en oeuvre par la personne d\'un acte potentiellement auto-agressif (sinon, une tentative avérée aurait eu lieu). Surdosage : la personne a des comprimés dans la main, mais quelqu\'un l\'empêche de les avaler. Si elle ingère un ou plusieurs comprimés, il s\'agit d\'une tentative avérée plutôt que d\'une tentative interrompue. Arme à feu : la personne pointe une arme vers elle, mais l\'arme lui est reprise par quelqu\'un ou quelque chose l\'empêche d\'appuyer sur la gâchette. Si elle appuie sur la gâchette et même si le coup ne part pas, il s\'agit d\'une tentative avérée. Saut dans le vide : la personne s\'apprête à sauter, mais quelqu\'un la retient et l\'éloigne du bord. Pendaison : la personne a une corde autour du cou mais ne s\'est pas encore pendue car quelqu\'un l\'en empêche.\n\nVous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais d\'en être empêché(e) par quelqu\'un ou quelque chose avant de véritablement passer à l\'acte ?',
+    text: `Q6. Tentative interrompue : Interruption (par des facteurs extérieurs) de la mise en oeuvre par la personne d'un acte potentiellement auto-agressif (sinon, une tentative avérée aurait eu lieu). Surdosage : la personne a des comprimés dans la main, mais quelqu'un l'empêche de les avaler. Si elle ingère un ou plusieurs comprimés, il s'agit d'une tentative avérée plutôt que d'une tentative interrompue. Arme à feu : la personne pointe une arme vers elle, mais l'arme lui est reprise par quelqu'un ou quelque chose l'empêche d'appuyer sur la gâchette. Si elle appuie sur la gâchette et même si le coup ne part pas, il s'agit d'une tentative avérée. Saut dans le vide : la personne s'apprête à sauter, mais quelqu'un la retient et l'éloigne du bord. Pendaison : la personne a une corde autour du cou mais ne s'est pas encore pendue car quelqu'un l'en empêche.
+
+
+**Vous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais d'en être empêché(e) par quelqu'un ou quelque chose avant de véritablement passer à l'acte ?**`,
     type: 'single_choice',
     required: false,
     options: [
@@ -5516,7 +5650,10 @@ export const SUICIDE_HISTORY_QUESTIONS: Question[] = [
   },
   {
     id: 'q7_aborted',
-    text: 'Q7. Tentative avortée : La personne se prépare à se suicider, mais s\'interrompt d\'elle-même avant d\'avoir réellement eu un comportement autodestructeur. Les exemples sont similaires à ceux illustrant une tentative interrompue, si ce n\'est qu\'ici la personne interrompt d\'elle-même sa tentative au lieu d\'être interrompue par un facteur extérieur.\n\nVous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais de vous arrêter de vous-même avant de véritablement passer à l\'acte ?',
+    text: `Q7. Tentative avortée : La personne se prépare à se suicider, mais s'interrompt d'elle-même avant d'avoir réellement eu un comportement autodestructeur. Les exemples sont similaires à ceux illustrant une tentative interrompue, si ce n'est qu'ici la personne interrompt d'elle-même sa tentative au lieu d'être interrompue par un facteur extérieur.
+
+
+**Vous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais de vous arrêter de vous-même avant de véritablement passer à l'acte ?**`,
     type: 'single_choice',
     required: false,
     options: [
@@ -5535,7 +5672,10 @@ export const SUICIDE_HISTORY_QUESTIONS: Question[] = [
   },
   {
     id: 'q8_preparations',
-    text: 'Q8. Préparatifs : Actes ou préparatifs en vue d\'une tentative de suicide imminente. Il peut s\'agir de tout ce qui dépasse le stade de la verbalisation ou de la pensée, comme l\'élaboration d\'une méthode spécifique (par ex. se procurer des comprimés ou une arme à feu) ou la prise de dispositions en vue de son suicide (par ex. dons d\'objets, rédaction d\'une lettre d\'adieu).\n\nAvez-vous pris certaines mesures pour faire une tentative de suicide ou pour préparer votre suicide (par ex. rassembler des comprimés, vous procurer une arme à feu, donner vos objets de valeur ou écrire une lettre d\'adieu) ?',
+    text: `Q8. Préparatifs : Actes ou préparatifs en vue d'une tentative de suicide imminente. Il peut s'agir de tout ce qui dépasse le stade de la verbalisation ou de la pensée, comme l'élaboration d'une méthode spécifique (par ex. se procurer des comprimés ou une arme à feu) ou la prise de dispositions en vue de son suicide (par ex. dons d'objets, rédaction d'une lettre d'adieu).
+
+
+**Avez-vous pris certaines mesures pour faire une tentative de suicide ou pour préparer votre suicide (par ex. rassembler des comprimés, vous procurer une arme à feu, donner vos objets de valeur ou écrire une lettre d'adieu) ?**`,
     type: 'single_choice',
     required: false,
     options: [
@@ -5621,7 +5761,10 @@ export const SUICIDE_BEHAVIOR_FOLLOWUP_QUESTIONS: Question[] = [
   },
   {
     id: 'q2_interrupted',
-    text: 'Tentative interrompue : Interruption (par des facteurs extérieurs) de la mise en oeuvre par la personne d\'un acte potentiellement auto-agressif (sinon, une tentative avérée aurait eu lieu). Surdosage : la personne a des comprimés dans la main, mais quelqu\'un l\'empêche de les avaler. Si elle ingère un ou plusieurs comprimés, il s\'agit d\'une tentative avérée plutôt que d\'une tentative interrompue. Arme à feu : la personne pointe une arme vers elle, mais l\'arme lui est reprise par quelqu\'un ou quelque chose l\'empêche d\'appuyer sur la gâchette. Si elle appuie sur la gâchette et même si le coup ne part pas, il s\'agit d\'une tentative avérée. Saut dans le vide : la personne s\'apprête à sauter, mais quelqu\'un la retient et l\'éloigne du bord. Pendaison : la personne a une corde autour du cou mais ne s\'est pas encore pendue car quelqu\'un l\'en empêche.\n\nVous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais d\'en être empêché(e) par quelqu\'un ou quelque chose avant de véritablement passer à l\'acte ?',
+    text: `Tentative interrompue : Interruption (par des facteurs extérieurs) de la mise en oeuvre par la personne d'un acte potentiellement auto-agressif (sinon, une tentative avérée aurait eu lieu). Surdosage : la personne a des comprimés dans la main, mais quelqu'un l'empêche de les avaler. Si elle ingère un ou plusieurs comprimés, il s'agit d'une tentative avérée plutôt que d'une tentative interrompue. Arme à feu : la personne pointe une arme vers elle, mais l'arme lui est reprise par quelqu'un ou quelque chose l'empêche d'appuyer sur la gâchette. Si elle appuie sur la gâchette et même si le coup ne part pas, il s'agit d'une tentative avérée. Saut dans le vide : la personne s'apprête à sauter, mais quelqu'un la retient et l'éloigne du bord. Pendaison : la personne a une corde autour du cou mais ne s'est pas encore pendue car quelqu'un l'en empêche.
+
+
+**Vous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais d'en être empêché(e) par quelqu'un ou quelque chose avant de véritablement passer à l'acte ?**`,
     type: 'single_choice',
     required: false,
     options: [
@@ -5640,7 +5783,10 @@ export const SUICIDE_BEHAVIOR_FOLLOWUP_QUESTIONS: Question[] = [
   },
   {
     id: 'q3_aborted',
-    text: 'Tentative avortée : La personne se prépare à se suicider, mais s\'interrompt d\'elle-même avant d\'avoir réellement eu un comportement autodestructeur. Les exemples sont similaires à ceux illustrant une tentative interrompue, si ce n\'est qu\'ici la personne interrompt d\'elle-même sa tentative au lieu d\'être interrompue par un facteur extérieur.\n\nVous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais de vous arrêter de vous-même avant de véritablement passer à l\'acte ?',
+    text: `Tentative avortée : La personne se prépare à se suicider, mais s'interrompt d'elle-même avant d'avoir réellement eu un comportement autodestructeur. Les exemples sont similaires à ceux illustrant une tentative interrompue, si ce n'est qu'ici la personne interrompt d'elle-même sa tentative au lieu d'être interrompue par un facteur extérieur.
+
+
+**Vous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais de vous arrêter de vous-même avant de véritablement passer à l'acte ?**`,
     type: 'single_choice',
     required: false,
     options: [
@@ -5659,7 +5805,10 @@ export const SUICIDE_BEHAVIOR_FOLLOWUP_QUESTIONS: Question[] = [
   },
   {
     id: 'q4_preparations',
-    text: 'Préparatifs : Actes ou préparatifs en vue d\'une tentative de suicide imminente. Il peut s\'agir de tout ce qui dépasse le stade de la verbalisation ou de la pensée, comme l\'élaboration d\'une méthode spécifique (par ex. se procurer des comprimés ou une arme à feu) ou la prise de dispositions en vue de son suicide (par ex. dons d\'objets, rédaction d\'une lettre d\'adieu).\n\nAvez-vous pris certaines mesures pour faire une tentative de suicide ou pour préparer votre suicide (par ex. rassembler des comprimés, vous procurer une arme à feu, donner vos objets de valeur ou écrire une lettre d\'adieu) ?',
+    text: `Préparatifs : Actes ou préparatifs en vue d'une tentative de suicide imminente. Il peut s'agir de tout ce qui dépasse le stade de la verbalisation ou de la pensée, comme l'élaboration d'une méthode spécifique (par ex. se procurer des comprimés ou une arme à feu) ou la prise de dispositions en vue de son suicide (par ex. dons d'objets, rédaction d'une lettre d'adieu).
+
+
+**Avez-vous pris certaines mesures pour faire une tentative de suicide ou pour préparer votre suicide (par ex. rassembler des comprimés, vous procurer une arme à feu, donner vos objets de valeur ou écrire une lettre d'adieu) ?**`,
     type: 'single_choice',
     required: false,
     options: [

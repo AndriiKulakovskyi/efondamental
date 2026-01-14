@@ -48,6 +48,7 @@ import {
   FAMILY_HISTORY_DEFINITION,
   CSSRS_DEFINITION,
   ISA_DEFINITION,
+  ISA_FOLLOWUP_DEFINITION,
   SIS_DEFINITION,
   SUICIDE_HISTORY_DEFINITION,
   SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
@@ -1143,11 +1144,11 @@ export default async function VisitDetailPage({
         // Build Suicide section questionnaires
         const suicideQuestionnaires = [
           {
-            ...ISA_DEFINITION,
-            id: ISA_DEFINITION.code,
+            ...ISA_FOLLOWUP_DEFINITION,
+            id: ISA_FOLLOWUP_DEFINITION.code,
             target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ISA_FR']?.completed || false,
-            completedAt: questionnaireStatuses['ISA_FR']?.completed_at,
+            completed: questionnaireStatuses['ISA_FOLLOWUP_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ISA_FOLLOWUP_FR']?.completed_at,
           },
           {
             ...SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
@@ -1535,11 +1536,11 @@ export default async function VisitDetailPage({
             completedAt: questionnaireStatuses['CSSRS_FR']?.completed_at,
           },
           {
-            ...ISA_DEFINITION,
-            id: ISA_DEFINITION.code,
+            ...ISA_FOLLOWUP_DEFINITION,
+            id: ISA_FOLLOWUP_DEFINITION.code,
             target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ISA_FR']?.completed || false,
-            completedAt: questionnaireStatuses['ISA_FR']?.completed_at,
+            completed: questionnaireStatuses['ISA_FOLLOWUP_FR']?.completed || false,
+            completedAt: questionnaireStatuses['ISA_FOLLOWUP_FR']?.completed_at,
           },
           {
             ...SIS_DEFINITION,

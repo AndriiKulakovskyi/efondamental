@@ -39,6 +39,7 @@ import {
   FAMILY_HISTORY_DEFINITION,
   CSSRS_DEFINITION,
   ISA_DEFINITION,
+  ISA_FOLLOWUP_DEFINITION,
   SIS_DEFINITION,
   SUICIDE_HISTORY_DEFINITION,
   SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
@@ -152,6 +153,7 @@ import {
   getFamilyHistoryResponse,
   getCssrsResponse,
   getIsaResponse,
+  getIsaSuiviResponse,
   getSisResponse,
   getSuicideHistoryResponse,
   getSuicideBehaviorFollowupResponse,
@@ -283,6 +285,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === FAMILY_HISTORY_DEFINITION.code) questionnaire = FAMILY_HISTORY_DEFINITION;
   else if (code === CSSRS_DEFINITION.code) questionnaire = CSSRS_DEFINITION;
   else if (code === ISA_DEFINITION.code) questionnaire = ISA_DEFINITION;
+  else if (code === ISA_FOLLOWUP_DEFINITION.code) questionnaire = ISA_FOLLOWUP_DEFINITION;
   else if (code === SIS_DEFINITION.code) questionnaire = SIS_DEFINITION;
   else if (code === SUICIDE_HISTORY_DEFINITION.code) questionnaire = SUICIDE_HISTORY_DEFINITION;
   else if (code === SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION.code) questionnaire = SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION;
@@ -398,6 +401,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === FAMILY_HISTORY_DEFINITION.code) existingResponse = await getFamilyHistoryResponse(visitId);
   else if (code === CSSRS_DEFINITION.code) existingResponse = await getCssrsResponse(visitId);
   else if (code === ISA_DEFINITION.code) existingResponse = await getIsaResponse(visitId);
+  else if (code === ISA_FOLLOWUP_DEFINITION.code) existingResponse = await getIsaSuiviResponse(visitId);
   else if (code === SIS_DEFINITION.code) existingResponse = await getSisResponse(visitId);
   else if (code === SUICIDE_HISTORY_DEFINITION.code) existingResponse = await getSuicideHistoryResponse(visitId);
   else if (code === SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION.code) existingResponse = await getSuicideBehaviorFollowupResponse(visitId);

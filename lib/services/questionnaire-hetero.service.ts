@@ -25,6 +25,8 @@ import {
   CssrsResponseInsert,
   IsaResponse,
   IsaResponseInsert,
+  IsaSuiviResponse,
+  IsaSuiviResponseInsert,
   SisResponse,
   SisResponseInsert,
   SuicideHistoryResponse,
@@ -904,6 +906,58 @@ export async function saveIsaResponse(
     .single();
 
   if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// ISA Suivi (Intentionnalité Suicidaire Actuelle Suivi)
+// ============================================================================
+
+export async function getIsaSuiviResponse(
+  visitId: string
+): Promise<IsaSuiviResponse | null> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('responses_isa_suivi')
+      .select('*')
+      .eq('visit_id', visitId)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      if (error.code === 'PGRST205') {
+        console.warn('Table responses_isa_suivi does not exist yet. Please apply migration 212.');
+        return null;
+      }
+      throw error;
+    }
+    return data;
+  } catch (error) {
+    console.error('Error in getIsaSuiviResponse:', error);
+    return null;
+  }
+}
+
+export async function saveIsaSuiviResponse(
+  response: IsaSuiviResponseInsert
+): Promise<IsaSuiviResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_isa_suivi')
+    .upsert({
+      ...response
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST205') {
+      throw new Error('La table responses_isa_suivi n\'existe pas. Veuillez appliquer la migration 212.');
+    }
+    throw error;
+  }
   return data;
 }
 
