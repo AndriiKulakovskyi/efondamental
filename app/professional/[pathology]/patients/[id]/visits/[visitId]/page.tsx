@@ -129,7 +129,8 @@ import {
   PSP_DEFINITION,
   ECV_DEFINITION,
   TROUBLES_PSYCHOTIQUES_DEFINITION,
-  SUICIDE_HISTORY_SZ_DEFINITION
+  SUICIDE_HISTORY_SZ_DEFINITION,
+  ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { TROUBLES_COMORBIDES_SZ_DEFINITION } from "@/lib/constants/questionnaires-schizophrenia-comorbid";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
@@ -430,6 +431,19 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['SUICIDE_HISTORY_SZ']?.completed || false,
                   completedAt: questionnaireStatuses['SUICIDE_HISTORY_SZ']?.completed_at,
+                }
+              ]
+            },
+            {
+              id: 'antecedents_familiaux',
+              name: 'Antecedents familiaux',
+              questionnaires: [
+                {
+                  ...ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
+                  id: ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['ANTECEDENTS_FAMILIAUX_PSY_SZ']?.completed || false,
+                  completedAt: questionnaireStatuses['ANTECEDENTS_FAMILIAUX_PSY_SZ']?.completed_at,
                 }
               ]
             }

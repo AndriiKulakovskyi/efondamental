@@ -4861,6 +4861,73 @@ export interface SuicideHistorySzResponse {
 export type SuicideHistorySzResponseInsert = Omit<SuicideHistorySzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
+// Antecedents Familiaux Psychiatriques - Schizophrenia
+// ============================================================================
+
+export interface AntecedentsFamiliauxPsySzResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // Structure: Enfants (Children)
+  rad_structure_fille?: string | null;
+  rad_structure_fille_atteint?: string | null;
+  rad_structure_fils?: string | null;
+  rad_structure_fils_atteint?: string | null;
+
+  // Structure: Fratrie (Siblings)
+  rad_structure_soeur?: string | null;
+  rad_structure_soeur_atteint?: string | null;
+  rad_structure_frere?: string | null;
+  rad_structure_frere_atteint?: string | null;
+
+  // Structure: Parents
+  rad_structure_mere?: string | null;
+  rad_atcdfampsy_mere_deces?: string | null;
+  rad_structure_pere?: string | null;
+  rad_atcdfampsy_pere_deces?: string | null;
+
+  // Fratrie Details: Soeurs (Sisters 1-5)
+  rad_soeur1_trouble?: string | null;
+  rad_soeur1_suicide?: string | null;
+  rad_soeur2_trouble?: string | null;
+  rad_soeur2_suicide?: string | null;
+  rad_soeur3_trouble?: string | null;
+  rad_soeur3_suicide?: string | null;
+  rad_soeur4_trouble?: string | null;
+  rad_soeur4_suicide?: string | null;
+  rad_soeur5_trouble?: string | null;
+  rad_soeur5_suicide?: string | null;
+
+  // Fratrie Details: Freres (Brothers 1-5)
+  rad_frere1_trouble?: string | null;
+  rad_frere1_suicide?: string | null;
+  rad_frere2_trouble?: string | null;
+  rad_frere2_suicide?: string | null;
+  rad_frere3_trouble?: string | null;
+  rad_frere3_suicide?: string | null;
+  rad_frere4_trouble?: string | null;
+  rad_frere4_suicide?: string | null;
+  rad_frere5_trouble?: string | null;
+  rad_frere5_suicide?: string | null;
+
+  // Parents Details: Mere (Mother)
+  rad_mere_trouble?: string | null;
+  rad_mere_suicide?: string | null;
+
+  // Parents Details: Pere (Father)
+  rad_pere_trouble?: string | null;
+  rad_pere_suicide?: string | null;
+
+  // Metadata
+  completed_at?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export type AntecedentsFamiliauxPsySzResponseInsert = Omit<AntecedentsFamiliauxPsySzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
 // PANSS (Positive and Negative Syndrome Scale) - Schizophrenia Hetero-questionnaire
 // ============================================================================
 

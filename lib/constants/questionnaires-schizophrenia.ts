@@ -3806,3 +3806,595 @@ export const SUICIDE_HISTORY_SZ_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// ANTECEDENTS FAMILIAUX PSYCHIATRIQUES - Schizophrenia
+// Evaluation des antecedents psychiatriques familiaux
+// ============================================================================
+
+// Helper options for count fields
+const COUNT_OPTIONS_FEMALE: QuestionOption[] = [
+  { code: '0', label: 'Aucune' },
+  { code: '1', label: '1' },
+  { code: '2', label: '2' },
+  { code: '3', label: '3' },
+  { code: '4', label: '4' },
+  { code: '5', label: '5' },
+  { code: '>5', label: '>5' }
+];
+
+const COUNT_OPTIONS_MALE: QuestionOption[] = [
+  { code: '0', label: 'Aucun' },
+  { code: '1', label: '1' },
+  { code: '2', label: '2' },
+  { code: '3', label: '3' },
+  { code: '4', label: '4' },
+  { code: '5', label: '5' },
+  { code: '>5', label: '>5' }
+];
+
+// Affected count options - same as parent count options
+const AFFECTED_COUNT_OPTIONS_FEMALE: QuestionOption[] = [
+  { code: '0', label: 'Aucune' },
+  { code: '1', label: '1' },
+  { code: '2', label: '2' },
+  { code: '3', label: '3' },
+  { code: '4', label: '4' },
+  { code: '5', label: '5' },
+  { code: '>5', label: '>5' }
+];
+
+const AFFECTED_COUNT_OPTIONS_MALE: QuestionOption[] = [
+  { code: '0', label: 'Aucun' },
+  { code: '1', label: '1' },
+  { code: '2', label: '2' },
+  { code: '3', label: '3' },
+  { code: '4', label: '4' },
+  { code: '5', label: '5' },
+  { code: '>5', label: '>5' }
+];
+
+const YES_NO_MAYBE_OPTIONS: QuestionOption[] = [
+  { code: 'oui', label: 'Oui' },
+  { code: 'non', label: 'Non' },
+  { code: 'ne_sais_pas', label: 'Ne sais pas' }
+];
+
+const YES_NO_OPTIONS: QuestionOption[] = [
+  { code: 'oui', label: 'Oui' },
+  { code: 'non', label: 'Non' }
+];
+
+const TROUBLE_PSY_OPTIONS: QuestionOption[] = [
+  { code: 'aucun', label: 'Aucun' },
+  { code: 'edm_unipolaire', label: 'EDM ou Unipolaire' },
+  { code: 'bipolaire', label: 'Bipolaire' },
+  { code: 'schizophrene', label: 'Schizophrene' },
+  { code: 'ne_sais_pas', label: 'Ne sais pas' }
+];
+
+const SUICIDE_OPTIONS: QuestionOption[] = [
+  { code: 'aucun', label: 'Aucun' },
+  { code: 'tentative', label: 'Tentative de suicide' },
+  { code: 'abouti', label: 'Suicide abouti' },
+  { code: 'ne_sais_pas', label: 'Ne sais pas' }
+];
+
+// Helper to check if count is >= 1 (i.e., not '0')
+// Uses 'answers.' prefix as required by the questionnaire renderer's JSONLogic evaluation
+// Note: The questionnaire renderer converts numeric string codes to numbers,
+// so '1' becomes 1, '2' becomes 2, etc. Only '>5' stays as string since it can't be parsed as number.
+const hasAtLeastOne = (fieldId: string) => ({
+  'in': [{ 'var': `answers.${fieldId}` }, [1, 2, 3, 4, 5, '>5']]
+});
+
+// Helper to check if affected count meets threshold (includes '>5' which counts as more than 5)
+// Uses 'answers.' prefix as required by the questionnaire renderer's JSONLogic evaluation
+// Note: The questionnaire renderer converts numeric string codes to numbers,
+// so '1' becomes 1, '2' becomes 2, etc. Only '>5' stays as string since it can't be parsed as number.
+const hasAffectedCount = (fieldId: string, minCount: number) => {
+  // For minCount 1-4, include all values from that point to 5 plus '>5'
+  // For minCount 5, include '5' and '>5'
+  // Use numbers for 1-5, string for '>5'
+  const allCounts: (number | string)[] = [1, 2, 3, 4, 5, '>5'];
+  const validCounts = allCounts.slice(minCount - 1);
+  return { 'in': [{ 'var': `answers.${fieldId}` }, validCounts] };
+};
+
+export const ANTECEDENTS_FAMILIAUX_PSY_SZ_QUESTIONS: Question[] = [
+  // ============================================================================
+  // SECTION: ANTECEDENTS FAMILIAUX - STRUCTURE
+  // ============================================================================
+  
+  // --- ENFANTS ---
+  {
+    id: 'titre_structure_enfant',
+    text: 'Enfants',
+    type: 'section',
+    required: false,
+    is_label: true
+  },
+  {
+    id: 'rad_structure_fille',
+    text: 'Nombre de filles',
+    type: 'single_choice',
+    required: false,
+    options: COUNT_OPTIONS_FEMALE
+  },
+  {
+    id: 'rad_structure_fille_atteint',
+    text: 'Parmi elles, veuillez indiquer combien presentent un trouble psychiatrique, un abus ou une dependance a une substance, un antecedent de tentative de suicide ou un facteur de risque cardio-vasculaire',
+    type: 'single_choice',
+    required: false,
+    options: AFFECTED_COUNT_OPTIONS_FEMALE,
+    indentLevel: 1,
+    display_if: hasAtLeastOne('rad_structure_fille')
+  },
+  {
+    id: 'rad_structure_fils',
+    text: 'Nombre de fils',
+    type: 'single_choice',
+    required: false,
+    options: COUNT_OPTIONS_MALE
+  },
+  {
+    id: 'rad_structure_fils_atteint',
+    text: 'Parmi eux, veuillez indiquer combien presentent un trouble psychiatrique, un abus ou une dependance a une substance, un antecedent de tentative de suicide ou un facteur de risque cardio-vasculaire',
+    type: 'single_choice',
+    required: false,
+    options: AFFECTED_COUNT_OPTIONS_MALE,
+    indentLevel: 1,
+    display_if: hasAtLeastOne('rad_structure_fils')
+  },
+  
+  // --- FRATRIE ---
+  {
+    id: 'titre_structure_fratrie',
+    text: 'Fratrie',
+    type: 'section',
+    required: false,
+    is_label: true
+  },
+  {
+    id: 'rad_structure_soeur',
+    text: 'Nombre de soeurs',
+    type: 'single_choice',
+    required: false,
+    options: COUNT_OPTIONS_FEMALE
+  },
+  {
+    id: 'rad_structure_soeur_atteint',
+    text: 'Parmi elles, veuillez indiquer combien presentent un trouble psychiatrique, un abus ou une dependance a une substance, un antecedent de tentative de suicide ou un facteur de risque cardio-vasculaire',
+    type: 'single_choice',
+    required: false,
+    options: AFFECTED_COUNT_OPTIONS_FEMALE,
+    indentLevel: 1,
+    display_if: hasAtLeastOne('rad_structure_soeur')
+  },
+  {
+    id: 'rad_structure_frere',
+    text: 'Nombre de freres',
+    type: 'single_choice',
+    required: false,
+    options: COUNT_OPTIONS_MALE
+  },
+  {
+    id: 'rad_structure_frere_atteint',
+    text: 'Parmi eux, veuillez indiquer combien presentent un trouble psychiatrique, un abus ou une dependance a une substance, un antecedent de tentative de suicide ou un facteur de risque cardio-vasculaire',
+    type: 'single_choice',
+    required: false,
+    options: AFFECTED_COUNT_OPTIONS_MALE,
+    indentLevel: 1,
+    display_if: hasAtLeastOne('rad_structure_frere')
+  },
+  
+  // --- PARENTS STRUCTURE ---
+  {
+    id: 'titre_parents',
+    text: 'Parents',
+    type: 'section',
+    required: false,
+    is_label: true
+  },
+    // --- CONSIGNE ---
+    {
+      id: 'titre_consigne',
+      text: 'Pour chaque membre de votre famille ci-dessous, veuillez indiquer s\'il presente un trouble psychiatrique, un abus ou une dependance a une substance, un antecedent de tentative de suicide ou un facteur de risque cardio-vasculaire. Puis saisir les caracteristiques du trouble dans l\'onglet qui lui correspond',
+      type: 'instruction',
+      required: false
+    },
+  {
+    id: 'rad_structure_mere',
+    text: 'Mere',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_MAYBE_OPTIONS
+  },
+  {
+    id: 'rad_atcdfampsy_mere_deces',
+    text: 'Deces',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_OPTIONS,
+    indentLevel: 1
+  },
+  {
+    id: 'rad_structure_pere',
+    text: 'Pere',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_MAYBE_OPTIONS
+  },
+  {
+    id: 'rad_atcdfampsy_pere_deces',
+    text: 'Deces',
+    type: 'single_choice',
+    required: false,
+    options: YES_NO_OPTIONS,
+    indentLevel: 1
+  },
+  
+  // ============================================================================
+  // SECTION: FRATRIE DETAILS - SOEURS (Conditional)
+  // ============================================================================
+  
+  // --- SOEUR 1 ---
+  {
+    id: 'titre_soeur1',
+    text: 'Antecedents de la soeur 1',
+    type: 'section',
+    required: false,
+    is_label: true,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 1)
+  },
+  {
+    id: 'rad_soeur1_trouble',
+    text: 'Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLE_PSY_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 1)
+  },
+  {
+    id: 'rad_soeur1_suicide',
+    text: 'Suicide',
+    type: 'single_choice',
+    required: false,
+    options: SUICIDE_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 1)
+  },
+  
+  // --- SOEUR 2 ---
+  {
+    id: 'titre_soeur2',
+    text: 'Antecedents de la soeur 2',
+    type: 'section',
+    required: false,
+    is_label: true,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 2)
+  },
+  {
+    id: 'rad_soeur2_trouble',
+    text: 'Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLE_PSY_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 2)
+  },
+  {
+    id: 'rad_soeur2_suicide',
+    text: 'Suicide',
+    type: 'single_choice',
+    required: false,
+    options: SUICIDE_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 2)
+  },
+  
+  // --- SOEUR 3 ---
+  {
+    id: 'titre_soeur3',
+    text: 'Antecedents de la soeur 3',
+    type: 'section',
+    required: false,
+    is_label: true,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 3)
+  },
+  {
+    id: 'rad_soeur3_trouble',
+    text: 'Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLE_PSY_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 3)
+  },
+  {
+    id: 'rad_soeur3_suicide',
+    text: 'Suicide',
+    type: 'single_choice',
+    required: false,
+    options: SUICIDE_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 3)
+  },
+  
+  // --- SOEUR 4 ---
+  {
+    id: 'titre_soeur4',
+    text: 'Antecedents de la soeur 4',
+    type: 'section',
+    required: false,
+    is_label: true,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 4)
+  },
+  {
+    id: 'rad_soeur4_trouble',
+    text: 'Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLE_PSY_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 4)
+  },
+  {
+    id: 'rad_soeur4_suicide',
+    text: 'Suicide',
+    type: 'single_choice',
+    required: false,
+    options: SUICIDE_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 4)
+  },
+  
+  // --- SOEUR 5 ---
+  {
+    id: 'titre_soeur5',
+    text: 'Antecedents de la soeur 5',
+    type: 'section',
+    required: false,
+    is_label: true,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 5)
+  },
+  {
+    id: 'rad_soeur5_trouble',
+    text: 'Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLE_PSY_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 5)
+  },
+  {
+    id: 'rad_soeur5_suicide',
+    text: 'Suicide',
+    type: 'single_choice',
+    required: false,
+    options: SUICIDE_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_soeur_atteint', 5)
+  },
+  
+  // ============================================================================
+  // SECTION: FRATRIE DETAILS - FRERES (Conditional)
+  // ============================================================================
+  
+  // --- FRERE 1 ---
+  {
+    id: 'titre_frere1',
+    text: 'Antecedents du frere 1',
+    type: 'section',
+    required: false,
+    is_label: true,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 1)
+  },
+  {
+    id: 'rad_frere1_trouble',
+    text: 'Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLE_PSY_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 1)
+  },
+  {
+    id: 'rad_frere1_suicide',
+    text: 'Suicide',
+    type: 'single_choice',
+    required: false,
+    options: SUICIDE_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 1)
+  },
+  
+  // --- FRERE 2 ---
+  {
+    id: 'titre_frere2',
+    text: 'Antecedents du frere 2',
+    type: 'section',
+    required: false,
+    is_label: true,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 2)
+  },
+  {
+    id: 'rad_frere2_trouble',
+    text: 'Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLE_PSY_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 2)
+  },
+  {
+    id: 'rad_frere2_suicide',
+    text: 'Suicide',
+    type: 'single_choice',
+    required: false,
+    options: SUICIDE_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 2)
+  },
+  
+  // --- FRERE 3 ---
+  {
+    id: 'titre_frere3',
+    text: 'Antecedents du frere 3',
+    type: 'section',
+    required: false,
+    is_label: true,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 3)
+  },
+  {
+    id: 'rad_frere3_trouble',
+    text: 'Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLE_PSY_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 3)
+  },
+  {
+    id: 'rad_frere3_suicide',
+    text: 'Suicide',
+    type: 'single_choice',
+    required: false,
+    options: SUICIDE_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 3)
+  },
+  
+  // --- FRERE 4 ---
+  {
+    id: 'titre_frere4',
+    text: 'Antecedents du frere 4',
+    type: 'section',
+    required: false,
+    is_label: true,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 4)
+  },
+  {
+    id: 'rad_frere4_trouble',
+    text: 'Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLE_PSY_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 4)
+  },
+  {
+    id: 'rad_frere4_suicide',
+    text: 'Suicide',
+    type: 'single_choice',
+    required: false,
+    options: SUICIDE_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 4)
+  },
+  
+  // --- FRERE 5 ---
+  {
+    id: 'titre_frere5',
+    text: 'Antecedents du frere 5',
+    type: 'section',
+    required: false,
+    is_label: true,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 5)
+  },
+  {
+    id: 'rad_frere5_trouble',
+    text: 'Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLE_PSY_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 5)
+  },
+  {
+    id: 'rad_frere5_suicide',
+    text: 'Suicide',
+    type: 'single_choice',
+    required: false,
+    options: SUICIDE_OPTIONS,
+    indentLevel: 1,
+    display_if: hasAffectedCount('rad_structure_frere_atteint', 5)
+  },
+  
+  // ============================================================================
+  // SECTION: PARENTS DETAILS (Conditional)
+  // ============================================================================
+  
+  // --- MERE ---
+  {
+    id: 'titre_mere',
+    text: 'Antecedents maternels',
+    type: 'section',
+    required: false,
+    is_label: true,
+    display_if: { '==': [{ 'var': 'answers.rad_structure_mere' }, 'oui'] }
+  },
+  {
+    id: 'rad_mere_trouble',
+    text: 'Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLE_PSY_OPTIONS,
+    indentLevel: 1,
+    display_if: { '==': [{ 'var': 'answers.rad_structure_mere' }, 'oui'] }
+  },
+  {
+    id: 'rad_mere_suicide',
+    text: 'Suicide',
+    type: 'single_choice',
+    required: false,
+    options: SUICIDE_OPTIONS,
+    indentLevel: 1,
+    display_if: { '==': [{ 'var': 'answers.rad_structure_mere' }, 'oui'] }
+  },
+  
+  // --- PERE ---
+  {
+    id: 'titre_pere',
+    text: 'Antecedents paternels',
+    type: 'section',
+    required: false,
+    is_label: true,
+    display_if: { '==': [{ 'var': 'answers.rad_structure_pere' }, 'oui'] }
+  },
+  {
+    id: 'rad_pere_trouble',
+    text: 'Troubles psychiatriques',
+    type: 'single_choice',
+    required: false,
+    options: TROUBLE_PSY_OPTIONS,
+    indentLevel: 1,
+    display_if: { '==': [{ 'var': 'answers.rad_structure_pere' }, 'oui'] }
+  },
+  {
+    id: 'rad_pere_suicide',
+    text: 'Suicide',
+    type: 'single_choice',
+    required: false,
+    options: SUICIDE_OPTIONS,
+    indentLevel: 1,
+    display_if: { '==': [{ 'var': 'answers.rad_structure_pere' }, 'oui'] }
+  }
+];
+
+export const ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION: QuestionnaireDefinition = {
+  id: 'antecedents_familiaux_psy_sz',
+  code: 'ANTECEDENTS_FAMILIAUX_PSY_SZ',
+  title: 'Antecedents familiaux psychiatriques',
+  description: 'Ce questionnaire recueille les antecedents psychiatriques familiaux du patient, incluant les troubles psychiatriques et les tentatives de suicide pour les parents, la fratrie et les enfants.',
+  instructions: 'Remplir les informations sur la structure familiale puis detailler les antecedents pour les membres concernes.',
+  questions: ANTECEDENTS_FAMILIAUX_PSY_SZ_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['schizophrenia'],
+    target_role: 'healthcare_professional',
+    version: '1.0',
+    language: 'fr-FR'
+  }
+};

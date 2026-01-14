@@ -33,6 +33,8 @@ import {
   TroublesComorbidesSzResponseInsert,
   SuicideHistorySzResponse,
   SuicideHistorySzResponseInsert,
+  AntecedentsFamiliauxPsySzResponse,
+  AntecedentsFamiliauxPsySzResponseInsert,
 } from '../types/database.types';
 
 // ============================================================================
@@ -1205,6 +1207,61 @@ export async function saveSuicideHistorySzResponse(
   const { data, error } = await supabase
     .from('responses_suicide_history_sz')
     .upsert(response, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// ANTECEDENTS FAMILIAUX PSYCHIATRIQUES - Schizophrenia
+// Evaluation des antecedents psychiatriques familiaux
+// ============================================================================
+
+export async function getAntecedentsFamiliauxPsySzResponse(
+  visitId: string
+): Promise<AntecedentsFamiliauxPsySzResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_antecedents_familiaux_psy_sz')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return data || null;
+}
+
+export async function saveAntecedentsFamiliauxPsySzResponse(
+  response: AntecedentsFamiliauxPsySzResponseInsert
+): Promise<AntecedentsFamiliauxPsySzResponse> {
+  const supabase = await createClient();
+
+  // Remove section/title fields that shouldn't be saved to DB
+  const {
+    titre_structure_enfant,
+    titre_structure_fratrie,
+    titre_consigne,
+    titre_parents,
+    titre_soeur1,
+    titre_soeur2,
+    titre_soeur3,
+    titre_soeur4,
+    titre_soeur5,
+    titre_frere1,
+    titre_frere2,
+    titre_frere3,
+    titre_frere4,
+    titre_frere5,
+    titre_mere,
+    titre_pere,
+    ...responseData
+  } = response as any;
+
+  const { data, error } = await supabase
+    .from('responses_antecedents_familiaux_psy_sz')
+    .upsert(responseData, { onConflict: 'visit_id' })
     .select()
     .single();
 
