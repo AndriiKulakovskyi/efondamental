@@ -4893,6 +4893,16 @@ export const CSSRS_QUESTIONS: Question[] = [
     required: false
   },
   {
+    id: 'cssrs_instructions',
+    text: `Posez les questions 1 et 2. Si les deux réponses sont négatives, passez à la section « Comportement suicidaire ».
+Si la réponse à la question 2 est « oui », posez les questions 3, 4 et 5. Si la réponse à la question 1 et/ou 2 est « oui », complétez la section « Intensité de l'idéation » ci-dessous.
+
+Depuis la semaine dernière pour une évaluation initiale ou depuis la dernière visite lors d’un suivi : moment où il/elle s'est senti(e) le plus suicidaire :`,
+    type: 'text',
+    metadata: { displayOnly: true },
+    required: false
+  },
+  {
     id: 'q1_wish_dead',
     text: `1. Désir d’être mort(e)
 Le sujet souscrit à des pensées concernant le désir de mourir ou de ne plus être en vie, ou le désir de s’endormir et de ne pas se réveiller
