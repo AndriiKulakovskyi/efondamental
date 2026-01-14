@@ -12,6 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { QuestionnaireDefinition } from "@/lib/constants/questionnaires";
 import { Question } from "@/lib/types/database.types";
 import {
@@ -45,6 +53,101 @@ interface QuestionnaireRendererProps {
 
 // Stable empty object to use as default for initialResponses
 const EMPTY_RESPONSES: Record<string, any> = {};
+
+/**
+ * A very simple markdown-like renderer to handle bold text and tables in questionnaire text/help.
+ */
+const MarkdownContent = ({ content }: { content: string }) => {
+  if (!content) return null;
+
+  const lines = content.split('\n');
+  const elements: React.ReactNode[] = [];
+  let currentTable: string[][] = [];
+
+  const renderText = (text: string) => {
+    // Handle bold and italic: ***bold-italic***, **bold**, *italic*
+    const parts = text.split(/(\*\*\*.*?\*\*\*|\*\*.*?\*\*|\*.*?\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('***') && part.endsWith('***')) {
+        return <strong key={i}><em>{part.slice(3, -3)}</em></strong>;
+      }
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i}>{part.slice(2, -2)}</strong>;
+      }
+      if (part.startsWith('*') && part.endsWith('*')) {
+        return <em key={i}>{part.slice(1, -1)}</em>;
+      }
+      return part;
+    });
+  };
+
+  const flushTable = (index: number) => {
+    if (currentTable.length === 0) return;
+
+    // Filter out separator lines (e.g., | :--- |)
+    const tableData = currentTable.filter(row => !row.every(cell => cell.trim().match(/^:?-+:?$/)));
+    
+    if (tableData.length === 0) {
+      currentTable = [];
+      return;
+    }
+
+    const hasHeader = currentTable.length > 1 && currentTable[1].every(cell => cell.trim().match(/^:?-+:?$/));
+    const headerRow = hasHeader ? tableData[0] : null;
+    const bodyRows = hasHeader ? tableData.slice(1) : tableData;
+
+    elements.push(
+      <div key={`table-${index}`} className="my-4 border rounded-lg overflow-hidden border-slate-200">
+        <Table>
+          {headerRow && (
+            <TableHeader className="bg-slate-50">
+              <TableRow>
+                {headerRow.map((cell, i) => (
+                  <TableHead key={i} className="font-bold text-slate-900 border-b border-slate-200">
+                    {renderText(cell.trim())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+          )}
+          <TableBody>
+            {bodyRows.map((row, i) => (
+              <TableRow key={i} className="hover:bg-transparent">
+                {row.map((cell, j) => (
+                  <TableCell key={j} className="border-b border-slate-100 last:border-0 py-3">
+                    {renderText(cell.trim())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
+    currentTable = [];
+  };
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+      const cells = trimmed.split('|').slice(1, -1);
+      currentTable.push(cells);
+    } else {
+      flushTable(index);
+      if (trimmed === '') {
+        elements.push(<div key={`empty-${index}`} className="h-2" />);
+      } else if (trimmed.startsWith('### ')) {
+        elements.push(<h3 key={`h3-${index}`} className="text-lg font-bold mt-4 mb-2 text-slate-900">{renderText(trimmed.slice(4))}</h3>);
+      } else {
+        elements.push(<p key={`p-${index}`} className="leading-relaxed mb-2">{renderText(trimmed)}</p>);
+      }
+    }
+  });
+
+  flushTable(lines.length);
+
+  return <div className="markdown-content">{elements}</div>;
+};
 
 export function QuestionnaireRenderer({
   questionnaire,
@@ -2568,15 +2671,19 @@ export function QuestionnaireRenderer({
 
     return (
       <div key={question.id} className={`space-y-3 ${isUnitField ? 'col-span-1' : ''} ${getIndentClass(question.indentLevel)}`}>
-        <Label htmlFor={question.id} className={`text-base font-semibold ${question.readonly ? 'text-indigo-700' : 'text-slate-800'}`}>
-          {question.text}
-          {isRequired && <span className="text-brand ml-1">*</span>}
-          {question.readonly && (
-            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 border border-indigo-200">
-              Calculé
-            </span>
-          )}
-        </Label>
+        {question.metadata?.displayOnly ? (
+          <MarkdownContent content={question.text} />
+        ) : (
+          <Label htmlFor={question.id} className={`text-base font-semibold ${question.readonly ? 'text-indigo-700' : 'text-slate-800'}`}>
+            {question.text}
+            {isRequired && <span className="text-brand ml-1">*</span>}
+            {question.readonly && (
+              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 border border-indigo-200">
+                Calculé
+              </span>
+            )}
+          </Label>
+        )}
 
         {question.help && (
           <div className="text-sm text-slate-500 space-y-1">
@@ -2590,11 +2697,7 @@ export function QuestionnaireRenderer({
                 </p>
               </div>
             ) : (
-              question.help.split('\n').map((line, index) => (
-                <p key={index} className={line.trim() === '' ? 'h-2' : 'leading-relaxed'}>
-                  {line || '\u00A0'}
-                </p>
-              ))
+              <MarkdownContent content={question.help} />
             )}
           </div>
         )}

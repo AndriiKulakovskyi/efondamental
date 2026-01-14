@@ -145,25 +145,33 @@ export function evaluateCondition(
     const [left, right] = condition['>='];
     const leftValue = evaluateExpression(left, answers);
     const rightValue = evaluateExpression(right, answers);
-    return leftValue >= rightValue;
+    const result = leftValue >= rightValue;
+    if (typeof left === 'object' && left.var === 'glycemie_a_jeun') {
+      console.log(`[JSONLogic >=] glycemie_a_jeun: ${leftValue} >= ${rightValue} -> ${result}`);
+    }
+    return result;
   }
 
   if (condition['>']) {
     const [left, right] = condition['>'];
     const leftValue = evaluateExpression(left, answers);
     const rightValue = evaluateExpression(right, answers);
-    return leftValue > rightValue;
+    const result = leftValue > rightValue;
+    if (typeof left === 'object' && left.var === 'glycemie_a_jeun') {
+      console.log(`[JSONLogic >] glycemie_a_jeun: ${leftValue} (type: ${typeof leftValue}) > ${rightValue} (type: ${typeof rightValue}) -> ${result}`);
+    }
+    return result;
   }
 
   if (condition['==']) {
     const [left, right] = condition['=='];
     const leftValue = evaluateExpression(left, answers);
     const rightValue = evaluateExpression(right, answers);
-    // Use loose equality to handle null/undefined cases but strict for actual values
-    if (leftValue === null || leftValue === undefined) {
-      return rightValue === null || rightValue === undefined;
+    const result = leftValue === rightValue;
+    if (typeof left === 'object' && left.var === 'glycemie_a_jeun_unit') {
+      console.log(`[JSONLogic ==] unit: ${leftValue} === ${rightValue} -> ${result}`);
     }
-    return leftValue === rightValue;
+    return result;
   }
 
   if (condition['!=']) {

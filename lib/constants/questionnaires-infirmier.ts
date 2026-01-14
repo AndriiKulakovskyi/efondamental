@@ -596,33 +596,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     ]
   },
   
-  // Control Questions
-  {
-    id: 'section_control',
-    text: 'Informations de contrôle',
-    type: 'section',
-    required: false
-  },
-  {
-    id: 'on_neuroleptics',
-    text: 'Patient traité par neuroleptiques/antipsychotiques ?',
-    type: 'single_choice',
-    required: true,
-    options: [
-      { code: 'yes', label: 'Oui' },
-      { code: 'no', label: 'Non' }
-    ]
-  },
-  {
-    id: 'woman_childbearing_age',
-    text: 'Femme en âge de procréer ?',
-    type: 'single_choice',
-    required: true,
-    options: [
-      { code: 'yes', label: 'Oui' },
-      { code: 'no', label: 'Non' }
-    ]
-  },
+  
   
   // ===== BIOCHIMIE =====
   {
@@ -634,7 +608,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'sodium',
     text: 'Sodium (mmol/L)',
-    help: 'Valeurs acceptées: 120-170',
+    help: 'Valeur normale comprise entre 135 et 145',
     type: 'number',
     required: false,
     min: 120,
@@ -643,7 +617,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'potassium',
     text: 'Potassium (mmol/L)',
-    help: 'Valeurs acceptées: 2.0-7.0',
+    help: 'Valeur normale comprise entre 3.5 et 5',
     type: 'number',
     required: false,
     min: 2.0,
@@ -652,7 +626,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'chlore',
     text: 'Chlore (Chlorure) (mmol/L)',
-    help: 'Valeurs acceptées: 80-130',
+    help: 'Valeur normale comprise entre 95 et 108',
     type: 'number',
     required: false,
     min: 80,
@@ -661,7 +635,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'bicarbonates',
     text: 'Bicarbonates (mmol/L)',
-    help: 'Valeurs acceptées: 10-40',
+    help: 'Valeur normale comprise entre 24 et 30',
     type: 'number',
     required: false,
     min: 10,
@@ -670,7 +644,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'protidemie',
     text: 'Protidémie (Protéines totales) (g/L)',
-    help: 'Valeurs acceptées: 50-90',
+    help: 'Valeur normale comprise entre 60 et 89.2',
     type: 'number',
     required: false,
     min: 50,
@@ -679,7 +653,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'albumine',
     text: 'Albumine (g/L)',
-    help: 'Valeurs acceptées: 30-55',
+    help: 'Valeur normale comprise entre 35 et 55',
     type: 'number',
     required: false,
     min: 30,
@@ -688,7 +662,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'uree',
     text: 'Urée (mmol/L)',
-    help: 'Valeurs acceptées: 1-20',
+    help: 'Valeur normale comprise entre 2.8 et 7.18',
     type: 'number',
     required: false,
     min: 1,
@@ -697,7 +671,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'acide_urique',
     text: 'Acide urique (µmol/L)',
-    help: 'Valeurs acceptées: 100-500',
+    help: 'Valeur normale comprise entre 208 et 428',
     type: 'number',
     required: false,
     min: 100,
@@ -706,7 +680,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'creatinine',
     text: 'Créatinine (µmol/L)',
-    help: 'Valeurs acceptées: 30-400',
+    help: 'Valeur normale comprise entre 74 et 110',
     type: 'number',
     required: false,
     min: 30,
@@ -715,7 +689,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'clairance_creatinine',
     text: 'Clairance de la créatinine (ml/min)',
-    help: 'Calculée automatiquement (Cockroft-Gault). Normale: 95±20 (F), 120±20 (H). Modifiable.',
+    help: 'Valeur normale comprise entre 80 et 120\n\nLa Clairance de la créatinine est calculée grâce à la formule de Cockroft et Gault à partir du dosage plasmatique.\n\nPour l\'homme, la clairance de la créatinine est égale à 1.23 x Poids x (140 - Age)/Créatinine en µmol/L\n\nPour la femme, la clairance de la créatinine est égale à 1.04 x Poids x (140 - Age)/Créatinine en µmol/L\n\nL\'âge est exprimé en année, le poids en kg, la créatinine en µmol/L.\n\nLa clairance normale est de 95 +/- 20 ml/minute chez la femme et de 120 +/- 20 ml/min chez l\'homme.',
     type: 'number',
     required: false,
     min: 0,
@@ -724,7 +698,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'phosphore',
     text: 'Phosphore (mmol/L)',
-    help: 'Valeurs acceptées: 0.5-2.0',
+    help: 'Valeur normale comprise entre 0.81 et 1.45',
     type: 'number',
     required: false,
     min: 0.5,
@@ -733,7 +707,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'fer',
     text: 'Fer (µmol/L)',
-    help: 'Valeurs acceptées: 5-40',
+    help: 'Valeur normale comprise entre 11.6 et 31.4',
     type: 'number',
     required: false,
     min: 5,
@@ -751,16 +725,23 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'calcemie',
     text: 'Calcémie (Calcium total) (mmol/L)',
-    help: 'Valeurs acceptées: 1.50-2.75',
+    help: 'Valeur normale comprise entre 2.1 et 2.65',
     type: 'number',
     required: false,
     min: 1.50,
     max: 2.75
   },
   {
+    id: 'calcemie_corrigee',
+    text: 'Calcémie corrigée:',
+    help: 'Formule: calcémie / 0,55 + protidémie / 160',
+    type: 'number',
+    required: false
+  },
+  {
     id: 'crp',
-    text: 'CRP (mg/L)',
-    help: 'Valeurs acceptées: 0-50',
+    text: 'CRP (mg/L): 5 mg/L = 5 microg/mL = 0.5 mg/dL',
+    help: 'Valeur normale inférieur a 10',
     type: 'number',
     required: false,
     min: 0,
@@ -769,7 +750,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'glycemie_a_jeun',
     text: 'Glycémie à jeûn',
-    help: 'Valeurs acceptées: 0-50',
+    help: 'Valeur normale comprise entre 3.88 et 6.1',
     type: 'number',
     required: false,
     min: 0,
@@ -786,9 +767,34 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     ]
   },
   {
+    id: 'diabetes_warning',
+    text: '***En cas de diabète (Glycémie > 7 mmol/L, soit > 1,26 g/L)***',
+    type: 'text',
+    required: false,
+    metadata: { displayOnly: true },
+    display_if: {
+      'or': [
+        {
+          'and': [
+            { '>': [{ var: 'glycemie_a_jeun' }, 0] },
+            { '==': [{ var: 'glycemie_a_jeun_unit' }, 'mmol_L'] },
+            { '>': [{ var: 'glycemie_a_jeun' }, 7] }
+          ]
+        },
+        {
+          'and': [
+            { '>': [{ var: 'glycemie_a_jeun' }, 0] },
+            { '==': [{ var: 'glycemie_a_jeun_unit' }, 'g_L'] },
+            { '>': [{ var: 'glycemie_a_jeun' }, 1.26] }
+          ]
+        }
+      ]
+    }
+  },
+  {
     id: 'hemoglobine_glyquee',
     text: 'Hémoglobine glyquée (%)',
-    help: 'Valeurs acceptées: 0-50',
+    help: 'Valeur normale inférieur a 6',
     type: 'number',
     required: false,
     min: 0,
@@ -823,8 +829,11 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'hdl',
     text: 'Cholestérol HDL',
+    help: 'Valeur normale comprise entre 1.1 et 1.8',
     type: 'number',
-    required: false
+    required: false,
+    min: 0,
+    max: 50
   },
   {
     id: 'hdl_unit',
@@ -842,8 +851,11 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'ldl',
     text: 'Cholestérol LDL',
+    help: 'Valeur normale comprise entre 2.6 et 4.1',
     type: 'number',
-    required: false
+    required: false,
+    min: 0,
+    max: 50
   },
   {
     id: 'ldl_unit',
@@ -861,28 +873,30 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'cholesterol_total',
     text: 'Cholestérol total (mmol/L)',
-    help: 'Valeurs acceptées: 1-15',
+    help: 'Valeur normale comprise entre 4.4 et 6.1',
     type: 'number',
     required: false,
-    min: 1,
-    max: 15
+    min: 0,
+    max: 50
   },
   {
     id: 'triglycerides',
     text: 'Triglycérides (mmol/L)',
-    help: 'Valeurs acceptées: 0.2-20',
+    help: 'Valeur normale comprise entre 0.5 et 1.4',
     type: 'number',
     required: false,
-    min: 0.2,
-    max: 20
+    min: 0,
+    max: 50
   },
   {
     id: 'rapport_total_hdl',
     text: 'Rapport Total / HDL',
-    help: 'Calculé automatiquement: Cholestérol total / Cholestérol HDL',
+    help: 'Norme inferieure a 5 chez l\'homme et 4,4 chez la femme',
     type: 'number',
     required: false,
-    readonly: true
+    readonly: true,
+    min: 0,
+    max: 50
   },
   
   // ===== BILAN HÉPATIQUE =====
@@ -895,7 +909,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'pal',
     text: 'Phosphatases alcalines (PAL) (UI/L)',
-    help: 'Valeurs acceptées: 20-400',
+    help: 'Valeur normale comprise entre 30 et 115',
     type: 'number',
     required: false,
     min: 20,
@@ -904,7 +918,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'asat',
     text: 'ASAT / TGO (UI/L)',
-    help: 'Valeurs acceptées: 5-500',
+    help: 'Valeur normale comprise entre 5 et 40',
     type: 'number',
     required: false,
     min: 5,
@@ -913,7 +927,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'alat',
     text: 'ALAT / TGP (UI/L)',
-    help: 'Valeurs acceptées: 5-500',
+    help: 'Valeur normale comprise entre 5 et 45',
     type: 'number',
     required: false,
     min: 5,
@@ -922,7 +936,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'ggt',
     text: 'Gamma-GT (UI/L)',
-    help: 'Valeurs acceptées: 5-1500',
+    help: 'Valeur normale comprise entre 10 et 65',
     type: 'number',
     required: false,
     min: 5,
@@ -930,9 +944,12 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   },
   {
     id: 'bilirubine_totale',
-    text: 'Bilirubine totale',
+    text: 'Bilirubine totale (µmol/L)',
+    help: 'Valeur normale comprise entre 4 et 21',
     type: 'number',
-    required: false
+    required: false,
+    min: 0,
+    max: 500
   },
   {
     id: 'bilirubine_totale_unit',
@@ -956,6 +973,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'tsh',
     text: 'TSH ultrasensible',
+    help: 'Valeur normale comprise entre 0.3 et 4.4',
     type: 'number',
     required: false
   },
@@ -965,7 +983,6 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 'pmol_L', label: 'pmol/L' },
       { code: 'uUI_mL', label: 'µUI/mL' },
       { code: 'mUI_L', label: 'mUI/L' }
     ],
@@ -976,20 +993,16 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 't3_libre',
     text: 'T3 libre (pmol/L)',
-    help: 'Valeurs acceptées: 1-30',
+    help: 'Valeur normale comprise entre 2.8 et 7',
     type: 'number',
-    required: false,
-    min: 1,
-    max: 30
+    required: false
   },
   {
     id: 't4_libre',
     text: 'T4 libre (pmol/L)',
-    help: 'Valeurs acceptées: 5-50',
+    help: 'Valeur normale comprise entre 12 et 23',
     type: 'number',
-    required: false,
-    min: 5,
-    max: 50
+    required: false
   },
   
   // ===== NFS (NUMÉRATION FORMULE SANGUINE) =====
@@ -1002,24 +1015,25 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'leucocytes',
     text: 'Leucocytes (GB) (G/L)',
-    help: 'Valeurs acceptées: 0.5-200',
+    help: 'Valeur normale comprise entre 4 et 10',
     type: 'number',
     required: false,
-    min: 0.5,
-    max: 200
+    min: 0,
+    max: 500
   },
   {
     id: 'hematies',
     text: 'Hématies (GR) (T/L)',
-    help: 'Valeurs acceptées: 1-8',
+    help: 'Valeur normale comprise entre 4 et 5',
     type: 'number',
     required: false,
-    min: 1,
-    max: 8
+    min: 0,
+    max: 20
   },
   {
     id: 'hemoglobine',
     text: 'Hémoglobine (Hb)',
+    help: 'Valeur normale comprise entre 11.5 et 15',
     type: 'number',
     required: false
   },
@@ -1039,6 +1053,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'hematocrite',
     text: 'Hématocrite (Ht)',
+    help: 'Valeur normale comprise entre 37 et 47',
     type: 'number',
     required: false
   },
@@ -1058,60 +1073,61 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'neutrophiles',
     text: 'Neutrophiles (G/L)',
-    help: 'Valeurs acceptées: 0-50',
+    help: 'Valeur normale comprise entre 1.7 et 7.5',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 200
+  },
+  {
+    id: 'basophiles',
+    text: 'Basophiles (G/L)',
+    help: 'Valeur normale Inférieur a 0.2',
     type: 'number',
     required: false,
     min: 0,
     max: 50
   },
   {
-    id: 'basophiles',
-    text: 'Basophiles (G/L)',
-    help: 'Valeurs acceptées: 0-5',
-    type: 'number',
-    required: false,
-    min: 0,
-    max: 5
-  },
-  {
     id: 'eosinophiles',
     text: 'Éosinophiles (G/L)',
-    help: 'Valeurs acceptées: 0-10',
+    help: 'Valeur normale inférieur a 0.8',
     type: 'number',
     required: false,
     min: 0,
-    max: 10
+    max: 50
   },
   {
     id: 'lymphocytes',
     text: 'Lymphocytes (G/L)',
-    help: 'Valeurs acceptées: 0-20',
+    help: 'Valeur normale comprise entre 1 et 4',
     type: 'number',
     required: false,
     min: 0,
-    max: 20
+    max: 200
   },
   {
     id: 'monocytes',
     text: 'Monocytes (G/L)',
-    help: 'Valeurs acceptées: 0-5',
+    help: 'Valeur normale comprise entre 0.2 et 1',
     type: 'number',
     required: false,
     min: 0,
-    max: 5
+    max: 50
   },
   {
     id: 'vgm',
     text: 'VGM (fL)',
-    help: 'Valeurs acceptées: 50-130',
+    help: 'Valeur normale comprise entre 80 et 100',
     type: 'number',
     required: false,
-    min: 50,
-    max: 130
+    min: 0,
+    max: 200
   },
   {
     id: 'tcmh',
     text: 'TCMH',
+    help: 'Valeur normale supérieur a 27',
     type: 'number',
     required: false
   },
@@ -1131,6 +1147,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'ccmh',
     text: 'CCMH',
+    help: 'Valeur normale comprise entre 30 et 35',
     type: 'number',
     required: false
   },
@@ -1151,11 +1168,11 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
   {
     id: 'plaquettes',
     text: 'Plaquettes (G/L)',
-    help: 'Valeurs acceptées: 10-1000',
+    help: 'Valeur normale comprise entre 150 et 500',
     type: 'number',
     required: false,
-    min: 10,
-    max: 1000
+    min: 0,
+    max: 2000
   },
   
   // ===== HCG =====
@@ -1221,10 +1238,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     text: 'Dosage des psychotropes',
     help: 'S\'assurer que le patient n\'ait pas pris son traitement le matin du dosage. Si le patient a pris son traitement, ne pas faire le dosage.',
     type: 'section',
-    required: false,
-    display_if: {
-      '==': [{ var: 'on_neuroleptics' }, 'yes']
-    }
+    required: false
   },
   {
     id: 'treatment_taken_morning',
@@ -1234,10 +1248,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     options: [
       { code: 'yes', label: 'Oui' },
       { code: 'no', label: 'Non' }
-    ],
-    display_if: {
-      '==': [{ var: 'on_neuroleptics' }, 'yes']
-    }
+    ]
   },
   {
     id: 'clozapine',
@@ -1245,10 +1256,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     display_if: {
-      'and': [
-        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
-        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
-      ]
+      '==': [{ var: 'treatment_taken_morning' }, 'no']
     }
   },
   {
@@ -1261,58 +1269,47 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
       { code: 'LP400', label: 'LP400' }
     ],
     display_if: {
-      'and': [
-        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
-        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
-      ]
+      '==': [{ var: 'treatment_taken_morning' }, 'no']
     }
   },
   {
     id: 'lithium_plasma',
     text: 'Taux de lithium plasmatique (mmol/L)',
+    help: 'Valeur normale comprise entre 0.6 et 1.2',
     type: 'number',
     required: false,
     display_if: {
-      'and': [
-        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
-        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
-      ]
+      '==': [{ var: 'treatment_taken_morning' }, 'no']
     }
   },
   {
     id: 'lithium_erythrocyte',
     text: 'Taux de lithium intra-érythrocytaire (mmol/L)',
+    help: 'Valeur normale comprise entre 0.2 et 0.5',
     type: 'number',
     required: false,
     display_if: {
-      'and': [
-        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
-        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
-      ]
+      '==': [{ var: 'treatment_taken_morning' }, 'no']
     }
   },
   {
     id: 'valproic_acid',
     text: 'Taux d\'acide valproïque plasmatique (mg/L)',
+    help: 'Valeur normale comprise entre 50 et 100',
     type: 'number',
     required: false,
     display_if: {
-      'and': [
-        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
-        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
-      ]
+      '==': [{ var: 'treatment_taken_morning' }, 'no']
     }
   },
   {
     id: 'carbamazepine',
     text: 'Taux de carbamazépine (mg/L)',
+    help: 'Valeur normale comprise entre 4 et 12',
     type: 'number',
     required: false,
     display_if: {
-      'and': [
-        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
-        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
-      ]
+      '==': [{ var: 'treatment_taken_morning' }, 'no']
     }
   },
   {
@@ -1321,10 +1318,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     display_if: {
-      'and': [
-        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
-        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
-      ]
+      '==': [{ var: 'treatment_taken_morning' }, 'no']
     }
   },
   {
@@ -1333,10 +1327,7 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     display_if: {
-      'and': [
-        { '==': [{ var: 'on_neuroleptics' }, 'yes'] },
-        { '==': [{ var: 'treatment_taken_morning' }, 'no'] }
-      ]
+      '==': [{ var: 'treatment_taken_morning' }, 'no']
     }
   },
   
@@ -1529,6 +1520,24 @@ export const BIOLOGICAL_ASSESSMENT_QUESTIONS: Question[] = [
         { '==': [{ var: 'toxo_igg_positive' }, 'yes'] },
         { '==': [{ var: 'toxo_pcr_done' }, 'yes'] }
       ]
+    }
+  },
+  {
+    id: 'toxo_interpretation_table',
+    text: `
+### Interprétation
+| IgM | IgG | Interprétation possible |
+| :--- | :--- | :--- |
+| Négatif | Positif | Infection passée |
+| Négatif | Négatif | Pas d'infection ou infection très précoce |
+| Positif | Négatif | Infection précoce |
+| Positif | Positif | Infection actuelle, infection chronique |
+`,
+    type: 'text',
+    metadata: { displayOnly: true },
+    required: false,
+    display_if: {
+      '==': [{ var: 'toxo_igg_positive' }, 'yes']
     }
   }
 ];
