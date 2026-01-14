@@ -35,6 +35,8 @@ import {
   SuicideHistorySzResponseInsert,
   AntecedentsFamiliauxPsySzResponse,
   AntecedentsFamiliauxPsySzResponseInsert,
+  PerinataliteSzResponse,
+  PerinataliteSzResponseInsert,
 } from '../types/database.types';
 
 // ============================================================================
@@ -1262,6 +1264,39 @@ export async function saveAntecedentsFamiliauxPsySzResponse(
   const { data, error } = await supabase
     .from('responses_antecedents_familiaux_psy_sz')
     .upsert(responseData, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// PERINATALITE - Schizophrenia specific (Perinatal History)
+// ============================================================================
+
+export async function getPerinataliteSzResponse(
+  visitId: string
+): Promise<PerinataliteSzResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_perinatalite_sz')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return data || null;
+}
+
+export async function savePerinataliteSzResponse(
+  response: PerinataliteSzResponseInsert
+): Promise<PerinataliteSzResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_perinatalite_sz')
+    .upsert(response, { onConflict: 'visit_id' })
     .select()
     .single();
 

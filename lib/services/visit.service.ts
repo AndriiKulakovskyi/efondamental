@@ -836,8 +836,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
             id: 'antecedents',
             name: 'Antécédents',
             questionnaires: [
-              FAMILY_HISTORY_DEFINITION,
-              PERINATALITE_DEFINITION
+              FAMILY_HISTORY_DEFINITION
             ]
           },
           {
@@ -854,6 +853,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
             id: 'histoire_somatique',
             name: 'Histoire somatique',
             questionnaires: [
+              PERINATALITE_DEFINITION,
               PATHO_NEURO_DEFINITION,
               PATHO_CARDIO_DEFINITION,
               PATHO_ENDOC_DEFINITION,

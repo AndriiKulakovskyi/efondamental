@@ -2471,6 +2471,18 @@ export interface PerinataliteResponse {
   // Q11: Neonatal hospitalization
   q11_neonatal_hospitalization?: 'yes' | 'no' | 'unknown' | null;
   
+  // Q12: Birth environment
+  q12_birth_environment?: 'urbain' | 'rural' | 'unknown' | null;
+  
+  // Q13: Obstetric complications
+  q13_obstetric_complications?: 'yes' | 'no' | 'unknown' | null;
+  
+  // Q14: Maternal viral infection during pregnancy
+  q14_maternal_viral_infection?: 'yes' | 'no' | 'unknown' | null;
+  
+  // Q15: Maternal pregnancy events (multiple selection)
+  q15_maternal_pregnancy_events?: string[] | null;
+  
   // Metadata
   completed_at: string;
   created_at: string;
@@ -4926,6 +4938,56 @@ export interface AntecedentsFamiliauxPsySzResponse {
 }
 
 export type AntecedentsFamiliauxPsySzResponseInsert = Omit<AntecedentsFamiliauxPsySzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
+// PERINATALITE - Schizophrenia specific (Perinatal History)
+// ============================================================================
+
+export interface PerinataliteSzResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Q1: Mother's age at birth (years)
+  q1_mother_age?: number | null;
+  
+  // Q2: Father's age at birth (years)
+  q2_father_age?: number | null;
+  
+  // Q3: Birth condition
+  q3_birth_condition?: 'premature' | 'term' | 'post_mature' | 'unknown' | null;
+  
+  // Q4: Gestational age (weeks)
+  q4_gestational_age?: number | null;
+  
+  // Q5: Type of birth
+  q5_birth_type?: 'vaginal' | 'cesarean' | 'unknown' | null;
+  
+  // Q6: Birth weight (grams)
+  q6_birth_weight?: number | null;
+  
+  // Q7: Neonatal hospitalization
+  q7_neonatal_hospitalization?: 'yes' | 'no' | 'unknown' | null;
+  
+  // Q8: Birth environment
+  q8_birth_environment?: 'urbain' | 'rural' | 'unknown' | null;
+  
+  // Q9: Obstetric complications
+  q9_obstetric_complications?: 'yes' | 'no' | 'unknown' | null;
+  
+  // Q10: Maternal viral infection during pregnancy
+  q10_maternal_viral_infection?: 'yes' | 'no' | 'unknown' | null;
+  
+  // Q11: Maternal pregnancy events (multiple selection)
+  q11_maternal_pregnancy_events?: string[] | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PerinataliteSzResponseInsert = Omit<PerinataliteSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
 // PANSS (Positive and Negative Syndrome Scale) - Schizophrenia Hetero-questionnaire

@@ -130,7 +130,8 @@ import {
   ECV_DEFINITION,
   TROUBLES_PSYCHOTIQUES_DEFINITION,
   SUICIDE_HISTORY_SZ_DEFINITION,
-  ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION
+  ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
+  SZ_PERINATALITE_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { TROUBLES_COMORBIDES_SZ_DEFINITION } from "@/lib/constants/questionnaires-schizophrenia-comorbid";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
@@ -431,6 +432,82 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['SUICIDE_HISTORY_SZ']?.completed || false,
                   completedAt: questionnaireStatuses['SUICIDE_HISTORY_SZ']?.completed_at,
+                }
+              ]
+            },
+            {
+              id: 'histoire_somatique',
+              name: 'Histoire somatique',
+              questionnaires: [
+                {
+                  ...SZ_PERINATALITE_DEFINITION,
+                  id: SZ_PERINATALITE_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['PERINATALITE_SZ']?.completed || false,
+                  completedAt: questionnaireStatuses['PERINATALITE_SZ']?.completed_at,
+                },
+                {
+                  ...PATHO_NEURO_DEFINITION,
+                  id: PATHO_NEURO_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['PATHO_NEURO_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['PATHO_NEURO_FR']?.completed_at,
+                },
+                {
+                  ...PATHO_CARDIO_DEFINITION,
+                  id: PATHO_CARDIO_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['PATHO_CARDIO_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['PATHO_CARDIO_FR']?.completed_at,
+                },
+                {
+                  ...PATHO_ENDOC_DEFINITION,
+                  id: PATHO_ENDOC_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['PATHO_ENDOC_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['PATHO_ENDOC_FR']?.completed_at,
+                },
+                {
+                  ...PATHO_DERMATO_DEFINITION,
+                  id: PATHO_DERMATO_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['PATHO_DERMATO_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['PATHO_DERMATO_FR']?.completed_at,
+                },
+                {
+                  ...PATHO_URINAIRE_DEFINITION,
+                  id: PATHO_URINAIRE_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['PATHO_URINAIRE_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['PATHO_URINAIRE_FR']?.completed_at,
+                },
+                {
+                  ...ANTECEDENTS_GYNECO_DEFINITION,
+                  id: ANTECEDENTS_GYNECO_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['ANTECEDENTS_GYNECO_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['ANTECEDENTS_GYNECO_FR']?.completed_at,
+                },
+                {
+                  ...PATHO_HEPATO_GASTRO_DEFINITION,
+                  id: PATHO_HEPATO_GASTRO_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['PATHO_HEPATO_GASTRO_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['PATHO_HEPATO_GASTRO_FR']?.completed_at,
+                },
+                {
+                  ...PATHO_ALLERGIQUE_DEFINITION,
+                  id: PATHO_ALLERGIQUE_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['PATHO_ALLERGIQUE_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['PATHO_ALLERGIQUE_FR']?.completed_at,
+                },
+                {
+                  ...AUTRES_PATHO_DEFINITION,
+                  id: AUTRES_PATHO_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['AUTRES_PATHO_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['AUTRES_PATHO_FR']?.completed_at,
                 }
               ]
             },
@@ -1681,13 +1758,6 @@ export default async function VisitDetailPage({
             target_role: 'healthcare_professional',
             completed: questionnaireStatuses['FAMILY_HISTORY_FR']?.completed || false,
             completedAt: questionnaireStatuses['FAMILY_HISTORY_FR']?.completed_at,
-          },
-          {
-            ...PERINATALITE_DEFINITION,
-            id: PERINATALITE_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['PERINATALITE_FR']?.completed || false,
-            completedAt: questionnaireStatuses['PERINATALITE_FR']?.completed_at,
           }
         ];
 
@@ -1725,6 +1795,13 @@ export default async function VisitDetailPage({
 
         // Build Histoire somatique section questionnaires
         const histoireSomatiqueQuestionnaires = [
+          {
+            ...PERINATALITE_DEFINITION,
+            id: PERINATALITE_DEFINITION.code,
+            target_role: 'healthcare_professional',
+            completed: questionnaireStatuses['PERINATALITE_FR']?.completed || false,
+            completedAt: questionnaireStatuses['PERINATALITE_FR']?.completed_at,
+          },
           {
             ...PATHO_NEURO_DEFINITION,
             id: PATHO_NEURO_DEFINITION.code,

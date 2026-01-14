@@ -124,7 +124,8 @@ import {
   saveTroublesPsychotiquesResponse,
   saveTroublesComorbidesSzResponse,
   saveSuicideHistorySzResponse,
-  saveAntecedentsFamiliauxPsySzResponse
+  saveAntecedentsFamiliauxPsySzResponse,
+  savePerinataliteSzResponse
 } from '@/lib/services/questionnaire-schizophrenia.service';
 import { 
   getVisitCompletionStatus,
@@ -241,7 +242,8 @@ import {
   TroublesPsychotiquesResponseInsert,
   TroublesComorbidesSzResponseInsert,
   SuicideHistorySzResponseInsert,
-  AntecedentsFamiliauxPsySzResponseInsert
+  AntecedentsFamiliauxPsySzResponseInsert,
+  PerinataliteSzResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 import { requireUserContext } from '@/lib/rbac/middleware';
@@ -440,6 +442,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as AntecedentsFamiliauxPsySzResponseInsert);
+        break;
+
+      case 'PERINATALITE_SZ':
+        result = await savePerinataliteSzResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as PerinataliteSzResponseInsert);
         break;
 
       // Initial Evaluation - ETAT

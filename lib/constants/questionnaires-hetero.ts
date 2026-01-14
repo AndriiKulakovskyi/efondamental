@@ -5791,6 +5791,57 @@ export const PERINATALITE_QUESTIONS: Question[] = [
       { code: 'no', label: 'Non', score: 0 },
       { code: 'unknown', label: 'Ne sais pas', score: 0 }
     ]
+  },
+  {
+    id: 'q12_birth_environment',
+    text: 'Etes-vous né dans un milieu',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'urbain', label: 'Urbain', score: 0 },
+      { code: 'rural', label: 'Rural', score: 0 },
+      { code: 'unknown', label: 'Ne sais pas', score: 0 }
+    ]
+  },
+  {
+    id: 'q13_obstetric_complications',
+    text: 'Y a-t-il eu des complications obstétricales à votre naissance',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'yes', label: 'Oui', score: 1 },
+      { code: 'no', label: 'Non', score: 0 },
+      { code: 'unknown', label: 'Ne sais pas', score: 0 }
+    ]
+  },
+  {
+    id: 'q14_maternal_viral_infection',
+    text: 'Votre mère a-t-elle eu une infection virale pendant sa grossesse',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'yes', label: 'Oui', score: 1 },
+      { code: 'no', label: 'Non', score: 0 },
+      { code: 'unknown', label: 'Ne sais pas', score: 0 }
+    ]
+  },
+  {
+    id: 'q15_maternal_pregnancy_events',
+    text: 'Votre mère a-t-elle vécu un ou plusieurs de ces évènements au cours de sa grossesse ?',
+    type: 'multiple_choice',
+    required: false,
+    options: [
+      { code: 'deces_proche', label: 'Décès d\'un proche', score: 1 },
+      { code: 'perte_travail', label: 'Perte du travail', score: 1 },
+      { code: 'perte_travail_conjoint', label: 'Perte de travail du conjoint', score: 1 },
+      { code: 'separation_divorce', label: 'Séparation/divorce', score: 1 },
+      { code: 'probleme_couple', label: 'Problème de couple', score: 1 },
+      { code: 'difficultes_enfants', label: 'Difficultés avec ses enfants', score: 1 },
+      { code: 'probleme_argent', label: 'Problème d\'argent', score: 1 },
+      { code: 'probleme_grossesse', label: 'Problème lié à la grossesse', score: 1 },
+      { code: 'demenagement', label: 'Déménagement', score: 1 },
+      { code: 'aucun', label: 'Aucun', score: 0 }
+    ]
   }
 ];
 
