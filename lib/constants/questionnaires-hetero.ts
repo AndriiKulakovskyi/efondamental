@@ -513,6 +513,13 @@ export const EGF_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 
 export const ALDA_QUESTIONS: Question[] = [
+  {
+    id: 'section_consignes',
+    text: 'CONSIGNES',
+    help: "Le critère A est utilisé pour déterminer une association entre amélioration clinique et le traitement. La cotation devrait porter sur la période pendant laquelle le traitement était considéré adéquat quant à la durée et au dosage. L'activité de la maladie devrait être jugée selon la fréquence, la sévérité et la durée des épisodes.",
+    type: 'section',
+    required: false
+  },
   // Dépistage Section
   {
     id: 'section_screening',
@@ -636,6 +643,8 @@ export const ALDA_DEFINITION: QuestionnaireDefinition = {
   code: 'ALDA',
   title: 'Echelle d\'Alda (Alda Scale) - Modified',
   description: 'Échelle d\'évaluation rétrospective de la réponse prophylactique au lithium, incluant un dépistage et des critères spécifiques de cotation.',
+  instructions: `CONSIGNES
+Le critère A est utilisé pour déterminer une association entre amélioration clinique et le traitement. La cotation devrait porter sur la période pendant laquelle le traitement était considéré adéquat quant à la durée et au dosage. L'activité de la maladie devrait être jugée selon la fréquence, la sévérité et la durée des épisodes.`,
   questions: ALDA_QUESTIONS,
   metadata: {
     singleColumn: true,
