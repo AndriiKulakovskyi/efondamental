@@ -201,7 +201,8 @@ import {
   BARNES_DEFINITION,
   SAS_DEFINITION,
   PSP_DEFINITION,
-  TROUBLES_PSYCHOTIQUES_DEFINITION
+  TROUBLES_PSYCHOTIQUES_DEFINITION,
+  SUICIDE_HISTORY_SZ_DEFINITION
 } from '../constants/questionnaires-schizophrenia';
 import { TROUBLES_COMORBIDES_SZ_DEFINITION } from '../constants/questionnaires-schizophrenia-comorbid';
 import {
@@ -627,6 +628,11 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               id: 'dsm5',
               name: 'DSM5',
               questionnaires: [TROUBLES_PSYCHOTIQUES_DEFINITION, TROUBLES_COMORBIDES_SZ_DEFINITION]
+            },
+            {
+              id: 'suicide',
+              name: 'Suicide',
+              questionnaires: [ISA_DEFINITION, SUICIDE_HISTORY_SZ_DEFINITION]
             }
           ]
         }

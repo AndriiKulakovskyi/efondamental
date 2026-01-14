@@ -128,7 +128,8 @@ import {
   SAS_DEFINITION,
   PSP_DEFINITION,
   ECV_DEFINITION,
-  TROUBLES_PSYCHOTIQUES_DEFINITION
+  TROUBLES_PSYCHOTIQUES_DEFINITION,
+  SUICIDE_HISTORY_SZ_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { TROUBLES_COMORBIDES_SZ_DEFINITION } from "@/lib/constants/questionnaires-schizophrenia-comorbid";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
@@ -409,6 +410,26 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['TROUBLES_COMORBIDES_SZ']?.completed || false,
                   completedAt: questionnaireStatuses['TROUBLES_COMORBIDES_SZ']?.completed_at,
+                }
+              ]
+            },
+            {
+              id: 'suicide',
+              name: 'Suicide',
+              questionnaires: [
+                {
+                  ...ISA_DEFINITION,
+                  id: ISA_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['ISA_FR']?.completed || false,
+                  completedAt: questionnaireStatuses['ISA_FR']?.completed_at,
+                },
+                {
+                  ...SUICIDE_HISTORY_SZ_DEFINITION,
+                  id: SUICIDE_HISTORY_SZ_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['SUICIDE_HISTORY_SZ']?.completed || false,
+                  completedAt: questionnaireStatuses['SUICIDE_HISTORY_SZ']?.completed_at,
                 }
               ]
             }

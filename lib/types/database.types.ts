@@ -4832,6 +4832,35 @@ export interface TroublesComorbidesSzResponse {
 export type TroublesComorbidesSzResponseInsert = Omit<TroublesComorbidesSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
+// Suicide History - Schizophrenia (Simplified)
+// Histoire des conduites suicidaires - Version simplifiee pour schizophrenie
+// ============================================================================
+
+export interface SuicideHistorySzResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // General information
+  q1_first_attempt_date?: string | null;
+  q2_attempt_count?: number | null;
+  q3_attempt_count_12m?: number | null;
+
+  // Attempt details
+  q4_violent_attempts?: string | null;
+  q4_1_violent_count?: number | null;
+  q5_serious_attempts?: string | null;
+  q5_1_serious_count?: number | null;
+
+  // Metadata
+  completed_at?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export type SuicideHistorySzResponseInsert = Omit<SuicideHistorySzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
 // PANSS (Positive and Negative Syndrome Scale) - Schizophrenia Hetero-questionnaire
 // ============================================================================
 

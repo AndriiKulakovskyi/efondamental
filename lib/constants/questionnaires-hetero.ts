@@ -5446,6 +5446,13 @@ export const SUICIDE_HISTORY_QUESTIONS: Question[] = [
     min: 0
   },
   {
+    id: 'q2_1_attempt_count_12m',
+    text: 'Q2.1. Combien de fois avez-vous tenté de vous suicider au cours des 12 derniers mois ?',
+    type: 'number',
+    required: false,
+    min: 0
+  },
+  {
     id: 'q3_violent_attempts',
     text: 'Q3. Existe-t-il des TS violentes (arme à feu, immolation, noyade, saut, pendaison, autre) ?',
     type: 'single_choice',

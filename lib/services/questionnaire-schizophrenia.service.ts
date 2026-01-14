@@ -31,6 +31,8 @@ import {
   EcvResponseInsert,
   TroublesComorbidesSzResponse,
   TroublesComorbidesSzResponseInsert,
+  SuicideHistorySzResponse,
+  SuicideHistorySzResponseInsert,
 } from '../types/database.types';
 
 // ============================================================================
@@ -1176,3 +1178,36 @@ export async function saveTroublesComorbidesSzResponse(
   return data;
 }
 
+// ============================================================================
+// SUICIDE HISTORY - Schizophrenia (Simplified)
+// Histoire des conduites suicidaires - Version simplifiee
+// ============================================================================
+
+export async function getSuicideHistorySzResponse(
+  visitId: string
+): Promise<SuicideHistorySzResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_suicide_history_sz')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return data || null;
+}
+
+export async function saveSuicideHistorySzResponse(
+  response: SuicideHistorySzResponseInsert
+): Promise<SuicideHistorySzResponse> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('responses_suicide_history_sz')
+    .upsert(response, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
