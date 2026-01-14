@@ -40,9 +40,12 @@ export function QuestionnairePageClient({
   const [submittedData, setSubmittedData] = useState<any>(existingData);
   const [justSubmitted, setJustSubmitted] = useState(false);
   
+  // Stabilize initialResponses to prevent unnecessary re-initialization of the renderer
+  const stableInitialResponses = useMemo(() => initialResponses, [initialResponses]);
+  
   // Track current responses for live score calculation
   // This is updated via callback from QuestionnaireRenderer
-  const [currentResponses, setCurrentResponses] = useState<Record<string, any>>(initialResponses);
+  const [currentResponses, setCurrentResponses] = useState<Record<string, any>>(stableInitialResponses);
 
   // Calculate progress based on visible questionnaire questions only
   // Uses conditional logic to only count questions that are currently visible
@@ -222,7 +225,7 @@ export function QuestionnairePageClient({
         
         <QuestionnaireRenderer
           questionnaire={questionnaire}
-          initialResponses={initialResponses}
+          initialResponses={stableInitialResponses}
           onSubmit={handleSubmit}
           onResponseChange={handleResponsesChange}
         />

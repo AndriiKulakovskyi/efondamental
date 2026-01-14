@@ -12,8 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { QuestionnaireDefinition } from "@/lib/constants/questionnaires";
-import { Question } from "@/lib/types/database.types";
+import { Question, QuestionOption } from "@/lib/types/database.types";
 import {
   evaluateConditionalLogic,
   validateQuestionnaireResponse,
@@ -46,6 +54,101 @@ interface QuestionnaireRendererProps {
 // Stable empty object to use as default for initialResponses
 const EMPTY_RESPONSES: Record<string, any> = {};
 
+/**
+ * A very simple markdown-like renderer to handle bold text and tables in questionnaire text/help.
+ */
+const MarkdownContent = ({ content }: { content: string }) => {
+  if (!content) return null;
+
+  const lines = content.split('\n');
+  const elements: React.ReactNode[] = [];
+  let currentTable: string[][] = [];
+
+  const renderText = (text: string) => {
+    // Handle bold and italic: ***bold-italic***, **bold**, *italic*
+    const parts = text.split(/(\*\*\*.*?\*\*\*|\*\*.*?\*\*|\*.*?\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('***') && part.endsWith('***')) {
+        return <strong key={i}><em>{part.slice(3, -3)}</em></strong>;
+      }
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i}>{part.slice(2, -2)}</strong>;
+      }
+      if (part.startsWith('*') && part.endsWith('*')) {
+        return <em key={i}>{part.slice(1, -1)}</em>;
+      }
+      return part;
+    });
+  };
+
+  const flushTable = (index: number) => {
+    if (currentTable.length === 0) return;
+
+    // Filter out separator lines (e.g., | :--- |)
+    const tableData = currentTable.filter(row => !row.every(cell => cell.trim().match(/^:?-+:?$/)));
+    
+    if (tableData.length === 0) {
+      currentTable = [];
+      return;
+    }
+
+    const hasHeader = currentTable.length > 1 && currentTable[1].every(cell => cell.trim().match(/^:?-+:?$/));
+    const headerRow = hasHeader ? tableData[0] : null;
+    const bodyRows = hasHeader ? tableData.slice(1) : tableData;
+
+    elements.push(
+      <div key={`table-${index}`} className="my-4 border rounded-lg overflow-hidden border-slate-200">
+        <Table>
+          {headerRow && (
+            <TableHeader className="bg-slate-50">
+              <TableRow>
+                {headerRow.map((cell, i) => (
+                  <TableHead key={i} className="font-bold text-slate-900 border-b border-slate-200">
+                    {renderText(cell.trim())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+          )}
+          <TableBody>
+            {bodyRows.map((row, i) => (
+              <TableRow key={i} className="hover:bg-transparent">
+                {row.map((cell, j) => (
+                  <TableCell key={j} className="border-b border-slate-100 last:border-0 py-3">
+                    {renderText(cell.trim())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
+    currentTable = [];
+  };
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+      const cells = trimmed.split('|').slice(1, -1);
+      currentTable.push(cells);
+    } else {
+      flushTable(index);
+      if (trimmed === '') {
+        elements.push(<div key={`empty-${index}`} className="h-2" />);
+      } else if (trimmed.startsWith('### ')) {
+        elements.push(<h3 key={`h3-${index}`} className="text-lg font-bold mt-4 mb-2 text-slate-900">{renderText(trimmed.slice(4))}</h3>);
+      } else {
+        elements.push(<p key={`p-${index}`} className="leading-relaxed mb-2">{renderText(trimmed)}</p>);
+      }
+    }
+  });
+
+  flushTable(lines.length);
+
+  return <div className="markdown-content">{elements}</div>;
+};
+
 export function QuestionnaireRenderer({
   questionnaire,
   initialResponses,
@@ -65,6 +168,19 @@ export function QuestionnaireRenderer({
         initialized[q.id] = new Date().toISOString().split('T')[0];
       }
     });
+    
+    // Auto-populate male_gender field for sleep apnea questionnaire
+    console.log('[Male Gender Init] stableInitialResponses:', stableInitialResponses);
+    if (initialized.patient_gender) {
+      console.log('[Male Gender Init] patient_gender:', initialized.patient_gender);
+      const gender = initialized.patient_gender?.toLowerCase();
+      const isMale = gender === 'male' || gender === 'm' || gender === 'homme';
+      initialized.male_gender = isMale ? 'Oui' : 'Non';
+      console.log('[Male Gender Init] Set male_gender to:', initialized.male_gender);
+    } else {
+      console.log('[Male Gender Init] No patient_gender found in initialized responses');
+    }
+    
     return initialized;
   }, [stableInitialResponses, questionnaire.questions]);
 
@@ -194,6 +310,22 @@ export function QuestionnaireRenderer({
       } else if (prev.tensionc) {
         delete updated.tensionc;
         hasChanges = true;
+      }
+
+      // Auto-populate male_gender field for sleep apnea questionnaire based on patient_gender
+      if (prev.patient_gender) {
+        console.log('[Male Gender Update] patient_gender:', prev.patient_gender);
+        const gender = prev.patient_gender?.toLowerCase();
+        const isMale = gender === 'male' || gender === 'm' || gender === 'homme';
+        const maleGenderValue = isMale ? 'Oui' : 'Non';
+        console.log('[Male Gender Update] Calculated value:', maleGenderValue, 'Current value:', updated.male_gender);
+        if (updated.male_gender !== maleGenderValue) {
+          updated.male_gender = maleGenderValue;
+          hasChanges = true;
+          console.log('[Male Gender Update] Updated male_gender to:', maleGenderValue);
+        }
+      } else {
+        console.log('[Male Gender Update] No patient_gender in prev');
       }
 
       // Compute clairance_creatinine using Cockroft-Gault formula
@@ -2056,7 +2188,19 @@ export function QuestionnaireRenderer({
     questionnaire,
     responses
   );
-
+  
+  // Debug visibility and state
+  useEffect(() => {
+    if (questionnaire.code === 'SLEEP_APNEA') {
+      console.log('--- [SLEEP_APNEA DEBUG] ---');
+      console.log('Diagnosed Sleep Apnea:', responses.diagnosed_sleep_apnea);
+      console.log('Patient Gender:', responses.patient_gender);
+      console.log('Male Gender Value:', responses.male_gender);
+      console.log('Visible Question IDs:', visibleQuestions);
+      console.log('Is male_gender in visibleQuestions?', visibleQuestions.includes('male_gender'));
+      console.log('---------------------------');
+    }
+  }, [responses, visibleQuestions, questionnaire.code]);
   // Track previous responses to detect actual changes
   const prevResponsesRef = useRef<Record<string, any>>(stableInitialResponses);
   const isFirstRender = useRef(true);
@@ -2282,6 +2426,47 @@ export function QuestionnaireRenderer({
     responses.item_16, responses.item_17, responses.item_18, responses.item_19, responses.item_20,
     responses.item_21, responses.item_22, responses.item_23, responses.item_24, responses.item_25,
     responses.item_26
+  ]);
+
+  // Dedicated calculation for Mood Episodes Total since last visit
+  useEffect(() => {
+    if (questionnaire?.code !== 'DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE') return;
+
+    setResponses((prev) => {
+      // Helper to get score from option code for a field
+      const getScore = (fieldId: string) => {
+        const question = questionnaire.questions.find(q => q.id === fieldId);
+        if (!question || !question.options) return 0;
+        const responseValue = prev[fieldId];
+        // Use loose equality (==) to handle string/number comparison
+        const option = (question.options as QuestionOption[]).find(opt => opt.code == responseValue);
+        return typeof option?.score === 'number' ? option.score : 0;
+      };
+
+      const nbEdm = getScore('rad_tb_hum_nbepdep');
+      const nbManie = getScore('rad_tb_hum_nbepmanan');
+      const nbHypomanie = getScore('rad_tb_hum_nbephypoman');
+
+      const totalScore = nbEdm + nbManie + nbHypomanie;
+      
+      let totalCode = totalScore.toString();
+      if (totalScore > 20) totalCode = '>20';
+      
+      let updated = { ...prev };
+      let hasChanges = false;
+
+      if (updated.rad_tb_hum_epthyman_nb !== totalCode) {
+        updated.rad_tb_hum_epthyman_nb = totalCode;
+        hasChanges = true;
+      }
+
+      return hasChanges ? updated : prev;
+    });
+  }, [
+    questionnaire.code,
+    responses.rad_tb_hum_nbepdep,
+    responses.rad_tb_hum_nbepmanan,
+    responses.rad_tb_hum_nbephypoman
   ]);
 
   const handleResponseChange = (questionId: string, value: any) => {
@@ -2586,15 +2771,19 @@ export function QuestionnaireRenderer({
 
     return (
       <div key={question.id} className={`space-y-3 ${isUnitField ? 'col-span-1' : ''} ${getIndentClass(question.indentLevel)}`}>
-        <Label htmlFor={question.id} className={`text-base font-semibold ${question.readonly ? 'text-indigo-700' : 'text-slate-800'}`}>
-          {question.text}
-          {isRequired && <span className="text-brand ml-1">*</span>}
-          {question.readonly && (
-            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 border border-indigo-200">
-              Calculé
-            </span>
-          )}
-        </Label>
+        {question.metadata?.displayOnly ? (
+          <MarkdownContent content={question.text} />
+        ) : (
+          <Label htmlFor={question.id} className={`text-base font-semibold ${question.readonly ? 'text-indigo-700' : 'text-slate-800'}`}>
+            {question.text}
+            {isRequired && <span className="text-brand ml-1">*</span>}
+            {question.readonly && (
+              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 border border-indigo-200">
+                Calculé
+              </span>
+            )}
+          </Label>
+        )}
 
         {question.help && (
           <div className="text-sm text-slate-500 space-y-1">
@@ -2608,11 +2797,7 @@ export function QuestionnaireRenderer({
                 </p>
               </div>
             ) : (
-              question.help.split('\n').map((line, index) => (
-                <p key={index} className={line.trim() === '' ? 'h-2' : 'leading-relaxed'}>
-                  {line || '\u00A0'}
-                </p>
-              ))
+              <MarkdownContent content={question.help} />
             )}
           </div>
         )}
@@ -2621,6 +2806,7 @@ export function QuestionnaireRenderer({
           <div className="space-y-1">
             <Input
               id={question.id}
+              name={question.id}
               type="text"
               value={value || ""}
               onChange={(e) => {
@@ -2728,6 +2914,7 @@ export function QuestionnaireRenderer({
               <>
                 <Input
                   id={question.id}
+                  name={question.id}
                   type="range"
                   value={value}
                   onChange={(e) =>
@@ -2777,7 +2964,10 @@ export function QuestionnaireRenderer({
             disabled={readonly || question.readonly}
             required={isRequired}
           >
-            <SelectTrigger className="bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand">
+            <SelectTrigger 
+              id={question.id} 
+              className="bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand"
+            >
               <SelectValue placeholder="Sélectionnez une option" />
             </SelectTrigger>
             <SelectContent>
@@ -2850,6 +3040,7 @@ export function QuestionnaireRenderer({
         {question.type === "date" && (
           <Input
             id={question.id}
+            name={question.id}
             type="date"
             value={value || ""}
             onChange={(e) => handleResponseChange(question.id, e.target.value)}
