@@ -39,6 +39,8 @@ import {
   PerinataliteSzResponseInsert,
   TeaCoffeeSzResponse,
   TeaCoffeeSzResponseInsert,
+  EvalAddictologiqueSzResponse,
+  EvalAddictologiqueSzResponseInsert,
 } from '../types/database.types';
 
 // ============================================================================
@@ -1342,6 +1344,134 @@ export async function saveTeaCoffeeSzResponse(
     .from('responses_tea_coffee')
     .upsert({
       ...responseData,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// EVALUATION ADDICTOLOGIQUE - Schizophrenia Addictologie Assessment
+// ============================================================================
+// Comprehensive addictological evaluation questionnaire including:
+// - Main screening (alcohol, tobacco, cannabis, other drugs, gambling)
+// - Conditional Alcohol section with DSM5 criteria and severity scoring
+
+export async function getEvalAddictologiqueSzResponse(
+  visitId: string
+): Promise<EvalAddictologiqueSzResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_eval_addictologique_sz')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return data || null;
+}
+
+export async function saveEvalAddictologiqueSzResponse(
+  response: EvalAddictologiqueSzResponseInsert
+): Promise<EvalAddictologiqueSzResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    section_screening,
+    section_alcohol_lifetime,
+    section_alcohol_12months,
+    section_dsm5_screening,
+    section_dsm5_criteria,
+    section_history,
+    section_family_history,
+    section_craving,
+    section_treatment,
+    section_hospitalization,
+    ...responseData
+  } = response as any;
+
+  // ========================================================================
+  // DSM5 SEVERITY SCORING
+  // ========================================================================
+  // Count positive criteria (value === 'Oui') for lifetime and 12-month
+  // Severity levels:
+  //   - 0-1 positive criteria: none
+  //   - 2-3 positive criteria: mild (legere)
+  //   - 4-5 positive criteria: moderate (moyenne)
+  //   - 6+ positive criteria: severe (severe)
+
+  // DSM5 criteria fields for lifetime (a-l)
+  const lifetimeCriteriaFields = [
+    'rad_add_alc8a1', 'rad_add_alc8b1', 'rad_add_alc8c1', 'rad_add_alc8d1',
+    'rad_add_alc8e1', 'rad_add_alc8f1', 'rad_add_alc8g1', 'rad_add_alc8h1',
+    'rad_add_alc8i1', 'rad_add_alc8j1', 'rad_add_alc8k1', 'rad_add_alc8l1'
+  ];
+
+  // DSM5 criteria fields for 12 months (a-l)
+  const monthCriteriaFields = [
+    'rad_add_alc8a2', 'rad_add_alc8b2', 'rad_add_alc8c2', 'rad_add_alc8d2',
+    'rad_add_alc8e2', 'rad_add_alc8f2', 'rad_add_alc8g2', 'rad_add_alc8h2',
+    'rad_add_alc8i2', 'rad_add_alc8j2', 'rad_add_alc8k2', 'rad_add_alc8l2'
+  ];
+
+  // Count positive criteria for lifetime
+  let dsm5_lifetime_count: number | null = null;
+  let dsm5_lifetime_severity: string | null = null;
+  
+  // Only calculate if patient has alcohol consumption (rad_add_alc1 === 'Oui')
+  if (responseData.rad_add_alc1 === 'Oui') {
+    const lifetimePositive = lifetimeCriteriaFields.filter(
+      field => (responseData as any)[field] === 'Oui'
+    ).length;
+    
+    dsm5_lifetime_count = lifetimePositive;
+    
+    if (lifetimePositive <= 1) {
+      dsm5_lifetime_severity = 'none';
+    } else if (lifetimePositive <= 3) {
+      dsm5_lifetime_severity = 'mild';
+    } else if (lifetimePositive <= 5) {
+      dsm5_lifetime_severity = 'moderate';
+    } else {
+      dsm5_lifetime_severity = 'severe';
+    }
+  }
+
+  // Count positive criteria for 12 months
+  let dsm5_12month_count: number | null = null;
+  let dsm5_12month_severity: string | null = null;
+  
+  if (responseData.rad_add_alc1 === 'Oui') {
+    const monthPositive = monthCriteriaFields.filter(
+      field => (responseData as any)[field] === 'Oui'
+    ).length;
+    
+    dsm5_12month_count = monthPositive;
+    
+    if (monthPositive <= 1) {
+      dsm5_12month_severity = 'none';
+    } else if (monthPositive <= 3) {
+      dsm5_12month_severity = 'mild';
+    } else if (monthPositive <= 5) {
+      dsm5_12month_severity = 'moderate';
+    } else {
+      dsm5_12month_severity = 'severe';
+    }
+  }
+
+  const { data, error } = await supabase
+    .from('responses_eval_addictologique_sz')
+    .upsert({
+      ...responseData,
+      dsm5_lifetime_count,
+      dsm5_lifetime_severity,
+      dsm5_12month_count,
+      dsm5_12month_severity,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

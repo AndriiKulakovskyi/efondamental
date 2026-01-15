@@ -207,7 +207,8 @@ import {
   SUICIDE_HISTORY_SZ_DEFINITION,
   TEA_COFFEE_SZ_DEFINITION,
   ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
-  SZ_PERINATALITE_DEFINITION
+  SZ_PERINATALITE_DEFINITION,
+  EVAL_ADDICTOLOGIQUE_SZ_DEFINITION
 } from '../constants/questionnaires-schizophrenia';
 import { TROUBLES_COMORBIDES_SZ_DEFINITION } from '../constants/questionnaires-schizophrenia-comorbid';
 import {
@@ -652,7 +653,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
             {
               id: 'addictologie',
               name: 'Addictologie',
-              questionnaires: [TEA_COFFEE_SZ_DEFINITION]
+              questionnaires: [EVAL_ADDICTOLOGIQUE_SZ_DEFINITION, TEA_COFFEE_SZ_DEFINITION]
             }
           ]
         }

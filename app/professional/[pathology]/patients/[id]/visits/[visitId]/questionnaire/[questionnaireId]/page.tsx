@@ -127,7 +127,8 @@ import {
   SUICIDE_HISTORY_SZ_DEFINITION,
   ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
   SZ_PERINATALITE_DEFINITION,
-  TEA_COFFEE_SZ_DEFINITION
+  TEA_COFFEE_SZ_DEFINITION,
+  EVAL_ADDICTOLOGIQUE_SZ_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { TROUBLES_COMORBIDES_SZ_DEFINITION } from "@/lib/constants/questionnaires-schizophrenia-comorbid";
 import { 
@@ -252,7 +253,8 @@ import {
   getSuicideHistorySzResponse,
   getAntecedentsFamiliauxPsySzResponse,
   getPerinataliteSzResponse,
-  getTeaCoffeeSzResponse
+  getTeaCoffeeSzResponse,
+  getEvalAddictologiqueSzResponse
 } from "@/lib/services/questionnaire-schizophrenia.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -404,6 +406,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION.code) questionnaire = ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION;
   else if (code === SZ_PERINATALITE_DEFINITION.code) questionnaire = SZ_PERINATALITE_DEFINITION;
   else if (code === TEA_COFFEE_SZ_DEFINITION.code) questionnaire = TEA_COFFEE_SZ_DEFINITION;
+  else if (code === EVAL_ADDICTOLOGIQUE_SZ_DEFINITION.code) questionnaire = EVAL_ADDICTOLOGIQUE_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -537,6 +540,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION.code) existingResponse = await getAntecedentsFamiliauxPsySzResponse(visitId);
   else if (code === SZ_PERINATALITE_DEFINITION.code) existingResponse = await getPerinataliteSzResponse(visitId);
   else if (code === TEA_COFFEE_SZ_DEFINITION.code) existingResponse = await getTeaCoffeeSzResponse(visitId);
+  else if (code === EVAL_ADDICTOLOGIQUE_SZ_DEFINITION.code) existingResponse = await getEvalAddictologiqueSzResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

@@ -5058,6 +5058,198 @@ export interface TeaCoffeeSzResponse {
 export type TeaCoffeeSzResponseInsert = Omit<TeaCoffeeSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
+// Evaluation Addictologique - Schizophrenia Addictologie Assessment
+// ============================================================================
+// Comprehensive addictological evaluation questionnaire including:
+// - Main screening (alcohol, tobacco, cannabis, other drugs, gambling)
+// - Conditional Alcohol section with DSM5 criteria and severity scoring
+
+export interface EvalAddictologiqueSzResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // ========================================================================
+  // SCREENING SECTION
+  // ========================================================================
+
+  // Q1: Alcohol consumption > 10 times lifetime
+  rad_add_alc1?: 'Oui' | 'Non' | null;
+
+  // Q1.2: Primary abstinent (shows if Q1 = 'Non')
+  rad_add_alc1a?: 'Oui' | 'Non' | null;
+
+  // Q2: Tobacco status
+  rad_add_tab?: 'Non fumeur' | 'Fumeur actuel' | 'Ex-fumeur' | 'Statut inconnu' | null;
+
+  // Q3: Cannabis consumption > 10 times lifetime
+  rad_add_cannabis?: 'Oui' | 'Non' | null;
+
+  // Q4: Other illicit drugs consumption > 10 times lifetime
+  rad_add_drogues?: 'Oui' | 'Non' | null;
+
+  // Q20: Gambling - lying about behavior
+  rad_add_jeux1?: 'Oui' | 'Non' | null;
+
+  // Q21: Gambling - need to bet more money
+  rad_add_jeux2?: 'Oui' | 'Non' | null;
+
+  // ========================================================================
+  // ALCOHOL SECTION - Lifetime Consumption
+  // ========================================================================
+
+  // 5a. Quantity (glasses/day) during maximum lifetime consumption periods
+  add_alc5a?: string | null;
+
+  // 5b. Frequency during maximum lifetime consumption periods
+  rad_add_alc5b?: '1_to_7' | 'less_than_once' | null;
+
+  // 5c. Specify times per week (shows if 5b = '1_to_7')
+  rad_add_alc5c?: number | null;
+
+  // ========================================================================
+  // ALCOHOL SECTION - 12 Month Consumption
+  // ========================================================================
+
+  // 6a. Quantity (glasses/day) during last 12 months
+  add_alc6a?: string | null;
+
+  // 6b. Frequency during last 12 months
+  rad_add_alc6b?: '1_to_7' | 'less_than_once' | null;
+
+  // 6c. Specify times per week (shows if 6b = '1_to_7')
+  rad_add_alc6c?: number | null;
+
+  // ========================================================================
+  // ALCOHOL SECTION - DSM5 Screening
+  // ========================================================================
+
+  // 8a. Has patient shown any alcohol use disorder symptom lifetime?
+  rad_add_alc8a?: 'Oui' | 'Non' | null;
+
+  // ========================================================================
+  // ALCOHOL SECTION - DSM5 Criteria (a-l for lifetime and 12 months)
+  // ========================================================================
+
+  // a. Taken in larger amounts than intended
+  rad_add_alc8a1?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_alc8a2?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // b. Tried to cut down or stop
+  rad_add_alc8b1?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_alc8b2?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // c. Time spent obtaining, using, recovering
+  rad_add_alc8c1?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_alc8c2?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // d. Cravings or urges to use
+  rad_add_alc8d1?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_alc8d2?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // e. Failure to fulfill major role obligations
+  rad_add_alc8e1?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_alc8e2?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // f. Continued use despite social/interpersonal problems
+  rad_add_alc8f1?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_alc8f2?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // g. Important activities given up or reduced
+  rad_add_alc8g1?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_alc8g2?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // h. Recurrent use in hazardous situations
+  rad_add_alc8h1?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_alc8h2?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // i. Continued use despite physical/psychological problems
+  rad_add_alc8i1?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_alc8i2?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // j. Tolerance
+  rad_add_alc8j1?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_alc8j2?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // k. Withdrawal symptoms or use to avoid withdrawal
+  rad_add_alc8k1?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_alc8k2?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // l. Legal problems related to use
+  rad_add_alc8l1?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_alc8l2?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // ========================================================================
+  // ALCOHOL SECTION - Computed DSM5 Severity Scores
+  // ========================================================================
+
+  dsm5_lifetime_count?: number | null;
+  dsm5_12month_count?: number | null;
+  dsm5_lifetime_severity?: 'none' | 'mild' | 'moderate' | 'severe' | null;
+  dsm5_12month_severity?: 'none' | 'mild' | 'moderate' | 'severe' | null;
+
+  // ========================================================================
+  // ALCOHOL SECTION - History
+  // ========================================================================
+
+  // 10a. Age of first alcohol consumption (years)
+  add_alc_10a?: number | null;
+
+  // 10b. Age of alcohol use disorder onset (years)
+  add_alc_10b?: number | null;
+
+  // 10c. Maximum abstinence duration (months)
+  add_alc_10c?: number | null;
+
+  // ========================================================================
+  // ALCOHOL SECTION - Family History
+  // ========================================================================
+
+  // 11. First-degree family history of alcohol use disorder
+  rad_add_alc11?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // ========================================================================
+  // ALCOHOL SECTION - Craving
+  // ========================================================================
+
+  // 12. Craving score (0-10)
+  rad_add_alc12?: string | null;
+
+  // ========================================================================
+  // ALCOHOL SECTION - Treatment
+  // ========================================================================
+
+  // 13. Lifetime medication treatment
+  rad_add_alc13?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // 13b. Which medication
+  add_alc13b?: string | null;
+
+  // ========================================================================
+  // ALCOHOL SECTION - Hospitalization
+  // ========================================================================
+
+  // 14a. Lifetime hospitalization for alcohol withdrawal
+  rad_add_alc14a?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // 14b. Number of hospitalizations
+  add_alc14b?: number | null;
+
+  // 14c. Age of first hospitalization
+  add_alc14c?: number | null;
+
+  // ========================================================================
+  // Metadata
+  // ========================================================================
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type EvalAddictologiqueSzResponseInsert = Omit<EvalAddictologiqueSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
 // PANSS (Positive and Negative Syndrome Scale) - Schizophrenia Hetero-questionnaire
 // ============================================================================
 
