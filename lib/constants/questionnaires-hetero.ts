@@ -422,8 +422,8 @@ export const CGI_QUESTIONS: Question[] = [
   },
   {
     id: 'therapeutic_effect',
-    text: 'Effet thérapeutique',
-    help: 'Important = amélioration marquée : disparition complète ou presque complète de tous les symptômes. Modéré = amélioration nette : disparition partielle des symptômes. Minime = très légère amélioration qui ne modifie pas le fonctionnement du patient.',
+    text: 'Index thérapeutique :',
+    help: 'Evaluer cet item uniquement en fonction de l\'effet du médicament. Choisissez les termes qui décrivent le mieux les degrés d\'efficacité thérapeutique et d\'effets secondaires et entourez le nombre qui se trouve à l\'intersection. Exemple : l\'effet thérapeutique est évalué comme "modéré" et les effets secondaires sont jugés comme "n\'interférant pas significativement avec le fonctionnement du patient" entourez 06.',
     type: 'single_choice',
     required: false,
     options: [
@@ -513,6 +513,13 @@ export const EGF_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 
 export const ALDA_QUESTIONS: Question[] = [
+  {
+    id: 'section_consignes',
+    text: 'CONSIGNES',
+    help: "Le critère A est utilisé pour déterminer une association entre amélioration clinique et le traitement. La cotation devrait porter sur la période pendant laquelle le traitement était considéré adéquat quant à la durée et au dosage. L'activité de la maladie devrait être jugée selon la fréquence, la sévérité et la durée des épisodes.",
+    type: 'section',
+    required: false
+  },
   // Dépistage Section
   {
     id: 'section_screening',
@@ -636,6 +643,8 @@ export const ALDA_DEFINITION: QuestionnaireDefinition = {
   code: 'ALDA',
   title: 'Echelle d\'Alda (Alda Scale) - Modified',
   description: 'Échelle d\'évaluation rétrospective de la réponse prophylactique au lithium, incluant un dépistage et des critères spécifiques de cotation.',
+  instructions: `CONSIGNES
+Le critère A est utilisé pour déterminer une association entre amélioration clinique et le traitement. La cotation devrait porter sur la période pendant laquelle le traitement était considéré adéquat quant à la durée et au dosage. L'activité de la maladie devrait être jugée selon la fréquence, la sévérité et la durée des épisodes.`,
   questions: ALDA_QUESTIONS,
   metadata: {
     singleColumn: true,
@@ -670,37 +679,15 @@ export const ETAT_PATIENT_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'q1a',
-    text: 'Impression subjective d\'hyper-réactivité émotionnelle',
+    id: 'q1_subjective',
+    text: 'Impression subjective de :',
     type: 'single_choice',
     required: false,
-    display_if: { 
-      'and': [
-        { '==': [{ 'var': 'answers.q1' }, 1] },
-        { '!=': [{ 'var': 'answers.q1b' }, 1] }
-      ]
-    },
+    display_if: { '==': [{ 'var': 'answers.q1' }, 1] },
     options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
-    ]
-  },
-  {
-    id: 'q1b',
-    text: 'Impression subjective d\'hypo-réactivité ou d\'anesthésie',
-    type: 'single_choice',
-    required: false,
-    display_if: { 
-      'and': [
-        { '==': [{ 'var': 'answers.q1' }, 1] },
-        { '!=': [{ 'var': 'answers.q1a' }, 1] }
-      ]
-    },
-    options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
+      { code: 1, label: 'Hyper-réactivité émotionnelle', score: 1 },
+      { code: 2, label: 'Hypo-réactivité ou d’anesthésie', score: 2 },
+      { code: 0, label: 'Aucune des deux', score: 0 }
     ]
   },
   {
@@ -726,37 +713,14 @@ export const ETAT_PATIENT_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'q3a',
-    text: 'Perte de poids',
+    id: 'q3_type',
+    text: 'préciser :',
     type: 'single_choice',
     required: false,
-    display_if: { 
-      'and': [
-        { '==': [{ 'var': 'answers.q3' }, 1] },
-        { '!=': [{ 'var': 'answers.q3b' }, 1] }
-      ]
-    },
+    display_if: { '==': [{ 'var': 'answers.q3' }, 1] },
     options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
-    ]
-  },
-  {
-    id: 'q3b',
-    text: 'Gain de poids',
-    type: 'single_choice',
-    required: false,
-    display_if: { 
-      'and': [
-        { '==': [{ 'var': 'answers.q3' }, 1] },
-        { '!=': [{ 'var': 'answers.q3a' }, 1] }
-      ]
-    },
-    options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
+      { code: 1, label: 'Perte', score: 1 },
+      { code: 2, label: 'Gain', score: 2 }
     ]
   },
   {
@@ -771,27 +735,14 @@ export const ETAT_PATIENT_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'q4a',
-    text: 'Insomnie',
+    id: 'q4_type',
+    text: 'Préciser :',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ 'var': 'answers.q4' }, 1] },
     options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
-    ]
-  },
-  {
-    id: 'q4b',
-    text: 'Hypersomnie',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ 'var': 'answers.q4' }, 1] },
-    options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
+      { code: 1, label: 'Insomnie', score: 1 },
+      { code: 2, label: 'Hypersomnie', score: 2 }
     ]
   },
   {
@@ -806,27 +757,14 @@ export const ETAT_PATIENT_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'q5a',
-    text: 'Agitation',
+    id: 'q5_type',
+    text: 'Préciser :',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ 'var': 'answers.q5' }, 1] },
     options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
-    ]
-  },
-  {
-    id: 'q5b',
-    text: 'Ralentissement',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ 'var': 'answers.q5' }, 1] },
-    options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
+      { code: 1, label: 'Agitation', score: 1 },
+      { code: 2, label: 'Ralentissement', score: 2 }
     ]
   },
   {
@@ -863,27 +801,14 @@ export const ETAT_PATIENT_QUESTIONS: Question[] = [
     ]
   },
   {
-    id: 'q8a',
-    text: 'Impression d\'accélération idéïque',
+    id: 'q8_type',
+    text: 'Impression de :',
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ 'var': 'answers.q8' }, 1] },
     options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
-    ]
-  },
-  {
-    id: 'q8b',
-    text: 'Impression de ralentissement idéïque',
-    type: 'single_choice',
-    required: false,
-    display_if: { '==': [{ 'var': 'answers.q8' }, 1] },
-    options: [
-      { code: 1, label: 'Oui', score: 1 },
-      { code: 0, label: 'Non', score: 0 },
-      { code: 9, label: 'Ne sais pas', score: 9 }
+      { code: 1, label: 'Accélération idéïque', score: 1 },
+      { code: 2, label: 'Ralentissement idéïque', score: 2 }
     ]
   },
   {
@@ -4893,8 +4818,22 @@ export const CSSRS_QUESTIONS: Question[] = [
     required: false
   },
   {
+    id: 'cssrs_instructions',
+    text: `Posez les questions 1 et 2. Si les deux réponses sont négatives, passez à la section « Comportement suicidaire ».
+Si la réponse à la question 2 est « oui », posez les questions 3, 4 et 5. Si la réponse à la question 1 et/ou 2 est « oui », complétez la section « Intensité de l'idéation » ci-dessous.
+
+Depuis la semaine dernière pour une évaluation initiale ou depuis la dernière visite lors d’un suivi : moment où il/elle s'est senti(e) le plus suicidaire :`,
+    type: 'text',
+    metadata: { displayOnly: true },
+    required: false
+  },
+  {
     id: 'q1_wish_dead',
-    text: '1. Désir d\'être mort(e) : Avez-vous souhaité être mort(e) ou de vous endormir et de ne jamais vous réveiller ?',
+    text: `1. Désir d’être mort(e)
+Le sujet souscrit à des pensées concernant le désir de mourir ou de ne plus être en vie, ou le désir de s’endormir et de ne pas se réveiller
+
+
+**Avez-vous souhaité être mort(e) ou de vous endormir et de ne jamais vous réveiller ?**`,
     help: 'Si la réponse aux questions 1 et 2 est "non", passez à la fin du questionnaire.',
     type: 'single_choice',
     required: true,
@@ -4905,7 +4844,11 @@ export const CSSRS_QUESTIONS: Question[] = [
   },
   {
     id: 'q2_non_specific',
-    text: '2. Pensées suicidaires actives non spécifiques : Avez-vous réellement pensé à vous suicider ?',
+    text: `2. Pensées suicidaires actives non spécifiques
+Pensées d’ordre général non spécifiques autour de la volonté de mettre fin à ses jours/ se suicider (par ex « j’ai pensé à me suicider »), non associées à des pensées sur les manières permettant de se suicider/méthodes associées, ni à une intention ou à un scénario, au cours de la période d’évaluation.
+
+
+**Avez-vous réellement pensé à vous suicider ?** `,
     help: 'Si la réponse est "oui", posez les questions 3, 4 et 5.',
     type: 'single_choice',
     required: true,
@@ -4916,7 +4859,11 @@ export const CSSRS_QUESTIONS: Question[] = [
   },
   {
     id: 'q3_method_no_intent',
-    text: '3. Idéation suicidaire active avec la définition des méthodes (sans scénario), sans intention de passage à l\'acte : Avez-vous pensé à la manière dont vous vous y prendriez ?',
+    text: `3. Idéation suicidaire active avec la définition des méthodes (sans scénario), sans intention de passage à l’acte :
+Le sujet pense au suicide et a envisagé au moins une méthode pour y parvenir au cours de la période d’évaluation. Il ne s’agit pas ici de l’élaboration d’un scénario spécifique comprenant le moment, le lieu ou la méthode (par ex. le sujet a pensé à une méthode pour se suicider mais ne dispose pas d’un scénario précis) Il s’agit par exemple d’une personne déclarant « J’ai pensé à avaler des médicaments, mais je n’ai pas de scénario précis sur le moment, le lieu ou la manière dont je le ferais…et je n’irai jamais jusque là ».
+
+
+**Avez-vous pensé à la manière dont vous vous y prendriez ?**`,
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'q2_non_specific' }, 1] },
@@ -4927,7 +4874,11 @@ export const CSSRS_QUESTIONS: Question[] = [
   },
   {
     id: 'q4_intent_no_plan',
-    text: '4. Idéation suicidaire active avec intention de passage à l\'acte, sans scénario précis : Avez-vous eu des pensées de ce genre et l\'intention de passer à l\'acte ?',
+    text: `4. Idéation suicidaire active avec intention de passage à l’acte, sans scénario précis
+Pensées suicidaires actives, le sujet exprime une intention plus ou moins forte de passer à l’acte et ne se contente pas de déclarer « J’ai des pensées suicidaires, mais je ne ferai jamais rien pour les mettre en œuvre ».
+
+
+**Avez-vous eu des pensées de ce genre et l’intention de passer à l’acte ?**`,
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'q2_non_specific' }, 1] },
@@ -4938,7 +4889,11 @@ export const CSSRS_QUESTIONS: Question[] = [
   },
   {
     id: 'q5_plan_intent',
-    text: '5. Idéation suicidaire active avec scénario précis et intention de passer à l\'acte : Avez-vous commencé ou fini d\'élaborer un scénario détaillé sur la manière dont vous voulez vous suicider ? Et avez-vous l\'intention de mettre ce scénario à exécution ?',
+    text: `5. Idéation suicidaire active avec scénario précis et intention de passser à l’acte
+Pensées suicidaires associées à l’élaboration complète ou partielle d’un scénario détaillé ; le sujet exprime une intention plus ou moins forte de mettre ce scénario à exécution
+
+
+**Avez-vous commencé ou fini d’élaborer un scénario détaillé sur la manière dont vous voulez vous suicider ? Avez-vous l’intention de mettre ce scénario à exécution ?**`,
     type: 'single_choice',
     required: false,
     display_if: { '==': [{ var: 'q2_non_specific' }, 1] },
@@ -5233,6 +5188,137 @@ export const ISA_DEFINITION: QuestionnaireDefinition = {
   }
 };
 
+export const ISA_FOLLOWUP_QUESTIONS: Question[] = [
+  {
+    id: 'q1_life_worth',
+    text: '1. Avez-vous déjà eu l\'impression que la vie ne vaut pas la peine d\'être vécue ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q1_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q1_life_worth' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: 'since_last_visit', label: 'Il y a entre une semaine et la dernière visite', score: 0 }
+    ]
+  },
+  {
+    id: 'q2_wish_death',
+    text: '2. Avez-vous déjà souhaité mourir, par exemple, de vous coucher et de ne pas vous réveiller ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q2_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q2_wish_death' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: 'since_last_visit', label: 'Il y a entre une semaine et la dernière visite', score: 0 }
+    ]
+  },
+  {
+    id: 'q3_thoughts',
+    text: '3. Avez-vous déjà pensé à vous donner la mort, même si vous ne le feriez jamais ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q3_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q3_thoughts' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: 'since_last_visit', label: 'Il y a entre une semaine et la dernière visite', score: 0 }
+    ]
+  },
+  {
+    id: 'q4_plan',
+    text: '4. Avez-vous déjà sérieusement envisagé de vous donner la mort ou planifié la façon de vous y prendre ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q4_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q4_plan' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: 'since_last_visit', label: 'Il y a entre une semaine et la dernière visite', score: 0 }
+    ]
+  },
+  {
+    id: 'q5_attempt',
+    text: '5. Avez-vous déjà essayé de vous donner la mort ?',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 1, label: 'Oui', score: 1 },
+      { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q5_time',
+    text: 'Quand cela est-il arrivé pour la dernière fois ?',
+    type: 'single_choice',
+    required: false,
+    display_if: {
+      '==': [{ var: 'q5_attempt' }, 1]
+    },
+    options: [
+      { code: 'last_week', label: 'La semaine dernière', score: 0 },
+      { code: 'since_last_visit', label: 'Il y a entre une semaine et la dernière visite', score: 0 }
+    ]
+  }
+];
+
+export const ISA_FOLLOWUP_DEFINITION: QuestionnaireDefinition = {
+  id: 'isa_followup',
+  code: 'ISA_FOLLOWUP_FR',
+  title: 'Intentionnalité Suicidaire Actuelle (suivi)',
+  description: 'Échelle évaluant les pensées, désirs et tentatives de suicide depuis la dernière visite.',
+  questions: ISA_FOLLOWUP_QUESTIONS,
+  metadata: {
+    singleColumn: true,
+    pathologies: ['bipolar'],
+    target_role: 'healthcare_professional'
+  }
+};
+
 // ============================================================================
 // SIS (Suicide Intent Scale) - Beck
 // ============================================================================
@@ -5504,7 +5590,10 @@ export const SUICIDE_HISTORY_QUESTIONS: Question[] = [
   },
   {
     id: 'q6_interrupted',
-    text: 'Q6. Tentative interrompue : Interruption (par des facteurs extérieurs) de la mise en oeuvre par la personne d\'un acte potentiellement auto-agressif (sinon, une tentative avérée aurait eu lieu). Surdosage : la personne a des comprimés dans la main, mais quelqu\'un l\'empêche de les avaler. Si elle ingère un ou plusieurs comprimés, il s\'agit d\'une tentative avérée plutôt que d\'une tentative interrompue. Arme à feu : la personne pointe une arme vers elle, mais l\'arme lui est reprise par quelqu\'un ou quelque chose l\'empêche d\'appuyer sur la gâchette. Si elle appuie sur la gâchette et même si le coup ne part pas, il s\'agit d\'une tentative avérée. Saut dans le vide : la personne s\'apprête à sauter, mais quelqu\'un la retient et l\'éloigne du bord. Pendaison : la personne a une corde autour du cou mais ne s\'est pas encore pendue car quelqu\'un l\'en empêche.\n\nVous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais d\'en être empêché(e) par quelqu\'un ou quelque chose avant de véritablement passer à l\'acte ?',
+    text: `Q6. Tentative interrompue : Interruption (par des facteurs extérieurs) de la mise en oeuvre par la personne d'un acte potentiellement auto-agressif (sinon, une tentative avérée aurait eu lieu). Surdosage : la personne a des comprimés dans la main, mais quelqu'un l'empêche de les avaler. Si elle ingère un ou plusieurs comprimés, il s'agit d'une tentative avérée plutôt que d'une tentative interrompue. Arme à feu : la personne pointe une arme vers elle, mais l'arme lui est reprise par quelqu'un ou quelque chose l'empêche d'appuyer sur la gâchette. Si elle appuie sur la gâchette et même si le coup ne part pas, il s'agit d'une tentative avérée. Saut dans le vide : la personne s'apprête à sauter, mais quelqu'un la retient et l'éloigne du bord. Pendaison : la personne a une corde autour du cou mais ne s'est pas encore pendue car quelqu'un l'en empêche.
+
+
+**Vous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais d'en être empêché(e) par quelqu'un ou quelque chose avant de véritablement passer à l'acte ?**`,
     type: 'single_choice',
     required: false,
     options: [
@@ -5523,7 +5612,10 @@ export const SUICIDE_HISTORY_QUESTIONS: Question[] = [
   },
   {
     id: 'q7_aborted',
-    text: 'Q7. Tentative avortée : La personne se prépare à se suicider, mais s\'interrompt d\'elle-même avant d\'avoir réellement eu un comportement autodestructeur. Les exemples sont similaires à ceux illustrant une tentative interrompue, si ce n\'est qu\'ici la personne interrompt d\'elle-même sa tentative au lieu d\'être interrompue par un facteur extérieur.\n\nVous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais de vous arrêter de vous-même avant de véritablement passer à l\'acte ?',
+    text: `Q7. Tentative avortée : La personne se prépare à se suicider, mais s'interrompt d'elle-même avant d'avoir réellement eu un comportement autodestructeur. Les exemples sont similaires à ceux illustrant une tentative interrompue, si ce n'est qu'ici la personne interrompt d'elle-même sa tentative au lieu d'être interrompue par un facteur extérieur.
+
+
+**Vous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais de vous arrêter de vous-même avant de véritablement passer à l'acte ?**`,
     type: 'single_choice',
     required: false,
     options: [
@@ -5542,7 +5634,10 @@ export const SUICIDE_HISTORY_QUESTIONS: Question[] = [
   },
   {
     id: 'q8_preparations',
-    text: 'Q8. Préparatifs : Actes ou préparatifs en vue d\'une tentative de suicide imminente. Il peut s\'agir de tout ce qui dépasse le stade de la verbalisation ou de la pensée, comme l\'élaboration d\'une méthode spécifique (par ex. se procurer des comprimés ou une arme à feu) ou la prise de dispositions en vue de son suicide (par ex. dons d\'objets, rédaction d\'une lettre d\'adieu).\n\nAvez-vous pris certaines mesures pour faire une tentative de suicide ou pour préparer votre suicide (par ex. rassembler des comprimés, vous procurer une arme à feu, donner vos objets de valeur ou écrire une lettre d\'adieu) ?',
+    text: `Q8. Préparatifs : Actes ou préparatifs en vue d'une tentative de suicide imminente. Il peut s'agir de tout ce qui dépasse le stade de la verbalisation ou de la pensée, comme l'élaboration d'une méthode spécifique (par ex. se procurer des comprimés ou une arme à feu) ou la prise de dispositions en vue de son suicide (par ex. dons d'objets, rédaction d'une lettre d'adieu).
+
+
+**Avez-vous pris certaines mesures pour faire une tentative de suicide ou pour préparer votre suicide (par ex. rassembler des comprimés, vous procurer une arme à feu, donner vos objets de valeur ou écrire une lettre d'adieu) ?**`,
     type: 'single_choice',
     required: false,
     options: [
@@ -5628,7 +5723,10 @@ export const SUICIDE_BEHAVIOR_FOLLOWUP_QUESTIONS: Question[] = [
   },
   {
     id: 'q2_interrupted',
-    text: 'Tentative interrompue : Interruption (par des facteurs extérieurs) de la mise en oeuvre par la personne d\'un acte potentiellement auto-agressif (sinon, une tentative avérée aurait eu lieu). Surdosage : la personne a des comprimés dans la main, mais quelqu\'un l\'empêche de les avaler. Si elle ingère un ou plusieurs comprimés, il s\'agit d\'une tentative avérée plutôt que d\'une tentative interrompue. Arme à feu : la personne pointe une arme vers elle, mais l\'arme lui est reprise par quelqu\'un ou quelque chose l\'empêche d\'appuyer sur la gâchette. Si elle appuie sur la gâchette et même si le coup ne part pas, il s\'agit d\'une tentative avérée. Saut dans le vide : la personne s\'apprête à sauter, mais quelqu\'un la retient et l\'éloigne du bord. Pendaison : la personne a une corde autour du cou mais ne s\'est pas encore pendue car quelqu\'un l\'en empêche.\n\nVous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais d\'en être empêché(e) par quelqu\'un ou quelque chose avant de véritablement passer à l\'acte ?',
+    text: `Tentative interrompue : Interruption (par des facteurs extérieurs) de la mise en oeuvre par la personne d'un acte potentiellement auto-agressif (sinon, une tentative avérée aurait eu lieu). Surdosage : la personne a des comprimés dans la main, mais quelqu'un l'empêche de les avaler. Si elle ingère un ou plusieurs comprimés, il s'agit d'une tentative avérée plutôt que d'une tentative interrompue. Arme à feu : la personne pointe une arme vers elle, mais l'arme lui est reprise par quelqu'un ou quelque chose l'empêche d'appuyer sur la gâchette. Si elle appuie sur la gâchette et même si le coup ne part pas, il s'agit d'une tentative avérée. Saut dans le vide : la personne s'apprête à sauter, mais quelqu'un la retient et l'éloigne du bord. Pendaison : la personne a une corde autour du cou mais ne s'est pas encore pendue car quelqu'un l'en empêche.
+
+
+**Vous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais d'en être empêché(e) par quelqu'un ou quelque chose avant de véritablement passer à l'acte ?**`,
     type: 'single_choice',
     required: false,
     options: [
@@ -5647,7 +5745,10 @@ export const SUICIDE_BEHAVIOR_FOLLOWUP_QUESTIONS: Question[] = [
   },
   {
     id: 'q3_aborted',
-    text: 'Tentative avortée : La personne se prépare à se suicider, mais s\'interrompt d\'elle-même avant d\'avoir réellement eu un comportement autodestructeur. Les exemples sont similaires à ceux illustrant une tentative interrompue, si ce n\'est qu\'ici la personne interrompt d\'elle-même sa tentative au lieu d\'être interrompue par un facteur extérieur.\n\nVous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais de vous arrêter de vous-même avant de véritablement passer à l\'acte ?',
+    text: `Tentative avortée : La personne se prépare à se suicider, mais s'interrompt d'elle-même avant d'avoir réellement eu un comportement autodestructeur. Les exemples sont similaires à ceux illustrant une tentative interrompue, si ce n'est qu'ici la personne interrompt d'elle-même sa tentative au lieu d'être interrompue par un facteur extérieur.
+
+
+**Vous est-il arrivé de commencer à faire quelque chose pour tenter de mettre fin à vos jours, mais de vous arrêter de vous-même avant de véritablement passer à l'acte ?**`,
     type: 'single_choice',
     required: false,
     options: [
@@ -5666,7 +5767,10 @@ export const SUICIDE_BEHAVIOR_FOLLOWUP_QUESTIONS: Question[] = [
   },
   {
     id: 'q4_preparations',
-    text: 'Préparatifs : Actes ou préparatifs en vue d\'une tentative de suicide imminente. Il peut s\'agir de tout ce qui dépasse le stade de la verbalisation ou de la pensée, comme l\'élaboration d\'une méthode spécifique (par ex. se procurer des comprimés ou une arme à feu) ou la prise de dispositions en vue de son suicide (par ex. dons d\'objets, rédaction d\'une lettre d\'adieu).\n\nAvez-vous pris certaines mesures pour faire une tentative de suicide ou pour préparer votre suicide (par ex. rassembler des comprimés, vous procurer une arme à feu, donner vos objets de valeur ou écrire une lettre d\'adieu) ?',
+    text: `Préparatifs : Actes ou préparatifs en vue d'une tentative de suicide imminente. Il peut s'agir de tout ce qui dépasse le stade de la verbalisation ou de la pensée, comme l'élaboration d'une méthode spécifique (par ex. se procurer des comprimés ou une arme à feu) ou la prise de dispositions en vue de son suicide (par ex. dons d'objets, rédaction d'une lettre d'adieu).
+
+
+**Avez-vous pris certaines mesures pour faire une tentative de suicide ou pour préparer votre suicide (par ex. rassembler des comprimés, vous procurer une arme à feu, donner vos objets de valeur ou écrire une lettre d'adieu) ?**`,
     type: 'single_choice',
     required: false,
     options: [

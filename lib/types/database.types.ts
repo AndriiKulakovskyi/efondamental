@@ -1048,23 +1048,18 @@ export interface EtatPatientResponse {
   patient_id: string;
   // Depressive symptoms (Q1-Q9)
   q1?: number | null; // Humeur dépressive
-  q1a?: number | null; // Hyper-réactivité émotionnelle
-  q1b?: number | null; // Hypo-réactivité
+  q1_subjective?: number | null; // Impression subjective (1=Hyper, 2=Hypo, 0=None)
   q2?: number | null; // Diminution d'intérêt
   q3?: number | null; // Perte/gain de poids
-  q3a?: number | null; // Perte de poids
-  q3b?: number | null; // Gain de poids
+  q3_type?: number | null; // Préciser poids (1=Perte, 2=Gain)
   q4?: number | null; // Insomnie/hypersomnie
-  q4a?: number | null; // Insomnie
-  q4b?: number | null; // Hypersomnie
+  q4_type?: number | null; // Préciser sommeil (1=Insomnie, 2=Hypersomnie)
   q5?: number | null; // Agitation/ralentissement
-  q5a?: number | null; // Agitation
-  q5b?: number | null; // Ralentissement
+  q5_type?: number | null; // Préciser psychomoteur (1=Agitation, 2=Ralentissement)
   q6?: number | null; // Fatigue
   q7?: number | null; // Dévalorisation
   q8?: number | null; // Diminution aptitude à penser
-  q8a?: number | null; // Accélération idéïque
-  q8b?: number | null; // Ralentissement idéïque
+  q8_type?: number | null; // Préciser pensée (1=Accélération, 2=Ralentissement)
   q9?: number | null; // Pensées de mort/suicide
   // Manic symptoms (Q10-Q18)
   q10?: number | null; // Humeur élevée
@@ -2297,6 +2292,40 @@ export interface IsaResponse {
 }
 
 export type IsaResponseInsert = Omit<IsaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ===== ISA Suivi (Intentionnalité Suicidaire Actuelle Suivi) Response =====
+export interface IsaSuiviResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  
+  // Question 1: Life not worth living
+  q1_life_worth?: number | null; // 0 or 1
+  q1_time?: 'last_week' | 'since_last_visit' | null;
+  
+  // Question 2: Wish to die
+  q2_wish_death?: number | null; // 0 or 1
+  q2_time?: 'last_week' | 'since_last_visit' | null;
+  
+  // Question 3: Thoughts of suicide
+  q3_thoughts?: number | null; // 0 or 1
+  q3_time?: 'last_week' | 'since_last_visit' | null;
+  
+  // Question 4: Plan/serious consideration
+  q4_plan?: number | null; // 0 or 1
+  q4_time?: 'last_week' | 'since_last_visit' | null;
+  
+  // Question 5: Attempt
+  q5_attempt?: number | null; // 0 or 1
+  q5_time?: 'last_week' | 'since_last_visit' | null;
+  
+  // Metadata
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type IsaSuiviResponseInsert = Omit<IsaSuiviResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ===== SIS (Suicide Intent Scale) Response =====
 export interface SisResponse {

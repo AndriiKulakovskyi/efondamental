@@ -46,6 +46,7 @@ import {
   getFamilyHistoryResponse,
   getCssrsResponse,
   getIsaResponse,
+  getIsaSuiviResponse,
   getSisResponse,
   getSuicideHistoryResponse,
   getSuicideBehaviorFollowupResponse,
@@ -122,6 +123,7 @@ import {
   FAMILY_HISTORY_DEFINITION,
   CSSRS_DEFINITION,
   ISA_DEFINITION,
+  ISA_FOLLOWUP_DEFINITION,
   SIS_DEFINITION,
   SUICIDE_HISTORY_DEFINITION,
   SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
@@ -665,7 +667,27 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         id: 'mod_medical_eval',
         name: 'Evaluation Médicale',
         description: 'Évaluation médicale complète',
-        questionnaires: [DSM5_HUMEUR_DEFINITION, DSM5_PSYCHOTIC_DEFINITION, DSM5_COMORBID_DEFINITION, DIVA_DEFINITION, FAMILY_HISTORY_DEFINITION, CSSRS_DEFINITION, ISA_DEFINITION, SIS_DEFINITION, SUICIDE_HISTORY_DEFINITION, PERINATALITE_DEFINITION, PATHO_NEURO_DEFINITION, PATHO_CARDIO_DEFINITION, PATHO_ENDOC_DEFINITION, PATHO_DERMATO_DEFINITION, PATHO_URINAIRE_DEFINITION, ANTECEDENTS_GYNECO_DEFINITION, PATHO_HEPATO_GASTRO_DEFINITION, PATHO_ALLERGIQUE_DEFINITION, AUTRES_PATHO_DEFINITION]
+        questionnaires: [
+          DSM5_HUMEUR_DEFINITION,
+          DSM5_PSYCHOTIC_DEFINITION,
+          DSM5_COMORBID_DEFINITION,
+          DIVA_DEFINITION,
+          FAMILY_HISTORY_DEFINITION,
+          CSSRS_DEFINITION,
+          ISA_DEFINITION,
+          SIS_DEFINITION,
+          SUICIDE_HISTORY_DEFINITION,
+          PERINATALITE_DEFINITION,
+          PATHO_NEURO_DEFINITION,
+          PATHO_CARDIO_DEFINITION,
+          PATHO_ENDOC_DEFINITION,
+          PATHO_DERMATO_DEFINITION,
+          PATHO_URINAIRE_DEFINITION,
+          ANTECEDENTS_GYNECO_DEFINITION,
+          PATHO_HEPATO_GASTRO_DEFINITION,
+          PATHO_ALLERGIQUE_DEFINITION,
+          AUTRES_PATHO_DEFINITION
+        ]
       },
       {
         id: 'mod_neuropsy',
@@ -759,7 +781,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
             id: 'suicide',
             name: 'Suicide',
             questionnaires: [
-              ISA_DEFINITION,
+              ISA_FOLLOWUP_DEFINITION,
               SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
               CSSRS_DEFINITION
             ]
@@ -844,7 +866,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
             name: 'Suicide',
             questionnaires: [
               CSSRS_DEFINITION,
-              ISA_DEFINITION,
+              ISA_FOLLOWUP_DEFINITION,
               SIS_DEFINITION,
               SUICIDE_HISTORY_DEFINITION
             ]
@@ -1157,7 +1179,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       getDiagPsySemHumeurDepuisVisiteResponse(visitId),
       getDiagPsySemPsychotiquesResponse(visitId),
       getCssrsResponse(visitId),
-      getIsaResponse(visitId),
+      getIsaSuiviResponse(visitId),
       getSuicideBehaviorFollowupResponse(visitId),
       // Soin, suivi et arret de travail (shared table)
       getPsyTraitementSemestrielResponse(visitId)
@@ -1231,7 +1253,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       getDivaResponse(visitId),
       getFamilyHistoryResponse(visitId),
       getCssrsResponse(visitId),
-      getIsaResponse(visitId),
+      getIsaSuiviResponse(visitId),
       getSisResponse(visitId),
       getSuicideHistoryResponse(visitId),
       getPerinataliteResponse(visitId),
