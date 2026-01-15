@@ -4793,6 +4793,520 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
       { code: 'Non', label: 'Non' }
     ]
   },
+
+  // ==================== CANNABIS - ABSTINENT (if Q3 = Non) ====================
+  {
+    id: 'rad_add_cannabis_abstinent',
+    text: '3a. Abstinent primaire ? (pas une seule consommation de cannabis vie entiere ?)',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_cannabis' }, 'Non'] },
+    indentLevel: 1
+  },
+
+  // ==================== CANNABIS - CONSUMPTION SECTION (if Q3 = Oui) ====================
+  {
+    id: 'section_cannabis',
+    text: 'Cannabis - Consommation',
+    type: 'section',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] }
+  },
+  // Quantity (joints/day) during max consumption periods - lifetime
+  {
+    id: 'rad_add_can_qty_vie',
+    text: '3a. Quantites (en joints) par jour de consommation en moyenne de cannabis DURANT LES PERIODES DE CONSOMMATION MAXIMALE AU COURS DE LA VIE',
+    type: 'number',
+    required: false,
+    min: 0,
+    display_if: { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] }
+  },
+  // Frequency during max consumption periods - lifetime
+  {
+    id: 'rad_add_can_freq_vie',
+    text: '3b. Frequence des consommations DURANT LES PERIODES DE CONSOMMATION MAXIMALE AU COURS DE LA VIE',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: '1_to_7', label: '1 a 7 fois par semaine' },
+      { code: 'less_than_once', label: 'Moins d\'une fois par semaine' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] }
+  },
+  // Specify times per week (1-7) for lifetime frequency
+  {
+    id: 'rad_add_can_freq_vie_spec',
+    text: '3b1. Precisez le nombre de fois par semaine',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1' },
+      { code: 2, label: '2' },
+      { code: 3, label: '3' },
+      { code: 4, label: '4' },
+      { code: 5, label: '5' },
+      { code: 6, label: '6' },
+      { code: 7, label: '7' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_can_freq_vie' }, '1_to_7'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_can_qty_12m',
+    text: '3c. Quantite (en joints) par jour de consommation en moyenne de cannabis AU COURS DES 12 DERNIERS MOIS',
+    type: 'number',
+    required: false,
+    min: 0,
+    display_if: { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] }
+  },
+  // Frequency - 12 months
+  {
+    id: 'rad_add_can_freq_12m',
+    text: '3d. Frequence des consommations AU COURS DES 12 DERNIERS MOIS',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: '1_to_7', label: '1 a 7 fois par semaine' },
+      { code: 'less_than_once', label: 'Moins d\'une fois par semaine' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] }
+  },
+  // Specify times per week (1-7) for 12 months frequency
+  {
+    id: 'rad_add_can_freq_12m_spec',
+    text: '3d1. Precisez le nombre de fois par semaine',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 1, label: '1' },
+      { code: 2, label: '2' },
+      { code: 3, label: '3' },
+      { code: 4, label: '4' },
+      { code: 5, label: '5' },
+      { code: 6, label: '6' },
+      { code: 7, label: '7' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_can_freq_12m' }, '1_to_7'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  // Quantity (joints/day) - 12 months
+
+
+  // ==================== CANNABIS - DSM5 SCREENING ====================
+  {
+    id: 'rad_add_can_dsm5_screen',
+    text: '3e. Le patient a-t-il présenté un symptôme de trouble lié à l\'usage de cannabis au cours de sa vie ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] }
+  },
+
+  // ==================== CANNABIS - DSM5 CRITERIA ====================
+  // Note: If rad_add_can_dsm5_screen = 'Non', all criteria should be auto-populated with 'Non'
+  // Criterion a
+  {
+    id: 'rad_add_can_dsm5_a',
+    text: '3f. A deja pris le produit en quantite superieures a celles prevues',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] }
+      ]
+    }
+  },
+  {
+    id: 'rad_add_can_dsm5_a_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] },
+        { '==': [{ 'var': 'rad_add_can_dsm5_a' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  // Criterion b
+  {
+    id: 'rad_add_can_dsm5_b',
+    text: '3g. A deja essaye de diminuer ou d\'arreter',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] }
+      ]
+    }
+  },
+  {
+    id: 'rad_add_can_dsm5_b_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] },
+        { '==': [{ 'var': 'rad_add_can_dsm5_b' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  // Criterion c
+  {
+    id: 'rad_add_can_dsm5_c',
+    text: '3h. Passe du temps a chercher, consommer ou se remettre des effets',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] }
+      ]
+    }
+  },
+  {
+    id: 'rad_add_can_dsm5_c_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] },
+        { '==': [{ 'var': 'rad_add_can_dsm5_c' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  // Criterion d
+  {
+    id: 'rad_add_can_dsm5_d',
+    text: '3i. Cravings ou besoins imperieux de consommer',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] }
+      ]
+    }
+  },
+  {
+    id: 'rad_add_can_dsm5_d_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] },
+        { '==': [{ 'var': 'rad_add_can_dsm5_d' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  // Criterion e
+  {
+    id: 'rad_add_can_dsm5_e',
+    text: '3j. Incapacité à remplir les obligations majeures au travail, à la maison ou à l\'école à cause de la consommation',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] }
+      ]
+    }
+  },
+  {
+    id: 'rad_add_can_dsm5_e_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] },
+        { '==': [{ 'var': 'rad_add_can_dsm5_e' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  // Criterion f
+  {
+    id: 'rad_add_can_dsm5_f',
+    text: '3l. Persistance de la consommation en depit de consequences interpersonnelles (disputes, etc.)',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] }
+      ]
+    }
+  },
+  {
+    id: 'rad_add_can_dsm5_f_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] },
+        { '==': [{ 'var': 'rad_add_can_dsm5_f' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  // Criterion g
+  {
+    id: 'rad_add_can_dsm5_g',
+    text: '3k. Abandon d\'activités sociales, professionnelles ou de loisir',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] }
+      ]
+    }
+  },
+  {
+    id: 'rad_add_can_dsm5_g_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] },
+        { '==': [{ 'var': 'rad_add_can_dsm5_g' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  // Criterion h
+  {
+    id: 'rad_add_can_dsm5_h',
+    text: '3l. Utilisation répétée quand cela peut être dangereux (conduite automobile?)',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] }
+      ]
+    }
+  },
+  {
+    id: 'rad_add_can_dsm5_h_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] },
+        { '==': [{ 'var': 'rad_add_can_dsm5_h' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  // Criterion i
+  {
+    id: 'rad_add_can_dsm5_i',
+    text: '3m. Poursuite de l\'utilisation en dépit de problèmes psychologiques ou physiques causés par elle',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] }
+      ]
+    }
+  },
+  {
+    id: 'rad_add_can_dsm5_i_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] },
+        { '==': [{ 'var': 'rad_add_can_dsm5_i' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  // Criterion j
+  {
+    id: 'rad_add_can_dsm5_j',
+    text: '3n. Tolerance (augmentation des quantités ou diminution des effets à quantité égale)',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] }
+      ]
+    }
+  },
+  {
+    id: 'rad_add_can_dsm5_j_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] },
+        { '==': [{ 'var': 'rad_add_can_dsm5_j' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  // Criterion k
+  {
+    id: 'rad_add_can_dsm5_k',
+    text: '3o. Symptômes de sevrage ou prise d\'un produit ou traitement pour éviter les symptômes de sevrage',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] }
+      ]
+    }
+  },
+  {
+    id: 'rad_add_can_dsm5_k_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] },
+        { '==': [{ 'var': 'rad_add_can_dsm5_k' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  // Criterion l
+  {
+    id: 'rad_add_can_dsm5_l',
+    text: '3p. Problèmes légaux liés à la consommation ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] }
+      ]
+    }
+  },
+  {
+    id: 'rad_add_can_dsm5_l_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] },
+        { '!=': [{ 'var': 'rad_add_can_dsm5_screen' }, 'Non'] },
+        { '==': [{ 'var': 'rad_add_can_dsm5_l' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // ==================== OTHER ADDICTIONS SCREENING ====================
   // Q4: Other drugs screening
   {
     id: 'rad_add_drogues',

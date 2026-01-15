@@ -3153,6 +3153,9 @@ export function QuestionnaireRenderer({
       {questionGroups.map((group, groupIndex) => {
         const isSectionExpanded = !group.section || expandedSections.has(group.section.id);
         const visibleGroupQuestions = group.questions.filter(q => visibleQuestions.includes(q.id));
+        
+        // Check if the section itself is visible (respects display_if on section)
+        const isSectionVisible = !group.section || visibleQuestions.includes(group.section.id);
 
         if (visibleGroupQuestions.length === 0 && group.section) {
           return null;
@@ -3160,7 +3163,7 @@ export function QuestionnaireRenderer({
 
         return (
           <div key={group.section?.id || `group-${groupIndex}`}>
-            {group.section && renderSection(
+            {group.section && isSectionVisible && renderSection(
               group.section, 
               questionnaire.questions, 
               group.section.is_subsection 

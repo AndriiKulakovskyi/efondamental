@@ -1384,13 +1384,15 @@ export async function saveEvalAddictologiqueSzResponse(
   const {
     section_screening,
     section_tabac,
+    section_cannabis,
+    section_other_addictions,
     section_alcohol_consumption,
     section_dsm5_criteria,
     ...responseData
   } = response as any;
 
   // ========================================================================
-  // DSM5 SEVERITY SCORING
+  // ALCOHOL DSM5 SEVERITY SCORING
   // ========================================================================
   // Count positive criteria (value === 'Oui') for lifetime and 12-month
   // Severity levels:
@@ -1399,32 +1401,32 @@ export async function saveEvalAddictologiqueSzResponse(
   //   - 4-5 positive criteria: moderate (moyenne)
   //   - 6+ positive criteria: severe (severe)
 
-  // DSM5 criteria fields for lifetime (a-l)
-  const lifetimeCriteriaFields = [
+  // DSM5 criteria fields for alcohol lifetime (a-l)
+  const alcoholLifetimeCriteriaFields = [
     'rad_add_alc8a1', 'rad_add_alc8b1', 'rad_add_alc8c1', 'rad_add_alc8d1',
     'rad_add_alc8e1', 'rad_add_alc8f1', 'rad_add_alc8g1', 'rad_add_alc8h1',
     'rad_add_alc8i1', 'rad_add_alc8j1', 'rad_add_alc8k1', 'rad_add_alc8l1'
   ];
 
-  // DSM5 criteria fields for 12 months (a-l)
-  const monthCriteriaFields = [
+  // DSM5 criteria fields for alcohol 12 months (a-l)
+  const alcoholMonthCriteriaFields = [
     'rad_add_alc8a2', 'rad_add_alc8b2', 'rad_add_alc8c2', 'rad_add_alc8d2',
     'rad_add_alc8e2', 'rad_add_alc8f2', 'rad_add_alc8g2', 'rad_add_alc8h2',
     'rad_add_alc8i2', 'rad_add_alc8j2', 'rad_add_alc8k2', 'rad_add_alc8l2'
   ];
 
-  // Count positive criteria for lifetime
+  // Count positive criteria for alcohol lifetime
   let dsm5_lifetime_count: number | null = null;
   let dsm5_lifetime_severity: string | null = null;
-  
+
   // Only calculate if patient has alcohol consumption (rad_add_alc1 === 'Oui')
   if (responseData.rad_add_alc1 === 'Oui') {
-    const lifetimePositive = lifetimeCriteriaFields.filter(
+    const lifetimePositive = alcoholLifetimeCriteriaFields.filter(
       field => (responseData as any)[field] === 'Oui'
     ).length;
-    
+
     dsm5_lifetime_count = lifetimePositive;
-    
+
     if (lifetimePositive <= 1) {
       dsm5_lifetime_severity = 'none';
     } else if (lifetimePositive <= 3) {
@@ -1436,17 +1438,17 @@ export async function saveEvalAddictologiqueSzResponse(
     }
   }
 
-  // Count positive criteria for 12 months
+  // Count positive criteria for alcohol 12 months
   let dsm5_12month_count: number | null = null;
   let dsm5_12month_severity: string | null = null;
-  
+
   if (responseData.rad_add_alc1 === 'Oui') {
-    const monthPositive = monthCriteriaFields.filter(
+    const monthPositive = alcoholMonthCriteriaFields.filter(
       field => (responseData as any)[field] === 'Oui'
     ).length;
-    
+
     dsm5_12month_count = monthPositive;
-    
+
     if (monthPositive <= 1) {
       dsm5_12month_severity = 'none';
     } else if (monthPositive <= 3) {
@@ -1458,6 +1460,69 @@ export async function saveEvalAddictologiqueSzResponse(
     }
   }
 
+  // ========================================================================
+  // CANNABIS DSM5 SEVERITY SCORING
+  // ========================================================================
+
+  // DSM5 criteria fields for cannabis lifetime (a-l)
+  const cannabisLifetimeCriteriaFields = [
+    'rad_add_can_dsm5_a', 'rad_add_can_dsm5_b', 'rad_add_can_dsm5_c', 'rad_add_can_dsm5_d',
+    'rad_add_can_dsm5_e', 'rad_add_can_dsm5_f', 'rad_add_can_dsm5_g', 'rad_add_can_dsm5_h',
+    'rad_add_can_dsm5_i', 'rad_add_can_dsm5_j', 'rad_add_can_dsm5_k', 'rad_add_can_dsm5_l'
+  ];
+
+  // DSM5 criteria fields for cannabis 12 months (a-l)
+  const cannabisMonthCriteriaFields = [
+    'rad_add_can_dsm5_a_12m', 'rad_add_can_dsm5_b_12m', 'rad_add_can_dsm5_c_12m', 'rad_add_can_dsm5_d_12m',
+    'rad_add_can_dsm5_e_12m', 'rad_add_can_dsm5_f_12m', 'rad_add_can_dsm5_g_12m', 'rad_add_can_dsm5_h_12m',
+    'rad_add_can_dsm5_i_12m', 'rad_add_can_dsm5_j_12m', 'rad_add_can_dsm5_k_12m', 'rad_add_can_dsm5_l_12m'
+  ];
+
+  // Count positive criteria for cannabis lifetime
+  let dsm5_cannabis_lifetime_count: number | null = null;
+  let dsm5_cannabis_lifetime_severity: string | null = null;
+
+  // Only calculate if patient has cannabis consumption (rad_add_cannabis === 'Oui')
+  if (responseData.rad_add_cannabis === 'Oui') {
+    const lifetimePositive = cannabisLifetimeCriteriaFields.filter(
+      field => (responseData as any)[field] === 'Oui'
+    ).length;
+
+    dsm5_cannabis_lifetime_count = lifetimePositive;
+
+    if (lifetimePositive <= 1) {
+      dsm5_cannabis_lifetime_severity = 'none';
+    } else if (lifetimePositive <= 3) {
+      dsm5_cannabis_lifetime_severity = 'mild';
+    } else if (lifetimePositive <= 5) {
+      dsm5_cannabis_lifetime_severity = 'moderate';
+    } else {
+      dsm5_cannabis_lifetime_severity = 'severe';
+    }
+  }
+
+  // Count positive criteria for cannabis 12 months
+  let dsm5_cannabis_12month_count: number | null = null;
+  let dsm5_cannabis_12month_severity: string | null = null;
+
+  if (responseData.rad_add_cannabis === 'Oui') {
+    const monthPositive = cannabisMonthCriteriaFields.filter(
+      field => (responseData as any)[field] === 'Oui'
+    ).length;
+
+    dsm5_cannabis_12month_count = monthPositive;
+
+    if (monthPositive <= 1) {
+      dsm5_cannabis_12month_severity = 'none';
+    } else if (monthPositive <= 3) {
+      dsm5_cannabis_12month_severity = 'mild';
+    } else if (monthPositive <= 5) {
+      dsm5_cannabis_12month_severity = 'moderate';
+    } else {
+      dsm5_cannabis_12month_severity = 'severe';
+    }
+  }
+
   const { data, error } = await supabase
     .from('responses_eval_addictologique_sz')
     .upsert({
@@ -1466,6 +1531,10 @@ export async function saveEvalAddictologiqueSzResponse(
       dsm5_lifetime_severity,
       dsm5_12month_count,
       dsm5_12month_severity,
+      dsm5_cannabis_lifetime_count,
+      dsm5_cannabis_lifetime_severity,
+      dsm5_cannabis_12month_count,
+      dsm5_cannabis_12month_severity,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

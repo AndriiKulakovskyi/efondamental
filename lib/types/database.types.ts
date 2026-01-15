@@ -5280,6 +5280,68 @@ export interface EvalAddictologiqueSzResponse {
   tab_traitements_utilises?: string[] | null;
 
   // ========================================================================
+  // CANNABIS SECTION (conditional on rad_add_cannabis)
+  // ========================================================================
+
+  // Abstinent primaire (if rad_add_cannabis = Non)
+  rad_add_cannabis_abstinent?: 'Oui' | 'Non' | null;
+
+  // Quantity (joints/day) during max consumption periods - lifetime
+  rad_add_can_qty_vie?: number | null;
+
+  // Frequency during max consumption periods - lifetime
+  rad_add_can_freq_vie?: '1_to_7' | 'less_than_once' | null;
+
+  // Specify times per week (1-7) for lifetime frequency
+  rad_add_can_freq_vie_spec?: number | null;
+
+  // Frequency - 12 months
+  rad_add_can_freq_12m?: '1_to_7' | 'less_than_once' | null;
+
+  // Specify times per week (1-7) for 12 months frequency
+  rad_add_can_freq_12m_spec?: number | null;
+
+  // Quantity (joints/day) - 12 months
+  rad_add_can_qty_12m?: number | null;
+
+  // DSM5 screening question
+  rad_add_can_dsm5_screen?: 'Oui' | 'Non' | null;
+
+  // DSM5 Criteria - Lifetime (a-l)
+  rad_add_can_dsm5_a?: 'Oui' | 'Non' | null;
+  rad_add_can_dsm5_b?: 'Oui' | 'Non' | null;
+  rad_add_can_dsm5_c?: 'Oui' | 'Non' | null;
+  rad_add_can_dsm5_d?: 'Oui' | 'Non' | null;
+  rad_add_can_dsm5_e?: 'Oui' | 'Non' | null;
+  rad_add_can_dsm5_f?: 'Oui' | 'Non' | null;
+  rad_add_can_dsm5_g?: 'Oui' | 'Non' | null;
+  rad_add_can_dsm5_h?: 'Oui' | 'Non' | null;
+  rad_add_can_dsm5_i?: 'Oui' | 'Non' | null;
+  rad_add_can_dsm5_j?: 'Oui' | 'Non' | null;
+  rad_add_can_dsm5_k?: 'Oui' | 'Non' | null;
+  rad_add_can_dsm5_l?: 'Oui' | 'Non' | null;
+
+  // DSM5 Criteria - 12 months follow-ups (a-l)
+  rad_add_can_dsm5_a_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_can_dsm5_b_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_can_dsm5_c_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_can_dsm5_d_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_can_dsm5_e_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_can_dsm5_f_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_can_dsm5_g_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_can_dsm5_h_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_can_dsm5_i_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_can_dsm5_j_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_can_dsm5_k_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_can_dsm5_l_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // DSM5 Cannabis severity scores (computed)
+  dsm5_cannabis_lifetime_count?: number | null;
+  dsm5_cannabis_12month_count?: number | null;
+  dsm5_cannabis_lifetime_severity?: 'none' | 'mild' | 'moderate' | 'severe' | null;
+  dsm5_cannabis_12month_severity?: 'none' | 'mild' | 'moderate' | 'severe' | null;
+
+  // ========================================================================
   // Metadata
   // ========================================================================
   completed_by?: string | null;
