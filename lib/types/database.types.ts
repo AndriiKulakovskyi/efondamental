@@ -5249,6 +5249,37 @@ export interface EvalAddictologiqueSzResponse {
   add_alc14c?: number | null;
 
   // ========================================================================
+  // TOBACCO SECTION (conditional on rad_add_tab = Fumeur actuel or Ex-fumeur)
+  // ========================================================================
+
+  // 1. Number of pack-years
+  tab_paquets_annees?: number | null;
+
+  // 2. Age of daily tobacco consumption start (years) - dropdown with options
+  tab_age_debut_quotidien?: string | null;
+
+  // 3. Cigarettes per day (average over last year)
+  tab_cigarettes_jour?: number | null;
+
+  // 4. Age of first cigarette (years)
+  tab_age_premiere_cigarette?: number | null;
+
+  // 5. Maximum abstinence duration (months)
+  tab_abstinence_max_mois?: number | null;
+
+  // 6. First-degree family history of tobacco use disorder
+  tab_antecedents_familiaux?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // 7. Craving score (0-10)
+  tab_craving_score?: string | null;
+
+  // 8. Lifetime medication treatment for tobacco use disorder
+  tab_traitement_vie?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // 8a. Treatments used (multi-select array)
+  tab_traitements_utilises?: string[] | null;
+
+  // ========================================================================
   // Metadata
   // ========================================================================
   completed_by?: string | null;

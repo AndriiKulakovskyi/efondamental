@@ -4827,6 +4827,169 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     ]
   },
 
+  // ==================== TOBACCO SECTION ====================
+  // Conditional on rad_add_tab = 'Fumeur actuel' OR 'Ex-fumeur'
+  {
+    id: 'section_tabac',
+    text: 'Tabac',
+    type: 'section',
+    required: false,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 1. Number of pack-years
+  {
+    id: 'tab_paquets_annees',
+    text: '1. Nombre de paquets-annees',
+    type: 'number',
+    required: false,
+    min: 0,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 2. Age of daily tobacco consumption start
+  {
+    id: 'tab_age_debut_quotidien',
+    text: '2. Age de debut de la consommation quotidienne de tabac (en annees)',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Ne sais pas', label: 'Ne sais pas' },
+      { code: '<5', label: '<5' },
+      ...Array.from({ length: 85 }, (_, i) => ({ code: String(i + 5), label: String(i + 5) })),
+      { code: '>89', label: '>89' }
+    ],
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 3. Cigarettes per day (average over last year)
+  {
+    id: 'tab_cigarettes_jour',
+    text: '3. Quantite de cigarettes fumees par jour en moyenne au cours de l\'annee ecoulee',
+    type: 'number',
+    required: false,
+    min: 0,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 4. Age of first cigarette
+  {
+    id: 'tab_age_premiere_cigarette',
+    text: '4. Age de la premiere cigarette (en annees)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 120,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 5. Maximum abstinence duration (months)
+  {
+    id: 'tab_abstinence_max_mois',
+    text: '5. Duree maximale d\'abstinence sur la vie (en mois)',
+    type: 'number',
+    required: false,
+    min: 0,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 6. First-degree family history of tobacco use disorder
+  {
+    id: 'tab_antecedents_familiaux',
+    text: '6. Antecedents de premier degre de trouble lie a l\'usage de tabac',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 7. Craving score (0-10)
+  {
+    id: 'tab_craving_score',
+    text: '7. Score de Craving (de 0 a 10): A combien evaluez-vous votre envie maximale de consommer du tabac sur la derniere semaine ?',
+    type: 'single_choice',
+    required: false,
+    options: CRAVING_OPTIONS,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 8. Lifetime medication treatment
+  {
+    id: 'tab_traitement_vie',
+    text: '8. Notion de traitement medicamenteux pour le trouble lie a l\'usage du tabac au cours de la vie ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 8a. Treatments used (conditional on tab_traitement_vie = 'Oui')
+  {
+    id: 'tab_traitements_utilises',
+    text: '8a. Quel(s) traitement(s) avez-vous utilise ?',
+    type: 'multiple_choice',
+    required: false,
+    options: [
+      { code: 'patchs_nicotine', label: 'Patchs de nicotine' },
+      { code: 'gommes_nicotine', label: 'Gommes de nicotine' },
+      { code: 'pastilles_nicotine', label: 'Pastilles de nicotine' },
+      { code: 'inhaleur_nicotine', label: 'Inhaleur de nicotine' },
+      { code: 'spray_nicotine', label: 'Spray de nicotine' },
+      { code: 'champix', label: 'Champix (Varenicline)' },
+      { code: 'zyban', label: 'Zyban (Bupropion)' },
+      { code: 'cigarette_electronique', label: 'Cigarette electronique' },
+      { code: 'autre', label: 'Autre' }
+    ],
+    display_if: {
+      'and': [
+        {
+          'or': [
+            { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+            { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+          ]
+        },
+        { '==': [{ 'var': 'tab_traitement_vie' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
   // ==================== ALCOHOL - CONSUMPTION SECTION ====================
   {
     id: 'section_alcohol_consumption',
