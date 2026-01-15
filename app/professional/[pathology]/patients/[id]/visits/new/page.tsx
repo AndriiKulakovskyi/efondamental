@@ -49,7 +49,13 @@ export default function NewVisitPage() {
         const response = await fetch(`/api/visit-templates?pathology=${pathology}`);
         if (response.ok) {
           const data = await response.json();
-          setVisitTemplates(data.templates);
+          // Sort templates to put screening first
+          const sortedTemplates = [...(data.templates || [])].sort((a, b) => {
+            if (a.visit_type === 'screening') return -1;
+            if (b.visit_type === 'screening') return 1;
+            return 0;
+          });
+          setVisitTemplates(sortedTemplates);
         }
       } catch (err) {
         console.error("Failed to load data", err);
