@@ -5121,6 +5121,16 @@ export interface EvalAddictologiqueSzResponse {
   rad_add_alc6c?: number | null;
 
   // ========================================================================
+  // ALCOHOL SECTION - Heavy Drinking Frequency (>6 drinks per occasion)
+  // ========================================================================
+
+  // 7b. Heavy drinking frequency during max consumption periods lifetime
+  rad_add_alc7b?: '1_to_7' | 'less_than_once' | null;
+
+  // 7c. Specify times per week (shows if 7b = '1_to_7')
+  rad_add_alc7c?: number | null;
+
+  // ========================================================================
   // ALCOHOL SECTION - DSM5 Screening
   // ========================================================================
 

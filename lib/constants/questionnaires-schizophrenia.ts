@@ -4827,10 +4827,10 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     ]
   },
 
-  // ==================== ALCOHOL - LIFETIME CONSUMPTION SECTION ====================
+  // ==================== ALCOHOL - CONSUMPTION SECTION ====================
   {
-    id: 'section_alcohol_lifetime',
-    text: 'Alcool - Consommation vie entiere',
+    id: 'section_alcohol_consumption',
+    text: 'Alcool - Consommation',
     type: 'section',
     required: false,
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
@@ -4838,7 +4838,7 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
   // 5a. Quantity during max lifetime consumption
   {
     id: 'add_alc5a',
-    text: 'Quantite en verres (unite standard = 10g) par jour de consommation, en moyenne durant les periodes de consommation maximales au cours de la vie',
+    text: '1a. Quantite en verres (unite standard = 10g) par jour de consommation, en moyenne durant les periodes de consommation maximales au cours de la vie',
     type: 'text',
     required: false,
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
@@ -4846,7 +4846,7 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
   // 5b. Frequency during max lifetime consumption
   {
     id: 'rad_add_alc5b',
-    text: 'Frequence des consommations durant les periodes de consommation maximale au cours de la vie',
+    text: '1b. Frequence des consommations durant les periodes de consommation maximale au cours de la vie',
     type: 'single_choice',
     required: false,
     options: FREQUENCY_OPTIONS,
@@ -4855,7 +4855,7 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
   // 5c. Specify times per week (shows if 5b = '1_to_7')
   {
     id: 'rad_add_alc5c',
-    text: 'Precisez le nombre de fois par semaine',
+    text: '1c. Precisez le nombre de fois par semaine',
     type: 'single_choice',
     required: false,
     options: FREQUENCY_DETAIL_OPTIONS,
@@ -4867,19 +4867,10 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     },
     indentLevel: 1
   },
-
-  // ==================== ALCOHOL - 12 MONTH CONSUMPTION SECTION ====================
-  {
-    id: 'section_alcohol_12months',
-    text: 'Alcool - Consommation 12 derniers mois',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
   // 6a. Quantity during last 12 months
   {
     id: 'add_alc6a',
-    text: 'Quantite (en verres, unite standard = 10g) par jour de consommation, en moyenne, au cours des 12 derniers mois',
+    text: '2a. Quantite (en verres, unite standard = 10g) par jour de consommation, en moyenne, au cours des 12 derniers mois',
     type: 'text',
     required: false,
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
@@ -4887,7 +4878,7 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
   // 6b. Frequency during last 12 months
   {
     id: 'rad_add_alc6b',
-    text: 'Frequence des consommations au cours des 12 derniers mois',
+    text: '2b. Frequence des consommations au cours des 12 derniers mois',
     type: 'single_choice',
     required: false,
     options: FREQUENCY_OPTIONS,
@@ -4896,7 +4887,7 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
   // 6c. Specify times per week (shows if 6b = '1_to_7')
   {
     id: 'rad_add_alc6c',
-    text: 'Precisez le nombre de fois par semaine',
+    text: '2c. Precisez le nombre de fois par semaine',
     type: 'single_choice',
     required: false,
     options: FREQUENCY_DETAIL_OPTIONS,
@@ -4908,19 +4899,36 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     },
     indentLevel: 1
   },
-
-  // ==================== ALCOHOL - DSM5 SCREENING ====================
+  // 7b. Heavy drinking frequency (>6 drinks per occasion) during max consumption
   {
-    id: 'section_dsm5_screening',
-    text: 'Criteres DSM5 - Depistage',
-    type: 'section',
+    id: 'rad_add_alc7b',
+    text: '3a. Frequence des consommations importantes (quantite d\'alcool superieure a 6 verres (unite standard = 10g) ingeres au cours d\'une meme occasion) DURANT LES PERIODES DE CONSOMMATION MAXIMALE AU COURS DE LA VIE',
+    type: 'single_choice',
     required: false,
+    options: FREQUENCY_OPTIONS,
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
   },
-  // 8a. Has patient shown any symptom lifetime?
+  // 7c. Specify times per week (shows if 7b = '1_to_7')
+  {
+    id: 'rad_add_alc7c',
+    text: '3b. Precisez le nombre de fois par semaine',
+    type: 'single_choice',
+    required: false,
+    options: FREQUENCY_DETAIL_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc7b' }, '1_to_7'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // ==================== ALCOHOL - DSM5 CRITERIA ====================
+  // 8a. DSM5 Screening - Has patient shown any symptom lifetime?
   {
     id: 'rad_add_alc8a',
-    text: 'Le patient a-t-il presente un symptome de trouble lie a l\'usage d\'alcool au cours de sa vie?',
+    text: '4. Le patient a-t-il presente un symptome de trouble lie a l\'usage d\'alcool au cours de sa vie?',
     type: 'single_choice',
     required: false,
     options: [
@@ -4930,22 +4938,16 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
   },
 
-  // ==================== ALCOHOL - DSM5 CRITERIA ====================
-  {
-    id: 'section_dsm5_criteria',
-    text: 'Criteres (DSM5) de trouble lie a l\'usage de substance (abus, dependance) durant les periodes de consommation maximales au cours de la vie',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-
   // Criterion a: Taken in larger amounts
   {
     id: 'rad_add_alc8a1',
-    text: 'a. A deja pris le produit en quantite superieures a celles prevues',
+    text: '4a. A deja pris le produit en quantite superieures à celles prévues',
     type: 'single_choice',
     required: false,
-    options: DSM5_CRITERIA_OPTIONS,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
   },
   {
@@ -4954,17 +4956,25 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8a1' }, 'Oui'] }
+      ]
+    },
     indentLevel: 1
   },
 
   // Criterion b: Tried to cut down or stop
   {
     id: 'rad_add_alc8b1',
-    text: 'b. A deja essaye de diminuer ou d\'arreter',
+    text: '4b. A deja essaye de diminuer ou d\'arrêter',
     type: 'single_choice',
     required: false,
-    options: DSM5_CRITERIA_OPTIONS,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
   },
   {
@@ -4973,17 +4983,25 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8b1' }, 'Oui'] }
+      ]
+    },
     indentLevel: 1
   },
 
   // Criterion c: Time spent obtaining, using, recovering
   {
     id: 'rad_add_alc8c1',
-    text: 'c. Passe du temps a chercher, consommer ou se remettre des effets',
+    text: '4c. Passe du temps a chercher, consommer ou se remettre des effets',
     type: 'single_choice',
     required: false,
-    options: DSM5_CRITERIA_OPTIONS,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
   },
   {
@@ -4992,17 +5010,25 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8c1' }, 'Oui'] }
+      ]
+    },
     indentLevel: 1
   },
 
   // Criterion d: Cravings or urges
   {
     id: 'rad_add_alc8d1',
-    text: 'd. Cravings ou besoins imperieux de consommer',
+    text: '4d. Cravings ou besoin impérieux de consommer',
     type: 'single_choice',
     required: false,
-    options: DSM5_CRITERIA_OPTIONS,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
   },
   {
@@ -5011,17 +5037,25 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8d1' }, 'Oui'] }
+      ]
+    },
     indentLevel: 1
   },
 
   // Criterion e: Failure to fulfill obligations
   {
     id: 'rad_add_alc8e1',
-    text: 'e. Incapacite a remplir les obligations majeures au travail, a la maison ou a l\'ecole a cause de la consommation',
+    text: '4e. Incapacité à remplir les obligations majeures au travail, à la maison ou à l\'école à cause de la consommation',
     type: 'single_choice',
     required: false,
-    options: DSM5_CRITERIA_OPTIONS,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
   },
   {
@@ -5030,17 +5064,25 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8e1' }, 'Oui'] }
+      ]
+    },
     indentLevel: 1
   },
 
   // Criterion f: Continued use despite social problems
   {
     id: 'rad_add_alc8f1',
-    text: 'f. Persistance de la consommation en depit de consequences interpersonnelles (disputes, etc.)',
+    text: '4f. Persistance de la consommation en dépit de conséquences interpersonnelles (disputes, etc.)',
     type: 'single_choice',
     required: false,
-    options: DSM5_CRITERIA_OPTIONS,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
   },
   {
@@ -5049,17 +5091,25 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8f1' }, 'Oui'] }
+      ]
+    },
     indentLevel: 1
   },
 
   // Criterion g: Activities given up or reduced
   {
     id: 'rad_add_alc8g1',
-    text: 'g. Abandon d\'activites sociales, professionnelles ou de loisir',
+    text: '4g. Abandon d\'activités sociales, professionnelles ou de loisir',
     type: 'single_choice',
     required: false,
-    options: DSM5_CRITERIA_OPTIONS,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
   },
   {
@@ -5068,17 +5118,25 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8g1' }, 'Oui'] }
+      ]
+    },
     indentLevel: 1
   },
 
   // Criterion h: Recurrent use in hazardous situations
   {
     id: 'rad_add_alc8h1',
-    text: 'h. Utilisation repetee quand cela peut etre dangereux (conduite automobile?)',
+    text: '4h. Utilisation répétée quand cela peut être dangereux (conduite automobile?)',
     type: 'single_choice',
     required: false,
-    options: DSM5_CRITERIA_OPTIONS,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
   },
   {
@@ -5087,17 +5145,25 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8h1' }, 'Oui'] }
+      ]
+    },
     indentLevel: 1
   },
 
   // Criterion i: Continued use despite problems
   {
     id: 'rad_add_alc8i1',
-    text: 'i. Poursuite de l\'utilisation en depit de problemes psychologiques ou physiques causees par elle',
+    text: '4i. Poursuite de l\'utilisation en dépit de problèmes psychologiques ou physiques causés par elle',
     type: 'single_choice',
     required: false,
-    options: DSM5_CRITERIA_OPTIONS,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
   },
   {
@@ -5106,17 +5172,25 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8i1' }, 'Oui'] }
+      ]
+    },
     indentLevel: 1
   },
 
   // Criterion j: Tolerance
   {
     id: 'rad_add_alc8j1',
-    text: 'j. Tolerance (augmentation des quantites ou diminution des effets a quantite egale)',
+    text: '4j. Tolerance (augmentation des quantités ou diminution des effets à quantité égale)',
     type: 'single_choice',
     required: false,
-    options: DSM5_CRITERIA_OPTIONS,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
   },
   {
@@ -5125,17 +5199,25 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8j1' }, 'Oui'] }
+      ]
+    },
     indentLevel: 1
   },
 
   // Criterion k: Withdrawal
   {
     id: 'rad_add_alc8k1',
-    text: 'k. Symptomes de sevrage ou prise d\'un produit ou traitement pour eviter les symptomes de sevrage',
+    text: '4k. Symptomes de sevrage ou prise d\'un produit ou traitement pour éviter les symptomes de sevrage',
     type: 'single_choice',
     required: false,
-    options: DSM5_CRITERIA_OPTIONS,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
   },
   {
@@ -5144,17 +5226,25 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8k1' }, 'Oui'] }
+      ]
+    },
     indentLevel: 1
   },
 
-  // Criterion l: Legal problems (not in DSM-5 but included)
+  // Criterion l: Legal problems
   {
     id: 'rad_add_alc8l1',
-    text: 'l. Problemes legaux lies a la consommation ?',
+    text: '4l. Problemes légaux liés à la consommation ?',
     type: 'single_choice',
     required: false,
-    options: DSM5_CRITERIA_OPTIONS,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
   },
   {
@@ -5163,160 +5253,10 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-    indentLevel: 1
-  },
-
-  // ==================== ALCOHOL - HISTORY ====================
-  {
-    id: 'section_history',
-    text: 'Historique',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 10a. Age of first consumption
-  {
-    id: 'add_alc_10a',
-    text: 'Age de la premiere consommation d\'alcool (en annees)',
-    type: 'number',
-    required: false,
-    min: 0,
-    max: 120,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 10b. Age of disorder onset
-  {
-    id: 'add_alc_10b',
-    text: 'Age de debut des troubles lies a l\'usage d\'alcool (abus ou dependance) (en annees)',
-    type: 'number',
-    required: false,
-    min: 0,
-    max: 120,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 10c. Maximum abstinence duration
-  {
-    id: 'add_alc_10c',
-    text: 'Duree maximale d\'abstinence (en mois)',
-    type: 'number',
-    required: false,
-    min: 0,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-
-  // ==================== ALCOHOL - FAMILY HISTORY ====================
-  {
-    id: 'section_family_history',
-    text: 'Antecedents familiaux',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 11. Family history of alcohol use disorder
-  {
-    id: 'rad_add_alc11',
-    text: 'Antecedents de premier degre de trouble lie a l\'usage d\'alcool (abus ou dependance)',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-
-  // ==================== ALCOHOL - CRAVING ====================
-  {
-    id: 'section_craving',
-    text: 'Craving',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 12. Craving score
-  {
-    id: 'rad_add_alc12',
-    text: 'Score de Craving (de 0 a 10): A combien evaluez vous votre envie maximale de consommer de l\'alcool sur la derniere semaine ?',
-    type: 'single_choice',
-    required: false,
-    options: CRAVING_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-
-  // ==================== ALCOHOL - TREATMENT ====================
-  {
-    id: 'section_treatment',
-    text: 'Traitement',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 13. Lifetime medication treatment
-  {
-    id: 'rad_add_alc13',
-    text: 'Notion de traitement medicamenteux pour le trouble lie a l\'usage d\'alcool au cours de la vie ?',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 13b. Which medication (shows if 13 = 'Oui')
-  {
-    id: 'add_alc13b',
-    text: 'Lequel ?',
-    type: 'text',
-    required: false,
     display_if: {
       'and': [
         { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc13' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
-  },
-
-  // ==================== ALCOHOL - HOSPITALIZATION ====================
-  {
-    id: 'section_hospitalization',
-    text: 'Hospitalisations',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 14a. Lifetime hospitalization for withdrawal
-  {
-    id: 'rad_add_alc14a',
-    text: 'Notion d\'hospitalisation pour sevrage a l\'alcool au cours de la vie.',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 14b. Number of hospitalizations (shows if 14a = 'Oui')
-  {
-    id: 'add_alc14b',
-    text: 'Nombre d\'hospitalisations pour sevrage',
-    type: 'number',
-    required: false,
-    min: 0,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc14a' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
-  },
-  // 14c. Age of first hospitalization (shows if 14a = 'Oui')
-  {
-    id: 'add_alc14c',
-    text: 'Age de la premiere hospitalisation pour sevrage (en annees)',
-    type: 'number',
-    required: false,
-    min: 0,
-    max: 120,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc14a' }, 'Oui'] }
+        { '==': [{ 'var': 'rad_add_alc8l1' }, 'Oui'] }
       ]
     },
     indentLevel: 1
