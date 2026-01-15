@@ -132,7 +132,8 @@ import {
   TROUBLES_PSYCHOTIQUES_DEFINITION,
   SUICIDE_HISTORY_SZ_DEFINITION,
   ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
-  SZ_PERINATALITE_DEFINITION
+  SZ_PERINATALITE_DEFINITION,
+  TEA_COFFEE_SZ_DEFINITION
 } from "@/lib/constants/questionnaires-schizophrenia";
 import { TROUBLES_COMORBIDES_SZ_DEFINITION } from "@/lib/constants/questionnaires-schizophrenia-comorbid";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
@@ -522,6 +523,19 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['ANTECEDENTS_FAMILIAUX_PSY_SZ']?.completed || false,
                   completedAt: questionnaireStatuses['ANTECEDENTS_FAMILIAUX_PSY_SZ']?.completed_at,
+                }
+              ]
+            },
+            {
+              id: 'addictologie',
+              name: 'Addictologie',
+              questionnaires: [
+                {
+                  ...TEA_COFFEE_SZ_DEFINITION,
+                  id: TEA_COFFEE_SZ_DEFINITION.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['TEA_COFFEE_SZ']?.completed || false,
+                  completedAt: questionnaireStatuses['TEA_COFFEE_SZ']?.completed_at,
                 }
               ]
             }

@@ -37,6 +37,8 @@ import {
   AntecedentsFamiliauxPsySzResponseInsert,
   PerinataliteSzResponse,
   PerinataliteSzResponseInsert,
+  TeaCoffeeSzResponse,
+  TeaCoffeeSzResponseInsert,
 } from '../types/database.types';
 
 // ============================================================================
@@ -1297,6 +1299,51 @@ export async function savePerinataliteSzResponse(
   const { data, error } = await supabase
     .from('responses_perinatalite_sz')
     .upsert(response, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// TEA AND COFFEE CONSUMPTION - Schizophrenia Addictologie
+// ============================================================================
+// Assessment of tea and coffee consumption patterns for schizophrenia patients
+
+export async function getTeaCoffeeSzResponse(
+  visitId: string
+): Promise<TeaCoffeeSzResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('responses_tea_coffee')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return data || null;
+}
+
+export async function saveTeaCoffeeSzResponse(
+  response: TeaCoffeeSzResponseInsert
+): Promise<TeaCoffeeSzResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    section_tea,
+    section_coffee,
+    ...responseData
+  } = response as any;
+
+  const { data, error } = await supabase
+    .from('responses_tea_coffee')
+    .upsert({
+      ...responseData,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
     .select()
     .single();
 

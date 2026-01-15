@@ -5019,6 +5019,45 @@ export interface PerinataliteSzResponse {
 export type PerinataliteSzResponseInsert = Omit<PerinataliteSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
+// TEA AND COFFEE CONSUMPTION - Schizophrenia Addictologie
+// ============================================================================
+// Assessment of tea and coffee consumption patterns for schizophrenia patients
+
+export interface TeaCoffeeSzResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+
+  // TEA Section - Lifetime maximum consumption periods
+  tea_5a?: number | null;  // Cups per day during max lifetime consumption
+  tea_5b?: '1_to_7' | 'less_than_once' | null;  // Frequency during max lifetime
+  tea_5b1?: number | null;  // Specific frequency (1-7) if tea_5b = '1_to_7'
+
+  // TEA Section - Last 12 months
+  tea_6a?: number | null;  // Cups per day during last 12 months
+  tea_6b?: '1_to_7' | 'less_than_once' | null;  // Frequency during last 12 months
+  tea_6b1?: number | null;  // Specific frequency (1-7) if tea_6b = '1_to_7'
+
+  // COFFEE Section - Lifetime maximum consumption periods
+  coffee_5a?: number | null;  // Cups per day during max lifetime consumption
+  coffee_5b?: '1_to_7' | 'less_than_once' | null;  // Frequency during max lifetime
+  coffee_5b1?: number | null;  // Specific frequency (1-7) if coffee_5b = '1_to_7'
+
+  // COFFEE Section - Last 12 months
+  coffee_6a?: number | null;  // Cups per day during last 12 months
+  coffee_6b?: '1_to_7' | 'less_than_once' | null;  // Frequency during last 12 months
+  coffee_6b1?: number | null;  // Specific frequency (1-7) if coffee_6b = '1_to_7'
+
+  // Metadata
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type TeaCoffeeSzResponseInsert = Omit<TeaCoffeeSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
 // PANSS (Positive and Negative Syndrome Scale) - Schizophrenia Hetero-questionnaire
 // ============================================================================
 

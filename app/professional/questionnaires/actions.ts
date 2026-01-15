@@ -126,7 +126,8 @@ import {
   saveTroublesComorbidesSzResponse,
   saveSuicideHistorySzResponse,
   saveAntecedentsFamiliauxPsySzResponse,
-  savePerinataliteSzResponse
+  savePerinataliteSzResponse,
+  saveTeaCoffeeSzResponse
 } from '@/lib/services/questionnaire-schizophrenia.service';
 import { 
   getVisitCompletionStatus,
@@ -245,7 +246,8 @@ import {
   TroublesComorbidesSzResponseInsert,
   SuicideHistorySzResponseInsert,
   AntecedentsFamiliauxPsySzResponseInsert,
-  PerinataliteSzResponseInsert
+  PerinataliteSzResponseInsert,
+  TeaCoffeeSzResponseInsert
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 import { requireUserContext } from '@/lib/rbac/middleware';
@@ -452,6 +454,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         } as PerinataliteSzResponseInsert);
+        break;
+
+      case 'TEA_COFFEE_SZ':
+        result = await saveTeaCoffeeSzResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        } as TeaCoffeeSzResponseInsert);
         break;
 
       // Initial Evaluation - ETAT

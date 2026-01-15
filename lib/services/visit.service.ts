@@ -204,7 +204,10 @@ import {
   SAS_DEFINITION,
   PSP_DEFINITION,
   TROUBLES_PSYCHOTIQUES_DEFINITION,
-  SUICIDE_HISTORY_SZ_DEFINITION
+  SUICIDE_HISTORY_SZ_DEFINITION,
+  TEA_COFFEE_SZ_DEFINITION,
+  ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
+  SZ_PERINATALITE_DEFINITION
 } from '../constants/questionnaires-schizophrenia';
 import { TROUBLES_COMORBIDES_SZ_DEFINITION } from '../constants/questionnaires-schizophrenia-comorbid';
 import {
@@ -635,12 +638,27 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               id: 'suicide',
               name: 'Suicide',
               questionnaires: [ISA_DEFINITION, SUICIDE_HISTORY_SZ_DEFINITION]
+            },
+            {
+              id: 'antecedents_familiaux',
+              name: 'Antecedents familiaux',
+              questionnaires: [ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION]
+            },
+            {
+              id: 'histoire_somatique',
+              name: 'Histoire somatique',
+              questionnaires: [SZ_PERINATALITE_DEFINITION]
+            },
+            {
+              id: 'addictologie',
+              name: 'Addictologie',
+              questionnaires: [TEA_COFFEE_SZ_DEFINITION]
             }
           ]
         }
       ];
     }
-    
+
     // Default (bipolar and others) initial evaluation
     return [
       {
