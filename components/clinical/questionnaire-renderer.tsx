@@ -3157,9 +3157,62 @@ export function QuestionnaireRenderer({
         // Check if the section itself is visible (respects display_if on section)
         const isSectionVisible = !group.section || visibleQuestions.includes(group.section.id);
 
+        // Split questions into section-owned (have display_if) and independent (no display_if)
+        // Section-owned questions respect section collapse; independent questions always render
+        const sectionOwnedQuestions = group.section?.display_if 
+          ? visibleGroupQuestions.filter(q => q.display_if !== undefined)
+          : visibleGroupQuestions;
+        
+        const independentQuestions = group.section?.display_if
+          ? visibleGroupQuestions.filter(q => q.display_if === undefined)
+          : [];
+
         if (visibleGroupQuestions.length === 0 && group.section) {
           return null;
         }
+
+        // Helper function to render a list of questions
+        const renderQuestionList = (questions: Question[]) => {
+          const rendered = new Set<string>();
+          return questions.map((question, qIndex) => {
+            // Skip if already rendered as part of a grouped pair
+            if (rendered.has(question.id)) {
+              return null;
+            }
+
+            const isUnitField = question.id.endsWith('_unit');
+            const isInlineField = question.inline === true;
+
+            // Skip unit/inline fields - they're rendered with their base field
+            if (isUnitField || isInlineField) {
+              return null;
+            }
+
+            // Check if next question is an inline/unit field for this question
+            const nextQuestion = qIndex < questions.length - 1 ? questions[qIndex + 1] : null;
+            const isNextQuestionUnit = nextQuestion?.id === `${question.id}_unit`;
+            const isNextQuestionInline = nextQuestion?.inline === true;
+
+            // If next question is the unit/inline field, render them together
+            if ((isNextQuestionUnit || isNextQuestionInline) && nextQuestion) {
+              rendered.add(question.id);
+              rendered.add(nextQuestion.id);
+              return (
+                <div key={`grouped-${question.id}`} className="grid grid-cols-3 gap-4 items-end">
+                  <div className="col-span-2">
+                    {renderQuestion(question, true)}
+                  </div>
+                  <div>
+                    {renderQuestion(nextQuestion, true)}
+                  </div>
+                </div>
+              );
+            }
+
+            rendered.add(question.id);
+            return renderQuestion(question, true);
+          });
+        };
 
         return (
           <div key={group.section?.id || `group-${groupIndex}`}>
@@ -3171,49 +3224,17 @@ export function QuestionnaireRenderer({
                 : questionnaire.questions.filter(q => q.type === 'section' && !q.is_subsection).findIndex(q => q.id === group.section?.id) + 1
             )}
 
-            {isSectionExpanded && visibleGroupQuestions.length > 0 && (
+            {/* Section-owned questions - respect section collapse */}
+            {isSectionExpanded && isSectionVisible && sectionOwnedQuestions.length > 0 && (
               <div className="p-6 pt-2 border-t border-slate-100 space-y-8">
-                {(() => {
-                  const rendered = new Set<string>();
-                  return visibleGroupQuestions.map((question, qIndex) => {
-                    // Skip if already rendered as part of a grouped pair
-                    if (rendered.has(question.id)) {
-                      return null;
-                    }
+                {renderQuestionList(sectionOwnedQuestions)}
+              </div>
+            )}
 
-                    const isUnitField = question.id.endsWith('_unit');
-                    const isInlineField = question.inline === true;
-
-                    // Skip unit/inline fields - they're rendered with their base field
-                    if (isUnitField || isInlineField) {
-                      return null;
-                    }
-
-                    // Check if next question is an inline/unit field for this question
-                    const nextQuestion = qIndex < visibleGroupQuestions.length - 1 ? visibleGroupQuestions[qIndex + 1] : null;
-                    const isNextQuestionUnit = nextQuestion?.id === `${question.id}_unit`;
-                    const isNextQuestionInline = nextQuestion?.inline === true;
-
-                    // If next question is the unit/inline field, render them together
-                    if ((isNextQuestionUnit || isNextQuestionInline) && nextQuestion) {
-                      rendered.add(question.id);
-                      rendered.add(nextQuestion.id);
-                      return (
-                        <div key={`grouped-${question.id}`} className="grid grid-cols-3 gap-4 items-end">
-                          <div className="col-span-2">
-                            {renderQuestion(question, true)}
-                          </div>
-                          <div>
-                            {renderQuestion(nextQuestion, true)}
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    rendered.add(question.id);
-                    return renderQuestion(question, true);
-                  });
-                })()}
+            {/* Independent questions - always render if visible (not affected by section collapse) */}
+            {independentQuestions.length > 0 && (
+              <div className={`p-6 pt-2 space-y-8 ${sectionOwnedQuestions.length > 0 && isSectionExpanded && isSectionVisible ? '' : 'border-t border-slate-100'}`}>
+                {renderQuestionList(independentQuestions)}
               </div>
             )}
           </div>
