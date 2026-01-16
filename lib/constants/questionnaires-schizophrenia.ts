@@ -6127,6 +6127,525 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     indentLevel: 1
   },
 
+  // ==================== AUTRES SUBSTANCES - CONSUMPTION & DSM5 ====================
+  // Conditional on rad_add_autres_substances_abus = 'Oui'
+
+  // Quantity lifetime
+  {
+    id: 'rad_add_autres_qty_vie',
+    text: '4f. Quantite (en unite standard) par jour de consommation, en moyenne (nommer la substance), DURANT LES PERIODES DE CONSOMMATION MAXIMALE AU COURS DE LA VIE',
+    type: 'number',
+    required: false,
+    min: 0,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Frequency lifetime
+  {
+    id: 'rad_add_autres_freq_vie',
+    text: '4g. Frequence des consommations DURANT LES PERIODES DE CONSOMMATION MAXIMALE AU COURS DE LA VIE',
+    type: 'single_choice',
+    required: false,
+    options: FREQUENCY_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_freq_vie_spec',
+    text: 'Precisez le nombre de fois par semaine',
+    type: 'single_choice',
+    required: false,
+    options: FREQUENCY_DETAIL_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_freq_vie' }, '1_to_7'] }
+      ]
+    },
+    indentLevel: 2
+  },
+
+  // Quantity 12 months
+  {
+    id: 'rad_add_autres_qty_12m',
+    text: '4h. Quantite (en unite standard) consommee par jour de consommation, en moyenne (nommer la substance) AU COURS DES 12 DERNIERS MOIS',
+    type: 'number',
+    required: false,
+    min: 0,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Frequency 12 months
+  {
+    id: 'rad_add_autres_freq_12m',
+    text: '4i. Frequence des consommations AU COURS DES 12 DERNIERS MOIS',
+    type: 'single_choice',
+    required: false,
+    options: FREQUENCY_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_freq_12m_spec',
+    text: 'Precisez le nombre de fois par semaine',
+    type: 'single_choice',
+    required: false,
+    options: FREQUENCY_DETAIL_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_freq_12m' }, '1_to_7'] }
+      ]
+    },
+    indentLevel: 2
+  },
+
+  // DSM5 Screening
+  {
+    id: 'rad_add_autres_dsm5_screen',
+    text: '4j. Le patient a-t-il presente un symptome de trouble lie a l\'usage (nommer la substance) au cours de sa vie ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // DSM5 Criterion a: Taken in larger amounts
+  {
+    id: 'rad_add_autres_dsm5_a',
+    text: '4k. A deja pris le produit en quantite superieures a celles prevues',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_dsm5_a_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_dsm5_a' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 2
+  },
+
+  // DSM5 Criterion b: Tried to cut down or stop
+  {
+    id: 'rad_add_autres_dsm5_b',
+    text: '4l. A deja essaye de diminuer ou d\'arreter',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_dsm5_b_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_dsm5_b' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 2
+  },
+
+  // DSM5 Criterion c: Time spent obtaining, using, recovering
+  {
+    id: 'rad_add_autres_dsm5_c',
+    text: '4m. Passe du temps a chercher, consommer ou se remettre des effets',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_dsm5_c_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_dsm5_c' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 2
+  },
+
+  // DSM5 Criterion d: Cravings or urges
+  {
+    id: 'rad_add_autres_dsm5_d',
+    text: '4n. Cravings ou besoins imperieux de consommer',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_dsm5_d_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_dsm5_d' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 2
+  },
+
+  // DSM5 Criterion e: Failure to fulfill obligations
+  {
+    id: 'rad_add_autres_dsm5_e',
+    text: '4o. Incapacite a remplir les obligations majeures au travail, a la maison ou a l\'ecole a cause de la consommation',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_dsm5_e_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_dsm5_e' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 2
+  },
+
+  // DSM5 Criterion f: Continued use despite social problems
+  {
+    id: 'rad_add_autres_dsm5_f',
+    text: '4p. Persistance de la consommation en depit de consequences interpersonnelles (disputes, etc.)',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_dsm5_f_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_dsm5_f' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 2
+  },
+
+  // DSM5 Criterion g: Activities given up or reduced
+  {
+    id: 'rad_add_autres_dsm5_g',
+    text: '4q. Abandon d\'activites sociales, professionnelles ou de loisir',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_dsm5_g_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_dsm5_g' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 2
+  },
+
+  // DSM5 Criterion h: Recurrent use in hazardous situations
+  {
+    id: 'rad_add_autres_dsm5_h',
+    text: '4r. Utilisation repetee quand cela peut etre dangereux (conduite automobile?)',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_dsm5_h_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_dsm5_h' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 2
+  },
+
+  // DSM5 Criterion i: Continued use despite problems
+  {
+    id: 'rad_add_autres_dsm5_i',
+    text: '4s. Poursuite de l\'utilisation en depit de problemes psychologiques ou physiques causees par elle',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_dsm5_i_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_dsm5_i' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 2
+  },
+
+  // DSM5 Criterion j: Tolerance
+  {
+    id: 'rad_add_autres_dsm5_j',
+    text: '4t. Tolerance (augmentation des quantites ou diminution des effets a quantite egale)',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_dsm5_j_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_dsm5_j' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 2
+  },
+
+  // DSM5 Criterion k: Withdrawal
+  {
+    id: 'rad_add_autres_dsm5_k',
+    text: '4u. Symptomes de sevrage ou prise d\'un produit ou traitement pour eviter les symptomes de sevrage',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_dsm5_k_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_dsm5_k' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 2
+  },
+
+  // DSM5 Criterion l: Legal problems
+  {
+    id: 'rad_add_autres_dsm5_l',
+    text: '4v. Problemes legaux lies a la consommation ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_dsm5_l_12m',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances_abus' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_dsm5_l' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 2
+  },
+
   // ==================== JEUX D'ARGENT SECTION ====================
   {
     id: 'section_jeux',

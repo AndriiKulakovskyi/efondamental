@@ -5367,6 +5367,57 @@ export interface EvalAddictologiqueSzResponse {
   rad_add_autres_substances_abus?: 'Oui' | 'Non' | null;
 
   // ========================================================================
+  // AUTRES SUBSTANCES - CONSUMPTION AND DSM5 (conditional on abus = Oui)
+  // ========================================================================
+
+  // Consumption - Lifetime
+  rad_add_autres_qty_vie?: number | null;
+  rad_add_autres_freq_vie?: '1_to_7' | 'less_than_once' | null;
+  rad_add_autres_freq_vie_spec?: number | null;
+
+  // Consumption - 12 months
+  rad_add_autres_qty_12m?: number | null;
+  rad_add_autres_freq_12m?: '1_to_7' | 'less_than_once' | null;
+  rad_add_autres_freq_12m_spec?: number | null;
+
+  // DSM5 screening question
+  rad_add_autres_dsm5_screen?: 'Oui' | 'Non' | null;
+
+  // DSM5 Criteria - Lifetime (a-l)
+  rad_add_autres_dsm5_a?: 'Oui' | 'Non' | null;
+  rad_add_autres_dsm5_b?: 'Oui' | 'Non' | null;
+  rad_add_autres_dsm5_c?: 'Oui' | 'Non' | null;
+  rad_add_autres_dsm5_d?: 'Oui' | 'Non' | null;
+  rad_add_autres_dsm5_e?: 'Oui' | 'Non' | null;
+  rad_add_autres_dsm5_f?: 'Oui' | 'Non' | null;
+  rad_add_autres_dsm5_g?: 'Oui' | 'Non' | null;
+  rad_add_autres_dsm5_h?: 'Oui' | 'Non' | null;
+  rad_add_autres_dsm5_i?: 'Oui' | 'Non' | null;
+  rad_add_autres_dsm5_j?: 'Oui' | 'Non' | null;
+  rad_add_autres_dsm5_k?: 'Oui' | 'Non' | null;
+  rad_add_autres_dsm5_l?: 'Oui' | 'Non' | null;
+
+  // DSM5 Criteria - 12 months follow-ups (a-l)
+  rad_add_autres_dsm5_a_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_autres_dsm5_b_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_autres_dsm5_c_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_autres_dsm5_d_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_autres_dsm5_e_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_autres_dsm5_f_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_autres_dsm5_g_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_autres_dsm5_h_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_autres_dsm5_i_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_autres_dsm5_j_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_autres_dsm5_k_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+  rad_add_autres_dsm5_l_12m?: 'Oui' | 'Non' | 'Ne sais pas' | null;
+
+  // DSM5 Autres substances severity scores (computed)
+  dsm5_autres_lifetime_count?: number | null;
+  dsm5_autres_12month_count?: number | null;
+  dsm5_autres_lifetime_severity?: 'none' | 'mild' | 'moderate' | 'severe' | null;
+  dsm5_autres_12month_severity?: 'none' | 'mild' | 'moderate' | 'severe' | null;
+
+  // ========================================================================
   // Metadata
   // ========================================================================
   completed_by?: string | null;

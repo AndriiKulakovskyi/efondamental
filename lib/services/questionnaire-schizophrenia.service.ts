@@ -1527,6 +1527,69 @@ export async function saveEvalAddictologiqueSzResponse(
     }
   }
 
+  // ========================================================================
+  // AUTRES SUBSTANCES DSM5 SEVERITY SCORING
+  // ========================================================================
+
+  // DSM5 criteria fields for autres substances lifetime (a-l)
+  const autresLifetimeCriteriaFields = [
+    'rad_add_autres_dsm5_a', 'rad_add_autres_dsm5_b', 'rad_add_autres_dsm5_c', 'rad_add_autres_dsm5_d',
+    'rad_add_autres_dsm5_e', 'rad_add_autres_dsm5_f', 'rad_add_autres_dsm5_g', 'rad_add_autres_dsm5_h',
+    'rad_add_autres_dsm5_i', 'rad_add_autres_dsm5_j', 'rad_add_autres_dsm5_k', 'rad_add_autres_dsm5_l'
+  ];
+
+  // DSM5 criteria fields for autres substances 12 months (a-l)
+  const autresMonthCriteriaFields = [
+    'rad_add_autres_dsm5_a_12m', 'rad_add_autres_dsm5_b_12m', 'rad_add_autres_dsm5_c_12m', 'rad_add_autres_dsm5_d_12m',
+    'rad_add_autres_dsm5_e_12m', 'rad_add_autres_dsm5_f_12m', 'rad_add_autres_dsm5_g_12m', 'rad_add_autres_dsm5_h_12m',
+    'rad_add_autres_dsm5_i_12m', 'rad_add_autres_dsm5_j_12m', 'rad_add_autres_dsm5_k_12m', 'rad_add_autres_dsm5_l_12m'
+  ];
+
+  // Count positive criteria for autres substances lifetime
+  let dsm5_autres_lifetime_count: number | null = null;
+  let dsm5_autres_lifetime_severity: string | null = null;
+
+  // Only calculate if patient has other substances with abuse potential
+  if (responseData.rad_add_autres_substances_abus === 'Oui') {
+    const lifetimePositive = autresLifetimeCriteriaFields.filter(
+      field => (responseData as any)[field] === 'Oui'
+    ).length;
+
+    dsm5_autres_lifetime_count = lifetimePositive;
+
+    if (lifetimePositive <= 1) {
+      dsm5_autres_lifetime_severity = 'none';
+    } else if (lifetimePositive <= 3) {
+      dsm5_autres_lifetime_severity = 'mild';
+    } else if (lifetimePositive <= 5) {
+      dsm5_autres_lifetime_severity = 'moderate';
+    } else {
+      dsm5_autres_lifetime_severity = 'severe';
+    }
+  }
+
+  // Count positive criteria for autres substances 12 months
+  let dsm5_autres_12month_count: number | null = null;
+  let dsm5_autres_12month_severity: string | null = null;
+
+  if (responseData.rad_add_autres_substances_abus === 'Oui') {
+    const monthPositive = autresMonthCriteriaFields.filter(
+      field => (responseData as any)[field] === 'Oui'
+    ).length;
+
+    dsm5_autres_12month_count = monthPositive;
+
+    if (monthPositive <= 1) {
+      dsm5_autres_12month_severity = 'none';
+    } else if (monthPositive <= 3) {
+      dsm5_autres_12month_severity = 'mild';
+    } else if (monthPositive <= 5) {
+      dsm5_autres_12month_severity = 'moderate';
+    } else {
+      dsm5_autres_12month_severity = 'severe';
+    }
+  }
+
   const { data, error } = await supabase
     .from('responses_eval_addictologique_sz')
     .upsert({
@@ -1539,6 +1602,10 @@ export async function saveEvalAddictologiqueSzResponse(
       dsm5_cannabis_lifetime_severity,
       dsm5_cannabis_12month_count,
       dsm5_cannabis_12month_severity,
+      dsm5_autres_lifetime_count,
+      dsm5_autres_lifetime_severity,
+      dsm5_autres_12month_count,
+      dsm5_autres_12month_severity,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
