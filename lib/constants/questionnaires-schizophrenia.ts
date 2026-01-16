@@ -4738,10 +4738,10 @@ const CRAVING_OPTIONS: QuestionOption[] = [
 ];
 
 export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
-  // ==================== SCREENING SECTION ====================
+  // ==================== ALCOOL SECTION ====================
   {
-    id: 'section_screening',
-    text: 'Evaluation addictologique',
+    id: 'section_alcool',
+    text: '1. Alcool',
     type: 'section',
     required: false
   },
@@ -4769,6 +4769,450 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Non'] },
     indentLevel: 1
   },
+
+  // ==================== ALCOHOL - CONSUMPTION SECTION ====================
+  {
+    id: 'section_alcohol_consumption',
+    text: 'Alcool - Consommation',
+    type: 'section',
+    required: false,
+    is_subsection: true,
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  // 5a. Quantity during max lifetime consumption
+  {
+    id: 'add_alc5a',
+    text: '1a. Quantite en verres (unite standard = 10g) par jour de consommation, en moyenne durant les periodes de consommation maximales au cours de la vie',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  // 5b. Frequency during max lifetime consumption
+  {
+    id: 'rad_add_alc5b',
+    text: '1b. Frequence des consommations durant les periodes de consommation maximale au cours de la vie',
+    type: 'single_choice',
+    required: false,
+    options: FREQUENCY_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  // 5c. Specify times per week (shows if 5b = '1_to_7')
+  {
+    id: 'rad_add_alc5c',
+    text: '1c. Precisez le nombre de fois par semaine',
+    type: 'single_choice',
+    required: false,
+    options: FREQUENCY_DETAIL_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc5b' }, '1_to_7'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  // 6a. Quantity during last 12 months
+  {
+    id: 'add_alc6a',
+    text: '2a. Quantite (en verres, unite standard = 10g) par jour de consommation, en moyenne, au cours des 12 derniers mois',
+    type: 'text',
+    required: false,
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  // 6b. Frequency during last 12 months
+  {
+    id: 'rad_add_alc6b',
+    text: '2b. Frequence des consommations au cours des 12 derniers mois',
+    type: 'single_choice',
+    required: false,
+    options: FREQUENCY_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  // 6c. Specify times per week (shows if 6b = '1_to_7')
+  {
+    id: 'rad_add_alc6c',
+    text: '2c. Precisez le nombre de fois par semaine',
+    type: 'single_choice',
+    required: false,
+    options: FREQUENCY_DETAIL_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc6b' }, '1_to_7'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  // 7b. Heavy drinking frequency (>6 drinks per occasion) during max consumption
+  {
+    id: 'rad_add_alc7b',
+    text: '3a. Frequence des consommations importantes (quantite d\'alcool superieure a 6 verres (unite standard = 10g) ingeres au cours d\'une meme occasion) DURANT LES PERIODES DE CONSOMMATION MAXIMALE AU COURS DE LA VIE',
+    type: 'single_choice',
+    required: false,
+    options: FREQUENCY_OPTIONS,
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  // 7c. Specify times per week (shows if 7b = '1_to_7')
+  {
+    id: 'rad_add_alc7c',
+    text: '3b. Precisez le nombre de fois par semaine',
+    type: 'single_choice',
+    required: false,
+    options: FREQUENCY_DETAIL_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc7b' }, '1_to_7'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // ==================== ALCOHOL - DSM5 CRITERIA ====================
+  // 8a. DSM5 Screening - Has patient shown any symptom lifetime?
+  {
+    id: 'rad_add_alc8a',
+    text: '4. Le patient a-t-il presente un symptome de trouble lie a l\'usage d\'alcool au cours de sa vie?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+
+  // Criterion a: Taken in larger amounts
+  {
+    id: 'rad_add_alc8a1',
+    text: '4a. A deja pris le produit en quantite superieures à celles prévues',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_alc8a2',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8a1' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Criterion b: Tried to cut down or stop
+  {
+    id: 'rad_add_alc8b1',
+    text: '4b. A deja essaye de diminuer ou d\'arrêter',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_alc8b2',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8b1' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Criterion c: Time spent obtaining, using, recovering
+  {
+    id: 'rad_add_alc8c1',
+    text: '4c. Passe du temps a chercher, consommer ou se remettre des effets',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_alc8c2',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8c1' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Criterion d: Cravings or urges
+  {
+    id: 'rad_add_alc8d1',
+    text: '4d. Cravings ou besoin impérieux de consommer',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_alc8d2',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8d1' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Criterion e: Failure to fulfill obligations
+  {
+    id: 'rad_add_alc8e1',
+    text: '4e. Incapacité à remplir les obligations majeures au travail, à la maison ou à l\'école à cause de la consommation',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_alc8e2',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8e1' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Criterion f: Continued use despite social problems
+  {
+    id: 'rad_add_alc8f1',
+    text: '4f. Persistance de la consommation en dépit de conséquences interpersonnelles (disputes, etc.)',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_alc8f2',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8f1' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Criterion g: Activities given up or reduced
+  {
+    id: 'rad_add_alc8g1',
+    text: '4g. Abandon d\'activités sociales, professionnelles ou de loisir',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_alc8g2',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8g1' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Criterion h: Recurrent use in hazardous situations
+  {
+    id: 'rad_add_alc8h1',
+    text: '4h. Utilisation répétée quand cela peut être dangereux (conduite automobile?)',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_alc8h2',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8h1' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Criterion i: Continued use despite problems
+  {
+    id: 'rad_add_alc8i1',
+    text: '4i. Poursuite de l\'utilisation en dépit de problèmes psychologiques ou physiques causés par elle',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_alc8i2',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8i1' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Criterion j: Tolerance
+  {
+    id: 'rad_add_alc8j1',
+    text: '4j. Tolerance (augmentation des quantités ou diminution des effets à quantité égale)',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_alc8j2',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8j1' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Criterion k: Withdrawal
+  {
+    id: 'rad_add_alc8k1',
+    text: '4k. Symptomes de sevrage ou prise d\'un produit ou traitement pour éviter les symptomes de sevrage',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_alc8k2',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8k1' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Criterion l: Legal problems
+  {
+    id: 'rad_add_alc8l1',
+    text: '4l. Problemes légaux liés à la consommation ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_alc8l2',
+    text: 'Au cours des 12 derniers mois ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_alc8l1' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // ==================== TABAC SECTION ====================
+  {
+    id: 'section_tabac_main',
+    text: '2. Tabac',
+    type: 'section',
+    required: false
+  },
   // Q2: Tobacco status
   {
     id: 'rad_add_tab',
@@ -4781,6 +5225,178 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
       { code: 'Ex-fumeur', label: 'Ex-fumeur' },
       { code: 'Statut inconnu', label: 'Statut inconnu' }
     ]
+  },
+
+  // ==================== TOBACCO SUBSECTION ====================
+  // Conditional on rad_add_tab = 'Fumeur actuel' OR 'Ex-fumeur'
+  {
+    id: 'section_tabac',
+    text: 'Tabac - Details',
+    type: 'section',
+    required: false,
+    is_subsection: true,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 1. Number of pack-years
+  {
+    id: 'tab_paquets_annees',
+    text: '1. Nombre de paquets-annees',
+    type: 'number',
+    required: false,
+    min: 0,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 2. Age of daily tobacco consumption start
+  {
+    id: 'tab_age_debut_quotidien',
+    text: '2. Age de debut de la consommation quotidienne de tabac (en annees)',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Ne sais pas', label: 'Ne sais pas' },
+      { code: '<5', label: '<5' },
+      ...Array.from({ length: 85 }, (_, i) => ({ code: String(i + 5), label: String(i + 5) })),
+      { code: '>89', label: '>89' }
+    ],
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 3. Cigarettes per day (average over last year)
+  {
+    id: 'tab_cigarettes_jour',
+    text: '3. Quantite de cigarettes fumees par jour en moyenne au cours de l\'annee ecoulee',
+    type: 'number',
+    required: false,
+    min: 0,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 4. Age of first cigarette
+  {
+    id: 'tab_age_premiere_cigarette',
+    text: '4. Age de la premiere cigarette (en annees)',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 120,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 5. Maximum abstinence duration (months)
+  {
+    id: 'tab_abstinence_max_mois',
+    text: '5. Duree maximale d\'abstinence sur la vie (en mois)',
+    type: 'number',
+    required: false,
+    min: 0,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 6. First-degree family history of tobacco use disorder
+  {
+    id: 'tab_antecedents_familiaux',
+    text: '6. Antecedents de premier degre de trouble lie a l\'usage de tabac',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 7. Craving score (0-10)
+  {
+    id: 'tab_craving_score',
+    text: '7. Score de Craving (de 0 a 10): A combien evaluez-vous votre envie maximale de consommer du tabac sur la derniere semaine ?',
+    type: 'single_choice',
+    required: false,
+    options: CRAVING_OPTIONS,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 8. Lifetime medication treatment
+  {
+    id: 'tab_traitement_vie',
+    text: '8. Notion de traitement medicamenteux pour le trouble lie a l\'usage du tabac au cours de la vie ?',
+    type: 'single_choice',
+    required: false,
+    options: DSM5_CRITERIA_OPTIONS,
+    display_if: {
+      'or': [
+        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+      ]
+    }
+  },
+  // 8a. Treatments used (conditional on tab_traitement_vie = 'Oui')
+  {
+    id: 'tab_traitements_utilises',
+    text: '8a. Quel(s) traitement(s) avez-vous utilise ?',
+    type: 'multiple_choice',
+    required: false,
+    options: [
+      { code: 'patchs_nicotine', label: 'Patchs de nicotine' },
+      { code: 'gommes_nicotine', label: 'Gommes de nicotine' },
+      { code: 'pastilles_nicotine', label: 'Pastilles de nicotine' },
+      { code: 'inhaleur_nicotine', label: 'Inhaleur de nicotine' },
+      { code: 'spray_nicotine', label: 'Spray de nicotine' },
+      { code: 'champix', label: 'Champix (Varenicline)' },
+      { code: 'zyban', label: 'Zyban (Bupropion)' },
+      { code: 'cigarette_electronique', label: 'Cigarette electronique' },
+      { code: 'autre', label: 'Autre' }
+    ],
+    display_if: {
+      'and': [
+        {
+          'or': [
+            { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
+            { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
+          ]
+        },
+        { '==': [{ 'var': 'tab_traitement_vie' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // ==================== CANNABIS SECTION ====================
+  {
+    id: 'section_cannabis_main',
+    text: '3. Cannabis',
+    type: 'section',
+    required: false
   },
   // Q3: Cannabis screening
   {
@@ -4814,6 +5430,7 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     text: 'Cannabis - Consommation',
     type: 'section',
     required: false,
+    is_subsection: true,
     display_if: { '==': [{ 'var': 'rad_add_cannabis' }, 'Oui'] }
   },
   // Quantity (joints/day) during max consumption periods - lifetime
@@ -5306,7 +5923,13 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     indentLevel: 1
   },
 
-  // ==================== OTHER ADDICTIONS SCREENING ====================
+  // ==================== AUTRES DROGUES SECTION ====================
+  {
+    id: 'section_autres_drogues',
+    text: '4. Autres drogues',
+    type: 'section',
+    required: false
+  },
   // Q4: Other drugs screening
   {
     id: 'rad_add_drogues',
@@ -5317,6 +5940,14 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
       { code: 'Oui', label: 'Oui' },
       { code: 'Non', label: 'Non' }
     ]
+  },
+
+  // ==================== JEUX D'ARGENT SECTION ====================
+  {
+    id: 'section_jeux',
+    text: '5. Jeux d\'argent',
+    type: 'section',
+    required: false
   },
   // Q20: Gambling - lying
   {
@@ -5339,604 +5970,6 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
       { code: 'Oui', label: 'Oui' },
       { code: 'Non', label: 'Non' }
     ]
-  },
-
-  // ==================== TOBACCO SECTION ====================
-  // Conditional on rad_add_tab = 'Fumeur actuel' OR 'Ex-fumeur'
-  {
-    id: 'section_tabac',
-    text: 'Tabac',
-    type: 'section',
-    required: false,
-    display_if: {
-      'or': [
-        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
-        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
-      ]
-    }
-  },
-  // 1. Number of pack-years
-  {
-    id: 'tab_paquets_annees',
-    text: '1. Nombre de paquets-annees',
-    type: 'number',
-    required: false,
-    min: 0,
-    display_if: {
-      'or': [
-        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
-        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
-      ]
-    }
-  },
-  // 2. Age of daily tobacco consumption start
-  {
-    id: 'tab_age_debut_quotidien',
-    text: '2. Age de debut de la consommation quotidienne de tabac (en annees)',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'Ne sais pas', label: 'Ne sais pas' },
-      { code: '<5', label: '<5' },
-      ...Array.from({ length: 85 }, (_, i) => ({ code: String(i + 5), label: String(i + 5) })),
-      { code: '>89', label: '>89' }
-    ],
-    display_if: {
-      'or': [
-        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
-        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
-      ]
-    }
-  },
-  // 3. Cigarettes per day (average over last year)
-  {
-    id: 'tab_cigarettes_jour',
-    text: '3. Quantite de cigarettes fumees par jour en moyenne au cours de l\'annee ecoulee',
-    type: 'number',
-    required: false,
-    min: 0,
-    display_if: {
-      'or': [
-        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
-        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
-      ]
-    }
-  },
-  // 4. Age of first cigarette
-  {
-    id: 'tab_age_premiere_cigarette',
-    text: '4. Age de la premiere cigarette (en annees)',
-    type: 'number',
-    required: false,
-    min: 0,
-    max: 120,
-    display_if: {
-      'or': [
-        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
-        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
-      ]
-    }
-  },
-  // 5. Maximum abstinence duration (months)
-  {
-    id: 'tab_abstinence_max_mois',
-    text: '5. Duree maximale d\'abstinence sur la vie (en mois)',
-    type: 'number',
-    required: false,
-    min: 0,
-    display_if: {
-      'or': [
-        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
-        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
-      ]
-    }
-  },
-  // 6. First-degree family history of tobacco use disorder
-  {
-    id: 'tab_antecedents_familiaux',
-    text: '6. Antecedents de premier degre de trouble lie a l\'usage de tabac',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: {
-      'or': [
-        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
-        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
-      ]
-    }
-  },
-  // 7. Craving score (0-10)
-  {
-    id: 'tab_craving_score',
-    text: '7. Score de Craving (de 0 a 10): A combien evaluez-vous votre envie maximale de consommer du tabac sur la derniere semaine ?',
-    type: 'single_choice',
-    required: false,
-    options: CRAVING_OPTIONS,
-    display_if: {
-      'or': [
-        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
-        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
-      ]
-    }
-  },
-  // 8. Lifetime medication treatment
-  {
-    id: 'tab_traitement_vie',
-    text: '8. Notion de traitement medicamenteux pour le trouble lie a l\'usage du tabac au cours de la vie ?',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: {
-      'or': [
-        { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
-        { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
-      ]
-    }
-  },
-  // 8a. Treatments used (conditional on tab_traitement_vie = 'Oui')
-  {
-    id: 'tab_traitements_utilises',
-    text: '8a. Quel(s) traitement(s) avez-vous utilise ?',
-    type: 'multiple_choice',
-    required: false,
-    options: [
-      { code: 'patchs_nicotine', label: 'Patchs de nicotine' },
-      { code: 'gommes_nicotine', label: 'Gommes de nicotine' },
-      { code: 'pastilles_nicotine', label: 'Pastilles de nicotine' },
-      { code: 'inhaleur_nicotine', label: 'Inhaleur de nicotine' },
-      { code: 'spray_nicotine', label: 'Spray de nicotine' },
-      { code: 'champix', label: 'Champix (Varenicline)' },
-      { code: 'zyban', label: 'Zyban (Bupropion)' },
-      { code: 'cigarette_electronique', label: 'Cigarette electronique' },
-      { code: 'autre', label: 'Autre' }
-    ],
-    display_if: {
-      'and': [
-        {
-          'or': [
-            { '==': [{ 'var': 'rad_add_tab' }, 'Fumeur actuel'] },
-            { '==': [{ 'var': 'rad_add_tab' }, 'Ex-fumeur'] }
-          ]
-        },
-        { '==': [{ 'var': 'tab_traitement_vie' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
-  },
-
-  // ==================== ALCOHOL - CONSUMPTION SECTION ====================
-  {
-    id: 'section_alcohol_consumption',
-    text: 'Alcool - Consommation',
-    type: 'section',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 5a. Quantity during max lifetime consumption
-  {
-    id: 'add_alc5a',
-    text: '1a. Quantite en verres (unite standard = 10g) par jour de consommation, en moyenne durant les periodes de consommation maximales au cours de la vie',
-    type: 'text',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 5b. Frequency during max lifetime consumption
-  {
-    id: 'rad_add_alc5b',
-    text: '1b. Frequence des consommations durant les periodes de consommation maximale au cours de la vie',
-    type: 'single_choice',
-    required: false,
-    options: FREQUENCY_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 5c. Specify times per week (shows if 5b = '1_to_7')
-  {
-    id: 'rad_add_alc5c',
-    text: '1c. Precisez le nombre de fois par semaine',
-    type: 'single_choice',
-    required: false,
-    options: FREQUENCY_DETAIL_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc5b' }, '1_to_7'] }
-      ]
-    },
-    indentLevel: 1
-  },
-  // 6a. Quantity during last 12 months
-  {
-    id: 'add_alc6a',
-    text: '2a. Quantite (en verres, unite standard = 10g) par jour de consommation, en moyenne, au cours des 12 derniers mois',
-    type: 'text',
-    required: false,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 6b. Frequency during last 12 months
-  {
-    id: 'rad_add_alc6b',
-    text: '2b. Frequence des consommations au cours des 12 derniers mois',
-    type: 'single_choice',
-    required: false,
-    options: FREQUENCY_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 6c. Specify times per week (shows if 6b = '1_to_7')
-  {
-    id: 'rad_add_alc6c',
-    text: '2c. Precisez le nombre de fois par semaine',
-    type: 'single_choice',
-    required: false,
-    options: FREQUENCY_DETAIL_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc6b' }, '1_to_7'] }
-      ]
-    },
-    indentLevel: 1
-  },
-  // 7b. Heavy drinking frequency (>6 drinks per occasion) during max consumption
-  {
-    id: 'rad_add_alc7b',
-    text: '3a. Frequence des consommations importantes (quantite d\'alcool superieure a 6 verres (unite standard = 10g) ingeres au cours d\'une meme occasion) DURANT LES PERIODES DE CONSOMMATION MAXIMALE AU COURS DE LA VIE',
-    type: 'single_choice',
-    required: false,
-    options: FREQUENCY_OPTIONS,
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  // 7c. Specify times per week (shows if 7b = '1_to_7')
-  {
-    id: 'rad_add_alc7c',
-    text: '3b. Precisez le nombre de fois par semaine',
-    type: 'single_choice',
-    required: false,
-    options: FREQUENCY_DETAIL_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc7b' }, '1_to_7'] }
-      ]
-    },
-    indentLevel: 1
-  },
-
-  // ==================== ALCOHOL - DSM5 CRITERIA ====================
-  // 8a. DSM5 Screening - Has patient shown any symptom lifetime?
-  {
-    id: 'rad_add_alc8a',
-    text: '4. Le patient a-t-il presente un symptome de trouble lie a l\'usage d\'alcool au cours de sa vie?',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'Oui', label: 'Oui' },
-      { code: 'Non', label: 'Non' }
-    ],
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-
-  // Criterion a: Taken in larger amounts
-  {
-    id: 'rad_add_alc8a1',
-    text: '4a. A deja pris le produit en quantite superieures à celles prévues',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'Oui', label: 'Oui' },
-      { code: 'Non', label: 'Non' }
-    ],
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  {
-    id: 'rad_add_alc8a2',
-    text: 'Au cours des 12 derniers mois ?',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc8a1' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
-  },
-
-  // Criterion b: Tried to cut down or stop
-  {
-    id: 'rad_add_alc8b1',
-    text: '4b. A deja essaye de diminuer ou d\'arrêter',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'Oui', label: 'Oui' },
-      { code: 'Non', label: 'Non' }
-    ],
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  {
-    id: 'rad_add_alc8b2',
-    text: 'Au cours des 12 derniers mois ?',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc8b1' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
-  },
-
-  // Criterion c: Time spent obtaining, using, recovering
-  {
-    id: 'rad_add_alc8c1',
-    text: '4c. Passe du temps a chercher, consommer ou se remettre des effets',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'Oui', label: 'Oui' },
-      { code: 'Non', label: 'Non' }
-    ],
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  {
-    id: 'rad_add_alc8c2',
-    text: 'Au cours des 12 derniers mois ?',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc8c1' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
-  },
-
-  // Criterion d: Cravings or urges
-  {
-    id: 'rad_add_alc8d1',
-    text: '4d. Cravings ou besoin impérieux de consommer',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'Oui', label: 'Oui' },
-      { code: 'Non', label: 'Non' }
-    ],
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  {
-    id: 'rad_add_alc8d2',
-    text: 'Au cours des 12 derniers mois ?',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc8d1' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
-  },
-
-  // Criterion e: Failure to fulfill obligations
-  {
-    id: 'rad_add_alc8e1',
-    text: '4e. Incapacité à remplir les obligations majeures au travail, à la maison ou à l\'école à cause de la consommation',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'Oui', label: 'Oui' },
-      { code: 'Non', label: 'Non' }
-    ],
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  {
-    id: 'rad_add_alc8e2',
-    text: 'Au cours des 12 derniers mois ?',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc8e1' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
-  },
-
-  // Criterion f: Continued use despite social problems
-  {
-    id: 'rad_add_alc8f1',
-    text: '4f. Persistance de la consommation en dépit de conséquences interpersonnelles (disputes, etc.)',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'Oui', label: 'Oui' },
-      { code: 'Non', label: 'Non' }
-    ],
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  {
-    id: 'rad_add_alc8f2',
-    text: 'Au cours des 12 derniers mois ?',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc8f1' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
-  },
-
-  // Criterion g: Activities given up or reduced
-  {
-    id: 'rad_add_alc8g1',
-    text: '4g. Abandon d\'activités sociales, professionnelles ou de loisir',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'Oui', label: 'Oui' },
-      { code: 'Non', label: 'Non' }
-    ],
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  {
-    id: 'rad_add_alc8g2',
-    text: 'Au cours des 12 derniers mois ?',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc8g1' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
-  },
-
-  // Criterion h: Recurrent use in hazardous situations
-  {
-    id: 'rad_add_alc8h1',
-    text: '4h. Utilisation répétée quand cela peut être dangereux (conduite automobile?)',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'Oui', label: 'Oui' },
-      { code: 'Non', label: 'Non' }
-    ],
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  {
-    id: 'rad_add_alc8h2',
-    text: 'Au cours des 12 derniers mois ?',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc8h1' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
-  },
-
-  // Criterion i: Continued use despite problems
-  {
-    id: 'rad_add_alc8i1',
-    text: '4i. Poursuite de l\'utilisation en dépit de problèmes psychologiques ou physiques causés par elle',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'Oui', label: 'Oui' },
-      { code: 'Non', label: 'Non' }
-    ],
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  {
-    id: 'rad_add_alc8i2',
-    text: 'Au cours des 12 derniers mois ?',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc8i1' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
-  },
-
-  // Criterion j: Tolerance
-  {
-    id: 'rad_add_alc8j1',
-    text: '4j. Tolerance (augmentation des quantités ou diminution des effets à quantité égale)',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'Oui', label: 'Oui' },
-      { code: 'Non', label: 'Non' }
-    ],
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  {
-    id: 'rad_add_alc8j2',
-    text: 'Au cours des 12 derniers mois ?',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc8j1' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
-  },
-
-  // Criterion k: Withdrawal
-  {
-    id: 'rad_add_alc8k1',
-    text: '4k. Symptomes de sevrage ou prise d\'un produit ou traitement pour éviter les symptomes de sevrage',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'Oui', label: 'Oui' },
-      { code: 'Non', label: 'Non' }
-    ],
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  {
-    id: 'rad_add_alc8k2',
-    text: 'Au cours des 12 derniers mois ?',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc8k1' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
-  },
-
-  // Criterion l: Legal problems
-  {
-    id: 'rad_add_alc8l1',
-    text: '4l. Problemes légaux liés à la consommation ?',
-    type: 'single_choice',
-    required: false,
-    options: [
-      { code: 'Oui', label: 'Oui' },
-      { code: 'Non', label: 'Non' }
-    ],
-    display_if: { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] }
-  },
-  {
-    id: 'rad_add_alc8l2',
-    text: 'Au cours des 12 derniers mois ?',
-    type: 'single_choice',
-    required: false,
-    options: DSM5_CRITERIA_OPTIONS,
-    display_if: {
-      'and': [
-        { '==': [{ 'var': 'rad_add_alc1' }, 'Oui'] },
-        { '==': [{ 'var': 'rad_add_alc8l1' }, 'Oui'] }
-      ]
-    },
-    indentLevel: 1
   }
 ];
 

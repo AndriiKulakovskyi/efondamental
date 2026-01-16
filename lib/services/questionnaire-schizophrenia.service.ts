@@ -1382,10 +1382,13 @@ export async function saveEvalAddictologiqueSzResponse(
 
   // Remove section fields that shouldn't be saved to DB
   const {
-    section_screening,
+    section_alcool,
+    section_tabac_main,
+    section_cannabis_main,
+    section_autres_drogues,
+    section_jeux,
     section_tabac,
     section_cannabis,
-    section_other_addictions,
     section_alcohol_consumption,
     section_dsm5_criteria,
     ...responseData
