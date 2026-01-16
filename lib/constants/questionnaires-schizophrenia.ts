@@ -5942,6 +5942,191 @@ export const EVAL_ADDICTOLOGIQUE_SZ_QUESTIONS: Question[] = [
     ]
   },
 
+  // ==================== AUTRES DROGUES - DETAILS SUBSECTION ====================
+  // Conditional on rad_add_drogues = 'Oui'
+  {
+    id: 'section_autres_drogues_details',
+    text: 'Autres drogues - Details',
+    type: 'section',
+    required: false,
+    is_subsection: true,
+    display_if: { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] }
+  },
+
+  // Sedatives/Benzodiazepines question
+  {
+    id: 'rad_add_sedatifs',
+    text: '4a. Avez-vous deja consomme des sedatifs, des somniferes, des tranquillisants, des benzodiazepines comme du valium, du rivotril, du xanax, du stilnox ou de l\'imovane en dehors d\'une prescription medicale ou en quantite superieures a celles prescrites, plus de dix fois dans votre vie ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_sedatifs_forme',
+    text: 'Sous quelle forme',
+    type: 'multiple_choice',
+    required: false,
+    options: [
+      { code: 'orale', label: 'Orale' },
+      { code: 'injectee', label: 'Injectee' },
+      { code: 'fumee', label: 'Fumee' },
+      { code: 'sub_lingual', label: 'Sub-lingual' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_sedatifs' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Heroin question
+  {
+    id: 'rad_add_heroine',
+    text: '4b. Avez-vous deja consomme de l\'heroine, plus de dix fois dans votre vie ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_heroine_forme',
+    text: 'Sous quelle forme',
+    type: 'multiple_choice',
+    required: false,
+    options: [
+      { code: 'orale', label: 'Orale' },
+      { code: 'injectee', label: 'Injectee' },
+      { code: 'fumee', label: 'Fumee' },
+      { code: 'sniffee', label: 'Sniffee' },
+      { code: 'sub_lingual', label: 'Sub-lingual' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_heroine' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Crack/Cocaine question
+  {
+    id: 'rad_add_crack',
+    text: '4c. Avez-vous deja consomme du crack ou de la cocaine, plus de dix fois dans votre vie ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_crack_forme',
+    text: 'Sous quelle forme',
+    type: 'multiple_choice',
+    required: false,
+    options: [
+      { code: 'orale', label: 'Orale' },
+      { code: 'injectee', label: 'Injectee' },
+      { code: 'fumee', label: 'Fumee' },
+      { code: 'sniffee', label: 'Sniffee' },
+      { code: 'sub_lingual', label: 'Sub-lingual' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_crack' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Opioids question
+  {
+    id: 'rad_add_opiaces',
+    text: '4d. Avez-vous deja consomme des opiaces comme du subutex, de la methadone, de la codeine en dehors d\'une prescription medicale ou en quantite superieures a celles prescrites, plus de dix fois dans votre vie ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_opiaces_forme',
+    text: 'Sous quelle forme',
+    type: 'multiple_choice',
+    required: false,
+    options: [
+      { code: 'orale', label: 'Orale' },
+      { code: 'injectee', label: 'Injectee' },
+      { code: 'fumee', label: 'Fumee' },
+      { code: 'sniffee', label: 'Sniffee' },
+      { code: 'sub_lingual', label: 'Sub-lingual' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_opiaces' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
+  // Other substances question
+  {
+    id: 'rad_add_autres_substances',
+    text: '4e. Avez-vous deja consomme plus de dix fois d\'autres produits ou drogues ou substances ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] }
+  },
+  {
+    id: 'rad_add_autres_substances_nom',
+    text: 'Laquelle',
+    type: 'text',
+    required: false,
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+  {
+    id: 'rad_add_autres_substances_abus',
+    text: 'Substance susceptible d\'entrainer un abus, une dependance ou un trouble lie a son usage ?',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 'Oui', label: 'Oui' },
+      { code: 'Non', label: 'Non' }
+    ],
+    display_if: {
+      'and': [
+        { '==': [{ 'var': 'rad_add_drogues' }, 'Oui'] },
+        { '==': [{ 'var': 'rad_add_autres_substances' }, 'Oui'] }
+      ]
+    },
+    indentLevel: 1
+  },
+
   // ==================== JEUX D'ARGENT SECTION ====================
   {
     id: 'section_jeux',

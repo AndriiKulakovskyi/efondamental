@@ -5342,6 +5342,31 @@ export interface EvalAddictologiqueSzResponse {
   dsm5_cannabis_12month_severity?: 'none' | 'mild' | 'moderate' | 'severe' | null;
 
   // ========================================================================
+  // AUTRES DROGUES SECTION (conditional on rad_add_drogues = Oui)
+  // ========================================================================
+
+  // Sedatives/Benzodiazepines
+  rad_add_sedatifs?: 'Oui' | 'Non' | null;
+  rad_add_sedatifs_forme?: string[] | null;
+
+  // Heroin
+  rad_add_heroine?: 'Oui' | 'Non' | null;
+  rad_add_heroine_forme?: string[] | null;
+
+  // Crack/Cocaine
+  rad_add_crack?: 'Oui' | 'Non' | null;
+  rad_add_crack_forme?: string[] | null;
+
+  // Opioids (Subutex, Methadone, Codeine)
+  rad_add_opiaces?: 'Oui' | 'Non' | null;
+  rad_add_opiaces_forme?: string[] | null;
+
+  // Other substances
+  rad_add_autres_substances?: 'Oui' | 'Non' | null;
+  rad_add_autres_substances_nom?: string | null;
+  rad_add_autres_substances_abus?: 'Oui' | 'Non' | null;
+
+  // ========================================================================
   // Metadata
   // ========================================================================
   completed_by?: string | null;

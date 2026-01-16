@@ -1386,6 +1386,7 @@ export async function saveEvalAddictologiqueSzResponse(
     section_tabac_main,
     section_cannabis_main,
     section_autres_drogues,
+    section_autres_drogues_details,
     section_jeux,
     section_tabac,
     section_cannabis,
