@@ -26,6 +26,21 @@ import {
   saveCtiResponse
 } from '@/lib/services/questionnaire.service';
 import {
+  // Bipolar screening - new service (public.bipolar_* tables)
+  saveBipolarAsrmResponse,
+  saveBipolarQidsResponse,
+  saveBipolarMdqResponse,
+  saveBipolarDiagnosticResponse,
+  saveBipolarOrientationResponse
+} from '@/lib/services/bipolar-screening.service';
+import {
+  type BipolarAsrmResponseInsert,
+  type BipolarQidsResponseInsert,
+  type BipolarMdqResponseInsert,
+  type BipolarDiagnosticResponseInsert,
+  type BipolarOrientationResponseInsert
+} from '@/lib/questionnaires/bipolar/screening';
+import {
   // Hetero questionnaires
   saveMadrsResponse,
   saveYmrsResponse,
@@ -136,11 +151,8 @@ import {
   getVisitById
 } from '@/lib/services/visit.service';
 import { 
-  AsrmResponseInsert, 
-  QidsResponseInsert, 
-  MdqResponseInsert,
-  BipolarDiagnosticResponseInsert,
-  OrientationResponseInsert,
+  // Legacy bipolar screening types (not used in actions anymore - using new module types)
+  // AsrmResponseInsert, QidsResponseInsert, MdqResponseInsert, OrientationResponseInsert
   // Initial Evaluation - ETAT
   Eq5d5lResponseInsert,
   PriseMResponseInsert,
@@ -267,35 +279,36 @@ export async function submitProfessionalQuestionnaireAction(
     
     let result;
     switch (questionnaireCode) {
+      // Bipolar Screening Questionnaires - use new public.bipolar_* tables
       case 'ASRM_FR':
-        result = await saveAsrmResponse({
+        result = await saveBipolarAsrmResponse({
           visit_id: visitId,
           patient_id: patientId,
           completed_by: completedBy,
           ...responses as any
-        } as AsrmResponseInsert);
+        } as BipolarAsrmResponseInsert);
         break;
         
       case 'QIDS_SR16_FR':
-        result = await saveQidsResponse({
+        result = await saveBipolarQidsResponse({
           visit_id: visitId,
           patient_id: patientId,
           completed_by: completedBy,
           ...responses as any
-        } as QidsResponseInsert);
+        } as BipolarQidsResponseInsert);
         break;
         
       case 'MDQ_FR':
-        result = await saveMdqResponse({
+        result = await saveBipolarMdqResponse({
           visit_id: visitId,
           patient_id: patientId,
           completed_by: completedBy,
           ...responses as any
-        } as MdqResponseInsert);
+        } as BipolarMdqResponseInsert);
         break;
 
       case 'EBIP_SCR_DIAG':
-        result = await saveDiagnosticResponse({
+        result = await saveBipolarDiagnosticResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
@@ -303,11 +316,11 @@ export async function submitProfessionalQuestionnaireAction(
         break;
 
       case 'EBIP_SCR_ORIENT':
-        result = await saveOrientationResponse({
+        result = await saveBipolarOrientationResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as OrientationResponseInsert);
+        } as BipolarOrientationResponseInsert);
         break;
 
       // Schizophrenia Screening Questionnaires

@@ -34,6 +34,14 @@ import {
   getCtiResponse
 } from './questionnaire.service';
 import {
+  // Bipolar screening questionnaires - new tables
+  getBipolarAsrmResponse,
+  getBipolarQidsResponse,
+  getBipolarMdqResponse,
+  getBipolarDiagnosticResponse,
+  getBipolarOrientationResponse
+} from './bipolar-screening.service';
+import {
   // Hetero questionnaires
   getMadrsResponse,
   getYmrsResponse,
@@ -85,12 +93,18 @@ import {
   getDiagPsySemHumeurDepuisVisiteResponse,
   getDiagPsySemPsychotiquesResponse
 } from './questionnaire-dsm5.service';
+// Bipolar Screening - New module definitions
 import {
   ASRM_DEFINITION,
   QIDS_DEFINITION,
   MDQ_DEFINITION,
   DIAGNOSTIC_DEFINITION,
-  ORIENTATION_DEFINITION,
+  ORIENTATION_DEFINITION
+} from '../questionnaires/bipolar/screening';
+// Legacy imports for non-bipolar-screening usage (initial evaluation, annual, etc.)
+import {
+  ASRM_DEFINITION as ASRM_DEFINITION_LEGACY,
+  QIDS_DEFINITION as QIDS_DEFINITION_LEGACY,
   // Initial Evaluation - ETAT
   EQ5D5L_DEFINITION,
   PRISE_M_DEFINITION,
@@ -995,15 +1009,16 @@ export async function getVisitCompletionStatus(visitId: string) {
       if (szOrient) completed++;
     } else {
       // Bipolar and others: 5 questionnaires (ASRM, QIDS, MDQ, Diag, Orient)
+      // Use new bipolar_* tables in public schema
       total = 5;
       totalModules = 2;
 
       const [asrm, qids, mdq, diag, orient] = await Promise.all([
-        getAsrmResponse(visitId),
-        getQidsResponse(visitId),
-        getMdqResponse(visitId),
-        getDiagnosticResponse(visitId),
-        getOrientationResponse(visitId)
+        getBipolarAsrmResponse(visitId),
+        getBipolarQidsResponse(visitId),
+        getBipolarMdqResponse(visitId),
+        getBipolarDiagnosticResponse(visitId),
+        getBipolarOrientationResponse(visitId)
       ]);
 
       if (asrm) completed++;
@@ -1385,16 +1400,16 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
 
   const completionMap = new Map<string, { completionPercentage: number; completedQuestionnaires: number; totalQuestionnaires: number }>();
 
-  // Process screening visits
+  // Process screening visits (using new public.bipolar_* tables)
   if (screeningVisits.length > 0) {
     const screeningIds = screeningVisits.map(v => v.id);
     
     const [asrmResults, qidsResults, mdqResults, diagResults, orientResults] = await Promise.all([
-      supabase.from('responses_asrm').select('visit_id').in('visit_id', screeningIds),
-      supabase.from('responses_qids_sr16').select('visit_id').in('visit_id', screeningIds),
-      supabase.from('responses_mdq').select('visit_id').in('visit_id', screeningIds),
-      supabase.from('responses_medical_diagnostic').select('visit_id').in('visit_id', screeningIds),
-      supabase.from('responses_bipolar_orientation').select('visit_id').in('visit_id', screeningIds)
+      supabase.from('bipolar_asrm').select('visit_id').in('visit_id', screeningIds),
+      supabase.from('bipolar_qids_sr16').select('visit_id').in('visit_id', screeningIds),
+      supabase.from('bipolar_mdq').select('visit_id').in('visit_id', screeningIds),
+      supabase.from('bipolar_diagnostic').select('visit_id').in('visit_id', screeningIds),
+      supabase.from('bipolar_orientation').select('visit_id').in('visit_id', screeningIds)
     ]);
 
     const asrmSet = new Set(asrmResults.data?.map(r => r.visit_id) || []);

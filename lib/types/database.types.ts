@@ -1,6 +1,18 @@
 // eFondaMental Platform - Database Types
 
 // ============================================================================
+// Note: Bipolar Screening Types are defined in their respective modules:
+// - BipolarAsrmResponse, BipolarAsrmResponseInsert: @/lib/questionnaires/bipolar/screening/auto/asrm
+// - BipolarQidsResponse, BipolarQidsResponseInsert: @/lib/questionnaires/bipolar/screening/auto/qids
+// - BipolarMdqResponse, BipolarMdqResponseInsert: @/lib/questionnaires/bipolar/screening/auto/mdq
+// - BipolarDiagnosticResponse, BipolarDiagnosticResponseInsert: @/lib/questionnaires/bipolar/screening/medical/diagnostic
+// - BipolarOrientationResponse, BipolarOrientationResponseInsert: @/lib/questionnaires/bipolar/screening/medical/orientation
+// 
+// These map to new tables in public schema: bipolar_asrm, bipolar_qids_sr16, bipolar_mdq, 
+// bipolar_diagnostic, bipolar_orientation
+// ============================================================================
+
+// ============================================================================
 // Center Types
 // ============================================================================
 
