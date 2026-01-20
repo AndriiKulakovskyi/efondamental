@@ -42,6 +42,10 @@ import {
   getBipolarOrientationResponse
 } from './bipolar-screening.service';
 import {
+  getBipolarInitialCompletionStatus as checkBipolarInitialCompletion,
+  BIPOLAR_INITIAL_TABLES
+} from './bipolar-initial.service';
+import {
   // Hetero questionnaires
   getMadrsResponse,
   getYmrsResponse,
@@ -1028,18 +1032,31 @@ export async function getVisitCompletionStatus(visitId: string) {
       if (orient) completed++;
     }
   } else if (visit.visit_type === 'initial_evaluation') {
-    // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 6 INFIRMIER + 4 DSM5 + 1 Family + 4 Suicide + 10 Histoire Somatique + 4 WAIS-4 = 55
-    total = 55;
-    totalModules = 7;
+    // Get patient to determine pathology-specific completion tracking
+    const patient = await getPatientById(visit.patient_id);
+    const pathologyType = patient?.pathology_type;
+    
+    // For bipolar initial evaluation, use bipolar_* tables
+    if (pathologyType === 'bipolar') {
+      // Use the bipolar-initial.service to check completion status against bipolar_* tables
+      const bipolarCompletion = await checkBipolarInitialCompletion(visitId);
+      total = Object.keys(BIPOLAR_INITIAL_TABLES).length;
+      totalModules = 7;
+      completed = Object.values(bipolarCompletion).filter(Boolean).length;
+    } else {
+      // Non-bipolar initial evaluation - use legacy tables
+      // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 6 INFIRMIER + 4 DSM5 + 1 Family + 4 Suicide + 10 Histoire Somatique + 4 WAIS-4 = 55
+      total = 55;
+      totalModules = 7;
 
     const [
-      eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,
-      asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti,
-      madrs, ymrs, cgi, egf, alda, etatPatient, fast, social,
-      tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biologicalAssessment,
-      dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs, isa, sis, suicideHistory, perinatalite, pathoNeuro, pathoCardio, pathoEndoc, pathoDermato, pathoUrinaire, antecedentsGyneco, pathoHepatoGastro, pathoAllergique, autresPatho,
-      wais4Criteria, wais4Learning, wais4Matrices, wais4DigitSpan
-    ] = await Promise.all([
+        eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,
+        asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti,
+        madrs, ymrs, cgi, egf, alda, etatPatient, fast, social,
+        tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biologicalAssessment,
+        dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs, isa, sis, suicideHistory, perinatalite, pathoNeuro, pathoCardio, pathoEndoc, pathoDermato, pathoUrinaire, antecedentsGyneco, pathoHepatoGastro, pathoAllergique, autresPatho,
+        wais4Criteria, wais4Learning, wais4Matrices, wais4DigitSpan
+      ] = await Promise.all([
       // ETAT questionnaires
       getEq5d5lResponse(visitId),
       getPriseMResponse(visitId),
@@ -1178,6 +1195,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (wais4Learning) completed++;
     if (wais4Matrices) completed++;
     if (wais4DigitSpan) completed++;
+    }
   } else if (visit.visit_type === 'biannual_followup') {
     // Biannual follow-up: 6 infirmier + 7 thymic + 12 medical (6 original + 6 soin_suivi) = 25 total
     total = 25;

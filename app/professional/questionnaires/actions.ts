@@ -34,6 +34,11 @@ import {
   saveBipolarOrientationResponse
 } from '@/lib/services/bipolar-screening.service';
 import {
+  // Bipolar initial evaluation - new service (public.bipolar_* tables)
+  saveBipolarInitialResponse,
+  BIPOLAR_INITIAL_TABLES
+} from '@/lib/services/bipolar-initial.service';
+import {
   type BipolarAsrmResponseInsert,
   type BipolarQidsResponseInsert,
   type BipolarMdqResponseInsert,
@@ -150,6 +155,111 @@ import {
   completeVisit,
   getVisitById
 } from '@/lib/services/visit.service';
+import { getPatientById } from '@/lib/services/patient.service';
+
+// Helper to check if a questionnaire should use bipolar_* tables
+async function shouldUseBipolarTables(visitId: string, questionnaireCode: string): Promise<boolean> {
+  // Check if the questionnaire code maps to a bipolar_* table
+  const bipolarTableCode = questionnaireCodeToBipolarKey(questionnaireCode);
+  if (!bipolarTableCode || !BIPOLAR_INITIAL_TABLES[bipolarTableCode]) {
+    return false;
+  }
+  
+  // Check if the visit is a bipolar initial evaluation
+  const visit = await getVisitById(visitId);
+  if (!visit || visit.visit_type !== 'initial_evaluation') {
+    return false;
+  }
+  
+  const patient = await getPatientById(visit.patient_id);
+  return patient?.pathology_type === 'bipolar';
+}
+
+// Map questionnaire codes to BIPOLAR_INITIAL_TABLES keys
+// All bipolar initial evaluation questionnaires now have individual column schemas
+function questionnaireCodeToBipolarKey(code: string): string | null {
+  const mapping: Record<string, string> = {
+    // Nurse module
+    'TOBACCO': 'TOBACCO',
+    'FAGERSTROM': 'FAGERSTROM',
+    'PHYSICAL_PARAMS': 'PHYSICAL_PARAMS',
+    'BLOOD_PRESSURE': 'BLOOD_PRESSURE',
+    'SLEEP_APNEA': 'SLEEP_APNEA',
+    'BIOLOGICAL_ASSESSMENT': 'BIOLOGICAL_ASSESSMENT',
+    // Thymic module
+    'MADRS': 'MADRS',
+    'YMRS': 'YMRS',
+    'CGI': 'CGI',
+    'EGF': 'EGF',
+    'ALDA': 'ALDA',
+    'ETAT_PATIENT': 'ETAT_PATIENT',
+    'FAST': 'FAST',
+    // Auto ETAT module
+    'EQ5D5L': 'EQ5D5L',
+    'PRISE_M': 'PRISE_M',
+    'STAI_YA': 'STAI_YA',
+    'MARS': 'MARS',
+    'MATHYS': 'MATHYS',
+    'PSQI': 'PSQI',
+    'EPWORTH': 'EPWORTH',
+    // Auto TRAITS module
+    'ASRS_FR': 'ASRS',
+    'CTQ_FR': 'CTQ',
+    'BIS10_FR': 'BIS10',
+    'ALS18': 'ALS18',
+    'AIM': 'AIM',
+    'WURS25': 'WURS25',
+    'AQ12': 'AQ12',
+    'CSM': 'CSM',
+    'CTI': 'CTI',
+    // Social module
+    'SOCIAL': 'SOCIAL',
+    // Medical module
+    'DSM5_HUMEUR_FR': 'DSM5_HUMEUR',
+    'DSM5_PSYCHOTIC_FR': 'DSM5_PSYCHOTIC',
+    'DSM5_COMORBID_FR': 'DSM5_COMORBID',
+    'DIVA_2_FR': 'DIVA',
+    'FAMILY_HISTORY_FR': 'FAMILY_HISTORY',
+    'CSSRS_FR': 'CSSRS',
+    'ISA_FR': 'ISA',
+    'SIS_FR': 'SIS',
+    'SUICIDE_HISTORY_FR': 'SUICIDE_HISTORY',
+    'PERINATALITE_FR': 'PERINATALITE',
+    'PATHO_NEURO_FR': 'PATHO_NEURO',
+    'PATHO_CARDIO_FR': 'PATHO_CARDIO',
+    'PATHO_ENDOC_FR': 'PATHO_ENDOC',
+    'PATHO_DERMATO_FR': 'PATHO_DERMATO',
+    'PATHO_URINAIRE_FR': 'PATHO_URINAIRE',
+    'ANTECEDENTS_GYNECO_FR': 'ANTECEDENTS_GYNECO',
+    'PATHO_HEPATO_GASTRO_FR': 'PATHO_HEPATO_GASTRO',
+    'PATHO_ALLERGIQUE_FR': 'PATHO_ALLERGIQUE',
+    'AUTRES_PATHO_FR': 'AUTRES_PATHO',
+    // Neuropsy module
+    'CVLT_FR': 'CVLT',
+    'TMT_FR': 'TMT',
+    'STROOP_FR': 'STROOP',
+    'FLUENCES_VERBALES_FR': 'FLUENCES_VERBALES',
+    'MEM3_SPATIAL_FR': 'MEM3_SPATIAL',
+    'WAIS4_CRITERIA_FR': 'WAIS4_CRITERIA',
+    'WAIS4_LEARNING_FR': 'WAIS4_LEARNING',
+    'WAIS4_MATRICES_FR': 'WAIS4_MATRICES',
+    'WAIS4_CODE_FR': 'WAIS4_CODE',
+    'WAIS4_DIGIT_SPAN_FR': 'WAIS4_DIGIT_SPAN',
+    'WAIS4_SIMILITUDES_FR': 'WAIS4_SIMILITUDES',
+    'WAIS3_CRITERIA_FR': 'WAIS3_CRITERIA',
+    'WAIS3_LEARNING_FR': 'WAIS3_LEARNING',
+    'WAIS3_VOCABULAIRE_FR': 'WAIS3_VOCABULAIRE',
+    'WAIS3_MATRICES_FR': 'WAIS3_MATRICES',
+    'WAIS3_CODE_SYMBOLES_FR': 'WAIS3_CODE_SYMBOLES',
+    'WAIS3_DIGIT_SPAN_FR': 'WAIS3_DIGIT_SPAN',
+    'WAIS3_CPT2_FR': 'WAIS3_CPT2',
+    'COBRA_FR': 'COBRA',
+    'CPT3_FR': 'CPT3',
+    'SCIP_FR': 'SCIP',
+    'TEST_COMMISSIONS_FR': 'TEST_COMMISSIONS',
+  };
+  return mapping[code] || null;
+}
 import { 
   // Legacy bipolar screening types (not used in actions anymore - using new module types)
   // AsrmResponseInsert, QidsResponseInsert, MdqResponseInsert, OrientationResponseInsert
@@ -276,6 +386,41 @@ export async function submitProfessionalQuestionnaireAction(
     // Get the current user to track who completed the questionnaire
     const context = await requireUserContext();
     const completedBy = context.user.id;
+    
+    // Check if this questionnaire should be routed to bipolar_* tables
+    // (for bipolar initial evaluation visits)
+    const useBipolarTables = await shouldUseBipolarTables(visitId, questionnaireCode);
+    
+    if (useBipolarTables) {
+      const bipolarKey = questionnaireCodeToBipolarKey(questionnaireCode);
+      if (bipolarKey) {
+        const result = await saveBipolarInitialResponse(bipolarKey, {
+          visit_id: visitId,
+          patient_id: patientId,
+          completed_by: completedBy,
+          ...responses
+        });
+        
+        // Check if visit is now 100% complete and auto-complete it
+        try {
+          const visit = await getVisitById(visitId);
+          const storedCompletion = visit?.completion_percentage ?? 0;
+          const completionStatus = await getVisitCompletionStatus(visitId);
+          
+          if (storedCompletion === 100 || completionStatus.completionPercentage === 100) {
+            if (visit?.status !== 'completed') {
+              await completeVisit(visitId);
+              console.log(`Visit ${visitId} automatically completed (100% questionnaires filled)`);
+            }
+          }
+        } catch (error) {
+          console.error('Failed to auto-complete visit:', error);
+        }
+        
+        revalidatePath('/professional');
+        return { success: true, data: result };
+      }
+    }
     
     let result;
     switch (questionnaireCode) {

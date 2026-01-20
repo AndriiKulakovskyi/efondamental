@@ -1,0 +1,351 @@
+// eFondaMental Platform - Bipolar Initial Evaluation Service
+// Handles all questionnaire data operations for bipolar initial visits
+
+import { createClient } from '@/lib/supabase/server';
+
+// ============================================================================
+// Generic Types for Bipolar Initial Questionnaires
+// ============================================================================
+
+interface BipolarQuestionnaireResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  completed_by?: string | null;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+  [key: string]: any;
+}
+
+type BipolarQuestionnaireInsert<T> = Omit<T, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+
+// ============================================================================
+// Table name mapping for bipolar initial questionnaires
+// ============================================================================
+
+const BIPOLAR_INITIAL_TABLES: Record<string, string> = {
+  // Nurse module
+  'TOBACCO': 'bipolar_tobacco',
+  'FAGERSTROM': 'bipolar_fagerstrom',
+  'PHYSICAL_PARAMS': 'bipolar_physical_params',
+  'BLOOD_PRESSURE': 'bipolar_blood_pressure',
+  'SLEEP_APNEA': 'bipolar_sleep_apnea',
+  'BIOLOGICAL_ASSESSMENT': 'bipolar_biological_assessment',
+  
+  // Thymic module
+  'MADRS': 'bipolar_madrs',
+  'YMRS': 'bipolar_ymrs',
+  'CGI': 'bipolar_cgi',
+  'EGF': 'bipolar_egf',
+  'ALDA': 'bipolar_alda',
+  'ETAT_PATIENT': 'bipolar_etat_patient',
+  'FAST': 'bipolar_fast',
+  
+  // Auto ETAT module
+  'EQ5D5L': 'bipolar_eq5d5l',
+  'PRISE_M': 'bipolar_prise_m',
+  'STAI_YA': 'bipolar_stai_ya',
+  'MARS': 'bipolar_mars',
+  'MATHYS': 'bipolar_mathys',
+  'PSQI': 'bipolar_psqi',
+  'EPWORTH': 'bipolar_epworth',
+  
+  // Auto TRAITS module
+  'ASRS': 'bipolar_asrs',
+  'CTQ': 'bipolar_ctq',
+  'BIS10': 'bipolar_bis10',
+  'ALS18': 'bipolar_als18',
+  'AIM': 'bipolar_aim',
+  'WURS25': 'bipolar_wurs25',
+  'AQ12': 'bipolar_aq12',
+  'CSM': 'bipolar_csm',
+  'CTI': 'bipolar_cti',
+  
+  // Social module
+  'SOCIAL': 'bipolar_social',
+  
+  // Medical module
+  'DSM5_HUMEUR': 'bipolar_dsm5_humeur',
+  'DSM5_PSYCHOTIC': 'bipolar_dsm5_psychotic',
+  'DSM5_COMORBID': 'bipolar_dsm5_comorbid',
+  'DIVA': 'bipolar_diva',
+  'FAMILY_HISTORY': 'bipolar_family_history',
+  'CSSRS': 'bipolar_cssrs',
+  'ISA': 'bipolar_isa',
+  'SIS': 'bipolar_sis',
+  'SUICIDE_HISTORY': 'bipolar_suicide_history',
+  'PERINATALITE': 'bipolar_perinatalite',
+  'PATHO_NEURO': 'bipolar_patho_neuro',
+  'PATHO_CARDIO': 'bipolar_patho_cardio',
+  'PATHO_ENDOC': 'bipolar_patho_endoc',
+  'PATHO_DERMATO': 'bipolar_patho_dermato',
+  'PATHO_URINAIRE': 'bipolar_patho_urinaire',
+  'ANTECEDENTS_GYNECO': 'bipolar_antecedents_gyneco',
+  'PATHO_HEPATO_GASTRO': 'bipolar_patho_hepato_gastro',
+  'PATHO_ALLERGIQUE': 'bipolar_patho_allergique',
+  'AUTRES_PATHO': 'bipolar_autres_patho',
+  
+  // Neuropsy module
+  'CVLT': 'bipolar_cvlt',
+  'TMT': 'bipolar_tmt',
+  'STROOP': 'bipolar_stroop',
+  'FLUENCES_VERBALES': 'bipolar_fluences_verbales',
+  'MEM3_SPATIAL': 'bipolar_mem3_spatial',
+  'WAIS4_CRITERIA': 'bipolar_wais4_criteria',
+  'WAIS4_LEARNING': 'bipolar_wais4_learning',
+  'WAIS4_MATRICES': 'bipolar_wais4_matrices',
+  'WAIS4_CODE': 'bipolar_wais4_code',
+  'WAIS4_DIGIT_SPAN': 'bipolar_wais4_digit_span',
+  'WAIS4_SIMILITUDES': 'bipolar_wais4_similitudes',
+  'WAIS3_CRITERIA': 'bipolar_wais3_criteria',
+  'WAIS3_LEARNING': 'bipolar_wais3_learning',
+  'WAIS3_VOCABULAIRE': 'bipolar_wais3_vocabulaire',
+  'WAIS3_MATRICES': 'bipolar_wais3_matrices',
+  'WAIS3_CODE_SYMBOLES': 'bipolar_wais3_code_symboles',
+  'WAIS3_DIGIT_SPAN': 'bipolar_wais3_digit_span',
+  'WAIS3_CPT2': 'bipolar_wais3_cpt2',
+  'COBRA': 'bipolar_cobra',
+  'CPT3': 'bipolar_cpt3',
+  'SCIP': 'bipolar_scip',
+  'TEST_COMMISSIONS': 'bipolar_test_commissions',
+};
+
+// ============================================================================
+// Generic Get/Save Functions
+// ============================================================================
+
+/**
+ * Get a bipolar initial questionnaire response by visit ID
+ */
+export async function getBipolarInitialResponse<T extends BipolarQuestionnaireResponse>(
+  questionnaireCode: string,
+  visitId: string
+): Promise<T | null> {
+  const tableName = BIPOLAR_INITIAL_TABLES[questionnaireCode];
+  if (!tableName) {
+    throw new Error(`Unknown bipolar initial questionnaire code: ${questionnaireCode}`);
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from(tableName)
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') {
+    console.error(`Error fetching ${tableName}:`, error);
+    throw error;
+  }
+
+  return data as T | null;
+}
+
+/**
+ * Save a bipolar initial questionnaire response (upsert)
+ */
+export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireResponse>(
+  questionnaireCode: string,
+  response: BipolarQuestionnaireInsert<T>
+): Promise<T> {
+  const tableName = BIPOLAR_INITIAL_TABLES[questionnaireCode];
+  if (!tableName) {
+    throw new Error(`Unknown bipolar initial questionnaire code: ${questionnaireCode}`);
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from(tableName)
+    .upsert(response, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error(`Error saving ${tableName}:`, error);
+    throw error;
+  }
+
+  return data as T;
+}
+
+// ============================================================================
+// Specific Get Functions (for convenience and type safety)
+// ============================================================================
+
+// Nurse module
+export async function getTobaccoResponse(visitId: string) {
+  return getBipolarInitialResponse('TOBACCO', visitId);
+}
+
+export async function getFagerstromResponse(visitId: string) {
+  return getBipolarInitialResponse('FAGERSTROM', visitId);
+}
+
+export async function getPhysicalParamsResponse(visitId: string) {
+  return getBipolarInitialResponse('PHYSICAL_PARAMS', visitId);
+}
+
+export async function getBloodPressureResponse(visitId: string) {
+  return getBipolarInitialResponse('BLOOD_PRESSURE', visitId);
+}
+
+export async function getSleepApneaResponse(visitId: string) {
+  return getBipolarInitialResponse('SLEEP_APNEA', visitId);
+}
+
+export async function getBiologicalAssessmentResponse(visitId: string) {
+  return getBipolarInitialResponse('BIOLOGICAL_ASSESSMENT', visitId);
+}
+
+// Thymic module
+export async function getMadrsResponse(visitId: string) {
+  return getBipolarInitialResponse('MADRS', visitId);
+}
+
+export async function getYmrsResponse(visitId: string) {
+  return getBipolarInitialResponse('YMRS', visitId);
+}
+
+export async function getCgiResponse(visitId: string) {
+  return getBipolarInitialResponse('CGI', visitId);
+}
+
+export async function getEgfResponse(visitId: string) {
+  return getBipolarInitialResponse('EGF', visitId);
+}
+
+export async function getAldaResponse(visitId: string) {
+  return getBipolarInitialResponse('ALDA', visitId);
+}
+
+export async function getEtatPatientResponse(visitId: string) {
+  return getBipolarInitialResponse('ETAT_PATIENT', visitId);
+}
+
+export async function getFastResponse(visitId: string) {
+  return getBipolarInitialResponse('FAST', visitId);
+}
+
+// Auto ETAT module
+export async function getEq5d5lResponse(visitId: string) {
+  return getBipolarInitialResponse('EQ5D5L', visitId);
+}
+
+export async function getPriseMResponse(visitId: string) {
+  return getBipolarInitialResponse('PRISE_M', visitId);
+}
+
+export async function getStaiYaResponse(visitId: string) {
+  return getBipolarInitialResponse('STAI_YA', visitId);
+}
+
+export async function getMarsResponse(visitId: string) {
+  return getBipolarInitialResponse('MARS', visitId);
+}
+
+export async function getMathysResponse(visitId: string) {
+  return getBipolarInitialResponse('MATHYS', visitId);
+}
+
+export async function getPsqiResponse(visitId: string) {
+  return getBipolarInitialResponse('PSQI', visitId);
+}
+
+export async function getEpworthResponse(visitId: string) {
+  return getBipolarInitialResponse('EPWORTH', visitId);
+}
+
+// Auto TRAITS module
+export async function getAsrsResponse(visitId: string) {
+  return getBipolarInitialResponse('ASRS', visitId);
+}
+
+export async function getCtqResponse(visitId: string) {
+  return getBipolarInitialResponse('CTQ', visitId);
+}
+
+export async function getBis10Response(visitId: string) {
+  return getBipolarInitialResponse('BIS10', visitId);
+}
+
+export async function getAls18Response(visitId: string) {
+  return getBipolarInitialResponse('ALS18', visitId);
+}
+
+export async function getAimResponse(visitId: string) {
+  return getBipolarInitialResponse('AIM', visitId);
+}
+
+export async function getWurs25Response(visitId: string) {
+  return getBipolarInitialResponse('WURS25', visitId);
+}
+
+export async function getAq12Response(visitId: string) {
+  return getBipolarInitialResponse('AQ12', visitId);
+}
+
+export async function getCsmResponse(visitId: string) {
+  return getBipolarInitialResponse('CSM', visitId);
+}
+
+export async function getCtiResponse(visitId: string) {
+  return getBipolarInitialResponse('CTI', visitId);
+}
+
+// Social module
+export async function getSocialResponse(visitId: string) {
+  return getBipolarInitialResponse('SOCIAL', visitId);
+}
+
+// ============================================================================
+// Batch Operations
+// ============================================================================
+
+/**
+ * Get completion status for all bipolar initial questionnaires in a visit
+ */
+export async function getBipolarInitialCompletionStatus(visitId: string): Promise<Record<string, boolean>> {
+  const supabase = await createClient();
+  const status: Record<string, boolean> = {};
+
+  // Check each table for responses
+  for (const [code, tableName] of Object.entries(BIPOLAR_INITIAL_TABLES)) {
+    const { data, error } = await supabase
+      .from(tableName)
+      .select('id')
+      .eq('visit_id', visitId)
+      .single();
+    
+    status[code] = !error && !!data;
+  }
+
+  return status;
+}
+
+/**
+ * Get all completed questionnaires for a bipolar initial visit
+ */
+export async function getAllBipolarInitialResponses(visitId: string): Promise<Record<string, any>> {
+  const responses: Record<string, any> = {};
+  
+  for (const code of Object.keys(BIPOLAR_INITIAL_TABLES)) {
+    try {
+      const response = await getBipolarInitialResponse(code, visitId);
+      if (response) {
+        responses[code] = response;
+      }
+    } catch (error) {
+      // Skip errors for individual questionnaires
+      console.warn(`Could not fetch ${code} response:`, error);
+    }
+  }
+
+  return responses;
+}
+
+// ============================================================================
+// Export table mapping for use in other services
+// ============================================================================
+
+export { BIPOLAR_INITIAL_TABLES };

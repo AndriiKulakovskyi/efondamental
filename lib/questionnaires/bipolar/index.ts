@@ -4,4 +4,7 @@
 // Screening visit questionnaires
 export * from './screening';
 
-// TODO: Add initial_evaluation, followup, annual modules when refactoring those visits
+// Initial evaluation questionnaires
+export * as initial from './initial';
+
+// TODO: Add followup, annual modules when refactoring those visits
