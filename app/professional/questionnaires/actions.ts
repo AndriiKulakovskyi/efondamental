@@ -184,6 +184,7 @@ function questionnaireCodeToBipolarKey(code: string): string | null {
     'FAGERSTROM': 'FAGERSTROM',
     'PHYSICAL_PARAMS': 'PHYSICAL_PARAMS',
     'BLOOD_PRESSURE': 'BLOOD_PRESSURE',
+    'ECG': 'ECG',
     'SLEEP_APNEA': 'SLEEP_APNEA',
     'BIOLOGICAL_ASSESSMENT': 'BIOLOGICAL_ASSESSMENT',
     // Thymic module
@@ -398,21 +399,30 @@ export async function submitProfessionalQuestionnaireAction(
         // - patient_gender: used for computing male_gender, clairance_creatinine (never a DB column)
         // - male_gender: only for SLEEP_APNEA
         // - patient_age: only for neuropsy scoring tables, not criteria tables (which use 'age')
-        const { patient_gender, male_gender, patient_age, ...filteredResponses } = responses;
+        // - years_of_education: only for neuropsy scoring tables
+        // - weight_kg: injected for creatinine clearance calculation, not a DB column
+        const { patient_gender, male_gender, patient_age, years_of_education, weight_kg, ...filteredResponses } = responses;
         
-        // Re-add male_gender only for SLEEP_APNEA questionnaire
+        // Re-add male_gender only for SLEEP_APNEA questionnaire (convert to boolean)
         if (bipolarKey === 'SLEEP_APNEA' && male_gender !== undefined) {
-          (filteredResponses as any).male_gender = male_gender;
+          // Convert "Oui"/"Non" string to boolean for DB
+          const isMale = male_gender === 'Oui' || male_gender === true || male_gender === 'true';
+          (filteredResponses as any).male_gender = isMale;
         }
         
-        // Re-add patient_age for tables that have this column (neuropsy scoring tables)
-        const tablesWithPatientAge = [
+        // Neuropsy tables that have patient_age and years_of_education columns
+        const neuropsyTables = [
           'CVLT', 'FLUENCES_VERBALES', 'MEM3_SPATIAL', 'STROOP', 'TEST_COMMISSIONS', 'TMT',
           'WAIS3_CODE_SYMBOLES', 'WAIS3_DIGIT_SPAN', 'WAIS3_LEARNING', 'WAIS3_MATRICES', 'WAIS3_VOCABULAIRE',
           'WAIS4_CODE', 'WAIS4_DIGIT_SPAN', 'WAIS4_LEARNING', 'WAIS4_MATRICES', 'WAIS4_SIMILITUDES'
         ];
-        if (tablesWithPatientAge.includes(bipolarKey) && patient_age !== undefined) {
-          (filteredResponses as any).patient_age = patient_age;
+        if (neuropsyTables.includes(bipolarKey)) {
+          if (patient_age !== undefined) {
+            (filteredResponses as any).patient_age = patient_age;
+          }
+          if (years_of_education !== undefined) {
+            (filteredResponses as any).years_of_education = years_of_education;
+          }
         }
         
         const result = await saveBipolarInitialResponse(bipolarKey, {

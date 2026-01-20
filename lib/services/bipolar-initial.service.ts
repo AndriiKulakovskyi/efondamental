@@ -30,6 +30,7 @@ const BIPOLAR_INITIAL_TABLES: Record<string, string> = {
   'FAGERSTROM': 'bipolar_fagerstrom',
   'PHYSICAL_PARAMS': 'bipolar_physical_params',
   'BLOOD_PRESSURE': 'bipolar_blood_pressure',
+  'ECG': 'bipolar_ecg',
   'SLEEP_APNEA': 'bipolar_sleep_apnea',
   'BIOLOGICAL_ASSESSMENT': 'bipolar_biological_assessment',
   
