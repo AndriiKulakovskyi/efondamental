@@ -4,5 +4,5 @@
 // ETAT submodule (7 questionnaires)
 export * as etat from './etat';
 
-// TODO: Add TRAITS submodule when created
-// export * as traits from './traits';
+// TRAITS submodule (9 questionnaires)
+export * as traits from './traits';

@@ -12,6 +12,64 @@ export {
   type Eq5d5lScoreInput
 } from './eq5d5l';
 
-// Note: Additional questionnaires (prise_m, stai_ya, mars, mathys, psqi, epworth)
-// are defined in the original lib/constants/questionnaires.ts and reused
-// for the initial evaluation visit. New bipolar_* tables will store the data.
+// PRISE-M (Medication Side Effects Profile)
+export {
+  PRISE_M_QUESTIONS,
+  PRISE_M_DEFINITION,
+  computePriseMScores,
+  interpretPriseMScore,
+  type BipolarPriseMResponse,
+  type BipolarPriseMResponseInsert
+} from './prise-m';
+
+// STAI-YA (State Anxiety Inventory)
+export {
+  STAI_YA_QUESTIONS,
+  STAI_YA_DEFINITION,
+  computeStaiYaScore,
+  interpretStaiYaScore,
+  rawToTScore,
+  type BipolarStaiYaResponse,
+  type BipolarStaiYaResponseInsert
+} from './stai-ya';
+
+// MARS (Medication Adherence Rating Scale)
+export {
+  MARS_QUESTIONS,
+  MARS_DEFINITION,
+  computeMarsScores,
+  interpretMarsScore,
+  type BipolarMarsResponse,
+  type BipolarMarsResponseInsert
+} from './mars';
+
+// MAThyS (Multidimensional Assessment of Thymic States)
+export {
+  MATHYS_QUESTIONS,
+  MATHYS_DEFINITION,
+  computeMathysScores,
+  interpretMathysScore,
+  type BipolarMathysResponse,
+  type BipolarMathysResponseInsert
+} from './mathys';
+
+// PSQI (Pittsburgh Sleep Quality Index)
+export {
+  PSQI_QUESTIONS,
+  PSQI_DEFINITION,
+  computePsqiScores,
+  interpretPsqiScore,
+  type BipolarPsqiResponse,
+  type BipolarPsqiResponseInsert
+} from './psqi';
+
+// Epworth (Epworth Sleepiness Scale)
+export {
+  EPWORTH_QUESTIONS,
+  EPWORTH_DEFINITION,
+  computeEpworthScore,
+  interpretEpworthScore,
+  interpretEpworthScoreSimple,
+  type BipolarEpworthResponse,
+  type BipolarEpworthResponseInsert
+} from './epworth';

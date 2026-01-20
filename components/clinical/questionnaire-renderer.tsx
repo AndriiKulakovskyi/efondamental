@@ -169,16 +169,18 @@ export function QuestionnaireRenderer({
       }
     });
     
-    // Auto-populate male_gender field for sleep apnea questionnaire
-    console.log('[Male Gender Init] stableInitialResponses:', stableInitialResponses);
-    if (initialized.patient_gender) {
-      console.log('[Male Gender Init] patient_gender:', initialized.patient_gender);
-      const gender = initialized.patient_gender?.toLowerCase();
-      const isMale = gender === 'male' || gender === 'm' || gender === 'homme';
-      initialized.male_gender = isMale ? 'Oui' : 'Non';
-      console.log('[Male Gender Init] Set male_gender to:', initialized.male_gender);
-    } else {
-      console.log('[Male Gender Init] No patient_gender found in initialized responses');
+    // Auto-populate male_gender field ONLY for sleep apnea questionnaire
+    if (questionnaire.code === 'SLEEP_APNEA') {
+      console.log('[Male Gender Init] stableInitialResponses:', stableInitialResponses);
+      if (initialized.patient_gender) {
+        console.log('[Male Gender Init] patient_gender:', initialized.patient_gender);
+        const gender = initialized.patient_gender?.toLowerCase();
+        const isMale = gender === 'male' || gender === 'm' || gender === 'homme';
+        initialized.male_gender = isMale ? 'Oui' : 'Non';
+        console.log('[Male Gender Init] Set male_gender to:', initialized.male_gender);
+      } else {
+        console.log('[Male Gender Init] No patient_gender found in initialized responses');
+      }
     }
     
     return initialized;
@@ -312,20 +314,22 @@ export function QuestionnaireRenderer({
         hasChanges = true;
       }
 
-      // Auto-populate male_gender field for sleep apnea questionnaire based on patient_gender
-      if (prev.patient_gender) {
-        console.log('[Male Gender Update] patient_gender:', prev.patient_gender);
-        const gender = prev.patient_gender?.toLowerCase();
-        const isMale = gender === 'male' || gender === 'm' || gender === 'homme';
-        const maleGenderValue = isMale ? 'Oui' : 'Non';
-        console.log('[Male Gender Update] Calculated value:', maleGenderValue, 'Current value:', updated.male_gender);
-        if (updated.male_gender !== maleGenderValue) {
-          updated.male_gender = maleGenderValue;
-          hasChanges = true;
-          console.log('[Male Gender Update] Updated male_gender to:', maleGenderValue);
+      // Auto-populate male_gender field ONLY for sleep apnea questionnaire based on patient_gender
+      if (questionnaire.code === 'SLEEP_APNEA') {
+        if (prev.patient_gender) {
+          console.log('[Male Gender Update] patient_gender:', prev.patient_gender);
+          const gender = prev.patient_gender?.toLowerCase();
+          const isMale = gender === 'male' || gender === 'm' || gender === 'homme';
+          const maleGenderValue = isMale ? 'Oui' : 'Non';
+          console.log('[Male Gender Update] Calculated value:', maleGenderValue, 'Current value:', updated.male_gender);
+          if (updated.male_gender !== maleGenderValue) {
+            updated.male_gender = maleGenderValue;
+            hasChanges = true;
+            console.log('[Male Gender Update] Updated male_gender to:', maleGenderValue);
+          }
+        } else {
+          console.log('[Male Gender Update] No patient_gender in prev');
         }
-      } else {
-        console.log('[Male Gender Update] No patient_gender in prev');
       }
 
       // Compute clairance_creatinine using Cockroft-Gault formula
