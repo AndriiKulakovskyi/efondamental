@@ -128,23 +128,24 @@ import {
   CSM_DEFINITION,
   CTI_DEFINITION
 } from '../constants/questionnaires';
+// Bipolar Initial - Thymic module
 import {
-  // Hetero questionnaire definitions
   MADRS_DEFINITION,
   YMRS_DEFINITION,
   CGI_DEFINITION,
   EGF_DEFINITION,
   ALDA_DEFINITION,
   ETAT_PATIENT_DEFINITION,
-  FAST_DEFINITION,
+  FAST_DEFINITION
+} from '../questionnaires/bipolar/initial/thymic';
+// Bipolar Initial - Medical module
+import {
   DIVA_DEFINITION,
   FAMILY_HISTORY_DEFINITION,
   CSSRS_DEFINITION,
   ISA_DEFINITION,
-  ISA_FOLLOWUP_DEFINITION,
   SIS_DEFINITION,
   SUICIDE_HISTORY_DEFINITION,
-  SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
   PERINATALITE_DEFINITION,
   PATHO_NEURO_DEFINITION,
   PATHO_CARDIO_DEFINITION,
@@ -154,7 +155,10 @@ import {
   ANTECEDENTS_GYNECO_DEFINITION,
   PATHO_HEPATO_GASTRO_DEFINITION,
   PATHO_ALLERGIQUE_DEFINITION,
-  AUTRES_PATHO_DEFINITION,
+  AUTRES_PATHO_DEFINITION
+} from '../questionnaires/bipolar/initial/medical';
+// Bipolar Initial - Neuropsy module
+import {
   WAIS4_CRITERIA_DEFINITION,
   WAIS4_LEARNING_DEFINITION,
   WAIS4_MATRICES_DEFINITION,
@@ -169,9 +173,7 @@ import {
   WAIS4_SIMILITUDES_DEFINITION,
   TEST_COMMISSIONS_DEFINITION,
   SCIP_DEFINITION,
-  // Independent neuropsychological test (extracted from WAIS sections)
   MEM3_SPATIAL_DEFINITION,
-  // WAIS-III specific definitions
   WAIS3_CRITERIA_DEFINITION,
   WAIS3_LEARNING_DEFINITION,
   WAIS3_VOCABULAIRE_DEFINITION,
@@ -179,6 +181,11 @@ import {
   WAIS3_CODE_SYMBOLES_DEFINITION,
   WAIS3_DIGIT_SPAN_DEFINITION,
   WAIS3_CPT2_DEFINITION
+} from '../questionnaires/bipolar/initial/neuropsy';
+// Legacy imports for follow-up specific definitions (not part of initial evaluation module)
+import {
+  ISA_FOLLOWUP_DEFINITION,
+  SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION
 } from '../constants/questionnaires-hetero';
 import {
   SOCIAL_DEFINITION

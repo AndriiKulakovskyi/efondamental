@@ -7,9 +7,9 @@
 // - Memory Tests: CVLT, MEM3_SPATIAL
 // - Processing Speed: TMT, STROOP, FLUENCES_VERBALES
 // - Cognitive Assessment: COBRA, CPT3, SCIP, TEST_COMMISSIONS
-// - WAIS-IV (6): Similitudes, Matrices, Code, Digit Span, Vocabulaire, Cubes
-// - WAIS-III (7): Vocabulaire, Matrices, Code/Symboles, Digit Span, 
-//                 Similitudes, Cubes, Arithmetique
+// - WAIS-IV (6): Criteria, Learning, Matrices, Code, Digit Span, Similitudes
+// - WAIS-III (7): Criteria, Learning, Vocabulaire, Matrices, Code/Symboles, 
+//                 Digit Span, CPT2
 //
 // All questionnaires save to bipolar_* tables via the generic service layer.
 // ============================================================================
@@ -112,6 +112,22 @@ export {
 // WAIS-IV Assessments
 // ============================================================================
 
+// WAIS-IV Criteria (Clinical criteria for evaluation)
+export {
+  WAIS4_CRITERIA_QUESTIONS,
+  WAIS4_CRITERIA_DEFINITION,
+  type BipolarWais4CriteriaResponse,
+  type BipolarWais4CriteriaResponseInsert
+} from './wais4-criteria';
+
+// WAIS-IV Learning (Learning disorders checklist)
+export {
+  WAIS4_LEARNING_QUESTIONS,
+  WAIS4_LEARNING_DEFINITION,
+  type BipolarWais4LearningResponse,
+  type BipolarWais4LearningResponseInsert
+} from './wais4-learning';
+
 // WAIS-IV Similitudes
 export {
   WAIS4_SIMILITUDES_QUESTIONS,
@@ -148,27 +164,25 @@ export {
   type BipolarWais4DigitSpanResponseInsert
 } from './wais4-digit-span';
 
-// WAIS-IV Vocabulaire
-export {
-  WAIS4_VOCABULAIRE_QUESTIONS,
-  WAIS4_VOCABULAIRE_DEFINITION,
-  computeWais4VocabulaireRawScore,
-  type BipolarWais4VocabulaireResponse,
-  type BipolarWais4VocabulaireResponseInsert
-} from './wais4-vocabulaire';
-
-// WAIS-IV Cubes
-export {
-  WAIS4_CUBES_QUESTIONS,
-  WAIS4_CUBES_DEFINITION,
-  computeWais4CubesRawScore,
-  type BipolarWais4CubesResponse,
-  type BipolarWais4CubesResponseInsert
-} from './wais4-cubes';
-
 // ============================================================================
 // WAIS-III Assessments
 // ============================================================================
+
+// WAIS-III Criteria (Clinical criteria for evaluation)
+export {
+  WAIS3_CRITERIA_QUESTIONS,
+  WAIS3_CRITERIA_DEFINITION,
+  type BipolarWais3CriteriaResponse,
+  type BipolarWais3CriteriaResponseInsert
+} from './wais3-criteria';
+
+// WAIS-III Learning (Learning disorders checklist)
+export {
+  WAIS3_LEARNING_QUESTIONS,
+  WAIS3_LEARNING_DEFINITION,
+  type BipolarWais3LearningResponse,
+  type BipolarWais3LearningResponseInsert
+} from './wais3-learning';
 
 // WAIS-III Vocabulaire
 export {
@@ -206,29 +220,10 @@ export {
   type BipolarWais3DigitSpanResponseInsert
 } from './wais3-digit-span';
 
-// WAIS-III Similitudes
+// WAIS-III CPT2 (Conners Continuous Performance Test II)
 export {
-  WAIS3_SIMILITUDES_QUESTIONS,
-  WAIS3_SIMILITUDES_DEFINITION,
-  computeWais3SimilitudesRawScore,
-  type BipolarWais3SimilitudesResponse,
-  type BipolarWais3SimilitudesResponseInsert
-} from './wais3-similitudes';
-
-// WAIS-III Cubes
-export {
-  WAIS3_CUBES_QUESTIONS,
-  WAIS3_CUBES_DEFINITION,
-  computeWais3CubesRawScore,
-  type BipolarWais3CubesResponse,
-  type BipolarWais3CubesResponseInsert
-} from './wais3-cubes';
-
-// WAIS-III Arithmetique
-export {
-  WAIS3_ARITHMETIQUE_QUESTIONS,
-  WAIS3_ARITHMETIQUE_DEFINITION,
-  computeWais3ArithmetiqueRawScore,
-  type BipolarWais3ArithmetiqueResponse,
-  type BipolarWais3ArithmetiqueResponseInsert
-} from './wais3-arithmetique';
+  WAIS3_CPT2_QUESTIONS,
+  WAIS3_CPT2_DEFINITION,
+  type BipolarWais3Cpt2Response,
+  type BipolarWais3Cpt2ResponseInsert
+} from './wais3-cpt2';

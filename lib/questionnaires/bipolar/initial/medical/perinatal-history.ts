@@ -7,7 +7,7 @@ import { Question } from '@/lib/types/database.types';
 // Types
 // ============================================================================
 
-export interface BipolarPerinatalHistoryResponse {
+export interface BipolarPerinataliteResponse {
   id: string;
   visit_id: string;
   patient_id: string;
@@ -41,8 +41,8 @@ export interface BipolarPerinatalHistoryResponse {
   updated_at: string;
 }
 
-export type BipolarPerinatalHistoryResponseInsert = Omit<
-  BipolarPerinatalHistoryResponse,
+export type BipolarPerinataliteResponseInsert = Omit<
+  BipolarPerinataliteResponse,
   'id' | 'created_at' | 'updated_at' | 'completed_at'
 > & {
   completed_by?: string | null;
@@ -52,7 +52,7 @@ export type BipolarPerinatalHistoryResponseInsert = Omit<
 // Questions Dictionary
 // ============================================================================
 
-export const PERINATAL_HISTORY_QUESTIONS: Question[] = [
+export const PERINATALITE_QUESTIONS: Question[] = [
   // Pregnancy Section
   {
     id: 'section_pregnancy',
@@ -294,9 +294,9 @@ export interface QuestionnaireDefinition {
   };
 }
 
-export const PERINATAL_HISTORY_DEFINITION: QuestionnaireDefinition = {
-  id: 'perinatal_history',
-  code: 'PERINATAL_HISTORY',
+export const PERINATALITE_DEFINITION: QuestionnaireDefinition = {
+  id: 'perinatalite',
+  code: 'PERINATALITE',
   title: 'Antecedents Perinataux',
   description: 'Recueil des antecedents obstetricaux et psychiatriques perinataux.',
   questions: PERINATAL_HISTORY_QUESTIONS,

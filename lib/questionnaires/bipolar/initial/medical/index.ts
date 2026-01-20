@@ -93,10 +93,10 @@ export {
 
 // Perinatal History
 export {
-  PERINATAL_HISTORY_QUESTIONS,
-  PERINATAL_HISTORY_DEFINITION,
-  type BipolarPerinatalHistoryResponse,
-  type BipolarPerinatalHistoryResponseInsert
+  PERINATALITE_QUESTIONS,
+  PERINATALITE_DEFINITION,
+  type BipolarPerinataliteResponse,
+  type BipolarPerinataliteResponseInsert
 } from './perinatal-history';
 
 // Pathologies (Medical History)

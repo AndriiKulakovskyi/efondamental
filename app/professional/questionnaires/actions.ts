@@ -215,7 +215,7 @@ function questionnaireCodeToBipolarKey(code: string): string | null {
     'CTI': 'CTI',
     // Social module
     'SOCIAL': 'SOCIAL',
-    // Medical module
+    // Medical module - legacy codes with _FR suffix
     'DSM5_HUMEUR_FR': 'DSM5_HUMEUR',
     'DSM5_PSYCHOTIC_FR': 'DSM5_PSYCHOTIC',
     'DSM5_COMORBID_FR': 'DSM5_COMORBID',
@@ -235,7 +235,27 @@ function questionnaireCodeToBipolarKey(code: string): string | null {
     'PATHO_HEPATO_GASTRO_FR': 'PATHO_HEPATO_GASTRO',
     'PATHO_ALLERGIQUE_FR': 'PATHO_ALLERGIQUE',
     'AUTRES_PATHO_FR': 'AUTRES_PATHO',
-    // Neuropsy module
+    // Medical module - new codes without _FR suffix (from new bipolar module definitions)
+    'DSM5_HUMEUR': 'DSM5_HUMEUR',
+    'DSM5_PSYCHOTIC': 'DSM5_PSYCHOTIC',
+    'DSM5_COMORBID': 'DSM5_COMORBID',
+    'DIVA': 'DIVA',
+    'FAMILY_HISTORY': 'FAMILY_HISTORY',
+    'CSSRS': 'CSSRS',
+    'ISA': 'ISA',
+    'SIS': 'SIS',
+    'SUICIDE_HISTORY': 'SUICIDE_HISTORY',
+    'PERINATALITE': 'PERINATALITE',
+    'PATHO_NEURO': 'PATHO_NEURO',
+    'PATHO_CARDIO': 'PATHO_CARDIO',
+    'PATHO_ENDOC': 'PATHO_ENDOC',
+    'PATHO_DERMATO': 'PATHO_DERMATO',
+    'PATHO_URINAIRE': 'PATHO_URINAIRE',
+    'ANTECEDENTS_GYNECO': 'ANTECEDENTS_GYNECO',
+    'PATHO_HEPATO_GASTRO': 'PATHO_HEPATO_GASTRO',
+    'PATHO_ALLERGIQUE': 'PATHO_ALLERGIQUE',
+    'AUTRES_PATHO': 'AUTRES_PATHO',
+    // Neuropsy module - legacy codes with _FR suffix
     'CVLT_FR': 'CVLT',
     'TMT_FR': 'TMT',
     'STROOP_FR': 'STROOP',
@@ -258,6 +278,29 @@ function questionnaireCodeToBipolarKey(code: string): string | null {
     'CPT3_FR': 'CPT3',
     'SCIP_FR': 'SCIP',
     'TEST_COMMISSIONS_FR': 'TEST_COMMISSIONS',
+    // Neuropsy module - new codes without _FR suffix (from new bipolar module definitions)
+    'CVLT': 'CVLT',
+    'TMT': 'TMT',
+    'STROOP': 'STROOP',
+    'FLUENCES_VERBALES': 'FLUENCES_VERBALES',
+    'MEM3_SPATIAL': 'MEM3_SPATIAL',
+    'WAIS4_CRITERIA': 'WAIS4_CRITERIA',
+    'WAIS4_LEARNING': 'WAIS4_LEARNING',
+    'WAIS4_MATRICES': 'WAIS4_MATRICES',
+    'WAIS4_CODE': 'WAIS4_CODE',
+    'WAIS4_DIGIT_SPAN': 'WAIS4_DIGIT_SPAN',
+    'WAIS4_SIMILITUDES': 'WAIS4_SIMILITUDES',
+    'WAIS3_CRITERIA': 'WAIS3_CRITERIA',
+    'WAIS3_LEARNING': 'WAIS3_LEARNING',
+    'WAIS3_VOCABULAIRE': 'WAIS3_VOCABULAIRE',
+    'WAIS3_MATRICES': 'WAIS3_MATRICES',
+    'WAIS3_CODE_SYMBOLES': 'WAIS3_CODE_SYMBOLES',
+    'WAIS3_DIGIT_SPAN': 'WAIS3_DIGIT_SPAN',
+    'WAIS3_CPT2': 'WAIS3_CPT2',
+    'COBRA': 'COBRA',
+    'CPT3': 'CPT3',
+    'SCIP': 'SCIP',
+    'TEST_COMMISSIONS': 'TEST_COMMISSIONS',
   };
   return mapping[code] || null;
 }
