@@ -11,35 +11,58 @@ export interface BipolarCvltResponse {
   id: string;
   visit_id: string;
   patient_id: string;
-  // Trial scores
-  trial1: number | null;
-  trial2: number | null;
-  trial3: number | null;
-  trial4: number | null;
-  trial5: number | null;
-  trials_1_5_total: number | null;
+  patient_age?: number | null;
+  years_of_education?: number | null;
+  patient_sex?: string | null;
+  // Trial scores (DB column names)
+  trial_1: number | null;
+  trial_2: number | null;
+  trial_3: number | null;
+  trial_4: number | null;
+  trial_5: number | null;
+  total_1_5: number | null;
   // List B
-  list_b_total: number | null;
-  // Short delay
-  short_delay_free: number | null;
-  short_delay_cued: number | null;
-  // Long delay
-  long_delay_free: number | null;
-  long_delay_cued: number | null;
+  list_b: number | null;
+  // Short delay (sdfr = Short Delay Free Recall, sdcr = Short Delay Cued Recall)
+  sdfr: number | null;
+  sdcr: number | null;
+  // Long delay (ldfr = Long Delay Free Recall, ldcr = Long Delay Cued Recall)
+  ldfr: number | null;
+  ldcr: number | null;
   // Recognition
   recognition_hits: number | null;
-  recognition_false_positives: number | null;
-  recognition_discriminability: number | null;
+  false_positives: number | null;
+  discriminability: number | null;
   // Additional metrics
   semantic_clustering: number | null;
   serial_clustering: number | null;
-  learning_slope: number | null;
-  intrusions_total: number | null;
-  perseverations_total: number | null;
-  // Calculated scores
-  z_score_trials_1_5: number | null;
-  z_score_long_delay_free: number | null;
-  z_score_recognition: number | null;
+  primacy: number | null;
+  recency: number | null;
+  response_bias: number | null;
+  intrusions: number | null;
+  perseverations: number | null;
+  // Standardized scores
+  trial_1_std: number | null;
+  trial_5_std: number | null;
+  total_1_5_std: number | null;
+  list_b_std: number | null;
+  sdfr_std: number | null;
+  sdcr_std: number | null;
+  ldfr_std: number | null;
+  ldcr_std: number | null;
+  semantic_std: number | null;
+  serial_std: number | null;
+  persev_std: number | null;
+  intru_std: number | null;
+  recog_std: number | null;
+  false_recog_std: number | null;
+  discrim_std: number | null;
+  primacy_std: number | null;
+  recency_std: number | null;
+  bias_std: number | null;
+  // Version
+  cvlt_delai?: number | null;
+  questionnaire_version?: string | null;
   // Metadata
   completed_by: string | null;
   completed_at: string;
@@ -67,7 +90,7 @@ export const CVLT_QUESTIONS: Question[] = [
     required: false
   },
   {
-    id: 'trial1',
+    id: 'trial_1',
     text: 'Essai 1 - Nombre de mots rappeles',
     type: 'number',
     required: true,
@@ -75,7 +98,7 @@ export const CVLT_QUESTIONS: Question[] = [
     max: 16
   },
   {
-    id: 'trial2',
+    id: 'trial_2',
     text: 'Essai 2 - Nombre de mots rappeles',
     type: 'number',
     required: true,
@@ -83,7 +106,7 @@ export const CVLT_QUESTIONS: Question[] = [
     max: 16
   },
   {
-    id: 'trial3',
+    id: 'trial_3',
     text: 'Essai 3 - Nombre de mots rappeles',
     type: 'number',
     required: true,
@@ -91,7 +114,7 @@ export const CVLT_QUESTIONS: Question[] = [
     max: 16
   },
   {
-    id: 'trial4',
+    id: 'trial_4',
     text: 'Essai 4 - Nombre de mots rappeles',
     type: 'number',
     required: true,
@@ -99,7 +122,7 @@ export const CVLT_QUESTIONS: Question[] = [
     max: 16
   },
   {
-    id: 'trial5',
+    id: 'trial_5',
     text: 'Essai 5 - Nombre de mots rappeles',
     type: 'number',
     required: true,
@@ -107,7 +130,7 @@ export const CVLT_QUESTIONS: Question[] = [
     max: 16
   },
   {
-    id: 'trials_1_5_total',
+    id: 'total_1_5',
     text: 'Total Essais 1-5',
     type: 'number',
     required: false,
@@ -124,7 +147,7 @@ export const CVLT_QUESTIONS: Question[] = [
     required: false
   },
   {
-    id: 'list_b_total',
+    id: 'list_b',
     text: 'Liste B - Nombre de mots rappeles',
     type: 'number',
     required: true,
@@ -140,16 +163,16 @@ export const CVLT_QUESTIONS: Question[] = [
     required: false
   },
   {
-    id: 'short_delay_free',
-    text: 'Rappel Libre Court Differe',
+    id: 'sdfr',
+    text: 'Rappel Libre Court Differe (SDFR)',
     type: 'number',
     required: true,
     min: 0,
     max: 16
   },
   {
-    id: 'short_delay_cued',
-    text: 'Rappel Indice Court Differe',
+    id: 'sdcr',
+    text: 'Rappel Indice Court Differe (SDCR)',
     type: 'number',
     required: true,
     min: 0,
@@ -164,16 +187,16 @@ export const CVLT_QUESTIONS: Question[] = [
     required: false
   },
   {
-    id: 'long_delay_free',
-    text: 'Rappel Libre Long Differe',
+    id: 'ldfr',
+    text: 'Rappel Libre Long Differe (LDFR)',
     type: 'number',
     required: true,
     min: 0,
     max: 16
   },
   {
-    id: 'long_delay_cued',
-    text: 'Rappel Indice Long Differe',
+    id: 'ldcr',
+    text: 'Rappel Indice Long Differe (LDCR)',
     type: 'number',
     required: true,
     min: 0,
@@ -196,7 +219,7 @@ export const CVLT_QUESTIONS: Question[] = [
     max: 16
   },
   {
-    id: 'recognition_false_positives',
+    id: 'false_positives',
     text: 'Reconnaissance - Nombre de faux positifs',
     type: 'number',
     required: true,
@@ -204,7 +227,7 @@ export const CVLT_QUESTIONS: Question[] = [
     max: 28
   },
   {
-    id: 'recognition_discriminability',
+    id: 'discriminability',
     text: 'Discriminabilite (d\')',
     type: 'number',
     required: false,
@@ -231,20 +254,32 @@ export const CVLT_QUESTIONS: Question[] = [
     required: false
   },
   {
-    id: 'learning_slope',
-    text: 'Pente d\'Apprentissage',
+    id: 'primacy',
+    text: 'Region de Primaute',
     type: 'number',
     required: false
   },
   {
-    id: 'intrusions_total',
+    id: 'recency',
+    text: 'Region de Recence',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'response_bias',
+    text: 'Biais de Reponse',
+    type: 'number',
+    required: false
+  },
+  {
+    id: 'intrusions',
     text: 'Total des Intrusions',
     type: 'number',
     required: false,
     min: 0
   },
   {
-    id: 'perseverations_total',
+    id: 'perseverations',
     text: 'Total des Perseverations',
     type: 'number',
     required: false,

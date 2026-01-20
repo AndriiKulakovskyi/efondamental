@@ -299,7 +299,7 @@ export const PERINATALITE_DEFINITION: QuestionnaireDefinition = {
   code: 'PERINATALITE',
   title: 'Antecedents Perinataux',
   description: 'Recueil des antecedents obstetricaux et psychiatriques perinataux.',
-  questions: PERINATAL_HISTORY_QUESTIONS,
+  questions: PERINATALITE_QUESTIONS,
   metadata: {
     singleColumn: true,
     pathologies: ['bipolar'],

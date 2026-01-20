@@ -215,6 +215,10 @@ import {
   getSocialResponse
 } from "@/lib/services/questionnaire-social.service";
 import {
+  getBipolarInitialResponse,
+  BIPOLAR_INITIAL_TABLES
+} from "@/lib/services/bipolar-initial.service";
+import {
   getTobaccoResponse,
   getFagerstromResponse,
   getPhysicalParamsResponse,
@@ -266,6 +270,148 @@ import {
   questionnaireUsesPatientSex,
   questionnaireUsesAgeField
 } from "@/lib/utils/patient-demographics";
+
+// Map questionnaire codes to BIPOLAR_INITIAL_TABLES keys
+// Used to route data fetching to bipolar_* tables for bipolar initial evaluations
+function questionnaireCodeToBipolarKey(code: string): string | null {
+  const mapping: Record<string, string> = {
+    // Nurse module
+    'TOBACCO': 'TOBACCO',
+    'FAGERSTROM': 'FAGERSTROM',
+    'PHYSICAL_PARAMS': 'PHYSICAL_PARAMS',
+    'BLOOD_PRESSURE': 'BLOOD_PRESSURE',
+    'ECG': 'ECG',
+    'SLEEP_APNEA': 'SLEEP_APNEA',
+    'BIOLOGICAL_ASSESSMENT': 'BIOLOGICAL_ASSESSMENT',
+    // Thymic module
+    'MADRS': 'MADRS',
+    'YMRS': 'YMRS',
+    'CGI': 'CGI',
+    'EGF': 'EGF',
+    'ALDA': 'ALDA',
+    'ETAT_PATIENT': 'ETAT_PATIENT',
+    'FAST': 'FAST',
+    // Auto ETAT module
+    'EQ5D5L': 'EQ5D5L',
+    'PRISE_M': 'PRISE_M',
+    'STAI_YA': 'STAI_YA',
+    'MARS': 'MARS',
+    'MATHYS': 'MATHYS',
+    'PSQI': 'PSQI',
+    'EPWORTH': 'EPWORTH',
+    // Auto TRAITS module
+    'ASRS_FR': 'ASRS',
+    'CTQ_FR': 'CTQ',
+    'BIS10_FR': 'BIS10',
+    'ALS18': 'ALS18',
+    'AIM': 'AIM',
+    'WURS25': 'WURS25',
+    'AQ12': 'AQ12',
+    'CSM': 'CSM',
+    'CTI': 'CTI',
+    // Social module
+    'SOCIAL': 'SOCIAL',
+    // Medical module - legacy codes with _FR suffix
+    'DSM5_HUMEUR_FR': 'DSM5_HUMEUR',
+    'DSM5_PSYCHOTIC_FR': 'DSM5_PSYCHOTIC',
+    'DSM5_COMORBID_FR': 'DSM5_COMORBID',
+    'DIVA_2_FR': 'DIVA',
+    'FAMILY_HISTORY_FR': 'FAMILY_HISTORY',
+    'CSSRS_FR': 'CSSRS',
+    'ISA_FR': 'ISA',
+    'SIS_FR': 'SIS',
+    'SUICIDE_HISTORY_FR': 'SUICIDE_HISTORY',
+    'PERINATALITE_FR': 'PERINATALITE',
+    'PATHO_NEURO_FR': 'PATHO_NEURO',
+    'PATHO_CARDIO_FR': 'PATHO_CARDIO',
+    'PATHO_ENDOC_FR': 'PATHO_ENDOC',
+    'PATHO_DERMATO_FR': 'PATHO_DERMATO',
+    'PATHO_URINAIRE_FR': 'PATHO_URINAIRE',
+    'ANTECEDENTS_GYNECO_FR': 'ANTECEDENTS_GYNECO',
+    'PATHO_HEPATO_GASTRO_FR': 'PATHO_HEPATO_GASTRO',
+    'PATHO_ALLERGIQUE_FR': 'PATHO_ALLERGIQUE',
+    'AUTRES_PATHO_FR': 'AUTRES_PATHO',
+    // Medical module - new codes without _FR suffix
+    'DSM5_HUMEUR': 'DSM5_HUMEUR',
+    'DSM5_PSYCHOTIC': 'DSM5_PSYCHOTIC',
+    'DSM5_COMORBID': 'DSM5_COMORBID',
+    'DIVA': 'DIVA',
+    'FAMILY_HISTORY': 'FAMILY_HISTORY',
+    'CSSRS': 'CSSRS',
+    'ISA': 'ISA',
+    'SIS': 'SIS',
+    'SUICIDE_HISTORY': 'SUICIDE_HISTORY',
+    'PERINATALITE': 'PERINATALITE',
+    'PATHO_NEURO': 'PATHO_NEURO',
+    'PATHO_CARDIO': 'PATHO_CARDIO',
+    'PATHO_ENDOC': 'PATHO_ENDOC',
+    'PATHO_DERMATO': 'PATHO_DERMATO',
+    'PATHO_URINAIRE': 'PATHO_URINAIRE',
+    'ANTECEDENTS_GYNECO': 'ANTECEDENTS_GYNECO',
+    'PATHO_HEPATO_GASTRO': 'PATHO_HEPATO_GASTRO',
+    'PATHO_ALLERGIQUE': 'PATHO_ALLERGIQUE',
+    'AUTRES_PATHO': 'AUTRES_PATHO',
+    // Neuropsy module - legacy codes with _FR suffix
+    'CVLT_FR': 'CVLT',
+    'TMT_FR': 'TMT',
+    'STROOP_FR': 'STROOP',
+    'FLUENCES_VERBALES_FR': 'FLUENCES_VERBALES',
+    'MEM3_SPATIAL_FR': 'MEM3_SPATIAL',
+    'WAIS4_CRITERIA_FR': 'WAIS4_CRITERIA',
+    'WAIS4_LEARNING_FR': 'WAIS4_LEARNING',
+    'WAIS4_MATRICES_FR': 'WAIS4_MATRICES',
+    'WAIS4_CODE_FR': 'WAIS4_CODE',
+    'WAIS4_DIGIT_SPAN_FR': 'WAIS4_DIGIT_SPAN',
+    'WAIS4_SIMILITUDES_FR': 'WAIS4_SIMILITUDES',
+    'WAIS3_CRITERIA_FR': 'WAIS3_CRITERIA',
+    'WAIS3_LEARNING_FR': 'WAIS3_LEARNING',
+    'WAIS3_VOCABULAIRE_FR': 'WAIS3_VOCABULAIRE',
+    'WAIS3_MATRICES_FR': 'WAIS3_MATRICES',
+    'WAIS3_CODE_SYMBOLES_FR': 'WAIS3_CODE_SYMBOLES',
+    'WAIS3_DIGIT_SPAN_FR': 'WAIS3_DIGIT_SPAN',
+    'WAIS3_CPT2_FR': 'WAIS3_CPT2',
+    'COBRA_FR': 'COBRA',
+    'CPT3_FR': 'CPT3',
+    'SCIP_FR': 'SCIP',
+    'TEST_COMMISSIONS_FR': 'TEST_COMMISSIONS',
+    // Neuropsy module - new codes without _FR suffix
+    'CVLT': 'CVLT',
+    'TMT': 'TMT',
+    'STROOP': 'STROOP',
+    'FLUENCES_VERBALES': 'FLUENCES_VERBALES',
+    'MEM3_SPATIAL': 'MEM3_SPATIAL',
+    'WAIS4_CRITERIA': 'WAIS4_CRITERIA',
+    'WAIS4_LEARNING': 'WAIS4_LEARNING',
+    'WAIS4_MATRICES': 'WAIS4_MATRICES',
+    'WAIS4_CODE': 'WAIS4_CODE',
+    'WAIS4_DIGIT_SPAN': 'WAIS4_DIGIT_SPAN',
+    'WAIS4_SIMILITUDES': 'WAIS4_SIMILITUDES',
+    'WAIS3_CRITERIA': 'WAIS3_CRITERIA',
+    'WAIS3_LEARNING': 'WAIS3_LEARNING',
+    'WAIS3_VOCABULAIRE': 'WAIS3_VOCABULAIRE',
+    'WAIS3_MATRICES': 'WAIS3_MATRICES',
+    'WAIS3_CODE_SYMBOLES': 'WAIS3_CODE_SYMBOLES',
+    'WAIS3_DIGIT_SPAN': 'WAIS3_DIGIT_SPAN',
+    'WAIS3_CPT2': 'WAIS3_CPT2',
+    'COBRA': 'COBRA',
+    'CPT3': 'CPT3',
+    'SCIP': 'SCIP',
+    'TEST_COMMISSIONS': 'TEST_COMMISSIONS',
+  };
+  return mapping[code] || null;
+}
+
+// Check if a questionnaire should fetch data from bipolar_* tables
+function shouldUseBipolarTables(pathology: string, visitType: string | undefined, code: string): boolean {
+  // Only for bipolar pathology with initial_evaluation visit type
+  if (pathology !== 'bipolar' || visitType !== 'initial_evaluation') {
+    return false;
+  }
+  
+  // Check if the questionnaire code maps to a bipolar table
+  const bipolarKey = questionnaireCodeToBipolarKey(code);
+  return bipolarKey !== null && BIPOLAR_INITIAL_TABLES[bipolarKey] !== undefined;
+}
 
 export default async function ProfessionalQuestionnairePage({
   params,
@@ -412,11 +558,22 @@ export default async function ProfessionalQuestionnairePage({
     notFound();
   }
 
+  // Fetch visit to determine visit type for data source routing
+  const visit = await getVisitById(visitId);
+  const useBipolarTables = shouldUseBipolarTables(pathology, visit?.visit_type, code);
+
   // Fetch existing response
   let existingResponse: any = null;
   
-  // Screening questionnaires
-  if (code === ASRM_DEFINITION.code) existingResponse = await getAsrmResponse(visitId);
+  // For bipolar initial evaluations, use bipolar_* tables
+  if (useBipolarTables) {
+    const bipolarKey = questionnaireCodeToBipolarKey(code);
+    if (bipolarKey) {
+      existingResponse = await getBipolarInitialResponse(bipolarKey, visitId);
+    }
+  }
+  // Screening questionnaires (always use legacy tables - these are separate from initial eval)
+  else if (code === ASRM_DEFINITION.code) existingResponse = await getAsrmResponse(visitId);
   else if (code === QIDS_DEFINITION.code) existingResponse = await getQidsResponse(visitId);
   else if (code === MDQ_DEFINITION.code) existingResponse = await getMdqResponse(visitId);
   else if (code === DIAGNOSTIC_DEFINITION.code) existingResponse = await getDiagnosticResponse(visitId);
@@ -558,11 +715,8 @@ export default async function ProfessionalQuestionnairePage({
   console.log('[Demographics Debug] Code:', code, '| Requires demographics:', requiresDemographics);
   
   if (requiresDemographics) {
-    // Fetch patient and visit data to calculate age at visit date
-    const [patient, visit] = await Promise.all([
-      getPatientById(patientId),
-      getVisitById(visitId)
-    ]);
+    // Fetch patient data (visit already fetched above for data source routing)
+    const patient = await getPatientById(patientId);
 
     console.log('[Demographics Debug] Patient:', patient ? { id: patient.id, dob: patient.date_of_birth, gender: patient.gender } : 'NOT FOUND');
     console.log('[Demographics Debug] Visit:', visit ? { id: visit.id, scheduled_date: visit.scheduled_date } : 'NOT FOUND');
