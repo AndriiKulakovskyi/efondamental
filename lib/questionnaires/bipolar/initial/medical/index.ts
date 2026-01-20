@@ -29,7 +29,6 @@ export {
 
 // DSM-5 Comorbidities
 export {
-  DSM5_COMORBID_QUESTIONS,
   DSM5_COMORBID_DEFINITION
 } from '@/lib/constants/questionnaires-dsm5';
 

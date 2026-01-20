@@ -64,7 +64,7 @@ export const EPWORTH_QUESTIONS: Question[] = [
   { id: 'q3', text: '3. Assis, inactif, dans un endroit public (au théâtre, en réunion)', type: 'single_choice', required: true, options: SLEEPINESS_OPTIONS },
   { id: 'q4', text: '4. Comme passager dans une voiture roulant sans arrêt pendant une heure', type: 'single_choice', required: true, options: SLEEPINESS_OPTIONS },
   { id: 'q5', text: "5. Allongé l'après-midi pour se reposer quand les circonstances le permettent", type: 'single_choice', required: true, options: SLEEPINESS_OPTIONS },
-  { id: 'q6', text: '6. Assis en train de parler à quelqu'un', type: 'single_choice', required: true, options: SLEEPINESS_OPTIONS },
+  { id: 'q6', text: "6. Assis en train de parler à quelqu'un", type: 'single_choice', required: true, options: SLEEPINESS_OPTIONS },
   { id: 'q7', text: '7. Assis calmement après un repas sans alcool', type: 'single_choice', required: true, options: SLEEPINESS_OPTIONS },
   { id: 'q8', text: '8. Dans une auto immobilisée quelques minutes dans un encombrement', type: 'single_choice', required: true, options: SLEEPINESS_OPTIONS },
   { id: 'q9', text: '9. Ces envies de dormir surviennent-elles ?', type: 'single_choice', required: false, options: [
