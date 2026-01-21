@@ -1,9 +1,9 @@
 -- ============================================================================
 -- Migration: Fix Bipolar Table Names in Visit Detail RPC
 -- ============================================================================
--- This migration fixes the get_visit_detail_data RPC function to use correct
--- table names for bipolar questionnaires:
+-- This migration fixes the get_visit_detail_data RPC function:
 -- - All bipolar tables now use prefix 'bipolar_' not 'responses_'
+-- - Added support for 'annual_evaluation' and 'biannual_followup' visit types
 -- - Fixes all modules: nurse, thymic, medical, neuropsy, auto, social, traits
 -- ============================================================================
 
