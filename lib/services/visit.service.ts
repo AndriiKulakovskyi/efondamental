@@ -234,9 +234,9 @@ import {
   TEA_COFFEE_SZ_DEFINITION,
   ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
   SZ_PERINATALITE_DEFINITION,
-  EVAL_ADDICTOLOGIQUE_SZ_DEFINITION
-} from '../constants/questionnaires-schizophrenia';
-import { TROUBLES_COMORBIDES_SZ_DEFINITION } from '../constants/questionnaires-schizophrenia-comorbid';
+  EVAL_ADDICTOLOGIQUE_SZ_DEFINITION,
+  TROUBLES_COMORBIDES_SZ_DEFINITION
+} from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
   getHumeurDepuisVisiteResponse,

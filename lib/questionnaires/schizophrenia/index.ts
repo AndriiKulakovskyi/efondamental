@@ -1,0 +1,45 @@
+// eFondaMental Platform - Schizophrenia Pathology Questionnaires
+// Export all schizophrenia questionnaire modules
+
+// Screening visit questionnaires (2 questionnaires)
+// Note: Schizophrenia screening has only medical questionnaires (no auto-questionnaires)
+export * from './screening';
+
+// Initial evaluation questionnaires (18 questionnaires across 4 modules)
+export * as initial from './initial';
+
+// Re-export commonly used definitions for convenience
+export {
+  SZ_DIAGNOSTIC_DEFINITION,
+  SZ_ORIENTATION_DEFINITION
+} from './screening/medical';
+
+export {
+  SZ_DOSSIER_INFIRMIER_DEFINITION,
+  SZ_BILAN_BIOLOGIQUE_DEFINITION
+} from './initial/nurse';
+
+export {
+  PANSS_DEFINITION,
+  CDSS_DEFINITION,
+  BARS_DEFINITION,
+  SUMD_DEFINITION,
+  AIMS_DEFINITION,
+  BARNES_DEFINITION,
+  SAS_DEFINITION,
+  PSP_DEFINITION
+} from './initial/hetero';
+
+export {
+  TROUBLES_PSYCHOTIQUES_DEFINITION,
+  TROUBLES_COMORBIDES_SZ_DEFINITION,
+  SUICIDE_HISTORY_SZ_DEFINITION,
+  ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
+  SZ_PERINATALITE_DEFINITION,
+  ECV_DEFINITION
+} from './initial/medical';
+
+export {
+  TEA_COFFEE_SZ_DEFINITION,
+  EVAL_ADDICTOLOGIQUE_SZ_DEFINITION
+} from './initial/addictologie';

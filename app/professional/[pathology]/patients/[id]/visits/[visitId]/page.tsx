@@ -138,9 +138,9 @@ import {
   ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
   SZ_PERINATALITE_DEFINITION,
   TEA_COFFEE_SZ_DEFINITION,
-  EVAL_ADDICTOLOGIQUE_SZ_DEFINITION
-} from "@/lib/constants/questionnaires-schizophrenia";
-import { TROUBLES_COMORBIDES_SZ_DEFINITION } from "@/lib/constants/questionnaires-schizophrenia-comorbid";
+  EVAL_ADDICTOLOGIQUE_SZ_DEFINITION,
+  TROUBLES_COMORBIDES_SZ_DEFINITION
+} from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
 export default async function VisitDetailPage({
