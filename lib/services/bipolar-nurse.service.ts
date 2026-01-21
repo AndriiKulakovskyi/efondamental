@@ -220,7 +220,25 @@ export async function getSleepApneaResponse(visitId: string): Promise<BipolarNur
     .single();
   
   if (error && error.code !== 'PGRST116') throw error;
-  return data;
+  if (!data) return null;
+  
+  // Convert boolean fields to 'yes'/'no' strings to match questionnaire options
+  const booleanToYesNo = (value: boolean | null): string | null => {
+    if (value === null || value === undefined) return null;
+    return value ? 'yes' : 'no';
+  };
+  
+  return {
+    ...data,
+    has_cpap_device: booleanToYesNo(data.has_cpap_device),
+    snoring: booleanToYesNo(data.snoring),
+    tiredness: booleanToYesNo(data.tiredness),
+    observed_apnea: booleanToYesNo(data.observed_apnea),
+    hypertension: booleanToYesNo(data.hypertension),
+    bmi_over_35: booleanToYesNo(data.bmi_over_35),
+    age_over_50: booleanToYesNo(data.age_over_50),
+    large_neck: booleanToYesNo(data.large_neck),
+  } as any;
 }
 
 export async function saveSleepApneaResponse(
@@ -228,7 +246,7 @@ export async function saveSleepApneaResponse(
 ): Promise<BipolarNurseSleepApneaResponse> {
   const supabase = await createClient();
   
-  // Compute STOP-Bang score if not already diagnosed
+  // Compute STOP-Bang score first using string values ('yes'/'no')
   const scoring = scoreSleepApnea({
     diagnosed_sleep_apnea: response.diagnosed_sleep_apnea ?? null,
     has_cpap_device: response.has_cpap_device ?? null,
@@ -242,20 +260,43 @@ export async function saveSleepApneaResponse(
     male_gender: response.male_gender ?? null
   });
   
+  // Convert 'yes'/'no' strings to booleans for database storage
+  const yesNoToBoolean = (value: any): boolean | null => {
+    if (value === null || value === undefined) return null;
+    if (typeof value === 'boolean') return value;
+    if (value === 'yes') return true;
+    if (value === 'no') return false;
+    return null;
+  };
+  
+  // Database expects booleans, not strings - cast to bypass TS types
+  const dataToSave = {
+    visit_id: response.visit_id,
+    patient_id: response.patient_id,
+    diagnosed_sleep_apnea: response.diagnosed_sleep_apnea,
+    has_cpap_device: yesNoToBoolean(response.has_cpap_device),
+    snoring: yesNoToBoolean(response.snoring),
+    tiredness: yesNoToBoolean(response.tiredness),
+    observed_apnea: yesNoToBoolean(response.observed_apnea),
+    hypertension: yesNoToBoolean(response.hypertension),
+    bmi_over_35: yesNoToBoolean(response.bmi_over_35),
+    age_over_50: yesNoToBoolean(response.age_over_50),
+    large_neck: yesNoToBoolean(response.large_neck),
+    male_gender: yesNoToBoolean(response.male_gender),
+    stop_bang_score: scoring.stop_bang_score,
+    risk_level: scoring.risk_level,
+    interpretation: scoring.interpretation,
+    updated_at: new Date().toISOString()
+  };
+  
   const { data, error } = await supabase
     .from('bipolar_nurse_sleep_apnea')
-    .upsert({
-      ...response,
-      stop_bang_score: scoring.stop_bang_score,
-      risk_level: scoring.risk_level,
-      interpretation: scoring.interpretation,
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'visit_id' })
+    .upsert(dataToSave as any, { onConflict: 'visit_id' })
     .select()
     .single();
   
   if (error) throw error;
-  return data;
+  return data as any;
 }
 
 // ============================================================================

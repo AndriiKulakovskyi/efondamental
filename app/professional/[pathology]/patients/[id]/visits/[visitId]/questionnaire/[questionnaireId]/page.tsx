@@ -711,6 +711,24 @@ export default async function ProfessionalQuestionnairePage({
     // Destructure to remove metadata if needed, but passing everything is usually fine as extra keys are ignored by Renderer if not in questions list.
     initialResponses = { ...existingResponse };
   }
+  
+  // Convert boolean fields to 'yes'/'no' strings for SLEEP_APNEA questionnaire
+  // Database stores booleans but questionnaire options expect string codes
+  if (code === 'SLEEP_APNEA' && existingResponse) {
+    const boolToYesNo = (val: any) => {
+      if (val === true) return 'yes';
+      if (val === false) return 'no';
+      return val;
+    };
+    initialResponses.has_cpap_device = boolToYesNo(initialResponses.has_cpap_device);
+    initialResponses.snoring = boolToYesNo(initialResponses.snoring);
+    initialResponses.tiredness = boolToYesNo(initialResponses.tiredness);
+    initialResponses.observed_apnea = boolToYesNo(initialResponses.observed_apnea);
+    initialResponses.hypertension = boolToYesNo(initialResponses.hypertension);
+    initialResponses.bmi_over_35 = boolToYesNo(initialResponses.bmi_over_35);
+    initialResponses.age_over_50 = boolToYesNo(initialResponses.age_over_50);
+    initialResponses.large_neck = boolToYesNo(initialResponses.large_neck);
+  }
 
   // Inject patient demographics (age at visit date, gender) for questionnaires that require them
   const requiresDemographics = questionnaireRequiresDemographics(code);
