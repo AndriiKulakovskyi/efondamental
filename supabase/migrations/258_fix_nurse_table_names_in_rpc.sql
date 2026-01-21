@@ -20,8 +20,8 @@ DECLARE
   v_dsm5_diva_evaluated TEXT;
   v_fagerstrom_required BOOLEAN;
   v_diva_required BOOLEAN;
-  v_wais4_accepted INTEGER;
-  v_wais3_accepted INTEGER;
+  v_wais4_accepted BOOLEAN;
+  v_wais3_accepted BOOLEAN;
   v_statuses JSONB;
 BEGIN
   -- Get visit type

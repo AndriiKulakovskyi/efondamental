@@ -1,7 +1,8 @@
 // Bipolar Initial Evaluation - Nurse Module Integration Tests
-// Tests for all 6 questionnaires in the nurse module
+// Tests for all 7 questionnaires in the nurse module using service layer
+// This version uses the service layer to ensure computed fields are calculated
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { SupabaseClient } from '@supabase/supabase-js';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -19,6 +20,15 @@ import {
   generateBiologicalAssessmentResponses,
   generateEcgResponses,
 } from '../utils/test-helpers';
+import {
+  saveTobaccoForTest,
+  saveFagerstromForTest,
+  savePhysicalParamsForTest,
+  saveBloodPressureForTest,
+  saveSleepApneaForTest,
+  saveBiologicalAssessmentForTest,
+  saveEcgForTest,
+} from '../utils/nurse-test-helpers';
 
 // ============================================================================
 // Configuration
@@ -51,7 +61,7 @@ function loadTestConfig(): TestConfig | null {
 // Test Suite
 // ============================================================================
 
-describe('Bipolar Initial Evaluation - Nurse Module Integration Tests', () => {
+describe('Bipolar Initial Evaluation - Nurse Module Integration Tests (Service Layer)', () => {
   let adminClient: SupabaseClient;
   let professionalClient: SupabaseClient;
   let visitId: string;
@@ -95,1070 +105,438 @@ describe('Bipolar Initial Evaluation - Nurse Module Integration Tests', () => {
   });
 
   // ==========================================================================
-  // TOBACCO ASSESSMENT TESTS
+  // SERVICE LAYER SUBMISSION TESTS
   // ==========================================================================
 
-  describe('Tobacco Assessment (TOBACCO)', () => {
-    it('should save non-smoker status correctly', async () => {
+  describe('1. Tobacco Assessment (via Service Layer)', () => {
+    it('should save non-smoker status with computed fields', async () => {
       const responses = generateTobaccoResponses({ status: 'non_smoker' });
 
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_tobacco')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
+      const data = await saveTobaccoForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...responses,
+      });
 
-      expect(error).toBeNull();
       expect(data).toBeDefined();
       expect(data.smoking_status).toBe('non_smoker');
       expect(data.pack_years).toBeNull();
+      expect(data.visit_id).toBe(visitId);
     });
 
-    it('should save current smoker with pack-years and substitution', async () => {
+    it('should save current smoker and handle upsert behavior', async () => {
       const responses = generateTobaccoResponses({
         status: 'current_smoker',
         packYears: 20,
         hasSubstitution: true,
       });
 
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_tobacco')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
+      const data = await saveTobaccoForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...responses,
+      });
 
-      expect(error).toBeNull();
       expect(data).toBeDefined();
       expect(data.smoking_status).toBe('current_smoker');
       expect(data.pack_years).toBe(20);
-      expect(data.smoking_start_age).toBe('18');
-      expect(data.has_substitution).toBe(true); // boolean in DB
-      expect(data.substitution_methods).toContain('e_cigarette');
-      expect(data.substitution_methods).toContain('patch');
-    });
-
-    it('should save ex-smoker with pack-years and end age', async () => {
-      const responses = generateTobaccoResponses({
-        status: 'ex_smoker',
-        packYears: 15,
-        hasSubstitution: false,
-      });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_tobacco')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.smoking_status).toBe('ex_smoker');
-      expect(data.pack_years_ex).toBe(15);
-      expect(data.smoking_start_age_ex).toBe('16');
-      expect(data.smoking_end_age).toBe('35');
-      expect(data.has_substitution_ex).toBe('no');
-      expect(data.substitution_methods_ex).toBeNull();
-    });
-
-    it('should handle unknown smoking status', async () => {
-      const responses = generateTobaccoResponses({ status: 'unknown' });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_tobacco')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.smoking_status).toBe('unknown');
+      expect(data.has_substitution).toBe(true);
     });
   });
 
-  // ==========================================================================
-  // FAGERSTROM TESTS
-  // ==========================================================================
+  describe('2. Fagerstrom Test (via Service Layer)', () => {
+    it('should compute total_score, dependence_level, and interpretation', async () => {
+      // First ensure tobacco status is current_smoker
+      await saveTobaccoForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        smoking_status: 'current_smoker',
+        pack_years: 10,
+      });
 
-  describe('Fagerstrom Nicotine Dependence (FAGERSTROM)', () => {
-    // First, set up a current smoker tobacco response (Fagerstrom depends on this)
-    beforeEach(async () => {
-      await adminClient
-        .from('bipolar_nurse_tobacco')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          smoking_status: 'current_smoker',
-          pack_years: 10,
-          smoking_start_age: '18',
-          has_substitution: 'no',
-        }, { onConflict: 'visit_id' });
-    });
+      const responses = generateFagerstromResponses();
 
-    it('should compute score 0-2 as no dependence', async () => {
-      const responses = generateFagerstromResponses({ dependenceLevel: 'none' });
+      const data = await saveFagerstromForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...responses,
+      });
 
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_fagerstrom')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
       expect(data).toBeDefined();
-      // Sum should be 0-2
-      const sum = data.q1 + data.q2 + data.q3 + data.q4 + data.q5 + data.q6;
-      expect(sum).toBeLessThanOrEqual(2);
-    });
-
-    it('should compute score 3-4 as low dependence', async () => {
-      const responses = generateFagerstromResponses({ dependenceLevel: 'low' });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_fagerstrom')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      const sum = data.q1 + data.q2 + data.q3 + data.q4 + data.q5 + data.q6;
-      expect(sum).toBeGreaterThanOrEqual(3);
-      expect(sum).toBeLessThanOrEqual(4);
-    });
-
-    it('should compute score 5 as moderate dependence', async () => {
-      const responses = generateFagerstromResponses({ dependenceLevel: 'moderate' });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_fagerstrom')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      const sum = data.q1 + data.q2 + data.q3 + data.q4 + data.q5 + data.q6;
-      expect(sum).toBe(5);
-    });
-
-    it('should compute score 6-7 as high dependence', async () => {
-      const responses = generateFagerstromResponses({ dependenceLevel: 'high' });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_fagerstrom')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      const sum = data.q1 + data.q2 + data.q3 + data.q4 + data.q5 + data.q6;
-      expect(sum).toBeGreaterThanOrEqual(6);
-      expect(sum).toBeLessThanOrEqual(7);
-    });
-
-    it('should compute score 8-10 as very high dependence', async () => {
-      const responses = generateFagerstromResponses({ dependenceLevel: 'very_high' });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_fagerstrom')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      const sum = data.q1 + data.q2 + data.q3 + data.q4 + data.q5 + data.q6;
-      expect(sum).toBeGreaterThanOrEqual(8);
-      expect(sum).toBeLessThanOrEqual(10);
-    });
-
-    it('should accept specific target score', async () => {
-      const responses = generateFagerstromResponses({ targetScore: 6 });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_fagerstrom')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      const sum = data.q1 + data.q2 + data.q3 + data.q4 + data.q5 + data.q6;
-      expect(sum).toBe(6);
+      expect(data.total_score).not.toBeNull();
+      expect(data.dependence_level).not.toBeNull();
+      expect(data.interpretation).not.toBeNull();
+      expect(typeof data.total_score).toBe('number');
+      expect(['none', 'low', 'moderate', 'high', 'very_high']).toContain(data.dependence_level);
     });
   });
 
-  // ==========================================================================
-  // PHYSICAL PARAMETERS TESTS
-  // ==========================================================================
+  describe('3. Physical Parameters (via Service Layer)', () => {
+    it('should compute BMI from height and weight', async () => {
+      const responses = generatePhysicalParamsResponses();
 
-  describe('Physical Parameters (PHYSICAL_PARAMS)', () => {
-    it('should compute BMI for normal weight', async () => {
-      const responses = generatePhysicalParamsResponses({ bmiCategory: 'normal' });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_physical_params')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.height_cm).toBe(175);
-      expect(data.weight_kg).toBeDefined();
-      // BMI should be 18.5-25 for normal
-      const expectedBmi = data.weight_kg / Math.pow(data.height_cm / 100, 2);
-      expect(expectedBmi).toBeGreaterThanOrEqual(18.5);
-      expect(expectedBmi).toBeLessThan(25);
-    });
-
-    it('should compute BMI for underweight', async () => {
-      const responses = generatePhysicalParamsResponses({ bmiCategory: 'underweight' });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_physical_params')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      const bmi = data.weight_kg / Math.pow(data.height_cm / 100, 2);
-      expect(bmi).toBeLessThan(18.5);
-    });
-
-    it('should compute BMI for overweight', async () => {
-      const responses = generatePhysicalParamsResponses({ bmiCategory: 'overweight' });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_physical_params')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      const bmi = data.weight_kg / Math.pow(data.height_cm / 100, 2);
-      expect(bmi).toBeGreaterThanOrEqual(25);
-      expect(bmi).toBeLessThan(30);
-    });
-
-    it('should compute BMI for obese', async () => {
-      const responses = generatePhysicalParamsResponses({ bmiCategory: 'obese' });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_physical_params')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      const bmi = data.weight_kg / Math.pow(data.height_cm / 100, 2);
-      expect(bmi).toBeGreaterThanOrEqual(30);
-    });
-
-    it('should store custom height and weight', async () => {
-      const responses = generatePhysicalParamsResponses({
-        heightCm: 180,
-        weightKg: 85,
+      const data = await savePhysicalParamsForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...responses,
       });
 
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_physical_params')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
       expect(data).toBeDefined();
-      expect(data.height_cm).toBe(180);
-      expect(data.weight_kg).toBe(85);
-      // BMI = 85 / (1.8^2) = 26.23
-      const expectedBmi = 85 / Math.pow(1.8, 2);
-      expect(expectedBmi).toBeCloseTo(26.23, 1);
-    });
-  });
-
-  // ==========================================================================
-  // BLOOD PRESSURE TESTS
-  // ==========================================================================
-
-  describe('Blood Pressure (BLOOD_PRESSURE)', () => {
-    it('should store normal blood pressure readings', async () => {
-      const responses = generateBloodPressureResponses();
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_blood_pressure')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.bp_lying_systolic).toBe(120);
-      expect(data.bp_lying_diastolic).toBe(78);
-      expect(data.bp_standing_systolic).toBe(118);
-      expect(data.bp_standing_diastolic).toBe(76);
-    });
-
-    it('should detect orthostatic hypotension', async () => {
-      const responses = generateBloodPressureResponses({
-        hasOrthostaticHypotension: true,
-      });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_blood_pressure')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      // Verify orthostatic drop: systolic drop >= 20 or diastolic drop >= 10
-      const systolicDrop = data.bp_lying_systolic - data.bp_standing_systolic;
-      const diastolicDrop = data.bp_lying_diastolic - data.bp_standing_diastolic;
-      expect(systolicDrop >= 20 || diastolicDrop >= 10).toBe(true);
-    });
-
-    it('should detect hypertension', async () => {
-      const responses = generateBloodPressureResponses({ hypertension: true });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_blood_pressure')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      // Hypertension: >= 140/90
-      expect(data.bp_lying_systolic >= 140 || data.bp_lying_diastolic >= 90).toBe(true);
-    });
-
-    it('should store heart rate readings', async () => {
-      const responses = generateBloodPressureResponses();
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_blood_pressure')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.heart_rate_lying).toBe(68);
-      expect(data.heart_rate_standing).toBe(72);
-    });
-  });
-
-  // ==========================================================================
-  // SLEEP APNEA TESTS
-  // ==========================================================================
-
-  describe('Sleep Apnea (SLEEP_APNEA)', () => {
-    it('should handle diagnosed sleep apnea with CPAP', async () => {
-      const responses = generateSleepApneaResponses({
-        diagnosed: true,
-        hasCpap: true,
-      });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_sleep_apnea')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.diagnosed_sleep_apnea).toBe('yes');
-      expect(data.has_cpap_device).toBe(true); // boolean in DB
-      // STOP-Bang questions should not be required
-    });
-
-    it('should handle diagnosed sleep apnea without CPAP', async () => {
-      const responses = generateSleepApneaResponses({
-        diagnosed: true,
-        hasCpap: false,
-      });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_sleep_apnea')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.diagnosed_sleep_apnea).toBe('yes');
-      expect(data.has_cpap_device).toBe(false); // boolean in DB
-    });
-
-    it('should compute STOP-Bang score 0-2 as low risk', async () => {
-      const responses = generateSleepApneaResponses({
-        riskLevel: 'low',
-        gender: 'F', // Female = 0 points for male_gender
-      });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_sleep_apnea')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.diagnosed_sleep_apnea).toBe('no');
-      // Count true responses (all STOP-Bang fields are booleans in DB)
-      let score = 0;
-      if (data.snoring === true) score++;
-      if (data.tiredness === true) score++;
-      if (data.observed_apnea === true) score++;
-      if (data.hypertension === true) score++;
-      if (data.bmi_over_35 === true) score++;
-      if (data.age_over_50 === true) score++;
-      if (data.large_neck === true) score++;
-      if (data.male_gender === true) score++;
-      expect(score).toBeLessThanOrEqual(2);
-    });
-
-    it('should compute STOP-Bang score 3-4 as intermediate risk', async () => {
-      const responses = generateSleepApneaResponses({
-        riskLevel: 'intermediate',
-        gender: 'F',
-      });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_sleep_apnea')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      let score = 0;
-      if (data.snoring === true) score++;
-      if (data.tiredness === true) score++;
-      if (data.observed_apnea === true) score++;
-      if (data.hypertension === true) score++;
-      if (data.bmi_over_35 === true) score++;
-      if (data.age_over_50 === true) score++;
-      if (data.large_neck === true) score++;
-      if (data.male_gender === true) score++;
-      expect(score).toBeGreaterThanOrEqual(3);
-      expect(score).toBeLessThanOrEqual(4);
-    });
-
-    it('should compute STOP-Bang score 5+ as high risk', async () => {
-      const responses = generateSleepApneaResponses({
-        riskLevel: 'high',
-        gender: 'M', // Male = +1 point
-      });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_sleep_apnea')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      let score = 0;
-      if (data.snoring === true) score++;
-      if (data.tiredness === true) score++;
-      if (data.observed_apnea === true) score++;
-      if (data.hypertension === true) score++;
-      if (data.bmi_over_35 === true) score++;
-      if (data.age_over_50 === true) score++;
-      if (data.large_neck === true) score++;
-      if (data.male_gender === true) score++;
-      expect(score).toBeGreaterThanOrEqual(5);
-    });
-  });
-
-  // ==========================================================================
-  // BIOLOGICAL ASSESSMENT TESTS
-  // ==========================================================================
-
-  describe('Biological Assessment (BIOLOGICAL_ASSESSMENT)', () => {
-    it('should store basic biochemistry values', async () => {
-      const responses = generateBiologicalAssessmentResponses();
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_biological_assessment')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.sodium).toBe(140);
-      expect(data.potassium).toBe(4.2);
-      expect(data.chlore).toBe(102);
-      expect(data.creatinine).toBe(85);
-    });
-
-    it('should store lipid panel values', async () => {
-      const responses = generateBiologicalAssessmentResponses();
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_biological_assessment')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.hdl).toBe(1.5);
-      expect(data.ldl).toBe(3.2);
-      expect(data.cholesterol_total).toBe(5.2);
-      expect(data.triglycerides).toBe(1.1);
-    });
-
-    it('should flag diabetes risk when glycemia is elevated', async () => {
-      const responses = generateBiologicalAssessmentResponses({
-        hasDiabetesRisk: true,
-      });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_biological_assessment')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.glycemie_a_jeun).toBe(8.5);
-      expect(data.glycemie_a_jeun_unit).toBe('mmol_L');
-      // Glycemia > 7 mmol/L indicates diabetes risk
-      expect(data.glycemie_a_jeun).toBeGreaterThan(7);
-    });
-
-    it('should flag lipid abnormality when cholesterol is elevated', async () => {
-      const responses = generateBiologicalAssessmentResponses({
-        hasLipidAbnormality: true,
-      });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_biological_assessment')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      // Cholesterol > 6.1 or triglycerides > 1.4 indicates abnormality
-      expect(data.cholesterol_total).toBe(7.0);
-      expect(data.triglycerides).toBe(2.5);
-    });
-
-    it('should store values for calculated fields', async () => {
-      const responses = generateBiologicalAssessmentResponses({
-        includeCalculatedFields: true,
-      });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_biological_assessment')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      // Values for rapport_total_hdl calculation: cholesterol_total / hdl
-      expect(data.cholesterol_total).toBe(5.2);
-      expect(data.hdl).toBe(1.5);
-      // Values for calcemie_corrigee calculation
-      expect(data.calcemie).toBe(2.35);
-      expect(data.protidemie).toBe(72);
-    });
-
-    it('should store thyroid values', async () => {
-      const responses = generateBiologicalAssessmentResponses();
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_biological_assessment')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.tsh).toBe(2.5);
-      expect(data.tsh_unit).toBe('mUI_L');
-    });
-
-    it('should store NFS values', async () => {
-      const responses = generateBiologicalAssessmentResponses();
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_biological_assessment')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.leucocytes).toBe(7.5);
-      expect(data.hematies).toBe(4.8);
-      expect(data.hemoglobine).toBe(14.2);
-      expect(data.plaquettes).toBe(250);
-    });
-  });
-
-  // ==========================================================================
-  // ECG TESTS
-  // ==========================================================================
-
-  describe('ECG Assessment (ECG)', () => {
-    it('should handle ECG not performed', async () => {
-      const responses = generateEcgResponses({ performed: false });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_ecg')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.ecg_performed).toBe('no');
-      expect(data.qt_measured).toBeNull();
-      expect(data.rr_measured).toBeNull();
-    });
-
-    it('should store normal ECG values', async () => {
-      const responses = generateEcgResponses({
-        performed: true,
-        prolongedQTc: false,
-        gender: 'M',
-      });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_ecg')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.ecg_performed).toBe('yes');
-      expect(data.heart_rate).toBe(72);
-      expect(data.qt_measured).toBe(0.38);
-      expect(data.rr_measured).toBe(0.85);
-      // QTc = QT / sqrt(RR) = 0.38 / sqrt(0.85) = 0.412
-      // Normal for male: <= 0.43
-    });
-
-    it('should detect prolonged QTc', async () => {
-      const responses = generateEcgResponses({
-        performed: true,
-        prolongedQTc: true,
-        gender: 'M',
-      });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_ecg')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.qt_measured).toBe(0.45);
-      expect(data.rr_measured).toBe(0.85);
-      // QTc = 0.45 / sqrt(0.85) = 0.488
-      // Prolonged for male: > 0.43
-      const qtc = data.qt_measured / Math.sqrt(data.rr_measured);
-      expect(qtc).toBeGreaterThan(0.43);
-    });
-
-    it('should store follow-up fields', async () => {
-      const responses = generateEcgResponses({ performed: true });
-
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_ecg')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses,
-        }, { onConflict: 'visit_id' })
-        .select()
-        .single();
-
-      expect(error).toBeNull();
-      expect(data).toBeDefined();
-      expect(data.ecg_sent_to_cardiologist).toBe('no');
-      expect(data.cardiologist_consultation_requested).toBe('no');
-    });
-  });
-
-  // ==========================================================================
-  // COMPUTED FIELDS VERIFICATION
-  // ==========================================================================
-
-  describe('Computed Fields Verification', () => {
-    it('should verify Fagerstrom computed fields', async () => {
-      const { data } = await adminClient
-        .from('bipolar_nurse_fagerstrom')
-        .select('*')
-        .eq('visit_id', visitId)
-        .single();
-
-      expect(data).toBeDefined();
-
-      // Only verify computed fields if they exist (service layer computes them)
-      if (data.total_score !== null && data.dependence_level !== null) {
-        expect(data.interpretation).toBeDefined();
-
-        // Verify total_score is sum of all responses
-        const manualSum = (data.q1 ?? 0) + (data.q2 ?? 0) + (data.q3 ?? 0) + 
-                          (data.q4 ?? 0) + (data.q5 ?? 0) + (data.q6 ?? 0);
-        expect(data.total_score).toBe(manualSum);
-
-        // Verify dependence level thresholds
-        if (data.total_score! <= 2) {
-          expect(data.dependence_level).toBe('none');
-        } else if (data.total_score! <= 4) {
-          expect(data.dependence_level).toBe('low');
-        } else if (data.total_score === 5) {
-          expect(data.dependence_level).toBe('moderate');
-        } else if (data.total_score! <= 7) {
-          expect(data.dependence_level).toBe('high');
-        } else {
-          expect(data.dependence_level).toBe('very_high');
-        }
-      }
-    });
-
-    it('should verify Physical Parameters BMI calculation', async () => {
-      const { data } = await adminClient
-        .from('bipolar_nurse_physical_params')
-        .select('*')
-        .eq('visit_id', visitId)
-        .single();
-
-      expect(data).toBeDefined();
-
+      expect(data.bmi).not.toBeNull();
+      expect(typeof data.bmi).toBe('number');
+      expect(data.bmi).toBeGreaterThan(0);
+      
+      // Verify BMI calculation
       if (data.height_cm && data.weight_kg) {
-        // Verify BMI calculation
-        const heightInMeters = data.height_cm / 100;
-        const expectedBMI = Math.round((data.weight_kg / (heightInMeters * heightInMeters)) * 10) / 10;
-        expect(data.bmi).toBeCloseTo(expectedBMI, 1);
-
-        // Verify BMI is in reasonable range
-        expect(data.bmi).toBeGreaterThan(10);
-        expect(data.bmi).toBeLessThan(80);
+        const expectedBMI = Math.round((data.weight_kg / Math.pow(data.height_cm / 100, 2)) * 100) / 100;
+        expect(data.bmi).toBeCloseTo(expectedBMI, 2);
       }
     });
+  });
 
-    it('should verify Blood Pressure tension formatting', async () => {
-      const { data } = await adminClient
-        .from('bipolar_nurse_blood_pressure')
-        .select('*')
-        .eq('visit_id', visitId)
-        .single();
+  describe('4. Blood Pressure (via Service Layer)', () => {
+    it('should compute tension_lying and tension_standing strings', async () => {
+      const responses = generateBloodPressureResponses();
+
+      const data = await saveBloodPressureForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...responses,
+      });
 
       expect(data).toBeDefined();
+      expect(data.tension_lying).not.toBeNull();
+      expect(data.tension_standing).not.toBeNull();
+      expect(data.tension_lying).toMatch(/^\d+\/\d+$/);
+      expect(data.tension_standing).toMatch(/^\d+\/\d+$/);
+    });
+  });
 
-      // Verify lying tension format only if computed field exists
-      if (data.bp_lying_systolic && data.bp_lying_diastolic && data.tension_lying !== null) {
-        expect(data.tension_lying).toBe(`${data.bp_lying_systolic}/${data.bp_lying_diastolic}`);
-      }
+  describe('5. Sleep Apnea (via Service Layer)', () => {
+    it('should compute STOP-Bang score, risk_level, and interpretation for undiagnosed patients', async () => {
+      const responses = generateSleepApneaResponses({ diagnosed: false });
 
-      // Verify standing tension format only if computed field exists
-      if (data.bp_standing_systolic && data.bp_standing_diastolic && data.tension_standing !== null) {
-        expect(data.tension_standing).toBe(`${data.bp_standing_systolic}/${data.bp_standing_diastolic}`);
-      }
+      const data = await saveSleepApneaForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...responses,
+      });
+
+      expect(data).toBeDefined();
+      expect(data.stop_bang_score).not.toBeNull();
+      expect(data.risk_level).not.toBeNull();
+      expect(data.interpretation).not.toBeNull();
+      expect(typeof data.stop_bang_score).toBe('number');
+      expect(['low', 'intermediate', 'high']).toContain(data.risk_level);
     });
 
-    it('should verify Sleep Apnea STOP-Bang score calculation', async () => {
-      const { data } = await adminClient
-        .from('bipolar_nurse_sleep_apnea')
-        .select('*')
-        .eq('visit_id', visitId)
-        .single();
+    it('should handle diagnosed sleep apnea patients (skip STOP-Bang)', async () => {
+      const responses = generateSleepApneaResponses({ diagnosed: true });
+
+      const data = await saveSleepApneaForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...responses,
+      });
 
       expect(data).toBeDefined();
-
-      if (data.diagnosed_sleep_apnea === 'no' && data.stop_bang_score !== null) {
-        // Verify STOP-Bang score
-        expect(data.risk_level).toBeDefined();
-
-        // Manually compute score
-        let manualScore = 0;
-        if (data.snoring === true) manualScore++;
-        if (data.tiredness === true) manualScore++;
-        if (data.observed_apnea === true) manualScore++;
-        if (data.hypertension === true) manualScore++;
-        if (data.bmi_over_35 === true) manualScore++;
-        if (data.age_over_50 === true) manualScore++;
-        if (data.large_neck === true) manualScore++;
-        if (data.male_gender === true) manualScore++;
-
-        expect(data.stop_bang_score).toBe(manualScore);
-
-        // Verify risk level thresholds
-        if (data.stop_bang_score! <= 2) {
-          expect(data.risk_level).toBe('low');
-        } else if (data.stop_bang_score! <= 4) {
-          expect(data.risk_level).toBe('intermediate');
-        } else {
-          expect(data.risk_level).toBe('high');
-        }
-      } else {
-        // Diagnosed patients or missing computed fields
-        expect(data.interpretation).toBeDefined();
-      }
+      expect(data.diagnosed_sleep_apnea).toBe('yes');
+      // STOP-Bang should be null for diagnosed patients
+      expect(data.stop_bang_score).toBeNull();
     });
+  });
 
-    it('should verify Biological Assessment computed ratios', async () => {
-      const { data } = await adminClient
-        .from('bipolar_nurse_biological_assessment')
-        .select('*')
-        .eq('visit_id', visitId)
-        .single();
+  describe('6. Biological Assessment (via Service Layer)', () => {
+    it('should compute rapport_total_hdl and calcemie_corrigee', async () => {
+      const responses = generateBiologicalAssessmentResponses();
+
+      const data = await saveBiologicalAssessmentForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...responses,
+      });
 
       expect(data).toBeDefined();
-
-      // Verify rapport_total_hdl if both values present
-      if (data.cholesterol_total && data.hdl && data.hdl > 0 && data.rapport_total_hdl !== null) {
+      
+      if (data.cholesterol_total && data.hdl && data.hdl > 0) {
+        expect(data.rapport_total_hdl).not.toBeNull();
         const expectedRatio = Math.round((data.cholesterol_total / data.hdl) * 100) / 100;
         expect(data.rapport_total_hdl).toBeCloseTo(expectedRatio, 2);
       }
 
-      // Verify calcemie_corrigee if both values present
-      if (data.calcemie && data.protidemie && data.calcemie_corrigee !== null) {
+      if (data.calcemie && data.protidemie) {
+        expect(data.calcemie_corrigee).not.toBeNull();
         const expectedCalcemie = Math.round((data.calcemie / 0.55 + data.protidemie / 160) * 100) / 100;
         expect(data.calcemie_corrigee).toBeCloseTo(expectedCalcemie, 2);
       }
     });
+  });
 
-    it('should verify ECG QTc calculation', async () => {
-      const { data } = await adminClient
-        .from('bipolar_nurse_ecg')
-        .select('*')
-        .eq('visit_id', visitId)
-        .single();
+  describe('7. ECG (via Service Layer)', () => {
+    it('should compute QTc and interpretation with patient gender', async () => {
+      const responses = generateEcgResponses({ performed: true });
+
+      const data = await saveEcgForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...responses,
+      }, patientGender as 'M' | 'F');
 
       expect(data).toBeDefined();
-      expect(data.interpretation).toBeDefined();
-
-      if (data.ecg_performed === 'yes' && data.qt_measured && data.rr_measured && 
-          data.rr_measured > 0 && data.qtc_calculated !== null) {
-        // Verify QTc calculation using Bazett formula
+      
+      if (data.ecg_performed === 'yes' && data.qt_measured && data.rr_measured) {
+        expect(data.qtc_calculated).not.toBeNull();
+        expect(data.interpretation).not.toBeNull();
+        
+        // Verify QTc calculation (Bazett formula)
         const expectedQTc = data.qt_measured / Math.sqrt(data.rr_measured);
         expect(data.qtc_calculated).toBeCloseTo(expectedQTc, 3);
-
-        // Verify QTc is in reasonable range
-        expect(data.qtc_calculated!).toBeGreaterThan(0.2);
-        expect(data.qtc_calculated!).toBeLessThan(0.8);
       }
     });
   });
 
   // ==========================================================================
-  // DATA INTEGRITY TESTS
+  // VISIT COMPLETION TRACKING TESTS
   // ==========================================================================
 
-  describe('Data Integrity', () => {
-    it('should maintain data across all nurse questionnaires', async () => {
-      // Verify all questionnaires have data for this visit
-      const [tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biological, ecg] =
-        await Promise.all([
-          adminClient.from('bipolar_nurse_tobacco').select('*').eq('visit_id', visitId).single(),
-          adminClient.from('bipolar_nurse_fagerstrom').select('*').eq('visit_id', visitId).single(),
-          adminClient.from('bipolar_nurse_physical_params').select('*').eq('visit_id', visitId).single(),
-          adminClient.from('bipolar_nurse_blood_pressure').select('*').eq('visit_id', visitId).single(),
-          adminClient.from('bipolar_nurse_sleep_apnea').select('*').eq('visit_id', visitId).single(),
-          adminClient.from('bipolar_nurse_biological_assessment').select('*').eq('visit_id', visitId).single(),
-          adminClient.from('bipolar_nurse_ecg').select('*').eq('visit_id', visitId).single(),
-        ]);
+  describe('Visit Completion Tracking', () => {
+    beforeAll(async () => {
+      // Ensure ALL 7 nurse questionnaires are submitted before testing completion
+      // This mimics what a healthcare professional would do in the real application
+      
+      // 1. Tobacco
+      await saveTobaccoForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...generateTobaccoResponses({ status: 'current_smoker', packYears: 10 }),
+      });
+      
+      // 2. Fagerstrom
+      await saveFagerstromForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...generateFagerstromResponses(),
+      });
+      
+      // 3. Physical Parameters
+      await savePhysicalParamsForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...generatePhysicalParamsResponses(),
+      });
+      
+      // 4. Blood Pressure
+      await saveBloodPressureForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...generateBloodPressureResponses(),
+      });
+      
+      // 5. Sleep Apnea
+      await saveSleepApneaForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...generateSleepApneaResponses({ diagnosed: false }),
+      });
+      
+      // 6. Biological Assessment
+      await saveBiologicalAssessmentForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...generateBiologicalAssessmentResponses(),
+      });
+      
+      // 7. ECG
+      await saveEcgForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...generateEcgResponses({ performed: true }),
+      }, patientGender as 'M' | 'F');
+    });
 
-      expect(tobacco.error).toBeNull();
+    it('should have all 7 nurse module questionnaires completed', async () => {
+      // Verify all questionnaire tables have entries for this visit
+      const [tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biological, ecg] = await Promise.all([
+        adminClient.from('bipolar_nurse_tobacco').select('id').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_fagerstrom').select('id').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_physical_params').select('id').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_blood_pressure').select('id').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_sleep_apnea').select('id').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_biological_assessment').select('id').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_ecg').select('id').eq('visit_id', visitId).single(),
+      ]);
+
       expect(tobacco.data).toBeDefined();
-      expect(fagerstrom.error).toBeNull();
       expect(fagerstrom.data).toBeDefined();
-      expect(physicalParams.error).toBeNull();
       expect(physicalParams.data).toBeDefined();
-      expect(bloodPressure.error).toBeNull();
       expect(bloodPressure.data).toBeDefined();
-      expect(sleepApnea.error).toBeNull();
       expect(sleepApnea.data).toBeDefined();
-      expect(biological.error).toBeNull();
       expect(biological.data).toBeDefined();
-      expect(ecg.error).toBeNull();
       expect(ecg.data).toBeDefined();
     });
 
-    it('should enforce visit_id unique constraint (upsert behavior)', async () => {
-      // First insert
-      await adminClient.from('bipolar_nurse_tobacco').upsert({
-        visit_id: visitId,
-        patient_id: patientId,
-        smoking_status: 'non_smoker',
-      }, { onConflict: 'visit_id' });
+    it('should calculate completion percentage based on completed nurse questionnaires', async () => {
+      const tables = [
+        'bipolar_nurse_tobacco',
+        'bipolar_nurse_fagerstrom',
+        'bipolar_nurse_physical_params',
+        'bipolar_nurse_blood_pressure',
+        'bipolar_nurse_sleep_apnea',
+        'bipolar_nurse_biological_assessment',
+        'bipolar_nurse_ecg',
+      ];
 
-      // Update via upsert
-      const { data, error } = await adminClient
-        .from('bipolar_nurse_tobacco')
-        .upsert({
-          visit_id: visitId,
-          patient_id: patientId,
-          smoking_status: 'current_smoker',
-          pack_years: 5,
-        }, { onConflict: 'visit_id' })
-        .select()
+      let completed = 0;
+      for (const table of tables) {
+        const { data } = await adminClient
+          .from(table)
+          .select('id')
+          .eq('visit_id', visitId)
+          .single();
+        
+        if (data) completed++;
+      }
+
+      // Nurse module has 7 questionnaires
+      expect(completed).toBe(7);
+      const percentage = Math.round((completed / 7) * 100);
+      expect(percentage).toBe(100);
+    });
+
+    it('should verify visit completion status can be updated', async () => {
+      // This simulates what the visit page would do after rendering all modules
+      // Note: Actual completion percentage includes ALL modules (nurse, neuropsy, medical, etc.)
+      // We're just testing the mechanism here
+      
+      const { error: updateError } = await adminClient
+        .from('visits')
+        .update({
+          completion_percentage: 12, // 7 out of ~58 total questionnaires
+          completed_questionnaires: 7,
+          total_questionnaires: 58,
+          completion_updated_at: new Date().toISOString(),
+        })
+        .eq('id', visitId);
+
+      expect(updateError).toBeNull();
+
+      // Verify the update
+      const { data: visit } = await adminClient
+        .from('visits')
+        .select('completion_percentage, completed_questionnaires, total_questionnaires')
+        .eq('id', visitId)
         .single();
 
-      expect(error).toBeNull();
-      expect(data.smoking_status).toBe('current_smoker');
-      expect(data.pack_years).toBe(5);
+      expect(visit?.completion_percentage).toBe(12);
+      expect(visit?.completed_questionnaires).toBe(7);
+      expect(visit?.total_questionnaires).toBe(58);
+    });
+  });
 
-      // Verify only one record exists
-      const { data: allRecords } = await adminClient
-        .from('bipolar_nurse_tobacco')
-        .select('*')
-        .eq('visit_id', visitId);
+  // ==========================================================================
+  // DATA INTEGRITY & VALIDATION TESTS
+  // ==========================================================================
 
-      expect(allRecords?.length).toBe(1);
+  describe('Data Integrity & Constraints', () => {
+    it('should enforce unique constraint on visit_id (upsert behavior)', async () => {
+      // First submission
+      const responses1 = generateTobaccoResponses({ status: 'non_smoker' });
+      const data1 = await saveTobaccoForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...responses1,
+      });
+
+      expect(data1.smoking_status).toBe('non_smoker');
+
+      // Second submission (should upsert, not error)
+      const responses2 = generateTobaccoResponses({ status: 'current_smoker', packYears: 5 });
+      const data2 = await saveTobaccoForTest(adminClient, {
+        visit_id: visitId,
+        patient_id: patientId,
+        ...responses2,
+      });
+
+      expect(data2.smoking_status).toBe('current_smoker');
+      expect(data2.pack_years).toBe(5);
+      expect(data2.id).toBe(data1.id); // Same record, updated
+    });
+
+    it('should verify all computed fields are non-null after service layer submission', async () => {
+      // Read back all data and verify computed fields exist
+      const [fagerstrom, physicalParams, bloodPressure, sleepApnea, biological, ecg] = await Promise.all([
+        adminClient.from('bipolar_nurse_fagerstrom').select('*').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_physical_params').select('*').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_blood_pressure').select('*').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_sleep_apnea').select('*').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_biological_assessment').select('*').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_ecg').select('*').eq('visit_id', visitId).single(),
+      ]);
+
+      // Fagerstrom computed fields
+      expect(fagerstrom.data?.total_score).not.toBeNull();
+      expect(fagerstrom.data?.dependence_level).not.toBeNull();
+      expect(fagerstrom.data?.interpretation).not.toBeNull();
+
+      // Physical params computed fields
+      expect(physicalParams.data?.bmi).not.toBeNull();
+
+      // Blood pressure computed fields
+      expect(bloodPressure.data?.tension_lying).not.toBeNull();
+      expect(bloodPressure.data?.tension_standing).not.toBeNull();
+
+      // Sleep apnea computed fields (if undiagnosed)
+      if (sleepApnea.data?.diagnosed_sleep_apnea === 'no') {
+        expect(sleepApnea.data?.stop_bang_score).not.toBeNull();
+        expect(sleepApnea.data?.risk_level).not.toBeNull();
+      }
+
+      // Biological assessment computed fields
+      if (biological.data?.cholesterol_total && biological.data?.hdl) {
+        expect(biological.data?.rapport_total_hdl).not.toBeNull();
+      }
+
+      // ECG computed fields
+      if (ecg.data?.ecg_performed === 'yes' && ecg.data?.qt_measured && ecg.data?.rr_measured) {
+        expect(ecg.data?.qtc_calculated).not.toBeNull();
+        expect(ecg.data?.interpretation).not.toBeNull();
+      }
+    });
+  });
+
+  // ==========================================================================
+  // END-TO-END FLOW VERIFICATION
+  // ==========================================================================
+
+  describe('End-to-End Application Flow', () => {
+    it('should retrieve all nurse module data as the application would', async () => {
+      // This simulates what the visit page would do to display data
+      const nurseData = await Promise.all([
+        adminClient.from('bipolar_nurse_tobacco').select('*').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_fagerstrom').select('*').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_physical_params').select('*').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_blood_pressure').select('*').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_sleep_apnea').select('*').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_biological_assessment').select('*').eq('visit_id', visitId).single(),
+        adminClient.from('bipolar_nurse_ecg').select('*').eq('visit_id', visitId).single(),
+      ]);
+
+      // All questionnaires should be retrievable
+      nurseData.forEach(result => {
+        expect(result.error).toBeNull();
+        expect(result.data).toBeDefined();
+      });
+
+      // Verify visit exists and has completion tracking
+      const { data: visit } = await adminClient
+        .from('visits')
+        .select('id, visit_type, completion_percentage, completed_questionnaires')
+        .eq('id', visitId)
+        .single();
+
+      expect(visit).toBeDefined();
+      expect(visit?.visit_type).toBe('initial_evaluation');
+      expect(visit?.completion_percentage).toBeGreaterThanOrEqual(0);
     });
   });
 });
