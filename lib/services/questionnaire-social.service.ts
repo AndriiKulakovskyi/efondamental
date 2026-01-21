@@ -16,7 +16,7 @@ export async function getSocialResponse(
 ): Promise<SocialResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_social')
+    .from('bipolar_social')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -25,7 +25,7 @@ export async function getSocialResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_social not found. Please run migrations.`);
+      console.warn(`Table bipolar_social not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -41,7 +41,7 @@ export async function saveSocialResponse(
 
   // No scoring for social questionnaire - it's purely informational
   const { data, error } = await supabase
-    .from('responses_social')
+    .from('bipolar_social')
     .upsert({
       ...response,
       completed_by: user.data.user?.id

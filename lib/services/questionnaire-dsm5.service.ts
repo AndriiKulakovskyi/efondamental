@@ -26,7 +26,7 @@ export async function getDsm5HumeurResponse(
 ): Promise<Dsm5HumeurResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_dsm5_humeur')
+    .from('bipolar_dsm5_humeur')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -44,7 +44,7 @@ export async function saveDsm5HumeurResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_dsm5_humeur')
+    .from('bipolar_dsm5_humeur')
     .upsert(response, { onConflict: 'visit_id' })
     .select()
     .single();
@@ -62,7 +62,7 @@ export async function getDsm5PsychoticResponse(
 ): Promise<Dsm5PsychoticResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_dsm5_psychotic')
+    .from('bipolar_dsm5_psychotic')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -80,7 +80,7 @@ export async function saveDsm5PsychoticResponse(
   const supabase = await createClient();
 
   const { data, error} = await supabase
-    .from('responses_dsm5_psychotic')
+    .from('bipolar_dsm5_psychotic')
     .upsert(response, { onConflict: 'visit_id' })
     .select()
     .single();
@@ -98,7 +98,7 @@ export async function getDsm5ComorbidResponse(
 ): Promise<Dsm5ComorbidResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_dsm5_comorbid')
+    .from('bipolar_dsm5_comorbid')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -160,7 +160,7 @@ export async function saveDsm5ComorbidResponse(
   });
 
   const { data, error } = await supabase
-    .from('responses_dsm5_comorbid')
+    .from('bipolar_dsm5_comorbid')
     .upsert(cleanResponse, { onConflict: 'visit_id' })
     .select()
     .single();
@@ -178,7 +178,7 @@ export async function getDiagPsySemHumeurActuelsResponse(
 ): Promise<DiagPsySemHumeurActuelsResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_diag_psy_sem_humeur_actuels')
+    .from('bipolar_followup_humeur_actuels')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -196,7 +196,7 @@ export async function saveDiagPsySemHumeurActuelsResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_diag_psy_sem_humeur_actuels')
+    .from('bipolar_followup_humeur_actuels')
     .upsert(response, { onConflict: 'visit_id' })
     .select()
     .single();
@@ -214,7 +214,7 @@ export async function getDiagPsySemHumeurDepuisVisiteResponse(
 ): Promise<DiagPsySemHumeurDepuisVisiteResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_diag_psy_sem_humeur_depuis_visite')
+    .from('bipolar_followup_humeur_depuis_visite')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -232,7 +232,7 @@ export async function saveDiagPsySemHumeurDepuisVisiteResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_diag_psy_sem_humeur_depuis_visite')
+    .from('bipolar_followup_humeur_depuis_visite')
     .upsert(response, { onConflict: 'visit_id' })
     .select()
     .single();
@@ -250,7 +250,7 @@ export async function getDiagPsySemPsychotiquesResponse(
 ): Promise<DiagPsySemPsychotiquesResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_diag_psy_sem_psychotiques')
+    .from('bipolar_followup_psychotiques')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -268,7 +268,7 @@ export async function saveDiagPsySemPsychotiquesResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_diag_psy_sem_psychotiques')
+    .from('bipolar_followup_psychotiques')
     .upsert(response, { onConflict: 'visit_id' })
     .select()
     .single();

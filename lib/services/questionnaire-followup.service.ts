@@ -17,7 +17,7 @@ export async function getPsyTraitementSemestrielResponse(
 ): Promise<PsyTraitementSemestrielResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_psy_traitement_semestriel')
+    .from('bipolar_psy_traitement_semestriel')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -25,7 +25,7 @@ export async function getPsyTraitementSemestrielResponse(
   if (error) {
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
-      console.warn(`Table responses_psy_traitement_semestriel not found. Please run migrations.`);
+      console.warn(`Table bipolar_psy_traitement_semestriel not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -50,7 +50,7 @@ export async function saveSuiviRecommandationsResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_psy_traitement_semestriel')
+    .from('bipolar_psy_traitement_semestriel')
     .upsert({
       ...response,
       completed_by: user.data.user?.id
@@ -79,7 +79,7 @@ export async function saveRecoursAuxSoinsResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_psy_traitement_semestriel')
+    .from('bipolar_psy_traitement_semestriel')
     .upsert({
       ...response,
       completed_by: user.data.user?.id
@@ -108,7 +108,7 @@ export async function saveTraitementNonPharmacologiqueResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_psy_traitement_semestriel')
+    .from('bipolar_psy_traitement_semestriel')
     .upsert({
       ...response,
       completed_by: user.data.user?.id
@@ -137,7 +137,7 @@ export async function saveArretsTravailResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_psy_traitement_semestriel')
+    .from('bipolar_psy_traitement_semestriel')
     .upsert({
       ...response,
       completed_by: user.data.user?.id
@@ -166,7 +166,7 @@ export async function saveSomatiqueContraceptifResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_psy_traitement_semestriel')
+    .from('bipolar_psy_traitement_semestriel')
     .upsert({
       ...response,
       completed_by: user.data.user?.id
@@ -195,7 +195,7 @@ export async function saveStatutProfessionnelResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_psy_traitement_semestriel')
+    .from('bipolar_psy_traitement_semestriel')
     .upsert({
       ...response,
       completed_by: user.data.user?.id

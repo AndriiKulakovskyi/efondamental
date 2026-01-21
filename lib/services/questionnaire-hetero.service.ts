@@ -105,7 +105,7 @@ export async function getMadrsResponse(
 ): Promise<MadrsResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_madrs')
+    .from('bipolar_madrs')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -114,7 +114,7 @@ export async function getMadrsResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_madrs not found. Please run migrations.`);
+      console.warn(`Table bipolar_madrs not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -149,7 +149,7 @@ export async function saveMadrsResponse(
   }
 
   const { data, error } = await supabase
-    .from('responses_madrs')
+    .from('bipolar_madrs')
     .upsert({
       ...response,
       total_score: totalScore,
@@ -172,7 +172,7 @@ export async function getYmrsResponse(
 ): Promise<YmrsResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_ymrs')
+    .from('bipolar_ymrs')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -181,7 +181,7 @@ export async function getYmrsResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_ymrs not found. Please run migrations.`);
+      console.warn(`Table bipolar_ymrs not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -216,7 +216,7 @@ export async function saveYmrsResponse(
   }
 
   const { data, error } = await supabase
-    .from('responses_ymrs')
+    .from('bipolar_ymrs')
     .upsert({
       ...response,
       total_score: totalScore,
@@ -239,7 +239,7 @@ export async function getCgiResponse(
 ): Promise<CgiResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_cgi')
+    .from('bipolar_cgi')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -248,7 +248,7 @@ export async function getCgiResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_cgi not found. Please run migrations.`);
+      console.warn(`Table bipolar_cgi not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -304,7 +304,7 @@ export async function saveCgiResponse(
   }
 
   const { data, error } = await supabase
-    .from('responses_cgi')
+    .from('bipolar_cgi')
     .upsert({
       ...response,
       therapeutic_index: therapeuticIndex,
@@ -327,7 +327,7 @@ export async function getEgfResponse(
 ): Promise<EgfResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_egf')
+    .from('bipolar_egf')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -336,7 +336,7 @@ export async function getEgfResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_egf not found. Please run migrations.`);
+      console.warn(`Table bipolar_egf not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -367,7 +367,7 @@ export async function saveEgfResponse(
   };
 
   const { data, error } = await supabase
-    .from('responses_egf')
+    .from('bipolar_egf')
     .upsert({
       ...response,
       interpretation: getInterpretation(response.egf_score),
@@ -389,7 +389,7 @@ export async function getAldaResponse(
 ): Promise<AldaResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_alda')
+    .from('bipolar_alda')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -398,7 +398,7 @@ export async function getAldaResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_alda not found. Please run migrations.`);
+      console.warn(`Table bipolar_alda not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -415,7 +415,7 @@ export async function saveAldaResponse(
   // If patient is not on lithium (q0 = 0), set all scores to null/0
   if (response.q0 === 0 || response.q0 === null) {
     const { data, error } = await supabase
-      .from('responses_alda')
+      .from('bipolar_alda')
       .upsert({
         ...response,
         qa: null,
@@ -462,7 +462,7 @@ export async function saveAldaResponse(
   }
 
   const { data, error } = await supabase
-    .from('responses_alda')
+    .from('bipolar_alda')
     .upsert({
       ...response,
       b_total_score: bTotalScore,
@@ -486,7 +486,7 @@ export async function getEtatPatientResponse(
 ): Promise<EtatPatientResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_etat_patient')
+    .from('bipolar_etat_patient')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -495,7 +495,7 @@ export async function getEtatPatientResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_etat_patient not found. Please run migrations.`);
+      console.warn(`Table bipolar_etat_patient not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -544,7 +544,7 @@ export async function saveEtatPatientResponse(
   }
 
   const { data, error } = await supabase
-    .from('responses_etat_patient')
+    .from('bipolar_etat_patient')
     .upsert({
       ...cleanedResponse,
       depression_count: depressionCount,
@@ -568,7 +568,7 @@ export async function getFastResponse(
 ): Promise<FastResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_fast')
+    .from('bipolar_fast')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -577,7 +577,7 @@ export async function getFastResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_fast not found. Please run migrations.`);
+      console.warn(`Table bipolar_fast not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -658,7 +658,7 @@ export async function saveFastResponse(
   }
 
   const { data, error } = await supabase
-    .from('responses_fast')
+    .from('bipolar_fast')
     .upsert({
       ...response,
       autonomy_score: autonomyScore,
@@ -687,7 +687,7 @@ export async function getDivaResponse(
 ): Promise<DivaResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_diva')
+    .from('bipolar_diva')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -792,7 +792,7 @@ export async function saveDivaResponse(
   const totalHyperactivityChildhood = transformedResponse.total_hyperactivity_childhood ?? countSymptoms(response, 'childhood', 'a2', 9);
 
   const { data, error } = await supabase
-    .from('responses_diva')
+    .from('bipolar_diva')
     .upsert({
       ...transformedResponse,
       total_inattention_adult: totalInattentionAdult,
@@ -817,7 +817,7 @@ export async function getFamilyHistoryResponse(
 ): Promise<FamilyHistoryResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_family_history')
+    .from('bipolar_family_history')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -836,7 +836,7 @@ export async function saveFamilyHistoryResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_family_history')
+    .from('bipolar_family_history')
     .upsert({
       ...response,
       completed_by: user.data.user?.id
@@ -857,7 +857,7 @@ export async function getCssrsResponse(
 ): Promise<CssrsResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_cssrs')
+    .from('bipolar_cssrs')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -876,7 +876,7 @@ export async function saveCssrsResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_cssrs')
+    .from('bipolar_cssrs')
     .upsert({
       ...response,
       completed_by: user.data.user?.id
@@ -897,7 +897,7 @@ export async function getIsaResponse(
 ): Promise<IsaResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_isa')
+    .from('bipolar_isa')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -915,7 +915,7 @@ export async function saveIsaResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_isa')
+    .from('bipolar_isa')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
@@ -936,7 +936,7 @@ export async function getIsaSuiviResponse(
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
-      .from('responses_isa_suivi')
+      .from('bipolar_followup_isa')
       .select('*')
       .eq('visit_id', visitId)
       .single();
@@ -944,7 +944,7 @@ export async function getIsaSuiviResponse(
     if (error) {
       if (error.code === 'PGRST116') return null;
       if (error.code === 'PGRST205') {
-        console.warn('Table responses_isa_suivi does not exist yet. Please apply migration 212.');
+        console.warn('Table bipolar_followup_isa does not exist yet. Please apply migration 212.');
         return null;
       }
       throw error;
@@ -962,7 +962,7 @@ export async function saveIsaSuiviResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_isa_suivi')
+    .from('bipolar_followup_isa')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
@@ -971,7 +971,7 @@ export async function saveIsaSuiviResponse(
 
   if (error) {
     if (error.code === 'PGRST205') {
-      throw new Error('La table responses_isa_suivi n\'existe pas. Veuillez appliquer la migration 212.');
+      throw new Error('La table bipolar_followup_isa n\'existe pas. Veuillez appliquer la migration 212.');
     }
     throw error;
   }
@@ -987,7 +987,7 @@ export async function getSisResponse(
 ): Promise<SisResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_sis')
+    .from('bipolar_sis')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1008,7 +1008,7 @@ export async function saveSisResponse(
   const { total_score, circumstances_subscore, conception_subscore, ...responseWithoutGeneratedFields } = response as any;
 
   const { data, error } = await supabase
-    .from('responses_sis')
+    .from('bipolar_sis')
     .upsert({
       ...responseWithoutGeneratedFields
     }, { onConflict: 'visit_id' })
@@ -1028,7 +1028,7 @@ export async function getSuicideHistoryResponse(
 ): Promise<SuicideHistoryResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_suicide_history')
+    .from('bipolar_suicide_history')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1046,7 +1046,7 @@ export async function saveSuicideHistoryResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_suicide_history')
+    .from('bipolar_suicide_history')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
@@ -1066,7 +1066,7 @@ export async function getSuicideBehaviorFollowupResponse(
 ): Promise<SuicideBehaviorFollowupResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_suicide_behavior_followup')
+    .from('bipolar_followup_suicide_behavior')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1084,7 +1084,7 @@ export async function saveSuicideBehaviorFollowupResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_suicide_behavior_followup')
+    .from('bipolar_followup_suicide_behavior')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
@@ -1104,7 +1104,7 @@ export async function getPerinataliteResponse(
 ): Promise<PerinataliteResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_perinatalite')
+    .from('bipolar_perinatalite')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1122,7 +1122,7 @@ export async function savePerinataliteResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_perinatalite')
+    .from('bipolar_perinatalite')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
@@ -1142,7 +1142,7 @@ export async function getPathoNeuroResponse(
 ): Promise<PathoNeuroResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_patho_neuro')
+    .from('bipolar_patho_neuro')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1160,7 +1160,7 @@ export async function savePathoNeuroResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_patho_neuro')
+    .from('bipolar_patho_neuro')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
@@ -1180,7 +1180,7 @@ export async function getPathoCardioResponse(
 ): Promise<PathoCardioResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_patho_cardio')
+    .from('bipolar_patho_cardio')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1198,7 +1198,7 @@ export async function savePathoCardioResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_patho_cardio')
+    .from('bipolar_patho_cardio')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
@@ -1218,7 +1218,7 @@ export async function getPathoEndocResponse(
 ): Promise<PathoEndocResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_patho_endoc')
+    .from('bipolar_patho_endoc')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1236,7 +1236,7 @@ export async function savePathoEndocResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_patho_endoc')
+    .from('bipolar_patho_endoc')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
@@ -1256,7 +1256,7 @@ export async function getPathoDermatoResponse(
 ): Promise<PathoDermatoResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_patho_dermato')
+    .from('bipolar_patho_dermato')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1274,7 +1274,7 @@ export async function savePathoDermatoResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_patho_dermato')
+    .from('bipolar_patho_dermato')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
@@ -1294,7 +1294,7 @@ export async function getPathoUrinaireResponse(
 ): Promise<PathoUrinaireResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_patho_urinaire')
+    .from('bipolar_patho_urinaire')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1312,7 +1312,7 @@ export async function savePathoUrinaireResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_patho_urinaire')
+    .from('bipolar_patho_urinaire')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
@@ -1332,7 +1332,7 @@ export async function getAntecedentsGynecoResponse(
 ): Promise<AntecedentsGynecoResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_antecedents_gyneco')
+    .from('bipolar_antecedents_gyneco')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1350,7 +1350,7 @@ export async function saveAntecedentsGynecoResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_antecedents_gyneco')
+    .from('bipolar_antecedents_gyneco')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
@@ -1370,7 +1370,7 @@ export async function getPathoHepatoGastroResponse(
 ): Promise<PathoHepatoGastroResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_patho_hepato_gastro')
+    .from('bipolar_patho_hepato_gastro')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1388,7 +1388,7 @@ export async function savePathoHepatoGastroResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_patho_hepato_gastro')
+    .from('bipolar_patho_hepato_gastro')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
@@ -1408,7 +1408,7 @@ export async function getPathoAllergiqueResponse(
 ): Promise<PathoAllergiqueResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_patho_allergique')
+    .from('bipolar_patho_allergique')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1426,7 +1426,7 @@ export async function savePathoAllergiqueResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_patho_allergique')
+    .from('bipolar_patho_allergique')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
@@ -1446,7 +1446,7 @@ export async function getAutresPathoResponse(
 ): Promise<AutresPathoResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_autres_patho')
+    .from('bipolar_autres_patho')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1461,7 +1461,7 @@ export async function saveAutresPathoResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_autres_patho')
+    .from('bipolar_autres_patho')
     .upsert({
       ...response
     }, { onConflict: 'visit_id' })
@@ -1481,7 +1481,7 @@ export async function getWais4CriteriaResponse(
 ): Promise<Wais4CriteriaResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_wais4_criteria')
+    .from('bipolar_wais4_criteria')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1500,7 +1500,7 @@ export async function saveWais4CriteriaResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_wais4_criteria')
+    .from('bipolar_wais4_criteria')
     .upsert({
       ...response,
       completed_by: user.data.user?.id
@@ -1521,7 +1521,7 @@ export async function getWais4LearningResponse(
 ): Promise<Wais4LearningResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_wais4_learning')
+    .from('bipolar_wais4_learning')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1540,7 +1540,7 @@ export async function saveWais4LearningResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_wais4_learning')
+    .from('bipolar_wais4_learning')
     .upsert({
       ...response,
       completed_by: user.data.user?.id
@@ -1561,7 +1561,7 @@ export async function getWais4MatricesResponse(
 ): Promise<Wais4MatricesResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_wais4_matrices')
+    .from('bipolar_wais4_matrices')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1609,7 +1609,7 @@ export async function saveWais4MatricesResponse(
   } = response as any;
 
   const { data, error } = await supabase
-    .from('responses_wais4_matrices')
+    .from('bipolar_wais4_matrices')
     .upsert({
       ...responseWithoutRawScore,
       standardized_score: standardizedScore,
@@ -1635,7 +1635,7 @@ export async function getCvltResponse(visitId: string): Promise<CvltResponse | n
   const supabase = await createClient();
   
   const { data, error } = await supabase
-    .from('responses_cvlt')
+    .from('bipolar_cvlt')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1687,7 +1687,7 @@ export async function saveCvltResponse(
   const { total_1_5, trials_1_5_total, patient_gender, ...responseWithoutGenerated } = response as any;
 
   const { data, error } = await supabase
-    .from('responses_cvlt')
+    .from('bipolar_cvlt')
     .upsert({
       ...responseWithoutGenerated,
       ...scores,
@@ -1711,7 +1711,7 @@ export async function getWais4CodeResponse(visitId: string): Promise<Wais4CodeRe
   const supabase = await createClient();
   
   const { data, error } = await supabase
-    .from('responses_wais4_code')
+    .from('bipolar_wais4_code')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1740,7 +1740,7 @@ export async function saveWais4CodeResponse(
   });
 
   const { data, error } = await supabase
-    .from('responses_wais4_code')
+    .from('bipolar_wais4_code')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -1781,7 +1781,7 @@ export async function getWais4DigitSpanResponse(visitId: string): Promise<Wais4D
   const supabase = await createClient();
   
   const { data, error } = await supabase
-    .from('responses_wais4_digit_span')
+    .from('bipolar_wais4_digit_span')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1866,7 +1866,7 @@ export async function saveWais4DigitSpanResponse(
   } = response as any;
   
   const { data, error } = await supabase
-    .from('responses_wais4_digit_span')
+    .from('bipolar_wais4_digit_span')
     .upsert({
       ...dbResponse,
       // Individual item scores
@@ -1948,7 +1948,7 @@ export async function getTmtResponse(
 ): Promise<TmtResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_tmt')
+    .from('bipolar_tmt')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -1986,7 +1986,7 @@ export async function saveTmtResponse(
   });
 
   const { data, error } = await supabase
-    .from('responses_tmt')
+    .from('bipolar_tmt')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -2019,7 +2019,7 @@ export async function getStroopResponse(
 ): Promise<StroopResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_stroop')
+    .from('bipolar_stroop')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -2052,7 +2052,7 @@ export async function saveStroopResponse(
   });
 
   const { data, error } = await supabase
-    .from('responses_stroop')
+    .from('bipolar_stroop')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -2100,7 +2100,7 @@ export async function getFluencesVerbalesResponse(
 ): Promise<FluencesVerbalesResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_fluences_verbales')
+    .from('bipolar_fluences_verbales')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -2139,7 +2139,7 @@ export async function saveFluencesVerbalesResponse(
   });
 
   const { data, error } = await supabase
-    .from('responses_fluences_verbales')
+    .from('bipolar_fluences_verbales')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -2179,7 +2179,7 @@ export async function getCobraResponse(
 ): Promise<CobraResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_cobra')
+    .from('bipolar_cobra')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -2205,7 +2205,7 @@ export async function saveCobraResponse(
 
   // Total score is computed by the database (GENERATED ALWAYS AS)
   const { data, error } = await supabase
-    .from('responses_cobra')
+    .from('bipolar_cobra')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -2243,7 +2243,7 @@ export async function getCpt3Response(
 ): Promise<Cpt3Response | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_cpt3')
+    .from('bipolar_cpt3')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -2268,7 +2268,7 @@ export async function saveCpt3Response(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_cpt3')
+    .from('bipolar_cpt3')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -2311,7 +2311,7 @@ export async function getWais4SimilitudesResponse(
 ): Promise<Wais4SimilitudesResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_wais4_similitudes')
+    .from('bipolar_wais4_similitudes')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -2359,7 +2359,7 @@ export async function saveWais4SimilitudesResponse(
   });
 
   const { data, error } = await supabase
-    .from('responses_wais4_similitudes')
+    .from('bipolar_wais4_similitudes')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -2403,7 +2403,7 @@ export async function getTestCommissionsResponse(
 ): Promise<TestCommissionsResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_test_commissions')
+    .from('bipolar_test_commissions')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -2428,7 +2428,7 @@ export async function saveTestCommissionsResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_test_commissions')
+    .from('bipolar_test_commissions')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -2468,7 +2468,7 @@ export async function getScipResponse(
 ): Promise<ScipResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_scip')
+    .from('bipolar_scip')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -2502,7 +2502,7 @@ export async function saveScipResponse(
   });
 
   const { data, error } = await supabase
-    .from('responses_scip')
+    .from('bipolar_scip')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -2529,7 +2529,7 @@ export async function saveScipResponse(
 // ============================================================================
 // WAIS-III CVLT (California Verbal Learning Test)
 // ============================================================================
-// Note: WAIS-III and WAIS-IV CVLT are identical - they use the unified responses_cvlt table
+// Note: WAIS-III and WAIS-IV CVLT are identical - they use the unified bipolar_cvlt table
 // These are alias functions for backwards compatibility
 
 export async function getWais3CvltResponse(
@@ -2603,7 +2603,7 @@ export async function getWais3CriteriaResponse(
 ): Promise<Wais3CriteriaResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_wais3_criteria')
+    .from('bipolar_wais3_criteria')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -2611,7 +2611,7 @@ export async function getWais3CriteriaResponse(
   if (error) {
     if (error.code === 'PGRST116') return null;
     if (error.code === 'PGRST205') {
-      console.warn('Table responses_wais3_criteria not found. Please run migrations.');
+      console.warn('Table bipolar_wais3_criteria not found. Please run migrations.');
       return null;
     }
     throw error;
@@ -2626,7 +2626,7 @@ export async function saveWais3CriteriaResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_wais3_criteria')
+    .from('bipolar_wais3_criteria')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -2663,7 +2663,7 @@ export async function getWais3LearningResponse(
 ): Promise<Wais3LearningResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_wais3_learning')
+    .from('bipolar_wais3_learning')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -2671,7 +2671,7 @@ export async function getWais3LearningResponse(
   if (error) {
     if (error.code === 'PGRST116') return null;
     if (error.code === 'PGRST205') {
-      console.warn('Table responses_wais3_learning not found. Please run migrations.');
+      console.warn('Table bipolar_wais3_learning not found. Please run migrations.');
       return null;
     }
     throw error;
@@ -2686,7 +2686,7 @@ export async function saveWais3LearningResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_wais3_learning')
+    .from('bipolar_wais3_learning')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -2722,7 +2722,7 @@ export async function getWais3VocabulaireResponse(
 ): Promise<Wais3VocabulaireResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_wais3_vocabulaire')
+    .from('bipolar_wais3_vocabulaire')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -2730,7 +2730,7 @@ export async function getWais3VocabulaireResponse(
   if (error) {
     if (error.code === 'PGRST116') return null;
     if (error.code === 'PGRST205') {
-      console.warn('Table responses_wais3_vocabulaire not found. Please run migrations.');
+      console.warn('Table bipolar_wais3_vocabulaire not found. Please run migrations.');
       return null;
     }
     throw error;
@@ -2762,7 +2762,7 @@ export async function saveWais3VocabulaireResponse(
 
   // All scores (raw, standard, standardized) computed in application and stored in database
   const { data, error } = await supabase
-    .from('responses_wais3_vocabulaire')
+    .from('bipolar_wais3_vocabulaire')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -2824,7 +2824,7 @@ export async function getWais3MatricesResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_wais3_matrices')
+    .from('bipolar_wais3_matrices')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -2874,7 +2874,7 @@ export async function saveWais3MatricesResponse(
   });
 
   const { data, error } = await supabase
-    .from('responses_wais3_matrices')
+    .from('bipolar_wais3_matrices')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -2929,7 +2929,7 @@ export async function getWais3CodeSymbolesResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_wais3_code_symboles')
+    .from('bipolar_wais3_code_symboles')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -2957,7 +2957,7 @@ export async function saveWais3CodeSymbolesResponse(
   });
 
   const { data, error } = await supabase
-    .from('responses_wais3_code_symboles')
+    .from('bipolar_wais3_code_symboles')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -2997,7 +2997,7 @@ export async function getWais3DigitSpanResponse(
 ): Promise<Wais3DigitSpanResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_wais3_digit_span')
+    .from('bipolar_wais3_digit_span')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -3034,7 +3034,7 @@ export async function saveWais3DigitSpanResponse(
   });
 
   const { data, error } = await supabase
-    .from('responses_wais3_digit_span')
+    .from('bipolar_wais3_digit_span')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -3103,7 +3103,7 @@ export async function getWais3Cpt2Response(
 ): Promise<Wais3Cpt2Response | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_wais3_cpt2')
+    .from('bipolar_wais3_cpt2')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -3120,7 +3120,7 @@ export async function saveWais3Cpt2Response(
 
   // No internal scoring - values come from external CPT II software
   const { data, error } = await supabase
-    .from('responses_wais3_cpt2')
+    .from('bipolar_wais3_cpt2')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -3206,7 +3206,7 @@ import type { Mem3SpatialResponse, Mem3SpatialResponseInsert } from '@/lib/types
 export async function getMem3SpatialResponse(visitId: string): Promise<Mem3SpatialResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_mem3_spatial')
+    .from('bipolar_mem3_spatial')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -3261,7 +3261,7 @@ export async function saveMem3SpatialResponse(
   const scores = calculateMem3SpatialScores(input);
 
   const { data, error } = await supabase
-    .from('responses_mem3_spatial')
+    .from('bipolar_mem3_spatial')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,

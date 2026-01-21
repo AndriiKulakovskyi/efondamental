@@ -15,7 +15,7 @@ export async function getPsqiResponse(
 ): Promise<PsqiResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_psqi')
+    .from('bipolar_psqi')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -129,7 +129,7 @@ export async function savePsqiResponse(
   } = response as any;
 
   const { data, error } = await supabase
-    .from('responses_psqi')
+    .from('bipolar_psqi')
     .upsert({
       ...dbResponse,
       c1_subjective_quality: c1SubjectiveQuality,
@@ -158,7 +158,7 @@ export async function getEpworthResponse(
 ): Promise<EpworthResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_epworth')
+    .from('bipolar_epworth')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -212,7 +212,7 @@ export async function saveEpworthResponse(
   }
 
   const { data, error } = await supabase
-    .from('responses_epworth')
+    .from('bipolar_epworth')
     .upsert({
       ...responseWithoutGeneratedFields,
       severity,

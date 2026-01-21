@@ -56,7 +56,7 @@ export async function getAsrmResponse(
 ): Promise<AsrmResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_asrm')
+    .from('bipolar_asrm')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -77,7 +77,7 @@ export async function saveAsrmResponse(
   const { total_score, ...responseWithoutGeneratedFields } = response as any;
 
   const { data, error } = await supabase
-    .from('responses_asrm')
+    .from('bipolar_asrm')
     .upsert(responseWithoutGeneratedFields, { onConflict: 'visit_id' })
     .select()
     .single();
@@ -95,7 +95,7 @@ export async function getQidsResponse(
 ): Promise<QidsResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_qids_sr16')
+    .from('bipolar_qids_sr16')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -129,7 +129,7 @@ export async function saveQidsResponse(
   else interpretation = 'Dépression très sévère';
 
   const { data, error } = await supabase
-    .from('responses_qids_sr16')
+    .from('bipolar_qids_sr16')
     .upsert({
       ...response,
       total_score: totalScore,
@@ -151,7 +151,7 @@ export async function getMdqResponse(
 ): Promise<MdqResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_mdq')
+    .from('bipolar_mdq')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -186,7 +186,7 @@ export async function saveMdqResponse(
     'MDQ Négatif - Dépistage négatif pour trouble bipolaire';
 
   const { data, error } = await supabase
-    .from('responses_mdq')
+    .from('bipolar_mdq')
     .upsert({
       ...responseWithoutTotalScore,
       q1_score: q1Score,
@@ -208,7 +208,7 @@ export async function getDiagnosticResponse(
 ): Promise<BipolarDiagnosticResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_medical_diagnostic')
+    .from('bipolar_diagnostic')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -227,7 +227,7 @@ export async function saveDiagnosticResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_medical_diagnostic')
+    .from('bipolar_diagnostic')
     .upsert({
       ...response,
       completed_by: user.data.user?.id
@@ -248,7 +248,7 @@ export async function getOrientationResponse(
 ): Promise<OrientationResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_bipolar_orientation')
+    .from('bipolar_orientation')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -267,7 +267,7 @@ export async function saveOrientationResponse(
   const user = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('responses_bipolar_orientation')
+    .from('bipolar_orientation')
     .upsert({
       ...response,
       completed_by: user.data.user?.id
@@ -339,7 +339,7 @@ export async function getEq5d5lResponse(
 ): Promise<Eq5d5lResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_eq5d5l')
+    .from('bipolar_eq5d5l')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -3570,7 +3570,7 @@ export async function saveEq5d5lResponse(
   );
 
   const { data, error } = await supabase
-    .from('responses_eq5d5l')
+    .from('bipolar_eq5d5l')
     .upsert({
       ...responseWithoutGeneratedFields,
       index_value: indexValue,
@@ -3590,7 +3590,7 @@ export async function getPriseMResponse(
 ): Promise<PriseMResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_prise_m')
+    .from('bipolar_prise_m')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -3643,7 +3643,7 @@ export async function savePriseMResponse(
                      sexualScore + otherScore;
 
   const { data, error } = await supabase
-    .from('responses_prise_m')
+    .from('bipolar_prise_m')
     .upsert({
       ...responseData,
       gastro_score: gastroScore,
@@ -3672,7 +3672,7 @@ export async function getStaiYaResponse(
 ): Promise<StaiYaResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_stai_ya')
+    .from('bipolar_stai_ya')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -3726,7 +3726,7 @@ export async function saveStaiYaResponse(
   }
 
   const { data, error } = await supabase
-    .from('responses_stai_ya')
+    .from('bipolar_stai_ya')
     .upsert({
       ...responseData,
       total_score: totalScore,
@@ -3747,7 +3747,7 @@ export async function getMarsResponse(
 ): Promise<MarsResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_mars')
+    .from('bipolar_mars')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -3788,7 +3788,7 @@ export async function saveMarsResponse(
     : 'Non applicable (pas de traitement)';
 
   const { data, error } = await supabase
-    .from('responses_mars')
+    .from('bipolar_mars')
     .upsert({
       ...responseData,
       total_score: totalScore,
@@ -3808,7 +3808,7 @@ export async function getMathysResponse(
 ): Promise<MathysResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_mathys')
+    .from('bipolar_mathys')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -3853,7 +3853,7 @@ export async function saveMathysResponse(
   const totalScore = subscoreEmotion + subscoreMotivation + subscorePerception + subscoreInteraction + subscoreCognition;
   
   const { data, error } = await supabase
-    .from('responses_mathys')
+    .from('bipolar_mathys')
     .upsert({
       ...responseData,
       emotional_hyperreactivity: Number((subscoreEmotion / 4).toFixed(2)),

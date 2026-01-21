@@ -202,7 +202,7 @@ export async function getPsychotropesLifetimeResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_psychotropes_lifetime')
+    .from('bipolar_psychotropes_lifetime')
     .select('*')
     .eq('patient_id', patientId)
     .single();
@@ -223,7 +223,7 @@ export async function savePsychotropesLifetimeResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_psychotropes_lifetime')
+    .from('bipolar_psychotropes_lifetime')
     .upsert(
       {
         ...response,
@@ -320,7 +320,7 @@ export async function getNonPharmacologicResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_non_pharmacologic')
+    .from('bipolar_non_pharmacologic')
     .select('*')
     .eq('patient_id', patientId)
     .single();
@@ -341,7 +341,7 @@ export async function saveNonPharmacologicResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('responses_non_pharmacologic')
+    .from('bipolar_non_pharmacologic')
     .upsert(
       {
         ...response,

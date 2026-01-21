@@ -16,7 +16,7 @@ export async function getTobaccoResponse(
 ): Promise<TobaccoResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_tobacco')
+    .from('bipolar_tobacco')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -25,7 +25,7 @@ export async function getTobaccoResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_tobacco not found. Please run migrations.`);
+      console.warn(`Table bipolar_tobacco not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -113,7 +113,7 @@ export async function saveTobaccoResponse(
   }
 
   const { data, error } = await supabase
-    .from('responses_tobacco')
+    .from('bipolar_tobacco')
     .upsert(normalizedResponse, { onConflict: 'visit_id' })
     .select()
     .single();
@@ -141,7 +141,7 @@ export async function getFagerstromResponse(
 ): Promise<FagerstromResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_fagerstrom')
+    .from('bipolar_fagerstrom')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -150,7 +150,7 @@ export async function getFagerstromResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_fagerstrom not found. Please run migrations.`);
+      console.warn(`Table bipolar_fagerstrom not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -215,7 +215,7 @@ export async function saveFagerstromResponse(
   }
 
   const { data, error } = await supabase
-    .from('responses_fagerstrom')
+    .from('bipolar_fagerstrom')
     .upsert({
       ...responseWithoutGeneratedFields,
       dependence_level: dependenceLevel,
@@ -236,7 +236,7 @@ export async function getPhysicalParamsResponse(
 ): Promise<PhysicalParamsResponse | null> {
   const supabase = await createClient();
   const { data, error} = await supabase
-    .from('responses_physical_params')
+    .from('bipolar_physical_params')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -245,7 +245,7 @@ export async function getPhysicalParamsResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_physical_params not found. Please run migrations.`);
+      console.warn(`Table bipolar_physical_params not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -263,7 +263,7 @@ export async function savePhysicalParamsResponse(
   const { bmi, ...responseWithoutBmi } = response as any;
 
   const { data, error } = await supabase
-    .from('responses_physical_params')
+    .from('bipolar_physical_params')
     .upsert({
       ...responseWithoutBmi,
       completed_by: user.data.user?.id
@@ -282,7 +282,7 @@ export async function getBloodPressureResponse(
 ): Promise<BloodPressureResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_blood_pressure')
+    .from('bipolar_blood_pressure')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -291,7 +291,7 @@ export async function getBloodPressureResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_blood_pressure not found. Please run migrations.`);
+      console.warn(`Table bipolar_blood_pressure not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -320,7 +320,7 @@ export async function saveBloodPressureResponse(
   }
 
   const { data, error } = await supabase
-    .from('responses_blood_pressure')
+    .from('bipolar_blood_pressure')
     .upsert({
       ...responseData,
       tension_lying: tensionLying,
@@ -341,7 +341,7 @@ export async function getSleepApneaResponse(
 ): Promise<SleepApneaResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_sleep_apnea')
+    .from('bipolar_sleep_apnea')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -350,7 +350,7 @@ export async function getSleepApneaResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_sleep_apnea not found. Please run migrations.`);
+      console.warn(`Table bipolar_sleep_apnea not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -435,7 +435,7 @@ export async function saveSleepApneaResponse(
   }
 
   const { data, error } = await supabase
-    .from('responses_sleep_apnea')
+    .from('bipolar_sleep_apnea')
     .upsert(normalizedResponse, { onConflict: 'visit_id' })
     .select()
     .single();
@@ -451,7 +451,7 @@ export async function getBiologicalAssessmentResponse(
 ): Promise<BiologicalAssessmentResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_biological_assessment')
+    .from('bipolar_biological_assessment')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -460,7 +460,7 @@ export async function getBiologicalAssessmentResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_biological_assessment not found. Please run migrations.`);
+      console.warn(`Table bipolar_biological_assessment not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -578,7 +578,7 @@ export async function saveBiologicalAssessmentResponse(
   }
 
   const { data, error } = await supabase
-    .from('responses_biological_assessment')
+    .from('bipolar_biological_assessment')
     .upsert(normalizedResponse, { onConflict: 'visit_id' })
     .select()
     .single();
@@ -594,7 +594,7 @@ export async function getEcgResponse(
 ): Promise<EcgResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_ecg')
+    .from('bipolar_ecg')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -603,7 +603,7 @@ export async function getEcgResponse(
     if (error.code === 'PGRST116') return null; // No data found
     if (error.code === 'PGRST205') {
       // Table doesn't exist yet - migration not applied
-      console.warn(`Table responses_ecg not found. Please run migrations.`);
+      console.warn(`Table bipolar_ecg not found. Please run migrations.`);
       return null;
     }
     throw error;
@@ -658,7 +658,7 @@ export async function saveEcgResponse(
   }
 
   const { data, error } = await supabase
-    .from('responses_ecg')
+    .from('bipolar_ecg')
     .upsert({
       ...response,
       interpretation,

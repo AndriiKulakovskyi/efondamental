@@ -34,7 +34,7 @@ export async function getAsrsResponse(
 ): Promise<AsrsResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_asrs')
+    .from('bipolar_asrs')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -82,7 +82,7 @@ export async function saveAsrsResponse(
     : `Dépistage négatif. Score total: ${totalScore}/72.`;
 
   const { data, error } = await supabase
-    .from('responses_asrs')
+    .from('bipolar_asrs')
     .upsert({
       ...response,
       part_a_positive_items: partAPositiveItems,
@@ -104,7 +104,7 @@ export async function getCtqResponse(
 ): Promise<CtqResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_ctq')
+    .from('bipolar_ctq')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -185,7 +185,7 @@ export async function saveCtqResponse(
     `Déni/Minimisation: ${denialScore}/3${denialScore > 0 ? ' (présent - interpréter avec prudence)' : ''}.`;
 
   const { data, error } = await supabase
-    .from('responses_ctq')
+    .from('bipolar_ctq')
     .upsert({
       ...response,
       emotional_abuse_score: emotionalAbuseScore,
@@ -216,7 +216,7 @@ export async function getBis10Response(
 ): Promise<Bis10Response | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_bis10')
+    .from('bipolar_bis10')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -272,7 +272,7 @@ export async function saveBis10Response(
   }
 
   const { data, error } = await supabase
-    .from('responses_bis10')
+    .from('bipolar_bis10')
     .upsert({
       ...response,
       cognitive_impulsivity_mean: Number(cognitiveImpulsivity.toFixed(2)),
@@ -294,7 +294,7 @@ export async function getAls18Response(
 ): Promise<Als18Response | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_als18')
+    .from('bipolar_als18')
     .select('id, visit_id, patient_id, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, anxiety_depression_mean, depression_elation_mean, anger_mean, total_mean, interpretation, completed_by, completed_at, created_at, updated_at')
     .eq('visit_id', visitId)
     .single();
@@ -337,7 +337,7 @@ export async function saveAls18Response(
 
   // Only insert the fields that actually exist in the database
   const { data, error } = await supabase
-    .from('responses_als18')
+    .from('bipolar_als18')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -381,7 +381,7 @@ export async function getAimResponse(
 ): Promise<AimResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_aim')
+    .from('bipolar_aim')
     .select(AIM_SELECT_FIELDS)
     .eq('visit_id', visitId)
     .single();
@@ -434,7 +434,7 @@ export async function saveAimResponse(
 
   // Only insert the fields that actually exist in the database
   const { data, error } = await supabase
-    .from('responses_aim')
+    .from('bipolar_aim')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -480,7 +480,7 @@ export async function getWurs25Response(
 ): Promise<Wurs25Response | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_wurs25')
+    .from('bipolar_wurs25')
     .select(WURS25_SELECT_FIELDS)
     .eq('visit_id', visitId)
     .single();
@@ -513,7 +513,7 @@ export async function saveWurs25Response(
 
   // Only insert the fields that actually exist in the database
   const { data, error } = await supabase
-    .from('responses_wurs25')
+    .from('bipolar_wurs25')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -561,7 +561,7 @@ export async function getAq12Response(
 ): Promise<Aq12Response | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_aq12')
+    .from('bipolar_aq12')
     .select(AQ12_SELECT_FIELDS)
     .eq('visit_id', visitId)
     .single();
@@ -603,7 +603,7 @@ export async function saveAq12Response(
 
   // Only insert the fields that actually exist in the database
   const { data, error } = await supabase
-    .from('responses_aq12')
+    .from('bipolar_aq12')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -638,7 +638,7 @@ export async function getCsmResponse(
 ): Promise<CsmResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_csm')
+    .from('bipolar_csm')
     .select(CSM_SELECT_FIELDS)
     .eq('visit_id', visitId)
     .single();
@@ -687,7 +687,7 @@ export async function saveCsmResponse(
 
   // Only insert the fields that actually exist in the database
   const { data, error } = await supabase
-    .from('responses_csm')
+    .from('bipolar_csm')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
@@ -724,7 +724,7 @@ export async function getCtiResponse(
 ): Promise<CtiResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('responses_cti')
+    .from('bipolar_cti')
     .select(CTI_SELECT_FIELDS)
     .eq('visit_id', visitId)
     .single();
@@ -771,7 +771,7 @@ export async function saveCtiResponse(
     `${circadianLabel}.`;
 
   const { data, error } = await supabase
-    .from('responses_cti')
+    .from('bipolar_cti')
     .upsert({
       visit_id: response.visit_id,
       patient_id: response.patient_id,
