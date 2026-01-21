@@ -126,6 +126,17 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'error';                    // Severe depression
     }
     
+    if (code === 'YMRS') {
+      // YMRS: Total score range 0-60
+      // 0-12: minimal, 13-19: mild hypomania, 20-25: moderate mania, ≥26: severe mania
+      const total = data.total_score;
+      if (total === null || total === undefined) return 'info';
+      if (total <= 12) return 'success';  // Minimal or no symptoms
+      if (total <= 19) return 'info';     // Mild hypomania
+      if (total <= 25) return 'warning';  // Moderate mania (clinically significant)
+      return 'error';                     // Severe mania (clinically significant)
+    }
+    
     if (code === 'WAIS4_MATRICES') {
       // WAIS-IV Matrices: Standardized score 8-12 is average, <8 is below, >12 is above
       if (data.standardized_score >= 13) return 'success';
@@ -353,6 +364,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'ALDA' && 'Score Alda'}
               {code === 'CGI' && 'Résultats CGI'}
               {code === 'MADRS' && 'Résultats MADRS - Échelle de Dépression'}
+              {code === 'YMRS' && 'Résultats YMRS - Échelle de Manie'}
               {code === 'WAIS4_MATRICES' && 'Résultats WAIS-IV Matrices'}
               {code === 'CVLT' && 'Résultats CVLT'}
               {code === 'WAIS4_CODE' && 'Résultats WAIS-IV Code'}
@@ -390,6 +402,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.cgi_s !== undefined ? data.cgi_s : '-')
                 : code === 'MADRS'
                 ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'YMRS'
+                ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'WAIS4_MATRICES'
                 ? (data.standardized_score !== undefined ? data.standardized_score : '-')
                 : code === 'CVLT'
@@ -424,6 +438,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'ALDA' && '/10'}
               {code === 'CGI' && '/7'}
               {code === 'MADRS' && '/60'}
+              {code === 'YMRS' && '/60'}
               {code === 'WAIS4_MATRICES' && '/19'}
               {code === 'CVLT' && '/80'}
               {code === 'WAIS4_CODE' && '/19'}
@@ -856,6 +871,131 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <p>• 7-19 points: Dépression légère</p>
               <p>• 20-34 points: Dépression moyenne</p>
               <p>• {'>'} 34 points: Dépression sévère</p>
+            </div>
+          </div>
+        )}
+
+        {/* YMRS Details */}
+        {code === 'YMRS' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Clinical Description */}
+            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
+              <p className="text-blue-900 text-xs leading-relaxed">
+                C'est une échelle clinique utilisée pour quantifier la sévérité des symptômes maniaques. Le score total reflète l'intensité globale de la manie. En pratique clinique, un score ≥ 20 est généralement considéré comme cliniquement significatif et justifie une prise en charge thérapeutique adaptée.
+              </p>
+            </div>
+
+            {/* Score Interpretation with detailed clinical info */}
+            <div className={`p-3 rounded-lg ${
+              data.total_score !== null && data.total_score >= 26
+                ? 'bg-red-50 border border-red-200'
+                : data.total_score !== null && data.total_score >= 20
+                ? 'bg-amber-50 border border-amber-200'
+                : data.total_score !== null && data.total_score >= 13
+                ? 'bg-blue-50 border border-blue-200'
+                : 'bg-green-50 border border-green-200'
+            }`}>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-base">
+                    {data.total_score !== null && data.total_score >= 26 && 'Manie sévère'}
+                    {data.total_score !== null && data.total_score >= 20 && data.total_score <= 25 && 'Manie modérée'}
+                    {data.total_score !== null && data.total_score >= 13 && data.total_score <= 19 && 'Hypomanie légère'}
+                    {data.total_score !== null && data.total_score >= 0 && data.total_score <= 12 && 'Absence de manie / symptômes minimes'}
+                  </span>
+                  <span className="text-xs text-gray-600 font-medium">Score: {data.total_score ?? '-'}/60</span>
+                </div>
+                
+                {/* Detailed Clinical Interpretation */}
+                <div className="pt-2 border-t">
+                  <p className="text-xs leading-relaxed text-gray-700">
+                    {data.total_score !== null && data.total_score <= 12 && (
+                      <>État euthymique ou traits résiduels non cliniquement significatifs. Fonctionnement global préservé, pas de retentissement fonctionnel notable. Score utilisé comme seuil de rémission.</>
+                    )}
+                    {data.total_score !== null && data.total_score >= 13 && data.total_score <= 19 && (
+                      <><strong>Zone grise clinique.</strong> Symptômes présents mais partiellement contrôlés (énergie accrue, réduction du sommeil, discours rapide). Pas ou peu de rupture fonctionnelle, jugement conservé. <strong className="text-blue-700">Signal d'alerte :</strong> risque d'escalade vers une manie franche. Ajustement thérapeutique précoce recommandé.</>
+                    )}
+                    {data.total_score !== null && data.total_score >= 20 && data.total_score <= 25 && (
+                      <>Symptômes clairement pathologiques : agitation motrice marquée, irritabilité persistante, accélération idéique, début d'altération du jugement. <strong className="text-amber-700">Retentissement fonctionnel net.</strong> Risque accru de comportements impulsifs. Prise en charge active nécessaire avec évaluation de la sécurité.</>
+                    )}
+                    {data.total_score !== null && data.total_score >= 26 && (
+                      <>Manie franche, souvent désorganisée : agitation intense, logorrhée, idées de grandeur, possible symptomatologie psychotique. <strong className="text-red-700">Altération majeure du fonctionnement, risque élevé.</strong> Indication fréquente d'hospitalisation. Épisode aigu non stabilisé.</>
+                    )}
+                  </p>
+                </div>
+                
+                {/* Clinical Significance Alert */}
+                {data.total_score !== null && data.total_score >= 20 && (
+                  <div className="pt-2 border-t">
+                    <p className={`text-xs font-medium ${data.total_score >= 26 ? 'text-red-700' : 'text-amber-700'}`}>
+                      Cliniquement significatif - Prise en charge thérapeutique adaptée {data.total_score >= 26 ? 'urgente' : 'active'} recommandée
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Item Scores */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Scores par item</h5>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">1. Élévation de l'humeur:</span>
+                  <span className="font-medium">{data.q1 ?? '-'}/4</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">2. Augmentation de l'activité motrice:</span>
+                  <span className="font-medium">{data.q2 ?? '-'}/4</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">3. Intérêt sexuel:</span>
+                  <span className="font-medium">{data.q3 ?? '-'}/4</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">4. Sommeil:</span>
+                  <span className="font-medium">{data.q4 ?? '-'}/4</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">5. Irritabilité (pondéré x2):</span>
+                  <span className="font-medium">{data.q5 ?? '-'}/8</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">6. Débit verbal (pondéré x2):</span>
+                  <span className="font-medium">{data.q6 ?? '-'}/8</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">7. Troubles du cours de la pensée:</span>
+                  <span className="font-medium">{data.q7 ?? '-'}/4</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">8. Contenu de la pensée (pondéré x2):</span>
+                  <span className="font-medium">{data.q8 ?? '-'}/8</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">9. Comportement agressif (pondéré x2):</span>
+                  <span className="font-medium">{data.q9 ?? '-'}/8</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">10. Apparence:</span>
+                  <span className="font-medium">{data.q10 ?? '-'}/4</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">11. Insight:</span>
+                  <span className="font-medium">{data.q11 ?? '-'}/4</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Scoring Guide with Clinical Context */}
+            <div className="text-xs text-gray-500 pt-2 border-t space-y-2">
+              <p><strong>Interprétation des seuils :</strong></p>
+              <div className="space-y-1 pl-2">
+                <p>• <strong>0-12 points :</strong> Absence de manie / symptômes minimes - Seuil de rémission</p>
+                <p>• <strong>13-19 points :</strong> Hypomanie légère - Zone d'alerte, ajustement thérapeutique précoce</p>
+                <p>• <strong>20-25 points :</strong> Manie modérée - Prise en charge active, évaluation sécurité</p>
+                <p>• <strong>≥ 26 points :</strong> Manie sévère - Indication hospitalisation fréquente</p>
+              </div>
+              <p className="mt-2 pt-2 border-t"><em>Note: Items 5, 6, 8, 9 sont pondérés x2 (cotés 0-8 au lieu de 0-4)</em></p>
             </div>
           </div>
         )}

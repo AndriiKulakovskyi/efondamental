@@ -198,7 +198,7 @@ export async function saveYmrsResponse(
   const user = await supabase.auth.getUser();
 
   // Calculate total score
-  // All 11 items are summed directly
+  // All 11 items are summed directly (items 5, 6, 8, 9 are double-weighted: 0-8)
   const items = [
     response.q1, response.q2, response.q3, response.q4, response.q5,
     response.q6, response.q7, response.q8, response.q9, response.q10, response.q11
@@ -207,14 +207,24 @@ export async function saveYmrsResponse(
   const totalScore = items.reduce((sum: number, item) => sum + (item ?? 0), 0);
 
   // Determine interpretation based on cutoffs
-  // Range: 0-60
+  // This clinical scale is used to quantify the severity of manic symptoms.
+  // The total score reflects the overall intensity of mania.
+  // Range: 0-60 (max score: 4×7 items + 8×4 double-weighted items = 28 + 32 = 60)
   let interpretation = '';
-  if (totalScore <= 11) {
-    interpretation = 'Pas d\'hypomanie';
-  } else if (totalScore <= 20) {
-    interpretation = 'Hypomanie';
+  let severity = '';
+  
+  if (totalScore <= 12) {
+    severity = 'Absence de manie / symptômes minimes';
+    interpretation = 'État euthymique ou traits résiduels non cliniquement significatifs. Fonctionnement global préservé, pas de retentissement fonctionnel notable. Score utilisé comme seuil de rémission.';
+  } else if (totalScore <= 19) {
+    severity = 'Hypomanie légère';
+    interpretation = 'Zone grise clinique. Symptômes présents mais partiellement contrôlés (énergie accrue, réduction du sommeil, discours rapide). Pas ou peu de rupture fonctionnelle, jugement conservé. Signal d\'alerte : risque d\'escalade vers une manie franche. Ajustement thérapeutique précoce recommandé.';
+  } else if (totalScore <= 25) {
+    severity = 'Manie modérée';
+    interpretation = 'Symptômes clairement pathologiques : agitation motrice marquée, irritabilité persistante, accélération idéique, début d\'altération du jugement. Retentissement fonctionnel net. Risque accru de comportements impulsifs. Prise en charge active nécessaire avec évaluation de la sécurité.';
   } else {
-    interpretation = 'Manie';
+    severity = 'Manie sévère';
+    interpretation = 'Manie franche, souvent désorganisée : agitation intense, logorrhée, idées de grandeur, possible symptomatologie psychotique. Altération majeure du fonctionnement, risque élevé. Indication fréquente d\'hospitalisation. Épisode aigu non stabilisé.';
   }
 
   const { data, error } = await supabase
@@ -222,7 +232,7 @@ export async function saveYmrsResponse(
     .upsert({
       ...response,
       total_score: totalScore,
-      interpretation,
+      interpretation: severity, // Store short severity label in DB
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

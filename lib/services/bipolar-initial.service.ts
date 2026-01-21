@@ -2,6 +2,12 @@
 // Handles all questionnaire data operations for bipolar initial visits
 
 import { createClient } from '@/lib/supabase/server';
+import { 
+  saveMadrsResponse, 
+  saveYmrsResponse,
+  type MadrsResponseInsert,
+  type YmrsResponseInsert 
+} from '@/lib/services/questionnaire-hetero.service';
 
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
@@ -153,6 +159,16 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
   const tableName = BIPOLAR_INITIAL_TABLES[questionnaireCode];
   if (!tableName) {
     throw new Error(`Unknown bipolar initial questionnaire code: ${questionnaireCode}`);
+  }
+
+  // Special handling for questionnaires that need score calculation
+  // MADRS and YMRS need to calculate total_score and interpretation
+  if (questionnaireCode === 'MADRS') {
+    return await saveMadrsResponse(response as any as MadrsResponseInsert) as any as T;
+  }
+  
+  if (questionnaireCode === 'YMRS') {
+    return await saveYmrsResponse(response as any as YmrsResponseInsert) as any as T;
   }
 
   // Convert "oui"/"non" string values to boolean for database boolean columns
