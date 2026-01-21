@@ -155,10 +155,22 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
     throw new Error(`Unknown bipolar initial questionnaire code: ${questionnaireCode}`);
   }
 
+  // Convert "oui"/"non" string values to boolean for database boolean columns
+  // This is needed because questionnaires use French string options but DB uses boolean
+  const convertedResponse = { ...response } as Record<string, unknown>;
+  for (const key of Object.keys(convertedResponse)) {
+    const value = convertedResponse[key];
+    if (value === 'oui') {
+      convertedResponse[key] = true;
+    } else if (value === 'non') {
+      convertedResponse[key] = false;
+    }
+  }
+
   const supabase = await createClient();
   const { data, error } = await supabase
     .from(tableName)
-    .upsert(response, { onConflict: 'visit_id' })
+    .upsert(convertedResponse, { onConflict: 'visit_id' })
     .select()
     .single();
 

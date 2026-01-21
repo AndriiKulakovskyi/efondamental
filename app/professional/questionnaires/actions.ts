@@ -175,9 +175,10 @@ async function shouldUseBipolarTables(visitId: string, questionnaireCode: string
     return false;
   }
   
-  // Check if the visit is a bipolar initial evaluation
+  // Check if the visit is a bipolar evaluation that uses these tables
+  // This includes initial_evaluation and annual_evaluation (which has full medical module)
   const visit = await getVisitById(visitId);
-  if (!visit || visit.visit_type !== 'initial_evaluation') {
+  if (!visit || !['initial_evaluation', 'annual_evaluation'].includes(visit.visit_type)) {
     return false;
   }
   
