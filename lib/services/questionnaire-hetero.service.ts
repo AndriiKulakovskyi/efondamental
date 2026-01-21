@@ -96,6 +96,24 @@ import { calculateScipScores } from './scip-scoring';
 import { calculateWais3MatricesScores } from './wais3-matrices-scoring';
 import { calculateWais3CodeSymbolesScores } from './wais3-code-symboles-scoring';
 
+// Re-export types for use in other services
+export type {
+  MadrsResponse,
+  MadrsResponseInsert,
+  YmrsResponse,
+  YmrsResponseInsert,
+  CgiResponse,
+  CgiResponseInsert,
+  EgfResponse,
+  EgfResponseInsert,
+  AldaResponse,
+  AldaResponseInsert,
+  EtatPatientResponse,
+  EtatPatientResponseInsert,
+  FastResponse,
+  FastResponseInsert
+};
+
 // ============================================================================
 // MADRS (Montgomery-Åsberg Depression Rating Scale)
 // ============================================================================
