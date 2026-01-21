@@ -1579,7 +1579,7 @@ export const DIVA_QUESTIONS: Question[] = [
 
 export const DIVA_DEFINITION: QuestionnaireDefinition = {
   id: 'diva',
-  code: 'DIVA_2_FR',
+  code: 'DIVA_2',
   title: 'DIVA 2.0 - Entretien Diagnostique pour le TDAH chez l\'adulte',
   description: 'Évaluation clinique structurée des critères du TDAH (DSM-IV) à l\'âge adulte et dans l\'enfance.',
   questions: DIVA_QUESTIONS,
@@ -4795,7 +4795,7 @@ export const FAMILY_HISTORY_QUESTIONS: Question[] = [
 
 export const FAMILY_HISTORY_DEFINITION: QuestionnaireDefinition = {
   id: 'family_history',
-  code: 'FAMILY_HISTORY_FR',
+  code: 'FAMILY_HISTORY',
   title: 'Antécédents Familiaux',
   description: 'Évaluation des antécédents familiaux. Section 1: Enfants. Section 2: Frères et Soeurs. Section 3: Parents. Section 4: Grands-Parents.',
   questions: FAMILY_HISTORY_QUESTIONS,
@@ -5037,7 +5037,7 @@ Pensées suicidaires associées à l’élaboration complète ou partielle d’u
 
 export const CSSRS_DEFINITION: QuestionnaireDefinition = {
   id: 'cssrs',
-  code: 'CSSRS_FR',
+  code: 'CSSRS',
   title: 'C-SSRS - Échelle d\'évaluation de Colombia sur la gravité du risque suicidaire',
   description: 'Évaluation standardisée de l\'idéation et du comportement suicidaire (depuis la semaine dernière).',
   questions: CSSRS_QUESTIONS,
@@ -5177,7 +5177,7 @@ export const ISA_QUESTIONS: Question[] = [
 
 export const ISA_DEFINITION: QuestionnaireDefinition = {
   id: 'isa',
-  code: 'ISA_FR',
+  code: 'ISA',
   title: 'Intentionnalité Suicidaire Actuelle',
   description: 'Cette échelle doit toujours être administrée, même en cas d\'absence de tentative de suicide avérée.\n\nÉchelle évaluant les pensées, désirs et tentatives de suicide, ainsi que leur temporalité récente ou passée.',
   questions: ISA_QUESTIONS,
@@ -5308,7 +5308,7 @@ export const ISA_FOLLOWUP_QUESTIONS: Question[] = [
 
 export const ISA_FOLLOWUP_DEFINITION: QuestionnaireDefinition = {
   id: 'isa_followup',
-  code: 'ISA_FOLLOWUP_FR',
+  code: 'ISA_FOLLOWUP',
   title: 'Intentionnalité Suicidaire Actuelle (suivi)',
   description: 'Échelle évaluant les pensées, désirs et tentatives de suicide depuis la dernière visite.',
   questions: ISA_FOLLOWUP_QUESTIONS,
@@ -5493,7 +5493,7 @@ export const SIS_QUESTIONS: Question[] = [
 
 export const SIS_DEFINITION: QuestionnaireDefinition = {
   id: 'sis',
-  code: 'SIS_FR',
+  code: 'SIS',
   title: 'SIS (Suicide Intent Scale) - Tentative la plus récente',
   description: 'Évaluation de l\'intentionnalité suicidaire basée sur les circonstances du geste et la conception du sujet lors de la tentative la plus récente (Beck).',
   questions: SIS_QUESTIONS,
@@ -5695,7 +5695,7 @@ export const SUICIDE_HISTORY_QUESTIONS: Question[] = [
 
 export const SUICIDE_HISTORY_DEFINITION: QuestionnaireDefinition = {
   id: 'suicide_history',
-  code: 'SUICIDE_HISTORY_FR',
+  code: 'SUICIDE_HISTORY',
   title: 'Histoire des conduites suicidaires',
   description: 'Évaluation de l\'historique des tentatives de suicide, incluant les dates, le nombre de tentatives, les types de tentatives (violentes, graves, interrompues, avortées) et leur gravité.',
   questions: SUICIDE_HISTORY_QUESTIONS,
@@ -5782,7 +5782,7 @@ export const SUICIDE_BEHAVIOR_FOLLOWUP_QUESTIONS: Question[] = [
 
 export const SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION: QuestionnaireDefinition = {
   id: 'suicide_behavior_followup',
-  code: 'SUICIDE_BEHAVIOR_FOLLOWUP_FR',
+  code: 'SUICIDE_BEHAVIOR_FOLLOWUP',
   title: 'Histoire des conduites suicidaires (Suivi)',
   description: 'Évaluation des comportements suicidaires pour le suivi semestriel : comportements auto-agressifs, tentatives interrompues, avortées et préparatifs.',
   questions: SUICIDE_BEHAVIOR_FOLLOWUP_QUESTIONS,
@@ -5951,7 +5951,7 @@ export const PERINATALITE_QUESTIONS: Question[] = [
 
 export const PERINATALITE_DEFINITION: QuestionnaireDefinition = {
   id: 'perinatalite',
-  code: 'PERINATALITE_FR',
+  code: 'PERINATALITE',
   title: 'Périnatalité',
   description: 'Recueil des informations périnatales et des conditions de naissance du patient.',
   questions: PERINATALITE_QUESTIONS,
@@ -6162,7 +6162,7 @@ export const PATHO_NEURO_QUESTIONS: Question[] = [
 
 export const PATHO_NEURO_DEFINITION: QuestionnaireDefinition = {
   id: 'patho_neuro',
-  code: 'PATHO_NEURO_FR',
+  code: 'PATHO_NEURO',
   title: 'Pathologies neurologiques',
   description: 'Recueil des antécédents de pathologies neurologiques du patient (migraine, sclérose en plaques, épilepsie, méningite, traumatisme crânien, AVC, autres).',
   questions: PATHO_NEURO_QUESTIONS,
@@ -6328,7 +6328,7 @@ export const PATHO_CARDIO_QUESTIONS: Question[] = [
 
 export const PATHO_CARDIO_DEFINITION: QuestionnaireDefinition = {
   id: 'patho_cardio',
-  code: 'PATHO_CARDIO_FR',
+  code: 'PATHO_CARDIO',
   title: 'Pathologies cardio-vasculaires',
   description: 'Recueil des antécédents de pathologies cardio-vasculaires du patient (hypertension artérielle, maladie coronarienne, infarctus du myocarde, trouble du rythme cardiaque, autres).',
   questions: PATHO_CARDIO_QUESTIONS,
@@ -6529,7 +6529,7 @@ export const PATHO_ENDOC_QUESTIONS: Question[] = [
 
 export const PATHO_ENDOC_DEFINITION: QuestionnaireDefinition = {
   id: 'patho_endoc',
-  code: 'PATHO_ENDOC_FR',
+  code: 'PATHO_ENDOC',
   title: 'Pathologies endocriniennes et métaboliques',
   description: 'Recueil des antécédents de pathologies endocriniennes et métaboliques du patient (diabète, dysthyroïdie, dyslipidémie, autres endocrinopathies).',
   questions: PATHO_ENDOC_QUESTIONS,
@@ -6817,7 +6817,7 @@ export const PATHO_DERMATO_QUESTIONS: Question[] = [
 
 export const PATHO_DERMATO_DEFINITION: QuestionnaireDefinition = {
   id: 'patho_dermato',
-  code: 'PATHO_DERMATO_FR',
+  code: 'PATHO_DERMATO',
   title: 'Pathologies dermatologiques',
   description: 'Recueil des antécédents de pathologies dermatologiques du patient (psoriasis, acné, eczéma, toxidermie médicamenteuse, perte de cheveux).',
   questions: PATHO_DERMATO_QUESTIONS,
@@ -6956,7 +6956,7 @@ export const PATHO_URINAIRE_QUESTIONS: Question[] = [
 
 export const PATHO_URINAIRE_DEFINITION: QuestionnaireDefinition = {
   id: 'patho_urinaire',
-  code: 'PATHO_URINAIRE_FR',
+  code: 'PATHO_URINAIRE',
   title: 'Pathologies des voies urinaires',
   description: 'Recueil des antécédents de pathologies des voies urinaires du patient (néphropathie, adénome prostatique, rétention urinaire).',
   questions: PATHO_URINAIRE_QUESTIONS,
@@ -7086,7 +7086,7 @@ export const ANTECEDENTS_GYNECO_QUESTIONS: Question[] = [
 
 export const ANTECEDENTS_GYNECO_DEFINITION: QuestionnaireDefinition = {
   id: 'antecedents_gyneco',
-  code: 'ANTECEDENTS_GYNECO_FR',
+  code: 'ANTECEDENTS_GYNECO',
   title: 'Antécédents gynécologiques',
   description: 'Recueil des antécédents gynécologiques de la patiente (grossesses, ménopause, pathologies gynécologiques).',
   questions: ANTECEDENTS_GYNECO_QUESTIONS,
@@ -7254,7 +7254,7 @@ export const PATHO_HEPATO_GASTRO_QUESTIONS: Question[] = [
 
 export const PATHO_HEPATO_GASTRO_DEFINITION: QuestionnaireDefinition = {
   id: 'patho_hepato_gastro',
-  code: 'PATHO_HEPATO_GASTRO_FR',
+  code: 'PATHO_HEPATO_GASTRO',
   title: 'Pathologies hépato-gastro-entérologiques',
   description: 'Recueil des antécédents de pathologies hépato-gastro-entérologiques du patient (MICI, cirrhose, ulcère, hépatites médicamenteuses).',
   questions: PATHO_HEPATO_GASTRO_QUESTIONS,
@@ -7430,7 +7430,7 @@ export const PATHO_ALLERGIQUE_QUESTIONS: Question[] = [
 
 export const PATHO_ALLERGIQUE_DEFINITION: QuestionnaireDefinition = {
   id: 'patho_allergique',
-  code: 'PATHO_ALLERGIQUE_FR',
+  code: 'PATHO_ALLERGIQUE',
   title: 'Pathologies allergiques et inflammatoires',
   description: 'Recueil des antécédents de pathologies allergiques et inflammatoires du patient (asthme, allergies, lupus, polyarthrite rhumatoïde, maladies auto-immunes).',
   questions: PATHO_ALLERGIQUE_QUESTIONS,
@@ -7931,7 +7931,7 @@ export const AUTRES_PATHO_QUESTIONS: Question[] = [
 
 export const AUTRES_PATHO_DEFINITION: QuestionnaireDefinition = {
   id: 'autres_patho',
-  code: 'AUTRES_PATHO_FR',
+  code: 'AUTRES_PATHO',
   title: 'Autres pathologies',
   description: 'Recueil des antécédents de pathologies diverses du patient: cancers, infections (VIH, hépatites), antécédents chirurgicaux, maladies génétiques, pathologies ophtalmologiques, et autres pathologies somatiques.',
   questions: AUTRES_PATHO_QUESTIONS,
@@ -8109,7 +8109,7 @@ export const WAIS4_CRITERIA_QUESTIONS: Question[] = [
 
 export const WAIS4_CRITERIA_DEFINITION: QuestionnaireDefinition = {
   id: 'wais4_criteria',
-  code: 'WAIS4_CRITERIA_FR',
+  code: 'WAIS4_CRITERIA',
   title: 'WAIS-IV Critères cliniques',
   description: 'Fiche de recueil des critères cliniques et démographiques pour la passation de la WAIS-IV.',
   questions: WAIS4_CRITERIA_QUESTIONS,
@@ -8249,7 +8249,7 @@ export const WAIS4_LEARNING_QUESTIONS: Question[] = [
 
 export const WAIS4_LEARNING_DEFINITION: QuestionnaireDefinition = {
   id: 'wais4_learning',
-  code: 'WAIS4_LEARNING_FR',
+  code: 'WAIS4_LEARNING',
   title: 'WAIS-IV Troubles des acquisitions et des apprentissages',
   description: 'Liste de contrôle des antécédents de troubles des acquisitions et des apprentissages.',
   questions: WAIS4_LEARNING_QUESTIONS,
@@ -8345,7 +8345,7 @@ export const WAIS4_MATRICES_QUESTIONS: Question[] = generateMatrixItems();
 
 export const WAIS4_MATRICES_DEFINITION: QuestionnaireDefinition = {
   id: 'wais4_matrices',
-  code: 'WAIS4_MATRICES_FR',
+  code: 'WAIS4_MATRICES',
   title: 'WAIS-IV Subtest Matrices',
   description: 'Évaluation du raisonnement fluide et de l\'intelligence visuo-spatiale (Items 1-26).',
   questions: WAIS4_MATRICES_QUESTIONS,
@@ -8859,7 +8859,7 @@ export const CVLT_QUESTIONS: Question[] = [
 
 export const CVLT_DEFINITION: QuestionnaireDefinition = {
   id: 'cvlt',
-  code: 'CVLT_FR',
+  code: 'CVLT',
   title: 'California Verbal Learning Test (CVLT)',
   description: 'Test d\'apprentissage verbal evaluant les strategies d\'encodage, de recuperation, et la memoire a court et long terme. Version francaise (Deweer et al., 2008).',
   questions: CVLT_QUESTIONS,
@@ -10103,7 +10103,7 @@ export const WAIS4_DIGIT_SPAN_QUESTIONS: Question[] = [
 
 export const WAIS4_DIGIT_SPAN_DEFINITION: QuestionnaireDefinition = {
   id: 'wais4_digit_span',
-  code: 'WAIS4_DIGIT_SPAN_FR',
+  code: 'WAIS4_DIGIT_SPAN',
   title: 'WAIS-IV Subtest Mémoire des chiffres (Digit Span)',
   description: 'Subtest évaluant la mémoire de travail auditive via trois tâches : ordre direct, ordre inverse et ordre croissant.',
   questions: WAIS4_DIGIT_SPAN_QUESTIONS,
@@ -10362,7 +10362,7 @@ export const TMT_QUESTIONS: Question[] = [
 
 export const TMT_DEFINITION: QuestionnaireDefinition = {
   id: 'tmt',
-  code: 'TMT_FR',
+  code: 'TMT',
   title: 'Trail Making Test (Reitan, 1955)',
   description: 'Test neuropsychologique evaluant l\'attention visuelle et la flexibilite cognitive.',
   questions: TMT_QUESTIONS,
@@ -10585,7 +10585,7 @@ export const STROOP_QUESTIONS: Question[] = [
 
 export const STROOP_DEFINITION: QuestionnaireDefinition = {
   id: 'stroop',
-  code: 'STROOP_FR',
+  code: 'STROOP',
   title: 'Test de Stroop (version Golden, 1978)',
   description: 'Test neuropsychologique evaluant les fonctions executives et l\'inhibition.',
   questions: STROOP_QUESTIONS,
@@ -10824,7 +10824,7 @@ export const FLUENCES_VERBALES_QUESTIONS: Question[] = [
 
 export const FLUENCES_VERBALES_DEFINITION: QuestionnaireDefinition = {
   id: 'fluences_verbales',
-  code: 'FLUENCES_VERBALES_FR',
+  code: 'FLUENCES_VERBALES',
   title: 'Fluences verbales (Cardebat et al., 1990)',
   description: 'Test neuropsychologique evaluant la fluence verbale (phonemique et semantique).',
   questions: FLUENCES_VERBALES_QUESTIONS,
@@ -10971,7 +10971,7 @@ export const COBRA_QUESTIONS: Question[] = [
 
 export const COBRA_DEFINITION: QuestionnaireDefinition = {
   id: 'cobra',
-  code: 'COBRA_FR',
+  code: 'COBRA',
   title: 'COBRA - Cognitive Complaints in Bipolar Disorder Rating Assessment',
   description: 'Auto-questionnaire evaluant les plaintes cognitives dans le trouble bipolaire.',
   questions: COBRA_QUESTIONS,
@@ -11146,7 +11146,7 @@ export const CPT3_QUESTIONS: Question[] = [
 
 export const CPT3_DEFINITION: QuestionnaireDefinition = {
   id: 'cpt3',
-  code: 'CPT3_FR',
+  code: 'CPT3',
   title: 'CPT-III - Conners\' Continuous Performance Test III',
   description: 'Evaluation informatisee des problemes d\'attention. Les resultats sont saisis depuis le rapport du logiciel.',
   questions: CPT3_QUESTIONS,
@@ -11353,7 +11353,7 @@ export const WAIS4_SIMILITUDES_QUESTIONS: Question[] = [
 
 export const WAIS4_SIMILITUDES_DEFINITION: QuestionnaireDefinition = {
   id: 'wais4_similitudes',
-  code: 'WAIS4_SIMILITUDES_FR',
+  code: 'WAIS4_SIMILITUDES',
   title: 'Similitudes (WAIS-IV)',
   description: 'Sous-test de la WAIS-IV evaluant le raisonnement verbal et la formation de concepts.',
   questions: WAIS4_SIMILITUDES_QUESTIONS,
@@ -11507,7 +11507,7 @@ export const TEST_COMMISSIONS_QUESTIONS: Question[] = [
 
 export const TEST_COMMISSIONS_DEFINITION: QuestionnaireDefinition = {
   id: 'test_commissions',
-  code: 'TEST_COMMISSIONS_FR',
+  code: 'TEST_COMMISSIONS',
   title: 'Test des Commissions',
   description: 'Test neuropsychologique evaluant les fonctions executives et la memoire.',
   questions: TEST_COMMISSIONS_QUESTIONS,
@@ -11660,7 +11660,7 @@ export const SCIP_QUESTIONS: Question[] = [
 
 export const SCIP_DEFINITION: QuestionnaireDefinition = {
   id: 'scip',
-  code: 'SCIP_FR',
+  code: 'SCIP',
   title: 'SCIP - Screening Assessment for Cognitive Impairment in Psychiatry',
   description: 'Outil de depistage rapide des troubles cognitifs en psychiatrie.',
   questions: SCIP_QUESTIONS,
@@ -11696,7 +11696,7 @@ export const WAIS3_FLUENCES_VERBALES_DEFINITION = FLUENCES_VERBALES_DEFINITION;
 
 export const WAIS3_CRITERIA_DEFINITION: QuestionnaireDefinition = {
   id: 'wais3_criteria',
-  code: 'WAIS3_CRITERIA_FR',
+  code: 'WAIS3_CRITERIA',
   title: 'WAIS-III - Critères cliniques',
   description: 'Fiche de recueil des critères cliniques et démographiques pour la passation de la WAIS-III.',
   questions: WAIS4_CRITERIA_QUESTIONS,
@@ -11713,7 +11713,7 @@ export const WAIS3_CRITERIA_DEFINITION: QuestionnaireDefinition = {
 
 export const WAIS3_LEARNING_DEFINITION: QuestionnaireDefinition = {
   id: 'wais3_learning',
-  code: 'WAIS3_LEARNING_FR',
+  code: 'WAIS3_LEARNING',
   title: 'WAIS-III - Troubles des acquisitions et des apprentissages',
   description: 'Liste de contrôle des antécédents de troubles des acquisitions et des apprentissages.',
   questions: WAIS4_LEARNING_QUESTIONS,
@@ -11826,7 +11826,7 @@ export const WAIS3_VOCABULAIRE_QUESTIONS: Question[] = [
 
 export const WAIS3_VOCABULAIRE_DEFINITION: QuestionnaireDefinition = {
   id: 'wais3_vocabulaire',
-  code: 'WAIS3_VOCABULAIRE_FR',
+  code: 'WAIS3_VOCABULAIRE',
   title: 'WAIS-III - Subtest Vocabulaire',
   description: 'Subtest Vocabulaire de la WAIS-III (Wechsler, 1997) - Évaluation des connaissances lexicales.\n\n**Règles d\'administration WAIS-III:**\n• Pour les 16 ans et plus : Commencer à l\'item 4 (Instruire)\n• **Règle de retour :** Si les items 4-7 ne sont pas tous parfaits (2 points), administrer les items 1-3 en ordre inverse\n• **Crédit automatique :** Les items avant le point de départ non administrés reçoivent 2 points chacun\n• **Arrêt :** Discontinuer après 6 scores consécutifs de 0\n• Entrer manuellement les scores selon ces règles (le système calcule la somme)',
   questions: WAIS3_VOCABULAIRE_QUESTIONS,
@@ -12172,7 +12172,7 @@ export const WAIS3_MATRICES_QUESTIONS: Question[] = [
 
 export const WAIS3_MATRICES_DEFINITION: QuestionnaireDefinition = {
   id: 'wais3_matrices',
-  code: 'WAIS3_MATRICES_FR',
+  code: 'WAIS3_MATRICES',
   title: 'WAIS-III - Subtest Matrices',
   description: 'Subtest Matrices de la WAIS-III (Wechsler, 1997) - Évaluation du raisonnement perceptif. Utilise les tables de normes WAIS-III.',
   questions: WAIS3_MATRICES_QUESTIONS,
@@ -12395,7 +12395,7 @@ export const WAIS3_CODE_SYMBOLES_QUESTIONS: Question[] = [
 
 export const WAIS3_CODE_SYMBOLES_DEFINITION: QuestionnaireDefinition = {
   id: 'wais3_code_symboles',
-  code: 'WAIS3_CODE_SYMBOLES_FR',
+  code: 'WAIS3_CODE_SYMBOLES',
   title: 'WAIS-III - Code, Symboles & IVT',
   description: 'Subtests Code et Symboles de la WAIS-III (Wechsler, 1997) avec l\'Indice de Vitesse de Traitement (IVT). ATTENTION: Cette version utilise les normes WAIS-III. Une version plus récente avec les normes WAIS-IV est disponible dans la section WAIS-IV.',
   questions: WAIS3_CODE_SYMBOLES_QUESTIONS,
@@ -13026,7 +13026,7 @@ export const WAIS3_DIGIT_SPAN_QUESTIONS: Question[] = [
 
 export const WAIS3_DIGIT_SPAN_DEFINITION: QuestionnaireDefinition = {
   id: 'wais3_digit_span',
-  code: 'WAIS3_DIGIT_SPAN_FR',
+  code: 'WAIS3_DIGIT_SPAN',
   title: 'WAIS-III - Mémoire des chiffres',
   description: 'Subtest Mémoire des chiffres de la WAIS-III (Wechsler, 1997) incluant l\'Ordre Direct et l\'Ordre Inverse. ATTENTION: Cette version utilise les normes WAIS-III. Une version plus récente avec les normes WAIS-IV est disponible dans la section WAIS-IV.',
   questions: WAIS3_DIGIT_SPAN_QUESTIONS,
@@ -13545,7 +13545,7 @@ export const WAIS3_CPT2_QUESTIONS: Question[] = [
 
 export const WAIS3_CPT2_DEFINITION: QuestionnaireDefinition = {
   id: 'wais3_cpt2',
-  code: 'WAIS3_CPT2_FR',
+  code: 'WAIS3_CPT2',
   title: 'WAIS-III - CPT II V.5',
   description: 'Conners\' Continuous Performance Test II (CPT II V.5) by C. Keith Conners, Ph.D. and MHS Staff. Ce formulaire permet la saisie des resultats calcules par le logiciel CPT II externe. Instructions: « Appuyez sur la barre d’espace ou sur le bouton gauche de la souris pour toutes les lettres EXCEPTÉ pour le X. S’il vous plaît répondez aussi vite que possible mais aussi correctement que possible. Quand vous appuierez sur le bouton OK l’exercice commencera. » Si le patient pose des questions pendant le test, dire : « je pourrai vous répondre dès que vous aurez terminé. S’il vous plaît continuez. »',
   questions: WAIS3_CPT2_QUESTIONS,
@@ -13709,7 +13709,7 @@ export const MEM3_SPATIAL_QUESTIONS: Question[] = [
 // Primary definition for MEM-III Spatial Memory (independent neuropsychological test)
 export const MEM3_SPATIAL_DEFINITION: QuestionnaireDefinition = {
   id: 'mem3_spatial',
-  code: 'MEM3_SPATIAL_FR',
+  code: 'MEM3_SPATIAL',
   title: 'MEM-III - Memoire Spatiale',
   description: 'MEM-III (Wechsler Memory Scale - 3rd Edition) - Subtest Memoire Spatiale (Spatial Span). Adaptation francaise: Gregoire, J., Penhouet C. (2001). Ce subtest comprend les composantes Ordre Direct (Forward) et Ordre Inverse (Backward). Test neuropsychologique independant.',
   questions: MEM3_SPATIAL_QUESTIONS,

@@ -98,7 +98,7 @@ export const ASRM_QUESTIONS: Question[] = [
 
 export const ASRM_DEFINITION: QuestionnaireDefinition = {
   id: 'asrm',
-  code: 'ASRM_FR',
+  code: 'ASRM',
   title: 'Auto-Questionnaire Altman (ASRM)',
   description: "Échelle d'Auto-Évaluation de la Manie - Période de référence: 7 derniers jours",
   questions: ASRM_QUESTIONS,
@@ -209,7 +209,7 @@ export const QIDS_QUESTIONS: Question[] = [
 
 export const QIDS_DEFINITION: QuestionnaireDefinition = {
   id: 'qids_sr16',
-  code: 'QIDS_SR16_FR',
+  code: 'QIDS_SR16',
   title: 'QIDS-SR16',
   description: 'Auto-questionnaire court sur les symptômes de la dépression - Période de référence: 7 derniers jours',
   questions: QIDS_QUESTIONS,
@@ -243,7 +243,7 @@ export const MDQ_QUESTIONS: Question[] = [
 
 export const MDQ_DEFINITION: QuestionnaireDefinition = {
   id: 'mdq',
-  code: 'MDQ_FR',
+  code: 'MDQ',
   title: 'MDQ - Questionnaire des Troubles de l\'Humeur',
   description: 'Outil de dépistage du trouble bipolaire - Période de référence: au cours de votre vie',
   questions: MDQ_QUESTIONS,
@@ -1451,7 +1451,7 @@ export const ASRS_QUESTIONS: Question[] = [
 
 export const ASRS_DEFINITION: QuestionnaireDefinition = {
   id: 'asrs',
-  code: 'ASRS_FR',
+  code: 'ASRS',
   title: 'ASRS - Adult ADHD Self-Report Scale',
   description: "Échelle d'auto-évaluation du trouble déficitaire de l'attention avec/sans hyperactivité chez l'adulte",
   questions: ASRS_QUESTIONS,
@@ -1497,7 +1497,7 @@ export const CTQ_QUESTIONS: Question[] = [
 
 export const CTQ_DEFINITION: QuestionnaireDefinition = {
   id: 'ctq',
-  code: 'CTQ_FR',
+  code: 'CTQ',
   title: 'CTQ - Childhood Trauma Questionnaire',
   description: "Questionnaire sur les traumatismes de l'enfance",
   questions: CTQ_QUESTIONS,
@@ -1535,7 +1535,7 @@ export const BIS10_QUESTIONS: Question[] = [
 
 export const BIS10_DEFINITION: QuestionnaireDefinition = {
   id: 'bis10',
-  code: 'BIS10_FR',
+  code: 'BIS10',
   title: 'BIS-10 - Barratt Impulsiveness Scale (Short Form)',
   description: "Échelle d'impulsivité de Barratt - Version courte (12 items)",
   questions: BIS10_QUESTIONS,

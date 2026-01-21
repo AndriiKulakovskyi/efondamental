@@ -48,16 +48,30 @@ export async function saveTobaccoResponse(
 ): Promise<BipolarNurseTobaccoResponse> {
   const supabase = await createClient();
   
+  // Ensure updated_at is set, completed_by is optional (will be null if not provided)
+  const dataToSave = {
+    ...response,
+    updated_at: new Date().toISOString()
+  };
+  
+  console.log('[saveTobaccoResponse] Saving data:', JSON.stringify(dataToSave, null, 2));
+  
   const { data, error } = await supabase
     .from('bipolar_nurse_tobacco')
-    .upsert({
-      ...response,
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'visit_id' })
+    .upsert(dataToSave, { onConflict: 'visit_id' })
     .select()
     .single();
   
-  if (error) throw error;
+  if (error) {
+    console.error('[saveTobaccoResponse] Supabase error:', JSON.stringify(error, null, 2));
+    throw new Error(`Failed to save tobacco response: ${error.message} (code: ${error.code})`);
+  }
+  
+  if (!data) {
+    throw new Error('No data returned from tobacco response save');
+  }
+  
+  console.log('[saveTobaccoResponse] Saved successfully:', JSON.stringify(data, null, 2));
   return data;
 }
 

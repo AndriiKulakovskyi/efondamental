@@ -78,12 +78,12 @@ const QUESTIONNAIRE_TABLE_MAP: Record<string, string> = {
   'FAST_FR': 'bipolar_fast',
   'COBRA_FR': 'bipolar_cobra',
   'ALDA_FR': 'bipolar_alda',
-  'TOBACCO_FR': 'bipolar_tobacco',
-  'FAGERSTROM_FR': 'bipolar_fagerstrom',
-  'PHYSICAL_PARAMS_FR': 'bipolar_physical_params',
-  'BLOOD_PRESSURE_FR': 'bipolar_blood_pressure',
-  'SLEEP_APNEA_FR': 'bipolar_sleep_apnea',
-  'BIOLOGICAL_FR': 'bipolar_biological_assessment',
+  'TOBACCO_FR': 'bipolar_nurse_tobacco',
+  'FAGERSTROM_FR': 'bipolar_nurse_fagerstrom',
+  'PHYSICAL_PARAMS_FR': 'bipolar_nurse_physical_params',
+  'BLOOD_PRESSURE_FR': 'bipolar_nurse_blood_pressure',
+  'SLEEP_APNEA_FR': 'bipolar_nurse_sleep_apnea',
+  'BIOLOGICAL_FR': 'bipolar_nurse_biological_assessment',
   'ETAT_PATIENT_FR': 'bipolar_etat_patient',
   'DSM5_HUMEUR_FR': 'bipolar_dsm5_humeur',
   'DSM5_PSYCHOTIC_FR': 'bipolar_dsm5_psychotic',
@@ -104,7 +104,7 @@ const QUESTIONNAIRE_TABLE_MAP: Record<string, string> = {
   'NON_PHARMACOLOGIC_FR': 'bipolar_non_pharmacologic',
   'PSY_TRAITEMENT_SEM_FR': 'bipolar_psy_traitement_semestriel',
   'MEDICAL_DIAGNOSTIC_FR': 'bipolar_diagnostic',
-  'ECG_FR': 'bipolar_ecg',
+  'ECG_FR': 'bipolar_nurse_ecg',
 };
 
 // ============================================================================

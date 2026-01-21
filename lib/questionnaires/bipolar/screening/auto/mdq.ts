@@ -221,7 +221,7 @@ export interface QuestionnaireDefinition {
 
 export const MDQ_DEFINITION: QuestionnaireDefinition = {
   id: 'mdq',
-  code: 'MDQ_FR',
+  code: 'MDQ',
   title: "MDQ - Questionnaire des Troubles de l'Humeur",
   description: 'Outil de depistage du trouble bipolaire - Periode de reference: au cours de votre vie',
   questions: MDQ_QUESTIONS,

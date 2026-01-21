@@ -25,14 +25,14 @@ type BipolarQuestionnaireInsert<T> = Omit<T, 'id' | 'created_at' | 'updated_at' 
 // ============================================================================
 
 const BIPOLAR_INITIAL_TABLES: Record<string, string> = {
-  // Nurse module
-  'TOBACCO': 'bipolar_tobacco',
-  'FAGERSTROM': 'bipolar_fagerstrom',
-  'PHYSICAL_PARAMS': 'bipolar_physical_params',
-  'BLOOD_PRESSURE': 'bipolar_blood_pressure',
-  'ECG': 'bipolar_ecg',
-  'SLEEP_APNEA': 'bipolar_sleep_apnea',
-  'BIOLOGICAL_ASSESSMENT': 'bipolar_biological_assessment',
+  // Nurse module (tables prefixed with bipolar_nurse_)
+  'TOBACCO': 'bipolar_nurse_tobacco',
+  'FAGERSTROM': 'bipolar_nurse_fagerstrom',
+  'PHYSICAL_PARAMS': 'bipolar_nurse_physical_params',
+  'BLOOD_PRESSURE': 'bipolar_nurse_blood_pressure',
+  'ECG': 'bipolar_nurse_ecg',
+  'SLEEP_APNEA': 'bipolar_nurse_sleep_apnea',
+  'BIOLOGICAL_ASSESSMENT': 'bipolar_nurse_biological_assessment',
   
   // Thymic module
   'MADRS': 'bipolar_madrs',

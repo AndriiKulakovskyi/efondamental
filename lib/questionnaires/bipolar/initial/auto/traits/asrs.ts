@@ -94,7 +94,7 @@ export const ASRS_QUESTIONS: Question[] = [
 
 export const ASRS_DEFINITION: QuestionnaireDefinition = {
   id: 'asrs',
-  code: 'ASRS_FR',
+  code: 'ASRS',
   title: 'ASRS - Adult ADHD Self-Report Scale',
   description: "Échelle d'auto-évaluation du trouble déficitaire de l'attention avec/sans hyperactivité chez l'adulte",
   questions: ASRS_QUESTIONS,

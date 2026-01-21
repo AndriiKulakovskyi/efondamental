@@ -263,7 +263,7 @@ export interface QuestionnaireDefinition {
 
 export const QIDS_DEFINITION: QuestionnaireDefinition = {
   id: 'qids_sr16',
-  code: 'QIDS_SR16_FR',
+  code: 'QIDS_SR16',
   title: 'QIDS-SR16',
   description: 'Auto-questionnaire court sur les symptomes de la depression - Periode de reference: 7 derniers jours',
   questions: QIDS_QUESTIONS,

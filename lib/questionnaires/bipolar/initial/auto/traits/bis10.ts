@@ -66,7 +66,7 @@ export const BIS10_QUESTIONS: Question[] = [
 
 export const BIS10_DEFINITION: QuestionnaireDefinition = {
   id: 'bis10',
-  code: 'BIS10_FR',
+  code: 'BIS10',
   title: 'BIS-10 - Barratt Impulsiveness Scale (Short Form)',
   description: "Échelle d'impulsivité de Barratt - Version courte (12 items)",
   questions: BIS10_QUESTIONS,

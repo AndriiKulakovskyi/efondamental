@@ -16,7 +16,7 @@ export async function getTobaccoResponse(
 ): Promise<TobaccoResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('bipolar_tobacco')
+    .from('bipolar_nurse_tobacco')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -113,7 +113,7 @@ export async function saveTobaccoResponse(
   }
 
   const { data, error } = await supabase
-    .from('bipolar_tobacco')
+    .from('bipolar_nurse_tobacco')
     .upsert(normalizedResponse, { onConflict: 'visit_id' })
     .select()
     .single();
@@ -141,7 +141,7 @@ export async function getFagerstromResponse(
 ): Promise<FagerstromResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('bipolar_fagerstrom')
+    .from('bipolar_nurse_fagerstrom')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -215,7 +215,7 @@ export async function saveFagerstromResponse(
   }
 
   const { data, error } = await supabase
-    .from('bipolar_fagerstrom')
+    .from('bipolar_nurse_fagerstrom')
     .upsert({
       ...responseWithoutGeneratedFields,
       dependence_level: dependenceLevel,
@@ -236,7 +236,7 @@ export async function getPhysicalParamsResponse(
 ): Promise<PhysicalParamsResponse | null> {
   const supabase = await createClient();
   const { data, error} = await supabase
-    .from('bipolar_physical_params')
+    .from('bipolar_nurse_physical_params')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -263,7 +263,7 @@ export async function savePhysicalParamsResponse(
   const { bmi, ...responseWithoutBmi } = response as any;
 
   const { data, error } = await supabase
-    .from('bipolar_physical_params')
+    .from('bipolar_nurse_physical_params')
     .upsert({
       ...responseWithoutBmi,
       completed_by: user.data.user?.id
@@ -282,7 +282,7 @@ export async function getBloodPressureResponse(
 ): Promise<BloodPressureResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('bipolar_blood_pressure')
+    .from('bipolar_nurse_blood_pressure')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -320,7 +320,7 @@ export async function saveBloodPressureResponse(
   }
 
   const { data, error } = await supabase
-    .from('bipolar_blood_pressure')
+    .from('bipolar_nurse_blood_pressure')
     .upsert({
       ...responseData,
       tension_lying: tensionLying,
@@ -341,7 +341,7 @@ export async function getSleepApneaResponse(
 ): Promise<SleepApneaResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('bipolar_sleep_apnea')
+    .from('bipolar_nurse_sleep_apnea')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -435,7 +435,7 @@ export async function saveSleepApneaResponse(
   }
 
   const { data, error } = await supabase
-    .from('bipolar_sleep_apnea')
+    .from('bipolar_nurse_sleep_apnea')
     .upsert(normalizedResponse, { onConflict: 'visit_id' })
     .select()
     .single();
@@ -451,7 +451,7 @@ export async function getBiologicalAssessmentResponse(
 ): Promise<BiologicalAssessmentResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('bipolar_biological_assessment')
+    .from('bipolar_nurse_biological_assessment')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -578,7 +578,7 @@ export async function saveBiologicalAssessmentResponse(
   }
 
   const { data, error } = await supabase
-    .from('bipolar_biological_assessment')
+    .from('bipolar_nurse_biological_assessment')
     .upsert(normalizedResponse, { onConflict: 'visit_id' })
     .select()
     .single();
@@ -594,7 +594,7 @@ export async function getEcgResponse(
 ): Promise<EcgResponse | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('bipolar_ecg')
+    .from('bipolar_nurse_ecg')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -658,7 +658,7 @@ export async function saveEcgResponse(
   }
 
   const { data, error } = await supabase
-    .from('bipolar_ecg')
+    .from('bipolar_nurse_ecg')
     .upsert({
       ...response,
       interpretation,

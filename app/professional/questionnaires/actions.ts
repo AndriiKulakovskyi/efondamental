@@ -273,27 +273,7 @@ function questionnaireCodeToBipolarKey(code: string): string | null {
     'CTI': 'CTI',
     // Social module
     'SOCIAL': 'SOCIAL',
-    // Medical module - legacy codes with _FR suffix
-    'DSM5_HUMEUR_FR': 'DSM5_HUMEUR',
-    'DSM5_PSYCHOTIC_FR': 'DSM5_PSYCHOTIC',
-    'DSM5_COMORBID_FR': 'DSM5_COMORBID',
-    'DIVA_2_FR': 'DIVA',
-    'FAMILY_HISTORY_FR': 'FAMILY_HISTORY',
-    'CSSRS_FR': 'CSSRS',
-    'ISA_FR': 'ISA',
-    'SIS_FR': 'SIS',
-    'SUICIDE_HISTORY_FR': 'SUICIDE_HISTORY',
-    'PERINATALITE_FR': 'PERINATALITE',
-    'PATHO_NEURO_FR': 'PATHO_NEURO',
-    'PATHO_CARDIO_FR': 'PATHO_CARDIO',
-    'PATHO_ENDOC_FR': 'PATHO_ENDOC',
-    'PATHO_DERMATO_FR': 'PATHO_DERMATO',
-    'PATHO_URINAIRE_FR': 'PATHO_URINAIRE',
-    'ANTECEDENTS_GYNECO_FR': 'ANTECEDENTS_GYNECO',
-    'PATHO_HEPATO_GASTRO_FR': 'PATHO_HEPATO_GASTRO',
-    'PATHO_ALLERGIQUE_FR': 'PATHO_ALLERGIQUE',
-    'AUTRES_PATHO_FR': 'AUTRES_PATHO',
-    // Medical module - new codes without _FR suffix (from new bipolar module definitions)
+    // Medical module
     'DSM5_HUMEUR': 'DSM5_HUMEUR',
     'DSM5_PSYCHOTIC': 'DSM5_PSYCHOTIC',
     'DSM5_COMORBID': 'DSM5_COMORBID',
@@ -313,30 +293,7 @@ function questionnaireCodeToBipolarKey(code: string): string | null {
     'PATHO_HEPATO_GASTRO': 'PATHO_HEPATO_GASTRO',
     'PATHO_ALLERGIQUE': 'PATHO_ALLERGIQUE',
     'AUTRES_PATHO': 'AUTRES_PATHO',
-    // Neuropsy module - legacy codes with _FR suffix
-    'CVLT_FR': 'CVLT',
-    'TMT_FR': 'TMT',
-    'STROOP_FR': 'STROOP',
-    'FLUENCES_VERBALES_FR': 'FLUENCES_VERBALES',
-    'MEM3_SPATIAL_FR': 'MEM3_SPATIAL',
-    'WAIS4_CRITERIA_FR': 'WAIS4_CRITERIA',
-    'WAIS4_LEARNING_FR': 'WAIS4_LEARNING',
-    'WAIS4_MATRICES_FR': 'WAIS4_MATRICES',
-    'WAIS4_CODE_FR': 'WAIS4_CODE',
-    'WAIS4_DIGIT_SPAN_FR': 'WAIS4_DIGIT_SPAN',
-    'WAIS4_SIMILITUDES_FR': 'WAIS4_SIMILITUDES',
-    'WAIS3_CRITERIA_FR': 'WAIS3_CRITERIA',
-    'WAIS3_LEARNING_FR': 'WAIS3_LEARNING',
-    'WAIS3_VOCABULAIRE_FR': 'WAIS3_VOCABULAIRE',
-    'WAIS3_MATRICES_FR': 'WAIS3_MATRICES',
-    'WAIS3_CODE_SYMBOLES_FR': 'WAIS3_CODE_SYMBOLES',
-    'WAIS3_DIGIT_SPAN_FR': 'WAIS3_DIGIT_SPAN',
-    'WAIS3_CPT2_FR': 'WAIS3_CPT2',
-    'COBRA_FR': 'COBRA',
-    'CPT3_FR': 'CPT3',
-    'SCIP_FR': 'SCIP',
-    'TEST_COMMISSIONS_FR': 'TEST_COMMISSIONS',
-    // Neuropsy module - new codes without _FR suffix (from new bipolar module definitions)
+    // Neuropsy module
     'CVLT': 'CVLT',
     'TMT': 'TMT',
     'STROOP': 'STROOP',
@@ -530,7 +487,7 @@ export async function submitProfessionalQuestionnaireAction(
     let result;
     switch (questionnaireCode) {
       // Bipolar Screening Questionnaires - use new public.bipolar_* tables
-      case 'ASRM_FR':
+      case 'ASRM':
         result = await saveBipolarAsrmResponse({
           visit_id: visitId,
           patient_id: patientId,
@@ -548,7 +505,7 @@ export async function submitProfessionalQuestionnaireAction(
         } as BipolarQidsResponseInsert);
         break;
         
-      case 'MDQ_FR':
+      case 'MDQ':
         result = await saveBipolarMdqResponse({
           visit_id: visitId,
           patient_id: patientId,
@@ -798,8 +755,8 @@ export async function submitProfessionalQuestionnaireAction(
       // shouldUseBipolarTables routing for bipolar patients. The old responses_* 
       // tables have been dropped and data migrated to bipolar_* tables.
       // If these codes reach here, it means the routing failed - throw an error.
-      case 'ASRS_FR':
-      case 'CTQ_FR':
+      case 'ASRS':
+      case 'CTQ':
       case 'BIS10_FR':
       case 'ALS18':
       case 'AIM':
@@ -819,9 +776,9 @@ export async function submitProfessionalQuestionnaireAction(
       case 'ETAT_PATIENT':
       case 'FAST':
       case 'DIVA_2_FR':
-      case 'FAMILY_HISTORY_FR':
-      case 'CSSRS_FR':
-      case 'ISA_FR':
+      case 'FAMILY_HISTORY':
+      case 'CSSRS':
+      case 'ISA':
         throw new Error(`Questionnaire ${questionnaireCode} should be routed through shouldUseBipolarTables. Tables have been migrated to bipolar_* schema.`);
         
       case 'ISA_FOLLOWUP':
@@ -833,8 +790,8 @@ export async function submitProfessionalQuestionnaireAction(
         } as BipolarFollowupIsaResponseInsert);
         break;
 
-      case 'SIS_FR':
-      case 'SUICIDE_HISTORY_FR':
+      case 'SIS':
+      case 'SUICIDE_HISTORY':
         throw new Error(`Questionnaire ${questionnaireCode} should be routed through shouldUseBipolarTables. Tables have been migrated to bipolar_* schema.`);
 
       case 'SUICIDE_BEHAVIOR_FOLLOWUP':
@@ -846,27 +803,31 @@ export async function submitProfessionalQuestionnaireAction(
         } as BipolarFollowupSuicideBehaviorResponseInsert);
         break;
 
-      case 'PERINATALITE_FR':
-      case 'PATHO_NEURO_FR':
-      case 'PATHO_CARDIO_FR':
-      case 'PATHO_ENDOC_FR':
-      case 'PATHO_DERMATO_FR':
-      case 'PATHO_URINAIRE_FR':
-      case 'ANTECEDENTS_GYNECO_FR':
-      case 'PATHO_HEPATO_GASTRO_FR':
-      case 'PATHO_ALLERGIQUE_FR':
+      case 'PERINATALITE':
+      case 'PATHO_NEURO':
+      case 'PATHO_CARDIO':
+      case 'PATHO_ENDOC':
+      case 'PATHO_DERMATO':
+      case 'PATHO_URINAIRE':
+      case 'ANTECEDENTS_GYNECO':
+      case 'PATHO_HEPATO_GASTRO':
+      case 'PATHO_ALLERGIQUE':
         throw new Error(`Questionnaire ${questionnaireCode} should be routed through shouldUseBipolarTables. Tables have been migrated to bipolar_* schema.`);
 
-      case 'AUTRES_PATHO_FR':
+      case 'AUTRES_PATHO':
       case 'SOCIAL':
         throw new Error(`Questionnaire ${questionnaireCode} should be routed through shouldUseBipolarTables. Tables have been migrated to bipolar_* schema.`);
 
       case 'TOBACCO':
+        console.log('[submitProfessionalQuestionnaireAction] TOBACCO - responses:', JSON.stringify(responses, null, 2));
+        console.log('[submitProfessionalQuestionnaireAction] TOBACCO - visitId:', visitId, 'patientId:', patientId, 'completedBy:', completedBy);
+        // Don't pass completed_by if it might be invalid - let it default to NULL
         result = await saveTobaccoResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
         } as BipolarNurseTobaccoResponseInsert);
+        console.log('[submitProfessionalQuestionnaireAction] TOBACCO - result:', result);
         break;
 
       case 'FAGERSTROM':
@@ -974,18 +935,18 @@ export async function submitProfessionalQuestionnaireAction(
       case 'WAIS4_CRITERIA_FR':
       case 'WAIS4_LEARNING_FR':
       case 'WAIS4_MATRICES_FR':
-      case 'CVLT_FR':
+      case 'CVLT':
       case 'WAIS4_CODE_FR':
       case 'WAIS_IV_CODE_SYMBOLES_IVT':
       case 'WAIS4_DIGIT_SPAN_FR':
-      case 'TMT_FR':
-      case 'STROOP_FR':
-      case 'FLUENCES_VERBALES_FR':
-      case 'COBRA_FR':
+      case 'TMT':
+      case 'STROOP':
+      case 'FLUENCES_VERBALES':
+      case 'COBRA':
       case 'CPT3_FR':
       case 'WAIS4_SIMILITUDES_FR':
-      case 'TEST_COMMISSIONS_FR':
-      case 'SCIP_FR':
+      case 'TEST_COMMISSIONS':
+      case 'SCIP':
         throw new Error(`Questionnaire ${questionnaireCode} should be routed through shouldUseBipolarTables. Tables have been migrated to bipolar_* schema.`);
 
       // WAIS-III and MEM3 Questionnaires
@@ -1082,10 +1043,14 @@ export async function submitProfessionalQuestionnaireAction(
       console.error('Failed to auto-complete visit:', error);
     }
     
-    revalidatePath('/professional'); // Broad revalidation or specific if we knew the path
+    // Revalidate to ensure the visit detail page shows updated completion status
+    // Revalidate all pages under /professional to catch any dynamic routes
+    revalidatePath('/professional', 'layout');
     return { success: true, data: result };
   } catch (error) {
-    console.error('Failed to submit questionnaire:', error);
+    console.error('[submitProfessionalQuestionnaireAction] ERROR:', error);
+    console.error('[submitProfessionalQuestionnaireAction] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('[submitProfessionalQuestionnaireAction] Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     return { success: false, error: 'Failed to submit questionnaire' };
   }
 }

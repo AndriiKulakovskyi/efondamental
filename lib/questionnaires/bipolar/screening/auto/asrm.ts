@@ -124,7 +124,7 @@ export interface QuestionnaireDefinition {
 
 export const ASRM_DEFINITION: QuestionnaireDefinition = {
   id: 'asrm',
-  code: 'ASRM_FR',
+  code: 'ASRM',
   title: 'Auto-Questionnaire Altman (ASRM)',
   description: "Echelle d'Auto-Evaluation de la Manie - Periode de reference: 7 derniers jours",
   questions: ASRM_QUESTIONS,

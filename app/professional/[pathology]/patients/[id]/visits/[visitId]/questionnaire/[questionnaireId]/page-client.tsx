@@ -60,7 +60,7 @@ export function QuestionnairePageClient({
 
   // Live score calculation for WAIS-IV Matrices
   const liveScores = useMemo(() => {
-    if (questionnaire.code !== 'WAIS4_MATRICES_FR') return null;
+    if (questionnaire.code !== 'WAIS4_MATRICES') return null;
     
     // Calculate raw score from item responses
     let rawScore = 0;
@@ -118,11 +118,11 @@ export function QuestionnairePageClient({
       
       // If no scoring (Diagnostic/Orientation), redirect
       const hasScoring = [
-        'ASRM_FR', 'QIDS_SR16_FR', 'MDQ_FR',
+        'ASRM', 'QIDS_SR16', 'MDQ',
         'EQ5D5L', 'PRISE_M', 'STAI_YA', 'MARS', 'MATHYS', 'PSQI', 'EPWORTH',
-        'ASRS_FR', 'CTQ_FR', 'BIS10_FR', 'ALS18', 'AIM', 'WURS25', 'AQ12', 'CSM', 'CTI',
+        'ASRS', 'CTQ', 'BIS10', 'ALS18', 'AIM', 'WURS25', 'AQ12', 'CSM', 'CTI',
         'MADRS', 'YMRS', 'CGI', 'EGF', 'ALDA', 'ETAT_PATIENT', 'FAST',
-        'WAIS4_MATRICES_FR', 'WAIS4_CRITERIA_FR', 'WAIS4_LEARNING_FR', 'CVLT_FR', 'WAIS4_CODE_FR',
+        'WAIS4_MATRICES', 'WAIS4_CRITERIA', 'WAIS4_LEARNING', 'CVLT', 'WAIS4_CODE',
         'SOCIAL',
         'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA',
         'PANSS', 'CDSS', 'BARS', 'SUMD', 'AIMS', 'BARNES', 'SAS', 'PSP'

@@ -11,7 +11,7 @@ interface ScoreDisplayProps {
 
 export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
   // Don't display score card for questionnaires without scores
-  const noScoreQuestionnaires = ['WAIS4_CRITERIA_FR', 'WAIS4_LEARNING_FR'];
+  const noScoreQuestionnaires = ['WAIS4_CRITERIA', 'WAIS4_LEARNING'];
   
   if (noScoreQuestionnaires.includes(code)) {
     return (
@@ -28,14 +28,14 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
   }
   
   const getSeverity = () => {
-    if (code === 'ASRM_FR') {
+    if (code === 'ASRM') {
       // ASRM: Total >= 6 -> mania/hypomania
       if (data.total_score >= 12) return 'error';
       if (data.total_score >= 6) return 'warning';
       return 'info';
     }
     
-    if (code === 'QIDS_SR16_FR') {
+    if (code === 'QIDS_SR16') {
       // QIDS: 0-5, 6-10, 11-15, 16-20, 21+
       if (data.total_score >= 21) return 'error';
       if (data.total_score >= 16) return 'error';
@@ -44,20 +44,20 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'success';
     }
     
-    if (code === 'MDQ_FR') {
+    if (code === 'MDQ') {
       // Check if interpretation contains "Positif" or use q1_score logic
       const isPositive = data.interpretation?.includes('Positif') || 
                         (data.q1_score >= 7 && data.q2 === 1 && data.q3 >= 2);
       return isPositive ? 'warning' : 'info';
     }
     
-    if (code === 'ASRS_FR') {
+    if (code === 'ASRS') {
       // ASRS: Screening positive if >= 4 items meet threshold in Part A
       const isPositive = data.screening_positive || data.part_a_positive_items >= 4;
       return isPositive ? 'warning' : 'info';
     }
     
-    if (code === 'CTQ_FR') {
+    if (code === 'CTQ') {
       // CTQ: Check if any subscale is severe
       const hasSevere = ['emotional_abuse_severity', 'physical_abuse_severity', 'sexual_abuse_severity', 
                         'emotional_neglect_severity', 'physical_neglect_severity']
@@ -71,7 +71,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'info';
     }
     
-    if (code === 'BIS10_FR') {
+    if (code === 'BIS10') {
       // BIS-10: High impulsivity >= 3.0, moderate >= 2.5
       const score = data.overall_impulsivity || 0;
       if (score >= 3.0) return 'error';
@@ -115,14 +115,14 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'error';
     }
     
-    if (code === 'WAIS4_MATRICES_FR') {
+    if (code === 'WAIS4_MATRICES') {
       // WAIS-IV Matrices: Standardized score 8-12 is average, <8 is below, >12 is above
       if (data.standardized_score >= 13) return 'success';
       if (data.standardized_score >= 8) return 'info';
       return 'warning';
     }
     
-    if (code === 'CVLT_FR') {
+    if (code === 'CVLT') {
       // CVLT: Use Total 1-5 standard score for severity
       const score = data.total_1_5_std;
       if (score === null || score === undefined) return 'info';
@@ -131,7 +131,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
-    if (code === 'WAIS4_CODE_FR' || code === 'WAIS_IV_CODE_SYMBOLES_IVT') {
+    if (code === 'WAIS4_CODE' || code === 'WAIS_IV_CODE_SYMBOLES_IVT') {
       // WAIS-IV Code/Symboles/IVT: Use IVT composite if available, else Code standard score
       if (data.wais_ivt !== null && data.wais_ivt !== undefined) {
         // IVT composite scoring: 50-150 scale, mean=100, SD=15
@@ -247,7 +247,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
   // Generate interpretation for WAIS-IV Matrices if not present
   let interpretation = data.interpretation;
   
-  if (code === 'WAIS4_MATRICES_FR' && !interpretation && data.standardized_score !== undefined) {
+  if (code === 'WAIS4_MATRICES' && !interpretation && data.standardized_score !== undefined) {
     if (data.standardized_score >= 13) {
       interpretation = 'Performance supérieure à la moyenne';
     } else if (data.standardized_score >= 8) {
@@ -260,7 +260,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
   }
   
   // Generate interpretation for ASRS if not present
-  if (code === 'ASRS_FR' && !interpretation) {
+  if (code === 'ASRS' && !interpretation) {
     if (data.screening_positive) {
       interpretation = `Dépistage POSITIF (${data.part_a_positive_items || 0}/6 items Partie A ≥ seuil). Les réponses suggèrent des symptômes cohérents avec un TDAH chez l'adulte. Une évaluation clinique complète est recommandée.`;
     } else {
@@ -270,7 +270,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
   
   if (!interpretation) {
     // Use interpretation field if available, otherwise fallback to calculation
-    interpretation = code === 'MDQ_FR' ? (data.interpretation || '') : '';
+    interpretation = code === 'MDQ' ? (data.interpretation || '') : '';
   }
 
   const getAlertIcon = () => {
@@ -301,7 +301,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
 
   // Calculations for MDQ details
   const getMdqDetails = () => {
-    if (code !== 'MDQ_FR') return null;
+    if (code !== 'MDQ') return null;
     
     // Use q1_score if available, otherwise sum Q1 items
     const q1Total = data.q1_score !== undefined ? data.q1_score : 
@@ -330,20 +330,20 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
           <div className="flex items-center gap-2">
             {getAlertIcon()}
             <h4 className="font-semibold">
-              {code === 'ASRM_FR' && 'Score ASRM'}
-              {code === 'QIDS_SR16_FR' && 'Score QIDS-SR16'}
-              {code === 'MDQ_FR' && 'Résultat MDQ'}
-              {code === 'ASRS_FR' && 'Résultat ASRS'}
-              {code === 'CTQ_FR' && 'Résultats CTQ'}
-              {code === 'BIS10_FR' && 'Résultats BIS-10'}
+              {code === 'ASRM' && 'Score ASRM'}
+              {code === 'QIDS_SR16' && 'Score QIDS-SR16'}
+              {code === 'MDQ' && 'Résultat MDQ'}
+              {code === 'ASRS' && 'Résultat ASRS'}
+              {code === 'CTQ' && 'Résultats CTQ'}
+              {code === 'BIS10' && 'Résultats BIS-10'}
               {code === 'WURS25' && 'Résultats WURS-25'}
               {code === 'CSM' && 'Résultats CSM - Chronotype'}
               {code === 'CTI' && 'Résultats CTI - Type Circadien'}
               {code === 'ALDA' && 'Score Alda'}
               {code === 'CGI' && 'Résultats CGI'}
-              {code === 'WAIS4_MATRICES_FR' && 'Résultats WAIS-IV Matrices'}
-              {code === 'CVLT_FR' && 'Résultats CVLT'}
-              {code === 'WAIS4_CODE_FR' && 'Résultats WAIS-IV Code'}
+              {code === 'WAIS4_MATRICES' && 'Résultats WAIS-IV Matrices'}
+              {code === 'CVLT' && 'Résultats CVLT'}
+              {code === 'WAIS4_CODE' && 'Résultats WAIS-IV Code'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && 'Résultats WAIS-IV Code, Symboles & IVT'}
               {code === 'PANSS' && 'Résultats PANSS'}
               {code === 'CDSS' && 'Résultats CDSS - Échelle de Calgary'}
@@ -358,13 +358,13 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
           <div className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
             <span className="text-xl font-bold">
-              {code === 'MDQ_FR' 
+              {code === 'MDQ' 
                 ? (data.interpretation?.includes('Positif') ? 'POSITIF' : 'NÉGATIF')
-                : code === 'ASRS_FR'
+                : code === 'ASRS'
                 ? (data.screening_positive ? 'POSITIF' : 'NÉGATIF')
-                : code === 'CTQ_FR'
+                : code === 'CTQ'
                 ? (data.total_score !== undefined ? data.total_score : '-')
-                : code === 'BIS10_FR'
+                : code === 'BIS10'
                 ? (data.overall_impulsivity !== undefined ? data.overall_impulsivity.toFixed(2) : '-')
                 : code === 'WURS25'
                 ? (data.adhd_likely ? 'POSITIF' : 'NÉGATIF')
@@ -376,11 +376,11 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
                 : code === 'CGI'
                 ? (data.cgi_s !== undefined ? data.cgi_s : '-')
-                : code === 'WAIS4_MATRICES_FR'
+                : code === 'WAIS4_MATRICES'
                 ? (data.standardized_score !== undefined ? data.standardized_score : '-')
-                : code === 'CVLT_FR'
+                : code === 'CVLT'
                 ? (data.total_1_5 !== undefined ? data.total_1_5 : '-')
-                : code === 'WAIS4_CODE_FR'
+                : code === 'WAIS4_CODE'
                 ? (data.wais_cod_std !== undefined ? data.wais_cod_std : '-')
                 : code === 'WAIS_IV_CODE_SYMBOLES_IVT'
                 ? (data.wais_ivt !== undefined && data.wais_ivt !== null ? data.wais_ivt : (data.wais_cod_std !== undefined ? data.wais_cod_std : '-'))
@@ -401,17 +401,17 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 : code === 'PSP'
                 ? (data.final_score !== undefined && data.final_score !== null ? data.final_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
-              {code === 'ASRM_FR' && '/20'}
-              {code === 'QIDS_SR16_FR' && '/27'}
-              {code === 'CTQ_FR' && '/125'}
-              {code === 'BIS10_FR' && '/4.0'}
+              {code === 'ASRM' && '/20'}
+              {code === 'QIDS_SR16' && '/27'}
+              {code === 'CTQ' && '/125'}
+              {code === 'BIS10' && '/4.0'}
               {code === 'CSM' && '/55'}
               {code === 'CTI' && '/55'}
               {code === 'ALDA' && '/10'}
               {code === 'CGI' && '/7'}
-              {code === 'WAIS4_MATRICES_FR' && '/19'}
-              {code === 'CVLT_FR' && '/80'}
-              {code === 'WAIS4_CODE_FR' && '/19'}
+              {code === 'WAIS4_MATRICES' && '/19'}
+              {code === 'CVLT' && '/80'}
+              {code === 'WAIS4_CODE' && '/19'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && (data.wais_ivt !== undefined && data.wais_ivt !== null ? '/150' : '/19')}
               {code === 'PANSS' && '/210'}
               {code === 'CDSS' && '/27'}
@@ -528,7 +528,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
         )}
 
         {/* MDQ Details */}
-        {code === 'MDQ_FR' && mdqDetails && (
+        {code === 'MDQ' && mdqDetails && (
           <div className="text-xs space-y-1 mt-2">
             <div className="flex justify-between">
               <span>Symptômes Q1:</span>
@@ -546,7 +546,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
         )}
 
         {/* ASRS Details */}
-        {code === 'ASRS_FR' && (
+        {code === 'ASRS' && (
           <div className="text-sm space-y-2 mt-2 pt-2 border-t">
             <div className="grid grid-cols-2 gap-2">
               <div className="flex justify-between">
@@ -573,7 +573,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
         )}
 
         {/* CTQ Details */}
-        {code === 'CTQ_FR' && (
+        {code === 'CTQ' && (
           <div className="text-sm space-y-3 mt-2 pt-2 border-t">
             <div className="space-y-2">
               <div className="flex justify-between items-center">
@@ -637,7 +637,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
         )}
 
         {/* BIS-10 Details */}
-        {code === 'BIS10_FR' && (
+        {code === 'BIS10' && (
           <div className="text-sm space-y-2 mt-2 pt-2 border-t">
             <div className="space-y-2">
               <div className="flex justify-between items-center">
@@ -755,7 +755,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
         )}
 
         {/* WAIS-IV Matrices Details */}
-        {code === 'WAIS4_MATRICES_FR' && (
+        {code === 'WAIS4_MATRICES' && (
           <div className="text-sm space-y-2 mt-2 pt-2 border-t">
             <div className="grid grid-cols-2 gap-2">
               <div className="flex justify-between">
@@ -779,7 +779,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
         )}
 
         {/* CVLT Details */}
-        {code === 'CVLT_FR' && (
+        {code === 'CVLT' && (
           <div className="text-sm space-y-3 mt-2 pt-2 border-t">
             {/* Demographics */}
             <div className="grid grid-cols-3 gap-2 text-xs">
@@ -879,7 +879,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
         )}
 
         {/* WAIS-IV Code Details */}
-        {code === 'WAIS4_CODE_FR' && (
+        {code === 'WAIS4_CODE' && (
           <div className="text-sm space-y-2 mt-2 pt-2 border-t">
             <div className="grid grid-cols-2 gap-2">
               <div className="flex justify-between">

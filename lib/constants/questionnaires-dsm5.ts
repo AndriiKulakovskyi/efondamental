@@ -937,7 +937,7 @@ export const DSM5_HUMEUR_QUESTIONS: Question[] = [
 
 export const DSM5_HUMEUR_DEFINITION: QuestionnaireDefinition = {
   id: 'dsm5_humeur',
-  code: 'DSM5_HUMEUR_FR',
+  code: 'DSM5_HUMEUR',
   title: 'DSM5 - Troubles de l\'humeur',
   description: 'Diagnostic DSM5 des troubles de l\'humeur pour l\'évaluation initiale du trouble bipolaire',
   questions: DSM5_HUMEUR_QUESTIONS,
@@ -1003,7 +1003,7 @@ export const DSM5_PSYCHOTIC_QUESTIONS: Question[] = [
 
 export const DSM5_PSYCHOTIC_DEFINITION: QuestionnaireDefinition = {
   id: 'dsm5_psychotic',
-  code: 'DSM5_PSYCHOTIC_FR',
+  code: 'DSM5_PSYCHOTIC',
   title: 'DSM5 - Trouble Psychotique',
   description: 'Diagnostic DSM5 des troubles psychotiques pour l\'évaluation initiale du trouble bipolaire',
   questions: DSM5_PSYCHOTIC_QUESTIONS,
@@ -2527,7 +2527,7 @@ const DSM5_COMORBID_ALL_QUESTIONS = [
 
 export const DSM5_COMORBID_DEFINITION: QuestionnaireDefinition = {
   id: 'dsm5_comorbid',
-  code: 'DSM5_COMORBID_FR',
+  code: 'DSM5_COMORBID',
   title: 'DSM5 - Troubles comorbides',
   description: 'Diagnostic DSM5 des troubles comorbides pour l\'évaluation initiale du trouble bipolaire',
   questions: DSM5_COMORBID_ALL_QUESTIONS,

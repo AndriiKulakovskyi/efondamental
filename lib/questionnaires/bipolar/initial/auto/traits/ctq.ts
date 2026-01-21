@@ -91,7 +91,7 @@ export const CTQ_QUESTIONS: Question[] = [
 
 export const CTQ_DEFINITION: QuestionnaireDefinition = {
   id: 'ctq',
-  code: 'CTQ_FR',
+  code: 'CTQ',
   title: 'CTQ - Childhood Trauma Questionnaire',
   description: "Questionnaire sur les traumatismes de l'enfance",
   questions: CTQ_QUESTIONS,
