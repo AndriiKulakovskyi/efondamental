@@ -4,13 +4,7 @@ import {
   saveAsrmResponse, 
   saveQidsResponse, 
   saveMdqResponse,
-  saveEq5d5lResponse,
-  savePriseMResponse,
-  saveStaiYaResponse,
-  saveMarsResponse,
-  saveMathysResponse,
-  savePsqiResponse,
-  saveEpworthResponse,
+  // Auto TRAITS (legacy, to be migrated)
   saveAsrsResponse,
   saveCtqResponse,
   saveBis10Response,
@@ -21,6 +15,7 @@ import {
   saveCsmResponse,
   saveCtiResponse
 } from '@/lib/services/questionnaire.service';
+import { saveBipolarInitialResponse } from '@/lib/services/bipolar-initial.service';
 import { 
   getVisitCompletionStatus,
   completeVisit,
@@ -95,31 +90,38 @@ export async function submitQuestionnaireAction(
         break;
         
       case 'EQ5D5L_FR':
-        await saveEq5d5lResponse(responseData as any);
+      case 'EQ5D5L':
+        await saveBipolarInitialResponse('EQ5D5L', responseData as any);
         break;
         
       case 'PRISE_M_FR':
-        await savePriseMResponse(responseData as any);
+      case 'PRISE_M':
+        await saveBipolarInitialResponse('PRISE_M', responseData as any);
         break;
         
       case 'STAI_YA_FR':
-        await saveStaiYaResponse(responseData as any);
+      case 'STAI_YA':
+        await saveBipolarInitialResponse('STAI_YA', responseData as any);
         break;
         
       case 'MARS_FR':
-        await saveMarsResponse(responseData as any);
+      case 'MARS':
+        await saveBipolarInitialResponse('MARS', responseData as any);
         break;
         
       case 'MATHYS_FR':
-        await saveMathysResponse(responseData as any);
+      case 'MATHYS':
+        await saveBipolarInitialResponse('MATHYS', responseData as any);
         break;
         
       case 'PSQI_FR':
-        await savePsqiResponse(responseData as any);
+      case 'PSQI':
+        await saveBipolarInitialResponse('PSQI', responseData as any);
         break;
         
       case 'EPWORTH_FR':
-        await saveEpworthResponse(responseData as any);
+      case 'EPWORTH':
+        await saveBipolarInitialResponse('EPWORTH', responseData as any);
         break;
         
       case 'ASRS_FR':

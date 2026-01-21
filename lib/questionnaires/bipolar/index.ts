@@ -7,4 +7,8 @@ export * from './screening';
 // Initial evaluation questionnaires
 export * as initial from './initial';
 
-// TODO: Add followup, annual modules when refactoring those visits
+// Followup (semestrial and annual) questionnaires
+export * as followup from './followup';
+
+// Nurse module questionnaires (shared across initial, semestrial, annual)
+export * as nurse from './nurse';

@@ -6,15 +6,7 @@ import {
   MDQ_DEFINITION,
   DIAGNOSTIC_DEFINITION,
   ORIENTATION_DEFINITION,
-  // Initial Evaluation - ETAT
-  EQ5D5L_DEFINITION,
-  PRISE_M_DEFINITION,
-  STAI_YA_DEFINITION,
-  MARS_DEFINITION,
-  MATHYS_DEFINITION,
-  PSQI_DEFINITION,
-  EPWORTH_DEFINITION,
-  // Initial Evaluation - TRAITS
+  // Initial Evaluation - TRAITS (to be migrated)
   ASRS_DEFINITION,
   CTQ_DEFINITION,
   BIS10_DEFINITION,
@@ -26,6 +18,16 @@ import {
   CTI_DEFINITION,
   QuestionnaireDefinition 
 } from "@/lib/constants/questionnaires";
+// Auto ETAT definitions (refactored)
+import {
+  EQ5D5L_DEFINITION,
+  PRISE_M_DEFINITION,
+  STAI_YA_DEFINITION,
+  MARS_DEFINITION,
+  MATHYS_DEFINITION,
+  PSQI_DEFINITION,
+  EPWORTH_DEFINITION
+} from "@/lib/questionnaires/bipolar/initial/auto/etat";
 import {
   // Hetero questionnaires
   MADRS_DEFINITION,
@@ -226,7 +228,7 @@ import {
   getSleepApneaResponse,
   getBiologicalAssessmentResponse,
   getEcgResponse
-} from "@/lib/services/questionnaire-infirmier.service";
+} from "@/lib/services/bipolar-nurse.service";
 import {
   getDsm5HumeurResponse,
   getDsm5PsychoticResponse,

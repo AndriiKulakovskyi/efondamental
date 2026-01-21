@@ -5,13 +5,7 @@ import {
   ASRM_DEFINITION, 
   QIDS_DEFINITION, 
   MDQ_DEFINITION,
-  EQ5D5L_DEFINITION,
-  PRISE_M_DEFINITION,
-  STAI_YA_DEFINITION,
-  MARS_DEFINITION,
-  MATHYS_DEFINITION,
-  PSQI_DEFINITION,
-  EPWORTH_DEFINITION,
+  // TRAITS (to be migrated)
   ASRS_DEFINITION,
   CTQ_DEFINITION,
   BIS10_DEFINITION,
@@ -23,6 +17,16 @@ import {
   CTI_DEFINITION,
   QuestionnaireDefinition 
 } from "@/lib/constants/questionnaires";
+// Auto ETAT definitions (refactored)
+import {
+  EQ5D5L_DEFINITION,
+  PRISE_M_DEFINITION,
+  STAI_YA_DEFINITION,
+  MARS_DEFINITION,
+  MATHYS_DEFINITION,
+  PSQI_DEFINITION,
+  EPWORTH_DEFINITION
+} from "@/lib/questionnaires/bipolar/initial/auto/etat";
 import { QuestionnairePageClient } from "./page-client";
 import { 
   isQuestionnaireLockedByProfessional, 

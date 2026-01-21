@@ -6,15 +6,7 @@ import {
   saveMdqResponse,
   saveDiagnosticResponse,
   saveOrientationResponse,
-  // Initial Evaluation - ETAT
-  saveEq5d5lResponse,
-  savePriseMResponse,
-  saveStaiYaResponse,
-  saveMarsResponse,
-  saveMathysResponse,
-  savePsqiResponse,
-  saveEpworthResponse,
-  // Initial Evaluation - TRAITS
+  // Initial Evaluation - TRAITS (legacy, to be migrated)
   saveAsrsResponse,
   saveCtqResponse,
   saveBis10Response,
@@ -111,7 +103,7 @@ import {
   saveSleepApneaResponse,
   saveBiologicalAssessmentResponse,
   saveEcgResponse
-} from '@/lib/services/questionnaire-infirmier.service';
+} from '@/lib/services/bipolar-nurse.service';
 import {
   saveDsm5HumeurResponse,
   saveDsm5PsychoticResponse,
@@ -121,13 +113,40 @@ import {
   saveDiagPsySemPsychotiquesResponse
 } from '@/lib/services/questionnaire-dsm5.service';
 import {
-  saveSuiviRecommandationsResponse,
-  saveRecoursAuxSoinsResponse,
-  saveTraitementNonPharmacologiqueResponse,
-  saveArretsTravailResponse,
-  saveSomatiqueContraceptifResponse,
-  saveStatutProfessionnelResponse
-} from '@/lib/services/questionnaire-followup.service';
+  saveHumeurActuelsResponse,
+  saveHumeurDepuisVisiteResponse,
+  savePsychotiquesResponse,
+  saveIsaFollowupResponse,
+  saveSuicideBehaviorFollowupResponse as saveSuicideBehaviorFollowupResponseNew,
+  saveSuiviRecommandationsResponse as saveSuiviRecommandationsResponseNew,
+  saveRecoursAuxSoinsResponse as saveRecoursAuxSoinsResponseNew,
+  saveTraitementNonPharmaResponse,
+  saveArretsTravailResponse as saveArretsTravailResponseNew,
+  saveSomatiqueContraceptifResponse as saveSomatiqueContraceptifResponseNew,
+  saveStatutProfessionnelResponse as saveStatutProfessionnelResponseNew
+} from '@/lib/services/bipolar-followup.service';
+import {
+  type BipolarFollowupHumeurActuelsResponseInsert,
+  type BipolarFollowupHumeurDepuisVisiteResponseInsert,
+  type BipolarFollowupPsychotiquesResponseInsert,
+  type BipolarFollowupIsaResponseInsert,
+  type BipolarFollowupSuicideBehaviorResponseInsert,
+  type BipolarFollowupSuiviRecommandationsResponseInsert,
+  type BipolarFollowupRecoursAuxSoinsResponseInsert,
+  type BipolarFollowupTraitementNonPharmaResponseInsert,
+  type BipolarFollowupArretsTravailResponseInsert,
+  type BipolarFollowupSomatiqueContraceptifResponseInsert,
+  type BipolarFollowupStatutProfessionnelResponseInsert
+} from '@/lib/questionnaires/bipolar/followup';
+import {
+  type BipolarNurseTobaccoResponseInsert,
+  type BipolarNurseFagerstromResponseInsert,
+  type BipolarNursePhysicalParamsResponseInsert,
+  type BipolarNurseBloodPressureResponseInsert,
+  type BipolarNurseSleepApneaResponseInsert,
+  type BipolarNurseBiologicalAssessmentResponseInsert,
+  type BipolarNurseEcgResponseInsert
+} from '@/lib/questionnaires/bipolar/nurse';
 import {
   saveScreeningSzDiagnosticResponse,
   saveScreeningSzOrientationResponse,
@@ -352,13 +371,6 @@ import {
   PathoAllergiqueResponseInsert,
   AutresPathoResponseInsert,
   SocialResponseInsert,
-  TobaccoResponseInsert,
-  FagerstromResponseInsert,
-  PhysicalParamsResponseInsert,
-  BloodPressureResponseInsert,
-  SleepApneaResponseInsert,
-  BiologicalAssessmentResponseInsert,
-  EcgResponseInsert,
   Dsm5HumeurResponseInsert,
   Dsm5PsychoticResponseInsert,
   Dsm5ComorbidResponseInsert,
@@ -706,61 +718,61 @@ export async function submitProfessionalQuestionnaireAction(
         } as EvalAddictologiqueSzResponseInsert);
         break;
 
-      // Initial Evaluation - ETAT
+      // Initial Evaluation - ETAT (using bipolar-initial.service.ts)
       case 'EQ5D5L':
-        result = await saveEq5d5lResponse({
+        result = await saveBipolarInitialResponse('EQ5D5L', {
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as Eq5d5lResponseInsert);
+        });
         break;
 
       case 'PRISE_M':
-        result = await savePriseMResponse({
+        result = await saveBipolarInitialResponse('PRISE_M', {
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as PriseMResponseInsert);
+        });
         break;
 
       case 'STAI_YA':
-        result = await saveStaiYaResponse({
+        result = await saveBipolarInitialResponse('STAI_YA', {
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as StaiYaResponseInsert);
+        });
         break;
 
       case 'MARS':
-        result = await saveMarsResponse({
+        result = await saveBipolarInitialResponse('MARS', {
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as MarsResponseInsert);
+        });
         break;
 
       case 'MATHYS':
-        result = await saveMathysResponse({
+        result = await saveBipolarInitialResponse('MATHYS', {
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as MathysResponseInsert);
+        });
         break;
 
       case 'PSQI':
-        result = await savePsqiResponse({
+        result = await saveBipolarInitialResponse('PSQI', {
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as PsqiResponseInsert);
+        });
         break;
 
       case 'EPWORTH':
-        result = await saveEpworthResponse({
+        result = await saveBipolarInitialResponse('EPWORTH', {
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as EpworthResponseInsert);
+        });
         break;
 
       // Initial Evaluation - TRAITS
@@ -925,12 +937,13 @@ export async function submitProfessionalQuestionnaireAction(
         } as IsaResponseInsert);
         break;
         
+      case 'ISA_FOLLOWUP':
       case 'ISA_FOLLOWUP_FR':
-        result = await saveIsaSuiviResponse({
+        result = await saveIsaFollowupResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as IsaSuiviResponseInsert);
+        } as BipolarFollowupIsaResponseInsert);
         break;
 
       case 'SIS_FR':
@@ -949,12 +962,13 @@ export async function submitProfessionalQuestionnaireAction(
         } as SuicideHistoryResponseInsert);
         break;
 
+      case 'SUICIDE_BEHAVIOR_FOLLOWUP':
       case 'SUICIDE_BEHAVIOR_FOLLOWUP_FR':
-        result = await saveSuicideBehaviorFollowupResponse({
+        result = await saveSuicideBehaviorFollowupResponseNew({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as SuicideBehaviorFollowupResponseInsert);
+        } as BipolarFollowupSuicideBehaviorResponseInsert);
         break;
 
       case 'PERINATALITE_FR':
@@ -1050,7 +1064,7 @@ export async function submitProfessionalQuestionnaireAction(
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as TobaccoResponseInsert);
+        } as BipolarNurseTobaccoResponseInsert);
         break;
 
       case 'FAGERSTROM':
@@ -1058,7 +1072,7 @@ export async function submitProfessionalQuestionnaireAction(
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as FagerstromResponseInsert);
+        } as BipolarNurseFagerstromResponseInsert);
         break;
 
       case 'PHYSICAL_PARAMS':
@@ -1066,7 +1080,7 @@ export async function submitProfessionalQuestionnaireAction(
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as PhysicalParamsResponseInsert);
+        } as BipolarNursePhysicalParamsResponseInsert);
         break;
 
       case 'BLOOD_PRESSURE':
@@ -1074,7 +1088,7 @@ export async function submitProfessionalQuestionnaireAction(
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as BloodPressureResponseInsert);
+        } as BipolarNurseBloodPressureResponseInsert);
         break;
 
       case 'SLEEP_APNEA':
@@ -1082,7 +1096,7 @@ export async function submitProfessionalQuestionnaireAction(
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as SleepApneaResponseInsert);
+        } as BipolarNurseSleepApneaResponseInsert);
         break;
         
       case 'BIOLOGICAL_ASSESSMENT':
@@ -1090,7 +1104,7 @@ export async function submitProfessionalQuestionnaireAction(
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as BiologicalAssessmentResponseInsert);
+        } as BipolarNurseBiologicalAssessmentResponseInsert);
         break;
 
       case 'ECG':
@@ -1098,7 +1112,7 @@ export async function submitProfessionalQuestionnaireAction(
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as EcgResponseInsert);
+        } as BipolarNurseEcgResponseInsert);
         break;
 
       case 'DSM5_HUMEUR_FR':
@@ -1125,28 +1139,31 @@ export async function submitProfessionalQuestionnaireAction(
         } as Dsm5ComorbidResponseInsert);
         break;
 
+      case 'HUMEUR_ACTUELS':
       case 'DIAG_PSY_SEM_HUMEUR_ACTUELS':
-        result = await saveDiagPsySemHumeurActuelsResponse({
+        result = await saveHumeurActuelsResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as DiagPsySemHumeurActuelsResponseInsert);
+        } as BipolarFollowupHumeurActuelsResponseInsert);
         break;
 
+      case 'HUMEUR_DEPUIS_VISITE':
       case 'DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE':
-        result = await saveDiagPsySemHumeurDepuisVisiteResponse({
+        result = await saveHumeurDepuisVisiteResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as DiagPsySemHumeurDepuisVisiteResponseInsert);
+        } as BipolarFollowupHumeurDepuisVisiteResponseInsert);
         break;
 
+      case 'PSYCHOTIQUES':
       case 'DIAG_PSY_SEM_PSYCHOTIQUES':
-        result = await saveDiagPsySemPsychotiquesResponse({
+        result = await savePsychotiquesResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as DiagPsySemPsychotiquesResponseInsert);
+        } as BipolarFollowupPsychotiquesResponseInsert);
         break;
 
       case 'WAIS4_CRITERIA_FR':
@@ -1453,53 +1470,53 @@ export async function submitProfessionalQuestionnaireAction(
         } as Mem3SpatialResponseInsert);
         break;
 
-      // Follow-up care module questionnaires
+      // Follow-up care module questionnaires (now separate tables)
       case 'SUIVI_RECOMMANDATIONS':
-        result = await saveSuiviRecommandationsResponse({
+        result = await saveSuiviRecommandationsResponseNew({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as PsyTraitementSemestrielResponseInsert);
+        } as BipolarFollowupSuiviRecommandationsResponseInsert);
         break;
 
       case 'RECOURS_AUX_SOINS':
-        result = await saveRecoursAuxSoinsResponse({
+        result = await saveRecoursAuxSoinsResponseNew({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as PsyTraitementSemestrielResponseInsert);
+        } as BipolarFollowupRecoursAuxSoinsResponseInsert);
         break;
 
       case 'TRAITEMENT_NON_PHARMACOLOGIQUE':
-        result = await saveTraitementNonPharmacologiqueResponse({
+        result = await saveTraitementNonPharmaResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as PsyTraitementSemestrielResponseInsert);
+        } as BipolarFollowupTraitementNonPharmaResponseInsert);
         break;
 
       case 'ARRETS_DE_TRAVAIL':
-        result = await saveArretsTravailResponse({
+        result = await saveArretsTravailResponseNew({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as PsyTraitementSemestrielResponseInsert);
+        } as BipolarFollowupArretsTravailResponseInsert);
         break;
 
       case 'SOMATIQUE_ET_CONTRACEPTIF':
-        result = await saveSomatiqueContraceptifResponse({
+        result = await saveSomatiqueContraceptifResponseNew({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as PsyTraitementSemestrielResponseInsert);
+        } as BipolarFollowupSomatiqueContraceptifResponseInsert);
         break;
 
       case 'STATUT_PROFESSIONNEL':
-        result = await saveStatutProfessionnelResponse({
+        result = await saveStatutProfessionnelResponseNew({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as PsyTraitementSemestrielResponseInsert);
+        } as BipolarFollowupStatutProfessionnelResponseInsert);
         break;
         
       default:

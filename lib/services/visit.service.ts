@@ -14,15 +14,7 @@ import {
   getMdqResponse,
   getDiagnosticResponse,
   getOrientationResponse,
-  // Initial Evaluation - ETAT
-  getEq5d5lResponse,
-  getPriseMResponse,
-  getStaiYaResponse,
-  getMarsResponse,
-  getMathysResponse,
-  getPsqiResponse,
-  getEpworthResponse,
-  // Initial Evaluation - TRAITS
+  // Initial Evaluation - TRAITS (legacy, to be migrated)
   getAsrsResponse,
   getCtqResponse,
   getBis10Response,
@@ -43,7 +35,15 @@ import {
 } from './bipolar-screening.service';
 import {
   getBipolarInitialCompletionStatus as checkBipolarInitialCompletion,
-  BIPOLAR_INITIAL_TABLES
+  BIPOLAR_INITIAL_TABLES,
+  // Auto ETAT questionnaires
+  getEq5d5lResponse,
+  getPriseMResponse,
+  getStaiYaResponse,
+  getMarsResponse,
+  getMathysResponse,
+  getPsqiResponse,
+  getEpworthResponse
 } from './bipolar-initial.service';
 import {
   // Hetero questionnaires
@@ -88,7 +88,7 @@ import {
   getEcgResponse,
   getSleepApneaResponse,
   getBiologicalAssessmentResponse
-} from './questionnaire-infirmier.service';
+} from './bipolar-nurse.service';
 import {
   getDsm5HumeurResponse,
   getDsm5PsychoticResponse,
@@ -105,19 +105,11 @@ import {
   DIAGNOSTIC_DEFINITION,
   ORIENTATION_DEFINITION
 } from '../questionnaires/bipolar/screening';
-// Legacy imports for non-bipolar-screening usage (initial evaluation, annual, etc.)
+// Legacy imports for non-bipolar-screening usage
 import {
   ASRM_DEFINITION as ASRM_DEFINITION_LEGACY,
   QIDS_DEFINITION as QIDS_DEFINITION_LEGACY,
-  // Initial Evaluation - ETAT
-  EQ5D5L_DEFINITION,
-  PRISE_M_DEFINITION,
-  STAI_YA_DEFINITION,
-  MARS_DEFINITION,
-  MATHYS_DEFINITION,
-  PSQI_DEFINITION,
-  EPWORTH_DEFINITION,
-  // Initial Evaluation - TRAITS
+  // Initial Evaluation - TRAITS (to be migrated)
   ASRS_DEFINITION,
   CTQ_DEFINITION,
   BIS10_DEFINITION,
@@ -128,6 +120,16 @@ import {
   CSM_DEFINITION,
   CTI_DEFINITION
 } from '../constants/questionnaires';
+// Bipolar Initial - Auto ETAT module (refactored)
+import {
+  EQ5D5L_DEFINITION,
+  PRISE_M_DEFINITION,
+  STAI_YA_DEFINITION,
+  MARS_DEFINITION,
+  MATHYS_DEFINITION,
+  PSQI_DEFINITION,
+  EPWORTH_DEFINITION
+} from '../questionnaires/bipolar/initial/auto/etat';
 // Bipolar Initial - Thymic module
 import {
   MADRS_DEFINITION,
@@ -182,14 +184,24 @@ import {
   WAIS3_DIGIT_SPAN_DEFINITION,
   WAIS3_CPT2_DEFINITION
 } from '../questionnaires/bipolar/initial/neuropsy';
-// Legacy imports for follow-up specific definitions (not part of initial evaluation module)
+// Bipolar Followup - New module definitions
 import {
+  HUMEUR_ACTUELS_DEFINITION,
+  HUMEUR_DEPUIS_VISITE_DEFINITION,
+  PSYCHOTIQUES_DEFINITION,
   ISA_FOLLOWUP_DEFINITION,
-  SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION
-} from '../constants/questionnaires-hetero';
+  SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
+  SUIVI_RECOMMANDATIONS_DEFINITION as SUIVI_RECOMMANDATIONS_DEFINITION_NEW,
+  RECOURS_AUX_SOINS_DEFINITION as RECOURS_AUX_SOINS_DEFINITION_NEW,
+  TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION as TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION_NEW,
+  ARRETS_DE_TRAVAIL_DEFINITION as ARRETS_DE_TRAVAIL_DEFINITION_NEW,
+  SOMATIQUE_CONTRACEPTIF_DEFINITION as SOMATIQUE_CONTRACEPTIF_DEFINITION_NEW,
+  STATUT_PROFESSIONNEL_DEFINITION as STATUT_PROFESSIONNEL_DEFINITION_NEW
+} from '../questionnaires/bipolar/followup';
 import {
   SOCIAL_DEFINITION
 } from '../constants/questionnaires-social';
+// Bipolar Nurse module
 import {
   TOBACCO_DEFINITION,
   FAGERSTROM_DEFINITION,
@@ -198,23 +210,12 @@ import {
   SLEEP_APNEA_DEFINITION,
   BIOLOGICAL_ASSESSMENT_DEFINITION,
   ECG_DEFINITION
-} from '../constants/questionnaires-infirmier';
+} from '../questionnaires/bipolar/nurse';
 import {
   DSM5_HUMEUR_DEFINITION,
   DSM5_PSYCHOTIC_DEFINITION,
-  DSM5_COMORBID_DEFINITION,
-  DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION,
-  DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION,
-  DIAG_PSY_SEM_PSYCHOTIQUES_DEFINITION
+  DSM5_COMORBID_DEFINITION
 } from '../constants/questionnaires-dsm5';
-import {
-  SUIVI_RECOMMANDATIONS_DEFINITION,
-  RECOURS_AUX_SOINS_DEFINITION,
-  TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION,
-  ARRETS_DE_TRAVAIL_DEFINITION,
-  SOMATIQUE_CONTRACEPTIF_DEFINITION,
-  STATUT_PROFESSIONNEL_DEFINITION
-} from '../constants/questionnaires-followup';
 import {
   SZ_DIAGNOSTIC_DEFINITION,
   SZ_ORIENTATION_DEFINITION,
@@ -237,8 +238,18 @@ import {
 } from '../constants/questionnaires-schizophrenia';
 import { TROUBLES_COMORBIDES_SZ_DEFINITION } from '../constants/questionnaires-schizophrenia-comorbid';
 import {
-  getPsyTraitementSemestrielResponse
-} from './questionnaire-followup.service';
+  getHumeurActuelsResponse,
+  getHumeurDepuisVisiteResponse,
+  getPsychotiquesResponse,
+  getIsaFollowupResponse,
+  getSuicideBehaviorFollowupResponse as getSuicideBehaviorFollowupResponseNew,
+  getSuiviRecommandationsResponse,
+  getRecoursAuxSoinsResponse,
+  getTraitementNonPharmaResponse,
+  getArretsTravailResponse,
+  getSomatiqueContraceptifResponse,
+  getStatutProfessionnelResponse
+} from './bipolar-followup.service';
 import {
   getScreeningSzDiagnosticResponse,
   getScreeningSzOrientationResponse,
@@ -816,9 +827,9 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
             id: 'dsm5',
             name: 'DSM5',
             questionnaires: [
-              DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION,
-              DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION,
-              DIAG_PSY_SEM_PSYCHOTIQUES_DEFINITION
+              HUMEUR_ACTUELS_DEFINITION,
+              HUMEUR_DEPUIS_VISITE_DEFINITION,
+              PSYCHOTIQUES_DEFINITION
             ]
           },
           {
@@ -834,12 +845,12 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
             id: 'soin_suivi',
             name: 'Soin, suivi et arrêt de travail',
             questionnaires: [
-              SUIVI_RECOMMANDATIONS_DEFINITION,
-              RECOURS_AUX_SOINS_DEFINITION,
-              TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION,
-              ARRETS_DE_TRAVAIL_DEFINITION,
-              SOMATIQUE_CONTRACEPTIF_DEFINITION,
-              STATUT_PROFESSIONNEL_DEFINITION
+              SUIVI_RECOMMANDATIONS_DEFINITION_NEW,
+              RECOURS_AUX_SOINS_DEFINITION_NEW,
+              TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION_NEW,
+              ARRETS_DE_TRAVAIL_DEFINITION_NEW,
+              SOMATIQUE_CONTRACEPTIF_DEFINITION_NEW,
+              STATUT_PROFESSIONNEL_DEFINITION_NEW
             ]
           }
         ]
@@ -935,12 +946,12 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
             id: 'soin_suivi',
             name: 'Soin, suivi et arrêt de travail',
             questionnaires: [
-              SUIVI_RECOMMANDATIONS_DEFINITION,
-              RECOURS_AUX_SOINS_DEFINITION,
-              TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION,
-              ARRETS_DE_TRAVAIL_DEFINITION,
-              SOMATIQUE_CONTRACEPTIF_DEFINITION,
-              STATUT_PROFESSIONNEL_DEFINITION
+              SUIVI_RECOMMANDATIONS_DEFINITION_NEW,
+              RECOURS_AUX_SOINS_DEFINITION_NEW,
+              TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION_NEW,
+              ARRETS_DE_TRAVAIL_DEFINITION_NEW,
+              SOMATIQUE_CONTRACEPTIF_DEFINITION_NEW,
+              STATUT_PROFESSIONNEL_DEFINITION_NEW
             ]
           }
         ]
@@ -1213,10 +1224,12 @@ export async function getVisitCompletionStatus(visitId: string) {
       tobacco, fagerstrom, physicalParams, bloodPressure, sleepApnea, biologicalAssessment,
       // Thymic evaluation questionnaires
       madrs, ymrs, cgi, egf, alda, etatPatient, fast,
-      // Medical evaluation questionnaires
-      diagPsySemHumeurActuels, diagPsySemHumeurDepuisVisite, diagPsySemPsychotiques, cssrs, isa, suicideBehaviorFollowup,
-      // Soin, suivi et arret de travail questionnaires (shared table)
-      psyTraitementSemestriel
+      // Medical evaluation questionnaires - DSM5
+      humeurActuels, humeurDepuisVisite, psychotiques,
+      // Suicide
+      cssrs, isaFollowup, suicideBehaviorFollowup,
+      // Soin, suivi et arret de travail questionnaires (separate tables now)
+      suiviRecommandations, recoursAuxSoins, traitementNonPharma, arretsTravail, somatiqueContraceptif, statutProfessionnel
     ] = await Promise.all([
       // Infirmier questionnaires
       getTobaccoResponse(visitId),
@@ -1233,15 +1246,21 @@ export async function getVisitCompletionStatus(visitId: string) {
       getAldaResponse(visitId),
       getEtatPatientResponse(visitId),
       getFastResponse(visitId),
-      // Medical evaluation questionnaires
-      getDiagPsySemHumeurActuelsResponse(visitId),
-      getDiagPsySemHumeurDepuisVisiteResponse(visitId),
-      getDiagPsySemPsychotiquesResponse(visitId),
+      // Medical evaluation questionnaires - DSM5
+      getHumeurActuelsResponse(visitId),
+      getHumeurDepuisVisiteResponse(visitId),
+      getPsychotiquesResponse(visitId),
+      // Suicide
       getCssrsResponse(visitId),
-      getIsaSuiviResponse(visitId),
-      getSuicideBehaviorFollowupResponse(visitId),
-      // Soin, suivi et arret de travail (shared table)
-      getPsyTraitementSemestrielResponse(visitId)
+      getIsaFollowupResponse(visitId),
+      getSuicideBehaviorFollowupResponseNew(visitId),
+      // Soin, suivi et arret de travail (separate tables)
+      getSuiviRecommandationsResponse(visitId),
+      getRecoursAuxSoinsResponse(visitId),
+      getTraitementNonPharmaResponse(visitId),
+      getArretsTravailResponse(visitId),
+      getSomatiqueContraceptifResponse(visitId),
+      getStatutProfessionnelResponse(visitId)
     ]);
 
     // Count infirmier questionnaires
@@ -1261,16 +1280,22 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (etatPatient) completed++;
     if (fast) completed++;
     
-    // Count medical evaluation
-    if (diagPsySemHumeurActuels) completed++;
-    if (diagPsySemHumeurDepuisVisite) completed++;
-    if (diagPsySemPsychotiques) completed++;
+    // Count medical evaluation - DSM5
+    if (humeurActuels) completed++;
+    if (humeurDepuisVisite) completed++;
+    if (psychotiques) completed++;
+    // Suicide
     if (cssrs) completed++;
-    if (isa) completed++;
+    if (isaFollowup) completed++;
     if (suicideBehaviorFollowup) completed++;
     
-    // Count soin, suivi et arret de travail (6 questionnaires share 1 table)
-    if (psyTraitementSemestriel) completed += 6;
+    // Count soin, suivi et arret de travail (6 separate tables now)
+    if (suiviRecommandations) completed++;
+    if (recoursAuxSoins) completed++;
+    if (traitementNonPharma) completed++;
+    if (arretsTravail) completed++;
+    if (somatiqueContraceptif) completed++;
+    if (statutProfessionnel) completed++;
   } else if (visit.visit_type === 'annual_evaluation') {
     // Annual evaluation: 7 infirmier + 7 thymic + 19 medical + 9 auto etat + 6 soin_suivi = 48 total
     total = 48;
@@ -1282,12 +1307,12 @@ export async function getVisitCompletionStatus(visitId: string) {
       // Thymic evaluation questionnaires (7)
       madrs, alda, ymrs, fast, cgi, egf, etatPatient,
       // Medical evaluation questionnaires (19)
-      dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs, isa, sis, suicideHistory,
+      dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs, isaFollowup, sis, suicideHistory,
       perinatalite, pathoNeuro, pathoCardio, pathoEndoc, pathoDermato, pathoUrinaire, antecedentsGyneco, pathoHepatoGastro, pathoAllergique, autresPatho,
       // Auto-questionnaires ETAT (9)
       eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,
-      // Soin, suivi et arret de travail questionnaires (shared table)
-      psyTraitementSemestriel
+      // Soin, suivi et arret de travail questionnaires (separate tables now)
+      suiviRecommandations, recoursAuxSoins, traitementNonPharma, arretsTravail, somatiqueContraceptif, statutProfessionnel
     ] = await Promise.all([
       // Infirmier questionnaires
       getTobaccoResponse(visitId),
@@ -1312,7 +1337,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       getDivaResponse(visitId),
       getFamilyHistoryResponse(visitId),
       getCssrsResponse(visitId),
-      getIsaSuiviResponse(visitId),
+      getIsaFollowupResponse(visitId),
       getSisResponse(visitId),
       getSuicideHistoryResponse(visitId),
       getPerinataliteResponse(visitId),
@@ -1335,8 +1360,13 @@ export async function getVisitCompletionStatus(visitId: string) {
       getQidsResponse(visitId),
       getPsqiResponse(visitId),
       getEpworthResponse(visitId),
-      // Soin, suivi et arret de travail (shared table)
-      getPsyTraitementSemestrielResponse(visitId)
+      // Soin, suivi et arret de travail (separate tables now)
+      getSuiviRecommandationsResponse(visitId),
+      getRecoursAuxSoinsResponse(visitId),
+      getTraitementNonPharmaResponse(visitId),
+      getArretsTravailResponse(visitId),
+      getSomatiqueContraceptifResponse(visitId),
+      getStatutProfessionnelResponse(visitId)
     ]);
 
     // Count infirmier questionnaires
@@ -1364,7 +1394,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (diva) completed++;
     if (familyHistory) completed++;
     if (cssrs) completed++;
-    if (isa) completed++;
+    if (isaFollowup) completed++;
     if (sis) completed++;
     if (suicideHistory) completed++;
     if (perinatalite) completed++;
@@ -1389,8 +1419,13 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (psqi) completed++;
     if (epworth) completed++;
     
-    // Count soin, suivi et arret de travail (6 questionnaires share 1 table)
-    if (psyTraitementSemestriel) completed += 6;
+    // Count soin, suivi et arret de travail (6 separate tables now)
+    if (suiviRecommandations) completed++;
+    if (recoursAuxSoins) completed++;
+    if (traitementNonPharma) completed++;
+    if (arretsTravail) completed++;
+    if (somatiqueContraceptif) completed++;
+    if (statutProfessionnel) completed++;
   }
 
   return {

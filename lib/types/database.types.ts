@@ -13,6 +13,26 @@
 // ============================================================================
 
 // ============================================================================
+// Note: Bipolar Followup Types are defined in their respective modules:
+// DSM5 (bipolar_followup_humeur_*, bipolar_followup_psychotiques):
+// - BipolarFollowupHumeurActuelsResponse: @/lib/questionnaires/bipolar/followup/dsm5/humeur-actuels
+// - BipolarFollowupHumeurDepuisVisiteResponse: @/lib/questionnaires/bipolar/followup/dsm5/humeur-depuis-visite
+// - BipolarFollowupPsychotiquesResponse: @/lib/questionnaires/bipolar/followup/dsm5/psychotiques
+// 
+// Suicide (bipolar_followup_isa, bipolar_followup_suicide_behavior):
+// - BipolarFollowupIsaResponse: @/lib/questionnaires/bipolar/followup/suicide/isa-followup
+// - BipolarFollowupSuicideBehaviorResponse: @/lib/questionnaires/bipolar/followup/suicide/suicide-behavior-followup
+// 
+// Soin Suivi (bipolar_followup_suivi_*, bipolar_followup_recours_*, etc.):
+// - BipolarFollowupSuiviRecommandationsResponse: @/lib/questionnaires/bipolar/followup/soin-suivi/suivi-recommandations
+// - BipolarFollowupRecoursAuxSoinsResponse: @/lib/questionnaires/bipolar/followup/soin-suivi/recours-aux-soins
+// - BipolarFollowupTraitementNonPharmaResponse: @/lib/questionnaires/bipolar/followup/soin-suivi/traitement-non-pharmacologique
+// - BipolarFollowupArretsTravailResponse: @/lib/questionnaires/bipolar/followup/soin-suivi/arrets-de-travail
+// - BipolarFollowupSomatiqueContraceptifResponse: @/lib/questionnaires/bipolar/followup/soin-suivi/somatique-contraceptif
+// - BipolarFollowupStatutProfessionnelResponse: @/lib/questionnaires/bipolar/followup/soin-suivi/statut-professionnel
+// ============================================================================
+
+// ============================================================================
 // Center Types
 // ============================================================================
 

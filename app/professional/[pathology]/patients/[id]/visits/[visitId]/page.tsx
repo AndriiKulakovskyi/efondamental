@@ -1,6 +1,6 @@
 import { getVisitDetailData } from "@/lib/services/visit-detail.service";
 import { getVisitModules, VirtualModule, updateVisitCompletionStatus } from "@/lib/services/visit.service";
-import { getTobaccoResponse } from "@/lib/services/questionnaire-infirmier.service";
+import { getTobaccoResponse } from "@/lib/services/bipolar-nurse.service";
 import { getDsm5ComorbidResponse } from "@/lib/services/questionnaire-dsm5.service";
 import { getWais4CriteriaResponse, getWais3CriteriaResponse } from "@/lib/services/questionnaire-hetero.service";
 import { getUserContext } from "@/lib/rbac/middleware";
@@ -19,13 +19,7 @@ import {
   MDQ_DEFINITION, 
   DIAGNOSTIC_DEFINITION, 
   ORIENTATION_DEFINITION,
-  EQ5D5L_DEFINITION,
-  PRISE_M_DEFINITION,
-  STAI_YA_DEFINITION,
-  MARS_DEFINITION,
-  MATHYS_DEFINITION,
-  PSQI_DEFINITION,
-  EPWORTH_DEFINITION,
+  // TRAITS (to be migrated)
   ASRS_DEFINITION,
   CTQ_DEFINITION,
   BIS10_DEFINITION,
@@ -36,6 +30,16 @@ import {
   CSM_DEFINITION,
   CTI_DEFINITION
 } from "@/lib/constants/questionnaires";
+// Auto ETAT definitions (refactored)
+import {
+  EQ5D5L_DEFINITION,
+  PRISE_M_DEFINITION,
+  STAI_YA_DEFINITION,
+  MARS_DEFINITION,
+  MATHYS_DEFINITION,
+  PSQI_DEFINITION,
+  EPWORTH_DEFINITION
+} from "@/lib/questionnaires/bipolar/initial/auto/etat";
 import {
   MADRS_DEFINITION,
   YMRS_DEFINITION,
