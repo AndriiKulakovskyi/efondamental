@@ -4635,7 +4635,7 @@ export type PsyTraitementSemestrielResponseInsert = Omit<PsyTraitementSemestriel
 // Schizophrenia Screening Diagnostic
 // ============================================================================
 
-export interface ScreeningSzDiagnosticResponse {
+export interface SchizophreniaScreeningDiagnosticResponse {
   id: string;
   visit_id: string;
   patient_id: string;
@@ -4683,13 +4683,13 @@ export interface ScreeningSzDiagnosticResponse {
   updated_at?: string;
 }
 
-export type ScreeningSzDiagnosticResponseInsert = Omit<ScreeningSzDiagnosticResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type SchizophreniaScreeningDiagnosticResponseInsert = Omit<SchizophreniaScreeningDiagnosticResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
 // Schizophrenia Screening Orientation Centre Expert
 // ============================================================================
 
-export interface ScreeningSzOrientationResponse {
+export interface SchizophreniaScreeningOrientationResponse {
   id: string;
   visit_id: string;
   patient_id: string;
@@ -4716,13 +4716,13 @@ export interface ScreeningSzOrientationResponse {
   updated_at?: string;
 }
 
-export type ScreeningSzOrientationResponseInsert = Omit<ScreeningSzOrientationResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'eligibility_result'>;
+export type SchizophreniaScreeningOrientationResponseInsert = Omit<SchizophreniaScreeningOrientationResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'eligibility_result'>;
 
 // ============================================================================
 // Schizophrenia Dossier Infirmier (Initial Evaluation - Nurse Assessment)
 // ============================================================================
 
-export interface DossierInfirmierSzResponse {
+export interface SchizophreniaDossierInfirmierResponse {
   id: string;
   visit_id: string;
   patient_id: string;
@@ -4753,13 +4753,13 @@ export interface DossierInfirmierSzResponse {
   updated_at?: string;
 }
 
-export type DossierInfirmierSzResponseInsert = Omit<DossierInfirmierSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'bmi' | 'elec_qtc'>;
+export type SchizophreniaDossierInfirmierResponseInsert = Omit<SchizophreniaDossierInfirmierResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'bmi' | 'elec_qtc'>;
 
 // ============================================================================
 // BILAN BIOLOGIQUE SCHIZOPHRENIA (Biological Assessment for Initial Evaluation)
 // ============================================================================
 
-export interface BilanBiologiqueSzResponse {
+export interface SchizophreniaBilanBiologiqueResponse {
   id: string;
   visit_id: string;
   patient_id: string;
@@ -4822,13 +4822,13 @@ export interface BilanBiologiqueSzResponse {
   updated_at?: string;
 }
 
-export type BilanBiologiqueSzResponseInsert = Omit<BilanBiologiqueSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'chol_rapport_hdltot'>;
+export type SchizophreniaBilanBiologiqueResponseInsert = Omit<SchizophreniaBilanBiologiqueResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'chol_rapport_hdltot'>;
 
 // ============================================================================
 // TROUBLES COMORBIDES (Schizophrenia Comorbid Disorders Assessment)
 // ============================================================================
 
-export interface TroublesComorbidesSzResponse {
+export interface SchizophreniaTroublesComorbidsResponse {
   id: string;
   visit_id: string;
   patient_id: string;
@@ -4902,14 +4902,14 @@ export interface TroublesComorbidesSzResponse {
   updated_at?: string;
 }
 
-export type TroublesComorbidesSzResponseInsert = Omit<TroublesComorbidesSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type SchizophreniaTroublesComorbidsResponseInsert = Omit<SchizophreniaTroublesComorbidsResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
 // Suicide History - Schizophrenia (Simplified)
 // Histoire des conduites suicidaires - Version simplifiee pour schizophrenie
 // ============================================================================
 
-export interface SuicideHistorySzResponse {
+export interface SchizophreniaSuicideHistoryResponse {
   id: string;
   visit_id: string;
   patient_id: string;
@@ -4931,13 +4931,13 @@ export interface SuicideHistorySzResponse {
   updated_at?: string | null;
 }
 
-export type SuicideHistorySzResponseInsert = Omit<SuicideHistorySzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type SchizophreniaSuicideHistoryResponseInsert = Omit<SchizophreniaSuicideHistoryResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
 // Antecedents Familiaux Psychiatriques - Schizophrenia
 // ============================================================================
 
-export interface AntecedentsFamiliauxPsySzResponse {
+export interface SchizophreniaAntecedentsFamiliauxPsyResponse {
   id: string;
   visit_id: string;
   patient_id: string;
@@ -4998,13 +4998,13 @@ export interface AntecedentsFamiliauxPsySzResponse {
   updated_at?: string | null;
 }
 
-export type AntecedentsFamiliauxPsySzResponseInsert = Omit<AntecedentsFamiliauxPsySzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type SchizophreniaAntecedentsFamiliauxPsyResponseInsert = Omit<SchizophreniaAntecedentsFamiliauxPsyResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
 // PERINATALITE - Schizophrenia specific (Perinatal History)
 // ============================================================================
 
-export interface PerinataliteSzResponse {
+export interface SchizophreniaPerinataliteResponse {
   id: string;
   visit_id: string;
   patient_id: string;
@@ -5048,14 +5048,14 @@ export interface PerinataliteSzResponse {
   updated_at: string;
 }
 
-export type PerinataliteSzResponseInsert = Omit<PerinataliteSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type SchizophreniaPerinataliteResponseInsert = Omit<SchizophreniaPerinataliteResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
 // TEA AND COFFEE CONSUMPTION - Schizophrenia Addictologie
 // ============================================================================
 // Assessment of tea and coffee consumption patterns for schizophrenia patients
 
-export interface TeaCoffeeSzResponse {
+export interface SchizophreniaTeaCoffeeResponse {
   id: string;
   visit_id: string;
   patient_id: string;
@@ -5087,7 +5087,7 @@ export interface TeaCoffeeSzResponse {
   updated_at: string;
 }
 
-export type TeaCoffeeSzResponseInsert = Omit<TeaCoffeeSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type SchizophreniaTeaCoffeeResponseInsert = Omit<SchizophreniaTeaCoffeeResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
 // Evaluation Addictologique - Schizophrenia Addictologie Assessment
@@ -5096,7 +5096,7 @@ export type TeaCoffeeSzResponseInsert = Omit<TeaCoffeeSzResponse, 'id' | 'create
 // - Main screening (alcohol, tobacco, cannabis, other drugs, gambling)
 // - Conditional Alcohol section with DSM5 criteria and severity scoring
 
-export interface EvalAddictologiqueSzResponse {
+export interface SchizophreniaEvalAddictologiqueResponse {
   id: string;
   visit_id: string;
   patient_id: string;
@@ -5458,7 +5458,7 @@ export interface EvalAddictologiqueSzResponse {
   updated_at: string;
 }
 
-export type EvalAddictologiqueSzResponseInsert = Omit<EvalAddictologiqueSzResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type SchizophreniaEvalAddictologiqueResponseInsert = Omit<SchizophreniaEvalAddictologiqueResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
 // PANSS (Positive and Negative Syndrome Scale) - Schizophrenia Hetero-questionnaire

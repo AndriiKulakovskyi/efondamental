@@ -1,21 +1,12 @@
 'use server';
 
-import { 
-  saveAsrmResponse, 
-  saveQidsResponse, 
-  saveMdqResponse,
-  // Auto TRAITS (legacy, to be migrated)
-  saveAsrsResponse,
-  saveCtqResponse,
-  saveBis10Response,
-  saveAls18Response,
-  saveAimResponse,
-  saveWurs25Response,
-  saveAq12Response,
-  saveCsmResponse,
-  saveCtiResponse
-} from '@/lib/services/questionnaire.service';
+// All bipolar questionnaires now use bipolar-*.service.ts with new bipolar_* tables
 import { saveBipolarInitialResponse } from '@/lib/services/bipolar-initial.service';
+import {
+  saveBipolarAsrmResponse,
+  saveBipolarQidsResponse,
+  saveBipolarMdqResponse
+} from '@/lib/services/bipolar-screening.service';
 import { 
   getVisitCompletionStatus,
   completeVisit,
@@ -77,16 +68,17 @@ export async function submitQuestionnaireAction(
     
     // Save based on questionnaire code
     switch (questionnaireCode) {
+      // Bipolar screening questionnaires - use new bipolar_* tables
       case 'ASRM_FR':
-        await saveAsrmResponse(responseData as any);
+        await saveBipolarAsrmResponse(responseData as any);
         break;
         
       case 'QIDS_SR16_FR':
-        await saveQidsResponse(responseData as any);
+        await saveBipolarQidsResponse(responseData as any);
         break;
         
       case 'MDQ_FR':
-        await saveMdqResponse(responseData as any);
+        await saveBipolarMdqResponse(responseData as any);
         break;
         
       case 'EQ5D5L_FR':
@@ -124,40 +116,41 @@ export async function submitQuestionnaireAction(
         await saveBipolarInitialResponse('EPWORTH', responseData as any);
         break;
         
+      // TRAITS questionnaires - use new bipolar_* tables via saveBipolarInitialResponse
       case 'ASRS_FR':
-        await saveAsrsResponse(responseData as any);
+        await saveBipolarInitialResponse('ASRS', responseData as any);
         break;
         
       case 'CTQ_FR':
-        await saveCtqResponse(responseData as any);
+        await saveBipolarInitialResponse('CTQ', responseData as any);
         break;
         
       case 'BIS10_FR':
-        await saveBis10Response(responseData as any);
+        await saveBipolarInitialResponse('BIS10', responseData as any);
         break;
         
       case 'ALS18_FR':
-        await saveAls18Response(responseData as any);
+        await saveBipolarInitialResponse('ALS18', responseData as any);
         break;
         
       case 'AIM_FR':
-        await saveAimResponse(responseData as any);
+        await saveBipolarInitialResponse('AIM', responseData as any);
         break;
         
       case 'WURS25_FR':
-        await saveWurs25Response(responseData as any);
+        await saveBipolarInitialResponse('WURS25', responseData as any);
         break;
         
       case 'AQ12_FR':
-        await saveAq12Response(responseData as any);
+        await saveBipolarInitialResponse('AQ12', responseData as any);
         break;
         
       case 'CSM_FR':
-        await saveCsmResponse(responseData as any);
+        await saveBipolarInitialResponse('CSM', responseData as any);
         break;
         
       case 'CTI_FR':
-        await saveCtiResponse(responseData as any);
+        await saveBipolarInitialResponse('CTI', responseData as any);
         break;
         
       default:

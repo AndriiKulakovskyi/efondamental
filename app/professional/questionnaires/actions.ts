@@ -1,22 +1,13 @@
 'use server';
 
-import { 
-  saveAsrmResponse, 
-  saveQidsResponse, 
-  saveMdqResponse,
-  saveDiagnosticResponse,
-  saveOrientationResponse,
-  // Initial Evaluation - TRAITS (legacy, to be migrated)
-  saveAsrsResponse,
-  saveCtqResponse,
-  saveBis10Response,
-  saveAls18Response,
-  saveAimResponse,
-  saveWurs25Response,
-  saveAq12Response,
-  saveCsmResponse,
-  saveCtiResponse
-} from '@/lib/services/questionnaire.service';
+// Legacy imports removed - all bipolar questionnaires now use bipolar-*.service.ts
+// The following functions have been migrated to new bipolar_* tables:
+// - saveAsrmResponse -> saveBipolarAsrmResponse
+// - saveQidsResponse -> saveBipolarQidsResponse
+// - saveMdqResponse -> saveBipolarMdqResponse
+// - saveDiagnosticResponse -> saveBipolarDiagnosticResponse
+// - saveOrientationResponse -> saveBipolarOrientationResponse
+// - TRAITS module (saveAsrsResponse, etc.) -> saveBipolarInitialResponse
 import {
   // Bipolar screening - new service (public.bipolar_* tables)
   saveBipolarAsrmResponse,
@@ -147,28 +138,28 @@ import {
   type BipolarNurseBiologicalAssessmentResponseInsert,
   type BipolarNurseEcgResponseInsert
 } from '@/lib/questionnaires/bipolar/nurse';
+// Schizophrenia screening - new service (public.schizophrenia_* tables)
 import {
-  saveScreeningSzDiagnosticResponse,
-  saveScreeningSzOrientationResponse,
-  saveDossierInfirmierSzResponse,
-  saveBilanBiologiqueSzResponse,
-  savePanssResponse,
-  saveCdssResponse,
-  saveBarsResponse,
-  saveSumdResponse,
-  saveAimsResponse,
-  saveBarnesResponse,
-  saveSasResponse,
-  savePspResponse,
-  saveEcvResponse,
-  saveTroublesPsychotiquesResponse,
-  saveTroublesComorbidesSzResponse,
-  saveSuicideHistorySzResponse,
-  saveAntecedentsFamiliauxPsySzResponse,
-  savePerinataliteSzResponse,
-  saveTeaCoffeeSzResponse,
-  saveEvalAddictologiqueSzResponse
-} from '@/lib/services/questionnaire-schizophrenia.service';
+  saveSchizophreniaScreeningDiagnosticResponse,
+  saveSchizophreniaScreeningOrientationResponse
+} from '@/lib/services/schizophrenia-screening.service';
+// Schizophrenia initial evaluation - new service (public.schizophrenia_* tables)
+import {
+  saveSchizophreniaInitialResponse,
+  SCHIZOPHRENIA_INITIAL_TABLES,
+  // Specialized save functions with scoring logic
+  savePanssResponse as saveSchizophreniaPanssResponse,
+  saveCdssResponse as saveSchizophreniaCdssResponse,
+  saveBarsResponse as saveSchizophreniaBarsResponse,
+  saveSumdResponse as saveSchizophreniaSumdResponse,
+  saveAimsResponse as saveSchizophreniaAimsResponse,
+  saveBarnesResponse as saveSchizophreniaBarnesResponse,
+  saveSasResponse as saveSchizophreniaSasResponse,
+  savePspResponse as saveSchizophreniaPspResponse,
+  saveDossierInfirmierSzResponse as saveSchizophreniaDossierInfirmierResponse,
+  saveBilanBiologiqueSzResponse as saveSchizophreniaBilanBiologiqueResponse,
+  saveEvalAddictologiqueSzResponse as saveSchizophreniaEvalAddictologiqueResponse
+} from '@/lib/services/schizophrenia-initial.service';
 import { 
   getVisitCompletionStatus,
   completeVisit,
@@ -192,6 +183,53 @@ async function shouldUseBipolarTables(visitId: string, questionnaireCode: string
   
   const patient = await getPatientById(visit.patient_id);
   return patient?.pathology_type === 'bipolar';
+}
+
+// Helper to check if a questionnaire should use schizophrenia_* tables
+async function shouldUseSchizophreniaTables(visitId: string, questionnaireCode: string): Promise<boolean> {
+  // Check if the questionnaire code maps to a schizophrenia_* table
+  const schizophreniaTableCode = questionnaireCodeToSchizophreniaKey(questionnaireCode);
+  if (!schizophreniaTableCode || !SCHIZOPHRENIA_INITIAL_TABLES[schizophreniaTableCode]) {
+    return false;
+  }
+  
+  // Check if the visit is a schizophrenia initial evaluation
+  const visit = await getVisitById(visitId);
+  if (!visit || visit.visit_type !== 'initial_evaluation') {
+    return false;
+  }
+  
+  const patient = await getPatientById(visit.patient_id);
+  return patient?.pathology_type === 'schizophrenia';
+}
+
+// Map questionnaire codes to SCHIZOPHRENIA_INITIAL_TABLES keys
+function questionnaireCodeToSchizophreniaKey(code: string): string | null {
+  const mapping: Record<string, string> = {
+    // Nurse module
+    'INF_DOSSIER_INFIRMIER': 'DOSSIER_INFIRMIER_SZ',
+    'INF_BILAN_BIOLOGIQUE_SZ': 'BILAN_BIOLOGIQUE_SZ',
+    // Hetero-questionnaires
+    'PANSS': 'PANSS',
+    'CDSS': 'CDSS',
+    'BARS': 'BARS',
+    'SUMD': 'SUMD',
+    'AIMS': 'AIMS',
+    'BARNES': 'BARNES',
+    'SAS': 'SAS',
+    'PSP': 'PSP',
+    // Medical evaluation
+    'TROUBLES_PSYCHOTIQUES': 'TROUBLES_PSYCHOTIQUES',
+    'TROUBLES_COMORBIDES_SZ': 'TROUBLES_COMORBIDES_SZ',
+    'ISA_SZ': 'ISA_SZ',
+    'SUICIDE_HISTORY_SZ': 'SUICIDE_HISTORY_SZ',
+    'ANTECEDENTS_FAMILIAUX_PSY_SZ': 'ANTECEDENTS_FAMILIAUX_PSY_SZ',
+    'PERINATALITE_SZ': 'PERINATALITE_SZ',
+    'TEA_COFFEE_SZ': 'TEA_COFFEE_SZ',
+    'EVAL_ADDICTOLOGIQUE_SZ': 'EVAL_ADDICTOLOGIQUE_SZ',
+    'ECV': 'ECV',
+  };
+  return mapping[code] || null;
 }
 
 // Map questionnaire codes to BIPOLAR_INITIAL_TABLES keys
@@ -406,28 +444,8 @@ import {
   Mem3SpatialResponseInsert,
   // Follow-up care module
   PsyTraitementSemestrielResponseInsert,
-  // Schizophrenia screening
-  ScreeningSzDiagnosticResponseInsert,
-  ScreeningSzOrientationResponseInsert,
-  // Schizophrenia initial evaluation
-  DossierInfirmierSzResponseInsert,
-  BilanBiologiqueSzResponseInsert,
-  PanssResponseInsert,
-  CdssResponseInsert,
-  BarsResponseInsert,
-  SumdResponseInsert,
-  AimsResponseInsert,
-  BarnesResponseInsert,
-  SasResponseInsert,
-  PspResponseInsert,
-  EcvResponseInsert,
-  TroublesPsychotiquesResponseInsert,
-  TroublesComorbidesSzResponseInsert,
-  SuicideHistorySzResponseInsert,
-  AntecedentsFamiliauxPsySzResponseInsert,
-  PerinataliteSzResponseInsert,
-  TeaCoffeeSzResponseInsert,
-  EvalAddictologiqueSzResponseInsert
+  // Schizophrenia types - now using new schizophrenia_* tables with inline types
+  // Legacy types kept for reference but not used in new service functions
 } from '@/lib/types/database.types';
 import { revalidatePath } from 'next/cache';
 import { requireUserContext } from '@/lib/rbac/middleware';
@@ -554,168 +572,168 @@ export async function submitProfessionalQuestionnaireAction(
         } as BipolarOrientationResponseInsert);
         break;
 
-      // Schizophrenia Screening Questionnaires
+      // Schizophrenia Screening Questionnaires - use new public.schizophrenia_* tables
       case 'SCREENING_DIAGNOSTIC_SZ':
-        result = await saveScreeningSzDiagnosticResponse({
+        result = await saveSchizophreniaScreeningDiagnosticResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as ScreeningSzDiagnosticResponseInsert);
+        });
         break;
 
       case 'SCREENING_ORIENTATION_SZ':
-        result = await saveScreeningSzOrientationResponse({
+        result = await saveSchizophreniaScreeningOrientationResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as ScreeningSzOrientationResponseInsert);
+        });
         break;
 
-      // Schizophrenia Initial Evaluation - Dossier Infirmier
+      // Schizophrenia Initial Evaluation - Dossier Infirmier (use new schizophrenia_* tables)
       case 'INF_DOSSIER_INFIRMIER':
-        result = await saveDossierInfirmierSzResponse({
+        result = await saveSchizophreniaDossierInfirmierResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as DossierInfirmierSzResponseInsert);
+        });
         break;
 
-      // Schizophrenia Initial Evaluation - Bilan Biologique
+      // Schizophrenia Initial Evaluation - Bilan Biologique (use new schizophrenia_* tables)
       case 'INF_BILAN_BIOLOGIQUE_SZ':
-        result = await saveBilanBiologiqueSzResponse({
+        result = await saveSchizophreniaBilanBiologiqueResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as BilanBiologiqueSzResponseInsert);
+        });
         break;
 
-      // Schizophrenia Hetero-questionnaires
+      // Schizophrenia Hetero-questionnaires (use new schizophrenia_* tables)
       case 'PANSS':
-        result = await savePanssResponse({
+        result = await saveSchizophreniaPanssResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as PanssResponseInsert);
+        });
         break;
 
       case 'CDSS':
-        result = await saveCdssResponse({
+        result = await saveSchizophreniaCdssResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as CdssResponseInsert);
+        });
         break;
 
       case 'BARS':
-        result = await saveBarsResponse({
+        result = await saveSchizophreniaBarsResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as BarsResponseInsert);
+        });
         break;
 
       case 'SUMD':
-        result = await saveSumdResponse({
+        result = await saveSchizophreniaSumdResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as SumdResponseInsert);
+        });
         break;
 
       case 'AIMS':
-        result = await saveAimsResponse({
+        result = await saveSchizophreniaAimsResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as AimsResponseInsert);
+        });
         break;
 
       case 'BARNES':
-        result = await saveBarnesResponse({
+        result = await saveSchizophreniaBarnesResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as BarnesResponseInsert);
+        });
         break;
 
       case 'SAS':
-        result = await saveSasResponse({
+        result = await saveSchizophreniaSasResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as SasResponseInsert);
+        });
         break;
 
       case 'PSP':
-        result = await savePspResponse({
+        result = await saveSchizophreniaPspResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as PspResponseInsert);
+        });
         break;
 
       case 'ECV':
-        result = await saveEcvResponse({
+        result = await saveSchizophreniaInitialResponse('ECV', {
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as EcvResponseInsert);
+        });
         break;
 
       case 'TROUBLES_PSYCHOTIQUES':
-        result = await saveTroublesPsychotiquesResponse({
+        result = await saveSchizophreniaInitialResponse('TROUBLES_PSYCHOTIQUES', {
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as TroublesPsychotiquesResponseInsert);
+        });
         break;
 
       case 'TROUBLES_COMORBIDES_SZ':
-        result = await saveTroublesComorbidesSzResponse({
+        result = await saveSchizophreniaInitialResponse('TROUBLES_COMORBIDES_SZ', {
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as TroublesComorbidesSzResponseInsert);
+        });
         break;
 
       case 'SUICIDE_HISTORY_SZ':
-        result = await saveSuicideHistorySzResponse({
+        result = await saveSchizophreniaInitialResponse('SUICIDE_HISTORY_SZ', {
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as SuicideHistorySzResponseInsert);
+        });
         break;
 
       case 'ANTECEDENTS_FAMILIAUX_PSY_SZ':
-        result = await saveAntecedentsFamiliauxPsySzResponse({
+        result = await saveSchizophreniaInitialResponse('ANTECEDENTS_FAMILIAUX_PSY_SZ', {
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as AntecedentsFamiliauxPsySzResponseInsert);
+        });
         break;
 
       case 'PERINATALITE_SZ':
-        result = await savePerinataliteSzResponse({
+        result = await saveSchizophreniaInitialResponse('PERINATALITE_SZ', {
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as PerinataliteSzResponseInsert);
+        });
         break;
 
       case 'TEA_COFFEE_SZ':
-        result = await saveTeaCoffeeSzResponse({
+        result = await saveSchizophreniaInitialResponse('TEA_COFFEE_SZ', {
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as TeaCoffeeSzResponseInsert);
+        });
         break;
 
       case 'EVAL_ADDICTOLOGIQUE_SZ':
-        result = await saveEvalAddictologiqueSzResponse({
+        result = await saveSchizophreniaEvalAddictologiqueResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        } as EvalAddictologiqueSzResponseInsert);
+        });
         break;
 
       // Initial Evaluation - ETAT (using bipolar-initial.service.ts)
@@ -775,167 +793,35 @@ export async function submitProfessionalQuestionnaireAction(
         });
         break;
 
-      // Initial Evaluation - TRAITS
+      // Initial Evaluation - TRAITS: These questionnaires are now handled by 
+      // shouldUseBipolarTables routing for bipolar patients. The old responses_* 
+      // tables have been dropped and data migrated to bipolar_* tables.
+      // If these codes reach here, it means the routing failed - throw an error.
       case 'ASRS_FR':
-        result = await saveAsrsResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as AsrsResponseInsert);
-        break;
-
       case 'CTQ_FR':
-        result = await saveCtqResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as CtqResponseInsert);
-        break;
-
       case 'BIS10_FR':
-        result = await saveBis10Response({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as Bis10ResponseInsert);
-        break;
-
       case 'ALS18':
-        result = await saveAls18Response({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as Als18ResponseInsert);
-        break;
-
       case 'AIM':
-        result = await saveAimResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as AimResponseInsert);
-        break;
-
       case 'WURS25':
-        result = await saveWurs25Response({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as Wurs25ResponseInsert);
-        break;
-
       case 'AQ12':
-        result = await saveAq12Response({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as Aq12ResponseInsert);
-        break;
-
       case 'CSM':
-        result = await saveCsmResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as CsmResponseInsert);
-        break;
-
       case 'CTI':
-        result = await saveCtiResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as CtiResponseInsert);
-        break;
+        throw new Error(`Questionnaire ${questionnaireCode} should be routed through shouldUseBipolarTables. Tables have been migrated to bipolar_* schema.`);
 
-      // Hetero questionnaires
+      // Hetero questionnaires - BIPOLAR: These are now handled by shouldUseBipolarTables 
+      // routing for bipolar patients. The old responses_* tables have been dropped.
       case 'MADRS':
-        result = await saveMadrsResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as MadrsResponseInsert);
-        break;
-
       case 'YMRS':
-        result = await saveYmrsResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as YmrsResponseInsert);
-        break;
-
       case 'CGI':
-        result = await saveCgiResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as CgiResponseInsert);
-        break;
-
       case 'EGF':
-        result = await saveEgfResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as EgfResponseInsert);
-        break;
-
       case 'ALDA':
-        result = await saveAldaResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as AldaResponseInsert);
-        break;
-
       case 'ETAT_PATIENT':
-        result = await saveEtatPatientResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as EtatPatientResponseInsert);
-        break;
-
       case 'FAST':
-        result = await saveFastResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as FastResponseInsert);
-        break;
-
       case 'DIVA_2_FR':
-        result = await saveDivaResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as DivaResponseInsert);
-        break;
-
       case 'FAMILY_HISTORY_FR':
-        result = await saveFamilyHistoryResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as FamilyHistoryResponseInsert);
-        break;
-
       case 'CSSRS_FR':
-        result = await saveCssrsResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as CssrsResponseInsert);
-        break;
-
       case 'ISA_FR':
-        result = await saveIsaResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as IsaResponseInsert);
-        break;
+        throw new Error(`Questionnaire ${questionnaireCode} should be routed through shouldUseBipolarTables. Tables have been migrated to bipolar_* schema.`);
         
       case 'ISA_FOLLOWUP':
       case 'ISA_FOLLOWUP_FR':
@@ -947,20 +833,8 @@ export async function submitProfessionalQuestionnaireAction(
         break;
 
       case 'SIS_FR':
-        result = await saveSisResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as SisResponseInsert);
-        break;
-
       case 'SUICIDE_HISTORY_FR':
-        result = await saveSuicideHistoryResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as SuicideHistoryResponseInsert);
-        break;
+        throw new Error(`Questionnaire ${questionnaireCode} should be routed through shouldUseBipolarTables. Tables have been migrated to bipolar_* schema.`);
 
       case 'SUICIDE_BEHAVIOR_FOLLOWUP':
       case 'SUICIDE_BEHAVIOR_FOLLOWUP_FR':
@@ -972,92 +846,19 @@ export async function submitProfessionalQuestionnaireAction(
         break;
 
       case 'PERINATALITE_FR':
-        result = await savePerinataliteResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as PerinataliteResponseInsert);
-        break;
-
       case 'PATHO_NEURO_FR':
-        result = await savePathoNeuroResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as PathoNeuroResponseInsert);
-        break;
-
       case 'PATHO_CARDIO_FR':
-        result = await savePathoCardioResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as PathoCardioResponseInsert);
-        break;
-
       case 'PATHO_ENDOC_FR':
-        result = await savePathoEndocResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as PathoEndocResponseInsert);
-        break;
-
       case 'PATHO_DERMATO_FR':
-        result = await savePathoDermatoResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as PathoDermatoResponseInsert);
-        break;
-
       case 'PATHO_URINAIRE_FR':
-        result = await savePathoUrinaireResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as PathoUrinaireResponseInsert);
-        break;
-
       case 'ANTECEDENTS_GYNECO_FR':
-        result = await saveAntecedentsGynecoResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as AntecedentsGynecoResponseInsert);
-        break;
-
       case 'PATHO_HEPATO_GASTRO_FR':
-        result = await savePathoHepatoGastroResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as PathoHepatoGastroResponseInsert);
-        break;
-
       case 'PATHO_ALLERGIQUE_FR':
-        result = await savePathoAllergiqueResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as PathoAllergiqueResponseInsert);
-        break;
+        throw new Error(`Questionnaire ${questionnaireCode} should be routed through shouldUseBipolarTables. Tables have been migrated to bipolar_* schema.`);
 
       case 'AUTRES_PATHO_FR':
-        result = await saveAutresPathoResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as AutresPathoResponseInsert);
-        break;
-
       case 'SOCIAL':
-        result = await saveSocialResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as SocialResponseInsert);
-        break;
+        throw new Error(`Questionnaire ${questionnaireCode} should be routed through shouldUseBipolarTables. Tables have been migrated to bipolar_* schema.`);
 
       case 'TOBACCO':
         result = await saveTobaccoResponse({
@@ -1166,309 +967,43 @@ export async function submitProfessionalQuestionnaireAction(
         } as BipolarFollowupPsychotiquesResponseInsert);
         break;
 
+      // NEUROPSY QUESTIONNAIRES - WAIS4, CVLT, TMT, etc. 
+      // These are now handled by shouldUseBipolarTables routing for bipolar patients.
+      // The old responses_* tables have been dropped and data migrated to bipolar_* tables.
       case 'WAIS4_CRITERIA_FR':
-        result = await saveWais4CriteriaResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          collection_date: responses.collection_date,
-          age: responses.age,
-          laterality: responses.laterality,
-          native_french_speaker: responses.native_french_speaker,
-          time_since_last_eval: responses.time_since_last_eval,
-          patient_euthymic: responses.patient_euthymic,
-          no_episode_3months: responses.no_episode_3months,
-          socio_prof_data_present: responses.socio_prof_data_present,
-          years_of_education: responses.years_of_education,
-          no_visual_impairment: responses.no_visual_impairment,
-          no_hearing_impairment: responses.no_hearing_impairment,
-          no_ect_past_year: responses.no_ect_past_year,
-          accepted_for_neuropsy_evaluation: responses.accepted_for_neuropsy_evaluation,
-        } as Wais4CriteriaResponseInsert);
-        break;
-
       case 'WAIS4_LEARNING_FR':
-        result = await saveWais4LearningResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as Wais4LearningResponseInsert);
-        break;
-
       case 'WAIS4_MATRICES_FR':
-        // Filter out computed score fields - backend will recalculate them
-        const { raw_score, standardized_score, percentile_rank, deviation_from_mean, ...matricesRawData } = responses as any;
-        
-        result = await saveWais4MatricesResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...matricesRawData
-        } as Wais4MatricesResponseInsert);
-        break;
-
       case 'CVLT_FR':
-        // Filter out computed score fields - backend will recalculate them
-        const {
-          trial_1_std, trial_5_std, total_1_5_std, list_b_std,
-          sdfr_std, sdcr_std, ldfr_std, ldcr_std,
-          semantic_std, serial_std, persev_std, intru_std,
-          recog_std, false_recog_std, discrim_std,
-          primacy_std, recency_std, bias_std,
-          ...cvltRawData
-        } = responses as any;
-        
-        result = await saveCvltResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...cvltRawData
-        } as CvltResponseInsert);
-        break;
-
       case 'WAIS4_CODE_FR':
       case 'WAIS_IV_CODE_SYMBOLES_IVT':
-        result = await saveWais4CodeResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as Wais4CodeResponseInsert);
-        break;
-
       case 'WAIS4_DIGIT_SPAN_FR':
-        result = await saveWais4DigitSpanResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as Wais4DigitSpanResponseInsert);
-        break;
-
       case 'TMT_FR':
-        result = await saveTmtResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as TmtResponseInsert);
-        break;
-
       case 'STROOP_FR':
-        result = await saveStroopResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as StroopResponseInsert);
-        break;
-
       case 'FLUENCES_VERBALES_FR':
-        result = await saveFluencesVerbalesResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as FluencesVerbalesResponseInsert);
-        break;
-
       case 'COBRA_FR':
-        result = await saveCobraResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as CobraResponseInsert);
-        break;
-
       case 'CPT3_FR':
-        result = await saveCpt3Response({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as Cpt3ResponseInsert);
-        break;
-
       case 'WAIS4_SIMILITUDES_FR':
-        result = await saveWais4SimilitudesResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as Wais4SimilitudesResponseInsert);
-        break;
-
       case 'TEST_COMMISSIONS_FR':
-        result = await saveTestCommissionsResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as TestCommissionsResponseInsert);
-        break;
-
       case 'SCIP_FR':
-        result = await saveScipResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as ScipResponseInsert);
-        break;
+        throw new Error(`Questionnaire ${questionnaireCode} should be routed through shouldUseBipolarTables. Tables have been migrated to bipolar_* schema.`);
 
-      // WAIS-III Questionnaires
+      // WAIS-III and MEM3 Questionnaires
+      // These are now handled by shouldUseBipolarTables routing for bipolar patients.
+      // The old responses_* tables have been dropped and data migrated to bipolar_* tables.
       case 'WAIS3_CVLT_FR':
-        // Filter out computed score fields - backend will recalculate them
-        const {
-          trial_1_std: w3_trial_1_std, trial_5_std: w3_trial_5_std, total_1_5_std: w3_total_1_5_std, list_b_std: w3_list_b_std,
-          sdfr_std: w3_sdfr_std, sdcr_std: w3_sdcr_std, ldfr_std: w3_ldfr_std, ldcr_std: w3_ldcr_std,
-          semantic_std: w3_semantic_std, serial_std: w3_serial_std, persev_std: w3_persev_std, intru_std: w3_intru_std,
-          recog_std: w3_recog_std, false_recog_std: w3_false_recog_std, discrim_std: w3_discrim_std,
-          primacy_std: w3_primacy_std, recency_std: w3_recency_std, bias_std: w3_bias_std,
-          ...wais3CvltRawData
-        } = responses as any;
-        
-        result = await saveCvltResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...wais3CvltRawData
-        } as CvltResponseInsert);
-        break;
-
       case 'WAIS3_TMT_FR':
-        result = await saveWais3TmtResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as Wais3TmtResponseInsert);
-        break;
-
       case 'WAIS3_STROOP_FR':
-        result = await saveWais3StroopResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as Wais3StroopResponseInsert);
-        break;
-
       case 'WAIS3_FLUENCES_VERBALES_FR':
-        result = await saveWais3FluencesVerbalesResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as Wais3FluencesVerbalesResponseInsert);
-        break;
-
       case 'WAIS3_CRITERIA_FR':
-        result = await saveWais3CriteriaResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          collection_date: responses.collection_date,
-          age: responses.age,
-          laterality: responses.laterality,
-          native_french_speaker: responses.native_french_speaker,
-          time_since_last_eval: responses.time_since_last_eval,
-          patient_euthymic: responses.patient_euthymic,
-          no_episode_3months: responses.no_episode_3months,
-          socio_prof_data_present: responses.socio_prof_data_present,
-          years_of_education: responses.years_of_education,
-          no_visual_impairment: responses.no_visual_impairment,
-          no_hearing_impairment: responses.no_hearing_impairment,
-          no_ect_past_year: responses.no_ect_past_year,
-          accepted_for_neuropsy_evaluation: responses.accepted_for_neuropsy_evaluation,
-        } as Wais3CriteriaResponseInsert);
-        break;
-
       case 'WAIS3_LEARNING_FR':
-        result = await saveWais3LearningResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as Wais3LearningResponseInsert);
-        break;
-
       case 'WAIS3_VOCABULAIRE_FR':
-        result = await saveWais3VocabulaireResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        } as Wais3VocabulaireResponseInsert);
-        break;
-
       case 'WAIS3_MATRICES_FR':
-        result = await saveWais3MatricesResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          patient_age: responses.patient_age,
-          item_01: responses.item_01,
-          item_02: responses.item_02,
-          item_03: responses.item_03,
-          item_04: responses.item_04,
-          item_05: responses.item_05,
-          item_06: responses.item_06,
-          item_07: responses.item_07,
-          item_08: responses.item_08,
-          item_09: responses.item_09,
-          item_10: responses.item_10,
-          item_11: responses.item_11,
-          item_12: responses.item_12,
-          item_13: responses.item_13,
-          item_14: responses.item_14,
-          item_15: responses.item_15,
-          item_16: responses.item_16,
-          item_17: responses.item_17,
-          item_18: responses.item_18,
-          item_19: responses.item_19,
-          item_20: responses.item_20,
-          item_21: responses.item_21,
-          item_22: responses.item_22,
-          item_23: responses.item_23,
-          item_24: responses.item_24,
-          item_25: responses.item_25,
-          item_26: responses.item_26
-        } as Wais3MatricesResponseInsert);
-        break;
-
       case 'WAIS3_CODE_SYMBOLES_FR':
-        result = await saveWais3CodeSymbolesResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          patient_age: responses.patient_age,
-          wais_cod_tot: responses.wais_cod_tot,
-          wais_cod_err: responses.wais_cod_err,
-          wais_symb_tot: responses.wais_symb_tot,
-          wais_symb_err: responses.wais_symb_err
-        } as Wais3CodeSymbolesResponseInsert);
-        break;
-
       case 'WAIS3_DIGIT_SPAN_FR':
-        result = await saveWais3DigitSpanResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          patient_age: responses.patient_age,
-          education_level: responses.education_level,
-          mcod_1a: responses.mcod_1a, mcod_1b: responses.mcod_1b,
-          mcod_2a: responses.mcod_2a, mcod_2b: responses.mcod_2b,
-          mcod_3a: responses.mcod_3a, mcod_3b: responses.mcod_3b,
-          mcod_4a: responses.mcod_4a, mcod_4b: responses.mcod_4b,
-          mcod_5a: responses.mcod_5a, mcod_5b: responses.mcod_5b,
-          mcod_6a: responses.mcod_6a, mcod_6b: responses.mcod_6b,
-          mcod_7a: responses.mcod_7a, mcod_7b: responses.mcod_7b,
-          mcod_8a: responses.mcod_8a, mcod_8b: responses.mcod_8b,
-          mcoi_1a: responses.mcoi_1a, mcoi_1b: responses.mcoi_1b,
-          mcoi_2a: responses.mcoi_2a, mcoi_2b: responses.mcoi_2b,
-          mcoi_3a: responses.mcoi_3a, mcoi_3b: responses.mcoi_3b,
-          mcoi_4a: responses.mcoi_4a, mcoi_4b: responses.mcoi_4b,
-          mcoi_5a: responses.mcoi_5a, mcoi_5b: responses.mcoi_5b,
-          mcoi_6a: responses.mcoi_6a, mcoi_6b: responses.mcoi_6b,
-          mcoi_7a: responses.mcoi_7a, mcoi_7b: responses.mcoi_7b
-        } as Wais3DigitSpanResponseInsert);
-        break;
-
       case 'WAIS3_CPT2_FR':
-        result = await saveWais3Cpt2Response({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses
-        } as Wais3Cpt2ResponseInsert);
-        break;
-      
       case 'WAIS3_MEM3_SPATIAL_FR':
       case 'MEM3_SPATIAL_FR':
-        result = await saveMem3SpatialResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses
-        } as Mem3SpatialResponseInsert);
-        break;
+        throw new Error(`Questionnaire ${questionnaireCode} should be routed through shouldUseBipolarTables. Tables have been migrated to bipolar_* schema.`);
 
       // Follow-up care module questionnaires (now separate tables)
       case 'SUIVI_RECOMMANDATIONS':

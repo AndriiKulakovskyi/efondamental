@@ -256,6 +256,10 @@ import {
   getPanssResponse,
   getCdssResponse
 } from './questionnaire-schizophrenia.service';
+import {
+  getSchizophreniaInitialCompletionStatus as checkSchizophreniaInitialCompletion,
+  SCHIZOPHRENIA_INITIAL_TABLES
+} from './schizophrenia-initial.service';
 import { getPatientById } from './patient.service';
 
 // ============================================================================
@@ -1061,8 +1065,14 @@ export async function getVisitCompletionStatus(visitId: string) {
       total = Object.keys(BIPOLAR_INITIAL_TABLES).length;
       totalModules = 7;
       completed = Object.values(bipolarCompletion).filter(Boolean).length;
+    } else if (pathologyType === 'schizophrenia') {
+      // Use the schizophrenia-initial.service to check completion status against schizophrenia_* tables
+      const szCompletion = await checkSchizophreniaInitialCompletion(visitId);
+      total = Object.keys(SCHIZOPHRENIA_INITIAL_TABLES).length;
+      totalModules = 4; // Nurse, Hetero, Medical, Addictologique
+      completed = Object.values(szCompletion).filter(Boolean).length;
     } else {
-      // Non-bipolar initial evaluation - use legacy tables
+      // Other pathologies - use legacy tables
       // 9 ETAT + 9 TRAITS + 7 HETERO + 1 SOCIAL + 6 INFIRMIER + 4 DSM5 + 1 Family + 4 Suicide + 10 Histoire Somatique + 4 WAIS-4 = 55
       total = 55;
       totalModules = 7;
@@ -1460,32 +1470,70 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
 
   const completionMap = new Map<string, { completionPercentage: number; completedQuestionnaires: number; totalQuestionnaires: number }>();
 
-  // Process screening visits (using new public.bipolar_* tables)
+  // Process screening visits - need to separate by pathology
   if (screeningVisits.length > 0) {
     const screeningIds = screeningVisits.map(v => v.id);
     
-    const [asrmResults, qidsResults, mdqResults, diagResults, orientResults] = await Promise.all([
-      supabase.from('bipolar_asrm').select('visit_id').in('visit_id', screeningIds),
-      supabase.from('bipolar_qids_sr16').select('visit_id').in('visit_id', screeningIds),
-      supabase.from('bipolar_mdq').select('visit_id').in('visit_id', screeningIds),
-      supabase.from('bipolar_diagnostic').select('visit_id').in('visit_id', screeningIds),
-      supabase.from('bipolar_orientation').select('visit_id').in('visit_id', screeningIds)
-    ]);
+    // Fetch patient pathology for each screening visit
+    const { data: visitPatients } = await supabase
+      .from('visits')
+      .select('id, patients!inner(pathology_type)')
+      .in('id', screeningIds);
+    
+    const visitPathologyMap = new Map<string, string>();
+    visitPatients?.forEach((vp: any) => {
+      visitPathologyMap.set(vp.id, vp.patients?.pathology_type || 'bipolar');
+    });
+    
+    const bipolarScreeningIds = screeningIds.filter(id => visitPathologyMap.get(id) !== 'schizophrenia');
+    const szScreeningIds = screeningIds.filter(id => visitPathologyMap.get(id) === 'schizophrenia');
+    
+    // Process bipolar screening visits (5 questionnaires: ASRM, QIDS, MDQ, Diag, Orient)
+    if (bipolarScreeningIds.length > 0) {
+      const [asrmResults, qidsResults, mdqResults, diagResults, orientResults] = await Promise.all([
+        supabase.from('bipolar_asrm').select('visit_id').in('visit_id', bipolarScreeningIds),
+        supabase.from('bipolar_qids_sr16').select('visit_id').in('visit_id', bipolarScreeningIds),
+        supabase.from('bipolar_mdq').select('visit_id').in('visit_id', bipolarScreeningIds),
+        supabase.from('bipolar_diagnostic').select('visit_id').in('visit_id', bipolarScreeningIds),
+        supabase.from('bipolar_orientation').select('visit_id').in('visit_id', bipolarScreeningIds)
+      ]);
 
-    const asrmSet = new Set(asrmResults.data?.map(r => r.visit_id) || []);
-    const qidsSet = new Set(qidsResults.data?.map(r => r.visit_id) || []);
-    const mdqSet = new Set(mdqResults.data?.map(r => r.visit_id) || []);
-    const diagSet = new Set(diagResults.data?.map(r => r.visit_id) || []);
-    const orientSet = new Set(orientResults.data?.map(r => r.visit_id) || []);
+      const asrmSet = new Set(asrmResults.data?.map(r => r.visit_id) || []);
+      const qidsSet = new Set(qidsResults.data?.map(r => r.visit_id) || []);
+      const mdqSet = new Set(mdqResults.data?.map(r => r.visit_id) || []);
+      const diagSet = new Set(diagResults.data?.map(r => r.visit_id) || []);
+      const orientSet = new Set(orientResults.data?.map(r => r.visit_id) || []);
 
-    for (const visit of screeningVisits) {
-      const completed = [asrmSet, qidsSet, mdqSet, diagSet, orientSet].filter(set => set.has(visit.id)).length;
-      const total = 5;
-      completionMap.set(visit.id, {
-        completedQuestionnaires: completed,
-        totalQuestionnaires: total,
-        completionPercentage: total > 0 ? Math.round((completed / total) * 100) : 0
-      });
+      for (const visitId of bipolarScreeningIds) {
+        const completed = [asrmSet, qidsSet, mdqSet, diagSet, orientSet].filter(set => set.has(visitId)).length;
+        const total = 5;
+        completionMap.set(visitId, {
+          completedQuestionnaires: completed,
+          totalQuestionnaires: total,
+          completionPercentage: total > 0 ? Math.round((completed / total) * 100) : 0
+        });
+      }
+    }
+    
+    // Process schizophrenia screening visits (2 questionnaires: Diagnostic, Orientation)
+    if (szScreeningIds.length > 0) {
+      const [szDiagResults, szOrientResults] = await Promise.all([
+        supabase.from('schizophrenia_screening_diagnostic').select('visit_id').in('visit_id', szScreeningIds),
+        supabase.from('schizophrenia_screening_orientation').select('visit_id').in('visit_id', szScreeningIds)
+      ]);
+
+      const szDiagSet = new Set(szDiagResults.data?.map(r => r.visit_id) || []);
+      const szOrientSet = new Set(szOrientResults.data?.map(r => r.visit_id) || []);
+
+      for (const visitId of szScreeningIds) {
+        const completed = [szDiagSet, szOrientSet].filter(set => set.has(visitId)).length;
+        const total = 2;
+        completionMap.set(visitId, {
+          completedQuestionnaires: completed,
+          totalQuestionnaires: total,
+          completionPercentage: total > 0 ? Math.round((completed / total) * 100) : 0
+        });
+      }
     }
   }
 
