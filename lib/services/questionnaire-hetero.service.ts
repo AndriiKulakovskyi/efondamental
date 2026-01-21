@@ -436,6 +436,8 @@ export async function saveAldaResponse(
         qb3: null,
         qb4: null,
         qb5: null,
+        score_a: null,
+        score_b: null,
         b_total_score: null,
         alda_score: null,
         interpretation: 'Patient non traité par lithium - questionnaire non applicable',
@@ -448,38 +450,52 @@ export async function saveAldaResponse(
     return data;
   }
 
-  // Calculate B total score (sum of B1-B5)
-  const bItems = [response.qb1, response.qb2, response.qb3, response.qb4, response.qb5];
-  const bTotalScore = bItems.reduce((sum: number, item) => sum + (item ?? 0), 0);
-
-  // Get Score A
+  // Score A: Clinical response to lithium (0-10)
+  // This is a synthetic clinical judgment based on:
+  // - Reduction in frequency of mood episodes
+  // - Reduction in severity
+  // - Improvement in functioning
+  // - Longitudinal stability on lithium
   const scoreA = response.qa ?? 0;
 
-  // Calculate Total Score with special rules:
-  // 1) If Score A < 7, Total Score = 0
-  // 2) Total Score = MAX(0, A - B)
-  let aldaScore = 0;
-  if (scoreA >= 7) {
-    aldaScore = Math.max(0, scoreA - bTotalScore);
-  }
+  // Score B: Confounding factors (0-10)
+  // Sum of 5 items, each rated 0-2:
+  // B1: Insufficient adherence
+  // B2: Concurrent active treatments
+  // B3: Inadequate duration of lithium treatment
+  // B4: Favorable natural evolution independent of lithium
+  // B5: Insufficient/unreliable clinical data
+  const bItems = [response.qb1, response.qb2, response.qb3, response.qb4, response.qb5];
+  const scoreB = bItems.reduce((sum: number, item) => sum + (item ?? 0), 0);
 
-  // Determine interpretation based on Total Score
+  // Final Alda Score = A - B (minimum 0)
+  // Higher B means attribution to lithium is more fragile
+  const aldaScore = Math.max(0, scoreA - scoreB);
+
+  // Enhanced interpretation based on clinical utility
   let interpretation = '';
+  let clinicalGuidance = '';
+  
   if (aldaScore >= 7 && aldaScore <= 10) {
-    interpretation = 'Bon répondeur (Réponse certaine)';
+    interpretation = 'Bon répondeur au lithium';
+    clinicalGuidance = 'Réponse robuste et spécifique avec peu de facteurs confondants. Profil typique de "lithium responder". Le lithium doit être maintenu comme traitement de référence.';
   } else if (aldaScore >= 4 && aldaScore <= 6) {
-    interpretation = 'Répondeur partiel / Réponse possible';
+    interpretation = 'Réponse partielle / intermédiaire';
+    clinicalGuidance = 'Bénéfice clinique probable mais attribution partielle au lithium. Peut justifier une poursuite ou une optimisation du traitement (dosage, observance). Évaluer si le lithium reste pertinent en association.';
   } else {
-    interpretation = 'Non-répondeur / Réponse improbable';
+    interpretation = 'Mauvais ou non-répondeur';
+    clinicalGuidance = 'Absence de bénéfice clair ou amélioration non attribuable au lithium. Intérêt limité du lithium en monothérapie. Considérer des alternatives thérapeutiques ou une réévaluation diagnostique.';
   }
 
   const { data, error } = await supabase
     .from('bipolar_alda')
     .upsert({
       ...response,
-      b_total_score: bTotalScore,
+      score_a: scoreA,
+      score_b: scoreB,
+      b_total_score: scoreB, // Backward compatibility
       alda_score: aldaScore,
-      interpretation,
+      interpretation: `${interpretation} (Score: ${aldaScore}/10). ${clinicalGuidance}`,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

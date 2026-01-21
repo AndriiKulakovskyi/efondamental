@@ -457,20 +457,116 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
 
         {/* ALDA Details */}
         {code === 'ALDA' && data.q0 === 1 && (
-          <div className="text-sm space-y-2 mt-2 pt-2 border-t">
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Score A (Amélioration):</span>
-                <span className="font-semibold">{data.qa ?? '-'}/10</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Score B (Confusions):</span>
-                <span className="font-semibold">{data.b_total_score ?? '-'}/10</span>
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Clinical Description */}
+            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
+              <p className="text-blue-900 text-xs leading-relaxed">
+                L'échelle d'Alda est un outil rétrospectif conçu pour estimer dans quelle mesure l'amélioration clinique peut être attribuée spécifiquement au lithium, en tenant compte des facteurs de confusion (observance, traitements concomitants, évolution naturelle).
+              </p>
+            </div>
+
+            {/* Score Interpretation */}
+            <div className={`p-3 rounded-lg ${
+              data.alda_score !== null && data.alda_score >= 7
+                ? 'bg-green-50 border border-green-200'
+                : data.alda_score !== null && data.alda_score >= 4
+                ? 'bg-blue-50 border border-blue-200'
+                : 'bg-amber-50 border border-amber-200'
+            }`}>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-base">
+                    {data.alda_score !== null && data.alda_score >= 7 && 'Bon répondeur au lithium'}
+                    {data.alda_score !== null && data.alda_score >= 4 && data.alda_score <= 6 && 'Réponse partielle / intermédiaire'}
+                    {data.alda_score !== null && data.alda_score >= 0 && data.alda_score <= 3 && 'Mauvais ou non-répondeur'}
+                  </span>
+                  <span className="text-xs text-gray-600 font-medium">Score Total: {data.alda_score ?? '-'}/10</span>
+                </div>
+                
+                {/* Clinical Guidance */}
+                <div className="pt-2 border-t">
+                  <p className="text-xs leading-relaxed text-gray-700">
+                    {data.alda_score !== null && data.alda_score >= 7 && (
+                      <>Réponse <strong className="text-green-700">robuste et spécifique</strong> avec peu de facteurs confondants. Profil typique de "lithium responder". Le lithium doit être maintenu comme traitement de référence.</>
+                    )}
+                    {data.alda_score !== null && data.alda_score >= 4 && data.alda_score <= 6 && (
+                      <>Bénéfice clinique <strong className="text-blue-700">probable mais attribution partielle</strong> au lithium. Peut justifier une poursuite ou une optimisation du traitement (dosage, observance). Évaluer si le lithium reste pertinent en association.</>
+                    )}
+                    {data.alda_score !== null && data.alda_score >= 0 && data.alda_score <= 3 && (
+                      <><strong className="text-amber-700">Absence de bénéfice clair</strong> ou amélioration non attribuable au lithium. Intérêt limité du lithium en monothérapie. Considérer des alternatives thérapeutiques ou une réévaluation diagnostique.</>
+                    )}
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="flex justify-between pt-2 border-t">
-              <span className="text-gray-600 font-medium">Score Total (A - B):</span>
-              <span className="font-bold text-lg">{data.alda_score ?? '-'}/10</span>
+
+            {/* Score A and Score B Details */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Composition du score</h5>
+              <div className="space-y-3">
+                {/* Score A */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-gray-700 font-medium">Score A - Réponse clinique au lithium:</span>
+                    <span className="font-bold text-lg">{data.qa ?? data.score_a ?? '-'}/10</span>
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    Jugement clinique synthétique basé sur la réduction de la fréquence et sévérité des épisodes, l'amélioration du fonctionnement, et la stabilité sous lithium.
+                  </p>
+                  <div className="text-xs text-gray-500 mt-2">
+                    <p>0 = aucune réponse | 1-3 = minime | 4-6 = modérée | 7-9 = marquée | 10 = excellente</p>
+                  </div>
+                </div>
+
+                {/* Score B */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-gray-700 font-medium">Score B - Facteurs confondants:</span>
+                    <span className="font-bold text-lg">{data.b_total_score ?? data.score_b ?? '-'}/10</span>
+                  </div>
+                  <p className="text-xs text-gray-600 mb-2">
+                    Plus le score B est élevé, moins l'amélioration peut être attribuée au lithium seul.
+                  </p>
+                  <div className="grid grid-cols-1 gap-1 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">B1 - Observance insuffisante:</span>
+                      <span className="font-medium">{data.qb1 ?? '-'}/2</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">B2 - Traitements concomitants actifs:</span>
+                      <span className="font-medium">{data.qb2 ?? '-'}/2</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">B3 - Durée insuffisante de traitement:</span>
+                      <span className="font-medium">{data.qb3 ?? '-'}/2</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">B4 - Évolution naturelle fluctuante:</span>
+                      <span className="font-medium">{data.qb4 ?? '-'}/2</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">B5 - Données cliniques insuffisantes:</span>
+                      <span className="font-medium">{data.qb5 ?? '-'}/2</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Final Calculation */}
+                <div className="p-2 bg-blue-50 rounded border border-blue-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700 font-semibold">Score Total d'Alda = A - B:</span>
+                    <span className="font-bold text-xl text-blue-700">{data.alda_score ?? '-'}/10</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Interpretation Guide */}
+            <div className="text-xs text-gray-500 pt-2 border-t space-y-1">
+              <p><strong>Interprétation clinique :</strong></p>
+              <p>• <strong>7-10 :</strong> Bon répondeur - Réponse robuste, maintenir le lithium</p>
+              <p>• <strong>4-6 :</strong> Réponse partielle - Optimisation ou association possible</p>
+              <p>• <strong>0-3 :</strong> Non-répondeur - Alternatives thérapeutiques à considérer</p>
             </div>
           </div>
         )}

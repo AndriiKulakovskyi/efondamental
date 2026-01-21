@@ -1063,7 +1063,9 @@ export interface AldaResponse {
   qb3?: number | null; // Criterion B3: 0-2
   qb4?: number | null; // Criterion B4: 0-2
   qb5?: number | null; // Criterion B5: 0-2
-  b_total_score?: number | null; // Sum of B1-B5
+  score_a?: number | null; // Score A: Clinical response (0-10)
+  score_b?: number | null; // Score B: Confounding factors (0-10)
+  b_total_score?: number | null; // Sum of B1-B5 (backward compatibility)
   alda_score?: number | null; // Total Score = A - B (with rules)
   interpretation?: string | null;
   completed_by?: string | null;
@@ -1071,7 +1073,7 @@ export interface AldaResponse {
   created_at: string;
   updated_at: string;
 }
-export type AldaResponseInsert = Omit<AldaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'b_total_score' | 'alda_score' | 'interpretation'>;
+export type AldaResponseInsert = Omit<AldaResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'score_a' | 'score_b' | 'b_total_score' | 'alda_score' | 'interpretation'>;
 
 // Etat du patient (Patient State - DSM-IV Symptoms)
 export interface EtatPatientResponse {
