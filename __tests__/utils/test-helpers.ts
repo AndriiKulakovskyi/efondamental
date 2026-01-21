@@ -16,8 +16,9 @@ import {
 // Bipolar pathology ID from the pathologies table
 const BIPOLAR_PATHOLOGY_ID = '6971860c-9efb-4216-b0a8-2e7132c720a0';
 
-// Bipolar screening visit template ID from the visit_templates table
+// Bipolar visit template IDs from the visit_templates table
 const BIPOLAR_SCREENING_TEMPLATE_ID = '189ab339-f6c8-4631-9aa7-48de8aee00dd';
+const BIPOLAR_INITIAL_EVAL_TEMPLATE_ID = '3892be8a-dd46-415a-a3fc-206d77a983b0';
 
 export interface TestPatientData {
   id: string;
@@ -134,7 +135,7 @@ export async function setupTestContext(): Promise<TestContext> {
 // ============================================================================
 
 /**
- * Cleans up all test data created for a specific visit
+ * Cleans up all test data created for a specific screening visit
  */
 export async function cleanupTestVisitData(
   adminClient: SupabaseClient,
@@ -150,6 +151,35 @@ export async function cleanupTestVisitData(
   ];
 
   for (const table of tables) {
+    const { error } = await adminClient
+      .from(table)
+      .delete()
+      .eq('visit_id', visitId);
+
+    if (error) {
+      console.warn(`Warning: Failed to delete from ${table}: ${error.message}`);
+    }
+  }
+}
+
+/**
+ * Cleans up all nurse module data for a specific initial evaluation visit
+ */
+export async function cleanupNurseModuleData(
+  adminClient: SupabaseClient,
+  visitId: string
+): Promise<void> {
+  const nurseTables = [
+    'bipolar_nurse_tobacco',
+    'bipolar_nurse_fagerstrom',
+    'bipolar_nurse_physical_params',
+    'bipolar_nurse_blood_pressure',
+    'bipolar_nurse_sleep_apnea',
+    'bipolar_nurse_biological_assessment',
+    'bipolar_nurse_ecg',
+  ];
+
+  for (const table of nurseTables) {
     const { error } = await adminClient
       .from(table)
       .delete()
@@ -367,4 +397,343 @@ export function generateOrientationResponses(options?: {
     accord_evaluation_centre_expert: 'oui',
     accord_transmission_cr: 'oui',
   };
+}
+
+// ============================================================================
+// Nurse Module Mock Response Generators
+// ============================================================================
+
+export type SmokingStatusType = 'non_smoker' | 'current_smoker' | 'ex_smoker' | 'unknown';
+
+/**
+ * Generate valid Tobacco assessment responses
+ * Note: has_substitution is boolean in DB, has_substitution_ex is varchar
+ */
+export function generateTobaccoResponses(options?: {
+  status?: SmokingStatusType;
+  packYears?: number;
+  hasSubstitution?: boolean;
+}): Record<string, string | number | boolean | string[] | null> {
+  const status = options?.status ?? 'non_smoker';
+
+  if (status === 'non_smoker' || status === 'unknown') {
+    return {
+      smoking_status: status,
+    };
+  }
+
+  if (status === 'current_smoker') {
+    const responses: Record<string, string | number | boolean | string[] | null> = {
+      smoking_status: 'current_smoker',
+      pack_years: options?.packYears ?? 10,
+      smoking_start_age: '18',
+      has_substitution: options?.hasSubstitution ?? false, // boolean in DB
+    };
+    if (options?.hasSubstitution) {
+      responses.substitution_methods = ['e_cigarette', 'patch'];
+    }
+    return responses;
+  }
+
+  // ex_smoker
+  const responses: Record<string, string | number | boolean | string[] | null> = {
+    smoking_status: 'ex_smoker',
+    pack_years_ex: options?.packYears ?? 15,
+    smoking_start_age_ex: '16',
+    smoking_end_age: '35',
+    has_substitution_ex: options?.hasSubstitution ? 'yes' : 'no', // varchar in DB
+  };
+  if (options?.hasSubstitution) {
+    responses.substitution_methods_ex = ['patch', 'nicorette'];
+  }
+  return responses;
+}
+
+export type DependenceLevelType = 'none' | 'low' | 'moderate' | 'high' | 'very_high';
+
+/**
+ * Generate valid Fagerstrom responses for given dependence level
+ * Score ranges: none (0-2), low (3-4), moderate (5), high (6-7), very_high (8-10)
+ */
+export function generateFagerstromResponses(options?: {
+  dependenceLevel?: DependenceLevelType;
+  targetScore?: number;
+}): Record<string, number> {
+  // Target scores for each level
+  const levelScores: Record<DependenceLevelType, number> = {
+    none: 1,
+    low: 4,
+    moderate: 5,
+    high: 7,
+    very_high: 9,
+  };
+
+  const targetScore = options?.targetScore ?? levelScores[options?.dependenceLevel ?? 'moderate'];
+
+  // Score distribution based on target
+  // q1: 0-3, q2: 0-1, q3: 0-1, q4: 0-3, q5: 0-1, q6: 0-1
+  // Max: 3+1+1+3+1+1 = 10
+  if (targetScore <= 2) {
+    return { q1: 0, q2: 0, q3: 0, q4: 0, q5: 1, q6: targetScore > 0 ? 1 : 0 };
+  }
+  if (targetScore <= 4) {
+    return { q1: 1, q2: 1, q3: 0, q4: 1, q5: targetScore === 4 ? 1 : 0, q6: 0 };
+  }
+  if (targetScore === 5) {
+    return { q1: 1, q2: 1, q3: 1, q4: 1, q5: 1, q6: 0 };
+  }
+  if (targetScore <= 7) {
+    return { q1: 2, q2: 1, q3: 1, q4: 2, q5: targetScore === 7 ? 1 : 0, q6: 0 };
+  }
+  // targetScore 8-10
+  return { q1: 3, q2: 1, q3: 1, q4: 3, q5: 1, q6: targetScore >= 10 ? 1 : 0 };
+}
+
+export type BMICategoryType = 'underweight' | 'normal' | 'overweight' | 'obese';
+
+/**
+ * Generate valid Physical Parameters responses
+ */
+export function generatePhysicalParamsResponses(options?: {
+  bmiCategory?: BMICategoryType;
+  heightCm?: number;
+  weightKg?: number;
+  pregnant?: boolean;
+}): Record<string, number | string | null> {
+  // Default values for normal BMI (height 175cm, weight 70kg -> BMI ~22.9)
+  let heightCm = options?.heightCm ?? 175;
+  let weightKg = options?.weightKg;
+
+  if (!weightKg) {
+    // Calculate weight based on desired BMI category
+    const heightM = heightCm / 100;
+    switch (options?.bmiCategory) {
+      case 'underweight':
+        weightKg = Math.round(17 * heightM * heightM); // BMI ~17
+        break;
+      case 'overweight':
+        weightKg = Math.round(27 * heightM * heightM); // BMI ~27
+        break;
+      case 'obese':
+        weightKg = Math.round(35 * heightM * heightM); // BMI ~35
+        break;
+      default:
+        weightKg = Math.round(22.5 * heightM * heightM); // BMI ~22.5 (normal)
+    }
+  }
+
+  const responses: Record<string, number | string | null> = {
+    height_cm: heightCm,
+    weight_kg: weightKg,
+    abdominal_circumference_cm: options?.bmiCategory === 'obese' ? 110 : 85,
+  };
+
+  if (options?.pregnant !== undefined) {
+    responses.pregnant = options.pregnant ? 'Oui' : 'Non';
+  }
+
+  return responses;
+}
+
+/**
+ * Generate valid Blood Pressure responses
+ */
+export function generateBloodPressureResponses(options?: {
+  hasOrthostaticHypotension?: boolean;
+  hypertension?: boolean;
+}): Record<string, number> {
+  if (options?.hasOrthostaticHypotension) {
+    // Orthostatic hypotension: drop >= 20 systolic or >= 10 diastolic
+    return {
+      bp_lying_systolic: 130,
+      bp_lying_diastolic: 85,
+      heart_rate_lying: 72,
+      bp_standing_systolic: 105, // Drop of 25
+      bp_standing_diastolic: 70, // Drop of 15
+      heart_rate_standing: 88,
+    };
+  }
+
+  if (options?.hypertension) {
+    return {
+      bp_lying_systolic: 160,
+      bp_lying_diastolic: 100,
+      heart_rate_lying: 78,
+      bp_standing_systolic: 155,
+      bp_standing_diastolic: 95,
+      heart_rate_standing: 82,
+    };
+  }
+
+  // Normal BP
+  return {
+    bp_lying_systolic: 120,
+    bp_lying_diastolic: 78,
+    heart_rate_lying: 68,
+    bp_standing_systolic: 118,
+    bp_standing_diastolic: 76,
+    heart_rate_standing: 72,
+  };
+}
+
+export type SleepApneaRiskType = 'low' | 'intermediate' | 'high';
+
+/**
+ * Generate valid Sleep Apnea responses
+ * Note: Most STOP-Bang fields are boolean in DB, diagnosed_sleep_apnea is varchar
+ */
+export function generateSleepApneaResponses(options?: {
+  diagnosed?: boolean;
+  hasCpap?: boolean;
+  riskLevel?: SleepApneaRiskType;
+  gender?: 'M' | 'F';
+}): Record<string, string | boolean> {
+  if (options?.diagnosed) {
+    return {
+      diagnosed_sleep_apnea: 'yes',
+      has_cpap_device: options.hasCpap ?? false, // boolean in DB
+    };
+  }
+
+  // Not diagnosed - use STOP-Bang questionnaire
+  // Score 0-2 = low, 3-4 = intermediate, 5-8 = high
+  const riskLevel = options?.riskLevel ?? 'low';
+  const isMale = options?.gender === 'M';
+
+  if (riskLevel === 'low') {
+    return {
+      diagnosed_sleep_apnea: 'no',
+      snoring: false,
+      tiredness: false,
+      observed_apnea: false,
+      hypertension: false,
+      bmi_over_35: false,
+      age_over_50: false,
+      large_neck: false,
+      male_gender: isMale, // boolean in DB
+    };
+  }
+
+  if (riskLevel === 'intermediate') {
+    return {
+      diagnosed_sleep_apnea: 'no',
+      snoring: true,
+      tiredness: true,
+      observed_apnea: false,
+      hypertension: true,
+      bmi_over_35: false,
+      age_over_50: false,
+      large_neck: false,
+      male_gender: isMale, // boolean in DB
+    };
+  }
+
+  // High risk
+  return {
+    diagnosed_sleep_apnea: 'no',
+    snoring: true,
+    tiredness: true,
+    observed_apnea: true,
+    hypertension: true,
+    bmi_over_35: true,
+    age_over_50: true,
+    large_neck: false,
+    male_gender: isMale, // boolean in DB
+  };
+}
+
+/**
+ * Generate valid Biological Assessment responses
+ */
+export function generateBiologicalAssessmentResponses(options?: {
+  hasDiabetesRisk?: boolean;
+  hasLipidAbnormality?: boolean;
+  includeCalculatedFields?: boolean;
+}): Record<string, string | number | null> {
+  const responses: Record<string, string | number | null> = {
+    collection_date: new Date().toISOString().split('T')[0],
+    collection_location: 'sur_site',
+    treatment_taken_morning: 'no',
+    // Basic biochemistry
+    sodium: 140,
+    potassium: 4.2,
+    chlore: 102,
+    creatinine: 85,
+    // Lipid panel
+    hdl: 1.5,
+    hdl_unit: 'mmol_L',
+    ldl: 3.2,
+    ldl_unit: 'mmol_L',
+    cholesterol_total: options?.hasLipidAbnormality ? 7.0 : 5.2,
+    triglycerides: options?.hasLipidAbnormality ? 2.5 : 1.1,
+    // Thyroid
+    tsh: 2.5,
+    tsh_unit: 'mUI_L',
+    // NFS
+    leucocytes: 7.5,
+    hematies: 4.8,
+    hemoglobine: 14.2,
+    hemoglobine_unit: 'g_dL',
+    plaquettes: 250,
+    // Liver
+    asat: 25,
+    alat: 30,
+    ggt: 40,
+  };
+
+  if (options?.hasDiabetesRisk) {
+    responses.glycemie_a_jeun = 8.5;
+    responses.glycemie_a_jeun_unit = 'mmol_L';
+    responses.hemoglobine_glyquee = 7.2;
+  } else {
+    responses.glycemie_a_jeun = 5.2;
+    responses.glycemie_a_jeun_unit = 'mmol_L';
+  }
+
+  if (options?.includeCalculatedFields) {
+    // For testing calculated fields
+    responses.calcemie = 2.35;
+    responses.protidemie = 72;
+  }
+
+  return responses;
+}
+
+/**
+ * Generate valid ECG responses
+ */
+export function generateEcgResponses(options?: {
+  performed?: boolean;
+  prolongedQTc?: boolean;
+  gender?: 'M' | 'F';
+}): Record<string, string | number | null> {
+  if (options?.performed === false) {
+    return {
+      ecg_performed: 'no',
+    };
+  }
+
+  // ECG performed
+  const responses: Record<string, string | number | null> = {
+    ecg_performed: 'yes',
+    heart_rate: 72,
+    ecg_sent_to_cardiologist: 'no',
+    cardiologist_consultation_requested: 'no',
+  };
+
+  if (options?.prolongedQTc) {
+    // QT and RR values that result in prolonged QTc
+    // QTc = QT / sqrt(RR)
+    // For prolonged: QTc > 0.43 (M) or > 0.48 (F)
+    // With RR = 0.85 (sqrt = 0.922), QT = 0.45 -> QTc = 0.488
+    responses.qt_measured = 0.45;
+    responses.rr_measured = 0.85;
+  } else {
+    // Normal QTc
+    // With RR = 0.85, QT = 0.38 -> QTc = 0.412 (normal)
+    responses.qt_measured = 0.38;
+    responses.rr_measured = 0.85;
+  }
+
+  return responses;
 }

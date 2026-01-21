@@ -35,8 +35,9 @@ const TEST_PATIENT = {
 // Bipolar pathology ID from the pathologies table
 const BIPOLAR_PATHOLOGY_ID = '6971860c-9efb-4216-b0a8-2e7132c720a0';
 
-// Bipolar screening visit template ID from the visit_templates table
+// Bipolar visit template IDs from the visit_templates table
 const BIPOLAR_SCREENING_TEMPLATE_ID = '189ab339-f6c8-4631-9aa7-48de8aee00dd';
+const BIPOLAR_INITIAL_EVAL_TEMPLATE_ID = '3892be8a-dd46-415a-a3fc-206d77a983b0';
 
 // Use existing seed user
 const TEST_PROFESSIONAL_EMAIL = 'doctor.paris@fondamental.fr';
@@ -188,7 +189,7 @@ async function createScreeningVisit(
     console.log(`Found existing screening visit: ${existing.id}`);
     
     // Reset the visit for fresh testing
-    await resetVisitData(client, existing.id);
+    await resetScreeningVisitData(client, existing.id);
     
     return existing;
   }
@@ -215,8 +216,8 @@ async function createScreeningVisit(
   return data;
 }
 
-async function resetVisitData(client: SupabaseClient, visitId: string): Promise<void> {
-  console.log('Resetting visit data for fresh testing...');
+async function resetScreeningVisitData(client: SupabaseClient, visitId: string): Promise<void> {
+  console.log('Resetting screening visit data for fresh testing...');
 
   // Delete all questionnaire responses for this visit
   const tables = [
@@ -249,7 +250,105 @@ async function resetVisitData(client: SupabaseClient, visitId: string): Promise<
     })
     .eq('id', visitId);
 
-  console.log('Visit data reset complete.');
+  console.log('Screening visit data reset complete.');
+}
+
+async function findExistingInitialEvalVisit(
+  client: SupabaseClient,
+  patientId: string
+): Promise<{ id: string } | null> {
+  const { data, error } = await client
+    .from('visits')
+    .select('id')
+    .eq('patient_id', patientId)
+    .eq('visit_type', 'initial_evaluation')
+    .neq('status', 'cancelled')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error && error.code !== 'PGRST116') {
+    console.warn('Warning checking for existing initial eval visit:', error.message);
+  }
+
+  return data;
+}
+
+async function createInitialEvalVisit(
+  client: SupabaseClient,
+  patientId: string,
+  professionalId: string
+): Promise<{ id: string }> {
+  // Check for existing initial evaluation visit
+  const existing = await findExistingInitialEvalVisit(client, patientId);
+  if (existing) {
+    console.log(`Found existing initial evaluation visit: ${existing.id}`);
+    
+    // Reset the visit for fresh testing
+    await resetInitialEvalVisitData(client, existing.id);
+    
+    return existing;
+  }
+
+  const { data, error } = await client
+    .from('visits')
+    .insert({
+      patient_id: patientId,
+      visit_type: 'initial_evaluation',
+      visit_template_id: BIPOLAR_INITIAL_EVAL_TEMPLATE_ID,
+      status: 'in_progress',
+      scheduled_date: new Date().toISOString(),
+      conducted_by: professionalId,
+      created_by: professionalId,
+    })
+    .select('id')
+    .single();
+
+  if (error || !data) {
+    throw new Error(`Failed to create initial evaluation visit: ${error?.message || 'No data'}`);
+  }
+
+  console.log(`Created initial evaluation visit: ${data.id}`);
+  return data;
+}
+
+async function resetInitialEvalVisitData(client: SupabaseClient, visitId: string): Promise<void> {
+  console.log('Resetting initial evaluation visit data for fresh testing...');
+
+  // Delete all nurse module questionnaire responses for this visit
+  const nurseTables = [
+    'bipolar_nurse_tobacco',
+    'bipolar_nurse_fagerstrom',
+    'bipolar_nurse_physical_params',
+    'bipolar_nurse_blood_pressure',
+    'bipolar_nurse_sleep_apnea',
+    'bipolar_nurse_biological_assessment',
+    'bipolar_nurse_ecg',
+  ];
+
+  for (const table of nurseTables) {
+    const { error } = await client
+      .from(table)
+      .delete()
+      .eq('visit_id', visitId);
+
+    if (error) {
+      console.warn(`  Warning deleting from ${table}: ${error.message}`);
+    }
+  }
+
+  // Reset visit status (initial eval has many more questionnaires)
+  await client
+    .from('visits')
+    .update({
+      status: 'in_progress',
+      completion_percentage: 0,
+      completed_questionnaires: 0,
+      total_questionnaires: 55, // Approximate for bipolar initial eval
+    })
+    .eq('id', visitId);
+
+  console.log('Initial evaluation visit data reset complete.');
 }
 
 // ============================================================================
@@ -286,8 +385,14 @@ async function main() {
     // Create or get screening visit
     console.log('');
     console.log('Setting up screening visit...');
-    const visit = await createScreeningVisit(client, patient.id, professionalId);
-    console.log(`  Visit ID: ${visit.id}`);
+    const screeningVisit = await createScreeningVisit(client, patient.id, professionalId);
+    console.log(`  Screening Visit ID: ${screeningVisit.id}`);
+
+    // Create or get initial evaluation visit
+    console.log('');
+    console.log('Setting up initial evaluation visit...');
+    const initialEvalVisit = await createInitialEvalVisit(client, patient.id, professionalId);
+    console.log(`  Initial Evaluation Visit ID: ${initialEvalVisit.id}`);
 
     // Output summary
     console.log('');
@@ -299,7 +404,8 @@ async function main() {
     console.log('');
     console.log(`  CENTER_ID=${centerId}`);
     console.log(`  PATIENT_ID=${patient.id}`);
-    console.log(`  VISIT_ID=${visit.id}`);
+    console.log(`  SCREENING_VISIT_ID=${screeningVisit.id}`);
+    console.log(`  INITIAL_EVAL_VISIT_ID=${initialEvalVisit.id}`);
     console.log(`  PROFESSIONAL_ID=${professionalId}`);
     console.log('');
     console.log('Test user credentials:');
@@ -315,7 +421,12 @@ async function main() {
       centerId,
       patientId: patient.id,
       patientMrn: patient.medical_record_number,
-      visitId: visit.id,
+      patientGender: TEST_PATIENT.gender,
+      // Legacy field for backwards compatibility with screening tests
+      visitId: screeningVisit.id,
+      // New fields for specific visit types
+      screeningVisitId: screeningVisit.id,
+      initialEvalVisitId: initialEvalVisit.id,
       professionalId: professionalId,
       professionalEmail: TEST_PROFESSIONAL_EMAIL,
     };

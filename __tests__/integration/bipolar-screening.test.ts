@@ -636,4 +636,238 @@ describe('Bipolar Screening Integration Tests', () => {
       expect(data?.[0]?.total_score).toBe(10); // Should be updated value
     });
   });
+
+  // ============================================================================
+  // Computed Fields Verification
+  // ============================================================================
+
+  describe('Computed Fields Verification', () => {
+    it('should verify QIDS computed fields match service layer calculation', async () => {
+      // Read the QIDS response that was submitted earlier in the test suite
+      const { data: submitted } = await context.adminClient
+        .from('bipolar_qids_sr16')
+        .select('*')
+        .eq('visit_id', context.visit.id)
+        .single();
+
+      expect(submitted).toBeDefined();
+      expect(submitted.total_score).toBeDefined();
+      expect(submitted.interpretation).toBeDefined();
+
+      // Compute expected values using scoring functions with the same inputs
+      const expected = scoreQids({
+        q1: submitted.q1,
+        q2: submitted.q2,
+        q3: submitted.q3,
+        q4: submitted.q4,
+        q5: submitted.q5,
+        q6: submitted.q6,
+        q7: submitted.q7,
+        q8: submitted.q8,
+        q9: submitted.q9,
+        q10: submitted.q10,
+        q11: submitted.q11,
+        q12: submitted.q12,
+        q13: submitted.q13,
+        q14: submitted.q14,
+        q15: submitted.q15,
+        q16: submitted.q16,
+      });
+
+      // Verify total_score matches
+      expect(submitted.total_score).toBe(expected.total_score);
+      
+      // Verify interpretation matches
+      expect(submitted.interpretation).toBe(expected.interpretation);
+      
+      // Verify severity category
+      expect(submitted.total_score).toBeGreaterThanOrEqual(0);
+      expect(submitted.total_score).toBeLessThanOrEqual(27);
+    });
+
+    it('should verify MDQ computed fields match service layer calculation', async () => {
+      // Read the MDQ response that was submitted earlier
+      const { data: submitted } = await context.adminClient
+        .from('bipolar_mdq')
+        .select('*')
+        .eq('visit_id', context.visit.id)
+        .single();
+
+      expect(submitted).toBeDefined();
+      expect(submitted.q1_score).toBeDefined();
+      expect(submitted.interpretation).toBeDefined();
+
+      // Compute expected values
+      const expected = scoreMdq({
+        q1_1: submitted.q1_1,
+        q1_2: submitted.q1_2,
+        q1_3: submitted.q1_3,
+        q1_4: submitted.q1_4,
+        q1_5: submitted.q1_5,
+        q1_6: submitted.q1_6,
+        q1_7: submitted.q1_7,
+        q1_8: submitted.q1_8,
+        q1_9: submitted.q1_9,
+        q1_10: submitted.q1_10,
+        q1_11: submitted.q1_11,
+        q1_12: submitted.q1_12,
+        q1_13: submitted.q1_13,
+        q2: submitted.q2,
+        q3: submitted.q3,
+      });
+
+      // Verify q1_score matches
+      expect(submitted.q1_score).toBe(expected.q1_score);
+      
+      // Verify is_positive logic
+      const expectedPositive = isMdqPositive({
+        q1_1: submitted.q1_1,
+        q1_2: submitted.q1_2,
+        q1_3: submitted.q1_3,
+        q1_4: submitted.q1_4,
+        q1_5: submitted.q1_5,
+        q1_6: submitted.q1_6,
+        q1_7: submitted.q1_7,
+        q1_8: submitted.q1_8,
+        q1_9: submitted.q1_9,
+        q1_10: submitted.q1_10,
+        q1_11: submitted.q1_11,
+        q1_12: submitted.q1_12,
+        q1_13: submitted.q1_13,
+        q2: submitted.q2,
+        q3: submitted.q3,
+      });
+      if (expectedPositive) {
+        expect(submitted.interpretation).toContain('Positif');
+      } else {
+        expect(submitted.interpretation).toContain('Négatif');
+      }
+      
+      // Verify q1_score in valid range
+      expect(submitted.q1_score).toBeGreaterThanOrEqual(0);
+      expect(submitted.q1_score).toBeLessThanOrEqual(13);
+    });
+
+    it('should verify ASRM uses generated column for total_score', async () => {
+      // Read the ASRM response that was submitted earlier
+      const { data: submitted } = await context.adminClient
+        .from('bipolar_asrm')
+        .select('*')
+        .eq('visit_id', context.visit.id)
+        .single();
+
+      expect(submitted).toBeDefined();
+      expect(submitted.total_score).toBeDefined();
+
+      // Compute expected score from individual questions
+      const expectedScore = computeAsrmScore({
+        q1: submitted.q1,
+        q2: submitted.q2,
+        q3: submitted.q3,
+        q4: submitted.q4,
+        q5: submitted.q5,
+      });
+      
+      // Verify database-generated total_score matches
+      expect(submitted.total_score).toBe(expectedScore);
+      
+      // Verify interpretation exists
+      expect(submitted.interpretation).toBeDefined();
+      
+      // If interpretation looks like test data, skip validation (Data Integrity test may have modified it)
+      if (!submitted.interpretation.includes('Test')) {
+        const isPositive = submitted.total_score! >= ASRM_CUTOFF;
+        const containsSuggestif = submitted.interpretation!.toLowerCase().includes('suggestif');
+        if (isPositive) {
+          expect(containsSuggestif).toBe(true);
+        }
+      }
+    });
+
+    it('should verify QIDS domain scoring (max logic)', async () => {
+      // Read the QIDS response to verify domain scoring logic
+      const { data: submitted } = await context.adminClient
+        .from('bipolar_qids_sr16')
+        .select('*')
+        .eq('visit_id', context.visit.id)
+        .single();
+
+      expect(submitted).toBeDefined();
+
+      // Manually compute using MAX logic
+      const sleepMax = Math.max(submitted.q1, submitted.q2, submitted.q3, submitted.q4);
+      const appetiteMax = Math.max(submitted.q6, submitted.q7, submitted.q8, submitted.q9);
+      const psychomotorMax = Math.max(submitted.q15, submitted.q16);
+      
+      const expectedTotal = sleepMax + submitted.q5 + appetiteMax +
+        submitted.q10 + submitted.q11 + submitted.q12 + submitted.q13 + submitted.q14 +
+        psychomotorMax;
+
+      // Verify score uses MAX logic, not SUM
+      expect(submitted.total_score).toBe(expectedTotal);
+      
+      // Verify the score is reasonable (not impossibly high)
+      expect(submitted.total_score).toBeGreaterThanOrEqual(0);
+      expect(submitted.total_score).toBeLessThanOrEqual(27);
+    });
+
+    it('should verify MDQ positive screening criteria', async () => {
+      // Read MDQ to verify positive/negative determination
+      const { data: submitted } = await context.adminClient
+        .from('bipolar_mdq')
+        .select('*')
+        .eq('visit_id', context.visit.id)
+        .single();
+
+      expect(submitted).toBeDefined();
+
+      // Verify q1_score is sum of 13 items
+      const computedQ1Score = submitted.q1_1 + submitted.q1_2 + submitted.q1_3 + 
+        submitted.q1_4 + submitted.q1_5 + submitted.q1_6 + submitted.q1_7 + 
+        submitted.q1_8 + submitted.q1_9 + submitted.q1_10 + submitted.q1_11 + 
+        submitted.q1_12 + submitted.q1_13;
+      
+      expect(submitted.q1_score).toBe(computedQ1Score);
+
+      // Verify interpretation follows criteria logic
+      const meetsPositiveCriteria = submitted.q1_score >= 7 && 
+        submitted.q2 === 1 && 
+        submitted.q3 !== null && 
+        submitted.q3 >= 2;
+      
+      if (meetsPositiveCriteria) {
+        expect(submitted.interpretation).toContain('Positif');
+      } else {
+        expect(submitted.interpretation).toContain('Négatif');
+      }
+    });
+
+    it('should verify QIDS severity thresholds', async () => {
+      // Read QIDS and verify interpretation thresholds
+      const { data: submitted } = await context.adminClient
+        .from('bipolar_qids_sr16')
+        .select('*')
+        .eq('visit_id', context.visit.id)
+        .single();
+
+      expect(submitted).toBeDefined();
+      
+      // Verify interpretation matches score thresholds
+      const score = submitted.total_score!;
+      const interp = submitted.interpretation!;
+      
+      // Check that interpretation is consistent with score
+      if (score <= 5) {
+        expect(interp).toContain('Pas de');
+      } else if (score <= 10) {
+        expect(interp).toContain('legere');
+      } else if (score <= 15) {
+        expect(interp).toContain('moderee');
+      } else if (score <= 20) {
+        expect(interp).toContain('severe');
+      } else {
+        expect(interp).toContain('tres severe');
+      }
+    });
+  });
 });
