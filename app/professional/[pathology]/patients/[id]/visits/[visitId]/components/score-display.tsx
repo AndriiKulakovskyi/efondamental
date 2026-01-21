@@ -115,6 +115,17 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'error';
     }
     
+    if (code === 'MADRS') {
+      // MADRS: Total score range 0-60
+      // 0-6: healthy, 7-19: mild, 20-34: moderate, >34: severe
+      const total = data.total_score;
+      if (total === null || total === undefined) return 'info';
+      if (total <= 6) return 'success';  // Healthy
+      if (total <= 19) return 'info';    // Mild depression
+      if (total <= 34) return 'warning'; // Moderate depression
+      return 'error';                    // Severe depression
+    }
+    
     if (code === 'WAIS4_MATRICES') {
       // WAIS-IV Matrices: Standardized score 8-12 is average, <8 is below, >12 is above
       if (data.standardized_score >= 13) return 'success';
@@ -341,6 +352,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'CTI' && 'Résultats CTI - Type Circadien'}
               {code === 'ALDA' && 'Score Alda'}
               {code === 'CGI' && 'Résultats CGI'}
+              {code === 'MADRS' && 'Résultats MADRS - Échelle de Dépression'}
               {code === 'WAIS4_MATRICES' && 'Résultats WAIS-IV Matrices'}
               {code === 'CVLT' && 'Résultats CVLT'}
               {code === 'WAIS4_CODE' && 'Résultats WAIS-IV Code'}
@@ -376,6 +388,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
                 : code === 'CGI'
                 ? (data.cgi_s !== undefined ? data.cgi_s : '-')
+                : code === 'MADRS'
+                ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'WAIS4_MATRICES'
                 ? (data.standardized_score !== undefined ? data.standardized_score : '-')
                 : code === 'CVLT'
@@ -409,6 +423,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'CTI' && '/55'}
               {code === 'ALDA' && '/10'}
               {code === 'CGI' && '/7'}
+              {code === 'MADRS' && '/60'}
               {code === 'WAIS4_MATRICES' && '/19'}
               {code === 'CVLT' && '/80'}
               {code === 'WAIS4_CODE' && '/19'}
@@ -750,6 +765,97 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="text-xs text-gray-600 mt-2 pt-2 border-t space-y-1">
               <p><strong>Echelle:</strong> Score &lt;28 (matinal), 28-37 (intermédiaire), &ge;38 (vespéral)</p>
               <p><strong>Flexibilité:</strong> Capacité d'adaptation aux changements d'horaires. <strong>Languide:</strong> Tendance à la fatigue et au besoin de sommeil.</p>
+            </div>
+          </div>
+        )}
+
+        {/* MADRS Details */}
+        {code === 'MADRS' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Clinical Description */}
+            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
+              <p className="text-blue-900 text-xs leading-relaxed">
+                Cette questionnaire évalue la gravité des symptômes dans des domaines très variés tels que l'humeur, le sommeil et l'appétit, la fatigue physique et psychique et les idées de suicide. L'échelle MADRS constitue un bon complément à l'échelle de dépression de Hamilton.
+              </p>
+            </div>
+
+            {/* Score Interpretation */}
+            <div className={`p-3 rounded-lg ${
+              data.total_score !== null && data.total_score > 34
+                ? 'bg-red-50 border border-red-200'
+                : data.total_score !== null && data.total_score > 19
+                ? 'bg-amber-50 border border-amber-200'
+                : data.total_score !== null && data.total_score > 6
+                ? 'bg-blue-50 border border-blue-200'
+                : 'bg-green-50 border border-green-200'
+            }`}>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">
+                    {data.total_score !== null && data.total_score > 34 && 'Dépression sévère'}
+                    {data.total_score !== null && data.total_score >= 20 && data.total_score <= 34 && 'Dépression moyenne'}
+                    {data.total_score !== null && data.total_score >= 7 && data.total_score <= 19 && 'Dépression légère'}
+                    {data.total_score !== null && data.total_score >= 0 && data.total_score <= 6 && 'Patient considéré comme sain'}
+                  </span>
+                  <span className="text-xs text-gray-600">Score: {data.total_score ?? '-'}/60</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Item Scores */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Scores par item (0-6)</h5>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">1. Tristesse apparente:</span>
+                  <span className="font-medium">{data.q1 ?? '-'}/6</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">2. Tristesse exprimée:</span>
+                  <span className="font-medium">{data.q2 ?? '-'}/6</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">3. Tension intérieure:</span>
+                  <span className="font-medium">{data.q3 ?? '-'}/6</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">4. Réduction du sommeil:</span>
+                  <span className="font-medium">{data.q4 ?? '-'}/6</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">5. Réduction de l'appétit:</span>
+                  <span className="font-medium">{data.q5 ?? '-'}/6</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">6. Difficultés de concentration:</span>
+                  <span className="font-medium">{data.q6 ?? '-'}/6</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">7. Lassitude:</span>
+                  <span className="font-medium">{data.q7 ?? '-'}/6</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">8. Incapacité à ressentir:</span>
+                  <span className="font-medium">{data.q8 ?? '-'}/6</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">9. Pensées pessimistes:</span>
+                  <span className="font-medium">{data.q9 ?? '-'}/6</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">10. Idées de suicide:</span>
+                  <span className="font-medium">{data.q10 ?? '-'}/6</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Scoring Guide */}
+            <div className="text-xs text-gray-500 pt-2 border-t space-y-1">
+              <p><strong>Interprétation:</strong></p>
+              <p>• 0-6 points: Patient considéré comme sain</p>
+              <p>• 7-19 points: Dépression légère</p>
+              <p>• 20-34 points: Dépression moyenne</p>
+              <p>• {'>'} 34 points: Dépression sévère</p>
             </div>
           </div>
         )}

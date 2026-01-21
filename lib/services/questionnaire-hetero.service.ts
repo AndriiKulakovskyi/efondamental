@@ -137,15 +137,17 @@ export async function saveMadrsResponse(
   const totalScore = items.reduce((sum: number, item) => sum + (item ?? 0), 0);
 
   // Determine interpretation based on cutoffs
+  // This scale evaluates the severity of symptoms in various domains such as mood, 
+  // sleep, appetite, physical and mental fatigue, and suicidal ideation.
   let interpretation = '';
   if (totalScore <= 6) {
-    interpretation = 'Euthymie';
+    interpretation = 'Patient considéré comme sain (0-6 points)';
   } else if (totalScore <= 19) {
-    interpretation = 'Dépression légère';
+    interpretation = 'Patient en dépression légère (7-19 points)';
   } else if (totalScore <= 34) {
-    interpretation = 'Dépression modérée';
+    interpretation = 'Patient en dépression moyenne (20-34 points)';
   } else {
-    interpretation = 'Dépression sévère';
+    interpretation = 'Patient en dépression sévère (>34 points)';
   }
 
   const { data, error } = await supabase
