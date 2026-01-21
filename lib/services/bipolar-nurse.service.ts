@@ -84,12 +84,12 @@ export async function saveFagerstromResponse(
   
   // Compute score and interpretation
   const scoring = scoreFagerstrom({
-    q1: response.q1,
-    q2: response.q2,
-    q3: response.q3,
-    q4: response.q4,
-    q5: response.q5,
-    q6: response.q6
+    q1: response.q1 ?? null,
+    q2: response.q2 ?? null,
+    q3: response.q3 ?? null,
+    q4: response.q4 ?? null,
+    q5: response.q5 ?? null,
+    q6: response.q6 ?? null
   });
   
   const { data, error } = await supabase
@@ -131,8 +131,8 @@ export async function savePhysicalParamsResponse(
   
   // Compute BMI
   const analysis = analyzePhysicalParams({
-    height_cm: response.height_cm,
-    weight_kg: response.weight_kg
+    height_cm: response.height_cm ?? null,
+    weight_kg: response.weight_kg ?? null
   });
   
   const { data, error } = await supabase
@@ -172,10 +172,10 @@ export async function saveBloodPressureResponse(
   
   // Compute tension strings
   const analysis = analyzeBloodPressure({
-    bp_lying_systolic: response.bp_lying_systolic,
-    bp_lying_diastolic: response.bp_lying_diastolic,
-    bp_standing_systolic: response.bp_standing_systolic,
-    bp_standing_diastolic: response.bp_standing_diastolic
+    bp_lying_systolic: response.bp_lying_systolic ?? null,
+    bp_lying_diastolic: response.bp_lying_diastolic ?? null,
+    bp_standing_systolic: response.bp_standing_systolic ?? null,
+    bp_standing_diastolic: response.bp_standing_diastolic ?? null
   });
   
   const { data, error } = await supabase
@@ -216,16 +216,16 @@ export async function saveSleepApneaResponse(
   
   // Compute STOP-Bang score if not already diagnosed
   const scoring = scoreSleepApnea({
-    diagnosed_sleep_apnea: response.diagnosed_sleep_apnea,
-    has_cpap_device: response.has_cpap_device,
-    snoring: response.snoring,
-    tiredness: response.tiredness,
-    observed_apnea: response.observed_apnea,
-    hypertension: response.hypertension,
-    bmi_over_35: response.bmi_over_35,
-    age_over_50: response.age_over_50,
-    large_neck: response.large_neck,
-    male_gender: response.male_gender
+    diagnosed_sleep_apnea: response.diagnosed_sleep_apnea ?? null,
+    has_cpap_device: response.has_cpap_device ?? null,
+    snoring: response.snoring ?? null,
+    tiredness: response.tiredness ?? null,
+    observed_apnea: response.observed_apnea ?? null,
+    hypertension: response.hypertension ?? null,
+    bmi_over_35: response.bmi_over_35 ?? null,
+    age_over_50: response.age_over_50 ?? null,
+    large_neck: response.large_neck ?? null,
+    male_gender: response.male_gender ?? null
   });
   
   const { data, error } = await supabase
@@ -316,10 +316,10 @@ export async function saveEcgResponse(
   
   // Compute QTc and interpretation
   const analysis = analyzeEcg({
-    ecg_performed: response.ecg_performed,
-    qt_measured: response.qt_measured,
-    rr_measured: response.rr_measured,
-    heart_rate: response.heart_rate,
+    ecg_performed: response.ecg_performed ?? null,
+    qt_measured: response.qt_measured ?? null,
+    rr_measured: response.rr_measured ?? null,
+    heart_rate: response.heart_rate ?? null,
     gender: patientGender ?? null
   });
   

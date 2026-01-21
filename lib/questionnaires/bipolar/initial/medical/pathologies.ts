@@ -865,3 +865,17 @@ export const AUTRES_PATHO_DEFINITION: QuestionnaireDefinition = {
   questions: AUTRES_PATHO_QUESTIONS,
   metadata: { singleColumn: true, pathologies: ['bipolar'], target_role: 'healthcare_professional' }
 };
+
+// ============================================================================
+// Insert Types for all pathology responses
+// ============================================================================
+
+export type BipolarPathoNeuroResponseInsert = Omit<BipolarPathoNeuroResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type BipolarPathoCardioResponseInsert = Omit<BipolarPathoCardioResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type BipolarPathoEndocResponseInsert = Omit<BipolarPathoEndocResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type BipolarPathoDermatoResponseInsert = Omit<BipolarPathoDermatoResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type BipolarPathoUrinaireResponseInsert = Omit<BipolarPathoUrinaireResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type BipolarAntecedentsGynecoResponseInsert = Omit<BipolarAntecedentsGynecoResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type BipolarPathoHepatoGastroResponseInsert = Omit<BipolarPathoHepatoGastroResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type BipolarPathoAllergiqueResponseInsert = Omit<BipolarPathoAllergiqueResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
+export type BipolarAutresPathoResponseInsert = Omit<BipolarAutresPathoResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;

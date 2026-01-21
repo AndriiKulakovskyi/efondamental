@@ -388,8 +388,9 @@ export async function saveCdssResponse(response: any): Promise<any> {
   let interpretation: string | null = null;
 
   if (allAnswered) {
-    total_score = items.reduce((sum, item) => sum + item, 0);
-    has_depressive_syndrome = total_score > 6;
+    const computedScore = items.reduce((sum, item) => sum + (item ?? 0), 0);
+    total_score = computedScore;
+    has_depressive_syndrome = computedScore > 6;
     interpretation = has_depressive_syndrome
       ? 'Presence d\'un syndrome depressif (score > 6)'
       : 'Absence de syndrome depressif significatif (score <= 6)';
@@ -541,20 +542,21 @@ export async function saveAimsResponse(response: any): Promise<any> {
   let interpretation: string | null = null;
 
   if (answeredItems.length > 0) {
-    movement_score = movementItems.reduce((sum, item) => sum + (item ?? 0), 0);
+    const computedScore = movementItems.reduce((sum, item) => sum + (item ?? 0), 0);
+    movement_score = computedScore;
 
     const hasModerateOrSevere = movementItems.some(item => item !== null && item >= 3);
     const lightOrMoreCount = movementItems.filter(item => item !== null && item >= 2).length;
 
     if (hasModerateOrSevere || lightOrMoreCount >= 2) {
-      if (movement_score >= 14) {
+      if (computedScore >= 14) {
         interpretation = 'Dyskinesie severe - Surveillance etroite recommandee';
-      } else if (movement_score >= 7) {
+      } else if (computedScore >= 7) {
         interpretation = 'Dyskinesie moderee - Evaluation du traitement conseillee';
       } else {
         interpretation = 'Dyskinesie probable - A surveiller';
       }
-    } else if (movement_score > 0) {
+    } else if (computedScore > 0) {
       interpretation = 'Mouvements minimes - Surveillance de routine';
     } else {
       interpretation = 'Pas de mouvement anormal detecte';
