@@ -1713,6 +1713,9 @@ export async function saveCvltResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
+  // Calculate total_1_5 from individual trials
+  const total_1_5 = (response.trial_1 || 0) + (response.trial_2 || 0) + (response.trial_3 || 0) + (response.trial_4 || 0) + (response.trial_5 || 0);
+
   // Calculate all standard scores
   const scores = calculateCvltScores({
     patient_age: response.patient_age,
@@ -1723,6 +1726,7 @@ export async function saveCvltResponse(
     trial_3: response.trial_3,
     trial_4: response.trial_4,
     trial_5: response.trial_5,
+    total_1_5: total_1_5,
     list_b: response.list_b,
     sdfr: response.sdfr,
     sdcr: response.sdcr,
@@ -1741,15 +1745,16 @@ export async function saveCvltResponse(
   });
 
   // Remove generated/incompatible fields before saving:
-  // - total_1_5: generated column in DB (computed from trial_1 + trial_2 + ... + trial_5)
-  // - trials_1_5_total: form field name (maps to total_1_5 in DB)
+  // - total_1_5: will be recalculated and added back
+  // - trials_1_5_total: form field name (if present)
   // - patient_gender: incompatible field (CVLT uses patient_sex instead)
-  const { total_1_5, trials_1_5_total, patient_gender, ...responseWithoutGenerated } = response as any;
+  const { total_1_5: _, trials_1_5_total, patient_gender, ...responseWithoutGenerated } = response as any;
 
   const { data, error } = await supabase
     .from('bipolar_cvlt')
     .upsert({
       ...responseWithoutGenerated,
+      total_1_5: total_1_5,
       ...scores,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })

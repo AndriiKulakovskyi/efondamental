@@ -496,6 +496,11 @@ export async function submitProfessionalQuestionnaireAction(
           // age is already in filteredResponses, no need to re-add
         }
         
+        // Special handling for CVLT: remove calculated field that's not in DB
+        if (bipolarKey === 'CVLT') {
+          delete (filteredResponses as any).trials_1_5_total;
+        }
+        
         const result = await saveBipolarInitialResponse(bipolarKey, {
           visit_id: visitId,
           patient_id: patientId,

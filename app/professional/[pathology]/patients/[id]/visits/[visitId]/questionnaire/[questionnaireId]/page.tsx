@@ -816,6 +816,32 @@ export default async function ProfessionalQuestionnairePage({
     console.log('[WAIS4 Digit Span Debug] Removed calculated score fields from form');
   }
 
+  // Remove calculated score fields from CVLT initial responses
+  // These are calculated automatically on save and should only be displayed on score page
+  if (code === 'CVLT' && existingResponse) {
+    delete initialResponses.trials_1_5_total;
+    delete initialResponses.total_1_5;
+    delete initialResponses.trial_1_std;
+    delete initialResponses.trial_5_std;
+    delete initialResponses.total_1_5_std;
+    delete initialResponses.list_b_std;
+    delete initialResponses.sdfr_std;
+    delete initialResponses.sdcr_std;
+    delete initialResponses.ldfr_std;
+    delete initialResponses.ldcr_std;
+    delete initialResponses.semantic_std;
+    delete initialResponses.serial_std;
+    delete initialResponses.persev_std;
+    delete initialResponses.intru_std;
+    delete initialResponses.recog_std;
+    delete initialResponses.false_recog_std;
+    delete initialResponses.discrim_std;
+    delete initialResponses.primacy_std;
+    delete initialResponses.recency_std;
+    delete initialResponses.bias_std;
+    console.log('[CVLT Debug] Removed calculated score fields from form');
+  }
+
   // Inject patient demographics (age at visit date, gender) for questionnaires that require them
   const requiresDemographics = questionnaireRequiresDemographics(code);
   console.log('[Demographics Debug] Code:', code, '| Requires demographics:', requiresDemographics);
@@ -940,6 +966,23 @@ export default async function ProfessionalQuestionnairePage({
       })
     };
     console.log('[WAIS4 Digit Span Debug] Filtered out score sections. Original questions:', questionnaire.questions.length, 'Filtered:', filteredQuestionnaire.questions.length);
+  }
+
+  // Filter out score fields from CVLT questionnaire
+  // Score fields (readonly with indentLevel: 1) should only appear on the score page, not in the input form
+  if (code === 'CVLT') {
+    filteredQuestionnaire = {
+      ...questionnaire,
+      questions: questionnaire.questions.filter(q => {
+        // Remove readonly fields with indentLevel (these are calculated scores)
+        if (q.readonly && q.indentLevel === 1) {
+          return false;
+        }
+        // Keep all other questions
+        return true;
+      })
+    };
+    console.log('[CVLT Debug] Filtered out score fields. Original questions:', questionnaire.questions.length, 'Filtered:', filteredQuestionnaire.questions.length);
   }
 
   return (
