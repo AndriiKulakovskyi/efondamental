@@ -29,7 +29,7 @@ export interface BipolarWais4CriteriaResponse {
   no_hearing_impairment: number | null;
   no_ect_past_year: number | null;
   // Acceptance
-  accepted_for_neuropsy_evaluation: number | null;
+  accepted_for_neuropsy_evaluation: boolean | number | null;
   // Metadata
   completed_by: string | null;
   completed_at: string;
@@ -159,9 +159,9 @@ export const WAIS4_CRITERIA_QUESTIONS: Question[] = [
     text: 'Nombre d\'annees d\'etudes (depuis les cours preparatoires)',
     type: 'number',
     required: true,
-    readonly: true,
     min: 0,
-    help: 'Calcule automatiquement depuis le profil du patient'
+    max: 30,
+    help: 'Pre-rempli depuis le profil du patient, modifiable si necessaire'
   },
   {
     id: 'no_visual_impairment',

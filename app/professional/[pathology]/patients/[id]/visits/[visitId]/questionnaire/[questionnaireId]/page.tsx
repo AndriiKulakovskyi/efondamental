@@ -746,6 +746,17 @@ export default async function ProfessionalQuestionnairePage({
     initialResponses.q5_plan_intent = boolToNum(initialResponses.q5_plan_intent);
   }
 
+  // Convert boolean to number for WAIS Criteria acceptance field
+  if ((code === 'WAIS3_CRITERIA' || code === 'WAIS4_CRITERIA') && existingResponse) {
+    const boolToNum = (val: any): number | null => {
+      if (val === true) return 1;
+      if (val === false) return 0;
+      return val;
+    };
+    initialResponses.accepted_for_neuropsy_evaluation = boolToNum(initialResponses.accepted_for_neuropsy_evaluation);
+    console.log('[WAIS Debug] Converted accepted_for_neuropsy_evaluation from boolean to:', initialResponses.accepted_for_neuropsy_evaluation);
+  }
+
   // Inject patient demographics (age at visit date, gender) for questionnaires that require them
   const requiresDemographics = questionnaireRequiresDemographics(code);
   console.log('[Demographics Debug] Code:', code, '| Requires demographics:', requiresDemographics);
@@ -798,7 +809,7 @@ export default async function ProfessionalQuestionnairePage({
         initialResponses = { ...initialResponses, years_of_education: patient.years_of_education };
         
         // WAIS3 Digit Span uses 'education_level' field (categorized)
-        if (code === 'WAIS3_DIGIT_SPAN_FR') {
+        if (code === 'WAIS3_DIGIT_SPAN') {
           // Convert years to category: 0: <2, 1: 2-11, 2: 12, 3: 13-14, 4: >=15
           let educationLevel = 0;
           if (patient.years_of_education >= 15) educationLevel = 4;
@@ -809,10 +820,25 @@ export default async function ProfessionalQuestionnairePage({
           initialResponses = { ...initialResponses, education_level: educationLevel };
           console.log('[Demographics Debug] Converted to education_level category:', educationLevel);
         }
+      } else {
+        // For WAIS Criteria, always inject years_of_education field (null if not set)
+        if (code === 'WAIS3_CRITERIA' || code === 'WAIS4_CRITERIA') {
+          initialResponses = { ...initialResponses, years_of_education: null };
+          console.log('[Demographics Debug] Years of education not set in patient profile (will show as empty)');
+        }
       }
     }
     
     console.log('[Demographics Debug] Final initialResponses keys:', Object.keys(initialResponses));
+  }
+
+  // For WAIS Criteria questionnaires, set default collection_date to today
+  if (code === 'WAIS3_CRITERIA' || code === 'WAIS4_CRITERIA') {
+    if (!initialResponses.collection_date) {
+      const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+      initialResponses = { ...initialResponses, collection_date: today };
+      console.log('[Demographics Debug] Set default collection_date to today:', today);
+    }
   }
 
   // For biological assessment, also fetch physical params for creatinine clearance computation

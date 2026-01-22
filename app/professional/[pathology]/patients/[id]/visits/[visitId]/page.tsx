@@ -193,8 +193,8 @@ export default async function VisitDetailPage({
   // Determine neuropsychological questionnaire visibility based on acceptance
   const wais4CriteriaAnswered = !!wais4CriteriaResponse;
   const wais3CriteriaAnswered = !!wais3CriteriaResponse;
-  const wais4Accepted = wais4CriteriaResponse?.accepted_for_neuropsy_evaluation === 1;
-  const wais3Accepted = wais3CriteriaResponse?.accepted_for_neuropsy_evaluation === 1;
+  const wais4Accepted = wais4CriteriaResponse?.accepted_for_neuropsy_evaluation === true || wais4CriteriaResponse?.accepted_for_neuropsy_evaluation === 1;
+  const wais3Accepted = wais3CriteriaResponse?.accepted_for_neuropsy_evaluation === true || wais3CriteriaResponse?.accepted_for_neuropsy_evaluation === 1;
   
   // NOTE: We will calculate actual completion status from constructed modules AFTER building them
   // This ensures accuracy by using the same logic as individual module cards
@@ -928,7 +928,7 @@ export default async function VisitDetailPage({
             { def: TMT_DEFINITION, code: 'TMT' },
             { def: STROOP_DEFINITION, code: 'STROOP' },
             { def: FLUENCES_VERBALES_DEFINITION, code: 'FLUENCES_VERBALES' },
-            { def: MEM3_SPATIAL_DEFINITION, code: 'MEM3_SPATIAL_FR' }
+            { def: MEM3_SPATIAL_DEFINITION, code: 'MEM3_SPATIAL' }
           ];
           
           return independentTests.map(({ def, code }) => {
@@ -1027,12 +1027,12 @@ export default async function VisitDetailPage({
               };
               
               // Add conditional questionnaires (WAIS-III specific tests)
-              addConditionalQuestionnaire(WAIS3_LEARNING_DEFINITION, 'WAIS3_LEARNING_FR');
-              addConditionalQuestionnaire(WAIS3_VOCABULAIRE_DEFINITION, 'WAIS3_VOCABULAIRE_FR');
-              addConditionalQuestionnaire(WAIS3_MATRICES_DEFINITION, 'WAIS3_MATRICES_FR');
-              addConditionalQuestionnaire(WAIS3_CODE_SYMBOLES_DEFINITION, 'WAIS3_CODE_SYMBOLES_FR');
-              addConditionalQuestionnaire(WAIS3_DIGIT_SPAN_DEFINITION, 'WAIS3_DIGIT_SPAN_FR');
-              addConditionalQuestionnaire(WAIS3_CPT2_DEFINITION, 'WAIS3_CPT2_FR');
+              addConditionalQuestionnaire(WAIS3_LEARNING_DEFINITION, 'WAIS3_LEARNING');
+              addConditionalQuestionnaire(WAIS3_VOCABULAIRE_DEFINITION, 'WAIS3_VOCABULAIRE');
+              addConditionalQuestionnaire(WAIS3_MATRICES_DEFINITION, 'WAIS3_MATRICES');
+              addConditionalQuestionnaire(WAIS3_CODE_SYMBOLES_DEFINITION, 'WAIS3_CODE_SYMBOLES');
+              addConditionalQuestionnaire(WAIS3_DIGIT_SPAN_DEFINITION, 'WAIS3_DIGIT_SPAN');
+              addConditionalQuestionnaire(WAIS3_CPT2_DEFINITION, 'WAIS3_CPT2');
               
               return wais3Questionnaires;
             })()
@@ -1989,7 +1989,7 @@ export default async function VisitDetailPage({
             { def: TMT_DEFINITION, code: 'TMT' },
             { def: STROOP_DEFINITION, code: 'STROOP' },
             { def: FLUENCES_VERBALES_DEFINITION, code: 'FLUENCES_VERBALES' },
-            { def: MEM3_SPATIAL_DEFINITION, code: 'MEM3_SPATIAL_FR' }
+            { def: MEM3_SPATIAL_DEFINITION, code: 'MEM3_SPATIAL' }
           ];
           
           return independentTests.map(({ def, code }) => {
@@ -2088,12 +2088,12 @@ export default async function VisitDetailPage({
               };
               
               // Add conditional questionnaires (WAIS-III specific tests)
-              addConditionalQuestionnaire(WAIS3_LEARNING_DEFINITION, 'WAIS3_LEARNING_FR');
-              addConditionalQuestionnaire(WAIS3_VOCABULAIRE_DEFINITION, 'WAIS3_VOCABULAIRE_FR');
-              addConditionalQuestionnaire(WAIS3_MATRICES_DEFINITION, 'WAIS3_MATRICES_FR');
-              addConditionalQuestionnaire(WAIS3_CODE_SYMBOLES_DEFINITION, 'WAIS3_CODE_SYMBOLES_FR');
-              addConditionalQuestionnaire(WAIS3_DIGIT_SPAN_DEFINITION, 'WAIS3_DIGIT_SPAN_FR');
-              addConditionalQuestionnaire(WAIS3_CPT2_DEFINITION, 'WAIS3_CPT2_FR');
+              addConditionalQuestionnaire(WAIS3_LEARNING_DEFINITION, 'WAIS3_LEARNING');
+              addConditionalQuestionnaire(WAIS3_VOCABULAIRE_DEFINITION, 'WAIS3_VOCABULAIRE');
+              addConditionalQuestionnaire(WAIS3_MATRICES_DEFINITION, 'WAIS3_MATRICES');
+              addConditionalQuestionnaire(WAIS3_CODE_SYMBOLES_DEFINITION, 'WAIS3_CODE_SYMBOLES');
+              addConditionalQuestionnaire(WAIS3_DIGIT_SPAN_DEFINITION, 'WAIS3_DIGIT_SPAN');
+              addConditionalQuestionnaire(WAIS3_CPT2_DEFINITION, 'WAIS3_CPT2');
               
               return wais3Questionnaires;
             })()

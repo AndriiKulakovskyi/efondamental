@@ -70,35 +70,33 @@ export interface PatientDemographicsForVisit {
  * This list is used to determine which questionnaires need demographic injection.
  */
 export const QUESTIONNAIRES_REQUIRING_DEMOGRAPHICS: string[] = [
-  // WAIS-IV questionnaires
-  'WAIS4_CRITERIA_FR',
-  'WAIS4_MATRICES_FR',
-  'WAIS4_MATRICES_FR',
-  'WAIS4_CODE_FR',
-  'WAIS_IV_CODE_SYMBOLES_IVT', // Added missing code for Code, Symboles & IVT
-  'WAIS4_DIGIT_SPAN_FR',
-  'WAIS4_SIMILITUDES_FR',
+  // WAIS-IV questionnaires (all require age for standardized scoring)
+  'WAIS4_CRITERIA',
+  'WAIS4_LEARNING',
+  'WAIS4_MATRICES',
+  'WAIS4_CODE',
+  'WAIS4_DIGIT_SPAN',
+  'WAIS4_SIMILITUDES',
   
-  // Cognitive assessments
-  'CVLT_FR',
-  'TMT_FR',
-  'STROOP_FR',
-  'FLUENCES_VERBALES_FR',
-  'TEST_COMMISSIONS_FR',
-  'SCIP_FR',
-  'COBRA_FR',
+  // WAIS-III questionnaires (all require age for standardized scoring)
+  'WAIS3_CRITERIA',
+  'WAIS3_LEARNING',
+  'WAIS3_VOCABULAIRE',
+  'WAIS3_MATRICES',
+  'WAIS3_CODE_SYMBOLES',
+  'WAIS3_DIGIT_SPAN',
+  'WAIS3_CPT2',
   
-  // WAIS-III questionnaires
-  'WAIS3_CRITERIA_FR',
-  'WAIS3_CVLT_FR',
-  'WAIS3_TMT_FR',
-  'WAIS3_STROOP_FR',
-  'WAIS3_FLUENCES_VERBALES_FR',
-  'WAIS3_VOCABULAIRE_FR',
-  'WAIS3_MATRICES_FR',
-  'WAIS3_CODE_SYMBOLES_FR',
-  'WAIS3_DIGIT_SPAN_FR',
-  'MEM3_SPATIAL_FR',
+  // Cognitive assessments (require age/sex/education for scoring)
+  'CVLT',
+  'TMT',
+  'STROOP',
+  'FLUENCES_VERBALES',
+  'TEST_COMMISSIONS',
+  'SCIP',
+  'COBRA',
+  'CPT3',
+  'MEM3_SPATIAL',
   
   // Infirmier questionnaires
   'BIOLOGICAL_ASSESSMENT',
@@ -114,17 +112,16 @@ export const QUESTIONNAIRES_REQUIRING_DEMOGRAPHICS: string[] = [
  * These need special handling to inject the age into the 'age' field.
  */
 export const QUESTIONNAIRES_USING_AGE_FIELD: string[] = [
-  'WAIS4_CRITERIA_FR',
-  'WAIS3_CRITERIA_FR',
+  'WAIS4_CRITERIA',
+  'WAIS3_CRITERIA',
 ];
 
 /**
  * Questionnaires that use patient_sex field (vs patient_gender).
- * CVLT specifically uses patient_sex with 'F'/'M' codes.
+ * CVLT specifically uses patient_sex with 'F'/'M' codes for regression-based Z-scores.
  */
 export const QUESTIONNAIRES_USING_PATIENT_SEX: string[] = [
-  'CVLT_FR',
-  'WAIS3_CVLT_FR',
+  'CVLT',
 ];
 
 /**
