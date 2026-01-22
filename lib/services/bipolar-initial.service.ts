@@ -257,7 +257,7 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
       item17: (response as any).item17 || 0,
       item18: (response as any).item18 || 0
     });
-
+    
     const similitudesResponse = {
       ...response,
       ...scores
@@ -272,6 +272,44 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving WAIS4_SIMILITUDES response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // WAIS4_MATRICES needs to calculate scores based on age and items
+  if (questionnaireCode === 'WAIS4_MATRICES') {
+    const { calculateStandardizedScore, calculatePercentileRank, calculateDeviationFromMean } = await import('./wais4-matrices-scoring');
+    
+    // Calculate raw score (sum of items 1-26)
+    // Note: Items are stored as item_01, item_02, etc. (with underscore and zero-padding)
+    let rawScore = 0;
+    for (let i = 1; i <= 26; i++) {
+      const itemKey = `item_${String(i).padStart(2, '0')}`;
+      rawScore += (response as any)[itemKey] || 0;
+    }
+    
+    const patientAge = (response as any).patient_age || 35;
+    const standardizedScore = calculateStandardizedScore(rawScore, patientAge);
+    const percentileRank = calculatePercentileRank(standardizedScore);
+    
+    const matricesResponse = {
+      ...response,
+      raw_score: rawScore,
+      standardized_score: standardizedScore,
+      percentile_rank: percentileRank
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(matricesResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving WAIS4_MATRICES response:', error);
       throw error;
     }
 

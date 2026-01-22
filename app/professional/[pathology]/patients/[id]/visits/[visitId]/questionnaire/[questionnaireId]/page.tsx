@@ -769,6 +769,15 @@ export default async function ProfessionalQuestionnairePage({
     console.log('[WAIS4 Similitudes Debug] Removed calculated score fields from form');
   }
 
+  // Remove calculated score fields from WAIS4_MATRICES initial responses
+  // These are calculated automatically on save and should only be displayed on score page
+  if (code === 'WAIS4_MATRICES' && existingResponse) {
+    delete initialResponses.raw_score;
+    delete initialResponses.standardized_score;
+    delete initialResponses.percentile_rank;
+    console.log('[WAIS4 Matrices Debug] Removed calculated score fields from form');
+  }
+
   // Inject patient demographics (age at visit date, gender) for questionnaires that require them
   const requiresDemographics = questionnaireRequiresDemographics(code);
   console.log('[Demographics Debug] Code:', code, '| Requires demographics:', requiresDemographics);

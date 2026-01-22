@@ -38,10 +38,10 @@ export interface BipolarWais4MatricesResponse {
   item24: number | null;
   item25: number | null;
   item26: number | null;
-  // Scores
+  // Scores (calculated automatically)
   raw_score: number | null;
-  scaled_score: number | null;
-  percentile: number | null;
+  standardized_score: number | null;
+  percentile_rank: number | null;
   // Metadata
   completed_by: string | null;
   completed_at: string;
@@ -51,7 +51,7 @@ export interface BipolarWais4MatricesResponse {
 
 export type BipolarWais4MatricesResponseInsert = Omit<
   BipolarWais4MatricesResponse,
-  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'raw_score' | 'scaled_score' | 'percentile'
+  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'raw_score' | 'standardized_score' | 'percentile_rank'
 > & {
   completed_by?: string | null;
 };

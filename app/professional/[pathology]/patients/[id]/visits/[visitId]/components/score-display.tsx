@@ -427,6 +427,18 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
     }
   }
   
+  if (code === 'WAIS4_MATRICES' && !interpretation && data.standardized_score !== undefined) {
+    if (data.standardized_score >= 13) {
+      interpretation = 'Raisonnement perceptif supérieur à la moyenne';
+    } else if (data.standardized_score >= 8) {
+      interpretation = 'Raisonnement perceptif dans la moyenne';
+    } else if (data.standardized_score >= 4) {
+      interpretation = 'Raisonnement perceptif inférieur à la moyenne';
+    } else {
+      interpretation = 'Raisonnement perceptif significativement inférieur à la moyenne';
+    }
+  }
+  
   // Generate interpretation for ASRS if not present
   if (code === 'ASRS' && !interpretation) {
     if (data.screening_positive) {
@@ -1490,6 +1502,42 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <span className="font-semibold">{data.standardized_value !== null && data.standardized_value !== undefined ? data.standardized_value.toFixed(2) : '-'}</span>
             </div>
             <div className="flex justify-between">
+              <span className="text-gray-600">Age du patient:</span>
+              <span className="font-semibold">{data.patient_age ?? '-'} ans</span>
+            </div>
+          </div>
+        )}
+
+        {/* WAIS4 Matrices Details */}
+        {code === 'WAIS4_MATRICES' && (
+          <div className="text-sm space-y-2 mt-2 pt-2 border-t">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Note brute à la WAIS MATRICE:</span>
+                <span className="font-semibold">{data.raw_score ?? '-'}/26</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Note standard à la WAIS MATRICE:</span>
+                <span className="font-semibold">{data.standardized_score ?? '-'}/19</span>
+              </div>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600">Déviation par rapport à la moyenne et l'écart type:</span>
+              <span className="font-semibold">
+                {data.standardized_score !== null && data.standardized_score !== undefined 
+                  ? ((data.standardized_score - 10) / 3).toFixed(2) 
+                  : '-'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Rang percentile:</span>
+              <span className="font-semibold">
+                {data.percentile_rank !== null && data.percentile_rank !== undefined 
+                  ? data.percentile_rank.toFixed(2) 
+                  : '-'}
+              </span>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
               <span className="text-gray-600">Age du patient:</span>
               <span className="font-semibold">{data.patient_age ?? '-'} ans</span>
             </div>

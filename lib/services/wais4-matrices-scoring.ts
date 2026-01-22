@@ -71,17 +71,38 @@ export function calculateStandardizedScore(rawScore: number, age: number): numbe
 
 /**
  * Calculate percentile rank from standardized score
- * Based on JavaScript: ((k - 9) / 3) * 100, where k = standardizedScore - 1
+ * WAIS-IV standardized scores follow a normal distribution with mean=10, SD=3
+ * Uses standard normal distribution percentile table
  * @param standardizedScore - Standardized score (1-19)
- * @returns Percentile rank (decimal value)
+ * @returns Percentile rank (0.1 to 99.9)
  */
 export function calculatePercentileRank(standardizedScore: number): number {
-  // JavaScript formula: ((k - 9) / 3) * 100, where k = standardizedScore - 1
-  const k = standardizedScore - 1;
-  const percentileRank = ((k - 9) / 3) * 100;
+  // Percentile lookup table for WAIS-IV standardized scores (1-19)
+  // Based on normal distribution with mean=10, SD=3
+  const percentileTable: { [key: number]: number } = {
+    1: 0.1,    // -3 SD
+    2: 0.4,    // -2.67 SD
+    3: 1,      // -2.33 SD
+    4: 2,      // -2 SD
+    5: 5,      // -1.67 SD
+    6: 9,      // -1.33 SD
+    7: 16,     // -1 SD
+    8: 25,     // -0.67 SD
+    9: 37,     // -0.33 SD
+    10: 50,    // Mean
+    11: 63,    // +0.33 SD
+    12: 75,    // +0.67 SD
+    13: 84,    // +1 SD
+    14: 91,    // +1.33 SD
+    15: 95,    // +1.67 SD
+    16: 98,    // +2 SD
+    17: 99,    // +2.33 SD
+    18: 99.6,  // +2.67 SD
+    19: 99.9   // +3 SD
+  };
   
-  // Round to 2 decimal places
-  return Math.round(percentileRank * 100) / 100;
+  // Return percentile from lookup table, default to 0.1 if not found
+  return percentileTable[standardizedScore] || 0.1;
 }
 
 /**

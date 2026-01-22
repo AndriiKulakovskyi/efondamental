@@ -8058,47 +8058,6 @@ const generateMatrixItems = (): Question[] => {
     });
   }
   
-  // Add computed score fields
-  items.push({
-    id: 'raw_score',
-    section: 'Scores Calculés',
-    text: 'Note brute à la WAIS MATRICE',
-    type: 'number',
-    required: false,
-    readonly: true,
-    help: 'Somme des items 1-26 (calculé automatiquement)'
-  });
-  
-  items.push({
-    id: 'standardized_score',
-    section: 'Scores Calculés',
-    text: 'Note standard à la WAIS MATRICE',
-    type: 'number',
-    required: false,
-    readonly: true,
-    help: 'Score standardisé (1-19) basé sur l\'âge et la note brute'
-  });
-  
-  items.push({
-    id: 'deviation_from_mean',
-    section: 'Scores Calculés',
-    text: 'Déviation par rapport à la moyenne et l\'écart type ((WAIS_VOC_STD - 10) /3)',
-    type: 'number',
-    required: false,
-    readonly: true,
-    help: 'Z-score: (Note Standard - 10) / 3'
-  });
-  
-  items.push({
-    id: 'percentile_rank',
-    section: 'Scores Calculés',
-    text: 'Rang percentile',
-    type: 'number',
-    required: false,
-    readonly: true,
-    help: 'Rang percentile calculé à partir de la note standardisée'
-  });
-  
   return items;
 };
 
