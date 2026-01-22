@@ -778,6 +778,44 @@ export default async function ProfessionalQuestionnairePage({
     console.log('[WAIS4 Matrices Debug] Removed calculated score fields from form');
   }
 
+  // Remove calculated score fields from WAIS4_DIGIT_SPAN initial responses
+  // These are calculated automatically on save and should only be displayed on score page
+  if (code === 'WAIS4_DIGIT_SPAN' && existingResponse) {
+    // Individual item scores (24 items: 8 per section)
+    for (let i = 1; i <= 8; i++) {
+      delete initialResponses[`wais_mcod_${i}`];
+      delete initialResponses[`wais_mcoi_${i}`];
+      delete initialResponses[`wais_mcoc_${i}`];
+    }
+    // Section totals
+    delete initialResponses.wais_mcod_tot;
+    delete initialResponses.wais_mcoi_tot;
+    delete initialResponses.wais_mcoc_tot;
+    delete initialResponses.mcod_total;
+    delete initialResponses.mcoi_total;
+    delete initialResponses.mcoc_total;
+    // Empan values
+    delete initialResponses.wais_mc_end;
+    delete initialResponses.wais_mc_env;
+    delete initialResponses.wais_mc_cro;
+    delete initialResponses.empan_direct;
+    delete initialResponses.empan_inverse;
+    delete initialResponses.empan_croissant;
+    // Empan Z-scores
+    delete initialResponses.wais_mc_end_std;
+    delete initialResponses.wais_mc_env_std;
+    delete initialResponses.wais_mc_cro_std;
+    // Empan difference
+    delete initialResponses.wais_mc_emp;
+    // Global scores
+    delete initialResponses.wais_mc_tot;
+    delete initialResponses.wais_mc_std;
+    delete initialResponses.wais_mc_cr;
+    delete initialResponses.raw_score;
+    delete initialResponses.standardized_score;
+    console.log('[WAIS4 Digit Span Debug] Removed calculated score fields from form');
+  }
+
   // Inject patient demographics (age at visit date, gender) for questionnaires that require them
   const requiresDemographics = questionnaireRequiresDemographics(code);
   console.log('[Demographics Debug] Code:', code, '| Requires demographics:', requiresDemographics);
@@ -889,9 +927,24 @@ export default async function ProfessionalQuestionnairePage({
     }
   }
 
+  // Filter out score sections from WAIS4_DIGIT_SPAN questionnaire
+  // These sections should only appear on the score page, not in the input form
+  let filteredQuestionnaire = questionnaire;
+  if (code === 'WAIS4_DIGIT_SPAN') {
+    const scoreSections = ['Totaux par section', 'Empans', 'Scores globaux'];
+    filteredQuestionnaire = {
+      ...questionnaire,
+      questions: questionnaire.questions.filter(q => {
+        // Keep questions that don't have a section or have a section not in the score sections list
+        return !q.section || !scoreSections.includes(q.section);
+      })
+    };
+    console.log('[WAIS4 Digit Span Debug] Filtered out score sections. Original questions:', questionnaire.questions.length, 'Filtered:', filteredQuestionnaire.questions.length);
+  }
+
   return (
     <QuestionnairePageClient
-      questionnaire={questionnaire}
+      questionnaire={filteredQuestionnaire}
       visitId={visitId}
       patientId={patientId}
       pathology={pathology}

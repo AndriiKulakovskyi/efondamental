@@ -316,6 +316,85 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
     return data as T;
   }
 
+  // WAIS4_DIGIT_SPAN needs to calculate all scores including item scores, section totals, empan, and standardized scores
+  if (questionnaireCode === 'WAIS4_DIGIT_SPAN') {
+    const { calculateDigitSpanScores } = await import('./wais4-digit-span-scoring');
+    
+    const scores = calculateDigitSpanScores({
+      patient_age: (response as any).patient_age || 35,
+      // Direct order (Ordre direct) - 8 items x 2 trials
+      wais4_mcod_1a: (response as any).wais4_mcod_1a,
+      wais4_mcod_1b: (response as any).wais4_mcod_1b,
+      wais4_mcod_2a: (response as any).wais4_mcod_2a,
+      wais4_mcod_2b: (response as any).wais4_mcod_2b,
+      wais4_mcod_3a: (response as any).wais4_mcod_3a,
+      wais4_mcod_3b: (response as any).wais4_mcod_3b,
+      wais4_mcod_4a: (response as any).wais4_mcod_4a,
+      wais4_mcod_4b: (response as any).wais4_mcod_4b,
+      wais4_mcod_5a: (response as any).wais4_mcod_5a,
+      wais4_mcod_5b: (response as any).wais4_mcod_5b,
+      wais4_mcod_6a: (response as any).wais4_mcod_6a,
+      wais4_mcod_6b: (response as any).wais4_mcod_6b,
+      wais4_mcod_7a: (response as any).wais4_mcod_7a,
+      wais4_mcod_7b: (response as any).wais4_mcod_7b,
+      wais4_mcod_8a: (response as any).wais4_mcod_8a,
+      wais4_mcod_8b: (response as any).wais4_mcod_8b,
+      // Inverse order (Ordre inverse) - 8 items x 2 trials
+      wais4_mcoi_1a: (response as any).wais4_mcoi_1a,
+      wais4_mcoi_1b: (response as any).wais4_mcoi_1b,
+      wais4_mcoi_2a: (response as any).wais4_mcoi_2a,
+      wais4_mcoi_2b: (response as any).wais4_mcoi_2b,
+      wais4_mcoi_3a: (response as any).wais4_mcoi_3a,
+      wais4_mcoi_3b: (response as any).wais4_mcoi_3b,
+      wais4_mcoi_4a: (response as any).wais4_mcoi_4a,
+      wais4_mcoi_4b: (response as any).wais4_mcoi_4b,
+      wais4_mcoi_5a: (response as any).wais4_mcoi_5a,
+      wais4_mcoi_5b: (response as any).wais4_mcoi_5b,
+      wais4_mcoi_6a: (response as any).wais4_mcoi_6a,
+      wais4_mcoi_6b: (response as any).wais4_mcoi_6b,
+      wais4_mcoi_7a: (response as any).wais4_mcoi_7a,
+      wais4_mcoi_7b: (response as any).wais4_mcoi_7b,
+      wais4_mcoi_8a: (response as any).wais4_mcoi_8a,
+      wais4_mcoi_8b: (response as any).wais4_mcoi_8b,
+      // Sequencing order (Ordre croissant) - 8 items x 2 trials
+      wais4_mcoc_1a: (response as any).wais4_mcoc_1a,
+      wais4_mcoc_1b: (response as any).wais4_mcoc_1b,
+      wais4_mcoc_2a: (response as any).wais4_mcoc_2a,
+      wais4_mcoc_2b: (response as any).wais4_mcoc_2b,
+      wais4_mcoc_3a: (response as any).wais4_mcoc_3a,
+      wais4_mcoc_3b: (response as any).wais4_mcoc_3b,
+      wais4_mcoc_4a: (response as any).wais4_mcoc_4a,
+      wais4_mcoc_4b: (response as any).wais4_mcoc_4b,
+      wais4_mcoc_5a: (response as any).wais4_mcoc_5a,
+      wais4_mcoc_5b: (response as any).wais4_mcoc_5b,
+      wais4_mcoc_6a: (response as any).wais4_mcoc_6a,
+      wais4_mcoc_6b: (response as any).wais4_mcoc_6b,
+      wais4_mcoc_7a: (response as any).wais4_mcoc_7a,
+      wais4_mcoc_7b: (response as any).wais4_mcoc_7b,
+      wais4_mcoc_8a: (response as any).wais4_mcoc_8a,
+      wais4_mcoc_8b: (response as any).wais4_mcoc_8b
+    });
+    
+    const digitSpanResponse = {
+      ...response,
+      ...scores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(digitSpanResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving WAIS4_DIGIT_SPAN response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
   // ALS18 needs to calculate subscale scores and interpretation
   if (questionnaireCode === 'ALS18') {
     const als18Scores = computeAls18Scores(response as Partial<BipolarAls18Response>);

@@ -190,6 +190,13 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
+    if (code === 'WAIS4_DIGIT_SPAN') {
+      // WAIS-IV Digit Span: Standardized score 8-12 is average (mean=10, SD=3)
+      if (data.wais_mc_std >= 13) return 'success';
+      if (data.wais_mc_std >= 8) return 'info';
+      return 'warning';
+    }
+    
     if (code === 'WAIS4_SIMILITUDES') {
       // WAIS-IV Similitudes: Standard score 8-12 is average (mean=10, SD=3)
       if (data.standard_score >= 13) return 'success';
@@ -439,6 +446,18 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
     }
   }
   
+  if (code === 'WAIS4_DIGIT_SPAN' && !interpretation && data.wais_mc_std !== undefined) {
+    if (data.wais_mc_std >= 13) {
+      interpretation = 'Mémoire de travail supérieure à la moyenne';
+    } else if (data.wais_mc_std >= 8) {
+      interpretation = 'Mémoire de travail dans la moyenne';
+    } else if (data.wais_mc_std >= 4) {
+      interpretation = 'Mémoire de travail inférieure à la moyenne';
+    } else {
+      interpretation = 'Mémoire de travail significativement inférieure à la moyenne';
+    }
+  }
+  
   // Generate interpretation for ASRS if not present
   if (code === 'ASRS' && !interpretation) {
     if (data.screening_positive) {
@@ -527,6 +546,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'MADRS' && 'Résultats MADRS - Échelle de Dépression'}
               {code === 'YMRS' && 'Résultats YMRS - Échelle de Manie'}
               {code === 'WAIS4_MATRICES' && 'Résultats WAIS-IV Matrices'}
+              {code === 'WAIS4_DIGIT_SPAN' && 'Résultats WAIS-IV Mémoire des chiffres (Digit Span)'}
               {code === 'WAIS4_SIMILITUDES' && 'Résultats WAIS-IV Similitudes'}
               {code === 'CVLT' && 'Résultats CVLT'}
               {code === 'WAIS4_CODE' && 'Résultats WAIS-IV Code'}
@@ -581,6 +601,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'WAIS4_MATRICES'
                 ? (data.standardized_score !== undefined ? data.standardized_score : '-')
+                : code === 'WAIS4_DIGIT_SPAN'
+                ? (data.wais_mc_std !== undefined ? data.wais_mc_std : '-')
                 : code === 'WAIS4_SIMILITUDES'
                 ? (data.standard_score !== undefined ? data.standard_score : '-')
                 : code === 'CVLT'
@@ -638,6 +660,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'MADRS' && '/60'}
               {code === 'YMRS' && '/60'}
               {code === 'WAIS4_MATRICES' && '/19'}
+              {code === 'WAIS4_DIGIT_SPAN' && '/19'}
               {code === 'CVLT' && '/80'}
               {code === 'WAIS4_CODE' && '/19'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && (data.wais_ivt !== undefined && data.wais_ivt !== null ? '/150' : '/19')}
@@ -1761,6 +1784,99 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 </div>
               </div>
             )}
+
+            {/* Demographics */}
+            <div className="pt-2 border-t">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Age du patient:</span>
+                <span className="font-semibold">{data.patient_age ?? '-'} ans</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* WAIS-IV Digit Span Details */}
+        {code === 'WAIS4_DIGIT_SPAN' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            {/* Section Totals */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Scores par section</h5>
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="flex flex-col items-center p-2 bg-blue-50 rounded">
+                  <span className="text-gray-600 text-xs mb-1">Ordre Direct</span>
+                  <span className="font-bold text-lg">{data.wais_mcod_tot ?? '-'}</span>
+                </div>
+                <div className="flex flex-col items-center p-2 bg-blue-50 rounded">
+                  <span className="text-gray-600 text-xs mb-1">Ordre Inverse</span>
+                  <span className="font-bold text-lg">{data.wais_mcoi_tot ?? '-'}</span>
+                </div>
+                <div className="flex flex-col items-center p-2 bg-blue-50 rounded">
+                  <span className="text-gray-600 text-xs mb-1">Ordre Croissant</span>
+                  <span className="font-bold text-lg">{data.wais_mcoc_tot ?? '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Empan Values */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Empan (longueur maximale)</h5>
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Direct:</span>
+                  <span className="font-medium">{data.wais_mc_end ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Inverse:</span>
+                  <span className="font-medium">{data.wais_mc_env ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Croissant:</span>
+                  <span className="font-medium">{data.wais_mc_cro ?? '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Empan Z-Scores */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Z-Scores Empan (normes par âge)</h5>
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Direct:</span>
+                  <span className="font-medium">{data.wais_mc_end_std !== null && data.wais_mc_end_std !== undefined ? Number(data.wais_mc_end_std).toFixed(2) : '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Inverse:</span>
+                  <span className="font-medium">{data.wais_mc_env_std !== null && data.wais_mc_env_std !== undefined ? Number(data.wais_mc_env_std).toFixed(2) : '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Croissant:</span>
+                  <span className="font-medium">{data.wais_mc_cro_std !== null && data.wais_mc_cro_std !== undefined ? Number(data.wais_mc_cro_std).toFixed(2) : '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Global Scores */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Scores globaux</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Note Brute Totale:</span>
+                  <span className="font-semibold">{data.wais_mc_tot ?? '-'}/48</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Note Standard:</span>
+                  <span className="font-semibold">{data.wais_mc_std ?? '-'}/19</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Empan Difference (D-I):</span>
+                  <span className="font-medium">{data.wais_mc_emp ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 font-medium">Valeur CR (Z-Score):</span>
+                  <span className="font-bold">{data.wais_mc_cr !== null && data.wais_mc_cr !== undefined ? Number(data.wais_mc_cr).toFixed(2) : '-'}</span>
+                </div>
+              </div>
+            </div>
 
             {/* Demographics */}
             <div className="pt-2 border-t">

@@ -75,6 +75,7 @@ export const QUESTIONNAIRES_REQUIRING_DEMOGRAPHICS: string[] = [
   'WAIS4_LEARNING',
   'WAIS4_MATRICES',
   'WAIS4_CODE',
+  'WAIS_IV_CODE_SYMBOLES_IVT', // Full version with Code, Symboles & IVT
   'WAIS4_DIGIT_SPAN',
   'WAIS4_SIMILITUDES',
   
