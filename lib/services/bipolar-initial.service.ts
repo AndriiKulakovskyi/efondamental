@@ -10,6 +10,7 @@ import {
 } from '@/lib/services/questionnaire-hetero.service';
 import { computeCtqScores, type BipolarCtqResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/ctq';
 import { computeBis10Scores, type BipolarBis10Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/bis10';
+import { computeAls18Scores, type BipolarAls18Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/als18';
 
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
@@ -213,6 +214,29 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving BIS10 response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // ALS18 needs to calculate subscale scores and interpretation
+  if (questionnaireCode === 'ALS18') {
+    const als18Scores = computeAls18Scores(response as Partial<BipolarAls18Response>);
+    const als18Response = {
+      ...response,
+      ...als18Scores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(als18Response, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving ALS18 response:', error);
       throw error;
     }
 

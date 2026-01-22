@@ -95,6 +95,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'info';
     }
     
+    if (code === 'ALS18') {
+      // ALS-18: Apathy scale, total 0-54
+      // 0-13: no apathy, 14-25: mild-moderate, >=26: severe
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 26) return 'error';    // Marked/severe apathy
+      if (score >= 14) return 'warning';  // Mild to moderate apathy
+      return 'success';                   // No clinically significant apathy
+    }
+    
     if (code === 'WURS25') {
       // WURS-25: Clinical cutoff >= 36 suggests childhood ADHD
       if (data.adhd_likely || data.total_score >= 36) return 'warning';
@@ -377,6 +387,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'WURS25' && 'Résultats WURS-25'}
               {code === 'CSM' && 'Résultats CSM - Chronotype'}
               {code === 'CTI' && 'Résultats CTI - Type Circadien'}
+              {code === 'ALS18' && 'Résultats ALS-18 - Apathie'}
               {code === 'ALDA' && 'Score Alda'}
               {code === 'CGI' && 'Résultats CGI'}
               {code === 'MADRS' && 'Résultats MADRS - Échelle de Dépression'}
@@ -411,6 +422,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 : code === 'CSM'
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'CTI'
+                ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'ALS18'
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'ALDA'
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
@@ -451,6 +464,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'BIS10' && '/4.0'}
               {code === 'CSM' && '/55'}
               {code === 'CTI' && '/55'}
+              {code === 'ALS18' && '/54'}
               {code === 'ALDA' && '/10'}
               {code === 'CGI' && '/7'}
               {code === 'MADRS' && '/60'}
@@ -892,6 +906,64 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="text-xs text-gray-600 mt-2 pt-2 border-t space-y-1">
               <p><strong>Echelle:</strong> Score &lt;28 (matinal), 28-37 (intermédiaire), &ge;38 (vespéral)</p>
               <p><strong>Flexibilité:</strong> Capacité d'adaptation aux changements d'horaires. <strong>Languide:</strong> Tendance à la fatigue et au besoin de sommeil.</p>
+            </div>
+          </div>
+        )}
+
+        {/* ALS-18 Apathy Details */}
+        {code === 'ALS18' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Score Interpretation */}
+            <div className={`p-3 rounded-lg ${
+              data.total_score !== null && data.total_score >= 26
+                ? 'bg-red-50 border border-red-200'
+                : data.total_score !== null && data.total_score >= 14
+                ? 'bg-amber-50 border border-amber-200'
+                : 'bg-green-50 border border-green-200'
+            }`}>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">
+                    {data.total_score !== null && data.total_score >= 26 && 'Apathie marquée / sévère'}
+                    {data.total_score !== null && data.total_score >= 14 && data.total_score < 26 && 'Apathie légère à modérée'}
+                    {(data.total_score === null || data.total_score < 14) && 'Absence d\'apathie cliniquement significative'}
+                  </span>
+                  <span className="text-xs text-gray-600">Score: {data.total_score ?? '-'}/54</span>
+                </div>
+                <p className="text-xs leading-relaxed mt-2">
+                  {data.total_score !== null && data.total_score >= 26 && 
+                    'Désengagement important, passivité, émoussement motivationnel net. Retentissement fonctionnel clair (autonomie, relations, activités). Profil compatible avec une apathie cliniquement centrale, souvent indépendante de la symptomatologie thymique aiguë.'}
+                  {data.total_score !== null && data.total_score >= 14 && data.total_score < 26 && 
+                    'Baisse d\'initiative, réduction de l\'engagement dans les activités quotidiennes, effort moindre pour démarrer ou maintenir une action. Retentissement fonctionnel possible mais partiel.'}
+                  {(data.total_score === null || data.total_score < 14) && 
+                    'Motivation globalement préservée. Les variations observées peuvent relever de la fatigue, du contexte ou de facteurs situationnels.'}
+                </p>
+              </div>
+            </div>
+
+            {/* Subscale Scores */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Scores par sous-échelle</h5>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Anxiété-Dépression (5 items):</span>
+                  <span className="font-medium">{data.anxiety_depression_score ?? '-'}/15</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Dépression-Élation (8 items):</span>
+                  <span className="font-medium">{data.depression_elation_score ?? '-'}/24</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Colère (5 items):</span>
+                  <span className="font-medium">{data.anger_score ?? '-'}/15</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Scale Reference */}
+            <div className="text-xs text-gray-600 mt-2 pt-2 border-t space-y-1">
+              <p><strong>Cotation:</strong> 18 items, 0-3 par item (0=Absolument pas caractéristique, 3=Très caractéristique)</p>
+              <p><strong>Seuils:</strong> 0-13 (absence d'apathie) | 14-25 (légère-modérée) | &ge;26 (marquée/sévère)</p>
             </div>
           </div>
         )}

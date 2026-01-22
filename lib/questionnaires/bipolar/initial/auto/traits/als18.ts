@@ -27,6 +27,7 @@ export interface BipolarAls18Response {
   depression_elation_score?: number | null;
   anger_score?: number | null;
   total_score?: number | null;
+  interpretation?: string | null;
   
   // Metadata
   completed_by?: string | null;
@@ -101,12 +102,15 @@ const SUBSCALES = {
   anger: [4, 8, 9, 11, 14]
 };
 
-export function computeAls18Scores(responses: Partial<BipolarAls18Response>): {
+export interface Als18ScoreResult {
   anxiety_depression_score: number;
   depression_elation_score: number;
   anger_score: number;
   total_score: number;
-} {
+  interpretation: string;
+}
+
+export function computeAls18Scores(responses: Partial<BipolarAls18Response>): Als18ScoreResult {
   const getValue = (itemNum: number): number => {
     const key = `q${itemNum}` as keyof BipolarAls18Response;
     const value = responses[key] as number | null | undefined;
@@ -116,20 +120,31 @@ export function computeAls18Scores(responses: Partial<BipolarAls18Response>): {
   const anxietyDepressionScore = SUBSCALES.anxiety_depression.reduce((sum, item) => sum + getValue(item), 0);
   const depressionElationScore = SUBSCALES.depression_elation.reduce((sum, item) => sum + getValue(item), 0);
   const angerScore = SUBSCALES.anger.reduce((sum, item) => sum + getValue(item), 0);
+  const totalScore = anxietyDepressionScore + depressionElationScore + angerScore;
   
   return {
     anxiety_depression_score: anxietyDepressionScore,
     depression_elation_score: depressionElationScore,
     anger_score: angerScore,
-    total_score: anxietyDepressionScore + depressionElationScore + angerScore
+    total_score: totalScore,
+    interpretation: interpretAls18Score(totalScore)
   };
 }
 
 export function interpretAls18Score(totalScore: number): string {
   // ALS-18 total score ranges from 0-54
-  // Higher scores indicate greater affective lability
-  if (totalScore <= 12) return 'Labilité affective faible';
-  if (totalScore <= 24) return 'Labilité affective modérée';
-  if (totalScore <= 36) return 'Labilité affective élevée';
-  return 'Labilité affective très élevée';
+  // Higher scores indicate greater apathy
+  if (totalScore <= 13) return 'Absence d\'apathie';
+  if (totalScore <= 25) return 'Apathie légère à modérée';
+  return 'Apathie marquée/sévère';
+}
+
+export function getAls18ClinicalGuidance(totalScore: number): string {
+  if (totalScore <= 13) {
+    return 'Motivation globalement préservée. Les variations observées peuvent relever de la fatigue, du contexte ou de facteurs situationnels.';
+  }
+  if (totalScore <= 25) {
+    return 'Baisse d\'initiative, réduction de l\'engagement dans les activités quotidiennes, effort moindre pour démarrer ou maintenir une action. Retentissement fonctionnel possible mais partiel.';
+  }
+  return 'Désengagement important, passivité, émoussement motivationnel net. Retentissement fonctionnel clair (autonomie, relations, activités). Profil compatible avec une apathie cliniquement centrale, souvent indépendante de la symptomatologie thymique aiguë.';
 }
