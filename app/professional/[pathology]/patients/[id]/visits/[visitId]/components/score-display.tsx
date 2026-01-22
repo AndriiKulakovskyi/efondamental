@@ -9,6 +9,22 @@ interface ScoreDisplayProps {
   data: any; // DB Row
 }
 
+// Helper function to get severity label for CTQ (handles both old and new formats)
+function getSeverityLabel(severity: string | null | undefined): string {
+  if (!severity) return '-';
+  // Handle new format
+  if (severity === 'no_trauma') return 'Absent';
+  if (severity === 'low') return 'Faible';
+  if (severity === 'moderate') return 'Modéré';
+  if (severity === 'severe') return 'Sévère';
+  // Handle old format (severe_extreme, low_moderate, etc.)
+  if (severity.includes('severe') || severity.includes('extreme')) return 'Sévère';
+  if (severity.includes('moderate')) return 'Modéré';
+  if (severity.includes('low')) return 'Faible';
+  if (severity.includes('none') || severity.includes('absent') || severity.includes('minimal')) return 'Absent';
+  return severity;
+}
+
 export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
   // Don't display score card for questionnaires without scores
   const noScoreQuestionnaires = ['WAIS4_CRITERIA', 'WAIS4_LEARNING'];
@@ -706,8 +722,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 <span className="text-gray-600">Abus émotionnel:</span>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">{data.emotional_abuse_score ?? '-'}/25</span>
-                  <Badge variant={data.emotional_abuse_severity === 'severe' ? 'destructive' : 'secondary'} className={`text-xs ${data.emotional_abuse_severity === 'moderate' ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
-                    {data.emotional_abuse_severity === 'no_trauma' ? 'Absent' : data.emotional_abuse_severity === 'low' ? 'Faible' : data.emotional_abuse_severity === 'moderate' ? 'Modéré' : data.emotional_abuse_severity === 'severe' ? 'Sévère' : '-'}
+                  <Badge variant={data.emotional_abuse_severity?.includes('severe') ? 'destructive' : 'secondary'} className={`text-xs ${data.emotional_abuse_severity?.includes('moderate') ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
+                    {getSeverityLabel(data.emotional_abuse_severity)}
                   </Badge>
                 </div>
               </div>
@@ -715,8 +731,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 <span className="text-gray-600">Abus physique:</span>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">{data.physical_abuse_score ?? '-'}/25</span>
-                  <Badge variant={data.physical_abuse_severity === 'severe' ? 'destructive' : 'secondary'} className={`text-xs ${data.physical_abuse_severity === 'moderate' ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
-                    {data.physical_abuse_severity === 'no_trauma' ? 'Absent' : data.physical_abuse_severity === 'low' ? 'Faible' : data.physical_abuse_severity === 'moderate' ? 'Modéré' : data.physical_abuse_severity === 'severe' ? 'Sévère' : '-'}
+                  <Badge variant={data.physical_abuse_severity?.includes('severe') ? 'destructive' : 'secondary'} className={`text-xs ${data.physical_abuse_severity?.includes('moderate') ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
+                    {getSeverityLabel(data.physical_abuse_severity)}
                   </Badge>
                 </div>
               </div>
@@ -724,8 +740,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 <span className="text-gray-600">Abus sexuel:</span>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">{data.sexual_abuse_score ?? '-'}/25</span>
-                  <Badge variant={data.sexual_abuse_severity === 'severe' ? 'destructive' : 'secondary'} className={`text-xs ${data.sexual_abuse_severity === 'moderate' ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
-                    {data.sexual_abuse_severity === 'no_trauma' ? 'Absent' : data.sexual_abuse_severity === 'low' ? 'Faible' : data.sexual_abuse_severity === 'moderate' ? 'Modéré' : data.sexual_abuse_severity === 'severe' ? 'Sévère' : '-'}
+                  <Badge variant={data.sexual_abuse_severity?.includes('severe') ? 'destructive' : 'secondary'} className={`text-xs ${data.sexual_abuse_severity?.includes('moderate') ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
+                    {getSeverityLabel(data.sexual_abuse_severity)}
                   </Badge>
                 </div>
               </div>
@@ -733,8 +749,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 <span className="text-gray-600">Négligence émotionnelle:</span>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">{data.emotional_neglect_score ?? '-'}/25</span>
-                  <Badge variant={data.emotional_neglect_severity === 'severe' ? 'destructive' : 'secondary'} className={`text-xs ${data.emotional_neglect_severity === 'moderate' ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
-                    {data.emotional_neglect_severity === 'no_trauma' ? 'Absent' : data.emotional_neglect_severity === 'low' ? 'Faible' : data.emotional_neglect_severity === 'moderate' ? 'Modéré' : data.emotional_neglect_severity === 'severe' ? 'Sévère' : '-'}
+                  <Badge variant={data.emotional_neglect_severity?.includes('severe') ? 'destructive' : 'secondary'} className={`text-xs ${data.emotional_neglect_severity?.includes('moderate') ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
+                    {getSeverityLabel(data.emotional_neglect_severity)}
                   </Badge>
                 </div>
               </div>
@@ -742,21 +758,21 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 <span className="text-gray-600">Négligence physique:</span>
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">{data.physical_neglect_score ?? '-'}/25</span>
-                  <Badge variant={data.physical_neglect_severity === 'severe' ? 'destructive' : 'secondary'} className={`text-xs ${data.physical_neglect_severity === 'moderate' ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
-                    {data.physical_neglect_severity === 'no_trauma' ? 'Absent' : data.physical_neglect_severity === 'low' ? 'Faible' : data.physical_neglect_severity === 'moderate' ? 'Modéré' : data.physical_neglect_severity === 'severe' ? 'Sévère' : '-'}
+                  <Badge variant={data.physical_neglect_severity?.includes('severe') ? 'destructive' : 'secondary'} className={`text-xs ${data.physical_neglect_severity?.includes('moderate') ? 'bg-orange-100 text-orange-700 border-orange-200' : ''}`}>
+                    {getSeverityLabel(data.physical_neglect_severity)}
                   </Badge>
                 </div>
               </div>
             </div>
             <div className="flex justify-between pt-2 border-t">
               <span className="text-gray-600 font-medium">Déni/Minimisation:</span>
-              <span className={`font-bold ${data.denial_score > 0 ? 'text-orange-700' : 'text-green-700'}`}>
-                {data.denial_score ?? '-'}/3
+              <span className={`font-bold ${data.denial_score >= 6 ? 'text-orange-700' : 'text-green-700'}`}>
+                {data.denial_score ?? '-'}/15
               </span>
             </div>
-            {data.denial_score > 0 && (
+            {data.denial_score >= 6 && (
               <p className="text-xs text-orange-700 mt-1 pt-2 border-t">
-                Présence de déni ou minimisation détectée. Les résultats doivent être interprétés avec prudence.
+                Score de minimisation significatif (≥6) : suspicion de sous-déclaration des traumatismes. Les résultats doivent être interprétés avec prudence.
               </p>
             )}
           </div>

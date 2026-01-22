@@ -31,7 +31,16 @@ export interface BipolarCtqResponse {
   emotional_neglect_score?: number | null;
   physical_neglect_score?: number | null;
   denial_score?: number | null;
+  minimization_score?: number | null;
   total_score?: number | null;
+  
+  // Severity interpretations
+  emotional_abuse_severity?: string | null;
+  physical_abuse_severity?: string | null;
+  sexual_abuse_severity?: string | null;
+  emotional_neglect_severity?: string | null;
+  physical_neglect_severity?: string | null;
+  interpretation?: string | null;
   
   // Metadata
   completed_by?: string | null;
@@ -128,16 +137,21 @@ const SUBSCALES = {
   denial: [10, 16, 22]
 };
 
-// Severity thresholds for each subscale
+// Severity thresholds for each subscale (based on CTQ clinical guidelines)
+// Abus émotionnel: 5-8 absent, 9-12 faible, 13-15 modéré, ≥16 sévère
+// Abus physique: 5-7 absent, 8-9 faible, 10-12 modéré, ≥13 sévère
+// Abus sexuel: 5 absent, 6-7 faible, 8-12 modéré, ≥13 sévère
+// Négligence émotionnelle: 5-9 absent, 10-14 faible, 15-17 modéré, ≥18 sévère
+// Négligence physique: 5-7 absent, 8-9 faible, 10-12 modéré, ≥13 sévère
 const SEVERITY_THRESHOLDS = {
-  emotional_abuse: { none: 8, low: 9, moderate: 13, severe: 16 },
-  physical_abuse: { none: 7, low: 8, moderate: 10, severe: 13 },
-  sexual_abuse: { none: 5, low: 6, moderate: 8, severe: 13 },
-  emotional_neglect: { none: 9, low: 10, moderate: 15, severe: 18 },
-  physical_neglect: { none: 7, low: 8, moderate: 10, severe: 13 }
+  emotional_abuse: { none: 8, low: 12, moderate: 15, severe: 16 },
+  physical_abuse: { none: 7, low: 9, moderate: 12, severe: 13 },
+  sexual_abuse: { none: 5, low: 7, moderate: 12, severe: 13 },
+  emotional_neglect: { none: 9, low: 14, moderate: 17, severe: 18 },
+  physical_neglect: { none: 7, low: 9, moderate: 12, severe: 13 }
 };
 
-export function computeCtqScores(responses: Partial<BipolarCtqResponse>): {
+export interface CtqScoreResult {
   emotional_abuse_score: number;
   physical_abuse_score: number;
   sexual_abuse_score: number;
@@ -145,7 +159,16 @@ export function computeCtqScores(responses: Partial<BipolarCtqResponse>): {
   physical_neglect_score: number;
   denial_score: number;
   total_score: number;
-} {
+  emotional_abuse_severity: string;
+  physical_abuse_severity: string;
+  sexual_abuse_severity: string;
+  emotional_neglect_severity: string;
+  physical_neglect_severity: string;
+  minimization_score: number;
+  interpretation: string;
+}
+
+export function computeCtqScores(responses: Partial<BipolarCtqResponse>): CtqScoreResult {
   const getAdjustedValue = (itemNum: number): number => {
     const key = `q${itemNum}` as keyof BipolarCtqResponse;
     const value = responses[key] as number | null | undefined;
@@ -153,16 +176,63 @@ export function computeCtqScores(responses: Partial<BipolarCtqResponse>): {
     return REVERSE_ITEMS.includes(itemNum) ? (6 - value) : value;
   };
   
+  const getRawValue = (itemNum: number): number => {
+    const key = `q${itemNum}` as keyof BipolarCtqResponse;
+    const value = responses[key] as number | null | undefined;
+    return value ?? 0;
+  };
+  
   const calculateSubscore = (items: number[]): number => {
     return items.reduce((sum, item) => sum + getAdjustedValue(item), 0);
   };
   
+  // Calculate subscale scores
   const emotionalAbuse = calculateSubscore(SUBSCALES.emotional_abuse);
   const physicalAbuse = calculateSubscore(SUBSCALES.physical_abuse);
   const sexualAbuse = calculateSubscore(SUBSCALES.sexual_abuse);
   const emotionalNeglect = calculateSubscore(SUBSCALES.emotional_neglect);
   const physicalNeglect = calculateSubscore(SUBSCALES.physical_neglect);
-  const denial = calculateSubscore(SUBSCALES.denial);
+  
+  // Denial/minimization score (items 10, 16, 22 - NOT reversed)
+  const denialScore = SUBSCALES.denial.reduce((sum, item) => sum + getRawValue(item), 0);
+  
+  // Calculate severities
+  const emotionalAbuseSeverity = interpretCtqSubscale('emotional_abuse', emotionalAbuse);
+  const physicalAbuseSeverity = interpretCtqSubscale('physical_abuse', physicalAbuse);
+  const sexualAbuseSeverity = interpretCtqSubscale('sexual_abuse', sexualAbuse);
+  const emotionalNeglectSeverity = interpretCtqSubscale('emotional_neglect', emotionalNeglect);
+  const physicalNeglectSeverity = interpretCtqSubscale('physical_neglect', physicalNeglect);
+  
+  // Total score (sum of all 5 clinical subscales, excluding denial)
+  const totalScore = emotionalAbuse + physicalAbuse + sexualAbuse + emotionalNeglect + physicalNeglect;
+  
+  // Build interpretation string
+  const interpretationParts: string[] = [];
+  
+  if (emotionalAbuseSeverity !== 'no_trauma') {
+    interpretationParts.push(`Abus émotionnel: ${getSeverityLabel(emotionalAbuseSeverity)}`);
+  }
+  if (physicalAbuseSeverity !== 'no_trauma') {
+    interpretationParts.push(`Abus physique: ${getSeverityLabel(physicalAbuseSeverity)}`);
+  }
+  if (sexualAbuseSeverity !== 'no_trauma') {
+    interpretationParts.push(`Abus sexuel: ${getSeverityLabel(sexualAbuseSeverity)}`);
+  }
+  if (emotionalNeglectSeverity !== 'no_trauma') {
+    interpretationParts.push(`Négligence émotionnelle: ${getSeverityLabel(emotionalNeglectSeverity)}`);
+  }
+  if (physicalNeglectSeverity !== 'no_trauma') {
+    interpretationParts.push(`Négligence physique: ${getSeverityLabel(physicalNeglectSeverity)}`);
+  }
+  
+  // Check for minimization (denial score >= 6 suggests underreporting)
+  if (denialScore >= 6) {
+    interpretationParts.push('Attention: Score de minimisation élevé - possible sous-déclaration des traumatismes');
+  }
+  
+  const interpretation = interpretationParts.length > 0 
+    ? interpretationParts.join('. ') 
+    : 'Aucun traumatisme significatif rapporté';
   
   return {
     emotional_abuse_score: emotionalAbuse,
@@ -170,15 +240,32 @@ export function computeCtqScores(responses: Partial<BipolarCtqResponse>): {
     sexual_abuse_score: sexualAbuse,
     emotional_neglect_score: emotionalNeglect,
     physical_neglect_score: physicalNeglect,
-    denial_score: denial,
-    total_score: emotionalAbuse + physicalAbuse + sexualAbuse + emotionalNeglect + physicalNeglect
+    denial_score: denialScore,
+    minimization_score: denialScore,
+    total_score: totalScore,
+    emotional_abuse_severity: emotionalAbuseSeverity,
+    physical_abuse_severity: physicalAbuseSeverity,
+    sexual_abuse_severity: sexualAbuseSeverity,
+    emotional_neglect_severity: emotionalNeglectSeverity,
+    physical_neglect_severity: physicalNeglectSeverity,
+    interpretation
   };
+}
+
+function getSeverityLabel(severity: string): string {
+  switch (severity) {
+    case 'no_trauma': return 'Absent/Minimal';
+    case 'low': return 'Faible à modéré';
+    case 'moderate': return 'Modéré à sévère';
+    case 'severe': return 'Sévère à extrême';
+    default: return severity;
+  }
 }
 
 export function interpretCtqSubscale(subscale: keyof typeof SEVERITY_THRESHOLDS, score: number): string {
   const thresholds = SEVERITY_THRESHOLDS[subscale];
-  if (score <= thresholds.none) return 'None/Minimal';
-  if (score <= thresholds.low) return 'Low/Moderate';
-  if (score <= thresholds.moderate) return 'Moderate/Severe';
-  return 'Severe/Extreme';
+  if (score <= thresholds.none) return 'no_trauma';
+  if (score <= thresholds.low) return 'low';
+  if (score <= thresholds.moderate) return 'moderate';
+  return 'severe';
 }

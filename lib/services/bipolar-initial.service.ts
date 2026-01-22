@@ -8,6 +8,7 @@ import {
   type MadrsResponseInsert,
   type YmrsResponseInsert 
 } from '@/lib/services/questionnaire-hetero.service';
+import { computeCtqScores, type BipolarCtqResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/ctq';
 
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
@@ -169,6 +170,29 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
   
   if (questionnaireCode === 'YMRS') {
     return await saveYmrsResponse(response as any as YmrsResponseInsert) as any as T;
+  }
+
+  // CTQ needs to calculate subscale scores and severity interpretations
+  if (questionnaireCode === 'CTQ') {
+    const ctqScores = computeCtqScores(response as Partial<BipolarCtqResponse>);
+    const ctqResponse = {
+      ...response,
+      ...ctqScores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(ctqResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving CTQ response:', error);
+      throw error;
+    }
+
+    return data as T;
   }
 
   // Convert "oui"/"non" string values to boolean for database boolean columns
