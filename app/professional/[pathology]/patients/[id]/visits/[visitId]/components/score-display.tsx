@@ -336,6 +336,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'error';                      // High/very high
     }
     
+    if (code === 'MARS') {
+      // MARS: Medication adherence
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 8) return 'success';    // Good adherence
+      if (score >= 6) return 'info';       // Moderate
+      if (score >= 4) return 'warning';    // Low
+      return 'error';                      // Very low
+    }
+    
     return 'info';
   };
 
@@ -458,6 +468,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'EQ5D5L' && 'Résultats EQ-5D-5L - Qualité de vie'}
               {code === 'PRISE_M' && 'Résultats PRISE-M - Effets secondaires'}
               {code === 'STAI_YA' && 'Résultats STAI-YA - Anxiété état'}
+              {code === 'MARS' && 'Résultats MARS - Observance thérapeutique'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -521,6 +532,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'STAI_YA'
                 ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'MARS'
+                ? (data.total_score !== undefined ? `${data.total_score}/10` : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM' && '/20'}
               {code === 'QIDS_SR16' && '/27'}
@@ -2668,6 +2681,89 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <p className="mt-1"><strong>Score total:</strong> 20-80 (plus élevé = plus d'anxiété)</p>
               <p className="mt-1"><strong>Seuils:</strong> ≤35 (légère) | 36-45 (modérée) | 46-55 (moyenne-haute) | 56-65 (élevée) | &gt;65 (très élevée)</p>
               <p className="mt-1 text-gray-600"><strong>Note:</strong> Le STAI-YA évalue l'anxiété état (situationnelle), à distinguer de l'anxiété trait (dispositionelle, STAI-YB).</p>
+            </div>
+          </div>
+        )}
+
+        {/* MARS Details */}
+        {code === 'MARS' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg ${
+                data.total_score >= 8
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : data.total_score >= 6
+                  ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : data.total_score >= 4
+                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                <p className="font-medium">{data.interpretation}</p>
+              </div>
+            )}
+
+            {/* Score Details */}
+            <div className="grid grid-cols-3 gap-4 pt-2">
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <div className="text-2xl font-bold text-gray-900">{data.total_score ?? '-'}</div>
+                <div className="text-xs text-gray-600 mt-1">Score total</div>
+                <div className="text-xs text-gray-500">/10</div>
+              </div>
+              <div className="text-center p-3 bg-blue-50 rounded-lg">
+                <div className="text-2xl font-bold text-blue-700">{data.adherence_subscore ?? '-'}</div>
+                <div className="text-xs text-gray-600 mt-1">Comportements</div>
+                <div className="text-xs text-gray-500">/4 (Items 1-4)</div>
+              </div>
+              <div className="text-center p-3 bg-purple-50 rounded-lg">
+                <div className="text-2xl font-bold text-purple-700">{data.attitude_subscore ?? '-'}</div>
+                <div className="text-xs text-gray-600 mt-1">Attitudes</div>
+                <div className="text-xs text-gray-500">/6 (Items 5-10)</div>
+              </div>
+            </div>
+
+            {/* Adherence Percentage */}
+            {data.adherence_percentage !== null && data.adherence_percentage !== undefined && (
+              <div className="pt-2 border-t">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600">Taux d'observance:</span>
+                  <span className="font-medium text-lg">{parseFloat(data.adherence_percentage).toFixed(0)}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div 
+                    className={`h-3 rounded-full transition-all ${
+                      data.adherence_percentage >= 80 ? 'bg-green-500' :
+                      data.adherence_percentage >= 60 ? 'bg-blue-500' :
+                      data.adherence_percentage >= 40 ? 'bg-amber-500' : 'bg-red-500'
+                    }`}
+                    style={{ width: `${Math.min(100, data.adherence_percentage)}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Medication Status */}
+            {data.taking_medication && (
+              <div className="pt-2 border-t">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Prend actuellement un traitement:</span>
+                  <span className={`font-medium ${
+                    data.taking_medication === 'oui' ? 'text-blue-600' : 'text-gray-600'
+                  }`}>
+                    {data.taking_medication === 'oui' ? 'Oui' : 
+                     data.taking_medication === 'non' ? 'Non' : data.taking_medication}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>MARS:</strong> Medication Adherence Rating Scale - Évalue l'observance et les attitudes face au traitement</p>
+              <p className="mt-1"><strong>Cotation:</strong> 10 items, 0-1 par item. Items positifs (7, 8): Oui=1pt. Items négatifs (1-6, 9, 10): Non=1pt</p>
+              <p className="mt-1"><strong>Score total:</strong> 0-10 (plus élevé = meilleure observance)</p>
+              <p className="mt-1"><strong>Seuils:</strong> ≥8 (bonne) | 6-7 (modérée) | 4-5 (faible) | &lt;4 (très faible)</p>
+              <p className="mt-1 text-gray-600"><strong>Note:</strong> Une faible observance est un facteur de risque majeur de rechute. L'identification des obstacles est essentielle.</p>
             </div>
           </div>
         )}

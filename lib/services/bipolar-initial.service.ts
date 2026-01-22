@@ -18,6 +18,7 @@ import { computeCtiScores, type BipolarCtiResponse } from '@/lib/questionnaires/
 import { computeEq5d5lScores, type BipolarEq5d5lResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/eq5d5l';
 import { computePriseMScores, type BipolarPriseMResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/prise-m';
 import { computeStaiYaScores, type BipolarStaiYaResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/stai-ya';
+import { computeMarsScores, type BipolarMarsResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/mars';
 
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
@@ -405,6 +406,29 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving STAI_YA response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // MARS needs to calculate adherence scores
+  if (questionnaireCode === 'MARS') {
+    const marsScores = computeMarsScores(response as Partial<BipolarMarsResponse>);
+    const marsResponse = {
+      ...response,
+      ...marsScores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(marsResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving MARS response:', error);
       throw error;
     }
 

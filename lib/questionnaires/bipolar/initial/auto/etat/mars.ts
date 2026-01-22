@@ -34,6 +34,8 @@ export interface BipolarMarsResponse {
   total_score?: number | null;
   adherence_subscore?: number | null;
   attitude_subscore?: number | null;
+  adherence_percentage?: number | null;
+  interpretation?: string | null;
   
   // Metadata
   completed_by?: string | null;
@@ -176,11 +178,15 @@ const POSITIVE_ITEMS = [7, 8];
 // Items where "No" indicates good adherence (1-6, 9, 10)
 const NEGATIVE_ITEMS = [1, 2, 3, 4, 5, 6, 9, 10];
 
-export function computeMarsScores(responses: Partial<BipolarMarsResponse>): {
+export interface MarsScoreResult {
   total_score: number;
   adherence_subscore: number;
   attitude_subscore: number;
-} {
+  adherence_percentage: number;
+  interpretation: string;
+}
+
+export function computeMarsScores(responses: Partial<BipolarMarsResponse>): MarsScoreResult {
   let totalScore = 0;
   let adherenceSubscore = 0; // Items 1-4: behavioral adherence
   let attitudeSubscore = 0;  // Items 5-10: attitudes toward medication
@@ -210,18 +216,28 @@ export function computeMarsScores(responses: Partial<BipolarMarsResponse>): {
     }
   }
   
+  const adherencePercentage = (totalScore / 10) * 100;
+  
   return {
     total_score: totalScore,
     adherence_subscore: adherenceSubscore,
-    attitude_subscore: attitudeSubscore
+    attitude_subscore: attitudeSubscore,
+    adherence_percentage: adherencePercentage,
+    interpretation: interpretMarsScore(totalScore)
   };
 }
 
 export function interpretMarsScore(totalScore: number): string {
   // MARS total score ranges from 0-10
   // Higher scores indicate better adherence
-  if (totalScore >= 8) return 'Bonne observance';
-  if (totalScore >= 6) return 'Observance modérée';
-  if (totalScore >= 4) return 'Observance faible';
-  return 'Très faible observance';
+  if (totalScore >= 8) {
+    return 'Bonne observance thérapeutique. Comportements et attitudes favorables à la prise régulière du traitement. Maintien de l\'adhésion recommandé.';
+  }
+  if (totalScore >= 6) {
+    return 'Observance modérée. Quelques difficultés d\'adhésion identifiées. Exploration des obstacles et renforcement de la motivation recommandés.';
+  }
+  if (totalScore >= 4) {
+    return 'Observance faible. Difficultés importantes d\'adhésion au traitement. Intervention ciblée nécessaire pour améliorer l\'observance.';
+  }
+  return 'Très faible observance. Non-adhésion majeure au traitement. Risque élevé de rechute. Intervention thérapeutique urgente recommandée pour identifier et lever les obstacles.';
 }
