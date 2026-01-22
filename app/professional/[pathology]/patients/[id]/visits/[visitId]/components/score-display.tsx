@@ -367,6 +367,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'error';                      // Severe/Very severe
     }
     
+    if (code === 'PSQI') {
+      // PSQI: Sleep quality (0-21, >5 = poor sleep)
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score <= 5) return 'success';    // Good sleep quality
+      if (score <= 10) return 'info';      // Altered sleep quality
+      if (score <= 15) return 'warning';   // Poor sleep quality
+      return 'error';                      // Very poor sleep quality
+    }
+    
     return 'info';
   };
 
@@ -491,6 +501,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'STAI_YA' && 'Résultats STAI-YA - Anxiété état'}
               {code === 'MARS' && 'Résultats MARS - Observance thérapeutique'}
               {code === 'MATHYS' && 'Résultats MAThyS - États thymiques'}
+              {code === 'PSQI' && 'Résultats PSQI - Qualité du Sommeil'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -560,9 +571,12 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.total_score !== undefined ? `${parseFloat(data.total_score).toFixed(1)}/200` : '-')
                 : code === 'QIDS_SR16'
                 ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'PSQI'
+                ? (data.total_score !== undefined ? data.total_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM' && '/20'}
               {code === 'QIDS_SR16' && '/27'}
+              {code === 'PSQI' && '/21'}
               {code === 'CTQ' && '/125'}
               {code === 'BIS10' && '/4.0'}
               {code === 'CSM' && '/55'}
@@ -2945,6 +2959,121 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <p className="mt-1"><strong>Domaines:</strong> Sommeil (items 1-4, max), Appétit/Poids (6-9, max), Psychomoteur (15-16, max), autres items scorés directement</p>
               <p className="mt-1"><strong>Seuils:</strong> 0-5 (absence) | 6-10 (légère) | 11-15 (modérée) | 16-20 (sévère) | 21-27 (très sévère)</p>
               <p className="mt-1 text-gray-600"><strong>Note:</strong> Outil validé pour le dépistage et le suivi de la dépression. Sensible au changement thérapeutique.</p>
+            </div>
+          </div>
+        )}
+
+        {/* PSQI Details */}
+        {code === 'PSQI' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg ${
+                data.total_score <= 5
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : data.total_score <= 10
+                  ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : data.total_score <= 15
+                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                <p className="font-medium">{data.interpretation}</p>
+              </div>
+            )}
+
+            {/* Component Scores */}
+            <div className="pt-2">
+              <h5 className="font-semibold text-gray-700 mb-3">Scores par composante (0-3 chacun)</h5>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">C1. Qualité subjective:</span>
+                  <span className="font-semibold">{data.c1_subjective_quality ?? '-'}/3</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">C2. Latence d'endormissement:</span>
+                  <span className="font-semibold">{data.c2_latency ?? '-'}/3</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">C3. Durée du sommeil:</span>
+                  <span className="font-semibold">{data.c3_duration ?? '-'}/3</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">C4. Efficience du sommeil:</span>
+                  <span className="font-semibold">{data.c4_efficiency ?? '-'}/3</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">C5. Perturbations:</span>
+                  <span className="font-semibold">{data.c5_disturbances ?? '-'}/3</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">C6. Médication:</span>
+                  <span className="font-semibold">{data.c6_medication ?? '-'}/3</span>
+                </div>
+                <div className="flex justify-between items-center col-span-2">
+                  <span className="text-gray-600">C7. Dysfonctionnement diurne:</span>
+                  <span className="font-semibold">{data.c7_daytime_dysfunction ?? '-'}/3</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Sleep Efficiency Details */}
+            {(data.sleep_efficiency_pct !== null && data.sleep_efficiency_pct !== undefined) && (
+              <div className="pt-2 border-t">
+                <h5 className="font-semibold text-gray-700 mb-2">Efficience du sommeil</h5>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full ${
+                          data.sleep_efficiency_pct >= 85 ? 'bg-green-500' :
+                          data.sleep_efficiency_pct >= 75 ? 'bg-blue-500' :
+                          data.sleep_efficiency_pct >= 65 ? 'bg-amber-500' :
+                          'bg-red-500'
+                        }`}
+                        style={{ width: `${Math.min(data.sleep_efficiency_pct, 100)}%` }}
+                      />
+                    </div>
+                    <span className="font-semibold text-sm w-12 text-right">
+                      {data.sleep_efficiency_pct.toFixed(1)}%
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    {data.time_in_bed_hours !== null && data.time_in_bed_hours !== undefined && (
+                      <span>Temps au lit: {data.time_in_bed_hours.toFixed(1)}h</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Sleep Quality Level */}
+            <div className="pt-2 border-t">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Qualité du sommeil:</span>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  data.total_score <= 5
+                    ? 'bg-green-100 text-green-800'
+                    : data.total_score <= 10
+                    ? 'bg-blue-100 text-blue-800'
+                    : data.total_score <= 15
+                    ? 'bg-amber-100 text-amber-800'
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {data.total_score <= 5 ? 'Bonne' :
+                   data.total_score <= 10 ? 'Altérée' :
+                   data.total_score <= 15 ? 'Mauvaise' :
+                   'Très mauvaise'}
+                </span>
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>PSQI:</strong> Pittsburgh Sleep Quality Index - Indice de Qualité du Sommeil</p>
+              <p className="mt-1"><strong>Cotation:</strong> 7 composantes (0-3 chacune). Score total: 0-21</p>
+              <p className="mt-1"><strong>Composantes:</strong> Qualité subjective, Latence, Durée, Efficience, Perturbations, Médication, Dysfonctionnement diurne</p>
+              <p className="mt-1"><strong>Seuils:</strong> 0-5 (bonne) | 6-10 (altérée) | 11-15 (mauvaise) | 16-21 (très mauvaise)</p>
+              <p className="mt-1 text-gray-600"><strong>Note:</strong> Score &gt; 5 indique une mauvaise qualité de sommeil cliniquement significative (Buysse et al., 1989)</p>
             </div>
           </div>
         )}

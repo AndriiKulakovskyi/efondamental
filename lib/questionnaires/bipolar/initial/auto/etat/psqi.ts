@@ -49,8 +49,13 @@ export interface BipolarPsqiResponse {
   c6_medication?: number | null;
   c7_daytime_dysfunction?: number | null;
   
-  // Total score
+  // Total score and interpretation
   total_score?: number | null;
+  interpretation?: string | null;
+  
+  // Calculated values
+  time_in_bed_hours?: number | null;
+  sleep_efficiency_pct?: number | null;
   
   // Metadata
   completed_by?: string | null;
@@ -178,7 +183,7 @@ function calculateTimeDifference(start: string, end: string): number {
   return diff;
 }
 
-export function computePsqiScores(responses: Partial<BipolarPsqiResponse>): {
+export interface PsqiScoreResult {
   c1_subjective_quality: number;
   c2_latency: number;
   c3_duration: number;
@@ -187,7 +192,12 @@ export function computePsqiScores(responses: Partial<BipolarPsqiResponse>): {
   c6_medication: number;
   c7_daytime_dysfunction: number;
   total_score: number;
-} {
+  time_in_bed_hours: number;
+  sleep_efficiency_pct: number;
+  interpretation: string;
+}
+
+export function computePsqiScores(responses: Partial<BipolarPsqiResponse>): PsqiScoreResult {
   // Component 1: Subjective sleep quality (Q6)
   const c1 = responses.q6 ?? 0;
   
@@ -262,15 +272,29 @@ export function computePsqiScores(responses: Partial<BipolarPsqiResponse>): {
     c5_disturbances: c5,
     c6_medication: c6,
     c7_daytime_dysfunction: c7,
-    total_score: total
+    total_score: total,
+    time_in_bed_hours: parseFloat(timeInBed.toFixed(2)),
+    sleep_efficiency_pct: parseFloat(efficiency.toFixed(2)),
+    interpretation: interpretPsqiScore(total)
   };
 }
 
 export function interpretPsqiScore(totalScore: number): string {
   // PSQI total score ranges from 0-21
   // Score > 5 indicates poor sleep quality
-  if (totalScore <= 5) return 'Bonne qualité de sommeil';
-  if (totalScore <= 10) return 'Qualité de sommeil altérée';
-  if (totalScore <= 15) return 'Mauvaise qualité de sommeil';
-  return 'Très mauvaise qualité de sommeil';
+  // Clinical guidelines from Buysse et al. (1989)
+  
+  if (totalScore <= 5) {
+    return 'Bonne qualité de sommeil. Score ≤ 5 : Sommeil de qualité satisfaisante sans plainte cliniquement significative. Les habitudes de sommeil sont adaptées et le retentissement diurne est absent ou minime.';
+  }
+  
+  if (totalScore <= 10) {
+    return 'Qualité de sommeil altérée. Score 6-10 : Difficultés de sommeil modérées. Présence de plaintes subjectives avec retentissement sur le fonctionnement quotidien. Évaluation des facteurs contributifs recommandée (anxiété, hygiène du sommeil, médicaments).';
+  }
+  
+  if (totalScore <= 15) {
+    return 'Mauvaise qualité de sommeil. Score 11-15 : Troubles du sommeil marqués avec impact significatif sur la qualité de vie. Plusieurs composantes du sommeil sont perturbées. Intervention thérapeutique recommandée : TCC-I (thérapie cognitivo-comportementale de l\'insomnie), révision des traitements, bilan des comorbidités.';
+  }
+  
+  return 'Très mauvaise qualité de sommeil. Score 16-21 : Insomnie sévère avec retentissement majeur. Dysfonctionnement important sur le plan diurne. Prise en charge multidisciplinaire nécessaire. Rechercher un trouble du sommeil primaire (apnée, syndrome des jambes sans repos) ou une pathologie psychiatrique sous-jacente. Orientation vers une consultation spécialisée du sommeil si besoin.';
 }
