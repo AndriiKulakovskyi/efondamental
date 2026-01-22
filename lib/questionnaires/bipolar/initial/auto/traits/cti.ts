@@ -15,15 +15,22 @@ export interface BipolarCtiResponse {
   visit_id: string;
   patient_id: string;
   
-  // Questions 1-11
+  // Questions 1-30 (CTI has 30 questions)
   q1?: number | null; q2?: number | null; q3?: number | null; q4?: number | null;
   q5?: number | null; q6?: number | null; q7?: number | null; q8?: number | null;
-  q9?: number | null; q10?: number | null; q11?: number | null;
+  q9?: number | null; q10?: number | null; q11?: number | null; q12?: number | null;
+  q13?: number | null; q14?: number | null; q15?: number | null; q16?: number | null;
+  q17?: number | null; q18?: number | null; q19?: number | null; q20?: number | null;
+  q21?: number | null; q22?: number | null; q23?: number | null; q24?: number | null;
+  q25?: number | null; q26?: number | null; q27?: number | null; q28?: number | null;
+  q29?: number | null; q30?: number | null;
   
   // Subscale scores
   flexibility_score?: number | null;
   languid_score?: number | null;
   total_score?: number | null;
+  circadian_type?: string | null;
+  interpretation?: string | null;
   
   // Metadata
   completed_by?: string | null;
@@ -85,15 +92,19 @@ export const CTI_DEFINITION: QuestionnaireDefinition = {
 // Scoring Functions
 // ============================================================================
 
-// Subscale item mappings
+// Subscale item mappings (for 11-item version)
 const FLEXIBILITY_ITEMS = [2, 4, 6, 8, 10];
 const LANGUID_ITEMS = [1, 3, 5, 7, 9, 11];
 
-export function computeCtiScores(responses: Partial<BipolarCtiResponse>): {
+export interface CtiScoreResult {
   flexibility_score: number;
   languid_score: number;
   total_score: number;
-} {
+  circadian_type: string;
+  interpretation: string;
+}
+
+export function computeCtiScores(responses: Partial<BipolarCtiResponse>): CtiScoreResult {
   const getValue = (itemNum: number): number => {
     const key = `q${itemNum}` as keyof BipolarCtiResponse;
     const value = responses[key] as number | null | undefined;
@@ -102,12 +113,23 @@ export function computeCtiScores(responses: Partial<BipolarCtiResponse>): {
   
   const flexibilityScore = FLEXIBILITY_ITEMS.reduce((sum, item) => sum + getValue(item), 0);
   const languidScore = LANGUID_ITEMS.reduce((sum, item) => sum + getValue(item), 0);
+  const totalScore = flexibilityScore + languidScore;
   
   return {
     flexibility_score: flexibilityScore,
     languid_score: languidScore,
-    total_score: flexibilityScore + languidScore
+    total_score: totalScore,
+    circadian_type: getCircadianType(totalScore),
+    interpretation: interpretCtiScores(flexibilityScore, languidScore)
   };
+}
+
+export function getCircadianType(totalScore: number): string {
+  // CTI total score for 11-item version: 11-55
+  // Scores < 28: evening type, 28-37: intermediate, >= 38: morning type
+  if (totalScore < 28) return 'evening';
+  if (totalScore <= 37) return 'intermediate';
+  return 'morning';
 }
 
 export function interpretCtiFlexibility(score: number): string {

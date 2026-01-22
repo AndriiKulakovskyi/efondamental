@@ -14,6 +14,7 @@ import { computeAls18Scores, type BipolarAls18Response } from '@/lib/questionnai
 import { computeAimScores, type BipolarAimResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/aim';
 import { computeAq12Scores, type BipolarAq12Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/aq12';
 import { computeCsmScores, type BipolarCsmResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/csm';
+import { computeCtiScores, type BipolarCtiResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/cti';
 
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
@@ -309,6 +310,29 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving CSM response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // CTI needs to calculate subscale scores and circadian type
+  if (questionnaireCode === 'CTI') {
+    const ctiScores = computeCtiScores(response as Partial<BipolarCtiResponse>);
+    const ctiResponse = {
+      ...response,
+      ...ctiScores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(ctiResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving CTI response:', error);
       throw error;
     }
 
