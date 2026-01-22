@@ -326,6 +326,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'error';                     // Significant/severe
     }
     
+    if (code === 'STAI_YA') {
+      // STAI-YA: State anxiety
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score <= 35) return 'success';   // Low anxiety
+      if (score <= 45) return 'info';      // Moderate
+      if (score <= 55) return 'warning';   // Moderate-high
+      return 'error';                      // High/very high
+    }
+    
     return 'info';
   };
 
@@ -447,6 +457,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'PSP' && 'Résultats PSP - Fonctionnement personnel et social'}
               {code === 'EQ5D5L' && 'Résultats EQ-5D-5L - Qualité de vie'}
               {code === 'PRISE_M' && 'Résultats PRISE-M - Effets secondaires'}
+              {code === 'STAI_YA' && 'Résultats STAI-YA - Anxiété état'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -507,6 +518,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 : code === 'EQ5D5L'
                 ? (data.profile_string || data.health_state || '-')
                 : code === 'PRISE_M'
+                ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'STAI_YA'
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM' && '/20'}
@@ -2585,6 +2598,76 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <p className="mt-1"><strong>Score total:</strong> Somme des 31 items (0-62)</p>
               <p className="mt-1"><strong>Seuils:</strong> 0 (aucun) | 1-10 (léger) | 11-20 (modéré) | 21-40 (important) | &gt;40 (sévère)</p>
               <p className="mt-1 text-gray-600"><strong>Note:</strong> Un score élevé ou de nombreux effets pénibles peuvent justifier un ajustement thérapeutique.</p>
+            </div>
+          </div>
+        )}
+
+        {/* STAI-YA Details */}
+        {code === 'STAI_YA' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg ${
+                data.total_score <= 35
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : data.total_score <= 45
+                  ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : data.total_score <= 55
+                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                <p className="font-medium">{data.interpretation}</p>
+              </div>
+            )}
+
+            {/* Score Details */}
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <div className="text-2xl font-bold text-gray-900">{data.total_score ?? '-'}</div>
+                <div className="text-xs text-gray-600 mt-1">Score brut</div>
+                <div className="text-xs text-gray-500">/80</div>
+              </div>
+              {data.note_t && (
+                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-700">{parseFloat(data.note_t).toFixed(0)}</div>
+                  <div className="text-xs text-gray-600 mt-1">Note T</div>
+                  <div className="text-xs text-gray-500">(Score normalisé)</div>
+                </div>
+              )}
+            </div>
+
+            {/* Anxiety Level Badge */}
+            {data.anxiety_level && (
+              <div className="pt-2 border-t">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Niveau d'anxiété:</span>
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    data.anxiety_level === 'low' || data.anxiety_level === 'légère'
+                      ? 'bg-green-100 text-green-800'
+                      : data.anxiety_level === 'moderate' || data.anxiety_level === 'modérée'
+                      ? 'bg-blue-100 text-blue-800'
+                      : data.anxiety_level === 'moderate-high' || data.anxiety_level === 'moyenne-haute'
+                      ? 'bg-amber-100 text-amber-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {data.anxiety_level === 'low' ? 'Légère' :
+                     data.anxiety_level === 'moderate' ? 'Modérée' :
+                     data.anxiety_level === 'moderate-high' ? 'Moyenne-haute' :
+                     data.anxiety_level === 'high' ? 'Élevée' :
+                     data.anxiety_level === 'very-high' ? 'Très élevée' :
+                     data.anxiety_level}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>STAI-YA (Form Y-A):</strong> Inventaire d'Anxiété État - Mesure l'anxiété ressentie au moment présent</p>
+              <p className="mt-1"><strong>Cotation:</strong> 20 items, 1-4 par item. Items inversés: 1, 2, 5, 8, 10, 11, 15, 16, 19, 20</p>
+              <p className="mt-1"><strong>Score total:</strong> 20-80 (plus élevé = plus d'anxiété)</p>
+              <p className="mt-1"><strong>Seuils:</strong> ≤35 (légère) | 36-45 (modérée) | 46-55 (moyenne-haute) | 56-65 (élevée) | &gt;65 (très élevée)</p>
+              <p className="mt-1 text-gray-600"><strong>Note:</strong> Le STAI-YA évalue l'anxiété état (situationnelle), à distinguer de l'anxiété trait (dispositionelle, STAI-YB).</p>
             </div>
           </div>
         )}

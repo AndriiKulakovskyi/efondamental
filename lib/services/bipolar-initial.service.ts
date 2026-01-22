@@ -17,6 +17,7 @@ import { computeCsmScores, type BipolarCsmResponse } from '@/lib/questionnaires/
 import { computeCtiScores, type BipolarCtiResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/cti';
 import { computeEq5d5lScores, type BipolarEq5d5lResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/eq5d5l';
 import { computePriseMScores, type BipolarPriseMResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/prise-m';
+import { computeStaiYaScores, type BipolarStaiYaResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/stai-ya';
 
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
@@ -381,6 +382,29 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving PRISE_M response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // STAI_YA needs to calculate anxiety scores
+  if (questionnaireCode === 'STAI_YA') {
+    const staiScores = computeStaiYaScores(response as Partial<BipolarStaiYaResponse>);
+    const staiResponse = {
+      ...response,
+      ...staiScores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(staiResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving STAI_YA response:', error);
       throw error;
     }
 

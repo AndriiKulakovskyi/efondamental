@@ -40,6 +40,8 @@ export interface BipolarStaiYaResponse {
   // Scores
   total_score?: number | null;
   note_t?: number | null;
+  anxiety_level?: string | null;
+  interpretation?: string | null;
   
   // Metadata
   completed_by?: string | null;
@@ -117,7 +119,13 @@ export const STAI_YA_DEFINITION: QuestionnaireDefinition = {
 // Reverse items: 1, 2, 5, 8, 10, 11, 15, 16, 19, 20
 const REVERSE_ITEMS = [1, 2, 5, 8, 10, 11, 15, 16, 19, 20];
 
-export function computeStaiYaScore(responses: Partial<BipolarStaiYaResponse>): number {
+export interface StaiYaScoreResult {
+  total_score: number;
+  anxiety_level: string;
+  interpretation: string;
+}
+
+export function computeStaiYaScores(responses: Partial<BipolarStaiYaResponse>): StaiYaScoreResult {
   let totalScore = 0;
   
   for (let i = 1; i <= 20; i++) {
@@ -134,17 +142,41 @@ export function computeStaiYaScore(responses: Partial<BipolarStaiYaResponse>): n
     }
   }
   
-  return totalScore;
+  const anxietyLevel = getAnxietyLevel(totalScore);
+  const interpretation = interpretStaiYaScore(totalScore);
+  
+  return {
+    total_score: totalScore,
+    anxiety_level: anxietyLevel,
+    interpretation
+  };
+}
+
+export function getAnxietyLevel(totalScore: number): string {
+  // STAI-YA scores range from 20-80
+  if (totalScore <= 35) return 'low';
+  if (totalScore <= 45) return 'moderate';
+  if (totalScore <= 55) return 'moderate-high';
+  if (totalScore <= 65) return 'high';
+  return 'very-high';
 }
 
 export function interpretStaiYaScore(totalScore: number): string {
   // STAI-YA scores range from 20-80
   // Higher scores indicate greater anxiety
-  if (totalScore <= 35) return 'Anxiété légère';
-  if (totalScore <= 45) return 'Anxiété modérée';
-  if (totalScore <= 55) return 'Anxiété moyenne-haute';
-  if (totalScore <= 65) return 'Anxiété élevée';
-  return 'Anxiété très élevée';
+  if (totalScore <= 35) {
+    return 'Anxiété légère ou absente. État émotionnel calme, détendu. Pas de signes cliniques d\'anxiété significative en ce moment.';
+  }
+  if (totalScore <= 45) {
+    return 'Anxiété modérée. Présence de tension ou d\'inquiétude légère à modérée. Niveau d\'anxiété encore gérable, mais une surveillance peut être utile.';
+  }
+  if (totalScore <= 55) {
+    return 'Anxiété moyenne-haute. Tension et inquiétude notables. Signes d\'anxiété cliniquement significative. Une intervention ou un suivi est recommandé.';
+  }
+  if (totalScore <= 65) {
+    return 'Anxiété élevée. Forte tension émotionnelle, inquiétude importante. Risque de retentissement fonctionnel. Prise en charge thérapeutique recommandée.';
+  }
+  return 'Anxiété très élevée / intense. État de détresse marqué, anxiété envahissante. Retentissement fonctionnel probable. Intervention thérapeutique urgente indiquée.';
 }
 
 // Convert raw score to T-score (using standard STAI norms)
