@@ -50,7 +50,6 @@ import {
   FAST_DEFINITION,
   DIVA_DEFINITION,
   FAMILY_HISTORY_DEFINITION,
-  CSSRS_DEFINITION,
   ISA_DEFINITION,
   ISA_FOLLOWUP_DEFINITION,
   SIS_DEFINITION,
@@ -91,6 +90,8 @@ import {
   WAIS3_DIGIT_SPAN_DEFINITION,
   WAIS3_CPT2_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
+// C-SSRS from medical module
+import { CSSRS_DEFINITION } from "@/lib/questionnaires/bipolar/initial/medical";
 import {
   SOCIAL_DEFINITION
 } from "@/lib/constants/questionnaires-social";

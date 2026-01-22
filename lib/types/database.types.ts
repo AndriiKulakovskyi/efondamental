@@ -2269,20 +2269,20 @@ export interface CssrsResponse {
   visit_id: string;
   patient_id: string;
   
-  // Suicidal Ideation Questions (0=No, 1=Yes)
-  q1_wish_dead?: number | null;
-  q2_non_specific?: number | null;
-  q3_method_no_intent?: number | null;
-  q4_intent_no_plan?: number | null;
-  q5_plan_intent?: number | null;
+  // Suicidal Ideation Questions (boolean: true=Oui, false=Non)
+  q1_wish_dead?: boolean | null;
+  q2_non_specific?: boolean | null;
+  q3_method_no_intent?: boolean | null;
+  q4_intent_no_plan?: boolean | null;
+  q5_plan_intent?: boolean | null;
   
-  // Intensity of Ideation
-  int_most_severe?: number | null; // 1-5
-  int_frequency?: number | null; // 1-5
-  int_duration?: number | null; // 1-5
-  int_control?: number | null; // 0-5
-  int_deterrents?: number | null; // 1-5
-  int_causes?: number | null; // 0-5
+  // Intensity of Ideation (1-5 scale)
+  int_most_severe?: number | null;
+  int_frequency?: number | null;
+  int_duration?: number | null;
+  int_control?: number | null;
+  int_deterrents?: number | null;
+  int_causes?: number | null;
   
   // Metadata
   completed_by?: string | null;

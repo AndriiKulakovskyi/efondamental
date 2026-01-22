@@ -193,11 +193,13 @@ export function calculateQuestionnaireProgress(
   responses: Record<string, any>,
   visibleQuestions: string[]
 ): number {
-  // Filter to non-section, non-instruction, visible questions only
-  // Exclude unit fields from the count (they're paired with their base field)
+  // Filter to answerable, visible questions only
+  // Exclude: sections, instructions, display-only text, unit fields
   const relevantQuestions = questions.filter(
     q => q.type !== 'section' && 
          q.type !== 'instruction' &&
+         q.type !== 'text' &&
+         !q.metadata?.displayOnly &&
          visibleQuestions.includes(q.id) &&
          !q.id.endsWith('_unit')
   );

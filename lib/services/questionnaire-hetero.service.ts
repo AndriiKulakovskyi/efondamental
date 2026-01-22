@@ -921,12 +921,26 @@ export async function saveCssrsResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
+  // Convert numeric codes (0/1) and string codes to boolean for database storage
+  const toBoolean = (val: any): boolean | null => {
+    if (val === 1 || val === '1' || val === 'oui' || val === true) return true;
+    if (val === 0 || val === '0' || val === 'non' || val === false) return false;
+    return null;
+  };
+
+  const transformedResponse = {
+    ...response,
+    q1_wish_dead: toBoolean(response.q1_wish_dead),
+    q2_non_specific: toBoolean(response.q2_non_specific),
+    q3_method_no_intent: toBoolean(response.q3_method_no_intent),
+    q4_intent_no_plan: toBoolean(response.q4_intent_no_plan),
+    q5_plan_intent: toBoolean(response.q5_plan_intent),
+    completed_by: user.data.user?.id
+  };
+
   const { data, error } = await supabase
     .from('bipolar_cssrs')
-    .upsert({
-      ...response,
-      completed_by: user.data.user?.id
-    }, { onConflict: 'visit_id' })
+    .upsert(transformedResponse, { onConflict: 'visit_id' })
     .select()
     .single();
 

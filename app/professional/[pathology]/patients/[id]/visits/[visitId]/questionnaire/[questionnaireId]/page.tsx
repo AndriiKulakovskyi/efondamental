@@ -39,7 +39,6 @@ import {
   FAST_DEFINITION,
   DIVA_DEFINITION,
   FAMILY_HISTORY_DEFINITION,
-  CSSRS_DEFINITION,
   ISA_DEFINITION,
   ISA_FOLLOWUP_DEFINITION,
   SIS_DEFINITION,
@@ -83,6 +82,8 @@ import {
   WAIS3_CPT2_DEFINITION,
   WAIS3_MEM3_SPATIAL_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
+// C-SSRS from medical module
+import { CSSRS_DEFINITION } from "@/lib/questionnaires/bipolar/initial/medical";
 import {
   SOCIAL_DEFINITION
 } from "@/lib/constants/questionnaires-social";
@@ -728,6 +729,21 @@ export default async function ProfessionalQuestionnairePage({
     initialResponses.bmi_over_35 = boolToYesNo(initialResponses.bmi_over_35);
     initialResponses.age_over_50 = boolToYesNo(initialResponses.age_over_50);
     initialResponses.large_neck = boolToYesNo(initialResponses.large_neck);
+  }
+
+  // Convert boolean fields to 0/1 numbers for C-SSRS questionnaire
+  // Database stores booleans but questionnaire options use numeric codes (0/1)
+  if (code === 'CSSRS' && existingResponse) {
+    const boolToNum = (val: any): number | null => {
+      if (val === true) return 1;
+      if (val === false) return 0;
+      return val;
+    };
+    initialResponses.q1_wish_dead = boolToNum(initialResponses.q1_wish_dead);
+    initialResponses.q2_non_specific = boolToNum(initialResponses.q2_non_specific);
+    initialResponses.q3_method_no_intent = boolToNum(initialResponses.q3_method_no_intent);
+    initialResponses.q4_intent_no_plan = boolToNum(initialResponses.q4_intent_no_plan);
+    initialResponses.q5_plan_intent = boolToNum(initialResponses.q5_plan_intent);
   }
 
   // Inject patient demographics (age at visit date, gender) for questionnaires that require them
