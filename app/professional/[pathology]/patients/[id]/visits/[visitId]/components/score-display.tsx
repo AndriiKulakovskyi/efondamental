@@ -377,6 +377,17 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'error';                      // Very poor sleep quality
     }
     
+    if (code === 'EPWORTH') {
+      // Epworth: Daytime sleepiness (0-24)
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score <= 5) return 'success';    // Lower normal
+      if (score <= 10) return 'info';      // Higher normal
+      if (score <= 12) return 'warning';   // Mild excessive
+      if (score <= 15) return 'warning';   // Moderate excessive
+      return 'error';                      // Severe excessive
+    }
+    
     return 'info';
   };
 
@@ -502,6 +513,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'MARS' && 'Résultats MARS - Observance thérapeutique'}
               {code === 'MATHYS' && 'Résultats MAThyS - États thymiques'}
               {code === 'PSQI' && 'Résultats PSQI - Qualité du Sommeil'}
+              {code === 'EPWORTH' && 'Résultats Epworth - Somnolence Diurne'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -573,10 +585,13 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'PSQI'
                 ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'EPWORTH'
+                ? (data.total_score !== undefined ? data.total_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM' && '/20'}
               {code === 'QIDS_SR16' && '/27'}
               {code === 'PSQI' && '/21'}
+              {code === 'EPWORTH' && '/24'}
               {code === 'CTQ' && '/125'}
               {code === 'BIS10' && '/4.0'}
               {code === 'CSM' && '/55'}
@@ -3074,6 +3089,111 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <p className="mt-1"><strong>Composantes:</strong> Qualité subjective, Latence, Durée, Efficience, Perturbations, Médication, Dysfonctionnement diurne</p>
               <p className="mt-1"><strong>Seuils:</strong> 0-5 (bonne) | 6-10 (altérée) | 11-15 (mauvaise) | 16-21 (très mauvaise)</p>
               <p className="mt-1 text-gray-600"><strong>Note:</strong> Score &gt; 5 indique une mauvaise qualité de sommeil cliniquement significative (Buysse et al., 1989)</p>
+            </div>
+          </div>
+        )}
+
+        {/* EPWORTH Details */}
+        {code === 'EPWORTH' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg ${
+                data.total_score <= 5
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : data.total_score <= 10
+                  ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : data.total_score <= 12
+                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                  : data.total_score <= 15
+                  ? 'bg-orange-50 border border-orange-200 text-orange-800'
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                <p className="font-medium">{data.interpretation}</p>
+              </div>
+            )}
+
+            {/* Severity Level */}
+            <div className="pt-2">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Niveau de somnolence:</span>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  data.total_score <= 5
+                    ? 'bg-green-100 text-green-800'
+                    : data.total_score <= 10
+                    ? 'bg-blue-100 text-blue-800'
+                    : data.total_score <= 12
+                    ? 'bg-amber-100 text-amber-800'
+                    : data.total_score <= 15
+                    ? 'bg-orange-100 text-orange-800'
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {data.severity || (
+                    data.total_score <= 5 ? 'Normale basse' :
+                    data.total_score <= 10 ? 'Normale haute' :
+                    data.total_score <= 12 ? 'Légère' :
+                    data.total_score <= 15 ? 'Modérée' :
+                    'Sévère'
+                  )}
+                </span>
+              </div>
+            </div>
+
+            {/* Clinical Context (Q9) */}
+            {data.q9 !== null && data.q9 !== undefined && (
+              <div className="pt-2 border-t">
+                <h5 className="font-semibold text-gray-700 mb-2">Contexte clinique</h5>
+                <div className="p-2 bg-gray-50 rounded">
+                  <p className="text-sm text-gray-700">
+                    <strong>Ces envies de dormir surviennent:</strong>{' '}
+                    {data.q9 === 0 && 'Seulement après les repas'}
+                    {data.q9 === 1 && 'À certaines heures du jour, toujours les mêmes'}
+                    {data.q9 === 2 && 'La nuit'}
+                    {data.q9 === 3 && 'N\'importe quelle heure du jour'}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Warning for severe cases */}
+            {data.total_score >= 16 && (
+              <div className="p-3 bg-red-50 border-2 border-red-300 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <span className="text-red-700 font-bold">⚠️</span>
+                  <div>
+                    <p className="font-bold text-red-900">Alerte: Somnolence diurne sévère</p>
+                    <p className="text-sm text-red-800 mt-1">
+                      Score ≥ 16 : Contre-indication formelle à la conduite automobile. 
+                      Bilan du sommeil en urgence recommandé (polysomnographie, recherche d'apnée du sommeil, narcolepsie).
+                      Orientation rapide vers un centre du sommeil.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Score Details */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Détails du score</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="p-2 bg-gray-50 rounded">
+                  <p className="text-gray-600">Score total:</p>
+                  <p className="font-semibold text-lg">{data.total_score ?? '-'}/24</p>
+                </div>
+                <div className="p-2 bg-gray-50 rounded">
+                  <p className="text-gray-600">Nombre de situations:</p>
+                  <p className="font-semibold text-lg">8 situations</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>Epworth:</strong> Échelle de Somnolence d'Epworth (Epworth Sleepiness Scale)</p>
+              <p className="mt-1"><strong>Cotation:</strong> 8 situations de la vie quotidienne (0-3 chacune). Score total: 0-24</p>
+              <p className="mt-1"><strong>Situations:</strong> Lecture, TV, inactivité publique, passager voiture, repos après-midi, conversation, après repas, voiture arrêtée</p>
+              <p className="mt-1"><strong>Seuils:</strong> 0-5 (normale basse) | 6-10 (normale haute) | 11-12 (légère) | 13-15 (modérée) | 16-24 (sévère)</p>
+              <p className="mt-1 text-gray-600"><strong>Note:</strong> Score &gt; 10 indique une somnolence diurne excessive pathologique. Outil de dépistage des troubles du sommeil (SAOS, narcolepsie)</p>
             </div>
           </div>
         )}

@@ -21,6 +21,7 @@ import { computeStaiYaScores, type BipolarStaiYaResponse } from '@/lib/questionn
 import { computeMarsScores, type BipolarMarsResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/mars';
 import { computeMathysScores, type BipolarMathysResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/mathys';
 import { computePsqiScores, type BipolarPsqiResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/psqi';
+import { computeEpworthScores, type BipolarEpworthResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/epworth';
 import { scoreQids, type BipolarQidsResponse } from '@/lib/questionnaires/bipolar/screening/auto/qids';
 
 // ============================================================================
@@ -503,6 +504,29 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving PSQI response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // EPWORTH needs to calculate sleepiness score and interpretation
+  if (questionnaireCode === 'EPWORTH') {
+    const epworthScores = computeEpworthScores(response as Partial<BipolarEpworthResponse>);
+    const epworthResponse = {
+      ...response,
+      ...epworthScores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(epworthResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving EPWORTH response:', error);
       throw error;
     }
 
