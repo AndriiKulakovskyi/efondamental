@@ -16,6 +16,7 @@ import { computeAq12Scores, type BipolarAq12Response } from '@/lib/questionnaire
 import { computeCsmScores, type BipolarCsmResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/csm';
 import { computeCtiScores, type BipolarCtiResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/cti';
 import { computeEq5d5lScores, type BipolarEq5d5lResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/eq5d5l';
+import { computePriseMScores, type BipolarPriseMResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/prise-m';
 
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
@@ -357,6 +358,29 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving EQ5D5L response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // PRISE_M needs to calculate side effects scores
+  if (questionnaireCode === 'PRISE_M') {
+    const priseMScores = computePriseMScores(response as Partial<BipolarPriseMResponse>);
+    const priseMResponse = {
+      ...response,
+      ...priseMScores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(priseMResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving PRISE_M response:', error);
       throw error;
     }
 

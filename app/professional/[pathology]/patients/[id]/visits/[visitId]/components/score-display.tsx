@@ -316,6 +316,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'warning';                   // Poor health perception
     }
     
+    if (code === 'PRISE_M') {
+      // PRISE-M: Side effects score
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score === 0) return 'success';  // No side effects
+      if (score <= 10) return 'info';     // Mild
+      if (score <= 20) return 'warning';  // Moderate
+      return 'error';                     // Significant/severe
+    }
+    
     return 'info';
   };
 
@@ -436,6 +446,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'SAS' && 'Résultats SAS - Effets extrapyramidaux'}
               {code === 'PSP' && 'Résultats PSP - Fonctionnement personnel et social'}
               {code === 'EQ5D5L' && 'Résultats EQ-5D-5L - Qualité de vie'}
+              {code === 'PRISE_M' && 'Résultats PRISE-M - Effets secondaires'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -495,6 +506,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.final_score !== undefined && data.final_score !== null ? data.final_score : '-')
                 : code === 'EQ5D5L'
                 ? (data.profile_string || data.health_state || '-')
+                : code === 'PRISE_M'
+                ? (data.total_score !== undefined ? data.total_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM' && '/20'}
               {code === 'QIDS_SR16' && '/27'}
@@ -2510,6 +2523,68 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <p><strong>Profil:</strong> Codage 5 dimensions (1=aucun problème, 5=pire état)</p>
               <p className="mt-1"><strong>VAS:</strong> Échelle visuelle analogique de l'état de santé (0=pire, 100=meilleur)</p>
               <p className="mt-1"><strong>Index:</strong> Valeur d'utilité de qualité de vie (1.0=santé parfaite, &lt;0=pire que la mort)</p>
+            </div>
+          </div>
+        )}
+
+        {/* PRISE-M Details */}
+        {code === 'PRISE_M' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg ${
+                data.total_score === 0
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : data.total_score <= 10
+                  ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : data.total_score <= 20
+                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                <p className="font-medium">{data.interpretation}</p>
+              </div>
+            )}
+
+            {/* Summary Stats */}
+            <div className="grid grid-cols-3 gap-4 pt-2">
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <div className="text-2xl font-bold text-gray-900">{data.total_score ?? '-'}</div>
+                <div className="text-xs text-gray-600 mt-1">Score total</div>
+                <div className="text-xs text-gray-500">/62</div>
+              </div>
+              <div className="text-center p-3 bg-blue-50 rounded-lg">
+                <div className="text-2xl font-bold text-blue-700">{data.tolerable_count ?? '-'}</div>
+                <div className="text-xs text-gray-600 mt-1">Effets tolérables</div>
+                <div className="text-xs text-gray-500">(Score 1)</div>
+              </div>
+              <div className="text-center p-3 bg-red-50 rounded-lg">
+                <div className="text-2xl font-bold text-red-700">{data.painful_count ?? '-'}</div>
+                <div className="text-xs text-gray-600 mt-1">Effets pénibles</div>
+                <div className="text-xs text-gray-500">(Score 2)</div>
+              </div>
+            </div>
+
+            {/* Medication Status */}
+            {data.taking_medication && (
+              <div className="pt-2 border-t">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Prend actuellement un traitement:</span>
+                  <span className={`font-medium ${
+                    data.taking_medication === 'oui' ? 'text-blue-600' : 'text-gray-600'
+                  }`}>
+                    {data.taking_medication === 'oui' ? 'Oui' : 
+                     data.taking_medication === 'non' ? 'Non' : data.taking_medication}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>Cotation:</strong> 31 items, 0-2 par item (0=Absent, 1=Tolérable, 2=Pénible)</p>
+              <p className="mt-1"><strong>Score total:</strong> Somme des 31 items (0-62)</p>
+              <p className="mt-1"><strong>Seuils:</strong> 0 (aucun) | 1-10 (léger) | 11-20 (modéré) | 21-40 (important) | &gt;40 (sévère)</p>
+              <p className="mt-1 text-gray-600"><strong>Note:</strong> Un score élevé ou de nombreux effets pénibles peuvent justifier un ajustement thérapeutique.</p>
             </div>
           </div>
         )}

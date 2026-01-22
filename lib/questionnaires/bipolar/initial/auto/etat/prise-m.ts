@@ -71,6 +71,7 @@ export interface BipolarPriseMResponse {
   total_score?: number | null;
   tolerable_count?: number | null;
   painful_count?: number | null;
+  interpretation?: string | null;
   
   // Metadata
   completed_by?: string | null;
@@ -190,11 +191,14 @@ export const PRISE_M_DEFINITION: QuestionnaireDefinition = {
 // Scoring Functions
 // ============================================================================
 
-export function computePriseMScores(responses: Partial<BipolarPriseMResponse>): {
+export interface PriseMScoreResult {
   total_score: number;
   tolerable_count: number;
   painful_count: number;
-} {
+  interpretation: string;
+}
+
+export function computePriseMScores(responses: Partial<BipolarPriseMResponse>): PriseMScoreResult {
   const questionIds = Array.from({ length: 31 }, (_, i) => `q${i + 1}`);
   
   let totalScore = 0;
@@ -213,14 +217,25 @@ export function computePriseMScores(responses: Partial<BipolarPriseMResponse>): 
   return {
     total_score: totalScore,
     tolerable_count: tolerableCount,
-    painful_count: painfulCount
+    painful_count: painfulCount,
+    interpretation: interpretPriseMScore(totalScore, tolerableCount, painfulCount)
   };
 }
 
-export function interpretPriseMScore(totalScore: number): string {
-  if (totalScore === 0) return 'Aucun effet secondaire rapporté';
-  if (totalScore <= 10) return 'Effets secondaires légers';
-  if (totalScore <= 20) return 'Effets secondaires modérés';
-  if (totalScore <= 40) return 'Effets secondaires importants';
-  return 'Effets secondaires sévères';
+export function interpretPriseMScore(totalScore: number, tolerableCount: number, painfulCount: number): string {
+  let interpretation = '';
+  
+  if (totalScore === 0) {
+    interpretation = 'Aucun effet secondaire rapporté.';
+  } else if (totalScore <= 10) {
+    interpretation = `Effets secondaires légers. ${painfulCount} effet(s) pénible(s), ${tolerableCount} tolérable(s).`;
+  } else if (totalScore <= 20) {
+    interpretation = `Effets secondaires modérés. ${painfulCount} effet(s) pénible(s), ${tolerableCount} tolérable(s). Surveillance recommandée.`;
+  } else if (totalScore <= 40) {
+    interpretation = `Effets secondaires importants. ${painfulCount} effet(s) pénible(s), ${tolerableCount} tolérable(s). Ajustement thérapeutique à envisager.`;
+  } else {
+    interpretation = `Effets secondaires sévères. ${painfulCount} effet(s) pénible(s), ${tolerableCount} tolérable(s). Consultation médicale urgente recommandée.`;
+  }
+  
+  return interpretation;
 }
