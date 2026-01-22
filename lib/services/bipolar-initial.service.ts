@@ -15,6 +15,7 @@ import { computeAimScores, type BipolarAimResponse } from '@/lib/questionnaires/
 import { computeAq12Scores, type BipolarAq12Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/aq12';
 import { computeCsmScores, type BipolarCsmResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/csm';
 import { computeCtiScores, type BipolarCtiResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/cti';
+import { computeEq5d5lScores, type BipolarEq5d5lResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/eq5d5l';
 
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
@@ -333,6 +334,29 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving CTI response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // EQ5D5L needs to calculate health state and interpretation
+  if (questionnaireCode === 'EQ5D5L') {
+    const eq5d5lScores = computeEq5d5lScores(response as any);
+    const eq5d5lResponse = {
+      ...response,
+      ...eq5d5lScores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(eq5d5lResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving EQ5D5L response:', error);
       throw error;
     }
 

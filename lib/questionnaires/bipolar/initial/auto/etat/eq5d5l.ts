@@ -18,6 +18,8 @@ export interface BipolarEq5d5lResponse {
   anxiety_depression: number;
   vas_score: number;
   health_state: string | null;
+  index_value: string | null;
+  profile_string: string | null;
   interpretation: string | null;
   completed_by: string | null;
   completed_at: string;
@@ -172,26 +174,71 @@ export interface Eq5d5lScoreInput {
   vas_score: number;
 }
 
+export interface Eq5d5lScoreResult {
+  health_state: string;
+  profile_string: string;
+  index_value: string;
+  interpretation: string;
+}
+
 export function computeHealthState(responses: Eq5d5lScoreInput): string {
   return `${responses.mobility}${responses.self_care}${responses.usual_activities}${responses.pain_discomfort}${responses.anxiety_depression}`;
 }
 
-export function interpretEq5d5l(responses: Eq5d5lScoreInput): string {
-  const healthState = computeHealthState(responses);
+export function computeEq5d5lScores(responses: Eq5d5lScoreInput): Eq5d5lScoreResult {
+  const profileString = computeHealthState(responses);
   const sumDimensions = responses.mobility + responses.self_care + responses.usual_activities + 
                         responses.pain_discomfort + responses.anxiety_depression;
   
-  let interpretation = `Etat de sante: ${healthState}. EVA: ${responses.vas_score}/100.`;
+  // Simple index approximation (real calculation requires country-specific value sets)
+  // This is a simplified formula for demonstration
+  const indexValue = (1 - ((sumDimensions - 5) * 0.1)).toFixed(3);
   
-  if (healthState === '11111') {
-    interpretation += ' Etat de sante parfait sur les 5 dimensions.';
-  } else if (sumDimensions <= 10) {
-    interpretation += ' Problemes de sante legers.';
-  } else if (sumDimensions <= 15) {
-    interpretation += ' Problemes de sante moderes.';
+  // Count dimensions with problems
+  const problemDimensions = [
+    responses.mobility,
+    responses.self_care,
+    responses.usual_activities,
+    responses.pain_discomfort,
+    responses.anxiety_depression
+  ].filter(v => v > 1).length;
+  
+  let interpretation = `Profil de santé: ${profileString}. Score VAS: ${responses.vas_score}/100.`;
+  
+  if (profileString === '11111') {
+    interpretation += ' Aucun problème de santé rapporté sur les 5 dimensions.';
   } else {
-    interpretation += ' Problemes de sante severes.';
+    interpretation += ` ${problemDimensions} dimension(s) avec problèmes.`;
   }
+  
+  // VAS interpretation
+  if (responses.vas_score >= 80) {
+    interpretation += ' VAS élevé - bonne perception de l\'état de santé.';
+  } else if (responses.vas_score >= 50) {
+    interpretation += ' VAS moyen - perception modérée de l\'état de santé.';
+  } else {
+    interpretation += ' VAS bas - perception défavorable de l\'état de santé.';
+  }
+  
+  // Index value interpretation
+  const indexNum = parseFloat(indexValue);
+  if (indexNum >= 0.8) {
+    interpretation += ' Index d\'utilité élevé - bonne qualité de vie.';
+  } else if (indexNum >= 0.5) {
+    interpretation += ' Index d\'utilité moyen - qualité de vie modérée.';
+  } else {
+    interpretation += ' Index d\'utilité bas - qualité de vie altérée.';
+  }
+  
+  return {
+    health_state: profileString,
+    profile_string: profileString,
+    index_value: indexValue,
+    interpretation
+  };
+}
 
-  return interpretation;
+export function interpretEq5d5l(responses: Eq5d5lScoreInput): string {
+  const result = computeEq5d5lScores(responses);
+  return result.interpretation;
 }

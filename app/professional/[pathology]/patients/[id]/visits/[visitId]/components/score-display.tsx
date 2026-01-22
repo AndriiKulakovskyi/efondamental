@@ -307,6 +307,15 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'error';                     // Very severe / no autonomy
     }
     
+    if (code === 'EQ5D5L') {
+      // EQ-5D-5L: Health state profile and VAS
+      const vas = data.vas_score;
+      if (vas === null || vas === undefined) return 'info';
+      if (vas >= 80) return 'success';    // Good health perception
+      if (vas >= 50) return 'info';       // Moderate health perception
+      return 'warning';                   // Poor health perception
+    }
+    
     return 'info';
   };
 
@@ -426,6 +435,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'BARNES' && 'Résultats BARNES - Akathisie'}
               {code === 'SAS' && 'Résultats SAS - Effets extrapyramidaux'}
               {code === 'PSP' && 'Résultats PSP - Fonctionnement personnel et social'}
+              {code === 'EQ5D5L' && 'Résultats EQ-5D-5L - Qualité de vie'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -483,6 +493,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.mean_score !== undefined && data.mean_score !== null ? data.mean_score.toFixed(2) : '-')
                 : code === 'PSP'
                 ? (data.final_score !== undefined && data.final_score !== null ? data.final_score : '-')
+                : code === 'EQ5D5L'
+                ? (data.profile_string || data.health_state || '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM' && '/20'}
               {code === 'QIDS_SR16' && '/27'}
@@ -2363,6 +2375,141 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="text-xs text-gray-500 pt-2 border-t">
               <p>Score: 91-100 = Tres bon, 71-90 = Bon, 51-70 = Modere, 31-50 = Altere, 1-30 = Severement altere</p>
               <p className="mt-1">Periode d'evaluation: Le mois dernier (30 derniers jours)</p>
+            </div>
+          </div>
+        )}
+
+        {/* EQ-5D-5L Details */}
+        {code === 'EQ5D5L' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Health State Profile */}
+            <div className={`p-3 rounded-lg ${
+              data.vas_score !== null && data.vas_score >= 80
+                ? 'bg-green-50 border border-green-200'
+                : data.vas_score !== null && data.vas_score >= 50
+                ? 'bg-blue-50 border border-blue-200'
+                : 'bg-amber-50 border border-amber-200'
+            }`}>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Profil de santé:</span>
+                  <span className="text-lg font-mono font-bold">{data.profile_string || data.health_state || '-'}</span>
+                </div>
+                {data.interpretation && (
+                  <p className="text-xs leading-relaxed mt-2">{data.interpretation}</p>
+                )}
+              </div>
+            </div>
+
+            {/* 5 Dimensions */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Évaluation des 5 dimensions</h5>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Mobilité:</span>
+                  <span className={`font-medium ${
+                    data.mobility === 1 ? 'text-green-600' :
+                    data.mobility === 2 ? 'text-blue-600' :
+                    data.mobility === 3 ? 'text-amber-600' :
+                    'text-red-600'
+                  }`}>
+                    {data.mobility === 1 ? 'Aucun problème' :
+                     data.mobility === 2 ? 'Problèmes légers' :
+                     data.mobility === 3 ? 'Problèmes modérés' :
+                     data.mobility === 4 ? 'Problèmes sévères' :
+                     data.mobility === 5 ? 'Incapacité' : '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Autonomie:</span>
+                  <span className={`font-medium ${
+                    data.self_care === 1 ? 'text-green-600' :
+                    data.self_care === 2 ? 'text-blue-600' :
+                    data.self_care === 3 ? 'text-amber-600' :
+                    'text-red-600'
+                  }`}>
+                    {data.self_care === 1 ? 'Aucun problème' :
+                     data.self_care === 2 ? 'Problèmes légers' :
+                     data.self_care === 3 ? 'Problèmes modérés' :
+                     data.self_care === 4 ? 'Problèmes sévères' :
+                     data.self_care === 5 ? 'Incapacité' : '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Activités courantes:</span>
+                  <span className={`font-medium ${
+                    data.usual_activities === 1 ? 'text-green-600' :
+                    data.usual_activities === 2 ? 'text-blue-600' :
+                    data.usual_activities === 3 ? 'text-amber-600' :
+                    'text-red-600'
+                  }`}>
+                    {data.usual_activities === 1 ? 'Aucun problème' :
+                     data.usual_activities === 2 ? 'Problèmes légers' :
+                     data.usual_activities === 3 ? 'Problèmes modérés' :
+                     data.usual_activities === 4 ? 'Problèmes sévères' :
+                     data.usual_activities === 5 ? 'Incapacité' : '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Douleur/Gêne:</span>
+                  <span className={`font-medium ${
+                    data.pain_discomfort === 1 ? 'text-green-600' :
+                    data.pain_discomfort === 2 ? 'text-blue-600' :
+                    data.pain_discomfort === 3 ? 'text-amber-600' :
+                    'text-red-600'
+                  }`}>
+                    {data.pain_discomfort === 1 ? 'Aucune' :
+                     data.pain_discomfort === 2 ? 'Légère' :
+                     data.pain_discomfort === 3 ? 'Modérée' :
+                     data.pain_discomfort === 4 ? 'Sévère' :
+                     data.pain_discomfort === 5 ? 'Extrême' : '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Anxiété/Dépression:</span>
+                  <span className={`font-medium ${
+                    data.anxiety_depression === 1 ? 'text-green-600' :
+                    data.anxiety_depression === 2 ? 'text-blue-600' :
+                    data.anxiety_depression === 3 ? 'text-amber-600' :
+                    'text-red-600'
+                  }`}>
+                    {data.anxiety_depression === 1 ? 'Aucune' :
+                     data.anxiety_depression === 2 ? 'Légère' :
+                     data.anxiety_depression === 3 ? 'Modérée' :
+                     data.anxiety_depression === 4 ? 'Sévère' :
+                     data.anxiety_depression === 5 ? 'Extrême' : '-'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* VAS and Index Value */}
+            <div className="pt-2 border-t">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Score VAS:</span>
+                  <span className={`font-bold text-lg ${
+                    data.vas_score >= 80 ? 'text-green-600' :
+                    data.vas_score >= 50 ? 'text-blue-600' :
+                    'text-amber-600'
+                  }`}>
+                    {data.vas_score ?? '-'}/100
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Index d'utilité:</span>
+                  <span className="font-bold text-lg text-blue-700">
+                    {data.index_value ?? '-'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>Profil:</strong> Codage 5 dimensions (1=aucun problème, 5=pire état)</p>
+              <p className="mt-1"><strong>VAS:</strong> Échelle visuelle analogique de l'état de santé (0=pire, 100=meilleur)</p>
+              <p className="mt-1"><strong>Index:</strong> Valeur d'utilité de qualité de vie (1.0=santé parfaite, &lt;0=pire que la mort)</p>
             </div>
           </div>
         )}
