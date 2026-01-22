@@ -359,11 +359,19 @@ export interface QidsInterpretationResult {
  * - 21-27: Very severe depression
  */
 export function interpretQidsScore(score: number): string {
-  if (score <= 5) return 'Pas de depression';
-  if (score <= 10) return 'Depression legere';
-  if (score <= 15) return 'Depression moderee';
-  if (score <= 20) return 'Depression severe';
-  return 'Depression tres severe';
+  if (score <= 5) {
+    return 'Absence de dépression. État thymique normal, sans symptomatologie dépressive cliniquement significative.';
+  }
+  if (score <= 10) {
+    return 'Dépression légère. Symptômes dépressifs présents mais d\'intensité modérée. Impact fonctionnel limité. Surveillance recommandée.';
+  }
+  if (score <= 15) {
+    return 'Dépression modérée. Symptomatologie dépressive notable avec retentissement sur le fonctionnement quotidien. Prise en charge thérapeutique indiquée.';
+  }
+  if (score <= 20) {
+    return 'Dépression sévère. Symptômes dépressifs importants avec retentissement fonctionnel marqué. Intervention thérapeutique active nécessaire.';
+  }
+  return 'Dépression très sévère. Symptomatologie dépressive majeure avec altération fonctionnelle importante. Prise en charge intensive urgente recommandée.';
 }
 
 export function getQidsSeverity(score: number): QidsInterpretationResult {

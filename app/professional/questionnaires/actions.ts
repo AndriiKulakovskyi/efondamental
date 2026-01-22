@@ -261,6 +261,7 @@ function questionnaireCodeToBipolarKey(code: string): string | null {
     'MATHYS': 'MATHYS',
     'PSQI': 'PSQI',
     'EPWORTH': 'EPWORTH',
+    'QIDS_SR16': 'QIDS_SR16',
     // Auto TRAITS module
     'ASRS': 'ASRS',
     'ASRS_FR': 'ASRS',

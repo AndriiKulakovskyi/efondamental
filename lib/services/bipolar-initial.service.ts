@@ -20,6 +20,7 @@ import { computePriseMScores, type BipolarPriseMResponse } from '@/lib/questionn
 import { computeStaiYaScores, type BipolarStaiYaResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/stai-ya';
 import { computeMarsScores, type BipolarMarsResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/mars';
 import { computeMathysScores, type BipolarMathysResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/mathys';
+import { scoreQids, type BipolarQidsResponse } from '@/lib/questionnaires/bipolar/screening/auto/qids';
 
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
@@ -69,6 +70,7 @@ const BIPOLAR_INITIAL_TABLES: Record<string, string> = {
   'MATHYS': 'bipolar_mathys',
   'PSQI': 'bipolar_psqi',
   'EPWORTH': 'bipolar_epworth',
+  'QIDS_SR16': 'bipolar_qids_sr16',
   
   // Auto TRAITS module
   'ASRS': 'bipolar_asrs',
@@ -453,6 +455,30 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving MATHYS response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // QIDS_SR16 needs to calculate depression scores
+  if (questionnaireCode === 'QIDS_SR16') {
+    const qidsScores = scoreQids(response as any);
+    const qidsResponse = {
+      ...response,
+      total_score: qidsScores.total_score,
+      interpretation: qidsScores.interpretation
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(qidsResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving QIDS_SR16 response:', error);
       throw error;
     }
 

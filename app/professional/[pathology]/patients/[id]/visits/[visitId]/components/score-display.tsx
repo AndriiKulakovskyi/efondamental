@@ -357,6 +357,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'error';                       // Hypomania/mania
     }
     
+    if (code === 'QIDS_SR16') {
+      // QIDS-SR16: Depression severity (0-27)
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score <= 5) return 'success';    // No depression
+      if (score <= 10) return 'info';      // Mild
+      if (score <= 15) return 'warning';   // Moderate
+      return 'error';                      // Severe/Very severe
+    }
+    
     return 'info';
   };
 
@@ -548,6 +558,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.total_score !== undefined ? `${data.total_score}/10` : '-')
                 : code === 'MATHYS'
                 ? (data.total_score !== undefined ? `${parseFloat(data.total_score).toFixed(1)}/200` : '-')
+                : code === 'QIDS_SR16'
+                ? (data.total_score !== undefined ? data.total_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM' && '/20'}
               {code === 'QIDS_SR16' && '/27'}
@@ -2864,6 +2876,75 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <p className="mt-1"><strong>Score total:</strong> 0-200 (~100 = état euthymique)</p>
               <p className="mt-1"><strong>Seuils:</strong> &lt;60 (dépression marquée) | 60-79 (tendance dépressive) | 80-120 (euthymie) | 121-140 (tendance hypomaniaque) | &gt;140 (hypomanie/manie)</p>
               <p className="mt-1 text-gray-600"><strong>Note:</strong> Outil sensible pour détecter les variations thymiques subtiles. Utile en suivi longitudinal.</p>
+            </div>
+          </div>
+        )}
+
+        {/* QIDS-SR16 Details */}
+        {code === 'QIDS_SR16' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg ${
+                data.total_score <= 5
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : data.total_score <= 10
+                  ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : data.total_score <= 15
+                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                <p className="font-medium">{data.interpretation}</p>
+              </div>
+            )}
+
+            {/* Severity Level */}
+            <div className="pt-2">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Niveau de sévérité:</span>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  data.total_score <= 5
+                    ? 'bg-green-100 text-green-800'
+                    : data.total_score <= 10
+                    ? 'bg-blue-100 text-blue-800'
+                    : data.total_score <= 15
+                    ? 'bg-amber-100 text-amber-800'
+                    : data.total_score <= 20
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-red-200 text-red-900'
+                }`}>
+                  {data.total_score <= 5 ? 'Absence' :
+                   data.total_score <= 10 ? 'Légère' :
+                   data.total_score <= 15 ? 'Modérée' :
+                   data.total_score <= 20 ? 'Sévère' :
+                   'Très sévère'}
+                </span>
+              </div>
+            </div>
+
+            {/* Suicidal Ideation Alert */}
+            {data.q12 && data.q12 >= 2 && (
+              <div className="p-3 bg-red-50 border-2 border-red-300 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <span className="text-red-700 font-bold">⚠️</span>
+                  <div>
+                    <p className="font-bold text-red-900">Alerte: Idéation suicidaire présente</p>
+                    <p className="text-sm text-red-800 mt-1">
+                      Le patient rapporte des pensées de mort ou de suicide (Item 12: score {data.q12}).
+                      Évaluation clinique urgente du risque suicidaire recommandée.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>QIDS-SR16:</strong> Quick Inventory of Depressive Symptomatology - Auto-questionnaire</p>
+              <p className="mt-1"><strong>Cotation:</strong> 16 items avec scoring par domaines (max par domaine). Score total: 0-27</p>
+              <p className="mt-1"><strong>Domaines:</strong> Sommeil (items 1-4, max), Appétit/Poids (6-9, max), Psychomoteur (15-16, max), autres items scorés directement</p>
+              <p className="mt-1"><strong>Seuils:</strong> 0-5 (absence) | 6-10 (légère) | 11-15 (modérée) | 16-20 (sévère) | 21-27 (très sévère)</p>
+              <p className="mt-1 text-gray-600"><strong>Note:</strong> Outil validé pour le dépistage et le suivi de la dépression. Sensible au changement thérapeutique.</p>
             </div>
           </div>
         )}
