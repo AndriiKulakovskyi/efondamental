@@ -405,7 +405,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 : code === 'CTQ'
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'BIS10'
-                ? (data.overall_impulsivity !== undefined ? data.overall_impulsivity.toFixed(2) : '-')
+                ? (data.overall_impulsivity !== undefined && data.overall_impulsivity !== null ? parseFloat(data.overall_impulsivity).toFixed(2) : '-')
                 : code === 'WURS25'
                 ? (data.adhd_likely ? 'POSITIF' : 'NÉGATIF')
                 : code === 'CSM'
@@ -784,16 +784,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Impulsivité cognitive:</span>
-                <span className="font-semibold">{data.cognitive_impulsivity_mean !== undefined ? data.cognitive_impulsivity_mean.toFixed(2) : '-'}/4.0</span>
+                <span className="font-semibold">{data.cognitive_impulsivity_mean !== undefined && data.cognitive_impulsivity_mean !== null ? parseFloat(data.cognitive_impulsivity_mean).toFixed(2) : '-'}/4.0</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Impulsivité motrice:</span>
-                <span className="font-semibold">{data.behavioral_impulsivity_mean !== undefined ? data.behavioral_impulsivity_mean.toFixed(2) : '-'}/4.0</span>
+                <span className="font-semibold">{data.behavioral_impulsivity_mean !== undefined && data.behavioral_impulsivity_mean !== null ? parseFloat(data.behavioral_impulsivity_mean).toFixed(2) : '-'}/4.0</span>
               </div>
             </div>
             <div className="flex justify-between pt-2 border-t">
               <span className="text-gray-600 font-medium">Impulsivité générale:</span>
-              <span className="font-bold text-lg">{data.overall_impulsivity !== undefined ? data.overall_impulsivity.toFixed(2) : '-'}/4.0</span>
+              <span className="font-bold text-lg">{data.overall_impulsivity !== undefined && data.overall_impulsivity !== null ? parseFloat(data.overall_impulsivity).toFixed(2) : '-'}/4.0</span>
             </div>
             {data.overall_impulsivity >= 3.0 && (
               <p className="text-xs text-red-700 mt-1 pt-2 border-t">

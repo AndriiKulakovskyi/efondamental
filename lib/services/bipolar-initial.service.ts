@@ -9,6 +9,7 @@ import {
   type YmrsResponseInsert 
 } from '@/lib/services/questionnaire-hetero.service';
 import { computeCtqScores, type BipolarCtqResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/ctq';
+import { computeBis10Scores, type BipolarBis10Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/bis10';
 
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
@@ -189,6 +190,29 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving CTQ response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // BIS10 needs to calculate impulsivity scores and means
+  if (questionnaireCode === 'BIS10') {
+    const bis10Scores = computeBis10Scores(response as Partial<BipolarBis10Response>);
+    const bis10Response = {
+      ...response,
+      ...bis10Scores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(bis10Response, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving BIS10 response:', error);
       throw error;
     }
 

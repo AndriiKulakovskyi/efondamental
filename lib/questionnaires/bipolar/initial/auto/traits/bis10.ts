@@ -20,10 +20,15 @@ export interface BipolarBis10Response {
   q5?: number | null; q6?: number | null; q7?: number | null; q8?: number | null;
   q9?: number | null; q10?: number | null; q11?: number | null; q12?: number | null;
   
-  // Scores
-  cognitive_impulsivity_score?: number | null;
-  motor_impulsivity_score?: number | null;
+  // Scores (matching database column names)
+  cognitive_score?: number | null;
+  motor_score?: number | null;
+  non_planning_score?: number | null;
   total_score?: number | null;
+  cognitive_impulsivity_mean?: string | null;
+  behavioral_impulsivity_mean?: string | null;
+  overall_impulsivity?: string | null;
+  interpretation?: string | null;
   
   // Metadata
   completed_by?: string | null;
@@ -89,15 +94,21 @@ export const BIS10_DEFINITION: QuestionnaireDefinition = {
 // Items to reverse (5 - score)
 const REVERSE_ITEMS = [1, 3, 4, 5, 9];
 
-// Subscale mappings
-const COGNITIVE_ITEMS = [1, 3, 4, 5, 9];
-const MOTOR_ITEMS = [2, 6, 7, 8, 10, 11, 12];
+// Subscale mappings for BIS-10 (12 items)
+const COGNITIVE_ITEMS = [1, 3, 4, 5, 9]; // 5 items
+const MOTOR_ITEMS = [2, 6, 7, 8, 10, 11, 12]; // 7 items
 
-export function computeBis10Scores(responses: Partial<BipolarBis10Response>): {
-  cognitive_impulsivity_score: number;
-  motor_impulsivity_score: number;
+export interface Bis10ScoreResult {
+  cognitive_score: number;
+  motor_score: number;
   total_score: number;
-} {
+  cognitive_impulsivity_mean: string;
+  behavioral_impulsivity_mean: string;
+  overall_impulsivity: string;
+  interpretation: string;
+}
+
+export function computeBis10Scores(responses: Partial<BipolarBis10Response>): Bis10ScoreResult {
   const getAdjustedValue = (itemNum: number): number => {
     const key = `q${itemNum}` as keyof BipolarBis10Response;
     const value = responses[key] as number | null | undefined;
@@ -107,19 +118,29 @@ export function computeBis10Scores(responses: Partial<BipolarBis10Response>): {
   
   const cognitiveScore = COGNITIVE_ITEMS.reduce((sum, item) => sum + getAdjustedValue(item), 0);
   const motorScore = MOTOR_ITEMS.reduce((sum, item) => sum + getAdjustedValue(item), 0);
+  const totalScore = cognitiveScore + motorScore;
+  
+  // Calculate means (scores are 1-4, mean ranges 1.0-4.0)
+  const cognitiveMean = cognitiveScore / COGNITIVE_ITEMS.length;
+  const motorMean = motorScore / MOTOR_ITEMS.length;
+  const overallMean = totalScore / (COGNITIVE_ITEMS.length + MOTOR_ITEMS.length);
   
   return {
-    cognitive_impulsivity_score: cognitiveScore,
-    motor_impulsivity_score: motorScore,
-    total_score: cognitiveScore + motorScore
+    cognitive_score: cognitiveScore,
+    motor_score: motorScore,
+    total_score: totalScore,
+    cognitive_impulsivity_mean: cognitiveMean.toFixed(2),
+    behavioral_impulsivity_mean: motorMean.toFixed(2),
+    overall_impulsivity: overallMean.toFixed(2),
+    interpretation: interpretBis10Score(overallMean)
   };
 }
 
-export function interpretBis10Score(totalScore: number): string {
-  // BIS-10 total score ranges from 12-48
+export function interpretBis10Score(meanScore: number): string {
+  // BIS-10 mean score interpretation (scale 1-4)
   // Higher scores indicate greater impulsivity
-  if (totalScore <= 20) return 'Faible impulsivité';
-  if (totalScore <= 28) return 'Impulsivité normale';
-  if (totalScore <= 36) return 'Impulsivité modérée';
+  if (meanScore < 2.0) return 'Faible impulsivité';
+  if (meanScore < 2.5) return 'Impulsivité normale';
+  if (meanScore < 3.0) return 'Impulsivité modérée';
   return 'Haute impulsivité';
 }
