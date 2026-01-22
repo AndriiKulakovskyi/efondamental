@@ -458,8 +458,8 @@ export async function submitProfessionalQuestionnaireAction(
         // - male_gender: only for SLEEP_APNEA
         // - patient_age: only for neuropsy scoring tables, not criteria tables (which use 'age')
         // - weight_kg: injected for creatinine clearance calculation, not a DB column
-        // Note: years_of_education is kept in responses and only filtered if not applicable to specific tables
-        const { patient_gender, male_gender, patient_age, weight_kg, ...filteredResponses } = responses;
+        // - years_of_education: only for specific neuropsy tables (re-added below for applicable questionnaires)
+        const { patient_gender, male_gender, patient_age, weight_kg, years_of_education, ...filteredResponses } = responses;
         
         // Re-add male_gender only for SLEEP_APNEA questionnaire (convert to boolean)
         if (bipolarKey === 'SLEEP_APNEA' && male_gender !== undefined) {
@@ -469,9 +469,10 @@ export async function submitProfessionalQuestionnaireAction(
         }
         
         // Neuropsy tables that have patient_age and years_of_education columns
+        // Note: COBRA, SCIP, CPT3 do NOT have years_of_education in their tables
         const neuropsyTables = [
-          'CVLT', 'FLUENCES_VERBALES', 'MEM3_SPATIAL', 'STROOP', 'TEST_COMMISSIONS', 'TMT',
-          'WAIS3_CODE_SYMBOLES', 'WAIS3_DIGIT_SPAN', 'WAIS3_LEARNING', 'WAIS3_MATRICES', 'WAIS3_VOCABULAIRE',
+          'CVLT', 'FLUENCES_VERBALES', 'MEM3_SPATIAL', 'STROOP', 'TMT',
+          'WAIS3_CODE_SYMBOLES', 'WAIS3_CPT2', 'WAIS3_DIGIT_SPAN', 'WAIS3_LEARNING', 'WAIS3_MATRICES', 'WAIS3_VOCABULAIRE',
           'WAIS4_CODE', 'WAIS4_DIGIT_SPAN', 'WAIS4_LEARNING', 'WAIS4_MATRICES', 'WAIS4_SIMILITUDES'
         ];
         
