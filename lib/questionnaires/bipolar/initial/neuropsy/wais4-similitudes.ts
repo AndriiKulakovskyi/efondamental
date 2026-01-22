@@ -30,10 +30,10 @@ export interface BipolarWais4SimilitudesResponse {
   item16: number | null;
   item17: number | null;
   item18: number | null;
-  // Scores
-  raw_score: number | null;
-  scaled_score: number | null;
-  percentile: number | null;
+  // Scores (calculated automatically)
+  total_raw_score: number | null;
+  standard_score: number | null;
+  standardized_value: number | null;
   // Metadata
   completed_by: string | null;
   completed_at: string;
@@ -43,7 +43,7 @@ export interface BipolarWais4SimilitudesResponse {
 
 export type BipolarWais4SimilitudesResponseInsert = Omit<
   BipolarWais4SimilitudesResponse,
-  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'raw_score' | 'scaled_score' | 'percentile'
+  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_raw_score' | 'standard_score' | 'standardized_value'
 > & {
   completed_by?: string | null;
 };

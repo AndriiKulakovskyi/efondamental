@@ -757,6 +757,18 @@ export default async function ProfessionalQuestionnairePage({
     console.log('[WAIS Debug] Converted accepted_for_neuropsy_evaluation from boolean to:', initialResponses.accepted_for_neuropsy_evaluation);
   }
 
+  // Remove calculated score fields from WAIS4_SIMILITUDES initial responses
+  // These are calculated automatically on save and should only be displayed on score page
+  if (code === 'WAIS4_SIMILITUDES' && existingResponse) {
+    delete initialResponses.total_raw_score;
+    delete initialResponses.standard_score;
+    delete initialResponses.standardized_value;
+    delete initialResponses.raw_score; // Old column
+    delete initialResponses.standardized_score; // Old column
+    delete initialResponses.percentile_rank; // Old column
+    console.log('[WAIS4 Similitudes Debug] Removed calculated score fields from form');
+  }
+
   // Inject patient demographics (age at visit date, gender) for questionnaires that require them
   const requiresDemographics = questionnaireRequiresDemographics(code);
   console.log('[Demographics Debug] Code:', code, '| Requires demographics:', requiresDemographics);

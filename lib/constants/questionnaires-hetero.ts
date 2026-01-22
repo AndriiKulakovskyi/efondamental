@@ -11078,37 +11078,6 @@ export const WAIS4_SIMILITUDES_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: true,
     options: WAIS4_SIMI_OPTIONS
-  },
-  // Scores section
-  {
-    id: 'section_scores',
-    text: 'Scores',
-    type: 'section',
-    required: false
-  },
-  {
-    id: 'total_raw_score',
-    text: 'Total - Note brute',
-    help: 'Somme des 18 items (0-36)',
-    type: 'number',
-    required: false,
-    readonly: true
-  },
-  {
-    id: 'standard_score',
-    text: 'Note standard',
-    help: 'Score standard selon l\'age (1-19)',
-    type: 'number',
-    required: false,
-    readonly: true
-  },
-  {
-    id: 'standardized_value',
-    text: 'Valeur standardisee',
-    help: '(Note standard - 10) / 3',
-    type: 'number',
-    required: false,
-    readonly: true
   }
 ];
 

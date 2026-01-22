@@ -190,6 +190,13 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
+    if (code === 'WAIS4_SIMILITUDES') {
+      // WAIS-IV Similitudes: Standard score 8-12 is average (mean=10, SD=3)
+      if (data.standard_score >= 13) return 'success';
+      if (data.standard_score >= 8) return 'info';
+      return 'warning';
+    }
+    
     if (code === 'CVLT') {
       // CVLT: Use Total 1-5 standard score for severity
       const score = data.total_1_5_std;
@@ -408,6 +415,18 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
     }
   }
   
+  if (code === 'WAIS4_SIMILITUDES' && !interpretation && data.standard_score !== undefined) {
+    if (data.standard_score >= 13) {
+      interpretation = 'Raisonnement verbal supérieur à la moyenne';
+    } else if (data.standard_score >= 8) {
+      interpretation = 'Raisonnement verbal dans la moyenne';
+    } else if (data.standard_score >= 4) {
+      interpretation = 'Raisonnement verbal inférieur à la moyenne';
+    } else {
+      interpretation = 'Raisonnement verbal significativement inférieur à la moyenne';
+    }
+  }
+  
   // Generate interpretation for ASRS if not present
   if (code === 'ASRS' && !interpretation) {
     if (data.screening_positive) {
@@ -496,6 +515,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'MADRS' && 'Résultats MADRS - Échelle de Dépression'}
               {code === 'YMRS' && 'Résultats YMRS - Échelle de Manie'}
               {code === 'WAIS4_MATRICES' && 'Résultats WAIS-IV Matrices'}
+              {code === 'WAIS4_SIMILITUDES' && 'Résultats WAIS-IV Similitudes'}
               {code === 'CVLT' && 'Résultats CVLT'}
               {code === 'WAIS4_CODE' && 'Résultats WAIS-IV Code'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && 'Résultats WAIS-IV Code, Symboles & IVT'}
@@ -549,6 +569,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'WAIS4_MATRICES'
                 ? (data.standardized_score !== undefined ? data.standardized_score : '-')
+                : code === 'WAIS4_SIMILITUDES'
+                ? (data.standard_score !== undefined ? data.standard_score : '-')
                 : code === 'CVLT'
                 ? (data.total_1_5 !== undefined ? data.total_1_5 : '-')
                 : code === 'WAIS4_CODE'
@@ -1446,6 +1468,30 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="flex justify-between">
               <span className="text-gray-600 font-medium">Rang Percentile:</span>
               <span className="font-bold text-lg">{data.percentile_rank !== null && data.percentile_rank !== undefined ? data.percentile_rank : '-'}</span>
+            </div>
+          </div>
+        )}
+
+        {/* WAIS4 Similitudes Details */}
+        {code === 'WAIS4_SIMILITUDES' && (
+          <div className="text-sm space-y-2 mt-2 pt-2 border-t">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Score Brut Total:</span>
+                <span className="font-semibold">{data.total_raw_score ?? '-'}/36</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Note Standard:</span>
+                <span className="font-semibold">{data.standard_score ?? '-'}/19</span>
+              </div>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600">Valeur Standardisée:</span>
+              <span className="font-semibold">{data.standardized_value !== null && data.standardized_value !== undefined ? data.standardized_value.toFixed(2) : '-'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Age du patient:</span>
+              <span className="font-semibold">{data.patient_age ?? '-'} ans</span>
             </div>
           </div>
         )}

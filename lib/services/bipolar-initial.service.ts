@@ -233,6 +233,51 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
     return data as T;
   }
 
+  // WAIS4_SIMILITUDES needs to calculate scores based on age and items
+  if (questionnaireCode === 'WAIS4_SIMILITUDES') {
+    const { calculateWais4SimilitudesScores } = await import('./wais4-similitudes-scoring');
+    const scores = calculateWais4SimilitudesScores({
+      patient_age: (response as any).patient_age || 35,
+      item1: (response as any).item1 || 0,
+      item2: (response as any).item2 || 0,
+      item3: (response as any).item3 || 0,
+      item4: (response as any).item4 || 0,
+      item5: (response as any).item5 || 0,
+      item6: (response as any).item6 || 0,
+      item7: (response as any).item7 || 0,
+      item8: (response as any).item8 || 0,
+      item9: (response as any).item9 || 0,
+      item10: (response as any).item10 || 0,
+      item11: (response as any).item11 || 0,
+      item12: (response as any).item12 || 0,
+      item13: (response as any).item13 || 0,
+      item14: (response as any).item14 || 0,
+      item15: (response as any).item15 || 0,
+      item16: (response as any).item16 || 0,
+      item17: (response as any).item17 || 0,
+      item18: (response as any).item18 || 0
+    });
+
+    const similitudesResponse = {
+      ...response,
+      ...scores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(similitudesResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving WAIS4_SIMILITUDES response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
   // ALS18 needs to calculate subscale scores and interpretation
   if (questionnaireCode === 'ALS18') {
     const als18Scores = computeAls18Scores(response as Partial<BipolarAls18Response>);
