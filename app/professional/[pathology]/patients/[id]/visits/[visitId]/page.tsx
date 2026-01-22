@@ -193,8 +193,8 @@ export default async function VisitDetailPage({
   // Determine neuropsychological questionnaire visibility based on acceptance
   const wais4CriteriaAnswered = !!wais4CriteriaResponse;
   const wais3CriteriaAnswered = !!wais3CriteriaResponse;
-  const wais4Accepted = wais4CriteriaResponse?.accepted_for_neuropsy_evaluation === true || wais4CriteriaResponse?.accepted_for_neuropsy_evaluation === 1;
-  const wais3Accepted = wais3CriteriaResponse?.accepted_for_neuropsy_evaluation === true || wais3CriteriaResponse?.accepted_for_neuropsy_evaluation === 1;
+  const wais4Accepted = wais4CriteriaResponse?.accepted_for_neuropsy_evaluation === 1;
+  const wais3Accepted = wais3CriteriaResponse?.accepted_for_neuropsy_evaluation === 1;
   
   // NOTE: We will calculate actual completion status from constructed modules AFTER building them
   // This ensures accuracy by using the same logic as individual module cards
