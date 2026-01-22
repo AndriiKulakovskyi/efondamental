@@ -19,6 +19,7 @@ import { computeEq5d5lScores, type BipolarEq5d5lResponse } from '@/lib/questionn
 import { computePriseMScores, type BipolarPriseMResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/prise-m';
 import { computeStaiYaScores, type BipolarStaiYaResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/stai-ya';
 import { computeMarsScores, type BipolarMarsResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/mars';
+import { computeMathysScores, type BipolarMathysResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/mathys';
 
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
@@ -429,6 +430,29 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving MARS response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // MATHYS needs to calculate multidimensional scores
+  if (questionnaireCode === 'MATHYS') {
+    const mathysScores = computeMathysScores(response as Partial<BipolarMathysResponse>);
+    const mathysResponse = {
+      ...response,
+      ...mathysScores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(mathysResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving MATHYS response:', error);
       throw error;
     }
 

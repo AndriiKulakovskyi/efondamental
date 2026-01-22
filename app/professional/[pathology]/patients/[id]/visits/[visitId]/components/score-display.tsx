@@ -346,6 +346,17 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'error';                      // Very low
     }
     
+    if (code === 'MATHYS') {
+      // MAThyS: Thymic state (0-200, ~100 = euthymic)
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score < 60) return 'error';       // Marked depression
+      if (score < 80) return 'warning';     // Depressive tendency
+      if (score <= 120) return 'success';   // Euthymic
+      if (score <= 140) return 'warning';   // Hypomanic tendency
+      return 'error';                       // Hypomania/mania
+    }
+    
     return 'info';
   };
 
@@ -469,6 +480,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'PRISE_M' && 'Résultats PRISE-M - Effets secondaires'}
               {code === 'STAI_YA' && 'Résultats STAI-YA - Anxiété état'}
               {code === 'MARS' && 'Résultats MARS - Observance thérapeutique'}
+              {code === 'MATHYS' && 'Résultats MAThyS - États thymiques'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -534,6 +546,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'MARS'
                 ? (data.total_score !== undefined ? `${data.total_score}/10` : '-')
+                : code === 'MATHYS'
+                ? (data.total_score !== undefined ? `${parseFloat(data.total_score).toFixed(1)}/200` : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM' && '/20'}
               {code === 'QIDS_SR16' && '/27'}
@@ -2764,6 +2778,92 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <p className="mt-1"><strong>Score total:</strong> 0-10 (plus élevé = meilleure observance)</p>
               <p className="mt-1"><strong>Seuils:</strong> ≥8 (bonne) | 6-7 (modérée) | 4-5 (faible) | &lt;4 (très faible)</p>
               <p className="mt-1 text-gray-600"><strong>Note:</strong> Une faible observance est un facteur de risque majeur de rechute. L'identification des obstacles est essentielle.</p>
+            </div>
+          </div>
+        )}
+
+        {/* MAThyS Details */}
+        {code === 'MATHYS' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg ${
+                data.total_score < 60 || data.total_score > 140
+                  ? 'bg-red-50 border border-red-200 text-red-800'
+                  : data.total_score < 80 || data.total_score > 120
+                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                  : 'bg-green-50 border border-green-200 text-green-800'
+              }`}>
+                <p className="font-medium">{data.interpretation}</p>
+              </div>
+            )}
+
+            {/* Main Subscores */}
+            <div className="pt-2">
+              <h5 className="font-semibold text-gray-700 mb-3">Sous-scores dimensionnels</h5>
+              <div className="grid grid-cols-5 gap-3">
+                <div className="text-center p-3 bg-purple-50 rounded-lg">
+                  <div className="text-xl font-bold text-purple-700">{data.subscore_emotion !== null && data.subscore_emotion !== undefined ? parseFloat(data.subscore_emotion).toFixed(1) : '-'}</div>
+                  <div className="text-xs text-gray-600 mt-1">Émotion</div>
+                  <div className="text-xs text-gray-500">/30</div>
+                </div>
+                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                  <div className="text-xl font-bold text-blue-700">{data.subscore_motivation !== null && data.subscore_motivation !== undefined ? parseFloat(data.subscore_motivation).toFixed(1) : '-'}</div>
+                  <div className="text-xs text-gray-600 mt-1">Motivation</div>
+                  <div className="text-xs text-gray-500">/30</div>
+                </div>
+                <div className="text-center p-3 bg-green-50 rounded-lg">
+                  <div className="text-xl font-bold text-green-700">{data.subscore_perception !== null && data.subscore_perception !== undefined ? parseFloat(data.subscore_perception).toFixed(1) : '-'}</div>
+                  <div className="text-xs text-gray-600 mt-1">Perception</div>
+                  <div className="text-xs text-gray-500">/50</div>
+                </div>
+                <div className="text-center p-3 bg-amber-50 rounded-lg">
+                  <div className="text-xl font-bold text-amber-700">{data.subscore_interaction !== null && data.subscore_interaction !== undefined ? parseFloat(data.subscore_interaction).toFixed(1) : '-'}</div>
+                  <div className="text-xs text-gray-600 mt-1">Interaction</div>
+                  <div className="text-xs text-gray-500">/20</div>
+                </div>
+                <div className="text-center p-3 bg-indigo-50 rounded-lg">
+                  <div className="text-xl font-bold text-indigo-700">{data.subscore_cognition !== null && data.subscore_cognition !== undefined ? parseFloat(data.subscore_cognition).toFixed(1) : '-'}</div>
+                  <div className="text-xs text-gray-600 mt-1">Cognition</div>
+                  <div className="text-xs text-gray-500">/50</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Dimension Scores */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-3">Dimensions cliniques (moyennes)</h5>
+              <div className="grid grid-cols-5 gap-3">
+                <div className="text-center p-2 bg-gray-50 rounded">
+                  <div className="text-lg font-bold text-gray-900">{data.cognitive_speed !== null && data.cognitive_speed !== undefined ? parseFloat(data.cognitive_speed).toFixed(2) : '-'}</div>
+                  <div className="text-xs text-gray-600 mt-1">Vitesse cognitive</div>
+                </div>
+                <div className="text-center p-2 bg-gray-50 rounded">
+                  <div className="text-lg font-bold text-gray-900">{data.emotional_hyperreactivity !== null && data.emotional_hyperreactivity !== undefined ? parseFloat(data.emotional_hyperreactivity).toFixed(2) : '-'}</div>
+                  <div className="text-xs text-gray-600 mt-1">Hyperréactivité émotionnelle</div>
+                </div>
+                <div className="text-center p-2 bg-gray-50 rounded">
+                  <div className="text-lg font-bold text-gray-900">{data.emotional_hyporeactivity !== null && data.emotional_hyporeactivity !== undefined ? parseFloat(data.emotional_hyporeactivity).toFixed(2) : '-'}</div>
+                  <div className="text-xs text-gray-600 mt-1">Hyporéactivité émotionnelle</div>
+                </div>
+                <div className="text-center p-2 bg-gray-50 rounded">
+                  <div className="text-lg font-bold text-gray-900">{data.motivation !== null && data.motivation !== undefined ? parseFloat(data.motivation).toFixed(2) : '-'}</div>
+                  <div className="text-xs text-gray-600 mt-1">Motivation</div>
+                </div>
+                <div className="text-center p-2 bg-gray-50 rounded">
+                  <div className="text-lg font-bold text-gray-900">{data.motor_activity !== null && data.motor_activity !== undefined ? parseFloat(data.motor_activity).toFixed(2) : '-'}</div>
+                  <div className="text-xs text-gray-600 mt-1">Activité motrice</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>MAThyS:</strong> Multidimensional Assessment of Thymic States - Évaluation multidimensionnelle des états thymiques</p>
+              <p className="mt-1"><strong>Cotation:</strong> 20 items, 0-10 par item avec demi-points. Items inversés: 5, 6, 7, 8, 9, 10, 17, 18</p>
+              <p className="mt-1"><strong>Score total:</strong> 0-200 (~100 = état euthymique)</p>
+              <p className="mt-1"><strong>Seuils:</strong> &lt;60 (dépression marquée) | 60-79 (tendance dépressive) | 80-120 (euthymie) | 121-140 (tendance hypomaniaque) | &gt;140 (hypomanie/manie)</p>
+              <p className="mt-1 text-gray-600"><strong>Note:</strong> Outil sensible pour détecter les variations thymiques subtiles. Utile en suivi longitudinal.</p>
             </div>
           </div>
         )}

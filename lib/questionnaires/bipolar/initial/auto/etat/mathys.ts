@@ -54,6 +54,14 @@ export interface BipolarMathysResponse {
   subscore_cognition?: number | null;
   total_score?: number | null;
   
+  // Additional dimension scores
+  cognitive_speed?: number | null;
+  emotional_hyperreactivity?: number | null;
+  emotional_hyporeactivity?: number | null;
+  motivation?: number | null;
+  motor_activity?: number | null;
+  interpretation?: string | null;
+  
   // Metadata
   completed_by?: string | null;
   completed_at: string;
@@ -168,14 +176,31 @@ const SUBSCALES = {
   cognition: [5, 9, 10, 12, 17]
 };
 
-export function computeMathysScores(responses: Partial<BipolarMathysResponse>): {
+// Additional dimension mappings
+const DIMENSIONS = {
+  cognitive_speed: [9, 12],  // Vitesse cognitive
+  emotional_hyperreactivity: [1, 3, 7, 10, 18],  // Hyperréactivité émotionnelle
+  emotional_hyporeactivity: [6, 7, 8, 13, 18],  // Hyporéactivité émotionnelle
+  motivation: [11, 15, 16],  // Motivation
+  motor_activity: [2, 19]  // Activité motrice
+};
+
+export interface MathysScoreResult {
   subscore_emotion: number;
   subscore_motivation: number;
   subscore_perception: number;
   subscore_interaction: number;
   subscore_cognition: number;
   total_score: number;
-} {
+  cognitive_speed: number;
+  emotional_hyperreactivity: number;
+  emotional_hyporeactivity: number;
+  motivation: number;
+  motor_activity: number;
+  interpretation: string;
+}
+
+export function computeMathysScores(responses: Partial<BipolarMathysResponse>): MathysScoreResult {
   // First, get adjusted values (apply reversal)
   const adjustedValues: Record<number, number> = {};
   
@@ -188,7 +213,7 @@ export function computeMathysScores(responses: Partial<BipolarMathysResponse>): 
     }
   }
   
-  // Calculate subscores
+  // Calculate subscores (sums)
   const calculateSubscore = (items: number[]): number => {
     let sum = 0;
     let count = 0;
@@ -201,14 +226,35 @@ export function computeMathysScores(responses: Partial<BipolarMathysResponse>): 
     return count > 0 ? sum : 0;
   };
   
+  // Calculate dimension scores (means)
+  const calculateDimensionScore = (items: number[]): number => {
+    let sum = 0;
+    let count = 0;
+    for (const item of items) {
+      if (adjustedValues[item] !== undefined) {
+        sum += adjustedValues[item];
+        count++;
+      }
+    }
+    return count > 0 ? parseFloat((sum / count).toFixed(2)) : 0;
+  };
+  
   const emotionScore = calculateSubscore(SUBSCALES.emotion);
   const motivationScore = calculateSubscore(SUBSCALES.motivation);
   const perceptionScore = calculateSubscore(SUBSCALES.perception);
   const interactionScore = calculateSubscore(SUBSCALES.interaction);
   const cognitionScore = calculateSubscore(SUBSCALES.cognition);
   
+  const cognitiveSpeed = calculateDimensionScore(DIMENSIONS.cognitive_speed);
+  const emotionalHyperreactivity = calculateDimensionScore(DIMENSIONS.emotional_hyperreactivity);
+  const emotionalHyporeactivity = calculateDimensionScore(DIMENSIONS.emotional_hyporeactivity);
+  const motivationDim = calculateDimensionScore(DIMENSIONS.motivation);
+  const motorActivity = calculateDimensionScore(DIMENSIONS.motor_activity);
+  
   // Total score is sum of all adjusted values
   const totalScore = Object.values(adjustedValues).reduce((a, b) => a + b, 0);
+  
+  const interpretation = interpretMathysScore(totalScore, emotionScore, motivationScore, cognitiveSpeed, motorActivity);
   
   return {
     subscore_emotion: emotionScore,
@@ -216,18 +262,47 @@ export function computeMathysScores(responses: Partial<BipolarMathysResponse>): 
     subscore_perception: perceptionScore,
     subscore_interaction: interactionScore,
     subscore_cognition: cognitionScore,
-    total_score: totalScore
+    total_score: totalScore,
+    cognitive_speed: cognitiveSpeed,
+    emotional_hyperreactivity: emotionalHyperreactivity,
+    emotional_hyporeactivity: emotionalHyporeactivity,
+    motivation: motivationDim,
+    motor_activity: motorActivity,
+    interpretation
   };
 }
 
-export function interpretMathysScore(totalScore: number): string {
+export function interpretMathysScore(
+  totalScore: number,
+  emotionScore: number,
+  motivationScore: number,
+  cognitiveSpeed: number,
+  motorActivity: number
+): string {
   // MAThyS total score ranges from 0-200
   // Score around 100 indicates euthymia (neutral state)
   // Higher scores indicate more activation/mania
   // Lower scores indicate more inhibition/depression
-  if (totalScore < 60) return 'État dépressif marqué';
-  if (totalScore < 80) return 'Tendance dépressive';
-  if (totalScore <= 120) return 'État euthymique';
-  if (totalScore <= 140) return 'Tendance hypomaniaque';
-  return 'État hypomaniaque/maniaque';
+  
+  let state = '';
+  let details = '';
+  
+  if (totalScore < 60) {
+    state = 'État dépressif marqué';
+    details = 'Inhibition importante sur le plan thymique, cognitif et moteur. Retentissement fonctionnel probable.';
+  } else if (totalScore < 80) {
+    state = 'Tendance dépressive';
+    details = 'Ralentissement modéré avec émoussement affectif et baisse de motivation. Surveillance recommandée.';
+  } else if (totalScore <= 120) {
+    state = 'État euthymique';
+    details = 'Équilibre thymique globalement préservé. Fonctionnement dans les normes.';
+  } else if (totalScore <= 140) {
+    state = 'Tendance hypomaniaque';
+    details = 'Activation modérée avec augmentation de l\'énergie, de la réactivité émotionnelle et cognitive. Surveillance conseillée.';
+  } else {
+    state = 'État hypomaniaque/maniaque';
+    details = 'Activation importante avec hyperréactivité, accélération cognitive et motrice. Risque de décompensation.';
+  }
+  
+  return `${state}. ${details} (Score total: ${totalScore.toFixed(1)}/200)`;
 }
