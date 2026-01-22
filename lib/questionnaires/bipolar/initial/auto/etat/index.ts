@@ -26,7 +26,7 @@ export {
 export {
   STAI_YA_QUESTIONS,
   STAI_YA_DEFINITION,
-  computeStaiYaScore,
+  computeStaiYaScores,
   interpretStaiYaScore,
   rawToTScore,
   type BipolarStaiYaResponse,
@@ -68,6 +68,7 @@ export {
   EPWORTH_QUESTIONS,
   EPWORTH_DEFINITION,
   computeEpworthScore,
+  computeEpworthScores,
   interpretEpworthScore,
   interpretEpworthScoreSimple,
   type BipolarEpworthResponse,
