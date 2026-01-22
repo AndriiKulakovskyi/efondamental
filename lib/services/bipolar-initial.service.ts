@@ -12,6 +12,7 @@ import { computeCtqScores, type BipolarCtqResponse } from '@/lib/questionnaires/
 import { computeBis10Scores, type BipolarBis10Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/bis10';
 import { computeAls18Scores, type BipolarAls18Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/als18';
 import { computeAimScores, type BipolarAimResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/aim';
+import { computeAq12Scores, type BipolarAq12Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/aq12';
 
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
@@ -261,6 +262,29 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving AIM response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // AQ12 needs to calculate subscale scores and interpretation
+  if (questionnaireCode === 'AQ12') {
+    const aq12Scores = computeAq12Scores(response as Partial<BipolarAq12Response>);
+    const aq12Response = {
+      ...response,
+      ...aq12Scores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(aq12Response, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving AQ12 response:', error);
       throw error;
     }
 

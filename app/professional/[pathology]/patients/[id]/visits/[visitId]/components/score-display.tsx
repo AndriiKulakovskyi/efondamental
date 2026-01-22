@@ -115,6 +115,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'info';                      // Low emotional intensity
     }
     
+    if (code === 'AQ12') {
+      // AQ-12 (BPAQ-12): Aggression Questionnaire, total 12-72
+      // 12-30: low, 31-45: moderate, >45: high
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score > 45) return 'error';     // High aggression
+      if (score >= 31) return 'warning';  // Moderate aggression
+      return 'success';                   // Low aggression
+    }
+    
     if (code === 'WURS25') {
       // WURS-25: Clinical cutoff >= 36 suggests childhood ADHD
       if (data.adhd_likely || data.total_score >= 36) return 'warning';
@@ -399,6 +409,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'CTI' && 'Résultats CTI - Type Circadien'}
               {code === 'ALS18' && 'Résultats ALS-18 - Apathie'}
               {code === 'AIM' && 'Résultats AIM-20 - Intensité Affective'}
+              {code === 'AQ12' && 'Résultats AQ-12 - Agressivité'}
               {code === 'ALDA' && 'Score Alda'}
               {code === 'CGI' && 'Résultats CGI'}
               {code === 'MADRS' && 'Résultats MADRS - Échelle de Dépression'}
@@ -437,6 +448,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 : code === 'ALS18'
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'AIM'
+                ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'AQ12'
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'ALDA'
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
@@ -479,6 +492,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'CTI' && '/55'}
               {code === 'ALS18' && '/54'}
               {code === 'AIM' && '/120'}
+              {code === 'AQ12' && '/72'}
               {code === 'ALDA' && '/10'}
               {code === 'CGI' && '/7'}
               {code === 'MADRS' && '/60'}
@@ -1023,6 +1037,69 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="text-xs text-gray-600 mt-2 pt-2 border-t space-y-1">
               <p><strong>Cotation:</strong> 20 items, 1-6 par item (1=Jamais, 6=Toujours). 6 items inversés.</p>
               <p><strong>Seuils:</strong> 20-50 (faible) | 51-80 (normale) | 81-120 (élevée)</p>
+            </div>
+          </div>
+        )}
+
+        {/* AQ-12 Aggression Details */}
+        {code === 'AQ12' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Score Interpretation */}
+            <div className={`p-3 rounded-lg ${
+              data.total_score !== null && data.total_score > 45
+                ? 'bg-red-50 border border-red-200'
+                : data.total_score !== null && data.total_score >= 31
+                ? 'bg-amber-50 border border-amber-200'
+                : 'bg-green-50 border border-green-200'
+            }`}>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">
+                    {data.total_score !== null && data.total_score > 45 && 'Agressivité élevée'}
+                    {data.total_score !== null && data.total_score >= 31 && data.total_score <= 45 && 'Agressivité modérée'}
+                    {(data.total_score === null || data.total_score < 31) && 'Faible agressivité'}
+                  </span>
+                  <span className="text-xs text-gray-600">Score: {data.total_score ?? '-'}/72</span>
+                </div>
+                <p className="text-xs leading-relaxed mt-2">
+                  {data.total_score !== null && data.total_score > 45 && 
+                    'Impulsivité marquée, colère difficile à contrôler, risque accru de comportements agressifs verbaux ou physiques.'}
+                  {data.total_score !== null && data.total_score >= 31 && data.total_score <= 45 && 
+                    'Irritabilité, colère réactive, conflits interpersonnels possibles, retentissement situationnel.'}
+                  {(data.total_score === null || data.total_score < 31) && 
+                    'Bonne régulation émotionnelle, conflits rares ou maîtrisés.'}
+                </p>
+              </div>
+            </div>
+
+            {/* Subscale Scores */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Scores par sous-échelle (3 items chacune)</h5>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Agressivité physique:</span>
+                  <span className="font-medium">{data.physical_aggression_score ?? '-'}/18</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Agressivité verbale:</span>
+                  <span className="font-medium">{data.verbal_aggression_score ?? '-'}/18</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Colère:</span>
+                  <span className="font-medium">{data.anger_score ?? '-'}/18</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Hostilité:</span>
+                  <span className="font-medium">{data.hostility_score ?? '-'}/18</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Scale Reference */}
+            <div className="text-xs text-gray-600 mt-2 pt-2 border-t space-y-1">
+              <p><strong>Cotation:</strong> 12 items (BPAQ-12), 1-6 par item (1=Pas du tout moi, 6=Tout à fait moi)</p>
+              <p><strong>Seuils:</strong> 12-30 (faible) | 31-45 (modérée) | &gt;45 (élevée)</p>
+              <p className="text-gray-500 italic mt-1">En clinique, on s'intéresse à la comparaison interindividuelle, à l'évolution dans le temps, et au lien avec l'impulsivité, les troubles de l'humeur, et le stress.</p>
             </div>
           </div>
         )}

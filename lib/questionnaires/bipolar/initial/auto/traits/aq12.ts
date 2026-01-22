@@ -26,6 +26,7 @@ export interface BipolarAq12Response {
   anger_score?: number | null;
   hostility_score?: number | null;
   total_score?: number | null;
+  interpretation?: string | null;
   
   // Metadata
   completed_by?: string | null;
@@ -98,13 +99,16 @@ const SUBSCALES = {
   hostility: [4, 8, 12]
 };
 
-export function computeAq12Scores(responses: Partial<BipolarAq12Response>): {
+export interface Aq12ScoreResult {
   physical_aggression_score: number;
   verbal_aggression_score: number;
   anger_score: number;
   hostility_score: number;
   total_score: number;
-} {
+  interpretation: string;
+}
+
+export function computeAq12Scores(responses: Partial<BipolarAq12Response>): Aq12ScoreResult {
   const getValue = (itemNum: number): number => {
     const key = `q${itemNum}` as keyof BipolarAq12Response;
     const value = responses[key] as number | null | undefined;
@@ -115,22 +119,32 @@ export function computeAq12Scores(responses: Partial<BipolarAq12Response>): {
   const verbalAggression = SUBSCALES.verbal_aggression.reduce((sum, item) => sum + getValue(item), 0);
   const anger = SUBSCALES.anger.reduce((sum, item) => sum + getValue(item), 0);
   const hostility = SUBSCALES.hostility.reduce((sum, item) => sum + getValue(item), 0);
+  const totalScore = physicalAggression + verbalAggression + anger + hostility;
   
   return {
     physical_aggression_score: physicalAggression,
     verbal_aggression_score: verbalAggression,
     anger_score: anger,
     hostility_score: hostility,
-    total_score: physicalAggression + verbalAggression + anger + hostility
+    total_score: totalScore,
+    interpretation: interpretAq12Score(totalScore)
   };
 }
 
 export function interpretAq12Score(totalScore: number): string {
-  // AQ-12 total score ranges from 12-72
+  // AQ-12 (BPAQ-12) total score ranges from 12-72
   // Higher scores indicate greater aggression
-  if (totalScore <= 24) return 'Niveau d\'agression faible';
-  if (totalScore <= 36) return 'Niveau d\'agression normal';
-  if (totalScore <= 48) return 'Niveau d\'agression modéré';
-  if (totalScore <= 60) return 'Niveau d\'agression élevé';
-  return 'Niveau d\'agression très élevé';
+  if (totalScore <= 30) return 'Faible agressivité';
+  if (totalScore <= 45) return 'Agressivité modérée';
+  return 'Agressivité élevée';
+}
+
+export function getAq12ClinicalGuidance(totalScore: number): string {
+  if (totalScore <= 30) {
+    return 'Bonne régulation émotionnelle, conflits rares ou maîtrisés.';
+  }
+  if (totalScore <= 45) {
+    return 'Irritabilité, colère réactive, conflits interpersonnels possibles, retentissement situationnel.';
+  }
+  return 'Impulsivité marquée, colère difficile à contrôler, risque accru de comportements agressifs verbaux ou physiques.';
 }
