@@ -105,6 +105,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'success';                   // No clinically significant apathy
     }
     
+    if (code === 'AIM') {
+      // AIM-20: Affect Intensity Measure, total 20-120
+      // 20-50: low, 51-80: normal, 81-120: high
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 81) return 'warning';  // High emotional intensity
+      if (score >= 51) return 'success';  // Normal
+      return 'info';                      // Low emotional intensity
+    }
+    
     if (code === 'WURS25') {
       // WURS-25: Clinical cutoff >= 36 suggests childhood ADHD
       if (data.adhd_likely || data.total_score >= 36) return 'warning';
@@ -388,6 +398,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'CSM' && 'Résultats CSM - Chronotype'}
               {code === 'CTI' && 'Résultats CTI - Type Circadien'}
               {code === 'ALS18' && 'Résultats ALS-18 - Apathie'}
+              {code === 'AIM' && 'Résultats AIM-20 - Intensité Affective'}
               {code === 'ALDA' && 'Score Alda'}
               {code === 'CGI' && 'Résultats CGI'}
               {code === 'MADRS' && 'Résultats MADRS - Échelle de Dépression'}
@@ -424,6 +435,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 : code === 'CTI'
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'ALS18'
+                ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'AIM'
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'ALDA'
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
@@ -465,6 +478,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'CSM' && '/55'}
               {code === 'CTI' && '/55'}
               {code === 'ALS18' && '/54'}
+              {code === 'AIM' && '/120'}
               {code === 'ALDA' && '/10'}
               {code === 'CGI' && '/7'}
               {code === 'MADRS' && '/60'}
@@ -964,6 +978,51 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="text-xs text-gray-600 mt-2 pt-2 border-t space-y-1">
               <p><strong>Cotation:</strong> 18 items, 0-3 par item (0=Absolument pas caractéristique, 3=Très caractéristique)</p>
               <p><strong>Seuils:</strong> 0-13 (absence d'apathie) | 14-25 (légère-modérée) | &ge;26 (marquée/sévère)</p>
+            </div>
+          </div>
+        )}
+
+        {/* AIM-20 Affect Intensity Details */}
+        {code === 'AIM' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Score Interpretation */}
+            <div className={`p-3 rounded-lg ${
+              data.total_score !== null && data.total_score >= 81
+                ? 'bg-amber-50 border border-amber-200'
+                : data.total_score !== null && data.total_score >= 51
+                ? 'bg-green-50 border border-green-200'
+                : 'bg-blue-50 border border-blue-200'
+            }`}>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">
+                    {data.total_score !== null && data.total_score >= 81 && 'Intensité affective élevée'}
+                    {data.total_score !== null && data.total_score >= 51 && data.total_score < 81 && 'Intensité affective normale'}
+                    {(data.total_score === null || data.total_score < 51) && 'Intensité affective faible'}
+                  </span>
+                  <span className="text-xs text-gray-600">Score: {data.total_score ?? '-'}/120</span>
+                </div>
+                <p className="text-xs leading-relaxed mt-2">
+                  {data.total_score !== null && data.total_score >= 81 && 
+                    'Forte intensité émotionnelle, émotions vécues comme envahissantes. Réactions émotionnelles rapides et puissantes, positives comme négatives. Vulnérabilité accrue à la dysrégulation émotionnelle. Ces scores sont souvent observés dans les troubles de l\'humeur, troubles anxieux, trouble borderline, et profils à haute sensibilité émotionnelle.'}
+                  {data.total_score !== null && data.total_score >= 51 && data.total_score < 81 && 
+                    'Intensité émotionnelle moyenne. Réactivité émotionnelle dans la norme. Capacité à ressentir fortement certaines émotions sans débordement systématique. Correspond au profil le plus fréquent en population générale.'}
+                  {(data.total_score === null || data.total_score < 51) && 
+                    'Réactivité émotionnelle faible. Émotions vécues comme modérées, peu envahissantes. Profil parfois associé à un style émotionnel contrôlé, distant ou peu expressif.'}
+                </p>
+              </div>
+            </div>
+
+            {/* Mean Score */}
+            <div className="flex justify-between items-center pt-2 border-t">
+              <span className="text-gray-600">Score moyen par item:</span>
+              <span className="font-semibold">{data.total_mean !== null && data.total_mean !== undefined ? parseFloat(data.total_mean).toFixed(2) : '-'}/6.0</span>
+            </div>
+
+            {/* Scale Reference */}
+            <div className="text-xs text-gray-600 mt-2 pt-2 border-t space-y-1">
+              <p><strong>Cotation:</strong> 20 items, 1-6 par item (1=Jamais, 6=Toujours). 6 items inversés.</p>
+              <p><strong>Seuils:</strong> 20-50 (faible) | 51-80 (normale) | 81-120 (élevée)</p>
             </div>
           </div>
         )}

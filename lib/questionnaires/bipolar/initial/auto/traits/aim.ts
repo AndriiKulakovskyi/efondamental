@@ -24,7 +24,8 @@ export interface BipolarAimResponse {
   
   // Scores
   total_score?: number | null;
-  mean_score?: number | null;
+  total_mean?: string | null;
+  interpretation?: string | null;
   
   // Metadata
   completed_by?: string | null;
@@ -96,10 +97,13 @@ export const AIM_DEFINITION: QuestionnaireDefinition = {
 // Items to reverse (7 - score)
 const REVERSE_ITEMS = [5, 10, 13, 15, 18, 20];
 
-export function computeAimScores(responses: Partial<BipolarAimResponse>): {
+export interface AimScoreResult {
   total_score: number;
-  mean_score: number;
-} {
+  total_mean: string;
+  interpretation: string;
+}
+
+export function computeAimScores(responses: Partial<BipolarAimResponse>): AimScoreResult {
   let total = 0;
   let count = 0;
   
@@ -114,17 +118,29 @@ export function computeAimScores(responses: Partial<BipolarAimResponse>): {
     }
   }
   
+  const meanScore = count > 0 ? total / count : 0;
+  
   return {
     total_score: total,
-    mean_score: count > 0 ? Math.round((total / count) * 100) / 100 : 0
+    total_mean: meanScore.toFixed(2),
+    interpretation: interpretAimScore(total)
   };
 }
 
-export function interpretAimScore(meanScore: number): string {
-  // AIM mean score ranges from 1-6
+export function interpretAimScore(totalScore: number): string {
+  // AIM-20 total score ranges from 20-120
   // Higher scores indicate greater affect intensity
-  if (meanScore <= 2.5) return 'Intensité affective faible';
-  if (meanScore <= 3.5) return 'Intensité affective normale';
-  if (meanScore <= 4.5) return 'Intensité affective élevée';
-  return 'Intensité affective très élevée';
+  if (totalScore <= 50) return 'Intensité affective faible';
+  if (totalScore <= 80) return 'Intensité affective normale';
+  return 'Intensité affective élevée';
+}
+
+export function getAimClinicalGuidance(totalScore: number): string {
+  if (totalScore <= 50) {
+    return 'Réactivité émotionnelle faible. Émotions vécues comme modérées, peu envahissantes. Profil parfois associé à un style émotionnel contrôlé, distant ou peu expressif.';
+  }
+  if (totalScore <= 80) {
+    return 'Intensité émotionnelle moyenne. Réactivité émotionnelle dans la norme. Capacité à ressentir fortement certaines émotions sans débordement systématique. Correspond au profil le plus fréquent en population générale.';
+  }
+  return 'Forte intensité émotionnelle, émotions vécues comme envahissantes. Réactions émotionnelles rapides et puissantes, positives comme négatives. Vulnérabilité accrue à la dysrégulation émotionnelle. Ces scores sont souvent observés dans les troubles de l\'humeur, troubles anxieux, trouble borderline, et profils à haute sensibilité émotionnelle.';
 }
