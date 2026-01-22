@@ -13,6 +13,7 @@ import { computeBis10Scores, type BipolarBis10Response } from '@/lib/questionnai
 import { computeAls18Scores, type BipolarAls18Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/als18';
 import { computeAimScores, type BipolarAimResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/aim';
 import { computeAq12Scores, type BipolarAq12Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/aq12';
+import { computeCsmScores, type BipolarCsmResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/csm';
 
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
@@ -285,6 +286,29 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving AQ12 response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // CSM needs to calculate total score and chronotype
+  if (questionnaireCode === 'CSM') {
+    const csmScores = computeCsmScores(response as Partial<BipolarCsmResponse>);
+    const csmResponse = {
+      ...response,
+      ...csmScores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(csmResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving CSM response:', error);
       throw error;
     }
 
