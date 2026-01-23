@@ -24,6 +24,11 @@ import { computePsqiScores, type BipolarPsqiResponse } from '@/lib/questionnaire
 import { computeEpworthScores, type BipolarEpworthResponse } from '@/lib/questionnaires/bipolar/initial/auto/etat/epworth';
 import { scoreQids, type BipolarQidsResponse } from '@/lib/questionnaires/bipolar/screening/auto/qids';
 
+// Nurse module calculation imports
+import { analyzePhysicalParams } from '@/lib/questionnaires/bipolar/nurse/physical-params';
+import { analyzeBloodPressure } from '@/lib/questionnaires/bipolar/nurse/blood-pressure';
+import { scoreSleepApnea } from '@/lib/questionnaires/bipolar/nurse/sleep-apnea';
+
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
 // ============================================================================
@@ -878,6 +883,158 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving EPWORTH response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // ============================================================================
+  // Nurse Module Questionnaires with Calculations
+  // ============================================================================
+
+  // PHYSICAL_PARAMS needs BMI calculation
+  if (questionnaireCode === 'PHYSICAL_PARAMS') {
+    const analysis = analyzePhysicalParams({
+      height_cm: response.height_cm ?? null,
+      weight_kg: response.weight_kg ?? null
+    });
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert({
+        ...response,
+        bmi: analysis.bmi,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving PHYSICAL_PARAMS response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // BLOOD_PRESSURE needs tension string formatting
+  if (questionnaireCode === 'BLOOD_PRESSURE') {
+    const analysis = analyzeBloodPressure({
+      bp_lying_systolic: response.bp_lying_systolic ?? null,
+      bp_lying_diastolic: response.bp_lying_diastolic ?? null,
+      bp_standing_systolic: response.bp_standing_systolic ?? null,
+      bp_standing_diastolic: response.bp_standing_diastolic ?? null
+    });
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert({
+        ...response,
+        tension_lying: analysis.tension_lying,
+        tension_standing: analysis.tension_standing,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving BLOOD_PRESSURE response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // SLEEP_APNEA needs STOP-Bang scoring + yes/no to boolean conversion
+  if (questionnaireCode === 'SLEEP_APNEA') {
+    const scoring = scoreSleepApnea({
+      diagnosed_sleep_apnea: response.diagnosed_sleep_apnea ?? null,
+      has_cpap_device: response.has_cpap_device ?? null,
+      snoring: response.snoring ?? null,
+      tiredness: response.tiredness ?? null,
+      observed_apnea: response.observed_apnea ?? null,
+      hypertension: response.hypertension ?? null,
+      bmi_over_35: response.bmi_over_35 ?? null,
+      age_over_50: response.age_over_50 ?? null,
+      large_neck: response.large_neck ?? null,
+      male_gender: response.male_gender ?? null
+    });
+    
+    // Convert 'yes'/'no' strings to booleans for database storage
+    const yesNoToBoolean = (value: any): boolean | null => {
+      if (value === null || value === undefined) return null;
+      if (typeof value === 'boolean') return value;
+      if (value === 'yes') return true;
+      if (value === 'no') return false;
+      return null;
+    };
+    
+    const dataToSave = {
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      completed_by: response.completed_by,
+      diagnosed_sleep_apnea: response.diagnosed_sleep_apnea,
+      has_cpap_device: yesNoToBoolean(response.has_cpap_device),
+      snoring: yesNoToBoolean(response.snoring),
+      tiredness: yesNoToBoolean(response.tiredness),
+      observed_apnea: yesNoToBoolean(response.observed_apnea),
+      hypertension: yesNoToBoolean(response.hypertension),
+      bmi_over_35: yesNoToBoolean(response.bmi_over_35),
+      age_over_50: yesNoToBoolean(response.age_over_50),
+      large_neck: yesNoToBoolean(response.large_neck),
+      male_gender: yesNoToBoolean(response.male_gender),
+      stop_bang_score: scoring.stop_bang_score,
+      risk_level: scoring.risk_level,
+      interpretation: scoring.interpretation,
+      updated_at: new Date().toISOString()
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(dataToSave, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving SLEEP_APNEA response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // BIOLOGICAL_ASSESSMENT needs HDL ratio and corrected calcium calculations
+  if (questionnaireCode === 'BIOLOGICAL_ASSESSMENT') {
+    // Compute rapport Total/HDL if both values exist
+    let rapport_total_hdl = null;
+    if (response.cholesterol_total && response.hdl && response.hdl > 0) {
+      rapport_total_hdl = Math.round((response.cholesterol_total / response.hdl) * 100) / 100;
+    }
+    
+    // Compute calcemie_corrigee if both values exist
+    let calcemie_corrigee = null;
+    if (response.calcemie && response.protidemie) {
+      calcemie_corrigee = Math.round((response.calcemie / 0.55 + response.protidemie / 160) * 100) / 100;
+    }
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert({
+        ...response,
+        rapport_total_hdl,
+        calcemie_corrigee,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving BIOLOGICAL_ASSESSMENT response:', error);
       throw error;
     }
 
