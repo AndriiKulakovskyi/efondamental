@@ -5,8 +5,10 @@ import { createClient } from '@/lib/supabase/server';
 import { 
   saveMadrsResponse, 
   saveYmrsResponse,
+  saveAldaResponse,
   type MadrsResponseInsert,
-  type YmrsResponseInsert 
+  type YmrsResponseInsert,
+  type AldaResponseInsert
 } from '@/lib/services/questionnaire-hetero.service';
 import { computeCtqScores, type BipolarCtqResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/ctq';
 import { computeBis10Scores, type BipolarBis10Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/bis10';
@@ -190,6 +192,11 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
   
   if (questionnaireCode === 'YMRS') {
     return await saveYmrsResponse(response as any as YmrsResponseInsert) as any as T;
+  }
+
+  // ALDA needs to calculate score_a, score_b and alda_score (A - B)
+  if (questionnaireCode === 'ALDA') {
+    return await saveAldaResponse(response as any as AldaResponseInsert) as any as T;
   }
 
   // CTQ needs to calculate subscale scores and severity interpretations

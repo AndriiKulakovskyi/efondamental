@@ -291,9 +291,15 @@ BEGIN
       'ALDA', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_alda WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_alda WHERE visit_id = p_visit_id)),
       'ETAT_PATIENT', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_etat_patient WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_etat_patient WHERE visit_id = p_visit_id)),
       'FAST', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_fast WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_fast WHERE visit_id = p_visit_id)),
+      -- Semi-annual DSM5 questionnaires
+      -- New codes (used by newer followup questionnaire definitions)
       'HUMEUR_ACTUELS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_humeur_actuels WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_humeur_actuels WHERE visit_id = p_visit_id)),
       'HUMEUR_DEPUIS_VISITE', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_humeur_depuis_visite WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_humeur_depuis_visite WHERE visit_id = p_visit_id)),
       'PSYCHOTIQUES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_psychotiques WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_psychotiques WHERE visit_id = p_visit_id)),
+      -- Legacy codes (used by the current bipolar visit UI modules)
+      'DIAG_PSY_SEM_HUMEUR_ACTUELS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_humeur_actuels WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_humeur_actuels WHERE visit_id = p_visit_id)),
+      'DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_humeur_depuis_visite WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_humeur_depuis_visite WHERE visit_id = p_visit_id)),
+      'DIAG_PSY_SEM_PSYCHOTIQUES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_psychotiques WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_psychotiques WHERE visit_id = p_visit_id)),
       'ISA_FOLLOWUP', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_isa WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_isa WHERE visit_id = p_visit_id)),
       'SUICIDE_BEHAVIOR_FOLLOWUP', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_suicide_behavior WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_suicide_behavior WHERE visit_id = p_visit_id)),
       'CSSRS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_cssrs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_cssrs WHERE visit_id = p_visit_id)),
@@ -301,6 +307,9 @@ BEGIN
       'RECOURS_AUX_SOINS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_recours_aux_soins WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_recours_aux_soins WHERE visit_id = p_visit_id)),
       'TRAITEMENT_NON_PHARMACOLOGIQUE', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_traitement_non_pharma WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_traitement_non_pharma WHERE visit_id = p_visit_id)),
       'ARRETS_DE_TRAVAIL', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_arrets_travail WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_arrets_travail WHERE visit_id = p_visit_id)),
+      -- The questionnaire code is SOMATIQUE_ET_CONTRACEPTIF (see lib questionnaire definition).
+      -- Keep SOMATIQUE_CONTRACEPTIF as a legacy alias to avoid breaking older clients.
+      'SOMATIQUE_ET_CONTRACEPTIF', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_somatique_contraceptif WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_somatique_contraceptif WHERE visit_id = p_visit_id)),
       'SOMATIQUE_CONTRACEPTIF', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_somatique_contraceptif WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_somatique_contraceptif WHERE visit_id = p_visit_id)),
       'STATUT_PROFESSIONNEL', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_statut_professionnel WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_statut_professionnel WHERE visit_id = p_visit_id))
     );
