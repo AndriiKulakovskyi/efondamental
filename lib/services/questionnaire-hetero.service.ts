@@ -111,7 +111,9 @@ export type {
   EtatPatientResponse,
   EtatPatientResponseInsert,
   FastResponse,
-  FastResponseInsert
+  FastResponseInsert,
+  DivaResponse,
+  DivaResponseInsert
 };
 
 // ============================================================================
