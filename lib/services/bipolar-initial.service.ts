@@ -2,6 +2,8 @@
 // Handles all questionnaire data operations for bipolar initial visits
 
 import { createClient } from '@/lib/supabase/server';
+import { transformQuestionnaireResponse } from '@/lib/utils/questionnaire-transforms';
+import { getQuestionnaireFieldTypes } from '@/lib/utils/questionnaire-field-definitions';
 import { 
   saveMadrsResponse, 
   saveYmrsResponse,
@@ -1021,44 +1023,31 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
     return data as T;
   }
 
-  // SLEEP_APNEA needs STOP-Bang scoring + yes/no to boolean conversion
+  // SLEEP_APNEA needs STOP-Bang scoring + value normalization
+  // After migration 285, all boolean fields are VARCHAR ('oui'/'non')
   if (questionnaireCode === 'SLEEP_APNEA') {
+    // Get field type definitions for normalization
+    const fieldTypes = getQuestionnaireFieldTypes('SLEEP_APNEA');
+    const normalizedResponse = fieldTypes 
+      ? transformQuestionnaireResponse(response, fieldTypes) as any
+      : response;
+    
+    // Calculate STOP-Bang score using normalized values
     const scoring = scoreSleepApnea({
-      diagnosed_sleep_apnea: response.diagnosed_sleep_apnea ?? null,
-      has_cpap_device: response.has_cpap_device ?? null,
-      snoring: response.snoring ?? null,
-      tiredness: response.tiredness ?? null,
-      observed_apnea: response.observed_apnea ?? null,
-      hypertension: response.hypertension ?? null,
-      bmi_over_35: response.bmi_over_35 ?? null,
-      age_over_50: response.age_over_50 ?? null,
-      large_neck: response.large_neck ?? null,
-      male_gender: response.male_gender ?? null
+      diagnosed_sleep_apnea: normalizedResponse.diagnosed_sleep_apnea ?? null,
+      has_cpap_device: normalizedResponse.has_cpap_device ?? null,
+      snoring: normalizedResponse.snoring ?? null,
+      tiredness: normalizedResponse.tiredness ?? null,
+      observed_apnea: normalizedResponse.observed_apnea ?? null,
+      hypertension: normalizedResponse.hypertension ?? null,
+      bmi_over_35: normalizedResponse.bmi_over_35 ?? null,
+      age_over_50: normalizedResponse.age_over_50 ?? null,
+      large_neck: normalizedResponse.large_neck ?? null,
+      male_gender: normalizedResponse.male_gender ?? null
     });
     
-    // Convert 'yes'/'no' strings to booleans for database storage
-    const yesNoToBoolean = (value: any): boolean | null => {
-      if (value === null || value === undefined) return null;
-      if (typeof value === 'boolean') return value;
-      if (value === 'yes') return true;
-      if (value === 'no') return false;
-      return null;
-    };
-    
     const dataToSave = {
-      visit_id: response.visit_id,
-      patient_id: response.patient_id,
-      completed_by: response.completed_by,
-      diagnosed_sleep_apnea: response.diagnosed_sleep_apnea,
-      has_cpap_device: yesNoToBoolean(response.has_cpap_device),
-      snoring: yesNoToBoolean(response.snoring),
-      tiredness: yesNoToBoolean(response.tiredness),
-      observed_apnea: yesNoToBoolean(response.observed_apnea),
-      hypertension: yesNoToBoolean(response.hypertension),
-      bmi_over_35: yesNoToBoolean(response.bmi_over_35),
-      age_over_50: yesNoToBoolean(response.age_over_50),
-      large_neck: yesNoToBoolean(response.large_neck),
-      male_gender: yesNoToBoolean(response.male_gender),
+      ...normalizedResponse,
       stop_bang_score: scoring.stop_bang_score,
       risk_level: scoring.risk_level,
       interpretation: scoring.interpretation,
@@ -1074,6 +1063,31 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving SLEEP_APNEA response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // FAMILY_HISTORY uses centralized transformation
+  // After migration 285, all boolean fields are VARCHAR ('oui'/'non'/'ne_sais_pas')
+  if (questionnaireCode === 'FAMILY_HISTORY') {
+    // Get field type definitions for normalization
+    const fieldTypes = getQuestionnaireFieldTypes('FAMILY_HISTORY');
+    const normalizedResponse = fieldTypes 
+      ? transformQuestionnaireResponse(response, fieldTypes) as any
+      : response;
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(normalizedResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving bipolar_family_history:', error);
+      console.error('Response keys:', Object.keys(normalizedResponse));
       throw error;
     }
 

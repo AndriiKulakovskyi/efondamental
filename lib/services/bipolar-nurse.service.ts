@@ -2,6 +2,8 @@
 // Service functions for nurse module questionnaire responses
 
 import { createClient } from '@/lib/supabase/server';
+import { transformQuestionnaireResponse } from '@/lib/utils/questionnaire-transforms';
+import { getQuestionnaireFieldTypes } from '@/lib/utils/questionnaire-field-definitions';
 import {
   BipolarNurseTobaccoResponse,
   BipolarNurseTobaccoResponseInsert,
@@ -246,43 +248,29 @@ export async function saveSleepApneaResponse(
 ): Promise<BipolarNurseSleepApneaResponse> {
   const supabase = await createClient();
   
-  // Compute STOP-Bang score first using string values ('yes'/'no')
+  // Use centralized transformation for SLEEP_APNEA fields
+  // After migration 285, database expects VARCHAR ('oui'/'non') not BOOLEAN
+  const fieldTypes = getQuestionnaireFieldTypes('SLEEP_APNEA');
+  const normalizedResponse = fieldTypes 
+    ? transformQuestionnaireResponse(response as Record<string, unknown>, fieldTypes) as any
+    : response;
+  
+  // Compute STOP-Bang score using normalized values
   const scoring = scoreSleepApnea({
-    diagnosed_sleep_apnea: response.diagnosed_sleep_apnea ?? null,
-    has_cpap_device: response.has_cpap_device ?? null,
-    snoring: response.snoring ?? null,
-    tiredness: response.tiredness ?? null,
-    observed_apnea: response.observed_apnea ?? null,
-    hypertension: response.hypertension ?? null,
-    bmi_over_35: response.bmi_over_35 ?? null,
-    age_over_50: response.age_over_50 ?? null,
-    large_neck: response.large_neck ?? null,
-    male_gender: response.male_gender ?? null
+    diagnosed_sleep_apnea: normalizedResponse.diagnosed_sleep_apnea ?? null,
+    has_cpap_device: normalizedResponse.has_cpap_device ?? null,
+    snoring: normalizedResponse.snoring ?? null,
+    tiredness: normalizedResponse.tiredness ?? null,
+    observed_apnea: normalizedResponse.observed_apnea ?? null,
+    hypertension: normalizedResponse.hypertension ?? null,
+    bmi_over_35: normalizedResponse.bmi_over_35 ?? null,
+    age_over_50: normalizedResponse.age_over_50 ?? null,
+    large_neck: normalizedResponse.large_neck ?? null,
+    male_gender: normalizedResponse.male_gender ?? null
   });
   
-  // Convert 'yes'/'no' strings to booleans for database storage
-  const yesNoToBoolean = (value: any): boolean | null => {
-    if (value === null || value === undefined) return null;
-    if (typeof value === 'boolean') return value;
-    if (value === 'yes') return true;
-    if (value === 'no') return false;
-    return null;
-  };
-  
-  // Database expects booleans, not strings - cast to bypass TS types
   const dataToSave = {
-    visit_id: response.visit_id,
-    patient_id: response.patient_id,
-    diagnosed_sleep_apnea: response.diagnosed_sleep_apnea,
-    has_cpap_device: yesNoToBoolean(response.has_cpap_device),
-    snoring: yesNoToBoolean(response.snoring),
-    tiredness: yesNoToBoolean(response.tiredness),
-    observed_apnea: yesNoToBoolean(response.observed_apnea),
-    hypertension: yesNoToBoolean(response.hypertension),
-    bmi_over_35: yesNoToBoolean(response.bmi_over_35),
-    age_over_50: yesNoToBoolean(response.age_over_50),
-    large_neck: yesNoToBoolean(response.large_neck),
-    male_gender: yesNoToBoolean(response.male_gender),
+    ...normalizedResponse,
     stop_bang_score: scoring.stop_bang_score,
     risk_level: scoring.risk_level,
     interpretation: scoring.interpretation,

@@ -240,8 +240,13 @@ import {
   getDiagPsySemPsychotiquesResponse
 } from "@/lib/services/questionnaire-dsm5.service";
 import {
-  getPsyTraitementSemestrielResponse
-} from "@/lib/services/questionnaire-followup.service";
+  getSuiviRecommandationsResponse,
+  getRecoursAuxSoinsResponse,
+  getTraitementNonPharmaResponse,
+  getArretsTravailResponse,
+  getSomatiqueContraceptifResponse,
+  getStatutProfessionnelResponse
+} from "@/lib/services/bipolar-followup.service";
 import {
   getScreeningSzDiagnosticResponse,
   getScreeningSzOrientationResponse,
@@ -680,13 +685,13 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === DIAG_PSY_SEM_HUMEUR_ACTUELS_DEFINITION.code) existingResponse = await getDiagPsySemHumeurActuelsResponse(visitId);
   else if (code === DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE_DEFINITION.code) existingResponse = await getDiagPsySemHumeurDepuisVisiteResponse(visitId);
   else if (code === DIAG_PSY_SEM_PSYCHOTIQUES_DEFINITION.code) existingResponse = await getDiagPsySemPsychotiquesResponse(visitId);
-  // Soin, suivi et arrêt de travail questionnaires (all share the same response table)
-  else if (code === SUIVI_RECOMMANDATIONS_DEFINITION.code) existingResponse = await getPsyTraitementSemestrielResponse(visitId);
-  else if (code === RECOURS_AUX_SOINS_DEFINITION.code) existingResponse = await getPsyTraitementSemestrielResponse(visitId);
-  else if (code === TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION.code) existingResponse = await getPsyTraitementSemestrielResponse(visitId);
-  else if (code === ARRETS_DE_TRAVAIL_DEFINITION.code) existingResponse = await getPsyTraitementSemestrielResponse(visitId);
-  else if (code === SOMATIQUE_CONTRACEPTIF_DEFINITION.code) existingResponse = await getPsyTraitementSemestrielResponse(visitId);
-  else if (code === STATUT_PROFESSIONNEL_DEFINITION.code) existingResponse = await getPsyTraitementSemestrielResponse(visitId);
+  // Soin, suivi et arrêt de travail questionnaires (each has its own table)
+  else if (code === SUIVI_RECOMMANDATIONS_DEFINITION.code) existingResponse = await getSuiviRecommandationsResponse(visitId);
+  else if (code === RECOURS_AUX_SOINS_DEFINITION.code) existingResponse = await getRecoursAuxSoinsResponse(visitId);
+  else if (code === TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION.code) existingResponse = await getTraitementNonPharmaResponse(visitId);
+  else if (code === ARRETS_DE_TRAVAIL_DEFINITION.code) existingResponse = await getArretsTravailResponse(visitId);
+  else if (code === SOMATIQUE_CONTRACEPTIF_DEFINITION.code) existingResponse = await getSomatiqueContraceptifResponse(visitId);
+  else if (code === STATUT_PROFESSIONNEL_DEFINITION.code) existingResponse = await getStatutProfessionnelResponse(visitId);
   // Schizophrenia screening questionnaires
   else if (code === SZ_DIAGNOSTIC_DEFINITION.code) existingResponse = await getScreeningSzDiagnosticResponse(visitId);
   else if (code === SZ_ORIENTATION_DEFINITION.code) existingResponse = await getScreeningSzOrientationResponse(visitId);

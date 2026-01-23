@@ -102,7 +102,6 @@ const QUESTIONNAIRE_TABLE_MAP: Record<string, string> = {
   'BIPOLAR_DIAGNOSTIC': 'bipolar_diagnostic',
   'BIPOLAR_ORIENTATION': 'bipolar_orientation',
   'NON_PHARMACOLOGIC_FR': 'bipolar_non_pharmacologic',
-  'PSY_TRAITEMENT_SEM_FR': 'bipolar_psy_traitement_semestriel',
   'MEDICAL_DIAGNOSTIC_FR': 'bipolar_diagnostic',
   'ECG_FR': 'bipolar_nurse_ecg',
 };

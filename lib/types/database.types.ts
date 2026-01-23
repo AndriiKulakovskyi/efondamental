@@ -1269,45 +1269,22 @@ export interface BloodPressureResponse {
 export type BloodPressureResponseInsert = Omit<BloodPressureResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ===== Sleep Apnea (STOP-Bang) Response =====
+// After migration 285, all STOP-Bang boolean fields are VARCHAR ('oui'/'non')
 export interface SleepApneaResponse {
   id: string;
   visit_id: string;
   patient_id: string;
   diagnosed_sleep_apnea: 'yes' | 'no' | 'unknown';
-  has_cpap_device?: boolean | null;
-  snoring?: boolean | null;
-  tiredness?: boolean | null;
-  observed_apnea?: boolean | null;
-  hypertension?: boolean | null;
-  bmi_over_35?: boolean | null;
-  age_over_50?: boolean | null;
-  large_neck?: boolean | null;
-  male_gender?: boolean | null;
+  has_cpap_device?: 'oui' | 'non' | null;
+  snoring?: 'oui' | 'non' | null;
+  tiredness?: 'oui' | 'non' | null;
+  observed_apnea?: 'oui' | 'non' | null;
+  hypertension?: 'oui' | 'non' | null;
+  bmi_over_35?: 'oui' | 'non' | null;
+  age_over_50?: 'oui' | 'non' | null;
+  large_neck?: 'oui' | 'non' | null;
+  male_gender?: 'oui' | 'non' | null;
   stop_bang_score?: number | null;
-  risk_level?: string | null;
-  interpretation?: string | null;
-  completed_by?: string | null;
-  completed_at: string;
-  created_at: string;
-  updated_at: string;
-}
-
-// ===== Sleep Apnea Response =====
-export interface SleepApneaResponse {
-  id: string;
-  visit_id: string;
-  patient_id: string;
-  diagnosed_sleep_apnea: 'yes' | 'no' | 'unknown';
-  has_cpap_device?: boolean | null;
-  snoring?: boolean | null;
-  tiredness?: boolean | null;
-  observed_apnea?: boolean | null;
-  high_blood_pressure?: boolean | null;
-  bmi_over_35?: boolean | null;
-  age_over_50?: boolean | null;
-  large_neck_circumference?: boolean | null;
-  male_gender?: boolean | null;
-  stopbang_score?: number | null;
   risk_level?: string | null;
   interpretation?: string | null;
   completed_by?: string | null;
@@ -1938,7 +1915,7 @@ export interface FamilyHistoryResponse {
   num_daughters_with_issues?: number | null; // 0-5
   
   daughter1_dob?: string | null;
-  daughter1_has_issues?: boolean | null;
+  daughter1_has_issues?: 'oui' | 'non' | null;
   daughter1_deceased?: 'oui' | 'non' | null;
   daughter1_death_date?: string | null;
   daughter1_death_cause?: string | null;
@@ -1950,7 +1927,7 @@ export interface FamilyHistoryResponse {
   daughter1_cardio?: string[] | null;
   
   daughter2_dob?: string | null;
-  daughter2_has_issues?: boolean | null;
+  daughter2_has_issues?: 'oui' | 'non' | null;
   daughter2_deceased?: 'oui' | 'non' | null;
   daughter2_death_date?: string | null;
   daughter2_death_cause?: string | null;
@@ -1962,7 +1939,7 @@ export interface FamilyHistoryResponse {
   daughter2_cardio?: string[] | null;
   
   daughter3_dob?: string | null;
-  daughter3_has_issues?: boolean | null;
+  daughter3_has_issues?: 'oui' | 'non' | null;
   daughter3_deceased?: 'oui' | 'non' | null;
   daughter3_death_date?: string | null;
   daughter3_death_cause?: string | null;
@@ -1974,7 +1951,7 @@ export interface FamilyHistoryResponse {
   daughter3_cardio?: string[] | null;
   
   daughter4_dob?: string | null;
-  daughter4_has_issues?: boolean | null;
+  daughter4_has_issues?: 'oui' | 'non' | null;
   daughter4_deceased?: 'oui' | 'non' | null;
   daughter4_death_date?: string | null;
   daughter4_death_cause?: string | null;
@@ -1986,7 +1963,7 @@ export interface FamilyHistoryResponse {
   daughter4_cardio?: string[] | null;
   
   daughter5_dob?: string | null;
-  daughter5_has_issues?: boolean | null;
+  daughter5_has_issues?: 'oui' | 'non' | null;
   daughter5_deceased?: 'oui' | 'non' | null;
   daughter5_death_date?: string | null;
   daughter5_death_cause?: string | null;
@@ -2002,7 +1979,7 @@ export interface FamilyHistoryResponse {
   num_sons_with_issues?: number | null; // 0-5
   
   son1_dob?: string | null;
-  son1_has_issues?: boolean | null;
+  son1_has_issues?: 'oui' | 'non' | null;
   son1_deceased?: 'oui' | 'non' | null;
   son1_death_date?: string | null;
   son1_death_cause?: string | null;
@@ -2014,7 +1991,7 @@ export interface FamilyHistoryResponse {
   son1_cardio?: string[] | null;
   
   son2_dob?: string | null;
-  son2_has_issues?: boolean | null;
+  son2_has_issues?: 'oui' | 'non' | null;
   son2_deceased?: 'oui' | 'non' | null;
   son2_death_date?: string | null;
   son2_death_cause?: string | null;
@@ -2026,7 +2003,7 @@ export interface FamilyHistoryResponse {
   son2_cardio?: string[] | null;
   
   son3_dob?: string | null;
-  son3_has_issues?: boolean | null;
+  son3_has_issues?: 'oui' | 'non' | null;
   son3_deceased?: 'oui' | 'non' | null;
   son3_death_date?: string | null;
   son3_death_cause?: string | null;
@@ -2038,7 +2015,7 @@ export interface FamilyHistoryResponse {
   son3_cardio?: string[] | null;
   
   son4_dob?: string | null;
-  son4_has_issues?: boolean | null;
+  son4_has_issues?: 'oui' | 'non' | null;
   son4_deceased?: 'oui' | 'non' | null;
   son4_death_date?: string | null;
   son4_death_cause?: string | null;
@@ -2050,7 +2027,7 @@ export interface FamilyHistoryResponse {
   son4_cardio?: string[] | null;
   
   son5_dob?: string | null;
-  son5_has_issues?: boolean | null;
+  son5_has_issues?: 'oui' | 'non' | null;
   son5_deceased?: 'oui' | 'non' | null;
   son5_death_date?: string | null;
   son5_death_cause?: string | null;
@@ -2066,7 +2043,7 @@ export interface FamilyHistoryResponse {
   num_sisters_with_issues?: number | null; // 0-5
   
   sister1_dob?: string | null;
-  sister1_has_issues?: boolean | null;
+  sister1_has_issues?: 'oui' | 'non' | null;
   sister1_deceased?: 'oui' | 'non' | null;
   sister1_death_date?: string | null;
   sister1_death_cause?: string | null;
@@ -2078,7 +2055,7 @@ export interface FamilyHistoryResponse {
   sister1_cardio?: string[] | null;
   
   sister2_dob?: string | null;
-  sister2_has_issues?: boolean | null;
+  sister2_has_issues?: 'oui' | 'non' | null;
   sister2_deceased?: 'oui' | 'non' | null;
   sister2_death_date?: string | null;
   sister2_death_cause?: string | null;
@@ -2090,7 +2067,7 @@ export interface FamilyHistoryResponse {
   sister2_cardio?: string[] | null;
   
   sister3_dob?: string | null;
-  sister3_has_issues?: boolean | null;
+  sister3_has_issues?: 'oui' | 'non' | null;
   sister3_deceased?: 'oui' | 'non' | null;
   sister3_death_date?: string | null;
   sister3_death_cause?: string | null;
@@ -2102,7 +2079,7 @@ export interface FamilyHistoryResponse {
   sister3_cardio?: string[] | null;
   
   sister4_dob?: string | null;
-  sister4_has_issues?: boolean | null;
+  sister4_has_issues?: 'oui' | 'non' | null;
   sister4_deceased?: 'oui' | 'non' | null;
   sister4_death_date?: string | null;
   sister4_death_cause?: string | null;
@@ -2114,7 +2091,7 @@ export interface FamilyHistoryResponse {
   sister4_cardio?: string[] | null;
   
   sister5_dob?: string | null;
-  sister5_has_issues?: boolean | null;
+  sister5_has_issues?: 'oui' | 'non' | null;
   sister5_deceased?: 'oui' | 'non' | null;
   sister5_death_date?: string | null;
   sister5_death_cause?: string | null;
@@ -2130,7 +2107,7 @@ export interface FamilyHistoryResponse {
   num_brothers_with_issues?: number | null; // 0-5
   
   brother1_dob?: string | null;
-  brother1_has_issues?: boolean | null;
+  brother1_has_issues?: 'oui' | 'non' | null;
   brother1_deceased?: 'oui' | 'non' | null;
   brother1_death_date?: string | null;
   brother1_death_cause?: string | null;
@@ -2142,7 +2119,7 @@ export interface FamilyHistoryResponse {
   brother1_cardio?: string[] | null;
   
   brother2_dob?: string | null;
-  brother2_has_issues?: boolean | null;
+  brother2_has_issues?: 'oui' | 'non' | null;
   brother2_deceased?: 'oui' | 'non' | null;
   brother2_death_date?: string | null;
   brother2_death_cause?: string | null;
@@ -2154,7 +2131,7 @@ export interface FamilyHistoryResponse {
   brother2_cardio?: string[] | null;
   
   brother3_dob?: string | null;
-  brother3_has_issues?: boolean | null;
+  brother3_has_issues?: 'oui' | 'non' | null;
   brother3_deceased?: 'oui' | 'non' | null;
   brother3_death_date?: string | null;
   brother3_death_cause?: string | null;
@@ -2166,7 +2143,7 @@ export interface FamilyHistoryResponse {
   brother3_cardio?: string[] | null;
   
   brother4_dob?: string | null;
-  brother4_has_issues?: boolean | null;
+  brother4_has_issues?: 'oui' | 'non' | null;
   brother4_deceased?: 'oui' | 'non' | null;
   brother4_death_date?: string | null;
   brother4_death_cause?: string | null;
@@ -2178,7 +2155,7 @@ export interface FamilyHistoryResponse {
   brother4_cardio?: string[] | null;
   
   brother5_dob?: string | null;
-  brother5_has_issues?: boolean | null;
+  brother5_has_issues?: 'oui' | 'non' | null;
   brother5_deceased?: 'oui' | 'non' | null;
   brother5_death_date?: string | null;
   brother5_death_cause?: string | null;
@@ -4489,149 +4466,6 @@ export interface DiagPsySemPsychotiquesResponse {
 }
 
 export type DiagPsySemPsychotiquesResponseInsert = Omit<DiagPsySemPsychotiquesResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
-
-// ============================================================================
-// Psy Traitement Semestriel (Follow-up Care Module)
-// Module: Soin, suivi et arret de travail
-// ============================================================================
-
-export interface PsyTraitementSemestrielResponse {
-  id: string;
-  visit_id: string;
-  patient_id: string;
-  
-  // ========================================================================
-  // SUIVI DES RECOMMANDATIONS
-  // ========================================================================
-  
-  rad_suivi_recom_medicamenteux?: 'Complètement suivi' | 'Partiellement suivi' | 'Non suivi' | null;
-  rad_suivi_recom_medicamenteux_non?: 'Refus du patient' | 'Désaccord du médecin pratiquant le suivi' | 'Problème de tolérance' | 'Problème de rechute' | 'Autres' | null;
-  rad_suivi_recom_non_medicamenteux?: 'Complètement suivi' | 'Partiellement suivi' | 'Non suivi' | null;
-  rad_suivi_recom_non_medicamenteux_non?: 'Refus du patient' | 'Désaccord avec le médecin pratiquant le suivi' | 'Impossible à mettre en place' | 'Autres' | null;
-  
-  // ========================================================================
-  // RECOURS AUX SOINS - Suivi habituel
-  // ========================================================================
-  
-  rad_recours_soin_psy?: 'Oui' | 'Non' | null;
-  
-  rad_recours_soin_psy_generaliste?: 'Oui' | 'Non' | null;
-  recours_soin_psy_generaliste_nb?: number | null;
-  
-  rad_recours_soin_psy_psychiatre?: 'Oui' | 'Non' | null;
-  recours_soin_psy_psychiatre_nb?: number | null;
-  
-  rad_recours_soin_psy_psychologue?: 'Oui' | 'Non' | null;
-  recours_soin_psy_psychologue_nb?: number | null;
-  
-  rad_recours_soin_psy_plusieurs?: 'Oui' | 'Non' | null;
-  recours_soin_psy_plusieurs_nb?: number | null;
-  
-  rad_recours_soin_psy_autres?: 'Oui' | 'Non' | null;
-  recours_soin_psy_autres_nb?: number | null;
-  
-  // ========================================================================
-  // RECOURS AUX SOINS - Urgence
-  // ========================================================================
-  
-  rad_recours_soin_urgence?: 'Oui' | 'Non' | null;
-  
-  rad_recours_soin_urgence_sans_hosp?: 'Oui' | 'Non' | null;
-  recours_soin_urgence_sans_hosp_nb?: number | null;
-  
-  rad_recours_soin_urgence_generaliste?: 'Oui' | 'Non' | null;
-  recours_soin_urgence_generaliste_nb?: number | null;
-  
-  rad_recours_soin_urgence_psychiatre?: 'Oui' | 'Non' | null;
-  recours_soin_urgence_psychiatre_nb?: number | null;
-  
-  rad_recours_soin_urgence_psychologue?: 'Oui' | 'Non' | null;
-  recours_soin_urgence_psychologue_nb?: number | null;
-  
-  rad_recours_soin_urgence_plusieurs?: 'Oui' | 'Non' | null;
-  recours_soin_urgence_plusieurs_nb?: number | null;
-  
-  rad_recours_soin_urgence_autres?: 'Oui' | 'Non' | null;
-  recours_soin_urgence_autres_nb?: number | null;
-  
-  // ========================================================================
-  // TRAITEMENT NON-PHARMACOLOGIQUE
-  // ========================================================================
-  
-  rad_non_pharmacologique?: 'Oui' | 'Non' | 'Ne sais pas' | null;
-  
-  // Sismotherapie
-  rad_non_pharmacologique_sismo?: 'Oui' | 'Non' | 'Ne sais pas' | null;
-  non_pharmacologique_sismo_nb?: number | null;
-  date_non_pharmacologique_sismo_debut?: string | null;
-  date_non_pharmacologique_sismo_fin?: string | null;
-  
-  // TMS
-  rad_non_pharmacologique_tms?: 'Oui' | 'Non' | 'Ne sais pas' | null;
-  non_pharmacologique_tms_nb?: number | null;
-  date_non_pharmacologique_tms_debut?: string | null;
-  date_non_pharmacologique_tms_fin?: string | null;
-  
-  // TCC
-  rad_non_pharmacologique_tcc?: 'Oui' | 'Non' | 'Ne sais pas' | null;
-  non_pharmacologique_tcc_nb?: number | null;
-  date_non_pharmacologique_tcc_debut?: string | null;
-  date_non_pharmacologique_tcc_fin?: string | null;
-  
-  // Psychoeducation
-  rad_non_pharmacologique_psychoed?: 'Oui' | 'Non' | 'Ne sais pas' | null;
-  non_pharmacologique_psychoed_nb?: number | null;
-  date_non_pharmacologique_psychoed_debut?: string | null;
-  date_non_pharmacologique_psychoed_fin?: string | null;
-  
-  // IPSRT
-  rad_non_pharmacologique_ipsrt?: 'Oui' | 'Non' | 'Ne sais pas' | null;
-  non_pharmacologique_ipsrt_nb?: number | null;
-  chk_non_pharmacologique_ipsrt_precisez?: string[] | null;
-  date_non_pharmacologique_ipsrt_debut?: string | null;
-  date_non_pharmacologique_ipsrt_fin?: string | null;
-  
-  // Autre
-  rad_non_pharmacologique_autre?: 'Oui' | 'Non' | 'Ne sais pas' | null;
-  non_pharmacologique_autre_precisez?: string | null;
-  non_pharmacologique_autre_nb?: number | null;
-  date_non_pharmacologique_autre_debut?: string | null;
-  date_non_pharmacologique_autre_fin?: string | null;
-  
-  // ========================================================================
-  // ARRETS DE TRAVAIL
-  // ========================================================================
-  
-  rad_arret_travail?: 'Oui' | 'Non' | 'Non applicable' | null;
-  arret_travail_nb?: number | null;
-  arret_travail_duree?: number | null;
-  
-  // ========================================================================
-  // SOMATIQUE ET CONTRACEPTIF
-  // ========================================================================
-  
-  fckedit_somatique_contraceptif?: string | null;
-  
-  // ========================================================================
-  // STATUT PROFESSIONNEL
-  // ========================================================================
-  
-  rad_changement_statut?: 'Oui' | 'Non' | 'Ne sais pas' | null;
-  rad_statut_actuel?: 'Sans emploi' | 'Actif' | 'Retraité' | 'Etudiant' | 'Pension' | 'Au foyer' | 'Autres' | null;
-  statut_actuel_autre?: string | null;
-  rad_social_stprof_class?: string | null;
-  
-  // ========================================================================
-  // Metadata
-  // ========================================================================
-  
-  completed_by?: string | null;
-  completed_at?: string | null;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export type PsyTraitementSemestrielResponseInsert = Omit<PsyTraitementSemestrielResponse, 'id' | 'created_at' | 'updated_at' | 'completed_at'>;
 
 // ============================================================================
 // Schizophrenia Screening Diagnostic

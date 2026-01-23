@@ -429,8 +429,6 @@ import {
   Wais3Cpt2ResponseInsert,
   // MEM-III Spatial (independent test)
   Mem3SpatialResponseInsert,
-  // Follow-up care module
-  PsyTraitementSemestrielResponseInsert,
   // Schizophrenia types - now using new schizophrenia_* tables with inline types
   // Legacy types kept for reference but not used in new service functions
 } from '@/lib/types/database.types';
