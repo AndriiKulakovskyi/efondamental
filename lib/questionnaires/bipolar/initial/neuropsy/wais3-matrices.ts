@@ -11,37 +11,39 @@ export interface BipolarWais3MatricesResponse {
   id: string;
   visit_id: string;
   patient_id: string;
-  // Items 1-26 (each scored 0 or 1)
-  item1: number | null;
-  item2: number | null;
-  item3: number | null;
-  item4: number | null;
-  item5: number | null;
-  item6: number | null;
-  item7: number | null;
-  item8: number | null;
-  item9: number | null;
-  item10: number | null;
-  item11: number | null;
-  item12: number | null;
-  item13: number | null;
-  item14: number | null;
-  item15: number | null;
-  item16: number | null;
-  item17: number | null;
-  item18: number | null;
-  item19: number | null;
-  item20: number | null;
-  item21: number | null;
-  item22: number | null;
-  item23: number | null;
-  item24: number | null;
-  item25: number | null;
-  item26: number | null;
-  // Scores
-  raw_score: number | null;
-  scaled_score: number | null;
-  percentile: number | null;
+  // Demographics
+  patient_age: number;
+  // Items 1-26 (each scored 0 or 1, with zero-padded IDs)
+  item_01: number | null;
+  item_02: number | null;
+  item_03: number | null;
+  item_04: number | null;
+  item_05: number | null;
+  item_06: number | null;
+  item_07: number | null;
+  item_08: number | null;
+  item_09: number | null;
+  item_10: number | null;
+  item_11: number | null;
+  item_12: number | null;
+  item_13: number | null;
+  item_14: number | null;
+  item_15: number | null;
+  item_16: number | null;
+  item_17: number | null;
+  item_18: number | null;
+  item_19: number | null;
+  item_20: number | null;
+  item_21: number | null;
+  item_22: number | null;
+  item_23: number | null;
+  item_24: number | null;
+  item_25: number | null;
+  item_26: number | null;
+  // Scores (match database schema)
+  total_raw_score: number | null;
+  standard_score: number | null;
+  standardized_value: number | null;
   // Metadata
   completed_by: string | null;
   completed_at: string;
@@ -51,7 +53,7 @@ export interface BipolarWais3MatricesResponse {
 
 export type BipolarWais3MatricesResponseInsert = Omit<
   BipolarWais3MatricesResponse,
-  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'raw_score' | 'scaled_score' | 'percentile'
+  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_raw_score' | 'standard_score' | 'standardized_value'
 > & {
   completed_by?: string | null;
 };
@@ -67,7 +69,7 @@ const ITEM_OPTIONS = [
 
 function createMatrixItem(num: number): Question {
   return {
-    id: `item${num}`,
+    id: `item_${String(num).padStart(2, '0')}`,
     text: `Item ${num}`,
     type: 'single_choice',
     required: num <= 4 ? true : false,
@@ -76,6 +78,19 @@ function createMatrixItem(num: number): Question {
 }
 
 export const WAIS3_MATRICES_QUESTIONS: Question[] = [
+  // Patient demographics section
+  {
+    id: 'patient_age',
+    text: 'Âge du patient (calculé automatiquement)',
+    type: 'number',
+    required: true,
+    readonly: true,
+    section: 'Données démographiques',
+    min: 16,
+    max: 90,
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
+  },
+  // Items section
   {
     id: 'section_instructions',
     text: 'WAIS-III Matrices',
@@ -93,7 +108,7 @@ export const WAIS3_MATRICES_QUESTIONS: Question[] = [
 export function computeWais3MatricesRawScore(responses: Record<string, number>): number {
   let total = 0;
   for (let i = 1; i <= 26; i++) {
-    total += responses[`item${i}`] || 0;
+    total += responses[`item_${String(i).padStart(2, '0')}`] || 0;
   }
   return total;
 }

@@ -1386,7 +1386,7 @@ export function QuestionnaireRenderer({
 
 
       // Compute WAIS-III Matrices scores - FIXED: Use guard condition to prevent ID collisions
-      if (questionnaire?.code === 'WAIS3_MATRICES_FR') {
+      if (questionnaire?.code === 'WAIS3_MATRICES' || questionnaire?.code === 'WAIS3_MATRICES_FR') {
         const matricesAge = Number(prev.patient_age);
         const matricesItems = [
           'item_01', 'item_02', 'item_03', 'item_04', 'item_05', 'item_06', 'item_07', 'item_08', 'item_09', 'item_10',
@@ -2370,7 +2370,7 @@ export function QuestionnaireRenderer({
 
   // Dedicated scoring for WAIS-III Matrices
   useEffect(() => {
-    if (questionnaire?.code !== 'WAIS3_MATRICES_FR') return;
+    if (questionnaire?.code !== 'WAIS3_MATRICES' && questionnaire?.code !== 'WAIS3_MATRICES_FR') return;
 
     setResponses((prev) => {
       const items = Array.from({ length: 26 }, (_, i) => `item_${(i + 1).toString().padStart(2, '0')}`);

@@ -354,6 +354,41 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
     return data as T;
   }
 
+  // WAIS3_MATRICES needs to calculate scores based on age and items
+  if (questionnaireCode === 'WAIS3_MATRICES') {
+    const { calculateWais3MatricesScores } = await import('./wais3-matrices-scoring');
+    
+    // Items use underscore and zero-padding (item_01...item_26)
+    const itemData: any = { patient_age: (response as any).patient_age || 35 };
+    for (let i = 1; i <= 26; i++) {
+      const itemKey = `item_${String(i).padStart(2, '0')}`;
+      itemData[itemKey] = (response as any)[itemKey] || 0;
+    }
+    
+    const scores = calculateWais3MatricesScores(itemData);
+    
+    const matricesResponse = {
+      ...response,
+      total_raw_score: scores.total_raw_score,
+      standard_score: scores.standard_score,
+      standardized_value: scores.standardized_value
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(matricesResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving WAIS3_MATRICES response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
   // WAIS4_DIGIT_SPAN needs to calculate all scores including item scores, section totals, empan, and standardized scores
   if (questionnaireCode === 'WAIS4_DIGIT_SPAN') {
     const { calculateDigitSpanScores } = await import('./wais4-digit-span-scoring');

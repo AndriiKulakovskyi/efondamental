@@ -11793,34 +11793,6 @@ export const WAIS3_MATRICES_QUESTIONS: Question[] = [
       { code: 0, label: '0', score: 0 },
       { code: 1, label: '1', score: 1 }
     ]
-  },
-  // Computed scores section
-  {
-    id: 'total_raw_score',
-    text: 'Note brute totale',
-    type: 'number',
-    required: false,
-    section: 'Scores calculés',
-    readonly: true,
-    help: 'Somme des notes des 26 items (calculée automatiquement)'
-  },
-  {
-    id: 'standard_score',
-    text: 'Note standard',
-    type: 'number',
-    required: false,
-    section: 'Scores calculés',
-    readonly: true,
-    help: 'Note standard selon les normes WAIS-III (calculée automatiquement)'
-  },
-  {
-    id: 'standardized_value',
-    text: 'Déviation par rapport à la moyenne et l\'écart type',
-    type: 'number',
-    required: false,
-    section: 'Scores calculés',
-    readonly: true,
-    help: 'Valeur Z-score équivalente (calculée automatiquement)'
   }
 ];
 
