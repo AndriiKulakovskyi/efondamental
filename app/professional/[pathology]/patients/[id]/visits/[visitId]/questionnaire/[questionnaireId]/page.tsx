@@ -842,6 +842,18 @@ export default async function ProfessionalQuestionnairePage({
     console.log('[CVLT Debug] Removed calculated score fields from form');
   }
 
+  // Remove calculated score fields from Fluences Verbales initial responses
+  // These are calculated automatically on save and should only be displayed on score page
+  if (code === 'FLUENCES_VERBALES' && existingResponse) {
+    delete initialResponses.fv_p_tot_rupregle;
+    delete initialResponses.fv_p_tot_correct_z;
+    delete initialResponses.fv_p_tot_correct_pc;
+    delete initialResponses.fv_anim_tot_rupregle;
+    delete initialResponses.fv_anim_tot_correct_z;
+    delete initialResponses.fv_anim_tot_correct_pc;
+    console.log('[Fluences Verbales Debug] Removed calculated score fields from form');
+  }
+
   // Inject patient demographics (age at visit date, gender) for questionnaires that require them
   const requiresDemographics = questionnaireRequiresDemographics(code);
   console.log('[Demographics Debug] Code:', code, '| Requires demographics:', requiresDemographics);
@@ -983,6 +995,31 @@ export default async function ProfessionalQuestionnairePage({
       })
     };
     console.log('[CVLT Debug] Filtered out score fields. Original questions:', questionnaire.questions.length, 'Filtered:', filteredQuestionnaire.questions.length);
+  }
+
+  // Filter out score fields from Fluences Verbales questionnaire
+  // Readonly score fields should only appear on the score page, not in the input form
+  if (code === 'FLUENCES_VERBALES') {
+    const scoreFieldIds = [
+      'fv_p_tot_rupregle',
+      'fv_p_tot_correct_z',
+      'fv_p_tot_correct_pc',
+      'fv_anim_tot_rupregle',
+      'fv_anim_tot_correct_z',
+      'fv_anim_tot_correct_pc'
+    ];
+    filteredQuestionnaire = {
+      ...questionnaire,
+      questions: questionnaire.questions.filter(q => {
+        // Remove readonly score fields
+        if (q.readonly && scoreFieldIds.includes(q.id)) {
+          return false;
+        }
+        // Keep all other questions
+        return true;
+      })
+    };
+    console.log('[Fluences Verbales Debug] Filtered out score fields. Original questions:', questionnaire.questions.length, 'Filtered:', filteredQuestionnaire.questions.length);
   }
 
   return (

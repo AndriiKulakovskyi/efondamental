@@ -2189,6 +2189,13 @@ export async function saveFluencesVerbalesResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
+  console.log('[Fluences Verbales Debug] Input to scoring function:', {
+    patient_age: response.patient_age,
+    years_of_education: response.years_of_education,
+    fv_p_tot_correct: response.fv_p_tot_correct,
+    fv_anim_tot_correct: response.fv_anim_tot_correct
+  });
+
   // Calculate all scores using the scoring function
   const scores = calculateFluencesVerbalesScores({
     patient_age: response.patient_age,
@@ -2203,6 +2210,8 @@ export async function saveFluencesVerbalesResponse(
     fv_anim_propres: response.fv_anim_propres
   });
 
+  console.log('[Fluences Verbales Debug] Calculated scores:', scores);
+
   const { data, error } = await supabase
     .from('bipolar_fluences_verbales')
     .upsert({
@@ -2210,19 +2219,29 @@ export async function saveFluencesVerbalesResponse(
       patient_id: response.patient_id,
       patient_age: response.patient_age,
       years_of_education: response.years_of_education,
-      // Lettre P
+      // Lettre P - all fields
       fv_p_tot_correct: response.fv_p_tot_correct,
+      fv_p_persev: response.fv_p_persev,
       fv_p_deriv: response.fv_p_deriv,
       fv_p_intrus: response.fv_p_intrus,
       fv_p_propres: response.fv_p_propres,
+      fv_p_cluster_tot: response.fv_p_cluster_tot,
+      fv_p_cluster_taille: response.fv_p_cluster_taille,
+      fv_p_switch_tot: response.fv_p_switch_tot,
+      // Lettre P - calculated scores
       fv_p_tot_rupregle: scores.fv_p_tot_rupregle,
       fv_p_tot_correct_z: scores.fv_p_tot_correct_z,
       fv_p_tot_correct_pc: scores.fv_p_tot_correct_pc,
-      // Animaux
+      // Animaux - all fields
       fv_anim_tot_correct: response.fv_anim_tot_correct,
+      fv_anim_persev: response.fv_anim_persev,
       fv_anim_deriv: response.fv_anim_deriv,
       fv_anim_intrus: response.fv_anim_intrus,
       fv_anim_propres: response.fv_anim_propres,
+      fv_anim_cluster_tot: response.fv_anim_cluster_tot,
+      fv_anim_cluster_taille: response.fv_anim_cluster_taille,
+      fv_anim_switch_tot: response.fv_anim_switch_tot,
+      // Animaux - calculated scores
       fv_anim_tot_rupregle: scores.fv_anim_tot_rupregle,
       fv_anim_tot_correct_z: scores.fv_anim_tot_correct_z,
       fv_anim_tot_correct_pc: scores.fv_anim_tot_correct_pc,
@@ -2232,6 +2251,16 @@ export async function saveFluencesVerbalesResponse(
     .single();
 
   if (error) throw error;
+  
+  console.log('[Fluences Verbales Debug] Saved data:', {
+    fv_p_tot_rupregle: data.fv_p_tot_rupregle,
+    fv_p_tot_correct_z: data.fv_p_tot_correct_z,
+    fv_p_tot_correct_pc: data.fv_p_tot_correct_pc,
+    fv_anim_tot_rupregle: data.fv_anim_tot_rupregle,
+    fv_anim_tot_correct_z: data.fv_anim_tot_correct_z,
+    fv_anim_tot_correct_pc: data.fv_anim_tot_correct_pc
+  });
+  
   return data;
 }
 

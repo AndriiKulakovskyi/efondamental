@@ -196,6 +196,18 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       if (data.wais_mc_std >= 8) return 'info';
       return 'warning';
     }
+
+    if (code === 'FLUENCES_VERBALES') {
+      // Fluences Verbales: Z-scores > 0 are above average
+      // Use the more impaired of the two tests for overall severity
+      const pZScore = data.fv_p_tot_correct_z ?? 0;
+      const animZScore = data.fv_anim_tot_correct_z ?? 0;
+      const worstZScore = Math.min(pZScore, animZScore);
+      
+      if (worstZScore >= 0) return 'success';
+      if (worstZScore >= -1) return 'info';
+      return 'warning';
+    }
     
     if (code === 'WAIS4_SIMILITUDES') {
       // WAIS-IV Similitudes: Standard score 8-12 is average (mean=10, SD=3)
@@ -457,7 +469,37 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       interpretation = 'Mémoire de travail significativement inférieure à la moyenne';
     }
   }
-  
+
+  if (code === 'FLUENCES_VERBALES' && !interpretation) {
+    const pZScore = data.fv_p_tot_correct_z ?? 0;
+    const animZScore = data.fv_anim_tot_correct_z ?? 0;
+    
+    let pInterpretation = '';
+    let animInterpretation = '';
+    
+    if (pZScore >= 1) {
+      pInterpretation = 'supérieure';
+    } else if (pZScore >= 0) {
+      pInterpretation = 'dans la moyenne';
+    } else if (pZScore >= -1) {
+      pInterpretation = 'légèrement inférieure';
+    } else {
+      pInterpretation = 'significativement inférieure';
+    }
+    
+    if (animZScore >= 1) {
+      animInterpretation = 'supérieure';
+    } else if (animZScore >= 0) {
+      animInterpretation = 'dans la moyenne';
+    } else if (animZScore >= -1) {
+      animInterpretation = 'légèrement inférieure';
+    } else {
+      animInterpretation = 'significativement inférieure';
+    }
+    
+    interpretation = `Fluence phonémique ${pInterpretation} à la moyenne. Fluence sémantique ${animInterpretation} à la moyenne.`;
+  }
+
   // Generate interpretation for ASRS if not present
   if (code === 'ASRS' && !interpretation) {
     if (data.screening_positive) {
@@ -549,6 +591,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'WAIS4_DIGIT_SPAN' && 'Résultats WAIS-IV Mémoire des chiffres (Digit Span)'}
               {code === 'WAIS4_SIMILITUDES' && 'Résultats WAIS-IV Similitudes'}
               {code === 'CVLT' && 'Résultats CVLT'}
+              {code === 'FLUENCES_VERBALES' && 'Résultats Fluences Verbales (Cardebat et al., 1990)'}
               {code === 'WAIS4_CODE' && 'Résultats WAIS-IV Code'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && 'Résultats WAIS-IV Code, Symboles & IVT'}
               {code === 'PANSS' && 'Résultats PANSS'}
@@ -1883,6 +1926,123 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <div className="flex justify-between">
                 <span className="text-gray-600">Age du patient:</span>
                 <span className="font-semibold">{data.patient_age ?? '-'} ans</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Fluences Verbales Details */}
+        {code === 'FLUENCES_VERBALES' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            {/* Phonemic Fluency (Letter P) */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Fluence Phonémique - Lettre P</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Mots corrects:</span>
+                  <span className="font-semibold">{data.fv_p_tot_correct ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Ruptures de règle:</span>
+                  <span className="font-medium">{data.fv_p_tot_rupregle ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Z-Score:</span>
+                  <span className="font-bold">{data.fv_p_tot_correct_z !== null && data.fv_p_tot_correct_z !== undefined ? Number(data.fv_p_tot_correct_z).toFixed(2) : '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Percentile:</span>
+                  <span className="font-bold">{data.fv_p_tot_correct_pc ?? '-'}</span>
+                </div>
+              </div>
+              <div className="mt-2 text-xs text-gray-500">
+                <div className="flex justify-between">
+                  <span>Persévérations:</span>
+                  <span>{data.fv_p_persev ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Mots dérivés:</span>
+                  <span>{data.fv_p_deriv ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Intrusions:</span>
+                  <span>{data.fv_p_intrus ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Noms propres:</span>
+                  <span>{data.fv_p_propres ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Clusters:</span>
+                  <span>{data.fv_p_cluster_tot ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Switches:</span>
+                  <span>{data.fv_p_switch_tot ?? '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Semantic Fluency (Animals) */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Fluence Sémantique - Animaux</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Mots corrects:</span>
+                  <span className="font-semibold">{data.fv_anim_tot_correct ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Ruptures de règle:</span>
+                  <span className="font-medium">{data.fv_anim_tot_rupregle ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Z-Score:</span>
+                  <span className="font-bold">{data.fv_anim_tot_correct_z !== null && data.fv_anim_tot_correct_z !== undefined ? Number(data.fv_anim_tot_correct_z).toFixed(2) : '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Percentile:</span>
+                  <span className="font-bold">{data.fv_anim_tot_correct_pc ?? '-'}</span>
+                </div>
+              </div>
+              <div className="mt-2 text-xs text-gray-500">
+                <div className="flex justify-between">
+                  <span>Persévérations:</span>
+                  <span>{data.fv_anim_persev ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Mots dérivés:</span>
+                  <span>{data.fv_anim_deriv ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Intrusions:</span>
+                  <span>{data.fv_anim_intrus ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Noms propres:</span>
+                  <span>{data.fv_anim_propres ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Clusters:</span>
+                  <span>{data.fv_anim_cluster_tot ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Switches:</span>
+                  <span>{data.fv_anim_switch_tot ?? '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Demographics */}
+            <div className="pt-2 border-t">
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Age:</span>
+                  <span className="font-semibold">{data.patient_age ?? '-'} ans</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Années d'études:</span>
+                  <span className="font-semibold">{data.years_of_education ?? '-'}</span>
+                </div>
               </div>
             </div>
           </div>

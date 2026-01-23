@@ -395,6 +395,61 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
     return data as T;
   }
 
+  // FLUENCES_VERBALES needs to calculate Z-scores and percentiles for phonemic and semantic fluency
+  if (questionnaireCode === 'FLUENCES_VERBALES') {
+    const { calculateFluencesVerbalesScores } = await import('./fluences-verbales-scoring');
+    
+    console.log('[Fluences Verbales Debug] Input to scoring function:', {
+      patient_age: (response as any).patient_age,
+      years_of_education: (response as any).years_of_education,
+      fv_p_tot_correct: (response as any).fv_p_tot_correct,
+      fv_anim_tot_correct: (response as any).fv_anim_tot_correct
+    });
+    
+    const scores = calculateFluencesVerbalesScores({
+      patient_age: (response as any).patient_age,
+      years_of_education: (response as any).years_of_education,
+      fv_p_tot_correct: (response as any).fv_p_tot_correct,
+      fv_p_deriv: (response as any).fv_p_deriv,
+      fv_p_intrus: (response as any).fv_p_intrus,
+      fv_p_propres: (response as any).fv_p_propres,
+      fv_anim_tot_correct: (response as any).fv_anim_tot_correct,
+      fv_anim_deriv: (response as any).fv_anim_deriv,
+      fv_anim_intrus: (response as any).fv_anim_intrus,
+      fv_anim_propres: (response as any).fv_anim_propres
+    });
+    
+    console.log('[Fluences Verbales Debug] Calculated scores:', scores);
+    
+    const fluencesResponse = {
+      ...response,
+      ...scores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(fluencesResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving FLUENCES_VERBALES response:', error);
+      throw error;
+    }
+    
+    console.log('[Fluences Verbales Debug] Saved data:', {
+      fv_p_tot_rupregle: data.fv_p_tot_rupregle,
+      fv_p_tot_correct_z: data.fv_p_tot_correct_z,
+      fv_p_tot_correct_pc: data.fv_p_tot_correct_pc,
+      fv_anim_tot_rupregle: data.fv_anim_tot_rupregle,
+      fv_anim_tot_correct_z: data.fv_anim_tot_correct_z,
+      fv_anim_tot_correct_pc: data.fv_anim_tot_correct_pc
+    });
+
+    return data as T;
+  }
+
   // ALS18 needs to calculate subscale scores and interpretation
   if (questionnaireCode === 'ALS18') {
     const als18Scores = computeAls18Scores(response as Partial<BipolarAls18Response>);
