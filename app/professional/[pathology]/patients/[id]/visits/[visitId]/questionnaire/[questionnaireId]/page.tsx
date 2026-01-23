@@ -75,13 +75,14 @@ import {
   WAIS3_FLUENCES_VERBALES_DEFINITION,
   WAIS3_CRITERIA_DEFINITION,
   WAIS3_LEARNING_DEFINITION,
-  WAIS3_VOCABULAIRE_DEFINITION,
   WAIS3_MATRICES_DEFINITION,
   WAIS3_CODE_SYMBOLES_DEFINITION,
   WAIS3_DIGIT_SPAN_DEFINITION,
   WAIS3_CPT2_DEFINITION,
   WAIS3_MEM3_SPATIAL_DEFINITION
 } from "@/lib/constants/questionnaires-hetero";
+// WAIS-III Vocabulaire from new location
+import { WAIS3_VOCABULAIRE_DEFINITION } from "@/lib/questionnaires/bipolar/initial/neuropsy/wais3-vocabulaire";
 // C-SSRS from medical module
 import { CSSRS_DEFINITION } from "@/lib/questionnaires/bipolar/initial/medical";
 import {

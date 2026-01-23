@@ -11475,42 +11475,7 @@ export const WAIS3_VOCABULAIRE_QUESTIONS: Question[] = [
   { id: 'item30', text: 'Note pour l\'item 30 - Elaborer', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
   { id: 'item31', text: 'Note pour l\'item 31 - Prosaïque', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
   { id: 'item32', text: 'Note pour l\'item 32 - Apologie', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  { id: 'item33', text: 'Note pour l\'item 33 - Conjecture', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS },
-  // Score section
-  {
-    id: 'section_scores',
-    text: 'Scores',
-    type: 'section',
-    required: false
-  },
-  {
-    id: 'total_raw_score',
-    text: 'Note brute à la WAIS VOCABULAIRE',
-    type: 'number',
-    required: false,
-    readonly: true,
-    help: 'Somme des 33 items (0-66). Calculé automatiquement par l\'application. Inclut les scores manuellement entrés selon les règles WAIS-III (crédits automatiques, arrêts).',
-    min: 0,
-    max: 66
-  },
-  {
-    id: 'standard_score',
-    text: 'Note standard à la WAIS VOCABULAIRE',
-    type: 'number',
-    required: false,
-    readonly: true,
-    help: 'Score standardisé ajusté par âge (1-19), calculé automatiquement',
-    min: 1,
-    max: 19
-  },
-  {
-    id: 'standardized_value',
-    text: 'Valeur standardisée (moyenne=10, écart-type=3)',
-    type: 'number',
-    required: false,
-    readonly: true,
-    help: 'Transformation z-score : (note standard - 10) / 3, calculé automatiquement'
-  }
+  { id: 'item33', text: 'Note pour l\'item 33 - Conjecture', type: 'single_choice', required: true, options: WAIS3_VOCABULAIRE_OPTIONS }
 ];
 
 export const WAIS3_VOCABULAIRE_DEFINITION: QuestionnaireDefinition = {

@@ -216,6 +216,13 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
+    if (code === 'WAIS3_VOCABULAIRE') {
+      // WAIS-III Vocabulaire: Standard score 8-12 is average (mean=10, SD=3)
+      if (data.standard_score >= 13) return 'success';
+      if (data.standard_score >= 8) return 'info';
+      return 'warning';
+    }
+    
     if (code === 'CVLT') {
       // CVLT: Use Total 1-5 standard score for severity
       const score = data.total_1_5_std;
@@ -446,6 +453,18 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
     }
   }
   
+  if (code === 'WAIS3_VOCABULAIRE' && !interpretation && data.standard_score !== undefined) {
+    if (data.standard_score >= 13) {
+      interpretation = 'Connaissances lexicales supérieures à la moyenne';
+    } else if (data.standard_score >= 8) {
+      interpretation = 'Connaissances lexicales dans la moyenne';
+    } else if (data.standard_score >= 4) {
+      interpretation = 'Connaissances lexicales inférieures à la moyenne';
+    } else {
+      interpretation = 'Connaissances lexicales significativement inférieures à la moyenne';
+    }
+  }
+  
   if (code === 'WAIS4_MATRICES' && !interpretation && data.standardized_score !== undefined) {
     if (data.standardized_score >= 13) {
       interpretation = 'Raisonnement perceptif supérieur à la moyenne';
@@ -590,6 +609,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'WAIS4_MATRICES' && 'Résultats WAIS-IV Matrices'}
               {code === 'WAIS4_DIGIT_SPAN' && 'Résultats WAIS-IV Mémoire des chiffres (Digit Span)'}
               {code === 'WAIS4_SIMILITUDES' && 'Résultats WAIS-IV Similitudes'}
+              {code === 'WAIS3_VOCABULAIRE' && 'Score WAIS-III Vocabulaire'}
               {code === 'CVLT' && 'Résultats CVLT'}
               {code === 'FLUENCES_VERBALES' && 'Résultats Fluences Verbales (Cardebat et al., 1990)'}
               {code === 'WAIS4_CODE' && 'Résultats WAIS-IV Code'}
@@ -647,6 +667,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 : code === 'WAIS4_DIGIT_SPAN'
                 ? (data.wais_mc_std !== undefined ? data.wais_mc_std : '-')
                 : code === 'WAIS4_SIMILITUDES'
+                ? (data.standard_score !== undefined ? data.standard_score : '-')
+                : code === 'WAIS3_VOCABULAIRE'
                 ? (data.standard_score !== undefined ? data.standard_score : '-')
                 : code === 'CVLT'
                 ? (data.total_1_5 !== undefined ? data.total_1_5 : '-')
@@ -1566,6 +1588,34 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="flex justify-between pt-2 border-t">
               <span className="text-gray-600">Valeur Standardisée:</span>
               <span className="font-semibold">{data.standardized_value !== null && data.standardized_value !== undefined ? data.standardized_value.toFixed(2) : '-'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Age du patient:</span>
+              <span className="font-semibold">{data.patient_age ?? '-'} ans</span>
+            </div>
+          </div>
+        )}
+
+        {/* WAIS3 Vocabulaire Details */}
+        {code === 'WAIS3_VOCABULAIRE' && (
+          <div className="text-sm space-y-2 mt-2 pt-2 border-t">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Score Brut Total:</span>
+                <span className="font-semibold">{data.total_raw_score ?? '-'}/66</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Note Standard:</span>
+                <span className="font-semibold">{data.standard_score ?? '-'}/19</span>
+              </div>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600">Valeur Standardisée:</span>
+              <span className="font-semibold">
+                {data.standardized_value !== null && data.standardized_value !== undefined 
+                  ? data.standardized_value.toFixed(2) 
+                  : '-'}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Age du patient:</span>

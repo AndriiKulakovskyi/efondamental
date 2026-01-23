@@ -316,6 +316,44 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
     return data as T;
   }
 
+  // WAIS3_VOCABULAIRE needs to calculate scores based on age and items
+  if (questionnaireCode === 'WAIS3_VOCABULAIRE') {
+    const { calculateWais3VocabulaireScores } = await import('./wais3-vocabulaire-scoring');
+    
+    // Calculate raw score (sum of all 33 items)
+    let rawScore = 0;
+    for (let i = 1; i <= 33; i++) {
+      rawScore += (response as any)[`item${i}`] || 0;
+    }
+    
+    const patientAge = (response as any).patient_age || 35; // Default to 35 if not provided
+    const scores = calculateWais3VocabulaireScores({
+      patient_age: patientAge,
+      total_raw_score: rawScore
+    });
+    
+    const vocabulaireResponse = {
+      ...response,
+      total_raw_score: rawScore,
+      standard_score: scores.standard_score,
+      standardized_value: scores.standardized_value
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(vocabulaireResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving WAIS3_VOCABULAIRE response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
   // WAIS4_DIGIT_SPAN needs to calculate all scores including item scores, section totals, empan, and standardized scores
   if (questionnaireCode === 'WAIS4_DIGIT_SPAN') {
     const { calculateDigitSpanScores } = await import('./wais4-digit-span-scoring');

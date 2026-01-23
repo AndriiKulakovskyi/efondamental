@@ -2219,7 +2219,8 @@ export function QuestionnaireRenderer({
 
   // Dedicated scoring for WAIS-III Vocabulaire (Wechsler, 1997)
   useEffect(() => {
-    if (questionnaire?.code !== 'WAIS3_VOCABULAIRE_FR') return;
+    if (questionnaire?.code !== 'WAIS3_VOCABULAIRE' && 
+        questionnaire?.code !== 'WAIS3_VOCABULAIRE_FR') return;
 
     setResponses((prev) => {
       const vocabItems = [

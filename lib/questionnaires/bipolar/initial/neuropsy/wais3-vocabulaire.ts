@@ -68,26 +68,46 @@ export type BipolarWais3VocabulaireResponseInsert = Omit<
 // ============================================================================
 
 const ITEM_OPTIONS = [
-  { code: 0, label: '0 - Reponse incorrecte', score: 0 },
-  { code: 1, label: '1 - Reponse partiellement correcte', score: 1 },
-  { code: 2, label: '2 - Reponse correcte complete', score: 2 }
+  { code: 0, label: '0', score: 0 },
+  { code: 1, label: '1', score: 1 },
+  { code: 2, label: '2', score: 2 }
+];
+
+const VOCABULARY_WORDS = [
+  'Bateau', 'Fauteuil', 'Bol', 'Instruire', 'Hier', 'Arracher', 'Sanction', 'Refuge',
+  'Calendrier', 'Baleine', 'Mime', 'Persévérer', 'Sauvage', 'Héréditaire', 'Connivence',
+  'Grandiose', 'Confier', 'Vigoureux', 'Contracter', 'Initiative', 'Esquisse', 'Irritable',
+  'Invectiver', 'Hétérogène', 'Assimiler', 'Concertation', 'Emulation', 'Pittoresque',
+  'Evasif', 'Elaborer', 'Prosaïque', 'Apologie', 'Conjecture'
 ];
 
 function createVocabularyItem(num: number): Question {
   return {
     id: `item${num}`,
-    text: `Item ${num}`,
+    text: `Note pour l'item ${num} - ${VOCABULARY_WORDS[num - 1]}`,
     type: 'single_choice',
-    required: num <= 4 ? true : false,
+    required: true,
     options: ITEM_OPTIONS
   };
 }
 
 export const WAIS3_VOCABULAIRE_QUESTIONS: Question[] = [
+  // Patient demographics section
   {
-    id: 'section_instructions',
-    text: 'WAIS-III Vocabulaire',
-    help: 'Demander au sujet de definir chaque mot. "Que signifie [mot]?"',
+    id: 'patient_age',
+    text: 'Âge du patient (calculé automatiquement)',
+    type: 'number',
+    required: true,
+    readonly: true,
+    section: 'Données démographiques',
+    min: 16,
+    max: 120,
+    help: 'Calculé automatiquement à partir de la date de naissance et de la date de visite'
+  },
+  // Vocabulary items section
+  {
+    id: 'section_items',
+    text: 'Items de vocabulaire',
     type: 'section',
     required: false
   },
@@ -128,8 +148,8 @@ export interface QuestionnaireDefinition {
 export const WAIS3_VOCABULAIRE_DEFINITION: QuestionnaireDefinition = {
   id: 'wais3_vocabulaire',
   code: 'WAIS3_VOCABULAIRE',
-  title: 'WAIS-III Vocabulaire',
-  description: 'Sous-test Vocabulaire de la WAIS-III - Evaluation des connaissances lexicales et de l\'expression verbale.',
+  title: 'WAIS-III - Subtest Vocabulaire',
+  description: 'Subtest Vocabulaire de la WAIS-III (Wechsler, 1997) - Évaluation des connaissances lexicales.\n\n**Règles d\'administration WAIS-III:**\n• Pour les 16 ans et plus : Commencer à l\'item 4 (Instruire)\n• **Règle de retour :** Si les items 4-7 ne sont pas tous parfaits (2 points), administrer les items 1-3 en ordre inverse\n• **Crédit automatique :** Les items avant le point de départ non administrés reçoivent 2 points chacun\n• **Arrêt :** Discontinuer après 6 scores consécutifs de 0\n• Entrer manuellement les scores selon ces règles (le système calcule la somme)',
   questions: WAIS3_VOCABULAIRE_QUESTIONS,
   metadata: {
     singleColumn: true,
