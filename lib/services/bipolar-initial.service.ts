@@ -6,9 +6,11 @@ import {
   saveMadrsResponse, 
   saveYmrsResponse,
   saveAldaResponse,
+  saveEtatPatientResponse,
   type MadrsResponseInsert,
   type YmrsResponseInsert,
-  type AldaResponseInsert
+  type AldaResponseInsert,
+  type EtatPatientResponseInsert
 } from '@/lib/services/questionnaire-hetero.service';
 import { computeCtqScores, type BipolarCtqResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/ctq';
 import { computeBis10Scores, type BipolarBis10Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/bis10';
@@ -197,6 +199,12 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
   // ALDA needs to calculate score_a, score_b and alda_score (A - B)
   if (questionnaireCode === 'ALDA') {
     return await saveAldaResponse(response as any as AldaResponseInsert) as any as T;
+  }
+
+  // ETAT_PATIENT (DSM-IV Symptoms) needs to calculate derived fields and must not
+  // attempt to persist client-only fields like total_score.
+  if (questionnaireCode === 'ETAT_PATIENT') {
+    return await saveEtatPatientResponse(response as any as EtatPatientResponseInsert) as any as T;
   }
 
   // CTQ needs to calculate subscale scores and severity interpretations
