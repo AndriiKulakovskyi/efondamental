@@ -7,11 +7,17 @@ import {
   saveYmrsResponse,
   saveAldaResponse,
   saveEtatPatientResponse,
+  saveFastResponse,
   type MadrsResponseInsert,
   type YmrsResponseInsert,
   type AldaResponseInsert,
-  type EtatPatientResponseInsert
+  type EtatPatientResponseInsert,
+  type FastResponseInsert
 } from '@/lib/services/questionnaire-hetero.service';
+import {
+  saveDsm5ComorbidResponse
+} from '@/lib/services/questionnaire-dsm5.service';
+import type { Dsm5ComorbidResponseInsert } from '@/lib/types/database.types';
 import { computeCtqScores, type BipolarCtqResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/ctq';
 import { computeBis10Scores, type BipolarBis10Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/bis10';
 import { computeAls18Scores, type BipolarAls18Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/als18';
@@ -173,6 +179,33 @@ export async function getBipolarInitialResponse<T extends BipolarQuestionnaireRe
     }
   }
 
+  // Defensive normalization for DSM5_COMORBID:
+  // Some environments have a subset of eating-disorder fields stored as BOOLEAN.
+  // The questionnaire renderer expects 'oui'/'non' string codes, so map booleans to strings.
+  if (data && questionnaireCode === 'DSM5_COMORBID') {
+    const normalized: any = { ...data };
+    const booleanToOuiNon = (val: any) => {
+      if (val === true) return 'oui';
+      if (val === false) return 'non';
+      return val;
+    };
+
+    const maybeBooleanYesNoFields = [
+      'anorexia_bulimic_amenorrhea',
+      'anorexia_bulimic_current',
+      'anorexia_restrictive_amenorrhea',
+      'anorexia_restrictive_current',
+      'binge_eating_current',
+      'bulimia_current'
+    ];
+
+    for (const field of maybeBooleanYesNoFields) {
+      normalized[field] = booleanToOuiNon(normalized[field]);
+    }
+
+    return normalized as T;
+  }
+
   return data as T | null;
 }
 
@@ -207,6 +240,20 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
   // attempt to persist client-only fields like total_score.
   if (questionnaireCode === 'ETAT_PATIENT') {
     return await saveEtatPatientResponse(response as any as EtatPatientResponseInsert) as any as T;
+  }
+
+  // FAST needs to compute and persist domain subscores, total_score, and interpretation.
+  // This ensures that when "Validate questionnaire" is clicked, scoring is computed
+  // server-side and stored in Supabase (consistent across initial/annual visits).
+  if (questionnaireCode === 'FAST') {
+    return await saveFastResponse(response as any as FastResponseInsert) as any as T;
+  }
+
+  // DSM5_COMORBID needs special handling because some environments had BOOLEAN columns
+  // for a subset of fields while the application submits 'oui'/'non' strings.
+  // Route through the DSM5 service which includes a safe retry strategy.
+  if (questionnaireCode === 'DSM5_COMORBID') {
+    return await saveDsm5ComorbidResponse(response as any as Dsm5ComorbidResponseInsert) as any as T;
   }
 
   // CTQ needs to calculate subscale scores and severity interpretations

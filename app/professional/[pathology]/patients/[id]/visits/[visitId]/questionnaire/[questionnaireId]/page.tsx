@@ -408,8 +408,13 @@ function questionnaireCodeToBipolarKey(code: string): string | null {
 
 // Check if a questionnaire should fetch data from bipolar_* tables
 function shouldUseBipolarTables(pathology: string, visitType: string | undefined, code: string): boolean {
-  // Only for bipolar pathology with initial_evaluation visit type
-  if (pathology !== 'bipolar' || visitType !== 'initial_evaluation') {
+  // Keep fetch/prefill routing aligned with save routing (see submitProfessionalQuestionnaireAction).
+  // Bipolar evaluation visits use bipolar_* tables (initial, annual, and biannual follow-up).
+  if (
+    pathology !== 'bipolar' ||
+    !visitType ||
+    !['initial_evaluation', 'annual_evaluation', 'biannual_followup'].includes(visitType)
+  ) {
     return false;
   }
   

@@ -107,6 +107,34 @@ export async function getDsm5ComorbidResponse(
     if (error.code === 'PGRST116') return null;
     throw error;
   }
+
+  // Defensive normalization:
+  // Some environments had a subset of DSM5_COMORBID eating-disorder fields stored as BOOLEAN.
+  // The app expects 'oui'/'non' string codes, so map booleans back to strings for UI compatibility.
+  if (data) {
+    const normalized: any = { ...data };
+    const booleanToOuiNon = (val: any) => {
+      if (val === true) return 'oui';
+      if (val === false) return 'non';
+      return val;
+    };
+
+    const maybeBooleanYesNoFields = [
+      'anorexia_bulimic_amenorrhea',
+      'anorexia_bulimic_current',
+      'anorexia_restrictive_amenorrhea',
+      'anorexia_restrictive_current',
+      'binge_eating_current',
+      'bulimia_current'
+    ];
+
+    for (const field of maybeBooleanYesNoFields) {
+      normalized[field] = booleanToOuiNon(normalized[field]);
+    }
+
+    return normalized;
+  }
+
   return data;
 }
 
@@ -159,11 +187,74 @@ export async function saveDsm5ComorbidResponse(
     delete (cleanResponse as any)[field];
   });
 
-  const { data, error } = await supabase
-    .from('bipolar_dsm5_comorbid')
-    .upsert(cleanResponse, { onConflict: 'visit_id' })
-    .select()
-    .single();
+  const tryUpsert = async (payload: any) => {
+    return await supabase
+      .from('bipolar_dsm5_comorbid')
+      .upsert(payload, { onConflict: 'visit_id' })
+      .select()
+      .single();
+  };
+
+  // First attempt: write as the app models it (string codes 'oui'/'non'/'ne_sais_pas')
+  let { data, error } = await tryUpsert(cleanResponse);
+
+  // Fallback: if the DB still has boolean columns for some fields,
+  // retry by converting 'oui'/'non' to true/false.
+  if (
+    error &&
+    error.code === '22P02' &&
+    typeof error.message === 'string' &&
+    error.message.includes('type boolean')
+  ) {
+    const toBool = (val: any) => {
+      if (val === 'oui') return true;
+      if (val === 'non') return false;
+      if (val === 'ne_sais_pas') return null;
+      return val;
+    };
+
+    // Retry 1: conservative conversion for known boolean offenders (eating-disorder yes/no flags)
+    {
+      const retryPayload: any = { ...cleanResponse };
+      const maybeBooleanYesNoFields = [
+        'anorexia_bulimic_amenorrhea',
+        'anorexia_bulimic_current',
+        'anorexia_restrictive_amenorrhea',
+        'anorexia_restrictive_current',
+        'binge_eating_current',
+        'bulimia_current'
+      ];
+
+      for (const field of maybeBooleanYesNoFields) {
+        retryPayload[field] = toBool(retryPayload[field]);
+      }
+
+      const retry = await tryUpsert(retryPayload);
+      data = retry.data;
+      error = retry.error;
+    }
+
+    // Retry 2: broad conversion (some environments have additional DSM5_COMORBID columns as BOOLEAN).
+    // Convert all exact 'oui'/'non'/'ne_sais_pas' string values to boolean/null and retry once more.
+    if (
+      error &&
+      error.code === '22P02' &&
+      typeof error.message === 'string' &&
+      error.message.includes('type boolean')
+    ) {
+      const broadPayload: any = { ...cleanResponse };
+      for (const [key, value] of Object.entries(broadPayload)) {
+        // Only convert exact tri-state strings; keep all other codes as-is.
+        if (value === 'oui' || value === 'non' || value === 'ne_sais_pas') {
+          broadPayload[key] = toBool(value);
+        }
+      }
+
+      const retry = await tryUpsert(broadPayload);
+      data = retry.data;
+      error = retry.error;
+    }
+  }
 
   if (error) throw error;
   return data;
