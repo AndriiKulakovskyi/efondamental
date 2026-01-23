@@ -1,0 +1,288 @@
+---
+description: Bipolar vertical visit type questionnaire-to-table mappings. Reference for screening, initial, semiannual, and annual visits.
+globs: lib/questionnaires/bipolar/**/*.ts, lib/services/bipolar-*.ts, app/**/bipolar/**/*.tsx
+alwaysApply: false
+---
+
+# Bipolar Vertical: Visit Type Questionnaire Mappings
+
+This rule defines the explicit mapping between questionnaires and Supabase tables for each bipolar visit type. When a questionnaire is reused across visits, responses are persisted in a **single shared table** to ensure data consistency and longitudinal integrity.
+
+---
+
+## Visit Types Overview
+
+| Visit Type | Code | Frequency | Total Questionnaires |
+|------------|------|-----------|---------------------|
+| Screening | `screening` | Once | 5 |
+| Initial Evaluation | `initial_evaluation` | Once | 57 |
+| Biannual Follow-up | `biannual_followup` | Every 6 months | 25 |
+| Annual Evaluation | `annual_evaluation` | Every 12 months | 70 |
+
+---
+
+## Screening Visit (5 questionnaires)
+
+### Auto Module (Patient Self-Report)
+
+| Questionnaire | Code | Table | Shared |
+|--------------|------|-------|--------|
+| ASRM | `ASRM` | `responses_asrm` | Yes |
+| MDQ | `MDQ` | `responses_mdq` | Yes |
+| QIDS-SR16 | `QIDS_SR16` | `responses_qids_sr16` | Yes |
+
+### Medical Module (Professional)
+
+| Questionnaire | Code | Table | Shared |
+|--------------|------|-------|--------|
+| Diagnostic | `BIPOLAR_DIAGNOSTIC` | `responses_bipolar_diagnostic` | No |
+| Orientation | `BIPOLAR_ORIENTATION` | `responses_bipolar_orientation` | No |
+
+---
+
+## Initial Evaluation Visit (57 questionnaires)
+
+### Nurse Module (6 questionnaires)
+
+| Questionnaire | Code | Table | Shared |
+|--------------|------|-------|--------|
+| Tobacco | `TOBACCO` | `responses_tobacco` | Yes |
+| Fagerstrom | `FAGERSTROM` | `responses_fagerstrom` | Yes |
+| Physical Parameters | `PHYSICAL_PARAMS` | `responses_physical_params` | Yes |
+| Blood Pressure | `BLOOD_PRESSURE` | `responses_blood_pressure` | Yes |
+| Sleep Apnea (STOP-Bang) | `SLEEP_APNEA` | `responses_sleep_apnea` | Yes |
+| Biological Assessment | `BIOLOGICAL_ASSESSMENT` | `responses_biological_assessment` | Yes |
+
+### Thymic Module (7 questionnaires)
+
+| Questionnaire | Code | Table | Shared |
+|--------------|------|-------|--------|
+| MADRS | `MADRS` | `responses_madrs` | Yes |
+| YMRS | `YMRS` | `responses_ymrs` | Yes |
+| CGI | `CGI` | `responses_cgi` | Yes |
+| EGF | `EGF` | `responses_egf` | Yes |
+| ALDA | `ALDA` | `responses_alda` | Yes |
+| Etat Patient | `ETAT_PATIENT` | `responses_etat_patient` | Yes |
+| FAST | `FAST` | `responses_fast` | Yes |
+
+### Auto Module - ETAT Submodule (7 questionnaires)
+
+| Questionnaire | Code | Table | Shared |
+|--------------|------|-------|--------|
+| EQ-5D-5L | `EQ5D5L` | `responses_eq5d5l` | Yes |
+| PRISE-M | `PRISE_M` | `responses_prise_m` | Yes |
+| STAI-YA | `STAI_YA` | `responses_stai_ya` | Yes |
+| MARS | `MARS` | `responses_mars` | Yes |
+| MAThyS | `MATHYS` | `responses_mathys` | Yes |
+| PSQI | `PSQI` | `responses_psqi` | Yes |
+| Epworth | `EPWORTH` | `responses_epworth` | Yes |
+
+### Auto Module - TRAITS Submodule (9 questionnaires)
+
+| Questionnaire | Code | Table | Shared |
+|--------------|------|-------|--------|
+| ASRS | `ASRS` | `responses_asrs` | No (Initial only) |
+| CTQ | `CTQ` | `responses_ctq` | No (Initial only) |
+| BIS-10 | `BIS10` | `responses_bis10` | No (Initial only) |
+| ALS-18 | `ALS18` | `responses_als18` | No (Initial only) |
+| AIM | `AIM` | `responses_aim` | No (Initial only) |
+| WURS-25 | `WURS25` | `responses_wurs25` | No (Initial only) |
+| AQ-12 | `AQ12` | `responses_aq12` | No (Initial only) |
+| CSM | `CSM` | `responses_csm` | No (Initial only) |
+| CTI | `CTI` | `responses_cti` | No (Initial only) |
+
+### Medical Module (19 questionnaires)
+
+| Questionnaire | Code | Table | Shared |
+|--------------|------|-------|--------|
+| DSM5 Mood Disorders | `DSM5_HUMEUR` | `responses_dsm5_humeur` | No (Initial only) |
+| DSM5 Psychotic | `DSM5_PSYCHOTIC` | `responses_dsm5_psychotic` | No (Initial only) |
+| DSM5 Comorbidities | `DSM5_COMORBID` | `responses_dsm5_comorbid` | No (Initial only) |
+| DIVA | `DIVA` | `responses_diva` | No (Initial only) |
+| Family History | `FAMILY_HISTORY` | `responses_family_history` | No (Initial only) |
+| C-SSRS | `CSSRS` | `responses_cssrs` | Yes |
+| C-SSRS History | `CSSRS_HISTORY` | `responses_cssrs_history` | No (Initial only) |
+| ISA | `ISA` | `responses_isa` | No (Initial only) |
+| SIS | `SIS` | `responses_sis` | Yes |
+| Suicide History | `SUICIDE_HISTORY` | `responses_suicide_history` | No (Initial only) |
+| Perinatal History | `PERINATALITE` | `responses_perinatalite` | No (Initial only) |
+| Patho Neuro | `PATHO_NEURO` | `responses_patho_neuro` | No (Initial only) |
+| Patho Cardio | `PATHO_CARDIO` | `responses_patho_cardio` | No (Initial only) |
+| Patho Endoc | `PATHO_ENDOC` | `responses_patho_endoc` | No (Initial only) |
+| Patho Dermato | `PATHO_DERMATO` | `responses_patho_dermato` | No (Initial only) |
+| Patho Urinaire | `PATHO_URINAIRE` | `responses_patho_urinaire` | No (Initial only) |
+| Antecedents Gyneco | `ANTECEDENTS_GYNECO` | `responses_antecedents_gyneco` | No (Initial only) |
+| Patho Hepato-Gastro | `PATHO_HEPATO_GASTRO` | `responses_patho_hepato_gastro` | No (Initial only) |
+| Patho Allergique | `PATHO_ALLERGIQUE` | `responses_patho_allergique` | No (Initial only) |
+| Autres Pathologies | `AUTRES_PATHO` | `responses_autres_patho` | No (Initial only) |
+
+### Neuropsy Module (22 questionnaires)
+
+| Questionnaire | Code | Table | Shared |
+|--------------|------|-------|--------|
+| CVLT | `CVLT` | `responses_cvlt` | Yes |
+| MEM3 Spatial | `MEM3_SPATIAL` | `responses_wais3_mem3_spatial` | Yes |
+| TMT | `TMT` | `responses_tmt` | Yes |
+| Stroop | `STROOP` | `responses_stroop` | Yes |
+| Fluences Verbales | `FLUENCES_VERBALES` | `responses_fluences_verbales` | Yes |
+| COBRA | `COBRA` | `responses_cobra` | Yes |
+| CPT-3 | `CPT3` | `responses_cpt3` | Yes |
+| SCIP | `SCIP` | `responses_scip` | Yes |
+| Test Commissions | `TEST_COMMISSIONS` | `responses_test_commissions` | Yes |
+| WAIS-IV Criteria | `WAIS4_CRITERIA` | `responses_wais4_criteria` | No |
+| WAIS-IV Learning | `WAIS4_LEARNING` | `responses_wais4_learning` | No |
+| WAIS-IV Similitudes | `WAIS4_SIMILITUDES` | `responses_wais4_similitudes` | No |
+| WAIS-IV Matrices | `WAIS4_MATRICES` | `responses_wais4_matrices` | No |
+| WAIS-IV Code | `WAIS4_CODE` | `responses_wais4_code` | No |
+| WAIS-IV Digit Span | `WAIS4_DIGIT_SPAN` | `responses_wais4_digit_span` | No |
+| WAIS-III Criteria | `WAIS3_CRITERIA` | `responses_wais3_criteria` | No |
+| WAIS-III Learning | `WAIS3_LEARNING` | `responses_wais3_learning` | No |
+| WAIS-III Vocabulaire | `WAIS3_VOCABULAIRE` | `responses_wais3_vocabulaire` | No |
+| WAIS-III Matrices | `WAIS3_MATRICES` | `responses_wais3_matrices` | No |
+| WAIS-III Code Symboles | `WAIS3_CODE_SYMBOLES` | `responses_wais3_code_symboles` | No |
+| WAIS-III Digit Span | `WAIS3_DIGIT_SPAN` | `responses_wais3_digit_span` | No |
+| WAIS-III CPT2 | `WAIS3_CPT2` | `responses_wais3_cpt2` | No |
+
+### Social Module (1 questionnaire)
+
+| Questionnaire | Code | Table | Shared |
+|--------------|------|-------|--------|
+| Social Evaluation | `SOCIAL` | `responses_social` | Yes |
+
+---
+
+## Biannual Follow-up Visit (25 questionnaires)
+
+### Nurse Module (7 questionnaires) - SHARED TABLES
+
+| Questionnaire | Code | Table |
+|--------------|------|-------|
+| Tobacco | `TOBACCO` | `responses_tobacco` |
+| Fagerstrom | `FAGERSTROM` | `responses_fagerstrom` |
+| Physical Parameters | `PHYSICAL_PARAMS` | `responses_physical_params` |
+| Blood Pressure | `BLOOD_PRESSURE` | `responses_blood_pressure` |
+| Sleep Apnea | `SLEEP_APNEA` | `responses_sleep_apnea` |
+| Biological Assessment | `BIOLOGICAL_ASSESSMENT` | `responses_biological_assessment` |
+| ECG | `ECG` | `responses_ecg` |
+
+### DSM5 Module (3 questionnaires)
+
+| Questionnaire | Code | Table | Shared |
+|--------------|------|-------|--------|
+| Humeur Actuels | `DSM5_HUMEUR_ACTUELS` | `responses_diag_psy_sem_humeur_actuels` | Yes |
+| Humeur Depuis Visite | `DSM5_HUMEUR_DEPUIS_VISITE` | `responses_diag_psy_sem_humeur_depuis_visite` | Yes |
+| Psychotiques | `DSM5_PSYCHOTIQUES` | `responses_diag_psy_sem_psychotiques` | Yes |
+
+### Suicide Module (2 questionnaires)
+
+| Questionnaire | Code | Table | Shared |
+|--------------|------|-------|--------|
+| ISA Suivi | `ISA_SUIVI` | `responses_isa_suivi` | Yes |
+| Suicide Behavior Followup | `SUICIDE_BEHAVIOR_FOLLOWUP` | `responses_suicide_behavior_followup` | Yes |
+
+### Soin Suivi Module (6 questionnaires)
+
+| Questionnaire | Code | Table | Shared |
+|--------------|------|-------|--------|
+| Suivi Recommandations | `SUIVI_RECOMMANDATIONS` | `responses_psy_traitement_semestriel` | Yes |
+| Recours aux Soins | `RECOURS_AUX_SOINS` | `responses_psy_traitement_semestriel` | Yes |
+| Traitement Non Pharmacologique | `TRAITEMENT_NON_PHARMACOLOGIQUE` | `responses_non_pharmacologic` | Yes |
+| Arrets de Travail | `ARRETS_DE_TRAVAIL` | `responses_psy_traitement_semestriel` | Yes |
+| Somatique Contraceptif | `SOMATIQUE_CONTRACEPTIF` | `responses_psy_traitement_semestriel` | Yes |
+| Statut Professionnel | `STATUT_PROFESSIONNEL` | `responses_psy_traitement_semestriel` | Yes |
+
+### Thymic Module (7 questionnaires) - SHARED TABLES
+
+| Questionnaire | Code | Table |
+|--------------|------|-------|
+| MADRS | `MADRS` | `responses_madrs` |
+| YMRS | `YMRS` | `responses_ymrs` |
+| CGI | `CGI` | `responses_cgi` |
+| EGF | `EGF` | `responses_egf` |
+| Etat Patient | `ETAT_PATIENT` | `responses_etat_patient` |
+| FAST | `FAST` | `responses_fast` |
+| ALDA | `ALDA` | `responses_alda` |
+
+---
+
+## Annual Evaluation Visit (70 questionnaires)
+
+Annual visits include ALL questionnaires from Biannual (25) PLUS additional questionnaires from Initial evaluation modules.
+
+### Additional Auto Module - ETAT (7 questionnaires) - SHARED TABLES
+
+| Questionnaire | Code | Table |
+|--------------|------|-------|
+| EQ-5D-5L | `EQ5D5L` | `responses_eq5d5l` |
+| PRISE-M | `PRISE_M` | `responses_prise_m` |
+| STAI-YA | `STAI_YA` | `responses_stai_ya` |
+| MARS | `MARS` | `responses_mars` |
+| MAThyS | `MATHYS` | `responses_mathys` |
+| PSQI | `PSQI` | `responses_psqi` |
+| Epworth | `EPWORTH` | `responses_epworth` |
+
+### Additional Neuropsy Module - SHARED TABLES
+
+| Questionnaire | Code | Table |
+|--------------|------|-------|
+| CVLT | `CVLT` | `responses_cvlt` |
+| MEM3 Spatial | `MEM3_SPATIAL` | `responses_wais3_mem3_spatial` |
+| TMT | `TMT` | `responses_tmt` |
+| Stroop | `STROOP` | `responses_stroop` |
+| Fluences Verbales | `FLUENCES_VERBALES` | `responses_fluences_verbales` |
+| COBRA | `COBRA` | `responses_cobra` |
+| CPT-3 | `CPT3` | `responses_cpt3` |
+| SCIP | `SCIP` | `responses_scip` |
+| Test Commissions | `TEST_COMMISSIONS` | `responses_test_commissions` |
+| WAIS-IV/III tests | Various | Various `responses_wais*` tables |
+
+### Additional C-SSRS & SIS - SHARED TABLES
+
+| Questionnaire | Code | Table |
+|--------------|------|-------|
+| C-SSRS | `CSSRS` | `responses_cssrs` |
+| SIS | `SIS` | `responses_sis` |
+
+### Additional Social Module - SHARED TABLE
+
+| Questionnaire | Code | Table |
+|--------------|------|-------|
+| Social Evaluation | `SOCIAL` | `responses_social` |
+
+---
+
+## Shared Table Rules
+
+### One Response Per Visit
+All tables have `visit_id` as UNIQUE constraint. Each visit creates a new response row in the shared table.
+
+### Longitudinal Tracking
+Query all responses for a patient across visits:
+```sql
+SELECT * FROM responses_madrs
+WHERE patient_id = ?
+ORDER BY created_at;
+```
+
+### Cross-Visit Comparison
+Shared tables enable longitudinal analysis (e.g., MADRS score trends over time).
+
+---
+
+## Service Layer Mapping
+
+| Visit Type | Service File |
+|------------|-------------|
+| Screening | `lib/services/bipolar-screening.service.ts` |
+| Initial | `lib/services/bipolar-initial.service.ts` |
+| Biannual/Annual | `lib/services/bipolar-followup.service.ts` |
+
+---
+
+## RPC Functions
+
+| Function | Purpose |
+|----------|---------|
+| `get_visit_detail_data(visit_id)` | Returns completion status for all questionnaires |
+| `get_professional_dashboard_data(...)` | Aggregates completion percentages per visit |
+| `get_patient_profile_data(...)` | Patient-level completion tracking |

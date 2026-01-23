@@ -1,0 +1,620 @@
+---
+description: Application-wide standard for questionnaire creation, maintenance, and validation. Reference model (etalon) for implementing, refactoring, or validating questionnaires.
+alwaysApply: true
+---
+
+# eFondaMental Questionnaire Standard
+
+This document defines the authoritative standard for creating, maintaining, and validating questionnaires across the entire application. Follow these rules to ensure code clarity, consistency, and long-term maintainability.
+
+---
+
+## 1. File Organization
+
+### 1.1 Directory Structure
+
+Each questionnaire MUST be isolated in its own file within the appropriate module:
+
+```
+lib/questionnaires/
+├── bipolar/
+│   ├── index.ts                    # Re-exports all modules
+│   ├── screening/
+│   │   ├── index.ts
+│   │   ├── auto/
+│   │   │   ├── index.ts
+│   │   │   ├── asrm.ts             # One file per questionnaire
+│   │   │   ├── mdq.ts
+│   │   │   └── qids.ts
+│   │   └── medical/
+│   │       ├── index.ts
+│   │       ├── diagnostic.ts
+│   │       └── orientation.ts
+│   ├── initial/
+│   │   ├── nurse/
+│   │   ├── thymic/
+│   │   ├── auto/
+│   │   │   ├── etat/               # Submodules for grouped questionnaires
+│   │   │   └── traits/
+│   │   ├── medical/
+│   │   ├── neuropsy/
+│   │   └── social/
+│   ├── followup/
+│   │   ├── dsm5/
+│   │   ├── suicide/
+│   │   └── soin-suivi/
+│   └── nurse/                      # Shared across visit types
+└── schizophrenia/
+    └── [similar structure]
+```
+
+### 1.2 Naming Conventions
+
+| Element | Convention | Example |
+|---------|------------|---------|
+| File name | kebab-case | `blood-pressure.ts` |
+| Type prefix | PascalCase with pathology | `BipolarMadrsResponse` |
+| Question constant | UPPER_SNAKE_CASE | `MADRS_QUESTIONS` |
+| Definition constant | UPPER_SNAKE_CASE | `MADRS_DEFINITION` |
+| Question ID | lowercase with underscores | `q1`, `rad_epactuel` |
+| Scoring function | camelCase with prefix | `scoreMadrs()`, `interpretMadrs()` |
+
+### 1.3 Index Files
+
+Each directory MUST have an `index.ts` that exports all questionnaires:
+
+```typescript
+// lib/questionnaires/bipolar/initial/thymic/index.ts
+export * from './madrs';
+export * from './ymrs';
+export * from './cgi';
+export * from './egf';
+export * from './alda';
+export * from './etat-patient';
+export * from './fast';
+```
+
+---
+
+## 2. Questionnaire File Structure
+
+Every questionnaire file MUST follow this exact structure in order:
+
+```typescript
+// 1. Imports
+import { Question, QuestionnaireDefinition } from '@/lib/questionnaires/types';
+
+// 2. Response Type (matches database schema)
+export interface BipolarMadrsResponse {
+  id: string;
+  visit_id: string;
+  patient_id: string;
+  q1: number;
+  q2: number;
+  // ... all question fields
+  total_score?: number;
+  interpretation?: string | null;
+  completed_by?: string;
+  completed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// 3. Insert Type (for database operations)
+export type BipolarMadrsResponseInsert = Omit<
+  BipolarMadrsResponse,
+  'id' | 'total_score' | 'interpretation' | 'completed_at' | 'created_at' | 'updated_at'
+>;
+
+// 4. Questions Array
+export const MADRS_QUESTIONS: Question[] = [
+  {
+    id: 'q1',
+    text: 'Apparent Sadness',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 0, label: 'No sadness', score: 0 },
+      { code: 1, label: '', score: 1 },
+      { code: 2, label: 'Looks dispirited but does brighten up without difficulty', score: 2 },
+      // ... all options
+    ],
+  },
+  // ... all questions
+];
+
+// 5. Scoring Function
+export function scoreMadrs(responses: BipolarMadrsResponseInsert): number {
+  const items = [
+    responses.q1, responses.q2, responses.q3, responses.q4, responses.q5,
+    responses.q6, responses.q7, responses.q8, responses.q9, responses.q10,
+  ];
+  return items.reduce((sum, val) => sum + (val ?? 0), 0);
+}
+
+// 6. Interpretation Function
+export function interpretMadrs(totalScore: number): string {
+  if (totalScore <= 6) return 'Normal/Symptom absent';
+  if (totalScore <= 19) return 'Mild depression';
+  if (totalScore <= 34) return 'Moderate depression';
+  return 'Severe depression';
+}
+
+// 7. Questionnaire Definition
+export const MADRS_DEFINITION: QuestionnaireDefinition = {
+  id: 'madrs',
+  code: 'MADRS',
+  title: 'Montgomery-Asberg Depression Rating Scale',
+  description: 'Clinician-rated scale for depression severity',
+  questions: MADRS_QUESTIONS,
+  scoringFunction: scoreMadrs,
+  interpretationFunction: interpretMadrs,
+};
+```
+
+---
+
+## 3. Question Structure
+
+### 3.1 Question Interface
+
+```typescript
+export interface Question {
+  id: string;                          // Unique identifier within questionnaire
+  text: string;                        // Question text (French)
+  type: QuestionType;                  // Input type
+  required: boolean;                   // Validation requirement
+  options?: QuestionOption[];          // For choice questions
+  min?: number;                        // For number inputs
+  max?: number;                        // For number inputs
+  unit?: string;                       // For measurements (kg, cm, etc.)
+  placeholder?: string;                // Input placeholder
+  display_if?: DisplayCondition;       // Conditional display logic
+  section?: string;                    // Visual grouping
+  subsection?: string;                 // Nested grouping
+  help_text?: string;                  // Tooltip/help content
+}
+```
+
+### 3.2 Question Types
+
+| Type | Usage | Options Required |
+|------|-------|------------------|
+| `single_choice` | Radio buttons | Yes |
+| `multiple_choice` | Checkboxes | Yes |
+| `number` | Numeric input | No |
+| `text` | Short text | No |
+| `textarea` | Long text | No |
+| `date` | Date picker | No |
+| `time` | Time picker | No |
+| `boolean` | Yes/No toggle | No |
+| `scale` | Slider/range | No (use min/max) |
+
+### 3.3 Question Options
+
+```typescript
+export interface QuestionOption {
+  code: number | string;    // Value stored in database
+  label: string;            // Display text
+  score?: number;           // Scoring value (if different from code)
+  exclusive?: boolean;      // For "None of the above" options
+}
+```
+
+### 3.4 Conditional Display
+
+```typescript
+// Simple condition
+display_if: { field: 'q1', operator: 'equals', value: 1 }
+
+// Multiple conditions (AND)
+display_if: {
+  conditions: [
+    { field: 'q1', operator: 'equals', value: 1 },
+    { field: 'q2', operator: 'greaterThan', value: 0 },
+  ],
+  logic: 'AND'
+}
+
+// Operators: equals, notEquals, greaterThan, lessThan, contains, in
+```
+
+---
+
+## 4. Scoring Functions
+
+### 4.1 Simple Sum Scoring
+
+```typescript
+export function scoreAsrm(responses: AsrmResponseInsert): number {
+  return [responses.q1, responses.q2, responses.q3, responses.q4, responses.q5]
+    .reduce((sum, val) => sum + (val ?? 0), 0);
+}
+```
+
+### 4.2 Subscale Scoring
+
+```typescript
+export function scoreFast(responses: FastResponseInsert): FastScores {
+  return {
+    autonomy: sum([responses.q1, responses.q2, responses.q3, responses.q4]),
+    occupational: sum([responses.q5, responses.q6, responses.q7, responses.q8, responses.q9]),
+    cognitive: sum([responses.q10, responses.q11, responses.q12, responses.q13, responses.q14]),
+    financial: sum([responses.q15, responses.q16]),
+    interpersonal: sum([responses.q17, responses.q18, responses.q19, responses.q20, responses.q21]),
+    leisure: sum([responses.q22, responses.q23, responses.q24]),
+    total: sum(Object.values(responses).filter(v => typeof v === 'number')),
+  };
+}
+```
+
+### 4.3 Reverse Scoring
+
+```typescript
+const REVERSE_ITEMS = ['q1', 'q6', 'q7', 'q10', 'q11', 'q15', 'q16', 'q19', 'q20'];
+
+export function scoreStaiYa(responses: StaiYaResponseInsert): number {
+  let total = 0;
+  for (let i = 1; i <= 20; i++) {
+    const key = `q${i}` as keyof StaiYaResponseInsert;
+    const value = responses[key] as number;
+    total += REVERSE_ITEMS.includes(key) ? (5 - value) : value;
+  }
+  return total;
+}
+```
+
+### 4.4 Normative Scoring (with external norms)
+
+```typescript
+import { CVLT_NORMS } from '@/lib/constants/cvlt-norms';
+
+export function scoreCvlt(
+  responses: CvltResponseInsert,
+  patientAge: number,
+  patientSex: 'M' | 'F',
+  yearsOfEducation: number
+): CvltScores {
+  const normGroup = getNormGroup(patientAge, patientSex, yearsOfEducation);
+  const norms = CVLT_NORMS[normGroup];
+  
+  return {
+    total_1_5: responses.trial_1 + responses.trial_2 + responses.trial_3 + 
+               responses.trial_4 + responses.trial_5,
+    total_1_5_zscore: calculateZScore(total_1_5, norms.total_1_5),
+    // ... other scores
+  };
+}
+```
+
+---
+
+## 5. Service Layer
+
+### 5.1 Service File Location
+
+| Domain | Service File |
+|--------|-------------|
+| Bipolar Screening | `lib/services/bipolar-screening.service.ts` |
+| Bipolar Initial | `lib/services/bipolar-initial.service.ts` |
+| Bipolar Followup | `lib/services/bipolar-followup.service.ts` |
+| Hetero-rated | `lib/services/questionnaire-hetero.service.ts` |
+| DSM5 | `lib/services/questionnaire-dsm5.service.ts` |
+| Traits | `lib/services/questionnaire-traits.service.ts` |
+| State (Etat) | `lib/services/questionnaire-etat.service.ts` |
+| Social | `lib/services/questionnaire-social.service.ts` |
+| Nurse | `lib/services/bipolar-nurse.service.ts` |
+
+### 5.2 Standard Get Function
+
+```typescript
+export async function getMadrsResponse(visitId: string): Promise<BipolarMadrsResponse | null> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('responses_madrs')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') return null; // Not found
+    throw error;
+  }
+  
+  return data;
+}
+```
+
+### 5.3 Standard Save Function
+
+```typescript
+export async function saveMadrsResponse(
+  response: BipolarMadrsResponseInsert
+): Promise<BipolarMadrsResponse> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  // Calculate scores
+  const totalScore = scoreMadrs(response);
+  const interpretation = interpretMadrs(totalScore);
+  
+  const { data, error } = await supabase
+    .from('responses_madrs')
+    .upsert({
+      ...response,
+      total_score: totalScore,
+      interpretation,
+      completed_by: user?.id,
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data;
+}
+```
+
+### 5.4 Generic Service Pattern (for many questionnaires)
+
+```typescript
+// Table mapping constant
+export const BIPOLAR_INITIAL_TABLES: Record<string, string> = {
+  'MADRS': 'responses_madrs',
+  'YMRS': 'responses_ymrs',
+  'CGI': 'responses_cgi',
+  // ...
+};
+
+// Generic get function
+export async function getBipolarInitialResponse<T>(
+  visitId: string,
+  questionnaireCode: string
+): Promise<T | null> {
+  const tableName = BIPOLAR_INITIAL_TABLES[questionnaireCode];
+  if (!tableName) throw new Error(`Unknown questionnaire: ${questionnaireCode}`);
+  
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from(tableName)
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error?.code === 'PGRST116') return null;
+  if (error) throw error;
+  return data as T;
+}
+
+// Generic save function
+export async function saveBipolarInitialResponse<T>(
+  response: any,
+  questionnaireCode: string
+): Promise<T> {
+  const tableName = BIPOLAR_INITIAL_TABLES[questionnaireCode];
+  if (!tableName) throw new Error(`Unknown questionnaire: ${questionnaireCode}`);
+  
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  const { data, error } = await supabase
+    .from(tableName)
+    .upsert({
+      ...response,
+      completed_by: user?.id,
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data as T;
+}
+```
+
+---
+
+## 6. Database Layer
+
+### 6.1 Table Naming
+
+Tables MUST be named: `responses_<questionnaire_code>` in lowercase.
+
+Examples: `responses_madrs`, `responses_ymrs`, `responses_dsm5_humeur`
+
+### 6.2 Required Columns
+
+Every response table MUST include:
+
+```sql
+CREATE TABLE responses_<name> (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  visit_id UUID REFERENCES visits(id) ON DELETE CASCADE NOT NULL UNIQUE,
+  patient_id UUID REFERENCES patients(id) ON DELETE CASCADE NOT NULL,
+  
+  -- Question columns here
+  
+  -- Computed scores (if applicable)
+  total_score INTEGER,
+  interpretation TEXT,
+  
+  -- Metadata
+  completed_by UUID REFERENCES user_profiles(id),
+  completed_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 6.3 UNIQUE Constraint on visit_id
+
+**CRITICAL**: The `visit_id` column MUST have a UNIQUE constraint to enable upsert operations:
+
+```sql
+visit_id UUID REFERENCES visits(id) ON DELETE CASCADE NOT NULL UNIQUE
+```
+
+### 6.4 Row Level Security (RLS)
+
+Every table MUST have RLS enabled with these policies:
+
+```sql
+ALTER TABLE responses_<name> ENABLE ROW LEVEL SECURITY;
+
+-- Patient policies
+CREATE POLICY "Patients view own responses" ON responses_<name>
+  FOR SELECT USING (auth.uid() = patient_id);
+
+CREATE POLICY "Patients insert own responses" ON responses_<name>
+  FOR INSERT WITH CHECK (auth.uid() = patient_id);
+
+CREATE POLICY "Patients update own responses" ON responses_<name>
+  FOR UPDATE USING (auth.uid() = patient_id);
+
+-- Professional policies
+CREATE POLICY "Professionals view all responses" ON responses_<name>
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() 
+            AND role IN ('healthcare_professional', 'manager', 'administrator'))
+  );
+
+CREATE POLICY "Professionals insert responses" ON responses_<name>
+  FOR INSERT WITH CHECK (
+    EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() 
+            AND role IN ('healthcare_professional', 'manager', 'administrator'))
+  );
+
+CREATE POLICY "Professionals update responses" ON responses_<name>
+  FOR UPDATE USING (
+    EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() 
+            AND role IN ('healthcare_professional', 'manager', 'administrator'))
+  );
+```
+
+### 6.5 Computed Columns (optional)
+
+For simple score calculations, use database-level computed columns:
+
+```sql
+total_score INTEGER GENERATED ALWAYS AS (q1 + q2 + q3 + q4 + q5) STORED
+```
+
+---
+
+## 7. RPC Functions
+
+### 7.1 Visit Detail Data
+
+The `get_visit_detail_data(p_visit_id UUID)` function must include the questionnaire in its completion tracking:
+
+```sql
+-- Add to the appropriate visit type section
+'<questionnaire_code>', (SELECT id FROM responses_<table> WHERE visit_id = p_visit_id),
+```
+
+### 7.2 Dashboard Progress
+
+The `get_professional_dashboard_data` function must count the questionnaire in visit completion calculations.
+
+---
+
+## 8. Frontend Integration
+
+### 8.1 Server Actions
+
+Add questionnaire to `app/professional/questionnaires/actions.ts`:
+
+```typescript
+case '<QUESTIONNAIRE_CODE>':
+  result = await save<Name>Response({
+    visit_id: visitId,
+    patient_id: patientId,
+    ...responses,
+  } as <Name>ResponseInsert);
+  break;
+```
+
+### 8.2 Visit Modules
+
+Register questionnaire in `lib/services/visit.service.ts` → `getVisitModules()`:
+
+```typescript
+questionnaires: [
+  MADRS_DEFINITION,
+  YMRS_DEFINITION,
+  <NEW>_DEFINITION,  // Add here
+]
+```
+
+### 8.3 Score Display
+
+If questionnaire has scores, update `components/score-display.tsx`:
+
+```typescript
+if (code === '<QUESTIONNAIRE_CODE>') {
+  if (data.total_score >= SEVERE_THRESHOLD) return 'error';
+  if (data.total_score >= MODERATE_THRESHOLD) return 'warning';
+  return 'success';
+}
+```
+
+---
+
+## 9. Validation Checklist
+
+Before considering a questionnaire complete, verify:
+
+- [ ] **File**: Isolated in own `.ts` file with correct naming
+- [ ] **Types**: Response and Insert types defined
+- [ ] **Questions**: All questions defined with correct types
+- [ ] **Scoring**: Scoring function(s) implemented if applicable
+- [ ] **Interpretation**: Interpretation function implemented if applicable
+- [ ] **Definition**: QuestionnaireDefinition exported
+- [ ] **Index**: Exported from module index.ts
+- [ ] **Migration**: Table created with `visit_id` UNIQUE constraint
+- [ ] **RLS**: All six policies created (3 patient + 3 professional)
+- [ ] **Service**: Get and Save functions in appropriate service file
+- [ ] **Action**: Case added to server action switch
+- [ ] **Visit Module**: Definition added to `getVisitModules()`
+- [ ] **RPC**: Added to `get_visit_detail_data` completion tracking
+- [ ] **Tests**: Unit tests for scoring functions
+
+---
+
+## 10. Common Patterns Reference
+
+### 10.1 Conditional Questionnaire (e.g., Fagerstrom only if smoker)
+
+```typescript
+// In questionnaire definition
+display_if: { field: 'smoking_status', operator: 'equals', value: 'current_smoker' }
+
+// In RPC function
+CASE WHEN (SELECT smoking_status FROM responses_tobacco WHERE visit_id = p_visit_id) = 'current_smoker'
+     THEN (SELECT id FROM responses_fagerstrom WHERE visit_id = p_visit_id)
+     ELSE 'not_applicable'
+END
+```
+
+### 10.2 Patient-Level Questionnaire (no visit_id)
+
+Some questionnaires are patient-level (not visit-specific):
+
+```sql
+CREATE TABLE responses_non_pharmacologic (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  patient_id UUID REFERENCES patients(id) ON DELETE CASCADE NOT NULL UNIQUE,
+  -- No visit_id column
+  -- ...
+);
+```
+
+### 10.3 Multi-Visit Shared Table
+
+When the same questionnaire is used across multiple visit types, use a single table:
+
+```typescript
+// Same table for initial, biannual, annual
+'MADRS': 'responses_madrs'  // Shared across all visits
+```
+
+Each visit creates a new row; longitudinal queries use `patient_id` with `ORDER BY created_at`.
