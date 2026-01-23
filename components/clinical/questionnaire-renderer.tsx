@@ -602,7 +602,9 @@ export function QuestionnaireRenderer({
       }
 
       // Compute MEM-III Spatial Span scores
-      if (questionnaire?.code === 'MEM3_SPATIAL_FR') {
+      if (questionnaire?.code === 'MEM3_SPATIAL' || 
+          questionnaire?.code === 'MEM3_SPATIAL_FR' || 
+          questionnaire?.code === 'WAIS3_MEM3_SPATIAL_FR') {
         const mspatAge = Number(prev.patient_age);
 
         // Update item notes only when both trials are answered (independent of age)
