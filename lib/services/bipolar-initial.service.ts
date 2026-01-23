@@ -8,11 +8,13 @@ import {
   saveAldaResponse,
   saveEtatPatientResponse,
   saveFastResponse,
+  saveDivaResponse,
   type MadrsResponseInsert,
   type YmrsResponseInsert,
   type AldaResponseInsert,
   type EtatPatientResponseInsert,
-  type FastResponseInsert
+  type FastResponseInsert,
+  type DivaResponseInsert
 } from '@/lib/services/questionnaire-hetero.service';
 import {
   saveDsm5ComorbidResponse
@@ -254,6 +256,13 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
   // Route through the DSM5 service which includes a safe retry strategy.
   if (questionnaireCode === 'DSM5_COMORBID') {
     return await saveDsm5ComorbidResponse(response as any as Dsm5ComorbidResponseInsert) as any as T;
+  }
+
+  // DIVA needs special handling because the database has BOOLEAN columns for symptom
+  // and criteria fields, while the application submits 'oui'/'non' strings.
+  // Route through saveDivaResponse which handles the string-to-boolean conversion.
+  if (questionnaireCode === 'DIVA') {
+    return await saveDivaResponse(response as any as DivaResponseInsert) as any as T;
   }
 
   // CTQ needs to calculate subscale scores and severity interpretations

@@ -282,6 +282,8 @@ function questionnaireCodeToBipolarKey(code: string): string | null {
     'DSM5_PSYCHOTIC': 'DSM5_PSYCHOTIC',
     'DSM5_COMORBID': 'DSM5_COMORBID',
     'DIVA': 'DIVA',
+    // Legacy alias still used by some routes/definitions
+    'DIVA_2': 'DIVA',
     'DIVA_2_FR': 'DIVA',
     'FAMILY_HISTORY': 'FAMILY_HISTORY',
     'CSSRS': 'CSSRS',

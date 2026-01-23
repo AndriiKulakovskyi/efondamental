@@ -760,7 +760,10 @@ export async function getDivaResponse(
       'a2e_adult', 'a2e_childhood', 'a2f_adult', 'a2f_childhood',
       'a2g_adult', 'a2g_childhood', 'a2h_adult', 'a2h_childhood',
       'a2i_adult', 'a2i_childhood',
-      // Criteria fields
+      // Criteria fields (support both legacy and current column naming)
+      'criteria_a_inattention_child_gte6', 'criteria_hi_hyperactivity_child_gte6',
+      'criteria_a_inattention_adult_gte6', 'criteria_hi_hyperactivity_adult_gte6',
+      // Older/alternate naming still present in some environments
       'criteria_a_inattention_gte6', 'criteria_a_hyperactivity_gte6',
       'criteria_b_lifetime_persistence', 'criteria_cd_impairment_childhood',
       'criteria_cd_impairment_adult', 'criteria_e_better_explained'
@@ -816,7 +819,10 @@ export async function saveDivaResponse(
     'a2e_adult', 'a2e_childhood', 'a2f_adult', 'a2f_childhood',
     'a2g_adult', 'a2g_childhood', 'a2h_adult', 'a2h_childhood',
     'a2i_adult', 'a2i_childhood',
-    // Criteria fields
+    // Criteria fields (support both legacy and current column naming)
+    'criteria_a_inattention_child_gte6', 'criteria_hi_hyperactivity_child_gte6',
+    'criteria_a_inattention_adult_gte6', 'criteria_hi_hyperactivity_adult_gte6',
+    // Older/alternate naming still present in some environments
     'criteria_a_inattention_gte6', 'criteria_a_hyperactivity_gte6',
     'criteria_b_lifetime_persistence', 'criteria_cd_impairment_childhood',
     'criteria_cd_impairment_adult', 'criteria_e_better_explained'

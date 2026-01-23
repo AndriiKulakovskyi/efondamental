@@ -1579,7 +1579,9 @@ export const DIVA_QUESTIONS: Question[] = [
 
 export const DIVA_DEFINITION: QuestionnaireDefinition = {
   id: 'diva',
-  code: 'DIVA_2',
+  // Canonical code used across RPC/statuses and service routing.
+  // Keep legacy aliases (e.g. DIVA_2, DIVA_2_FR) handled in routing code.
+  code: 'DIVA',
   title: 'DIVA 2.0 - Entretien Diagnostique pour le TDAH chez l\'adulte',
   description: 'Évaluation clinique structurée des critères du TDAH (DSM-IV) à l\'âge adulte et dans l\'enfance.',
   questions: DIVA_QUESTIONS,

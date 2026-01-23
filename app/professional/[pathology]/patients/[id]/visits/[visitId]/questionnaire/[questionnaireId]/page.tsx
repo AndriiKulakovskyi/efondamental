@@ -320,6 +320,7 @@ function questionnaireCodeToBipolarKey(code: string): string | null {
     'DSM5_HUMEUR_FR': 'DSM5_HUMEUR',
     'DSM5_PSYCHOTIC_FR': 'DSM5_PSYCHOTIC',
     'DSM5_COMORBID_FR': 'DSM5_COMORBID',
+    'DIVA_2': 'DIVA',
     'DIVA_2_FR': 'DIVA',
     'FAMILY_HISTORY_FR': 'FAMILY_HISTORY',
     'CSSRS_FR': 'CSSRS',
@@ -470,6 +471,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ETAT_PATIENT_DEFINITION.code) questionnaire = ETAT_PATIENT_DEFINITION;
   else if (code === FAST_DEFINITION.code) questionnaire = FAST_DEFINITION;
   else if (code === DIVA_DEFINITION.code) questionnaire = DIVA_DEFINITION;
+  else if (code === 'DIVA_2') questionnaire = DIVA_DEFINITION;
   else if (code === FAMILY_HISTORY_DEFINITION.code) questionnaire = FAMILY_HISTORY_DEFINITION;
   else if (code === CSSRS_DEFINITION.code) questionnaire = CSSRS_DEFINITION;
   else if (code === ISA_DEFINITION.code) questionnaire = ISA_DEFINITION;
@@ -615,6 +617,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ETAT_PATIENT_DEFINITION.code) existingResponse = await getEtatPatientResponse(visitId);
   else if (code === FAST_DEFINITION.code) existingResponse = await getFastResponse(visitId);
   else if (code === DIVA_DEFINITION.code) existingResponse = await getDivaResponse(visitId);
+  else if (code === 'DIVA_2') existingResponse = await getDivaResponse(visitId);
   else if (code === FAMILY_HISTORY_DEFINITION.code) existingResponse = await getFamilyHistoryResponse(visitId);
   else if (code === CSSRS_DEFINITION.code) existingResponse = await getCssrsResponse(visitId);
   else if (code === ISA_DEFINITION.code) existingResponse = await getIsaResponse(visitId);
