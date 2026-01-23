@@ -248,16 +248,36 @@ describe('Bipolar Screening Integration Tests', () => {
     });
 
     it('should correctly interpret QIDS severity levels', () => {
-      expect(interpretQidsScore(0)).toBe('Pas de depression');
-      expect(interpretQidsScore(5)).toBe('Pas de depression');
-      expect(interpretQidsScore(6)).toBe('Depression legere');
-      expect(interpretQidsScore(10)).toBe('Depression legere');
-      expect(interpretQidsScore(11)).toBe('Depression moderee');
-      expect(interpretQidsScore(15)).toBe('Depression moderee');
-      expect(interpretQidsScore(16)).toBe('Depression severe');
-      expect(interpretQidsScore(20)).toBe('Depression severe');
-      expect(interpretQidsScore(21)).toBe('Depression tres severe');
-      expect(interpretQidsScore(27)).toBe('Depression tres severe');
+      expect(interpretQidsScore(0)).toBe(
+        'Absence de dépression. État thymique normal, sans symptomatologie dépressive cliniquement significative.'
+      );
+      expect(interpretQidsScore(5)).toBe(
+        'Absence de dépression. État thymique normal, sans symptomatologie dépressive cliniquement significative.'
+      );
+      expect(interpretQidsScore(6)).toBe(
+        "Dépression légère. Symptômes dépressifs présents mais d'intensité modérée. Impact fonctionnel limité. Surveillance recommandée."
+      );
+      expect(interpretQidsScore(10)).toBe(
+        "Dépression légère. Symptômes dépressifs présents mais d'intensité modérée. Impact fonctionnel limité. Surveillance recommandée."
+      );
+      expect(interpretQidsScore(11)).toBe(
+        'Dépression modérée. Symptomatologie dépressive notable avec retentissement sur le fonctionnement quotidien. Prise en charge thérapeutique indiquée.'
+      );
+      expect(interpretQidsScore(15)).toBe(
+        'Dépression modérée. Symptomatologie dépressive notable avec retentissement sur le fonctionnement quotidien. Prise en charge thérapeutique indiquée.'
+      );
+      expect(interpretQidsScore(16)).toBe(
+        'Dépression sévère. Symptômes dépressifs importants avec retentissement fonctionnel marqué. Intervention thérapeutique active nécessaire.'
+      );
+      expect(interpretQidsScore(20)).toBe(
+        'Dépression sévère. Symptômes dépressifs importants avec retentissement fonctionnel marqué. Intervention thérapeutique active nécessaire.'
+      );
+      expect(interpretQidsScore(21)).toBe(
+        'Dépression très sévère. Symptomatologie dépressive majeure avec altération fonctionnelle importante. Prise en charge intensive urgente recommandée.'
+      );
+      expect(interpretQidsScore(27)).toBe(
+        'Dépression très sévère. Symptomatologie dépressive majeure avec altération fonctionnelle importante. Prise en charge intensive urgente recommandée.'
+      );
     });
 
     it('should fetch saved QIDS response', async () => {
@@ -858,15 +878,15 @@ describe('Bipolar Screening Integration Tests', () => {
       
       // Check that interpretation is consistent with score
       if (score <= 5) {
-        expect(interp).toContain('Pas de');
+        expect(interp).toContain('Absence de dépression');
       } else if (score <= 10) {
-        expect(interp).toContain('legere');
+        expect(interp).toContain('Dépression légère');
       } else if (score <= 15) {
-        expect(interp).toContain('moderee');
+        expect(interp).toContain('Dépression modérée');
       } else if (score <= 20) {
-        expect(interp).toContain('severe');
+        expect(interp).toContain('Dépression sévère');
       } else {
-        expect(interp).toContain('tres severe');
+        expect(interp).toContain('Dépression très sévère');
       }
     });
   });

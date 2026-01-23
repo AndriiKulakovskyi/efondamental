@@ -274,6 +274,7 @@ import {
   questionnaireUsesPatientSex,
   questionnaireUsesAgeField
 } from "@/lib/utils/patient-demographics";
+import { normalizeResponseForQuestionnaireForm } from "@/lib/utils/questionnaire-prefill";
 
 // Map questionnaire codes to BIPOLAR_INITIAL_TABLES keys
 // Used to route data fetching to bipolar_* tables for bipolar initial evaluations
@@ -712,6 +713,7 @@ export default async function ProfessionalQuestionnairePage({
   if (existingResponse) {
     // Destructure to remove metadata if needed, but passing everything is usually fine as extra keys are ignored by Renderer if not in questions list.
     initialResponses = { ...existingResponse };
+    initialResponses = normalizeResponseForQuestionnaireForm(questionnaire, initialResponses) as Record<string, any>;
   }
   
   // Convert boolean fields to 'yes'/'no' strings for SLEEP_APNEA questionnaire

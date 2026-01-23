@@ -156,32 +156,54 @@ describe('QIDS-SR16 Scoring Functions', () => {
 
   describe('interpretQidsScore', () => {
     it('should interpret score <=5 as none', () => {
-      expect(interpretQidsScore(5)).toBe('Pas de depression');
+      expect(interpretQidsScore(5)).toBe(
+        'Absence de dépression. État thymique normal, sans symptomatologie dépressive cliniquement significative.'
+      );
     });
 
     it('should interpret score 6-10 as mild', () => {
-      expect(interpretQidsScore(8)).toBe('Depression legere');
+      expect(interpretQidsScore(8)).toBe(
+        "Dépression légère. Symptômes dépressifs présents mais d'intensité modérée. Impact fonctionnel limité. Surveillance recommandée."
+      );
     });
 
     it('should interpret score 11-15 as moderate', () => {
-      expect(interpretQidsScore(13)).toBe('Depression moderee');
+      expect(interpretQidsScore(13)).toBe(
+        'Dépression modérée. Symptomatologie dépressive notable avec retentissement sur le fonctionnement quotidien. Prise en charge thérapeutique indiquée.'
+      );
     });
 
     it('should interpret score 16-20 as severe', () => {
-      expect(interpretQidsScore(18)).toBe('Depression severe');
+      expect(interpretQidsScore(18)).toBe(
+        'Dépression sévère. Symptômes dépressifs importants avec retentissement fonctionnel marqué. Intervention thérapeutique active nécessaire.'
+      );
     });
 
     it('should interpret score >20 as very severe', () => {
-      expect(interpretQidsScore(24)).toBe('Depression tres severe');
+      expect(interpretQidsScore(24)).toBe(
+        'Dépression très sévère. Symptomatologie dépressive majeure avec altération fonctionnelle importante. Prise en charge intensive urgente recommandée.'
+      );
     });
 
     it('should handle boundary values correctly', () => {
-      expect(interpretQidsScore(10)).toBe('Depression legere');
-      expect(interpretQidsScore(11)).toBe('Depression moderee');
-      expect(interpretQidsScore(15)).toBe('Depression moderee');
-      expect(interpretQidsScore(16)).toBe('Depression severe');
-      expect(interpretQidsScore(20)).toBe('Depression severe');
-      expect(interpretQidsScore(21)).toBe('Depression tres severe');
+      expect(interpretQidsScore(10)).toBe(
+        "Dépression légère. Symptômes dépressifs présents mais d'intensité modérée. Impact fonctionnel limité. Surveillance recommandée."
+      );
+      expect(interpretQidsScore(11)).toBe(
+        'Dépression modérée. Symptomatologie dépressive notable avec retentissement sur le fonctionnement quotidien. Prise en charge thérapeutique indiquée.'
+      );
+      expect(interpretQidsScore(15)).toBe(
+        'Dépression modérée. Symptomatologie dépressive notable avec retentissement sur le fonctionnement quotidien. Prise en charge thérapeutique indiquée.'
+      );
+      expect(interpretQidsScore(16)).toBe(
+        'Dépression sévère. Symptômes dépressifs importants avec retentissement fonctionnel marqué. Intervention thérapeutique active nécessaire.'
+      );
+      expect(interpretQidsScore(20)).toBe(
+        'Dépression sévère. Symptômes dépressifs importants avec retentissement fonctionnel marqué. Intervention thérapeutique active nécessaire.'
+      );
+      expect(interpretQidsScore(21)).toBe(
+        'Dépression très sévère. Symptomatologie dépressive majeure avec altération fonctionnelle importante. Prise en charge intensive urgente recommandée.'
+      );
     });
   });
 
@@ -199,7 +221,9 @@ describe('QIDS-SR16 Scoring Functions', () => {
       // = 2 + 2 + 1 + 2 + 2 + 2 + 2 + 2 + 1 = 16
       expect(result.total_score).toBe(16);
       expect(result.severity).toBe('severe');
-      expect(result.interpretation).toBe('Depression severe');
+      expect(result.interpretation).toBe(
+        'Dépression sévère. Symptômes dépressifs importants avec retentissement fonctionnel marqué. Intervention thérapeutique active nécessaire.'
+      );
     });
   });
 });

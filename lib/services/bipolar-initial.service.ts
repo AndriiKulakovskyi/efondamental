@@ -166,9 +166,11 @@ export async function getBipolarInitialResponse<T extends BipolarQuestionnaireRe
     .eq('visit_id', visitId)
     .single();
 
-  if (error && error.code !== 'PGRST116') {
-    console.error(`Error fetching ${tableName}:`, error);
-    throw error;
+  if (error) {
+    if (error.code !== 'PGRST116') {
+      console.error(`Error fetching ${tableName}:`, error);
+      throw error;
+    }
   }
 
   return data as T | null;
@@ -1056,22 +1058,10 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
     return data as T;
   }
 
-  // Convert "oui"/"non" string values to boolean for database boolean columns
-  // This is needed because questionnaires use French string options but DB uses boolean
-  const convertedResponse = { ...response } as Record<string, unknown>;
-  for (const key of Object.keys(convertedResponse)) {
-    const value = convertedResponse[key];
-    if (value === 'oui') {
-      convertedResponse[key] = true;
-    } else if (value === 'non') {
-      convertedResponse[key] = false;
-    }
-  }
-
   const supabase = await createClient();
   const { data, error } = await supabase
     .from(tableName)
-    .upsert(convertedResponse, { onConflict: 'visit_id' })
+    .upsert(response, { onConflict: 'visit_id' })
     .select()
     .single();
 

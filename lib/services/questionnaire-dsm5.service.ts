@@ -159,29 +159,6 @@ export async function saveDsm5ComorbidResponse(
     delete (cleanResponse as any)[field];
   });
 
-  // Convert "oui"/"non" string values to boolean for boolean columns
-  const booleanFields = [
-    'anorexia_restrictive_amenorrhea',
-    'anorexia_restrictive_current',
-    'anorexia_bulimic_amenorrhea',
-    'anorexia_bulimic_current',
-    'bulimia_current',
-    'binge_eating_current',
-    'eating_unspecified_current',
-    'night_eating_current',
-    'diva_evaluated',
-    'panic_disorder_present'
-  ];
-  
-  booleanFields.forEach(field => {
-    const value = (cleanResponse as any)[field];
-    if (value === 'oui') {
-      (cleanResponse as any)[field] = true;
-    } else if (value === 'non') {
-      (cleanResponse as any)[field] = false;
-    }
-  });
-
   const { data, error } = await supabase
     .from('bipolar_dsm5_comorbid')
     .upsert(cleanResponse, { onConflict: 'visit_id' })
