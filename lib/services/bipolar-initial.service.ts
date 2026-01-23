@@ -389,6 +389,67 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
     return data as T;
   }
 
+  // WAIS3_DIGIT_SPAN needs to calculate all scores including totals, spans, and z-scores
+  if (questionnaireCode === 'WAIS3_DIGIT_SPAN') {
+    const { calculateWais3DigitSpanScores } = await import('./wais3-digit-span-scoring');
+    
+    const scores = calculateWais3DigitSpanScores({
+      patient_age: (response as any).patient_age || 35,
+      education_level: (response as any).education_level,
+      // Forward (Ordre Direct) - 8 items x 2 trials
+      mcod_1a: (response as any).mcod_1a,
+      mcod_1b: (response as any).mcod_1b,
+      mcod_2a: (response as any).mcod_2a,
+      mcod_2b: (response as any).mcod_2b,
+      mcod_3a: (response as any).mcod_3a,
+      mcod_3b: (response as any).mcod_3b,
+      mcod_4a: (response as any).mcod_4a,
+      mcod_4b: (response as any).mcod_4b,
+      mcod_5a: (response as any).mcod_5a,
+      mcod_5b: (response as any).mcod_5b,
+      mcod_6a: (response as any).mcod_6a,
+      mcod_6b: (response as any).mcod_6b,
+      mcod_7a: (response as any).mcod_7a,
+      mcod_7b: (response as any).mcod_7b,
+      mcod_8a: (response as any).mcod_8a,
+      mcod_8b: (response as any).mcod_8b,
+      // Backward (Ordre Inverse) - 7 items x 2 trials
+      mcoi_1a: (response as any).mcoi_1a,
+      mcoi_1b: (response as any).mcoi_1b,
+      mcoi_2a: (response as any).mcoi_2a,
+      mcoi_2b: (response as any).mcoi_2b,
+      mcoi_3a: (response as any).mcoi_3a,
+      mcoi_3b: (response as any).mcoi_3b,
+      mcoi_4a: (response as any).mcoi_4a,
+      mcoi_4b: (response as any).mcoi_4b,
+      mcoi_5a: (response as any).mcoi_5a,
+      mcoi_5b: (response as any).mcoi_5b,
+      mcoi_6a: (response as any).mcoi_6a,
+      mcoi_6b: (response as any).mcoi_6b,
+      mcoi_7a: (response as any).mcoi_7a,
+      mcoi_7b: (response as any).mcoi_7b
+    });
+    
+    const digitSpanResponse = {
+      ...response,
+      ...scores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(digitSpanResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving WAIS3_DIGIT_SPAN response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
   // WAIS4_DIGIT_SPAN needs to calculate all scores including item scores, section totals, empan, and standardized scores
   if (questionnaireCode === 'WAIS4_DIGIT_SPAN') {
     const { calculateDigitSpanScores } = await import('./wais4-digit-span-scoring');

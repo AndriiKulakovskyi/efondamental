@@ -470,9 +470,10 @@ export async function submitProfessionalQuestionnaireAction(
         
         // Neuropsy tables that have patient_age and years_of_education columns
         // Note: COBRA, SCIP, CPT3 do NOT have years_of_education in their tables
+        // Note: WAIS3_CPT2 is a data entry form for externally computed results, no patient_age column
         const neuropsyTables = [
           'CVLT', 'FLUENCES_VERBALES', 'MEM3_SPATIAL', 'STROOP', 'TMT',
-          'WAIS3_CODE_SYMBOLES', 'WAIS3_CPT2', 'WAIS3_DIGIT_SPAN', 'WAIS3_LEARNING', 'WAIS3_MATRICES', 'WAIS3_VOCABULAIRE',
+          'WAIS3_CODE_SYMBOLES', 'WAIS3_DIGIT_SPAN', 'WAIS3_LEARNING', 'WAIS3_MATRICES', 'WAIS3_VOCABULAIRE',
           'WAIS4_CODE', 'WAIS4_DIGIT_SPAN', 'WAIS4_LEARNING', 'WAIS4_MATRICES', 'WAIS4_SIMILITUDES'
         ];
         
