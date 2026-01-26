@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useMemo, useCallback, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { QuestionnaireRenderer } from "@/components/clinical/questionnaire-renderer";
 import { QuestionnaireProgressHeader } from "@/components/clinical/questionnaire-progress-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,9 +44,14 @@ export function QuestionnairePageClient({
   submitAction
 }: QuestionnairePageClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // Check if we should show the score page based on URL param (persists across revalidation)
+  const showScoreFromUrl = searchParams.get('submitted') === 'true';
+  
   const [error, setError] = useState<string | null>(null);
   const [submittedData, setSubmittedData] = useState<any>(existingData);
-  const [justSubmitted, setJustSubmitted] = useState(false);
+  const [justSubmitted, setJustSubmitted] = useState(showScoreFromUrl);
   
   // Stabilize initialResponses to prevent unnecessary re-initialization of the renderer
   const stableInitialResponses = useMemo(() => initialResponses, [initialResponses]);
@@ -121,10 +126,7 @@ export function QuestionnairePageClient({
         throw new Error(result.error || "Failed to submit");
       }
 
-      setSubmittedData(result.data);
-      setJustSubmitted(true);
-      
-      // If no scoring (Diagnostic/Orientation), redirect
+      // If no scoring (Diagnostic/Orientation), redirect immediately without showing score page
       const hasScoring = [
         'ASRM', 'QIDS_SR16', 'MDQ',
         'EQ5D5L', 'PRISE_M', 'STAI_YA', 'MARS', 'MATHYS', 'PSQI', 'EPWORTH',
@@ -135,13 +137,30 @@ export function QuestionnairePageClient({
         'WAIS3_MATRICES', 'WAIS3_MATRICES_FR',
         'SOCIAL',
         'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA',
-        'PANSS', 'CDSS', 'BARS', 'SUMD', 'AIMS', 'BARNES', 'SAS', 'PSP'
+        'PANSS', 'CDSS', 'BARS', 'SUMD', 'AIMS', 'BARNES', 'SAS', 'PSP',
+        'ISA_FOLLOWUP'
       ].includes(questionnaire.code);
 
+      console.log('[QuestionnairePageClient] Submit success:', {
+        code: questionnaire.code,
+        hasScoring,
+        willRedirect: !hasScoring
+      });
+
       if (!hasScoring) {
-         router.back();
-         router.refresh();
+        // No score page for this questionnaire - redirect back to visit
+        router.push(`/professional/${pathology}/patients/${patientId}/visits/${visitId}`);
+        return; // Exit early to prevent state updates that would be lost
       }
+
+      // For questionnaires with scoring, show the score page
+      // Use URL param to persist state across Next.js revalidation
+      setSubmittedData(result.data);
+      setJustSubmitted(true);
+      
+      // Navigate to same page with ?submitted=true to persist state across revalidation
+      const currentPath = window.location.pathname;
+      router.replace(`${currentPath}?submitted=true`);
 
     } catch (err) {
       setError("Une erreur est survenue lors de l'envoi du questionnaire.");
@@ -153,7 +172,9 @@ export function QuestionnairePageClient({
     router.refresh();
   };
 
-  if (justSubmitted && submittedData) {
+  // Show score page if we just submitted or if URL indicates submission (persists across revalidation)
+  // The showScoreFromUrl check ensures score page persists even after Next.js revalidates
+  if ((justSubmitted || showScoreFromUrl) && submittedData) {
     return (
       <div className="min-h-screen bg-[#FDFBFA]">
         <QuestionnaireProgressHeader

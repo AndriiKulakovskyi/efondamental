@@ -177,7 +177,7 @@ export async function saveIsaFollowupResponse(
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
-  // Compute scoring
+  // Compute scoring (application-computed, not database-generated)
   const scoring = scoreIsaFollowup({
     q1_life_worth: response.q1_life_worth,
     q2_wish_death: response.q2_wish_death,
@@ -195,6 +195,7 @@ export async function saveIsaFollowupResponse(
     .from('bipolar_followup_isa')
     .upsert({
       ...response,
+      total_score: scoring.total_score,
       risk_level: scoring.risk_level_label,
       interpretation: scoring.interpretation,
       completed_by: user.data.user?.id

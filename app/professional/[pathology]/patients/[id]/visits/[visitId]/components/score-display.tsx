@@ -284,6 +284,18 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'success';                   // No significant depressive syndrome
     }
 
+    if (code === 'ISA_FOLLOWUP') {
+      // ISA Followup: Total score 0-5 (sum of 5 binary questions)
+      // Risk levels: 0=minimal, 1=low, 2=moderate, 3-4=high, 5=very high
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 5) return 'error';     // Very high risk
+      if (score >= 3) return 'error';     // High risk
+      if (score >= 2) return 'warning';   // Moderate risk
+      if (score >= 1) return 'info';      // Low risk
+      return 'success';                   // Minimal risk
+    }
+
     if (code === 'BARS') {
       // BARS: Adherence percentage 0-100%
       const score = data.adherence_score;
@@ -636,6 +648,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && 'Résultats WAIS-IV Code, Symboles & IVT'}
               {code === 'PANSS' && 'Résultats PANSS'}
               {code === 'CDSS' && 'Résultats CDSS - Échelle de Calgary'}
+              {code === 'ISA_FOLLOWUP' && 'Résultats ISA - Intentionnalité Suicidaire Actuelle (Suivi)'}
               {code === 'BARS' && 'Résultats BARS - Échelle d\'observance'}
               {code === 'SUMD' && 'Résultats SUMD - Conscience de la maladie'}
               {code === 'AIMS' && 'Résultats AIMS - Mouvements involontaires'}
@@ -753,6 +766,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && (data.wais_ivt !== undefined && data.wais_ivt !== null ? '/150' : '/19')}
               {code === 'PANSS' && '/210'}
               {code === 'CDSS' && '/27'}
+              {code === 'ISA_FOLLOWUP' && '/5'}
               {code === 'BARS' && '%'}
               {code === 'SUMD' && ''}
               {code === 'AIMS' && '/28'}
@@ -2323,6 +2337,89 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
             <div className="flex justify-between pt-2 border-t">
               <span className="text-gray-600 font-medium">Score Total:</span>
               <span className="font-bold text-lg">{data.total_score ?? '-'}/27</span>
+            </div>
+          </div>
+        )}
+
+        {/* ISA FOLLOWUP Details */}
+        {code === 'ISA_FOLLOWUP' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Risk Level */}
+            <div className={`p-3 rounded-lg ${
+              data.total_score >= 5 ? 'bg-red-50 border border-red-200' :
+              data.total_score >= 3 ? 'bg-red-50 border border-red-200' :
+              data.total_score >= 2 ? 'bg-amber-50 border border-amber-200' :
+              data.total_score >= 1 ? 'bg-blue-50 border border-blue-200' :
+              'bg-green-50 border border-green-200'
+            }`}>
+              <div className="text-center">
+                <span className="font-medium">
+                  {data.risk_level ?? data.interpretation ?? 'Questionnaire incomplet'}
+                </span>
+              </div>
+            </div>
+
+            {/* Question Responses */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Reponses aux questions</h5>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">1. La vie ne vaut pas la peine:</span>
+                  <span className="font-medium">{data.q1_life_worth === 1 ? 'Oui' : data.q1_life_worth === 0 ? 'Non' : '-'}</span>
+                </div>
+                {data.q1_life_worth === 1 && data.q1_time && (
+                  <div className="flex justify-between ml-4 text-gray-500">
+                    <span className="text-xs">Derniere occurrence:</span>
+                    <span className="text-xs">{data.q1_time === 'last_week' ? 'Semaine derniere' : 'Depuis derniere visite'}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-gray-600">2. Souhaite mourir:</span>
+                  <span className="font-medium">{data.q2_wish_death === 1 ? 'Oui' : data.q2_wish_death === 0 ? 'Non' : '-'}</span>
+                </div>
+                {data.q2_wish_death === 1 && data.q2_time && (
+                  <div className="flex justify-between ml-4 text-gray-500">
+                    <span className="text-xs">Derniere occurrence:</span>
+                    <span className="text-xs">{data.q2_time === 'last_week' ? 'Semaine derniere' : 'Depuis derniere visite'}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-gray-600">3. Pensees suicidaires:</span>
+                  <span className="font-medium">{data.q3_thoughts === 1 ? 'Oui' : data.q3_thoughts === 0 ? 'Non' : '-'}</span>
+                </div>
+                {data.q3_thoughts === 1 && data.q3_time && (
+                  <div className="flex justify-between ml-4 text-gray-500">
+                    <span className="text-xs">Derniere occurrence:</span>
+                    <span className="text-xs">{data.q3_time === 'last_week' ? 'Semaine derniere' : 'Depuis derniere visite'}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-gray-600">4. Plan ou consideration serieuse:</span>
+                  <span className="font-medium">{data.q4_plan === 1 ? 'Oui' : data.q4_plan === 0 ? 'Non' : '-'}</span>
+                </div>
+                {data.q4_plan === 1 && data.q4_time && (
+                  <div className="flex justify-between ml-4 text-gray-500">
+                    <span className="text-xs">Derniere occurrence:</span>
+                    <span className="text-xs">{data.q4_time === 'last_week' ? 'Semaine derniere' : 'Depuis derniere visite'}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-gray-600">5. Tentative de suicide:</span>
+                  <span className="font-medium">{data.q5_attempt === 1 ? 'Oui' : data.q5_attempt === 0 ? 'Non' : '-'}</span>
+                </div>
+                {data.q5_attempt === 1 && data.q5_time && (
+                  <div className="flex justify-between ml-4 text-gray-500">
+                    <span className="text-xs">Derniere occurrence:</span>
+                    <span className="text-xs">{data.q5_time === 'last_week' ? 'Semaine derniere' : 'Depuis derniere visite'}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Total Score */}
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">Score Total:</span>
+              <span className="font-bold text-lg">{data.total_score ?? '-'}/5</span>
             </div>
           </div>
         )}
