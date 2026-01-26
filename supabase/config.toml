@@ -1,0 +1,4 @@
+project_id = "local"
+
+[db]
+seed = "supabase/seed.sql"
