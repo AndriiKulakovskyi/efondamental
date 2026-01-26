@@ -542,6 +542,7 @@ export async function submitProfessionalQuestionnaireAction(
         } as BipolarAsrmResponseInsert);
         break;
         
+      case 'QIDS_SR16':
       case 'QIDS_SR16_FR':
         result = await saveBipolarQidsResponse({
           visit_id: visitId,
