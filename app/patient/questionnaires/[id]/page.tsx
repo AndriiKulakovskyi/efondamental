@@ -1,6 +1,7 @@
 import { requireUserContext } from "@/lib/rbac/middleware";
 import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
+import { submitQuestionnaireAction } from "../actions";
 import { 
   ASRM_DEFINITION, 
   QIDS_DEFINITION, 
@@ -127,6 +128,7 @@ export default async function QuestionnairePage({
       patientId={patient.id}
       isLockedByProfessional={isLocked}
       existingResponse={existingResponse}
+      submitAction={submitQuestionnaireAction}
     />
   );
 }

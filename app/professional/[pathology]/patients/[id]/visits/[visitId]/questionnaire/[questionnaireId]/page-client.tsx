@@ -8,11 +8,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
 import { QuestionnaireDefinition } from "@/lib/constants/questionnaires";
-import { submitProfessionalQuestionnaireAction } from "@/app/professional/questionnaires/actions";
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { ScoreDisplay } from "../../components/score-display";
 import { calculateStandardizedScore, calculatePercentileRank } from "@/lib/services/wais4-matrices-scoring";
 import { evaluateConditionalLogic, calculateQuestionnaireProgress } from "@/lib/utils/questionnaire-logic";
+
+type SubmitProfessionalQuestionnaireAction = (
+  questionnaireCode: string,
+  visitId: string,
+  patientId: string,
+  responses: Record<string, unknown>
+) => Promise<{ success: boolean; data?: unknown; error?: string }>;
 
 interface QuestionnairePageClientProps {
   questionnaire: QuestionnaireDefinition;
@@ -23,6 +29,7 @@ interface QuestionnairePageClientProps {
   visitType?: string;
   initialResponses?: Record<string, any>;
   existingData?: any;
+  submitAction: SubmitProfessionalQuestionnaireAction;
 }
 
 export function QuestionnairePageClient({
@@ -33,7 +40,8 @@ export function QuestionnairePageClient({
   patientName,
   visitType,
   initialResponses = {},
-  existingData
+  existingData,
+  submitAction
 }: QuestionnairePageClientProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -102,7 +110,7 @@ export function QuestionnairePageClient({
   const handleSubmit = async (responses: Record<string, any>) => {
     setError(null);
     try {
-      const result = await submitProfessionalQuestionnaireAction(
+      const result = await submitAction(
         questionnaire.code,
         visitId,
         patientId,

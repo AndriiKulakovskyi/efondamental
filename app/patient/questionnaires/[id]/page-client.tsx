@@ -7,7 +7,13 @@ import { QuestionnaireRenderer } from "@/components/clinical/questionnaire-rende
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { QuestionnaireDefinition } from "@/lib/constants/questionnaires";
 import { Question, QuestionOption } from "@/lib/types/database.types";
-import { submitQuestionnaireAction } from "../actions";
+
+type SubmitPatientQuestionnaireAction = (
+  questionnaireCode: string,
+  visitId: string,
+  patientId: string,
+  responses: Record<string, unknown>
+) => Promise<{ success: boolean; error?: string }>;
 
 interface QuestionnairePageClientProps {
   questionnaire: QuestionnaireDefinition;
@@ -15,6 +21,7 @@ interface QuestionnairePageClientProps {
   patientId: string;
   isLockedByProfessional?: boolean;
   existingResponse?: Record<string, any> | null;
+  submitAction: SubmitPatientQuestionnaireAction;
 }
 
 export function QuestionnairePageClient({
@@ -22,7 +29,8 @@ export function QuestionnairePageClient({
   visitId,
   patientId,
   isLockedByProfessional = false,
-  existingResponse = null
+  existingResponse = null,
+  submitAction
 }: QuestionnairePageClientProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +38,7 @@ export function QuestionnairePageClient({
   const handleSubmit = async (responses: Record<string, any>) => {
     setError(null);
     try {
-      const result = await submitQuestionnaireAction(
+      const result = await submitAction(
         questionnaire.code,
         visitId,
         patientId,

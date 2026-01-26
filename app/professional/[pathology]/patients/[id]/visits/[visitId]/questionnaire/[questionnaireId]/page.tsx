@@ -1,5 +1,6 @@
 import { getUserContext } from "@/lib/rbac/middleware";
 import { notFound, redirect } from "next/navigation";
+import { submitProfessionalQuestionnaireAction } from "@/app/professional/questionnaires/actions";
 import { 
   ASRM_DEFINITION, 
   QIDS_DEFINITION, 
@@ -1046,6 +1047,7 @@ export default async function ProfessionalQuestionnairePage({
       pathology={pathology}
       initialResponses={initialResponses}
       existingData={existingResponse}
+      submitAction={submitProfessionalQuestionnaireAction}
     />
   );
 }
