@@ -1,0 +1,41 @@
+-- Fix: Add neuropsychological questionnaires to annual_evaluation visit type
+-- Previously, these questionnaires were only tracked in initial_evaluation but not in annual_evaluation
+-- This caused completion status not to update when these questionnaires were submitted in annual visits
+
+-- Added the following neuropsychological questionnaires to annual_evaluation:
+--
+-- Independent tests:
+-- - CVLT (bipolar_cvlt)
+-- - TMT (bipolar_tmt)
+-- - STROOP (bipolar_stroop)
+-- - FLUENCES_VERBALES (bipolar_fluences_verbales)
+-- - MEM3_SPATIAL (bipolar_mem3_spatial)
+--
+-- WAIS-III:
+-- - WAIS3_CRITERIA (bipolar_wais3_criteria)
+-- - WAIS3_LEARNING (bipolar_wais3_learning)
+-- - WAIS3_VOCABULAIRE (bipolar_wais3_vocabulaire)
+-- - WAIS3_MATRICES (bipolar_wais3_matrices)
+-- - WAIS3_CODE_SYMBOLES (bipolar_wais3_code_symboles)
+-- - WAIS3_DIGIT_SPAN (bipolar_wais3_digit_span)
+-- - WAIS3_CPT2 (bipolar_wais3_cpt2)
+--
+-- WAIS-IV:
+-- - WAIS4_CRITERIA (bipolar_wais4_criteria)
+-- - WAIS4_LEARNING (bipolar_wais4_learning)
+-- - WAIS4_MATRICES (bipolar_wais4_matrices)
+-- - WAIS_IV_CODE_SYMBOLES_IVT (bipolar_wais4_code)
+-- - WAIS4_DIGIT_SPAN (bipolar_wais4_digit_span)
+-- - WAIS4_SIMILITUDES (bipolar_wais4_similitudes)
+-- - COBRA (bipolar_cobra)
+-- - CPT3 (bipolar_cpt3)
+-- - TEST_COMMISSIONS (bipolar_test_commissions)
+-- - SCIP (bipolar_scip)
+--
+-- Also added Auto ETAT questionnaires:
+-- - EQ5D5L, PRISE_M, STAI_YA, MARS, MATHYS, ASRM, QIDS_SR16, PSQI, EPWORTH
+--
+-- Also added wais3_criteria_response and wais4_criteria_response to the result for conditional display
+
+-- Note: Full RPC function is updated via apply_migration MCP tool
+-- This file documents the change for version control
