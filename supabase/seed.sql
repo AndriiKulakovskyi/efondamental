@@ -2,6 +2,8 @@
 -- This script initializes the database with test data for development purposes.
 -- Default password for all users: Password123!
 
+SET search_path = public, extensions;
+
 -- ============================================================================
 -- CLEANUP (optional - uncomment if you need to reset)
 -- ============================================================================
@@ -94,7 +96,7 @@ ON CONFLICT (id) DO NOTHING;
 -- ============================================================================
 
 -- Helper: The password hash for "Password123!" using bcrypt
--- Generated with: SELECT crypt('Password123!', gen_salt('bf'));
+-- Generated with: SELECT extensions.crypt('Password123!', extensions.gen_salt('bf'));
 -- Note: In Supabase, you may need to use the Supabase CLI or dashboard to create users
 -- This script creates the user_profiles directly, assuming auth.users are created separately
 
@@ -103,43 +105,59 @@ ON CONFLICT (id) DO NOTHING;
 -- so we create user_profiles manually below.
 
 INSERT INTO auth.users (
-  id,
   instance_id,
+  id,
+  aud,
+  role,
   email,
   encrypted_password,
   email_confirmed_at,
+  confirmation_token,
+  recovery_token,
+  email_change_token_new,
+  email_change,
+  raw_app_meta_data,
   raw_user_meta_data,
   created_at,
   updated_at,
-  role,
-  aud,
-  confirmation_token
+  phone_change,
+  phone_change_token,
+  email_change_token_current,
+  email_change_confirm_status,
+  reauthentication_token,
+  is_sso_user,
+  is_anonymous
 )
 VALUES
+  -- README credentials (fondamental.fr)
+  ('00000000-0000-0000-0000-000000000000', '10000000-0000-0000-0000-000000000001', 'authenticated', 'authenticated', 'admin@fondamental.fr', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"administrator","first_name":"Admin","last_name":"FondaMental","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+  ('00000000-0000-0000-0000-000000000000', '10000000-0000-0000-0000-000000000010', 'authenticated', 'authenticated', 'manager.paris@fondamental.fr', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"manager","first_name":"Manager","last_name":"Paris","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+  ('00000000-0000-0000-0000-000000000000', '10000000-0000-0000-0000-000000000020', 'authenticated', 'authenticated', 'doctor.paris@fondamental.fr', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"healthcare_professional","first_name":"Doctor","last_name":"Paris","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+
   -- Administrator
-  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'admin@efondamental.dev', crypt('Password123!', gen_salt('bf')), NOW(), '{"role": "administrator", "first_name": "Admin", "last_name": "System"}', NOW(), NOW(), 'authenticated', 'authenticated', ''),
-  
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000001', 'authenticated', 'authenticated', 'admin@efondamental.dev', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"administrator","first_name":"Admin","last_name":"System","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+
   -- Managers (one per center)
-  ('00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000000', 'manager.bipolar@efondamental.dev', crypt('Password123!', gen_salt('bf')), NOW(), '{"role": "manager", "first_name": "Marie", "last_name": "Dupont"}', NOW(), NOW(), 'authenticated', 'authenticated', ''),
-  ('00000000-0000-0000-0000-000000000011', '00000000-0000-0000-0000-000000000000', 'manager.schizo@efondamental.dev', crypt('Password123!', gen_salt('bf')), NOW(), '{"role": "manager", "first_name": "Pierre", "last_name": "Martin"}', NOW(), NOW(), 'authenticated', 'authenticated', ''),
-  ('00000000-0000-0000-0000-000000000012', '00000000-0000-0000-0000-000000000000', 'manager.asperger@efondamental.dev', crypt('Password123!', gen_salt('bf')), NOW(), '{"role": "manager", "first_name": "Sophie", "last_name": "Bernard"}', NOW(), NOW(), 'authenticated', 'authenticated', ''),
-  ('00000000-0000-0000-0000-000000000013', '00000000-0000-0000-0000-000000000000', 'manager.depression@efondamental.dev', crypt('Password123!', gen_salt('bf')), NOW(), '{"role": "manager", "first_name": "Jean", "last_name": "Leroy"}', NOW(), NOW(), 'authenticated', 'authenticated', ''),
-  
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000010', 'authenticated', 'authenticated', 'manager.bipolar@efondamental.dev', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"manager","first_name":"Marie","last_name":"Dupont","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000011', 'authenticated', 'authenticated', 'manager.schizo@efondamental.dev', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"manager","first_name":"Pierre","last_name":"Martin","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000012', 'authenticated', 'authenticated', 'manager.asperger@efondamental.dev', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"manager","first_name":"Sophie","last_name":"Bernard","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000013', 'authenticated', 'authenticated', 'manager.depression@efondamental.dev', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"manager","first_name":"Jean","last_name":"Leroy","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+
   -- Doctors - Bipolar Center (2)
-  ('00000000-0000-0000-0000-000000000020', '00000000-0000-0000-0000-000000000000', 'dr.lambert@efondamental.dev', crypt('Password123!', gen_salt('bf')), NOW(), '{"role": "healthcare_professional", "first_name": "Antoine", "last_name": "Lambert"}', NOW(), NOW(), 'authenticated', 'authenticated', ''),
-  ('00000000-0000-0000-0000-000000000021', '00000000-0000-0000-0000-000000000000', 'dr.moreau@efondamental.dev', crypt('Password123!', gen_salt('bf')), NOW(), '{"role": "healthcare_professional", "first_name": "Claire", "last_name": "Moreau"}', NOW(), NOW(), 'authenticated', 'authenticated', ''),
-  
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000020', 'authenticated', 'authenticated', 'dr.lambert@efondamental.dev', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"healthcare_professional","first_name":"Antoine","last_name":"Lambert","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000021', 'authenticated', 'authenticated', 'dr.moreau@efondamental.dev', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"healthcare_professional","first_name":"Claire","last_name":"Moreau","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+
   -- Doctors - Schizophrenia Center (2)
-  ('00000000-0000-0000-0000-000000000022', '00000000-0000-0000-0000-000000000000', 'dr.petit@efondamental.dev', crypt('Password123!', gen_salt('bf')), NOW(), '{"role": "healthcare_professional", "first_name": "Philippe", "last_name": "Petit"}', NOW(), NOW(), 'authenticated', 'authenticated', ''),
-  ('00000000-0000-0000-0000-000000000023', '00000000-0000-0000-0000-000000000000', 'dr.roux@efondamental.dev', crypt('Password123!', gen_salt('bf')), NOW(), '{"role": "healthcare_professional", "first_name": "Isabelle", "last_name": "Roux"}', NOW(), NOW(), 'authenticated', 'authenticated', ''),
-  
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000022', 'authenticated', 'authenticated', 'dr.petit@efondamental.dev', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"healthcare_professional","first_name":"Philippe","last_name":"Petit","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000023', 'authenticated', 'authenticated', 'dr.roux@efondamental.dev', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"healthcare_professional","first_name":"Isabelle","last_name":"Roux","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+
   -- Doctors - Asperger Center (2)
-  ('00000000-0000-0000-0000-000000000024', '00000000-0000-0000-0000-000000000000', 'dr.fournier@efondamental.dev', crypt('Password123!', gen_salt('bf')), NOW(), '{"role": "healthcare_professional", "first_name": "Nicolas", "last_name": "Fournier"}', NOW(), NOW(), 'authenticated', 'authenticated', ''),
-  ('00000000-0000-0000-0000-000000000025', '00000000-0000-0000-0000-000000000000', 'dr.girard@efondamental.dev', crypt('Password123!', gen_salt('bf')), NOW(), '{"role": "healthcare_professional", "first_name": "Emilie", "last_name": "Girard"}', NOW(), NOW(), 'authenticated', 'authenticated', ''),
-  
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000024', 'authenticated', 'authenticated', 'dr.fournier@efondamental.dev', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"healthcare_professional","first_name":"Nicolas","last_name":"Fournier","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000025', 'authenticated', 'authenticated', 'dr.girard@efondamental.dev', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"healthcare_professional","first_name":"Emilie","last_name":"Girard","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+
   -- Doctors - Depression Center (2)
-  ('00000000-0000-0000-0000-000000000026', '00000000-0000-0000-0000-000000000000', 'dr.mercier@efondamental.dev', crypt('Password123!', gen_salt('bf')), NOW(), '{"role": "healthcare_professional", "first_name": "Laurent", "last_name": "Mercier"}', NOW(), NOW(), 'authenticated', 'authenticated', ''),
-  ('00000000-0000-0000-0000-000000000027', '00000000-0000-0000-0000-000000000000', 'dr.blanc@efondamental.dev', crypt('Password123!', gen_salt('bf')), NOW(), '{"role": "healthcare_professional", "first_name": "Valerie", "last_name": "Blanc"}', NOW(), NOW(), 'authenticated', 'authenticated', '')
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000026', 'authenticated', 'authenticated', 'dr.mercier@efondamental.dev', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"healthcare_professional","first_name":"Laurent","last_name":"Mercier","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false),
+  ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000027', 'authenticated', 'authenticated', 'dr.blanc@efondamental.dev', extensions.crypt('Password123!', extensions.gen_salt('bf')), NOW(), '', '', '', '', '{"provider":"email","providers":["email"]}', '{"role":"healthcare_professional","first_name":"Valerie","last_name":"Blanc","email_verified":true}', NOW(), NOW(), '', '', '', 0, '', false, false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================================
@@ -147,6 +165,11 @@ ON CONFLICT (id) DO NOTHING;
 -- ============================================================================
 INSERT INTO public.user_profiles (id, role, center_id, first_name, last_name, email, active)
 VALUES
+  -- README credentials (fondamental.fr)
+  ('10000000-0000-0000-0000-000000000001', 'administrator', NULL, 'Admin', 'FondaMental', 'admin@fondamental.fr', true),
+  ('10000000-0000-0000-0000-000000000010', 'manager', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Manager', 'Paris', 'manager.paris@fondamental.fr', true),
+  ('10000000-0000-0000-0000-000000000020', 'healthcare_professional', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Doctor', 'Paris', 'doctor.paris@fondamental.fr', true),
+
   -- Administrator (no center - system-wide)
   ('00000000-0000-0000-0000-000000000001', 'administrator', NULL, 'Admin', 'System', 'admin@efondamental.dev', true),
   
