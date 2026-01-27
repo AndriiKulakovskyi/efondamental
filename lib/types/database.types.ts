@@ -336,6 +336,7 @@ export interface BipolarDiagnosticResponse {
   visit_id: string;
   patient_id: string;
   date_recueil?: string | null;
+  evaluator_name?: string | null;
   diag_prealable: 'oui' | 'non' | 'je_ne_sais_pas';
   diag_evoque: 'oui' | 'non' | 'differe';
   bilan_programme?: 'oui' | 'non' | null;
