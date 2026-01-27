@@ -83,7 +83,7 @@ export function RecentlyConsultedTable({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-mono text-slate-700">
-                    {patient.medical_record_number}
+                    {patient.fondacode || 'N/A'}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

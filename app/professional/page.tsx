@@ -14,11 +14,28 @@ export default async function ProfessionalLandingPage() {
     redirect("/auth/error?message=No center assigned");
   }
 
-  // Fetch pathologies and their statistics in parallel
-  const [pathologies, pathologyStats] = await Promise.all([
+  // Fetch center pathologies and their statistics in parallel
+  const [centerPathologies, pathologyStats] = await Promise.all([
     getCenterPathologies(context.profile.center_id),
     getPathologyLandingStats(context.profile.center_id),
   ]);
+
+  // Determine which pathologies to display
+  // 1. For Healthcare Professionals: Show ONLY their assigned pathologies from context
+  // 2. For Managers/Admins: Show ALL pathologies assigned to their center
+  let pathologies: { id: string; name: string; type: string; description?: string | null }[] = [];
+  
+  if (context.profile.role === 'healthcare_professional') {
+    pathologies = context.pathologies || [];
+  } else {
+    // Managers/Admins see everything in the center
+    pathologies = centerPathologies.map(p => ({
+      id: p.id,
+      name: p.name,
+      type: p.type,
+      description: p.description
+    }));
+  }
 
   // Create a lookup map for quick access to stats by pathology type
   const statsMap = new Map(

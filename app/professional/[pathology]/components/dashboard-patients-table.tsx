@@ -35,7 +35,7 @@ export function DashboardPatientsTable({
     return (
       patient.first_name.toLowerCase().includes(searchLower) ||
       patient.last_name.toLowerCase().includes(searchLower) ||
-      patient.medical_record_number.toLowerCase().includes(searchLower)
+      patient.fondacode?.toLowerCase().includes(searchLower)
     );
   });
 
@@ -133,7 +133,7 @@ export function DashboardPatientsTable({
                           {patient.first_name} {patient.last_name}
                         </p>
                         <p className="text-xs text-slate-400 font-mono">
-                          {patient.medical_record_number}
+                          {patient.fondacode || 'N/A'}
                         </p>
                       </div>
                     </Link>

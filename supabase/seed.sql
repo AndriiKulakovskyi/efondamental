@@ -17,12 +17,12 @@ SET search_path = public, extensions;
 -- ============================================================================
 -- 1. PATHOLOGIES
 -- ============================================================================
-INSERT INTO public.pathologies (id, type, name, description, color)
+INSERT INTO public.pathologies (id, type, name, description, color, code)
 VALUES
-  ('11111111-1111-1111-1111-111111111111', 'bipolar', 'Troubles Bipolaires', 'Expert center for bipolar disorder diagnosis and treatment', '#3B82F6'),
-  ('22222222-2222-2222-2222-222222222222', 'schizophrenia', 'Schizophrenie', 'Expert center for schizophrenia spectrum disorders', '#8B5CF6'),
-  ('33333333-3333-3333-3333-333333333333', 'asd_asperger', 'Asperger / TSA', 'Expert center for autism spectrum disorders', '#10B981'),
-  ('44444444-4444-4444-4444-444444444444', 'depression', 'Depression Resistante', 'Expert center for treatment-resistant depression', '#F59E0B')
+  ('11111111-1111-1111-1111-111111111111', 'bipolar', 'Troubles Bipolaires', 'Expert center for bipolar disorder diagnosis and treatment', '#3B82F6', '01'),
+  ('22222222-2222-2222-2222-222222222222', 'schizophrenia', 'Schizophrenie', 'Expert center for schizophrenia spectrum disorders', '#8B5CF6', '02'),
+  ('33333333-3333-3333-3333-333333333333', 'asd_asperger', 'Asperger / TSA', 'Expert center for autism spectrum disorders', '#10B981', '04'),
+  ('44444444-4444-4444-4444-444444444444', 'depression', 'Depression Resistante', 'Expert center for treatment-resistant depression', '#F59E0B', '03')
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================================
@@ -30,10 +30,10 @@ ON CONFLICT (id) DO NOTHING;
 -- ============================================================================
 INSERT INTO public.centers (id, name, code, city, address, phone, email, active)
 VALUES
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Centre Expert Paris Bipolaire', 'CEP-BIP', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 00', 'bipolar@efondamental.dev', true),
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Centre Expert Paris Schizophrenie', 'CEP-SCZ', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 01', 'schizo@efondamental.dev', true),
-  ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Centre Expert Paris Asperger', 'CEP-ASP', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 02', 'asperger@efondamental.dev', true),
-  ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'Centre Expert Paris Depression', 'CEP-DEP', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 03', 'depression@efondamental.dev', true)
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Centre Expert Paris Bipolaire', '01', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 00', 'bipolar@efondamental.dev', true),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Centre Expert Paris Schizophrenie', '02', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 01', 'schizo@efondamental.dev', true),
+  ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Centre Expert Paris Asperger', '04', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 02', 'asperger@efondamental.dev', true),
+  ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'Centre Expert Paris Depression', '03', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 03', 'depression@efondamental.dev', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================================

@@ -5,7 +5,8 @@ import { StatCard } from "@/components/ui/stat-card";
 import { Users, Calendar, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { notFound } from "next/navigation";
-import { formatTimeAgo } from "@/lib/utils/date";
+import { formatTimeAgo } from "@/lib/utils/date"; // Keep for other uses if any, but adding TimeAgo import
+import { TimeAgo } from "@/components/ui/time-ago";
 import Link from "next/link";
 
 export default async function ProfessionalDetailPage({
@@ -102,11 +103,26 @@ export default async function ProfessionalDetailPage({
                 </dd>
               </div>
               <div>
+                <dt className="text-sm font-medium text-slate-500">Assigned Pathologies</dt>
+                <dd className="mt-1 flex flex-wrap gap-1">
+                  {professional.user_pathologies && professional.user_pathologies.length > 0 ? (
+                    professional.user_pathologies.map((up) => (
+                      <span
+                        key={up.pathology_id}
+                        className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand/10 text-brand-dark"
+                      >
+                        {up.pathologies?.name || 'Unknown'}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-sm text-slate-400 italic">None assigned</span>
+                  )}
+                </dd>
+              </div>
+              <div>
                 <dt className="text-sm font-medium text-slate-500">Last Active</dt>
                 <dd className="text-sm text-slate-900">
-                  {stats.lastActivity
-                    ? formatTimeAgo(stats.lastActivity)
-                    : "Never"}
+                  <TimeAgo date={stats.lastActivity} />
                 </dd>
               </div>
             </dl>
