@@ -107,6 +107,7 @@ export interface Patient {
   first_name: string;
   last_name: string;
   date_of_birth: string;
+  maiden_name: string | null;
   gender: 'M' | 'F' | null;
   place_of_birth: string | null;
   email: string | null;
