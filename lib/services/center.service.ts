@@ -1,6 +1,7 @@
 // eFondaMental Platform - Center Service
 
 import { createClient } from '../supabase/server';
+import { createAdminClient } from '../supabase/admin';
 import { Center, CenterInsert, CenterUpdate, Pathology } from '../types/database.types';
 import { PathologyType } from '../types/enums';
 
@@ -171,7 +172,7 @@ export async function setCenterPathologies(
   centerId: string,
   pathologyIds: string[]
 ): Promise<void> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   // Remove all existing pathologies
   await supabase

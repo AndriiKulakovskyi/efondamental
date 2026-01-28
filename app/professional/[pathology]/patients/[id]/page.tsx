@@ -97,7 +97,10 @@ export default async function PatientDetailPage({
             Patients
           </a>
           <span className="mx-2">/</span>
-          <span className="text-slate-900">{patient.first_name} {patient.last_name}</span>
+          <span className="text-slate-900">
+            {patient.first_name} {patient.last_name}
+            {patient.gender === 'F' && patient.maiden_name && ` (${patient.maiden_name})`}
+          </span>
         </nav>
 
         {/* Patient Header Card */}
@@ -109,6 +112,9 @@ export default async function PatientDetailPage({
               <div>
               <h2 className="text-2xl font-bold text-slate-900">
                   {patient.first_name} {patient.last_name}
+                  {patient.gender === 'F' && patient.maiden_name && (
+                    <span className="text-slate-400 font-bold ml-2">({patient.maiden_name})</span>
+                  )}
                 </h2>
               <div className="flex items-center gap-3 mt-1 text-slate-500 text-sm">
                 <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-medium border border-slate-200">

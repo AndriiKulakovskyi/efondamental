@@ -27,6 +27,7 @@ interface PatientData {
   last_name: string;
   date_of_birth: string;
   gender: 'M' | 'F' | string | null;
+  maiden_name: string | null;
   place_of_birth: string | null;
   email: string | null;
   phone: string | null;
@@ -61,6 +62,7 @@ export function EditPatientModal({ patient, isOpen, onClose }: EditPatientModalP
   const [dateOfBirth, setDateOfBirth] = useState(patient.date_of_birth);
   const [yearsOfEducation, setYearsOfEducation] = useState(patient.years_of_education?.toString() || "");
   const [gender, setGender] = useState(normalizeGender(patient.gender));
+  const [maidenName, setMaidenName] = useState(patient.maiden_name || "");
   const [placeOfBirth, setPlaceOfBirth] = useState(patient.place_of_birth || "");
   const [email, setEmail] = useState(patient.email || "");
   const [phone, setPhone] = useState(patient.phone || "");
@@ -138,6 +140,7 @@ export function EditPatientModal({ patient, isOpen, onClose }: EditPatientModalP
           date_of_birth: dateOfBirth,
           years_of_education: yearsOfEducation ? parseInt(yearsOfEducation) : null,
           gender: gender || null,
+          maiden_name: maidenName.trim() || null,
           place_of_birth: placeOfBirth.trim() || null,
           email: email.trim() || null,
           phone: phone.trim() || null,
@@ -259,6 +262,22 @@ export function EditPatientModal({ patient, isOpen, onClose }: EditPatientModalP
                   <option value="F">Femme</option>
                 </select>
               </div>
+
+              {gender === 'F' && (
+                <div className="space-y-2 animate-in fade-in slide-in-from-top-1 duration-200 col-span-2">
+                  <Label htmlFor="maidenName">Nom de jeune fille</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input
+                      id="maidenName"
+                      value={maidenName}
+                      onChange={(e) => setMaidenName(e.target.value)}
+                      placeholder="Nom de jeune fille"
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="placeOfBirth">Lieu de naissance</Label>

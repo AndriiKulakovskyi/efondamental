@@ -107,6 +107,7 @@ export interface Patient {
   first_name: string;
   last_name: string;
   date_of_birth: string;
+  maiden_name: string | null;
   gender: 'M' | 'F' | null;
   place_of_birth: string | null;
   email: string | null;
@@ -336,6 +337,7 @@ export interface BipolarDiagnosticResponse {
   visit_id: string;
   patient_id: string;
   date_recueil?: string | null;
+  evaluator_name?: string | null;
   diag_prealable: 'oui' | 'non' | 'je_ne_sais_pas';
   diag_evoque: 'oui' | 'non' | 'differe';
   bilan_programme?: 'oui' | 'non' | null;
