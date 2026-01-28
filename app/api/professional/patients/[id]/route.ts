@@ -44,14 +44,32 @@ export async function PATCH(
     const { 
       first_name,
       last_name,
+      marital_name,
       date_of_birth,
       years_of_education,
       gender,
       maiden_name,
-      place_of_birth,
+      birth_city,
+      birth_department,
+      birth_country,
+      hospital_id,
+      social_security_number,
       email, 
       phone,
+      street_number_and_name,
+      building_details,
+      postal_code,
+      city,
+      phone_private,
+      phone_professional,
+      phone_mobile,
       address,
+      patient_sector,
+      referred_by,
+      visit_purpose,
+      gp_report_consent,
+      psychiatrist_report_consent,
+      center_awareness_source,
       emergency_contact,
       sendInvitation 
     } = body;
@@ -90,14 +108,15 @@ export async function PATCH(
       );
     }
 
-    // Check for duplicate patient if name, DOB, or place of birth is changing
+    // Check for duplicate patient if identifying fields are changing
     const newFirstName = first_name ?? patient.first_name;
     const newLastName = last_name ?? patient.last_name;
     const newDateOfBirth = date_of_birth ?? patient.date_of_birth;
-    const newPlaceOfBirth = place_of_birth !== undefined ? place_of_birth : (patient as any).place_of_birth;
+    // Use birth_city as the primary geographic identifier for duplicate detection
+    const newPlaceOfBirth = birth_city !== undefined ? birth_city : (patient as any).birth_city || (patient as any).place_of_birth;
 
     // Only check for duplicates if any of the identifying fields changed
-    if (first_name !== undefined || last_name !== undefined || date_of_birth !== undefined || place_of_birth !== undefined) {
+    if (first_name !== undefined || last_name !== undefined || date_of_birth !== undefined || birth_city !== undefined) {
       const duplicateCheck = await checkDuplicatePatient(
         context.profile.center_id,
         newFirstName,
@@ -149,16 +168,46 @@ export async function PATCH(
         changes.maiden_name = { old: (patient as any).maiden_name, new: maiden_name };
       }
     }
+    if (marital_name !== undefined) {
+      updates.marital_name = marital_name;
+      if ((patient as any).marital_name !== marital_name) {
+        changes.marital_name = { old: (patient as any).marital_name, new: marital_name };
+      }
+    }
     if (gender !== undefined) {
       updates.gender = gender;
       if (patient.gender !== gender) {
         changes.gender = { old: patient.gender, new: gender };
       }
     }
-    if (place_of_birth !== undefined) {
-      updates.place_of_birth = place_of_birth;
-      if ((patient as any).place_of_birth !== place_of_birth) {
-        changes.place_of_birth = { old: (patient as any).place_of_birth, new: place_of_birth };
+    if (birth_city !== undefined) {
+      updates.birth_city = birth_city;
+      if ((patient as any).birth_city !== birth_city) {
+        changes.birth_city = { old: (patient as any).birth_city, new: birth_city };
+      }
+    }
+    if (birth_department !== undefined) {
+      updates.birth_department = birth_department;
+      if ((patient as any).birth_department !== birth_department) {
+        changes.birth_department = { old: (patient as any).birth_department, new: birth_department };
+      }
+    }
+    if (birth_country !== undefined) {
+      updates.birth_country = birth_country;
+      if ((patient as any).birth_country !== birth_country) {
+        changes.birth_country = { old: (patient as any).birth_country, new: birth_country };
+      }
+    }
+    if (hospital_id !== undefined) {
+      updates.hospital_id = hospital_id;
+      if ((patient as any).hospital_id !== hospital_id) {
+        changes.hospital_id = { old: (patient as any).hospital_id, new: hospital_id };
+      }
+    }
+    if (social_security_number !== undefined) {
+      updates.social_security_number = social_security_number;
+      if ((patient as any).social_security_number !== social_security_number) {
+        changes.social_security_number = { old: (patient as any).social_security_number, new: social_security_number };
       }
     }
     if (email !== undefined) {
@@ -173,10 +222,88 @@ export async function PATCH(
         changes.phone = { old: patient.phone, new: phone };
       }
     }
+    if (phone_private !== undefined) {
+      updates.phone_private = phone_private;
+      if ((patient as any).phone_private !== phone_private) {
+        changes.phone_private = { old: (patient as any).phone_private, new: phone_private };
+      }
+    }
+    if (phone_professional !== undefined) {
+      updates.phone_professional = phone_professional;
+      if ((patient as any).phone_professional !== phone_professional) {
+        changes.phone_professional = { old: (patient as any).phone_professional, new: phone_professional };
+      }
+    }
+    if (phone_mobile !== undefined) {
+      updates.phone_mobile = phone_mobile;
+      if ((patient as any).phone_mobile !== phone_mobile) {
+        changes.phone_mobile = { old: (patient as any).phone_mobile, new: phone_mobile };
+      }
+    }
     if (address !== undefined) {
       updates.address = address;
       if (patient.address !== address) {
         changes.address = { old: patient.address, new: address };
+      }
+    }
+    if (street_number_and_name !== undefined) {
+      updates.street_number_and_name = street_number_and_name;
+      if ((patient as any).street_number_and_name !== street_number_and_name) {
+        changes.street_number_and_name = { old: (patient as any).street_number_and_name, new: street_number_and_name };
+      }
+    }
+    if (building_details !== undefined) {
+      updates.building_details = building_details;
+      if ((patient as any).building_details !== building_details) {
+        changes.building_details = { old: (patient as any).building_details, new: building_details };
+      }
+    }
+    if (postal_code !== undefined) {
+      updates.postal_code = postal_code;
+      if ((patient as any).postal_code !== postal_code) {
+        changes.postal_code = { old: (patient as any).postal_code, new: postal_code };
+      }
+    }
+    if (city !== undefined) {
+      updates.city = city;
+      if ((patient as any).city !== city) {
+        changes.city = { old: (patient as any).city, new: city };
+      }
+    }
+    if (patient_sector !== undefined) {
+      updates.patient_sector = patient_sector;
+      if ((patient as any).patient_sector !== patient_sector) {
+        changes.patient_sector = { old: (patient as any).patient_sector, new: patient_sector };
+      }
+    }
+    if (referred_by !== undefined) {
+      updates.referred_by = referred_by;
+      if ((patient as any).referred_by !== referred_by) {
+        changes.referred_by = { old: (patient as any).referred_by, new: referred_by };
+      }
+    }
+    if (visit_purpose !== undefined) {
+      updates.visit_purpose = visit_purpose;
+      if ((patient as any).visit_purpose !== visit_purpose) {
+        changes.visit_purpose = { old: (patient as any).visit_purpose, new: visit_purpose };
+      }
+    }
+    if (gp_report_consent !== undefined) {
+      updates.gp_report_consent = gp_report_consent;
+      if ((patient as any).gp_report_consent !== gp_report_consent) {
+        changes.gp_report_consent = { old: (patient as any).gp_report_consent, new: gp_report_consent };
+      }
+    }
+    if (psychiatrist_report_consent !== undefined) {
+      updates.psychiatrist_report_consent = psychiatrist_report_consent;
+      if ((patient as any).psychiatrist_report_consent !== psychiatrist_report_consent) {
+        changes.psychiatrist_report_consent = { old: (patient as any).psychiatrist_report_consent, new: psychiatrist_report_consent };
+      }
+    }
+    if (center_awareness_source !== undefined) {
+      updates.center_awareness_source = center_awareness_source;
+      if ((patient as any).center_awareness_source !== center_awareness_source) {
+        changes.center_awareness_source = { old: (patient as any).center_awareness_source, new: center_awareness_source };
       }
     }
     if (emergency_contact !== undefined) {

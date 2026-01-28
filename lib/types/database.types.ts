@@ -146,6 +146,28 @@ export interface Patient {
   deleted_at: string | null;
   deleted_by: string | null;
   fondacode: string | null;
+  // Identité (Identity) fields
+  birth_city: string | null;
+  birth_department: string | null;
+  birth_country: string | null;
+  hospital_id: string | null;
+  social_security_number: string | null;
+  marital_name: string | null;
+  // Coordonnées (Contact) fields
+  street_number_and_name: string | null;
+  building_details: string | null;
+  postal_code: string | null;
+  city: string | null;
+  phone_private: string | null;
+  phone_professional: string | null;
+  phone_mobile: string | null;
+  // Provenance (Referral) fields
+  patient_sector: string | null;
+  referred_by: string | null;
+  visit_purpose: string | null;
+  gp_report_consent: string | null;
+  psychiatrist_report_consent: string | null;
+  center_awareness_source: string | null;
 }
 
 export interface PatientFull extends Patient {
