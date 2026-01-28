@@ -3,6 +3,7 @@
 import { AlertCircle, AlertTriangle, Info, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { interpretFagerstromScore } from "@/lib/questionnaires/bipolar/nurse";
 
 interface ScoreDisplayProps {
   code: string;
@@ -25,7 +26,9 @@ function getSeverityLabel(severity: string | null | undefined): string {
   return severity;
 }
 
-export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
+export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
+  const code = rawCode?.toUpperCase();
+  
   // Don't display score card for questionnaires without scores
   const noScoreQuestionnaires = ['WAIS4_CRITERIA', 'WAIS4_LEARNING'];
   
@@ -440,6 +443,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'error';                      // Severe excessive
     }
     
+    if (code === 'FAGERSTROM') {
+      // Fagerstrom (FTND): Nicotine dependence (0-10)
+      const score = data.total_score ?? data.totalScore;
+      if (score === null || score === undefined) return 'info';
+      if (score <= 2) return 'success';    // Pas de dépendance
+      if (score <= 4) return 'info';       // Dépendance faible
+      if (score <= 6) return 'warning';    // Dépendance moyenne (Strong in some interpretations, but app uses warning for 5-6)
+      return 'error';                      // Dépendance forte/très forte
+    }
+    
     return 'info';
   };
 
@@ -662,6 +675,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'MATHYS' && 'Résultats MAThyS - États thymiques'}
               {code === 'PSQI' && 'Résultats PSQI - Qualité du Sommeil'}
               {code === 'EPWORTH' && 'Résultats Epworth - Somnolence Diurne'}
+              {code === 'FAGERSTROM' && 'Résultats FTND - Test de Fagerström'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -743,11 +757,14 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'EPWORTH'
                 ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'FAGERSTROM'
+                ? (data.total_score ?? data.totalScore ?? '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM' && '/20'}
               {code === 'QIDS_SR16' && '/27'}
               {code === 'PSQI' && '/21'}
               {code === 'EPWORTH' && '/24'}
+              {code === 'FAGERSTROM' && '/10'}
               {code === 'CTQ' && '/125'}
               {code === 'BIS10' && '/4.0'}
               {code === 'CSM' && '/55'}
@@ -3761,6 +3778,60 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <p className="mt-1"><strong>Situations:</strong> Lecture, TV, inactivité publique, passager voiture, repos après-midi, conversation, après repas, voiture arrêtée</p>
               <p className="mt-1"><strong>Seuils:</strong> 0-5 (normale basse) | 6-10 (normale haute) | 11-12 (légère) | 13-15 (modérée) | 16-24 (sévère)</p>
               <p className="mt-1 text-gray-600"><strong>Note:</strong> Score &gt; 10 indique une somnolence diurne excessive pathologique. Outil de dépistage des troubles du sommeil (SAOS, narcolepsie)</p>
+            </div>
+          </div>
+        )}
+
+        {code === 'FAGERSTROM' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Rich Interpretation Card */}
+            {(interpretation || data.total_score !== undefined || data.totalScore !== undefined) && (
+              <div className={`p-4 rounded-lg border-2 ${
+                getScoreColor() === 'border-green-200 bg-green-50/30' ? 'bg-green-50 border-green-200 text-green-900' :
+                getScoreColor() === 'border-blue-200 bg-blue-50/30' ? 'bg-blue-50 border-blue-200 text-blue-900' :
+                getScoreColor() === 'border-amber-200 bg-amber-50/30' ? 'bg-amber-50 border-amber-200 text-amber-900' :
+                getScoreColor() === 'border-orange-200 bg-orange-50/30' ? 'bg-orange-50 border-orange-200 text-orange-900' :
+                'bg-red-50 border-red-200 text-red-900'
+              }`}>
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5">{getAlertIcon()}</div>
+                  <div className="space-y-2">
+                    <p className="font-bold text-base leading-tight">
+                      Interprétation clinique
+                    </p>
+                    <p className="text-sm leading-relaxed font-medium">
+                      {interpretation || interpretFagerstromScore(data.total_score ?? data.totalScore, data)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Clinical Highlights (only if enough data) */}
+            {data.q1 !== undefined && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                  <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Dépendance physique</p>
+                  <p className="text-sm font-medium">
+                    {data.q1 === 3 ? "Très précoce (< 5 min)" :
+                     data.q1 === 2 ? "Précoce (6-30 min)" :
+                     "Modérée (> 30 min)"}
+                  </p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                  <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Consommation</p>
+                  <p className="text-sm font-medium">
+                    {data.q4 === 0 ? "≤ 10 cig./jour" :
+                     data.q4 === 1 ? "11-20 cig./jour" :
+                     data.q4 === 2 ? "21-30 cig./jour" :
+                     "≥ 31 cig./jour"}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="text-[10px] text-gray-400 italic pt-2 text-right">
+              FTND : Fagerström Test for Nicotine Dependence
             </div>
           </div>
         )}
