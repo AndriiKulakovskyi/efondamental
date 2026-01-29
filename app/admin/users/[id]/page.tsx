@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { UserEditForm } from "./components/user-edit-form";
-import { getAllCenters, getAllPathologies } from "@/lib/services/center.service";
+import { getAllCenters, getAllPathologies, getAllCenterPathologies } from "@/lib/services/center.service";
 
 export default async function AdminUserDetailPage({
   params,
@@ -41,6 +41,9 @@ export default async function AdminUserDetailPage({
   // Fetch all pathologies for selection
   const pathologies = await getAllPathologies();
 
+  // Fetch all center-pathology mappings for filtering
+  const centerPathologyMappings = await getAllCenterPathologies();
+
   return (
     <div className="space-y-6">
       <div>
@@ -57,6 +60,7 @@ export default async function AdminUserDetailPage({
           name: p.name,
           type: p.type
         }))}
+        centerPathologyMappings={centerPathologyMappings}
       />
     </div>
   );
