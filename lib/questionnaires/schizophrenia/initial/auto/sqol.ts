@@ -114,7 +114,7 @@ export const SQOL_SUBSCALES = {
  */
 export function calculateSqolSubscaleScore(
   responses: Record<string, any>,
-  questionIds: string[]
+  questionIds: readonly string[]
 ): number | null {
   let sum = 0;
   let validCount = 0;
@@ -574,9 +574,7 @@ export const SQOL_SZ_DEFINITION: QuestionnaireDefinition = {
   title: 'Qualité de vie (S-QoL)',
   description: "Questionnaire d'auto-évaluation de la qualité de vie pour les personnes atteintes de schizophrénie (Auquier et al., 2003). Évalue 8 dimensions: vie sentimentale, estime de soi, relations familiales, relations amicales, autonomie, bien-être psychologique, bien-être physique et résilience.",
   questions: SQOL_SZ_QUESTIONS,
-  scoringFunction: (responses: Record<string, any>) => {
-    const subscaleScores = calculateAllSqolSubscales(responses);
-    return calculateSqolGlobalScore(subscaleScores) ?? 0;
-  },
-  interpretationFunction: interpretSqolScore,
+  // Note: Scoring is handled in the service layer (saveSqolResponse in schizophrenia-initial.service.ts)
+  // The scoring functions calculateAllSqolSubscales, calculateSqolGlobalScore, and interpretSqolScore
+  // are exported for use by the service layer.
 };
