@@ -371,6 +371,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'warning';                   // Poor health perception
     }
     
+    if (code === 'IPAQ_SZ') {
+      // IPAQ: Activity level classification
+      const level = data.activity_level;
+      if (level === 'high') return 'success';
+      if (level === 'moderate') return 'info';
+      return 'warning'; // low activity
+    }
+    
     if (code === 'PRISE_M') {
       // PRISE-M: Side effects score
       const score = data.total_score;
@@ -679,6 +687,7 @@ if (code === 'FAGERSTROM') {
               {code === 'SAS' && 'Résultats SAS - Effets extrapyramidaux'}
               {code === 'PSP' && 'Résultats PSP - Fonctionnement personnel et social'}
               {(code === 'EQ5D5L' || code === 'EQ5D5L_SZ') && 'Résultats EQ-5D-5L - Qualité de vie'}
+              {code === 'IPAQ_SZ' && 'Résultats IPAQ - Activité physique'}
               {code === 'PRISE_M' && 'Résultats PRISE-M - Effets secondaires'}
               {code === 'STAI_YA' && 'Résultats STAI-YA - Anxiété état'}
               {(code === 'MARS' || code === 'MARS_SZ') && 'Résultats MARS - Observance thérapeutique'}
@@ -762,6 +771,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.total_score !== undefined ? `${data.total_score}/10` : '-')
                 : code === 'BIS_SZ'
                 ? (data.total_score !== undefined ? `${parseFloat(data.total_score).toFixed(1)}/12` : '-')
+                : code === 'IPAQ_SZ'
+                ? (data.total_met_minutes !== undefined ? `${Math.round(data.total_met_minutes)} MET-min/sem` : '-')
                 : code === 'MATHYS'
                 ? (data.total_score !== undefined ? `${parseFloat(data.total_score).toFixed(1)}/200` : '-')
                 : code === 'QIDS_SR16'
@@ -3202,6 +3213,128 @@ if (code === 'FAGERSTROM') {
               <p><strong>Profil:</strong> Codage 5 dimensions (1=aucun problème, 5=pire état)</p>
               <p className="mt-1"><strong>VAS:</strong> Échelle visuelle analogique de l'état de santé (0=pire, 100=meilleur)</p>
               <p className="mt-1"><strong>Index:</strong> Valeur d'utilité de qualité de vie (1.0=santé parfaite, &lt;0=pire que la mort)</p>
+            </div>
+          </div>
+        )}
+
+        {/* IPAQ (Physical Activity) Details */}
+        {code === 'IPAQ_SZ' && (
+          <div className="text-sm space-y-4 mt-4 pt-4 border-t-2 border-gray-200">
+            {/* Activity Level Badge */}
+            <div className={`p-4 rounded-lg text-center ${
+              data.activity_level === 'high'
+                ? 'bg-green-50 border-2 border-green-300'
+                : data.activity_level === 'moderate'
+                ? 'bg-blue-50 border-2 border-blue-300'
+                : 'bg-amber-50 border-2 border-amber-300'
+            }`}>
+              <div className={`text-2xl font-bold ${
+                data.activity_level === 'high'
+                  ? 'text-green-700'
+                  : data.activity_level === 'moderate'
+                  ? 'text-blue-700'
+                  : 'text-amber-700'
+              }`}>
+                {data.activity_level === 'high' ? 'NIVEAU ÉLEVÉ' :
+                 data.activity_level === 'moderate' ? 'NIVEAU MODÉRÉ' :
+                 'NIVEAU FAIBLE'}
+              </div>
+              <div className="text-sm mt-1 text-gray-600">
+                {Math.round(data.total_met_minutes || 0)} MET-minutes/semaine
+              </div>
+              {data.total_met_minutes >= 600 && (
+                <div className="text-xs text-green-600 mt-2 font-medium">
+                  ✓ Atteint les recommandations OMS (≥600 MET-min/semaine)
+                </div>
+              )}
+              {data.total_met_minutes < 600 && data.total_met_minutes !== null && (
+                <div className="text-xs text-amber-600 mt-2 font-medium">
+                  ⚠ En dessous des recommandations OMS (≥600 MET-min/semaine)
+                </div>
+              )}
+            </div>
+
+            {/* MET Breakdown */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-3">Détail par type d'activité</h5>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="text-center p-3 bg-red-50 rounded-lg border border-red-200">
+                  <div className="text-xl font-bold text-red-700">
+                    {Math.round(data.vigorous_met_minutes || 0)}
+                  </div>
+                  <div className="text-xs font-medium text-red-800 mt-1">Activité intense</div>
+                  <div className="text-xs text-gray-500">MET-min/sem</div>
+                  {data.vigorous_days > 0 && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      {data.vigorous_days}j × {((data.vigorous_hours || 0) * 60) + (data.vigorous_minutes || 0)}min
+                    </div>
+                  )}
+                </div>
+                <div className="text-center p-3 bg-orange-50 rounded-lg border border-orange-200">
+                  <div className="text-xl font-bold text-orange-700">
+                    {Math.round(data.moderate_met_minutes || 0)}
+                  </div>
+                  <div className="text-xs font-medium text-orange-800 mt-1">Activité modérée</div>
+                  <div className="text-xs text-gray-500">MET-min/sem</div>
+                  {data.moderate_days > 0 && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      {data.moderate_days}j × {((data.moderate_hours || 0) * 60) + (data.moderate_minutes || 0)}min
+                    </div>
+                  )}
+                </div>
+                <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="text-xl font-bold text-blue-700">
+                    {Math.round(data.walking_met_minutes || 0)}
+                  </div>
+                  <div className="text-xs font-medium text-blue-800 mt-1">Marche</div>
+                  <div className="text-xs text-gray-500">MET-min/sem</div>
+                  {data.walking_days > 0 && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      {data.walking_days}j × {((data.walking_hours || 0) * 60) + (data.walking_minutes || 0)}min
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Sitting Time */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Temps assis</h5>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <span className="text-gray-600">Jour de semaine:</span>
+                  <span className="font-medium text-gray-900">
+                    {data.sitting_weekday_total !== null ? `${Math.floor(data.sitting_weekday_total / 60)}h${data.sitting_weekday_total % 60 > 0 ? ` ${data.sitting_weekday_total % 60}min` : ''}` : '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <span className="text-gray-600">Jour de week-end:</span>
+                  <span className="font-medium text-gray-900">
+                    {data.sitting_weekend_total !== null ? `${Math.floor(data.sitting_weekend_total / 60)}h${data.sitting_weekend_total % 60 > 0 ? ` ${data.sitting_weekend_total % 60}min` : ''}` : '-'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg mt-2 ${
+                data.activity_level === 'high'
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : data.activity_level === 'moderate'
+                  ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : 'bg-amber-50 border border-amber-200 text-amber-800'
+              }`}>
+                <p className="text-sm">{data.interpretation}</p>
+              </div>
+            )}
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>IPAQ:</strong> International Physical Activity Questionnaire - Version courte (7 derniers jours)</p>
+              <p className="mt-1"><strong>MET:</strong> Équivalent métabolique (Intense=8.0, Modéré=4.0, Marche=3.3)</p>
+              <p className="mt-1"><strong>Classification:</strong> ÉLEVÉ (≥1500 MET intense ou ≥3000 total) | MODÉRÉ (≥600 MET) | FAIBLE (&lt;600 MET)</p>
+              <p className="mt-1 text-gray-600"><strong>OMS:</strong> ≥150 min/semaine d'activité modérée ou ≥75 min/semaine d'activité intense recommandés.</p>
             </div>
           </div>
         )}

@@ -59,6 +59,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'MARS_SZ': 'schizophrenia_mars',
   'BIS_SZ': 'schizophrenia_bis',
   'EQ5D5L_SZ': 'schizophrenia_eq5d5l',
+  'IPAQ_SZ': 'schizophrenia_ipaq',
 };
 
 // ============================================================================
@@ -1656,6 +1657,244 @@ export async function saveEq5d5lSzResponse(response: any): Promise<any> {
 
   if (error) {
     console.error('Error saving schizophrenia_eq5d5l:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// IPAQ (International Physical Activity Questionnaire)
+// ============================================================================
+
+/**
+ * Get IPAQ response
+ */
+export async function getIpaqSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('IPAQ_SZ', visitId);
+}
+
+/**
+ * MET values for IPAQ scoring
+ */
+const IPAQ_MET_VALUES = {
+  vigorous: 8.0,
+  moderate: 4.0,
+  walking: {
+    vigorous: 5.0,  // Brisk walking
+    moderate: 3.3,  // Default
+    slow: 2.5
+  }
+};
+
+/**
+ * Get walking MET value based on pace
+ */
+function getWalkingMET(pace: string | null | undefined): number {
+  if (!pace) return IPAQ_MET_VALUES.walking.moderate;
+  
+  if (pace === 'vigorous' || pace.includes('vive allure')) {
+    return IPAQ_MET_VALUES.walking.vigorous;
+  }
+  if (pace === 'slow' || pace.includes('lente')) {
+    return IPAQ_MET_VALUES.walking.slow;
+  }
+  return IPAQ_MET_VALUES.walking.moderate;
+}
+
+/**
+ * Calculate minutes per day from hours and minutes
+ */
+function calculateMinutesPerDay(hours: number | null | undefined, minutes: number | null | undefined): number {
+  return ((hours || 0) * 60) + (minutes || 0);
+}
+
+/**
+ * Classify activity level according to IPAQ guidelines
+ */
+function classifyActivityLevel(
+  vigorousDays: number,
+  moderateDays: number,
+  walkingDays: number,
+  vigorousMinutesPerDay: number,
+  moderateMinutesPerDay: number,
+  walkingMinutesPerDay: number,
+  vigorousMET: number,
+  totalMET: number
+): 'low' | 'moderate' | 'high' {
+  // Calculate total days (unique days with any activity)
+  const totalDays = Math.min(7, vigorousDays + moderateDays + walkingDays);
+  
+  // HIGH criteria
+  // Criterion 1: ≥3 days vigorous activity AND ≥1500 MET-min/week from vigorous
+  const highCriterion1 = vigorousDays >= 3 && vigorousMET >= 1500;
+  // Criterion 2: ≥7 days of any combination AND ≥3000 total MET-min/week
+  const highCriterion2 = totalDays >= 7 && totalMET >= 3000;
+  
+  if (highCriterion1 || highCriterion2) {
+    return 'high';
+  }
+  
+  // MODERATE criteria
+  // Criterion 1: ≥3 days vigorous activity, ≥20 min/day
+  const moderateCriterion1 = vigorousDays >= 3 && vigorousMinutesPerDay >= 20;
+  // Criterion 2: ≥5 days moderate or walking, ≥30 min/day
+  const moderateCriterion2 = (moderateDays + walkingDays) >= 5 && 
+    ((moderateMinutesPerDay >= 30) || (walkingMinutesPerDay >= 30));
+  // Criterion 3: ≥5 days any combination AND ≥600 MET-min/week
+  const moderateCriterion3 = totalDays >= 5 && totalMET >= 600;
+  
+  if (moderateCriterion1 || moderateCriterion2 || moderateCriterion3) {
+    return 'moderate';
+  }
+  
+  return 'low';
+}
+
+/**
+ * Generate interpretation text for IPAQ scores
+ */
+function interpretIpaqScore(
+  totalMET: number,
+  activityLevel: 'low' | 'moderate' | 'high',
+  vigorousMET: number,
+  moderateMET: number,
+  walkingMET: number,
+  sittingWeekday: number,
+  sittingWeekend: number
+): string {
+  let interpretation = `Score total: ${Math.round(totalMET)} MET-minutes/semaine. `;
+  
+  // Activity level interpretation
+  if (activityLevel === 'high') {
+    interpretation += 'Niveau d\'activité ÉLEVÉ - Atteint les recommandations de santé publique avec marge. ';
+  } else if (activityLevel === 'moderate') {
+    interpretation += 'Niveau d\'activité MODÉRÉ - Atteint les recommandations minimales d\'activité physique. ';
+  } else {
+    interpretation += 'Niveau d\'activité FAIBLE - N\'atteint pas les recommandations minimales d\'activité physique. ';
+  }
+  
+  // WHO guidelines comparison
+  if (totalMET >= 600) {
+    interpretation += 'Conforme aux recommandations OMS (≥600 MET-min/semaine). ';
+  } else {
+    interpretation += 'En dessous des recommandations OMS (≥600 MET-min/semaine). ';
+  }
+  
+  // Domain breakdown
+  interpretation += `Détail: Intense ${Math.round(vigorousMET)}, Modéré ${Math.round(moderateMET)}, Marche ${Math.round(walkingMET)} MET-min. `;
+  
+  // Sitting time
+  interpretation += `Temps assis: ${Math.round(sittingWeekday)} min/jour (semaine), ${Math.round(sittingWeekend)} min/jour (week-end).`;
+  
+  return interpretation;
+}
+
+/**
+ * Save IPAQ response with MET scoring and activity level classification
+ */
+export async function saveIpaqSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // If questionnaire not done, just save the status
+  if (response.questionnaire_done === 'Non fait') {
+    const { data, error } = await supabase
+      .from('schizophrenia_ipaq')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        questionnaire_done: response.questionnaire_done,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving schizophrenia_ipaq (not done):', error);
+      throw error;
+    }
+    return data;
+  }
+
+  // Remove section and instruction fields that shouldn't be saved to DB
+  const {
+    instruction_consigne,
+    section_vigorous,
+    section_moderate,
+    section_walking,
+    section_sitting,
+    instruction_sitting,
+    ...responseData
+  } = response;
+  
+  // Calculate MET-minutes for each domain
+  const vigorousDays = responseData.vigorous_days || 0;
+  const vigorousMinutesPerDay = calculateMinutesPerDay(responseData.vigorous_hours, responseData.vigorous_minutes);
+  const vigorous_met_minutes = IPAQ_MET_VALUES.vigorous * vigorousDays * vigorousMinutesPerDay;
+  
+  const moderateDays = responseData.moderate_days || 0;
+  const moderateMinutesPerDay = calculateMinutesPerDay(responseData.moderate_hours, responseData.moderate_minutes);
+  const moderate_met_minutes = IPAQ_MET_VALUES.moderate * moderateDays * moderateMinutesPerDay;
+  
+  const walkingDays = responseData.walking_days || 0;
+  const walkingMinutesPerDay = calculateMinutesPerDay(responseData.walking_hours, responseData.walking_minutes);
+  const walkingMETValue = getWalkingMET(responseData.walking_pace);
+  const walking_met_minutes = walkingMETValue * walkingDays * walkingMinutesPerDay;
+  
+  const total_met_minutes = vigorous_met_minutes + moderate_met_minutes + walking_met_minutes;
+  
+  // Classify activity level
+  const activity_level = classifyActivityLevel(
+    vigorousDays,
+    moderateDays,
+    walkingDays,
+    vigorousMinutesPerDay,
+    moderateMinutesPerDay,
+    walkingMinutesPerDay,
+    vigorous_met_minutes,
+    total_met_minutes
+  );
+  
+  // Calculate sitting time totals
+  const sitting_weekday_total = calculateMinutesPerDay(
+    responseData.sitting_weekday_hours, 
+    responseData.sitting_weekday_minutes
+  );
+  const sitting_weekend_total = calculateMinutesPerDay(
+    responseData.sitting_weekend_hours, 
+    responseData.sitting_weekend_minutes
+  );
+  
+  // Generate interpretation
+  const interpretation = interpretIpaqScore(
+    total_met_minutes,
+    activity_level,
+    vigorous_met_minutes,
+    moderate_met_minutes,
+    walking_met_minutes,
+    sitting_weekday_total,
+    sitting_weekend_total
+  );
+
+  const { data, error } = await supabase
+    .from('schizophrenia_ipaq')
+    .upsert({
+      ...responseData,
+      vigorous_met_minutes,
+      moderate_met_minutes,
+      walking_met_minutes,
+      total_met_minutes,
+      activity_level,
+      sitting_weekday_total,
+      sitting_weekend_total,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_ipaq:', error);
     throw error;
   }
   return data;

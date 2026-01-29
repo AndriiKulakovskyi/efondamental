@@ -58,3 +58,17 @@ export {
   type SchizophreniaEq5d5lResponseInsert,
   type Eq5d5lSzScoreResult,
 } from './eq5d5l';
+
+export {
+  IPAQ_SZ_QUESTIONS,
+  IPAQ_SZ_DEFINITION,
+  IPAQ_MET_VALUES,
+  getWalkingMET,
+  calculateMinutesPerDay,
+  computeIpaqMETMinutes,
+  classifyActivityLevel,
+  interpretIpaqScore,
+  type SchizophreniaIpaqResponse,
+  type SchizophreniaIpaqResponseInsert,
+  type IpaqSzScoreResult,
+} from './ipaq';

@@ -148,7 +148,8 @@ import {
   CTQ_SZ_DEFINITION,
   MARS_SZ_DEFINITION,
   BIS_SZ_DEFINITION,
-  EQ5D5L_SZ_DEFINITION
+  EQ5D5L_SZ_DEFINITION,
+  IPAQ_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -643,6 +644,16 @@ export default async function VisitDetailPage({
               target_role: 'patient',
               completed: questionnaireStatuses['EQ5D5L_SZ']?.completed || false,
               completedAt: questionnaireStatuses['EQ5D5L_SZ']?.completed_at,
+            },
+            {
+              id: IPAQ_SZ_DEFINITION.code,
+              code: IPAQ_SZ_DEFINITION.code,
+              title: IPAQ_SZ_DEFINITION.title,
+              description: IPAQ_SZ_DEFINITION.description,
+              questions: IPAQ_SZ_DEFINITION.questions,
+              target_role: 'patient',
+              completed: questionnaireStatuses['IPAQ_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['IPAQ_SZ']?.completed_at,
             }
           ]
         },
