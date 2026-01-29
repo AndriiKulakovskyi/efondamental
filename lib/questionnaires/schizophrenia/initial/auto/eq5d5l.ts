@@ -3,7 +3,8 @@
 // Reference: Herdman M, Gudex C, Lloyd A, et al. Development and preliminary testing of the new five-level version of EQ-5D (EQ-5D-5L). Qual Life Res. 2011;20(10):1727-1736.
 // French value set: Andrade LF, Ludwig K, Goni JMR, Oppe M, de Pouvourville G. A French Value Set for the EQ-5D-5L. Pharmacoeconomics. 2020;38(4):413-425.
 
-import { Question, QuestionnaireDefinition } from '@/lib/types/database.types';
+import { Question } from '@/lib/types/database.types';
+import { QuestionnaireDefinition } from '@/lib/constants/questionnaires';
 
 // ============================================================================
 // Types

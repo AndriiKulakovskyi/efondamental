@@ -2,7 +2,8 @@
 // Schizophrenia Initial Evaluation - Autoquestionnaire Module
 // Reference: Craig CL, Marshall AL, Sjöström M, et al. International physical activity questionnaire: 12-country reliability and validity. Med Sci Sports Exerc. 2003;35(8):1381-1395.
 
-import { Question, QuestionnaireDefinition } from '@/lib/types/database.types';
+import { Question } from '@/lib/types/database.types';
+import { QuestionnaireDefinition } from '@/lib/constants/questionnaires';
 
 // ============================================================================
 // Types
