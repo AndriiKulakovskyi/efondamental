@@ -303,15 +303,15 @@ export default async function VisitDetailPage({
               ...SZ_DOSSIER_INFIRMIER_DEFINITION,
               id: SZ_DOSSIER_INFIRMIER_DEFINITION.code,
               target_role: 'healthcare_professional',
-              completed: questionnaireStatuses['INF_DOSSIER_INFIRMIER']?.completed || false,
-              completedAt: questionnaireStatuses['INF_DOSSIER_INFIRMIER']?.completed_at,
+              completed: questionnaireStatuses['DOSSIER_INFIRMIER_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['DOSSIER_INFIRMIER_SZ']?.completed_at,
             },
             {
               ...SZ_BILAN_BIOLOGIQUE_DEFINITION,
               id: SZ_BILAN_BIOLOGIQUE_DEFINITION.code,
               target_role: 'healthcare_professional',
-              completed: questionnaireStatuses['INF_BILAN_BIOLOGIQUE_SZ']?.completed || false,
-              completedAt: questionnaireStatuses['INF_BILAN_BIOLOGIQUE_SZ']?.completed_at,
+              completed: questionnaireStatuses['BILAN_BIOLOGIQUE_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['BILAN_BIOLOGIQUE_SZ']?.completed_at,
             }
           ]
         },

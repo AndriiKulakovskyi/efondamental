@@ -126,9 +126,9 @@ type QuestionnaireGetter = (visitId: string) => Promise<any>;
 
 const QUESTIONNAIRE_GETTERS: Record<string, QuestionnaireGetter> = {
   // Screening questionnaires
-  'ASRM_FR': getAsrmResponse,
-  'QIDS_SR16_FR': getQidsResponse,
-  'MDQ_FR': getMdqResponse,
+  'ASRM': getAsrmResponse,
+  'QIDS_SR16': getQidsResponse,
+  'MDQ': getMdqResponse,
   // Initial Evaluation - ETAT questionnaires (codes without _FR suffix)
   'EQ5D5L': getEq5d5lResponse,
   'PRISE_M': getPriseMResponse,
