@@ -243,7 +243,7 @@ export const BILAN_SOCIAL_SZ_QUESTIONS: Question[] = [
     text: 'Type de revenus',
     type: 'multiple_choice',
     required: true,
-    help_text: 'Plusieurs choix possibles',
+    help: 'Plusieurs choix possibles',
     options: [
       { code: 'salaire', label: 'Salaire' },
       { code: 'rmi_rsa', label: 'RMI/RSA' },
