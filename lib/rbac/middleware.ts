@@ -278,7 +278,7 @@ export interface UserContext {
   profile: UserProfile;
   permissions: string[];
   centerName?: string;
-  pathologies?: string[];
+  pathologies?: { id: string; name: string; type: string; description: string | null }[];
 }
 
 export const getUserContext = cache(async (): Promise<UserContext | null> => {
@@ -319,20 +319,28 @@ export const getUserContext = cache(async (): Promise<UserContext | null> => {
     new Set([...defaultPermissions, ...additionalPermissions])
   );
 
-  // Get center and pathology information
+  // Get center information
   let centerName: string | undefined;
-  let pathologies: string[] | undefined;
 
   if (profile.center_id) {
     const { data: centerData } = await supabase
-      .from('v_users_full')
-      .select('center_name, center_pathologies')
-      .eq('id', user.id)
+      .from('centers')
+      .select('name')
+      .eq('id', profile.center_id)
       .single();
 
-    centerName = centerData?.center_name || undefined;
-    pathologies = centerData?.center_pathologies || undefined;
+    centerName = centerData?.name || undefined;
   }
+
+  // Get assigned pathologies (multi-assignment)
+  const { data: userPathologies } = await supabase
+    .from('user_pathologies')
+    .select('pathology:pathologies(id, name, type, description)')
+    .eq('user_id', user.id);
+
+  const pathologies = userPathologies
+    ?.map((up: any) => up.pathology)
+    .filter(Boolean) || [];
 
   return {
     user: {

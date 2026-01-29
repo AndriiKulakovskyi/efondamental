@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { UserEditForm } from "./components/user-edit-form";
-import { getAllCenters } from "@/lib/services/center.service";
+import { getAllCenters, getAllPathologies } from "@/lib/services/center.service";
 
 export default async function AdminUserDetailPage({
   params,
@@ -20,6 +20,9 @@ export default async function AdminUserDetailPage({
         id,
         name,
         code
+      ),
+      user_pathologies (
+        pathology_id
       )
     `)
     .eq("id", id)
@@ -34,6 +37,9 @@ export default async function AdminUserDetailPage({
 
   // Fetch all centers for the dropdown
   const centers = await getAllCenters();
+  
+  // Fetch all pathologies for selection
+  const pathologies = await getAllPathologies();
 
   return (
     <div className="space-y-6">
@@ -46,6 +52,11 @@ export default async function AdminUserDetailPage({
         user={user}
         email={authUser?.user?.email || user.email}
         centers={centers}
+        pathologies={pathologies.map(p => ({
+          id: p.id,
+          name: p.name,
+          type: p.type
+        }))}
       />
     </div>
   );

@@ -117,8 +117,8 @@ export default async function PatientDetailPage({
                   )}
                 </h2>
               <div className="flex items-center gap-3 mt-1 text-slate-500 text-sm">
-                <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-medium border border-slate-200">
-                  DMI: {patient.medical_record_number}
+                <span className="bg-brand/10 text-brand-dark px-2 py-0.5 rounded text-xs font-bold border border-brand/20">
+                  FondaCode: {patient.fondacode || 'N/A'}
                   </span>
                 <span>&bull;</span>
                   <span>{patient.pathology_name}</span>

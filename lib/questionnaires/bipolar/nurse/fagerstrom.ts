@@ -172,22 +172,51 @@ export function getFagerstromDependenceLevel(score: number): DependenceLevel {
 export function getDependenceLevelLabel(level: DependenceLevel): string {
   switch (level) {
     case 'none':
-      return 'Pas de dependance';
+      return 'Pas de dépendance';
     case 'low':
-      return 'Dependance faible';
+      return 'Dépendance faible';
     case 'moderate':
-      return 'Dependance moyenne';
+      return 'Dépendance moyenne';
     case 'high':
-      return 'Dependance forte';
+      return 'Dépendance forte';
     case 'very_high':
-      return 'Dependance tres forte';
+      return 'Dépendance très forte';
   }
 }
 
-export function interpretFagerstromScore(score: number): string {
+export function interpretFagerstromScore(score: number, responses?: FagerstromScoreInput): string {
   const level = getFagerstromDependenceLevel(score);
   const levelLabel = getDependenceLevelLabel(level);
-  return `Score FTND: ${score}/10. ${levelLabel}.`;
+  
+  let interpretation = `Score FTND: ${score}/10. ${levelLabel}.`;
+
+  // Add general guidance based on score
+  if (score <= 2) {
+    interpretation += " Le sevrage peut être envisagé sans substitution nicotinique systématique.";
+  } else if (score <= 4) {
+    interpretation += " Substitution nicotinique à faible dose peut faciliter le sevrage.";
+  } else if (score <= 6) {
+    interpretation += " Substitution nicotinique recommandée pour le sevrage.";
+  } else {
+    interpretation += " Substitution nicotinique fortement recommandée, éventuellement associée à un accompagnement thérapeutique.";
+  }
+
+  // Add specific item interpretations if responses are provided
+  if (responses) {
+    if (responses.q1 !== null && responses.q1 !== undefined && responses.q1 >= 2) {
+      interpretation += ' Cigarette matinale précoce (dépendance physique).';
+    }
+    
+    if (responses.q3 === 1) {
+      interpretation += ' Première cigarette difficilement remplaçable.';
+    }
+
+    if (responses.q4 !== null && responses.q4 !== undefined && responses.q4 >= 2) {
+      interpretation += ' Consommation importante (>20 cigarettes/jour).';
+    }
+  }
+
+  return interpretation;
 }
 
 // ============================================================================
@@ -197,18 +226,17 @@ export function interpretFagerstromScore(score: number): string {
 export interface FagerstromScoringResult {
   total_score: number;
   dependence_level: DependenceLevel;
-  dependence_level_label: string;
   interpretation: string;
 }
 
 export function scoreFagerstrom(responses: FagerstromScoreInput): FagerstromScoringResult {
   const total_score = computeFagerstromScore(responses);
   const dependence_level = getFagerstromDependenceLevel(total_score);
+  const interpretation = interpretFagerstromScore(total_score, responses);
 
   return {
     total_score,
     dependence_level,
-    dependence_level_label: getDependenceLevelLabel(dependence_level),
-    interpretation: interpretFagerstromScore(total_score)
+    interpretation
   };
 }

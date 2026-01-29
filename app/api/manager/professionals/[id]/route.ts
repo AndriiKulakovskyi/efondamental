@@ -25,7 +25,7 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const { first_name, last_name, email, phone, username, active } = body;
+    const { first_name, last_name, email, phone, username, active, pathologies } = body;
 
     const supabase = await createClient();
 
@@ -76,6 +76,12 @@ export async function PATCH(
         { error: updateError.message },
         { status: 400 }
       );
+    }
+    
+    // Update pathologies if provided
+    if (pathologies && Array.isArray(pathologies)) {
+      const { setUserPathologies } = await import("@/lib/services/user.service");
+      await setUserPathologies(id, pathologies);
     }
 
     // Update auth email if changed

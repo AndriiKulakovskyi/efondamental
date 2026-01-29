@@ -5,6 +5,7 @@ import { getRecentActivity } from "@/lib/services/audit.service";
 import { StatCard } from "@/components/ui/stat-card";
 import { Users, UserCheck, Calendar, CheckCircle } from "lucide-react";
 import { formatTimeAgo } from "@/lib/utils/date";
+import { TimeAgo } from "@/components/ui/time-ago";
 import { redirect } from "next/navigation";
 
 export default async function ManagerDashboard() {
@@ -97,9 +98,10 @@ export default async function ManagerDashboard() {
                   <p className="text-slate-900 font-medium capitalize">
                     {activity.action.replace(/_/g, ' ')}
                   </p>
-                  <p className="text-slate-500">
-                    {formatTimeAgo(activity.created_at)}
-                  </p>
+                  <TimeAgo
+                    date={activity.created_at}
+                    className="text-xs text-slate-400 mt-1 block"
+                  />
                 </div>
               ))}
             </div>

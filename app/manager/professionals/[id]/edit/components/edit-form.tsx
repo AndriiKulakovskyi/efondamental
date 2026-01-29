@@ -12,9 +12,10 @@ import { UserProfile } from "@/lib/types/database.types";
 
 interface EditProfessionalFormProps {
   professional: UserProfile;
+  centerPathologies: { id: string; name: string; type: string }[];
 }
 
-export function EditProfessionalForm({ professional }: EditProfessionalFormProps) {
+export function EditProfessionalForm({ professional, centerPathologies }: EditProfessionalFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +28,9 @@ export function EditProfessionalForm({ professional }: EditProfessionalFormProps
   const [phone, setPhone] = useState(professional.phone || "");
   const [username, setUsername] = useState(professional.username || "");
   const [active, setActive] = useState(professional.active);
+  const [selectedPathologies, setSelectedPathologies] = useState<string[]>(
+    professional.user_pathologies?.map(up => up.pathology_id) || []
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,6 +64,7 @@ export function EditProfessionalForm({ professional }: EditProfessionalFormProps
           phone: phone.trim() || null,
           username: username.trim() || null,
           active,
+          pathologies: selectedPathologies,
         }),
       });
 
@@ -177,6 +182,41 @@ export function EditProfessionalForm({ professional }: EditProfessionalFormProps
               Active (Can login and access the system)
             </Label>
           </div>
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold text-slate-900 mb-4">
+          Assigned Pathologies
+        </h3>
+        <p className="text-sm text-slate-600 mb-4">
+          Select the pathologies this professional can work with.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {centerPathologies.map((pathology) => (
+            <div key={pathology.id} className="flex items-center space-x-2">
+              <Checkbox
+                id={`pathology-${pathology.id}`}
+                checked={selectedPathologies.includes(pathology.id)}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setSelectedPathologies([...selectedPathologies, pathology.id]);
+                  } else {
+                    setSelectedPathologies(selectedPathologies.filter(id => id !== pathology.id));
+                  }
+                }}
+                disabled={isLoading}
+              />
+              <Label htmlFor={`pathology-${pathology.id}`} className="cursor-pointer">
+                {pathology.name}
+              </Label>
+            </div>
+          ))}
+          {centerPathologies.length === 0 && (
+            <p className="text-sm text-slate-400 italic col-span-2">
+              No pathologies configured for this center.
+            </p>
+          )}
         </div>
       </Card>
 

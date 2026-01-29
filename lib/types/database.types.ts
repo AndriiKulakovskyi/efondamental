@@ -59,6 +59,7 @@ export interface Pathology {
   description: string | null;
   color: string | null;
   created_at: string;
+  code: string | null;
 }
 
 export interface UserProfile {
@@ -75,6 +76,26 @@ export interface UserProfile {
   created_at: string;
   updated_at: string;
   created_by: string | null;
+  user_pathologies?: {
+    pathology_id: string;
+    pathologies: {
+      id: string;
+      name: string;
+      type: string;
+    };
+  }[];
+}
+
+export interface UserPathology {
+  id: string;
+  user_id: string;
+  pathology_id: string;
+  created_at: string;
+}
+
+export interface UserPathologyInsert {
+  user_id: string;
+  pathology_id: string;
 }
 
 export type UserProfileInsert = Omit<UserProfile, 'created_at' | 'updated_at'>;
@@ -124,6 +145,29 @@ export interface Patient {
   user_id: string | null;
   deleted_at: string | null;
   deleted_by: string | null;
+  fondacode: string | null;
+  // Identité (Identity) fields
+  birth_city: string | null;
+  birth_department: string | null;
+  birth_country: string | null;
+  hospital_id: string | null;
+  social_security_number: string | null;
+  marital_name: string | null;
+  // Coordonnées (Contact) fields
+  street_number_and_name: string | null;
+  building_details: string | null;
+  postal_code: string | null;
+  city: string | null;
+  phone_private: string | null;
+  phone_professional: string | null;
+  phone_mobile: string | null;
+  // Provenance (Referral) fields
+  patient_sector: string | null;
+  referred_by: string | null;
+  visit_purpose: string | null;
+  gp_report_consent: string | null;
+  psychiatrist_report_consent: string | null;
+  center_awareness_source: string | null;
 }
 
 export interface PatientFull extends Patient {
@@ -138,7 +182,7 @@ export interface PatientFull extends Patient {
   assigned_to_last_name: string | null;
 }
 
-export type PatientInsert = Omit<Patient, 'id' | 'created_at' | 'updated_at' | 'user_id' | 'deleted_at' | 'deleted_by'>;
+export type PatientInsert = Omit<Patient, 'id' | 'created_at' | 'updated_at' | 'user_id' | 'deleted_at' | 'deleted_by' | 'fondacode'>;
 export type PatientUpdate = Partial<Omit<Patient, 'id' | 'created_at' | 'updated_at' | 'user_id' | 'deleted_at' | 'deleted_by'>>;
 
 export interface Visit {

@@ -184,7 +184,7 @@ export function PatientSearch({ pathology, initialPatients = [], onFilterChange 
                           {patient.first_name} {patient.last_name}
                         </p>
                         <p className="text-sm text-slate-600">
-                          MRN: <span className="font-mono">{patient.medical_record_number}</span>
+                          FondaCode: <span className="font-mono">{patient.fondacode || 'N/A'}</span>
                         </p>
                       </div>
                       <div className="text-right">

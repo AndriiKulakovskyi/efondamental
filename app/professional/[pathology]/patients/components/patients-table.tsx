@@ -20,10 +20,10 @@ const createColumns = (pathology: string): ColumnDef<PatientFull>[] => [
     ),
   },
   {
-    accessorKey: "medical_record_number",
-    header: "MRN",
+    accessorKey: "fondacode",
+    header: "FondaCode",
     cell: ({ row }) => (
-      <span className="font-mono text-sm">{row.original.medical_record_number}</span>
+      <span className="font-mono text-sm font-semibold text-brand">{row.original.fondacode || 'N/A'}</span>
     ),
   },
   {

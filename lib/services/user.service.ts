@@ -17,7 +17,17 @@ export async function getUserById(userId: string): Promise<UserProfile | null> {
 
   const { data, error } = await supabase
     .from('user_profiles')
-    .select('*')
+    .select(`
+      *,
+      user_pathologies (
+        pathology_id,
+        pathologies (
+          id,
+          name,
+          type
+        )
+      )
+    `)
     .eq('id', userId)
     .single();
 
@@ -221,6 +231,39 @@ export async function setUserPermissions(
 
     if (error) {
       throw new Error(`Failed to set user permissions: ${error.message}`);
+    }
+  }
+}
+
+/**
+ * Sets the pathologies assigned to a user (many-to-many relationship)
+ * This function replaces all existing assignments with the new ones.
+ */
+export async function setUserPathologies(
+  userId: string,
+  pathologyIds: string[]
+): Promise<void> {
+  const supabase = await createClient();
+
+  // First, delete all existing pathology assignments
+  await supabase
+    .from('user_pathologies')
+    .delete()
+    .eq('user_id', userId);
+
+  // Then, add new pathology assignments
+  if (pathologyIds.length > 0) {
+    const { error } = await supabase
+      .from('user_pathologies')
+      .insert(
+        pathologyIds.map((pathologyId) => ({
+          user_id: userId,
+          pathology_id: pathologyId,
+        }))
+      );
+
+    if (error) {
+      throw new Error(`Failed to set user pathologies: ${error.message}`);
     }
   }
 }

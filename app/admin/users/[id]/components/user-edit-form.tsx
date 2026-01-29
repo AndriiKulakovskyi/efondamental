@@ -20,9 +20,11 @@ interface UserEditFormProps {
       name: string;
       code: string;
     } | null;
+    user_pathologies?: { pathology_id: string }[];
   };
   email: string;
   centers: Center[];
+  pathologies: { id: string; name: string; type: string }[];
 }
 
 const ROLES: { value: UserRoleType; label: string }[] = [
@@ -32,7 +34,7 @@ const ROLES: { value: UserRoleType; label: string }[] = [
   { value: "patient", label: "Patient" },
 ];
 
-export function UserEditForm({ user, email, centers }: UserEditFormProps) {
+export function UserEditForm({ user, email, centers, pathologies }: UserEditFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +49,9 @@ export function UserEditForm({ user, email, centers }: UserEditFormProps) {
   const [role, setRole] = useState<UserRoleType>(user.role as UserRoleType);
   const [centerId, setCenterId] = useState<string>(user.center_id || "");
   const [active, setActive] = useState(user.active);
+  const [selectedPathologies, setSelectedPathologies] = useState<string[]>(
+    user.user_pathologies?.map(up => up.pathology_id) || []
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,6 +94,7 @@ export function UserEditForm({ user, email, centers }: UserEditFormProps) {
           role,
           center_id: role === "administrator" ? null : centerId || null,
           active,
+          pathologies: selectedPathologies,
         }),
       });
 
@@ -240,7 +246,7 @@ export function UserEditForm({ user, email, centers }: UserEditFormProps) {
             </div>
           )}
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 pt-2">
             <Checkbox
               id="active"
               checked={active}
@@ -251,6 +257,41 @@ export function UserEditForm({ user, email, centers }: UserEditFormProps) {
               Active (User can login and access the system)
             </Label>
           </div>
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold text-slate-900 mb-4">
+          Pathology Assignments
+        </h3>
+        <p className="text-sm text-slate-600 mb-4">
+          Select the pathologies this user is authorized to manage or access.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {pathologies.map((pathology) => (
+            <div key={pathology.id} className="flex items-center space-x-2">
+              <Checkbox
+                id={`pathology-${pathology.id}`}
+                checked={selectedPathologies.includes(pathology.id)}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setSelectedPathologies([...selectedPathologies, pathology.id]);
+                  } else {
+                    setSelectedPathologies(selectedPathologies.filter(id => id !== pathology.id));
+                  }
+                }}
+                disabled={isLoading}
+              />
+              <Label htmlFor={`pathology-${pathology.id}`} className="cursor-pointer">
+                {pathology.name}
+              </Label>
+            </div>
+          ))}
+          {pathologies.length === 0 && (
+            <p className="text-sm text-slate-400 italic col-span-2">
+              No pathologies available in the system.
+            </p>
+          )}
         </div>
       </Card>
 

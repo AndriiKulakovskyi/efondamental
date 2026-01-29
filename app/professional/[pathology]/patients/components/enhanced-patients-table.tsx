@@ -23,10 +23,10 @@ const createColumns = (pathology: string): ColumnDef<PatientFull>[] => [
     ),
   },
   {
-    accessorKey: "medical_record_number",
-    header: "NRM",
+    accessorKey: "fondacode",
+    header: "FondaCode",
     cell: ({ row }) => (
-      <span className="font-mono text-sm">{row.original.medical_record_number}</span>
+      <span className="font-mono text-sm font-semibold text-brand">{row.original.fondacode || 'N/A'}</span>
     ),
   },
   {
@@ -83,10 +83,10 @@ export function EnhancedPatientsTable({ patients, pathology }: EnhancedPatientsT
   const columns = useMemo(() => createColumns(pathology), [pathology]);
 
   const exportToCSV = () => {
-    const headers = ["Nom", "NRM", "Age", "Sexe", "Statut"];
+    const headers = ["Nom", "FondaCode", "Age", "Sexe", "Statut"];
     const rows = patients.map(p => [
       `${p.first_name} ${p.last_name}`,
-      p.medical_record_number,
+      p.fondacode || 'N/A',
       calculateAge(p.date_of_birth),
       p.gender || "",
       p.active ? "Actif" : "Inactif",
