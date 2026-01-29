@@ -353,8 +353,8 @@ export async function getEq5d5lResponse(
 
 // EQ-5D-5L France Crosswalk Value Set
 // Maps 5-digit health state profiles to utility index values
-// TODO: Paste the complete France crosswalk table here
-const FRANCE_CROSSWALK: Record<string, number> = {
+// Source: Andrade LF, et al. A French Value Set for the EQ-5D-5L. Pharmacoeconomics. 2020;38(4):413-425.
+export const FRANCE_CROSSWALK: Record<string, number> = {
   "11111": 1.000,
   "11112": 0.929,
   "11113": 0.910,
@@ -3482,7 +3482,7 @@ const FRANCE_CROSSWALK: Record<string, number> = {
   "55555": -0.530
 };
 
-function calculateEq5d5lScore(
+export function calculateEq5d5lScore(
   mobility: number,
   selfCare: number,
   usualActivities: number,

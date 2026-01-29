@@ -362,7 +362,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'error';                     // Very severe / no autonomy
     }
     
-    if (code === 'EQ5D5L') {
+    if (code === 'EQ5D5L' || code === 'EQ5D5L_SZ') {
       // EQ-5D-5L: Health state profile and VAS
       const vas = data.vas_score;
       if (vas === null || vas === undefined) return 'info';
@@ -678,7 +678,7 @@ if (code === 'FAGERSTROM') {
               {code === 'BARNES' && 'Résultats BARNES - Akathisie'}
               {code === 'SAS' && 'Résultats SAS - Effets extrapyramidaux'}
               {code === 'PSP' && 'Résultats PSP - Fonctionnement personnel et social'}
-              {code === 'EQ5D5L' && 'Résultats EQ-5D-5L - Qualité de vie'}
+              {(code === 'EQ5D5L' || code === 'EQ5D5L_SZ') && 'Résultats EQ-5D-5L - Qualité de vie'}
               {code === 'PRISE_M' && 'Résultats PRISE-M - Effets secondaires'}
               {code === 'STAI_YA' && 'Résultats STAI-YA - Anxiété état'}
               {(code === 'MARS' || code === 'MARS_SZ') && 'Résultats MARS - Observance thérapeutique'}
@@ -752,7 +752,7 @@ if (code === 'FAGERSTROM') {
                 ? (data.mean_score !== undefined && data.mean_score !== null ? data.mean_score.toFixed(2) : '-')
                 : code === 'PSP'
                 ? (data.final_score !== undefined && data.final_score !== null ? data.final_score : '-')
-                : code === 'EQ5D5L'
+                : (code === 'EQ5D5L' || code === 'EQ5D5L_SZ')
                 ? (data.profile_string || data.health_state || '-')
                 : code === 'PRISE_M'
                 ? (data.total_score !== undefined ? data.total_score : '-')
@@ -3072,7 +3072,7 @@ if (code === 'FAGERSTROM') {
         )}
 
         {/* EQ-5D-5L Details */}
-        {code === 'EQ5D5L' && (
+        {(code === 'EQ5D5L' || code === 'EQ5D5L_SZ') && (
           <div className="text-sm space-y-4 mt-2 pt-2 border-t">
             {/* Health State Profile */}
             <div className={`p-3 rounded-lg ${

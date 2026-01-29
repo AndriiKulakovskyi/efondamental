@@ -139,7 +139,8 @@ import {
   SQOL_SZ_DEFINITION,
   CTQ_SZ_DEFINITION,
   MARS_SZ_DEFINITION,
-  BIS_SZ_DEFINITION
+  BIS_SZ_DEFINITION,
+  EQ5D5L_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { 
   getAsrmResponse, 
@@ -280,7 +281,8 @@ import {
 import {
   getCtqResponse as getCtqSzResponse,
   getMarsResponse as getMarsSzResponse,
-  getBisResponse as getBisSzResponse
+  getBisResponse as getBisSzResponse,
+  getEq5d5lSzResponse
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -590,6 +592,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === CTQ_SZ_DEFINITION.code) questionnaire = CTQ_SZ_DEFINITION;
   else if (code === MARS_SZ_DEFINITION.code) questionnaire = MARS_SZ_DEFINITION;
   else if (code === BIS_SZ_DEFINITION.code) questionnaire = BIS_SZ_DEFINITION;
+  else if (code === EQ5D5L_SZ_DEFINITION.code) questionnaire = EQ5D5L_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -743,6 +746,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === CTQ_SZ_DEFINITION.code) existingResponse = await getCtqSzResponse(visitId);
   else if (code === MARS_SZ_DEFINITION.code) existingResponse = await getMarsSzResponse(visitId);
   else if (code === BIS_SZ_DEFINITION.code) existingResponse = await getBisSzResponse(visitId);
+  else if (code === EQ5D5L_SZ_DEFINITION.code) existingResponse = await getEq5d5lSzResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

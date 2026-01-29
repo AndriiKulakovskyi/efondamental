@@ -58,6 +58,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'CTQ': 'schizophrenia_ctq',
   'MARS_SZ': 'schizophrenia_mars',
   'BIS_SZ': 'schizophrenia_bis',
+  'EQ5D5L_SZ': 'schizophrenia_eq5d5l',
 };
 
 // ============================================================================
@@ -1578,6 +1579,83 @@ export async function saveBisResponse(response: any): Promise<any> {
 
   if (error) {
     console.error('Error saving schizophrenia_bis:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// EQ-5D-5L (Schizophrenia)
+// ============================================================================
+
+/**
+ * Get EQ-5D-5L response
+ */
+export async function getEq5d5lSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('EQ5D5L_SZ', visitId);
+}
+
+/**
+ * Save EQ-5D-5L response with scoring using French value set
+ */
+export async function saveEq5d5lSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // If questionnaire not done, just save the status
+  if (response.questionnaire_done === 'Non fait') {
+    const { data, error } = await supabase
+      .from('schizophrenia_eq5d5l')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        questionnaire_done: response.questionnaire_done,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving schizophrenia_eq5d5l (not done):', error);
+      throw error;
+    }
+    return data;
+  }
+
+  // Import the scoring function
+  const { calculateEq5d5lScore } = await import('./questionnaire.service');
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    instruction_consigne,
+    section_vas,
+    ...responseData
+  } = response;
+  
+  // Calculate scores using French value set
+  const { profile, indexValue, interpretation } = calculateEq5d5lScore(
+    responseData.mobility,
+    responseData.self_care,
+    responseData.usual_activities,
+    responseData.pain_discomfort,
+    responseData.anxiety_depression,
+    responseData.vas_score
+  );
+
+  const { data, error } = await supabase
+    .from('schizophrenia_eq5d5l')
+    .upsert({
+      ...responseData,
+      health_state: profile,
+      index_value: indexValue,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_eq5d5l:', error);
     throw error;
   }
   return data;

@@ -240,7 +240,8 @@ import {
   SQOL_SZ_DEFINITION,
   CTQ_SZ_DEFINITION,
   MARS_SZ_DEFINITION,
-  BIS_SZ_DEFINITION
+  BIS_SZ_DEFINITION,
+  EQ5D5L_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -747,6 +748,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               title: BIS_SZ_DEFINITION.title,
               description: BIS_SZ_DEFINITION.description,
               questions: BIS_SZ_DEFINITION.questions,
+            },
+            {
+              id: EQ5D5L_SZ_DEFINITION.id,
+              code: EQ5D5L_SZ_DEFINITION.code,
+              title: EQ5D5L_SZ_DEFINITION.title,
+              description: EQ5D5L_SZ_DEFINITION.description,
+              questions: EQ5D5L_SZ_DEFINITION.questions,
             }
           ]
         },

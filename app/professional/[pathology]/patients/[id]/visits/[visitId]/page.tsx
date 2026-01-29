@@ -147,7 +147,8 @@ import {
   SQOL_SZ_DEFINITION,
   CTQ_SZ_DEFINITION,
   MARS_SZ_DEFINITION,
-  BIS_SZ_DEFINITION
+  BIS_SZ_DEFINITION,
+  EQ5D5L_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -632,6 +633,16 @@ export default async function VisitDetailPage({
               target_role: 'patient',
               completed: questionnaireStatuses['BIS_SZ']?.completed || false,
               completedAt: questionnaireStatuses['BIS_SZ']?.completed_at,
+            },
+            {
+              id: EQ5D5L_SZ_DEFINITION.code,
+              code: EQ5D5L_SZ_DEFINITION.code,
+              title: EQ5D5L_SZ_DEFINITION.title,
+              description: EQ5D5L_SZ_DEFINITION.description,
+              questions: EQ5D5L_SZ_DEFINITION.questions,
+              target_role: 'patient',
+              completed: questionnaireStatuses['EQ5D5L_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['EQ5D5L_SZ']?.completed_at,
             }
           ]
         },
