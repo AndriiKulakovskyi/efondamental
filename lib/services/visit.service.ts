@@ -238,7 +238,8 @@ import {
   TROUBLES_COMORBIDES_SZ_DEFINITION,
   BILAN_SOCIAL_SZ_DEFINITION,
   SQOL_SZ_DEFINITION,
-  CTQ_SZ_DEFINITION
+  CTQ_SZ_DEFINITION,
+  MARS_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -731,6 +732,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               title: CTQ_SZ_DEFINITION.title,
               description: CTQ_SZ_DEFINITION.description,
               questions: CTQ_SZ_DEFINITION.questions,
+            },
+            {
+              id: MARS_SZ_DEFINITION.id,
+              code: MARS_SZ_DEFINITION.code,
+              title: MARS_SZ_DEFINITION.title,
+              description: MARS_SZ_DEFINITION.description,
+              questions: MARS_SZ_DEFINITION.questions,
             }
           ]
         },

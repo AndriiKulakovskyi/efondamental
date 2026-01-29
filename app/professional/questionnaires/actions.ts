@@ -160,7 +160,8 @@ import {
   saveBilanBiologiqueSzResponse as saveSchizophreniaBilanBiologiqueResponse,
   saveEvalAddictologiqueSzResponse as saveSchizophreniaEvalAddictologiqueResponse,
   saveSqolResponse as saveSchizophreniaSqolResponse,
-  saveCtqResponse as saveSchizophreniaCtqResponse
+  saveCtqResponse as saveSchizophreniaCtqResponse,
+  saveMarsResponse as saveSchizophreniaMarsResponse
 } from '@/lib/services/schizophrenia-initial.service';
 import { 
   getVisitCompletionStatus,
@@ -773,6 +774,14 @@ export async function submitProfessionalQuestionnaireAction(
         });
         break;
 
+      case 'MARS_SZ':
+        result = await saveSchizophreniaMarsResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        });
+        break;
+
       // Initial Evaluation - ETAT (using bipolar-initial.service.ts)
       case 'EQ5D5L':
         result = await saveBipolarInitialResponse('EQ5D5L', {
@@ -834,8 +843,8 @@ export async function submitProfessionalQuestionnaireAction(
       // shouldUseBipolarTables routing for bipolar patients. The old responses_* 
       // tables have been dropped and data migrated to bipolar_* tables.
       // If these codes reach here, it means the routing failed - throw an error.
+      // Note: 'CTQ' is handled above for schizophrenia patients (case 'CTQ' -> schizophrenia_ctq)
       case 'ASRS':
-      case 'CTQ':
       case 'BIS10_FR':
       case 'ALS18':
       case 'AIM':

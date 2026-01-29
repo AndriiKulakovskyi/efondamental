@@ -145,7 +145,8 @@ import {
   TROUBLES_COMORBIDES_SZ_DEFINITION,
   BILAN_SOCIAL_SZ_DEFINITION,
   SQOL_SZ_DEFINITION,
-  CTQ_SZ_DEFINITION
+  CTQ_SZ_DEFINITION,
+  MARS_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -608,8 +609,18 @@ export default async function VisitDetailPage({
               description: CTQ_SZ_DEFINITION.description,
               questions: CTQ_SZ_DEFINITION.questions,
               target_role: 'patient',
-              completed: questionnaireStatuses['CTQ']?.completed || false,
-              completedAt: questionnaireStatuses['CTQ']?.completed_at,
+              completed: questionnaireStatuses['CTQ_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['CTQ_SZ']?.completed_at,
+            },
+            {
+              id: MARS_SZ_DEFINITION.code,
+              code: MARS_SZ_DEFINITION.code,
+              title: MARS_SZ_DEFINITION.title,
+              description: MARS_SZ_DEFINITION.description,
+              questions: MARS_SZ_DEFINITION.questions,
+              target_role: 'patient',
+              completed: questionnaireStatuses['MARS_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['MARS_SZ']?.completed_at,
             }
           ]
         },

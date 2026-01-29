@@ -56,6 +56,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   // Auto module (patient self-administered)
   'SQOL_SZ': 'schizophrenia_sqol',
   'CTQ': 'schizophrenia_ctq',
+  'MARS_SZ': 'schizophrenia_mars',
 };
 
 // ============================================================================
@@ -1310,6 +1311,142 @@ export async function saveCtqResponse(response: any): Promise<any> {
 
   if (error) {
     console.error('Error saving schizophrenia_ctq:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// MARS (Medication Adherence Rating Scale) Scoring
+// ============================================================================
+
+// Q7 and Q8 are reverse-scored (positive items): Oui=1, Non=0
+const MARS_POSITIVE_ITEMS = [7, 8];
+
+// Domain mappings
+const MARS_DOMAIN_ITEMS = {
+  adherence_behavior: [1, 2, 3, 4],      // Q1-Q4: Comportement d'adhésion
+  attitude: [5, 6],                       // Q5-Q6: Attitude face aux médicaments
+  positive_effects: [7, 8],               // Q7-Q8: Effets positifs perçus (reverse)
+  negative_effects: [9, 10]               // Q9-Q10: Effets négatifs perçus
+};
+
+/**
+ * Get the scored value for a MARS item
+ */
+function getMarsItemScore(itemNum: number, value: string | null | undefined): number {
+  if (value === null || value === undefined) return 0;
+  
+  if (MARS_POSITIVE_ITEMS.includes(itemNum)) {
+    // Positive items: Oui = 1 point (perceives benefit)
+    return value === 'Oui' ? 1 : 0;
+  } else {
+    // Negative items: Non = 1 point (good adherence/no negative effect)
+    return value === 'Non' ? 1 : 0;
+  }
+}
+
+/**
+ * Interpret MARS total score
+ */
+function interpretMarsScore(totalScore: number): string {
+  if (totalScore >= 8) {
+    return 'Bonne observance thérapeutique. Comportements et attitudes favorables à la prise régulière du traitement.';
+  }
+  if (totalScore >= 6) {
+    return 'Observance modérée. Quelques difficultés d\'adhésion identifiées. Exploration des obstacles recommandée.';
+  }
+  if (totalScore >= 4) {
+    return 'Observance faible. Difficultés importantes d\'adhésion au traitement. Intervention ciblée nécessaire.';
+  }
+  return 'Très faible observance. Non-adhésion majeure au traitement. Risque élevé de rechute. Intervention urgente recommandée.';
+}
+
+/**
+ * Get MARS response
+ */
+export async function getMarsResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('MARS_SZ', visitId);
+}
+
+/**
+ * Save MARS response with scoring
+ */
+export async function saveMarsResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // If questionnaire not done, just save the status
+  if (response.questionnaire_done === 'Non fait') {
+    const { data, error } = await supabase
+      .from('schizophrenia_mars')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        questionnaire_done: response.questionnaire_done,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving schizophrenia_mars:', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Calculate scores
+  let total_score = 0;
+  let adherence_subscore = 0;
+  let attitude_subscore = 0;
+  let positive_effects_subscore = 0;
+  let negative_effects_subscore = 0;
+  
+  for (let i = 1; i <= 10; i++) {
+    const qKey = `q${i}`;
+    const value = response[qKey] as string | null | undefined;
+    const itemScore = getMarsItemScore(i, value);
+    
+    total_score += itemScore;
+    
+    // Assign to appropriate subscale
+    if (MARS_DOMAIN_ITEMS.adherence_behavior.includes(i)) {
+      adherence_subscore += itemScore;
+    } else if (MARS_DOMAIN_ITEMS.attitude.includes(i)) {
+      attitude_subscore += itemScore;
+    } else if (MARS_DOMAIN_ITEMS.positive_effects.includes(i)) {
+      positive_effects_subscore += itemScore;
+    } else if (MARS_DOMAIN_ITEMS.negative_effects.includes(i)) {
+      negative_effects_subscore += itemScore;
+    }
+  }
+  
+  const interpretation = interpretMarsScore(total_score);
+  
+  // Remove instruction fields before saving
+  const { 
+    instruction_consigne,
+    ...responseData 
+  } = response;
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_mars')
+    .upsert({
+      ...responseData,
+      total_score,
+      adherence_subscore,
+      attitude_subscore,
+      positive_effects_subscore,
+      negative_effects_subscore,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_mars:', error);
     throw error;
   }
   return data;

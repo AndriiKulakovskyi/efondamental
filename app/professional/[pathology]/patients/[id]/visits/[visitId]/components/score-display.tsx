@@ -76,7 +76,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return isPositive ? 'warning' : 'info';
     }
     
-    if (code === 'CTQ') {
+    if (code === 'CTQ' || code === 'CTQ_SZ') {
       // CTQ: Check if any subscale is severe
       const hasSevere = ['emotional_abuse_severity', 'physical_abuse_severity', 'sexual_abuse_severity', 
                         'emotional_neglect_severity', 'physical_neglect_severity']
@@ -391,7 +391,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'error';                      // High/very high
     }
     
-    if (code === 'MARS') {
+    if (code === 'MARS' || code === 'MARS_SZ') {
       // MARS: Medication adherence
       const score = data.total_score;
       if (score === null || score === undefined) return 'info';
@@ -638,7 +638,7 @@ if (code === 'FAGERSTROM') {
               {code === 'QIDS_SR16' && 'Score QIDS-SR16'}
               {code === 'MDQ' && 'Résultat MDQ'}
               {code === 'ASRS' && 'Résultat ASRS'}
-              {code === 'CTQ' && 'Résultats CTQ'}
+              {(code === 'CTQ' || code === 'CTQ_SZ') && 'Résultats CTQ'}
               {code === 'BIS10' && 'Résultats BIS-10'}
               {code === 'WURS25' && 'Résultats WURS-25'}
               {code === 'CSM' && 'Résultats CSM - Chronotype'}
@@ -671,7 +671,7 @@ if (code === 'FAGERSTROM') {
               {code === 'EQ5D5L' && 'Résultats EQ-5D-5L - Qualité de vie'}
               {code === 'PRISE_M' && 'Résultats PRISE-M - Effets secondaires'}
               {code === 'STAI_YA' && 'Résultats STAI-YA - Anxiété état'}
-              {code === 'MARS' && 'Résultats MARS - Observance thérapeutique'}
+              {(code === 'MARS' || code === 'MARS_SZ') && 'Résultats MARS - Observance thérapeutique'}
               {code === 'MATHYS' && 'Résultats MAThyS - États thymiques'}
               {code === 'PSQI' && 'Résultats PSQI - Qualité du Sommeil'}
               {code === 'EPWORTH' && 'Résultats Epworth - Somnolence Diurne'}
@@ -685,7 +685,7 @@ if (code === 'FAGERSTROM') {
                 ? (data.interpretation?.includes('Positif') ? 'POSITIF' : 'NÉGATIF')
                 : code === 'ASRS'
                 ? (data.screening_positive ? 'POSITIF' : 'NÉGATIF')
-                : code === 'CTQ'
+                : (code === 'CTQ' || code === 'CTQ_SZ')
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'BIS10'
                 ? (data.overall_impulsivity !== undefined && data.overall_impulsivity !== null ? parseFloat(data.overall_impulsivity).toFixed(2) : '-')
@@ -747,7 +747,7 @@ if (code === 'FAGERSTROM') {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'STAI_YA'
                 ? (data.total_score !== undefined ? data.total_score : '-')
-                : code === 'MARS'
+                : (code === 'MARS' || code === 'MARS_SZ')
                 ? (data.total_score !== undefined ? `${data.total_score}/10` : '-')
                 : code === 'MATHYS'
                 ? (data.total_score !== undefined ? `${parseFloat(data.total_score).toFixed(1)}/200` : '-')
@@ -765,7 +765,7 @@ if (code === 'FAGERSTROM') {
               {code === 'PSQI' && '/21'}
               {code === 'EPWORTH' && '/24'}
               {code === 'FAGERSTROM' && '/10'}
-              {code === 'CTQ' && '/125'}
+              {(code === 'CTQ' || code === 'CTQ_SZ') && '/125'}
               {code === 'BIS10' && '/4.0'}
               {code === 'CSM' && '/55'}
               {code === 'CTI' && '/55'}
@@ -1039,7 +1039,7 @@ if (code === 'FAGERSTROM') {
         )}
 
         {/* CTQ Details */}
-        {code === 'CTQ' && (
+        {(code === 'CTQ' || code === 'CTQ_SZ') && (
           <div className="text-sm space-y-3 mt-2 pt-2 border-t">
             <div className="space-y-2">
               <div className="flex justify-between items-center">
@@ -3326,7 +3326,7 @@ if (code === 'FAGERSTROM') {
         )}
 
         {/* MARS Details */}
-        {code === 'MARS' && (
+        {(code === 'MARS' || code === 'MARS_SZ') && (
           <div className="text-sm space-y-4 mt-2 pt-2 border-t">
             {/* Interpretation */}
             {data.interpretation && (

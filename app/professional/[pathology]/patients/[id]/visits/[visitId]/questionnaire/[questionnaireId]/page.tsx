@@ -136,7 +136,9 @@ import {
   EVAL_ADDICTOLOGIQUE_SZ_DEFINITION,
   TROUBLES_COMORBIDES_SZ_DEFINITION,
   BILAN_SOCIAL_SZ_DEFINITION,
-  SQOL_SZ_DEFINITION
+  SQOL_SZ_DEFINITION,
+  CTQ_SZ_DEFINITION,
+  MARS_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { 
   getAsrmResponse, 
@@ -274,6 +276,10 @@ import {
   getBilanSocialSzResponse,
   getSqolResponse
 } from "@/lib/services/questionnaire-schizophrenia.service";
+import {
+  getCtqResponse as getCtqSzResponse,
+  getMarsResponse as getMarsSzResponse
+} from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
 import { QuestionnairePageClient } from "./page-client";
@@ -579,6 +585,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === BILAN_SOCIAL_SZ_DEFINITION.code) questionnaire = BILAN_SOCIAL_SZ_DEFINITION;
   // Schizophrenia auto module (patient self-administered)
   else if (code === SQOL_SZ_DEFINITION.code) questionnaire = SQOL_SZ_DEFINITION;
+  else if (code === CTQ_SZ_DEFINITION.code) questionnaire = CTQ_SZ_DEFINITION;
+  else if (code === MARS_SZ_DEFINITION.code) questionnaire = MARS_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -729,6 +737,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === BILAN_SOCIAL_SZ_DEFINITION.code) existingResponse = await getBilanSocialSzResponse(visitId);
   // Schizophrenia auto module (patient self-administered)
   else if (code === SQOL_SZ_DEFINITION.code) existingResponse = await getSqolResponse(visitId);
+  else if (code === CTQ_SZ_DEFINITION.code) existingResponse = await getCtqSzResponse(visitId);
+  else if (code === MARS_SZ_DEFINITION.code) existingResponse = await getMarsSzResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

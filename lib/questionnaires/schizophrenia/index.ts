@@ -50,5 +50,6 @@ export {
 
 export {
   SQOL_SZ_DEFINITION,
-  CTQ_SZ_DEFINITION
+  CTQ_SZ_DEFINITION,
+  MARS_SZ_DEFINITION
 } from './initial/auto';
