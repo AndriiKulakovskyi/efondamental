@@ -53,6 +53,15 @@ export function QuestionnairePageClient({
   const [submittedData, setSubmittedData] = useState<any>(existingData);
   const [justSubmitted, setJustSubmitted] = useState(showScoreFromUrl);
   
+  // Sync submittedData with existingData when URL has ?submitted=true
+  // This handles the case where the page reloads after submission and existingData
+  // now contains the saved response from the server
+  useEffect(() => {
+    if (showScoreFromUrl && existingData && !submittedData) {
+      setSubmittedData(existingData);
+    }
+  }, [showScoreFromUrl, existingData, submittedData]);
+  
   // Stabilize initialResponses to prevent unnecessary re-initialization of the renderer
   const stableInitialResponses = useMemo(() => initialResponses, [initialResponses]);
   
@@ -139,7 +148,7 @@ export function QuestionnairePageClient({
         'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA',
         'PANSS', 'CDSS', 'BARS', 'SUMD', 'AIMS', 'BARNES', 'SAS', 'PSP',
         'ISA_FOLLOWUP',
-        'SQOL_SZ', 'CTQ_SZ', 'MARS_SZ'
+        'SQOL_SZ', 'CTQ_SZ', 'MARS_SZ', 'BIS_SZ'
       ].includes(questionnaire.code);
 
       console.log('[QuestionnairePageClient] Submit success:', {
@@ -175,7 +184,9 @@ export function QuestionnairePageClient({
 
   // Show score page if we just submitted or if URL indicates submission (persists across revalidation)
   // The showScoreFromUrl check ensures score page persists even after Next.js revalidates
-  if ((justSubmitted || showScoreFromUrl) && submittedData) {
+  // Use existingData as fallback when showScoreFromUrl is true (handles page reload after submission)
+  const scoreData = submittedData || (showScoreFromUrl ? existingData : null);
+  if ((justSubmitted || showScoreFromUrl) && scoreData) {
     return (
       <div className="min-h-screen bg-[#FDFBFA]">
         <QuestionnaireProgressHeader
@@ -200,7 +211,7 @@ export function QuestionnairePageClient({
             <CardContent className="pt-6 space-y-6">
               <ScoreDisplay 
                 code={questionnaire.code} 
-                data={submittedData} 
+                data={scoreData} 
               />
               
               <div className="flex justify-end pt-4 border-t">

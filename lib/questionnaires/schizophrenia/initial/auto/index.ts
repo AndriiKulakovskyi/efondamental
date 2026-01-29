@@ -38,3 +38,13 @@ export {
   type SchizophreniaMarsResponseInsert,
   type MarsSzScoreResult,
 } from './mars';
+
+export {
+  BIS_SZ_QUESTIONS,
+  BIS_SZ_DEFINITION,
+  computeBisScores,
+  interpretBisScore,
+  type SchizophreniaBisResponse,
+  type SchizophreniaBisResponseInsert,
+  type BisSzScoreResult,
+} from './bis';

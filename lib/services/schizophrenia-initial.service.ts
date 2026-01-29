@@ -57,6 +57,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'SQOL_SZ': 'schizophrenia_sqol',
   'CTQ': 'schizophrenia_ctq',
   'MARS_SZ': 'schizophrenia_mars',
+  'BIS_SZ': 'schizophrenia_bis',
 };
 
 // ============================================================================
@@ -1447,6 +1448,136 @@ export async function saveMarsResponse(response: any): Promise<any> {
 
   if (error) {
     console.error('Error saving schizophrenia_mars:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// BIS (Birchwood Insight Scale) Scoring
+// ============================================================================
+
+// Positive items: D'accord = 2 (indicates insight)
+const BIS_POSITIVE_ITEMS = [1, 4, 5, 7, 8];
+// Negative items: D'accord = 0 (indicates lack of insight)
+const BIS_NEGATIVE_ITEMS = [2, 3, 6];
+
+/**
+ * Get the scored value for a BIS item
+ */
+function getBisItemScore(itemNum: number, value: string | null | undefined): number {
+  if (value === null || value === undefined) return 0;
+  
+  if (BIS_POSITIVE_ITEMS.includes(itemNum)) {
+    // Positive items: D'accord = good insight (2 points)
+    if (value === "D'accord") return 2;
+    if (value === 'Pas d\'accord') return 0;
+    if (value === 'Incertain') return 1;
+  } else {
+    // Negative items: Pas d'accord = good insight (2 points)
+    if (value === "D'accord") return 0;
+    if (value === 'Pas d\'accord') return 2;
+    if (value === 'Incertain') return 1;
+  }
+  return 0;
+}
+
+/**
+ * Interpret BIS total score
+ */
+function interpretBisScore(totalScore: number): string {
+  if (totalScore >= 10) {
+    return 'Très bon insight. Le patient reconnaît ses symptômes, sa maladie et son besoin de traitement.';
+  }
+  if (totalScore >= 7) {
+    return 'Bon insight. Le patient a une conscience satisfaisante de sa situation clinique.';
+  }
+  if (totalScore >= 4) {
+    return 'Insight modéré. Certaines dimensions de la conscience de la maladie sont partiellement reconnues.';
+  }
+  return 'Pauvre insight. Difficultés importantes à reconnaître la maladie, les symptômes ou le besoin de traitement.';
+}
+
+/**
+ * Get BIS response
+ */
+export async function getBisResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('BIS_SZ', visitId);
+}
+
+/**
+ * Save BIS response with scoring
+ */
+export async function saveBisResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // If questionnaire not done, just save the status
+  if (response.questionnaire_done === 'Non fait') {
+    const { data, error } = await supabase
+      .from('schizophrenia_bis')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        questionnaire_done: response.questionnaire_done,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving schizophrenia_bis:', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Calculate conscience_symptome (Q1 + Q8)
+  const conscience_symptome_score = 
+    getBisItemScore(1, response.q1) + 
+    getBisItemScore(8, response.q8);
+  
+  // Calculate conscience_maladie (Q2 + Q7)
+  const conscience_maladie_score = 
+    getBisItemScore(2, response.q2) + 
+    getBisItemScore(7, response.q7);
+  
+  // Calculate besoin_traitement ((Q3 + Q4 + Q5 + Q6) / 2)
+  const besoin_traitement_raw = 
+    getBisItemScore(3, response.q3) + 
+    getBisItemScore(4, response.q4) + 
+    getBisItemScore(5, response.q5) + 
+    getBisItemScore(6, response.q6);
+  const besoin_traitement_score = besoin_traitement_raw / 2;
+  
+  // Total score is sum of subscales
+  const total_score = conscience_symptome_score + conscience_maladie_score + besoin_traitement_score;
+  
+  const interpretation = interpretBisScore(total_score);
+  
+  // Remove instruction fields before saving
+  const { 
+    instruction_version,
+    instruction_consigne,
+    ...responseData 
+  } = response;
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_bis')
+    .upsert({
+      ...responseData,
+      conscience_symptome_score,
+      conscience_maladie_score,
+      besoin_traitement_score,
+      total_score,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_bis:', error);
     throw error;
   }
   return data;

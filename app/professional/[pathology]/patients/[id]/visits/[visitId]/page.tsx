@@ -146,7 +146,8 @@ import {
   BILAN_SOCIAL_SZ_DEFINITION,
   SQOL_SZ_DEFINITION,
   CTQ_SZ_DEFINITION,
-  MARS_SZ_DEFINITION
+  MARS_SZ_DEFINITION,
+  BIS_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -621,6 +622,16 @@ export default async function VisitDetailPage({
               target_role: 'patient',
               completed: questionnaireStatuses['MARS_SZ']?.completed || false,
               completedAt: questionnaireStatuses['MARS_SZ']?.completed_at,
+            },
+            {
+              id: BIS_SZ_DEFINITION.code,
+              code: BIS_SZ_DEFINITION.code,
+              title: BIS_SZ_DEFINITION.title,
+              description: BIS_SZ_DEFINITION.description,
+              questions: BIS_SZ_DEFINITION.questions,
+              target_role: 'patient',
+              completed: questionnaireStatuses['BIS_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['BIS_SZ']?.completed_at,
             }
           ]
         },

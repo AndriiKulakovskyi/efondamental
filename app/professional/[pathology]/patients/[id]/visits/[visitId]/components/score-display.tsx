@@ -401,6 +401,16 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'error';                      // Very low
     }
     
+    if (code === 'BIS_SZ') {
+      // BIS (Birchwood Insight Scale): Higher score = better insight (0-12)
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 10) return 'success';    // Very good insight
+      if (score >= 7) return 'info';        // Good insight
+      if (score >= 4) return 'warning';     // Moderate insight
+      return 'error';                       // Poor insight
+    }
+    
     if (code === 'MATHYS') {
       // MAThyS: Thymic state (0-200, ~100 = euthymic)
       const score = data.total_score;
@@ -672,6 +682,7 @@ if (code === 'FAGERSTROM') {
               {code === 'PRISE_M' && 'Résultats PRISE-M - Effets secondaires'}
               {code === 'STAI_YA' && 'Résultats STAI-YA - Anxiété état'}
               {(code === 'MARS' || code === 'MARS_SZ') && 'Résultats MARS - Observance thérapeutique'}
+              {code === 'BIS_SZ' && "Résultats BIS - Échelle d'Insight de Birchwood"}
               {code === 'MATHYS' && 'Résultats MAThyS - États thymiques'}
               {code === 'PSQI' && 'Résultats PSQI - Qualité du Sommeil'}
               {code === 'EPWORTH' && 'Résultats Epworth - Somnolence Diurne'}
@@ -749,6 +760,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : (code === 'MARS' || code === 'MARS_SZ')
                 ? (data.total_score !== undefined ? `${data.total_score}/10` : '-')
+                : code === 'BIS_SZ'
+                ? (data.total_score !== undefined ? `${parseFloat(data.total_score).toFixed(1)}/12` : '-')
                 : code === 'MATHYS'
                 ? (data.total_score !== undefined ? `${parseFloat(data.total_score).toFixed(1)}/200` : '-')
                 : code === 'QIDS_SR16'
@@ -3404,6 +3417,64 @@ if (code === 'FAGERSTROM') {
               <p className="mt-1"><strong>Score total:</strong> 0-10 (plus élevé = meilleure observance)</p>
               <p className="mt-1"><strong>Seuils:</strong> ≥8 (bonne) | 6-7 (modérée) | 4-5 (faible) | &lt;4 (très faible)</p>
               <p className="mt-1 text-gray-600"><strong>Note:</strong> Une faible observance est un facteur de risque majeur de rechute. L'identification des obstacles est essentielle.</p>
+            </div>
+          </div>
+        )}
+
+        {/* BIS (Birchwood Insight Scale) Details */}
+        {code === 'BIS_SZ' && (
+          <div className="text-sm space-y-4 mt-4 pt-4 border-t-2 border-gray-200">
+            {/* Score Grid - 4 scores prominently displayed */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-3">Scores BIS - Insight</h5>
+              <div className="grid grid-cols-4 gap-3">
+                {/* Total Score */}
+                <div className="text-center p-3 bg-gray-100 rounded-lg border-2 border-gray-300">
+                  <div className="text-2xl font-bold text-gray-900">{data.total_score !== null && data.total_score !== undefined ? parseFloat(data.total_score).toFixed(1) : '-'}</div>
+                  <div className="text-xs font-semibold text-gray-700 mt-1">Score total</div>
+                  <div className="text-xs text-gray-500">/12</div>
+                </div>
+                {/* Conscience des symptômes */}
+                <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="text-2xl font-bold text-blue-700">{data.conscience_symptome_score !== null && data.conscience_symptome_score !== undefined ? parseFloat(data.conscience_symptome_score).toFixed(0) : '-'}</div>
+                  <div className="text-xs font-medium text-blue-800 mt-1">Conscience symptômes</div>
+                  <div className="text-xs text-gray-500">/4</div>
+                </div>
+                {/* Conscience de la maladie */}
+                <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
+                  <div className="text-2xl font-bold text-purple-700">{data.conscience_maladie_score !== null && data.conscience_maladie_score !== undefined ? parseFloat(data.conscience_maladie_score).toFixed(0) : '-'}</div>
+                  <div className="text-xs font-medium text-purple-800 mt-1">Conscience maladie</div>
+                  <div className="text-xs text-gray-500">/4</div>
+                </div>
+                {/* Besoin de traitement */}
+                <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="text-2xl font-bold text-green-700">{data.besoin_traitement_score !== null && data.besoin_traitement_score !== undefined ? parseFloat(data.besoin_traitement_score).toFixed(1) : '-'}</div>
+                  <div className="text-xs font-medium text-green-800 mt-1">Besoin traitement</div>
+                  <div className="text-xs text-gray-500">/4</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg ${
+                data.total_score >= 10
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : data.total_score >= 7
+                  ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : data.total_score >= 4
+                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                <p className="font-medium">{data.interpretation}</p>
+              </div>
+            )}
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>BIS:</strong> Échelle d'Insight de Birchwood - Évalue la conscience de la maladie chez les patients psychotiques</p>
+              <p className="mt-1"><strong>Cotation:</strong> 8 items ternaires. Items positifs (1,4,5,7,8): D'accord=2. Items négatifs (2,3,6): Pas d'accord=2.</p>
+              <p className="mt-1"><strong>Seuils:</strong> ≥10 (très bon insight) | 7-9 (bon) | 4-6 (modéré) | &lt;4 (pauvre)</p>
             </div>
           </div>
         )}
