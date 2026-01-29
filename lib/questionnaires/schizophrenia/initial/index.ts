@@ -3,7 +3,7 @@
 // Export all initial evaluation questionnaire modules
 // ============================================================================
 //
-// Total: 20 questionnaires across 4 modules
+// Total: 21 questionnaires across 5 modules
 // All questionnaires save to schizophrenia_* tables via schizophrenia-initial.service.ts
 //
 // ============================================================================
@@ -26,3 +26,8 @@ export * as medical from './medical';
 // Addiction and substance use assessments
 // Tea/Coffee consumption, Evaluation addictologique
 export * as addictologie from './addictologie';
+
+// Social module (1 questionnaire)
+// Social situation assessment
+// Bilan social
+export * as social from './social';

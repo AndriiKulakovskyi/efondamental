@@ -49,6 +49,9 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'TEA_COFFEE_SZ': 'schizophrenia_tea_coffee',
   'EVAL_ADDICTOLOGIQUE_SZ': 'schizophrenia_eval_addictologique',
   'ECV': 'schizophrenia_ecv',
+  
+  // Social module
+  'BILAN_SOCIAL_SZ': 'schizophrenia_bilan_social',
 };
 
 // ============================================================================
@@ -244,6 +247,11 @@ export async function getEvalAddictologiqueSzResponse(visitId: string) {
 
 export async function getEcvResponse(visitId: string) {
   return getSchizophreniaInitialResponse('ECV', visitId);
+}
+
+// Social module
+export async function getBilanSocialSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('BILAN_SOCIAL_SZ', visitId);
 }
 
 // ============================================================================

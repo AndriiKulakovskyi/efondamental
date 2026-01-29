@@ -134,7 +134,8 @@ import {
   SZ_PERINATALITE_DEFINITION,
   TEA_COFFEE_SZ_DEFINITION,
   EVAL_ADDICTOLOGIQUE_SZ_DEFINITION,
-  TROUBLES_COMORBIDES_SZ_DEFINITION
+  TROUBLES_COMORBIDES_SZ_DEFINITION,
+  BILAN_SOCIAL_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { 
   getAsrmResponse, 
@@ -268,7 +269,8 @@ import {
   getAntecedentsFamiliauxPsySzResponse,
   getPerinataliteSzResponse,
   getTeaCoffeeSzResponse,
-  getEvalAddictologiqueSzResponse
+  getEvalAddictologiqueSzResponse,
+  getBilanSocialSzResponse
 } from "@/lib/services/questionnaire-schizophrenia.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -571,6 +573,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === SZ_PERINATALITE_DEFINITION.code) questionnaire = SZ_PERINATALITE_DEFINITION;
   else if (code === TEA_COFFEE_SZ_DEFINITION.code) questionnaire = TEA_COFFEE_SZ_DEFINITION;
   else if (code === EVAL_ADDICTOLOGIQUE_SZ_DEFINITION.code) questionnaire = EVAL_ADDICTOLOGIQUE_SZ_DEFINITION;
+  // Schizophrenia social module
+  else if (code === BILAN_SOCIAL_SZ_DEFINITION.code) questionnaire = BILAN_SOCIAL_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -717,6 +721,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === SZ_PERINATALITE_DEFINITION.code) existingResponse = await getPerinataliteSzResponse(visitId);
   else if (code === TEA_COFFEE_SZ_DEFINITION.code) existingResponse = await getTeaCoffeeSzResponse(visitId);
   else if (code === EVAL_ADDICTOLOGIQUE_SZ_DEFINITION.code) existingResponse = await getEvalAddictologiqueSzResponse(visitId);
+  // Schizophrenia social module
+  else if (code === BILAN_SOCIAL_SZ_DEFINITION.code) existingResponse = await getBilanSocialSzResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).
@@ -772,6 +778,16 @@ export default async function ProfessionalQuestionnairePage({
     };
     initialResponses.accepted_for_neuropsy_evaluation = boolToNum(initialResponses.accepted_for_neuropsy_evaluation);
     console.log('[WAIS Debug] Converted accepted_for_neuropsy_evaluation from boolean to:', initialResponses.accepted_for_neuropsy_evaluation);
+  }
+
+  // Convert boolean to number for BILAN_SOCIAL_SZ justice_safeguard field
+  if (code === 'BILAN_SOCIAL_SZ' && existingResponse) {
+    const boolToNum = (val: any): number | null => {
+      if (val === true) return 1;
+      if (val === false) return 0;
+      return val;
+    };
+    initialResponses.justice_safeguard = boolToNum(initialResponses.justice_safeguard);
   }
 
   // Remove calculated score fields from WAIS4_SIMILITUDES initial responses

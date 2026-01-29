@@ -41,6 +41,7 @@ export {
   getTeaCoffeeSzResponse,
   getEvalAddictologiqueSzResponse,
   getEcvResponse,
+  getBilanSocialSzResponse,
   // Specialized save functions with scoring
   savePanssResponse,
   saveCdssResponse,

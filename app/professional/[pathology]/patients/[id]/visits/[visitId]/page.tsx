@@ -142,7 +142,8 @@ import {
   SZ_PERINATALITE_DEFINITION,
   TEA_COFFEE_SZ_DEFINITION,
   EVAL_ADDICTOLOGIQUE_SZ_DEFINITION,
-  TROUBLES_COMORBIDES_SZ_DEFINITION
+  TROUBLES_COMORBIDES_SZ_DEFINITION,
+  BILAN_SOCIAL_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -561,6 +562,38 @@ export default async function VisitDetailPage({
               ]
             }
           ]
+        },
+        {
+          id: 'mod_neuropsy_sz',
+          name: 'Evaluation Neuropsychologique',
+          description: 'Évaluation neuropsychologique',
+          questionnaires: []
+        },
+        {
+          id: 'mod_social_sz',
+          name: 'Social',
+          description: 'Évaluation sociale',
+          questionnaires: [
+            {
+              ...BILAN_SOCIAL_SZ_DEFINITION,
+              id: BILAN_SOCIAL_SZ_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['BILAN_SOCIAL_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['BILAN_SOCIAL_SZ']?.completed_at,
+            }
+          ]
+        },
+        {
+          id: 'mod_auto_sz',
+          name: 'Autoquestionnaires',
+          description: 'Questionnaires remplis par le patient',
+          questionnaires: []
+        },
+        {
+          id: 'mod_auto_entourage_sz',
+          name: 'Autoquestionnaires entourage',
+          description: 'Questionnaires remplis par l\'entourage du patient',
+          questionnaires: []
         }
       ];
     } else {

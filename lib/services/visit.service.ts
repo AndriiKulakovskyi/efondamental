@@ -235,7 +235,8 @@ import {
   ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
   SZ_PERINATALITE_DEFINITION,
   EVAL_ADDICTOLOGIQUE_SZ_DEFINITION,
-  TROUBLES_COMORBIDES_SZ_DEFINITION
+  TROUBLES_COMORBIDES_SZ_DEFINITION,
+  BILAN_SOCIAL_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -696,6 +697,30 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               questionnaires: [EVAL_ADDICTOLOGIQUE_SZ_DEFINITION, TEA_COFFEE_SZ_DEFINITION]
             }
           ]
+        },
+        {
+          id: 'mod_neuropsy_sz',
+          name: 'Evaluation Neuropsychologique',
+          description: 'Évaluation neuropsychologique',
+          questionnaires: []
+        },
+        {
+          id: 'mod_social_sz',
+          name: 'Social',
+          description: 'Évaluation sociale',
+          questionnaires: [BILAN_SOCIAL_SZ_DEFINITION]
+        },
+        {
+          id: 'mod_auto_sz',
+          name: 'Autoquestionnaires',
+          description: 'Questionnaires remplis par le patient',
+          questionnaires: []
+        },
+        {
+          id: 'mod_auto_entourage_sz',
+          name: 'Autoquestionnaires entourage',
+          description: 'Questionnaires remplis par l\'entourage du patient',
+          questionnaires: []
         }
       ];
     }

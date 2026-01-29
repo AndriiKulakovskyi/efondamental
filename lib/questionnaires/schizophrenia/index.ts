@@ -5,7 +5,7 @@
 // Note: Schizophrenia screening has only medical questionnaires (no auto-questionnaires)
 export * from './screening';
 
-// Initial evaluation questionnaires (18 questionnaires across 4 modules)
+// Initial evaluation questionnaires (21 questionnaires across 5 modules)
 export * as initial from './initial';
 
 // Re-export commonly used definitions for convenience
@@ -43,3 +43,7 @@ export {
   TEA_COFFEE_SZ_DEFINITION,
   EVAL_ADDICTOLOGIQUE_SZ_DEFINITION
 } from './initial/addictologie';
+
+export {
+  BILAN_SOCIAL_SZ_DEFINITION
+} from './initial/social';

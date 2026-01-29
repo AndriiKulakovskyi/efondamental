@@ -741,6 +741,19 @@ export async function submitProfessionalQuestionnaireAction(
         });
         break;
 
+      case 'BILAN_SOCIAL_SZ':
+        // Convert numeric codes to boolean for justice_safeguard field
+        const bilanSocialData = { ...responses as any };
+        if (bilanSocialData.justice_safeguard !== undefined && bilanSocialData.justice_safeguard !== null) {
+          bilanSocialData.justice_safeguard = bilanSocialData.justice_safeguard === 1;
+        }
+        result = await saveSchizophreniaInitialResponse('BILAN_SOCIAL_SZ', {
+          visit_id: visitId,
+          patient_id: patientId,
+          ...bilanSocialData
+        });
+        break;
+
       // Initial Evaluation - ETAT (using bipolar-initial.service.ts)
       case 'EQ5D5L':
         result = await saveBipolarInitialResponse('EQ5D5L', {
