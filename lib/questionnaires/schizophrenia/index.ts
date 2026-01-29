@@ -49,5 +49,6 @@ export {
 } from './initial/social';
 
 export {
-  SQOL_SZ_DEFINITION
+  SQOL_SZ_DEFINITION,
+  CTQ_SZ_DEFINITION
 } from './initial/auto';

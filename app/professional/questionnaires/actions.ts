@@ -159,7 +159,8 @@ import {
   saveDossierInfirmierSzResponse as saveSchizophreniaDossierInfirmierResponse,
   saveBilanBiologiqueSzResponse as saveSchizophreniaBilanBiologiqueResponse,
   saveEvalAddictologiqueSzResponse as saveSchizophreniaEvalAddictologiqueResponse,
-  saveSqolResponse as saveSchizophreniaSqolResponse
+  saveSqolResponse as saveSchizophreniaSqolResponse,
+  saveCtqResponse as saveSchizophreniaCtqResponse
 } from '@/lib/services/schizophrenia-initial.service';
 import { 
   getVisitCompletionStatus,
@@ -758,6 +759,14 @@ export async function submitProfessionalQuestionnaireAction(
       // Schizophrenia Auto module (patient self-administered)
       case 'SQOL_SZ':
         result = await saveSchizophreniaSqolResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        });
+        break;
+
+      case 'CTQ':
+        result = await saveSchizophreniaCtqResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any

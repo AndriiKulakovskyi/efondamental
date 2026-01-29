@@ -55,6 +55,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   
   // Auto module (patient self-administered)
   'SQOL_SZ': 'schizophrenia_sqol',
+  'CTQ': 'schizophrenia_ctq',
 };
 
 // ============================================================================
@@ -260,6 +261,10 @@ export async function getBilanSocialSzResponse(visitId: string) {
 // Auto module (patient self-administered)
 export async function getSqolResponse(visitId: string) {
   return getSchizophreniaInitialResponse('SQOL_SZ', visitId);
+}
+
+export async function getCtqResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('CTQ', visitId);
 }
 
 // ============================================================================
@@ -1115,6 +1120,196 @@ export async function saveSqolResponse(response: any): Promise<any> {
 
   if (error) {
     console.error('Error saving schizophrenia_sqol:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// CTQ (Childhood Trauma Questionnaire) Scoring
+// ============================================================================
+
+// Items that need to be reversed during scoring (6 - value)
+const CTQ_REVERSE_ITEMS = [2, 5, 7, 13, 19, 26, 28];
+
+// Subscale item mappings
+const CTQ_SUBSCALE_ITEMS = {
+  emotional_abuse: [3, 8, 14, 18, 25],
+  physical_abuse: [9, 11, 12, 15, 17],
+  sexual_abuse: [20, 21, 23, 24, 27],
+  emotional_neglect: [5, 7, 13, 19, 28],
+  physical_neglect: [1, 2, 4, 6, 26],
+  denial: [10, 16, 22]
+};
+
+// Severity thresholds for each subscale (based on CTQ clinical guidelines)
+const CTQ_SEVERITY_THRESHOLDS_SERVICE = {
+  emotional_abuse: { none: 8, low: 12, moderate: 15, severe: 16 },
+  physical_abuse: { none: 7, low: 9, moderate: 12, severe: 13 },
+  sexual_abuse: { none: 5, low: 7, moderate: 12, severe: 13 },
+  emotional_neglect: { none: 9, low: 14, moderate: 17, severe: 18 },
+  physical_neglect: { none: 7, low: 9, moderate: 12, severe: 13 }
+};
+
+/**
+ * Get the adjusted value for an item (reverse scoring applied if needed)
+ */
+function getCtqAdjustedValue(responses: Record<string, any>, itemNum: number): number {
+  const key = `q${itemNum}`;
+  const value = responses[key] as number | null | undefined;
+  if (value === null || value === undefined) return 0;
+  return CTQ_REVERSE_ITEMS.includes(itemNum) ? (6 - value) : value;
+}
+
+/**
+ * Get raw value for an item (no reverse scoring)
+ */
+function getCtqRawValue(responses: Record<string, any>, itemNum: number): number {
+  const key = `q${itemNum}`;
+  const value = responses[key] as number | null | undefined;
+  return value ?? 0;
+}
+
+/**
+ * Calculate CTQ subscale score with reverse scoring
+ */
+function calculateCtqSubscaleScore(responses: Record<string, any>, items: number[]): number {
+  return items.reduce((sum, item) => sum + getCtqAdjustedValue(responses, item), 0);
+}
+
+/**
+ * Determine severity level for a CTQ subscale
+ */
+function interpretCtqSeverity(subscale: keyof typeof CTQ_SEVERITY_THRESHOLDS_SERVICE, score: number): string {
+  const thresholds = CTQ_SEVERITY_THRESHOLDS_SERVICE[subscale];
+  if (score <= thresholds.none) return 'no_trauma';
+  if (score <= thresholds.low) return 'low';
+  if (score <= thresholds.moderate) return 'moderate';
+  return 'severe';
+}
+
+/**
+ * Get severity label in French
+ */
+function getCtqSeverityLabelFr(severity: string): string {
+  switch (severity) {
+    case 'no_trauma': return 'Absent/Minimal';
+    case 'low': return 'Faible à modéré';
+    case 'moderate': return 'Modéré à sévère';
+    case 'severe': return 'Sévère à extrême';
+    default: return severity;
+  }
+}
+
+/**
+ * Save CTQ response with subscale scoring, severity levels, and denial calculation
+ */
+export async function saveCtqResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // If questionnaire not done, just save the status
+  if (response.questionnaire_done === 'Non fait') {
+    const { data, error } = await supabase
+      .from('schizophrenia_ctq')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        questionnaire_done: response.questionnaire_done,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving schizophrenia_ctq:', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Calculate subscale scores (with reverse scoring applied)
+  const emotional_abuse_score = calculateCtqSubscaleScore(response, CTQ_SUBSCALE_ITEMS.emotional_abuse);
+  const physical_abuse_score = calculateCtqSubscaleScore(response, CTQ_SUBSCALE_ITEMS.physical_abuse);
+  const sexual_abuse_score = calculateCtqSubscaleScore(response, CTQ_SUBSCALE_ITEMS.sexual_abuse);
+  const emotional_neglect_score = calculateCtqSubscaleScore(response, CTQ_SUBSCALE_ITEMS.emotional_neglect);
+  const physical_neglect_score = calculateCtqSubscaleScore(response, CTQ_SUBSCALE_ITEMS.physical_neglect);
+  
+  // Calculate severity levels
+  const emotional_abuse_severity = interpretCtqSeverity('emotional_abuse', emotional_abuse_score);
+  const physical_abuse_severity = interpretCtqSeverity('physical_abuse', physical_abuse_score);
+  const sexual_abuse_severity = interpretCtqSeverity('sexual_abuse', sexual_abuse_score);
+  const emotional_neglect_severity = interpretCtqSeverity('emotional_neglect', emotional_neglect_score);
+  const physical_neglect_severity = interpretCtqSeverity('physical_neglect', physical_neglect_score);
+  
+  // Denial/minimization score (items 10, 16, 22 - NOT reversed, raw sum)
+  const denial_score = CTQ_SUBSCALE_ITEMS.denial.reduce((sum, item) => sum + getCtqRawValue(response, item), 0);
+  const minimization_score = denial_score;
+  
+  // Total score (sum of all 5 clinical subscales, excluding denial)
+  const total_score = emotional_abuse_score + physical_abuse_score + sexual_abuse_score + 
+                      emotional_neglect_score + physical_neglect_score;
+  
+  // Build interpretation string
+  const interpretationParts: string[] = [];
+  
+  if (emotional_abuse_severity !== 'no_trauma') {
+    interpretationParts.push(`Abus émotionnel: ${getCtqSeverityLabelFr(emotional_abuse_severity)}`);
+  }
+  if (physical_abuse_severity !== 'no_trauma') {
+    interpretationParts.push(`Abus physique: ${getCtqSeverityLabelFr(physical_abuse_severity)}`);
+  }
+  if (sexual_abuse_severity !== 'no_trauma') {
+    interpretationParts.push(`Abus sexuel: ${getCtqSeverityLabelFr(sexual_abuse_severity)}`);
+  }
+  if (emotional_neglect_severity !== 'no_trauma') {
+    interpretationParts.push(`Négligence émotionnelle: ${getCtqSeverityLabelFr(emotional_neglect_severity)}`);
+  }
+  if (physical_neglect_severity !== 'no_trauma') {
+    interpretationParts.push(`Négligence physique: ${getCtqSeverityLabelFr(physical_neglect_severity)}`);
+  }
+  
+  // Check for minimization (denial score >= 6 suggests underreporting)
+  if (denial_score >= 6) {
+    interpretationParts.push('Attention: Score de minimisation élevé - possible sous-déclaration des traumatismes');
+  }
+  
+  const interpretation = interpretationParts.length > 0 
+    ? interpretationParts.join('. ') 
+    : 'Aucun traumatisme significatif rapporté';
+  
+  // Remove instruction fields before saving
+  const { 
+    instruction_consigne, 
+    instruction_titre,
+    ...responseData 
+  } = response;
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_ctq')
+    .upsert({
+      ...responseData,
+      emotional_abuse_score,
+      physical_abuse_score,
+      sexual_abuse_score,
+      emotional_neglect_score,
+      physical_neglect_score,
+      emotional_abuse_severity,
+      physical_abuse_severity,
+      sexual_abuse_severity,
+      emotional_neglect_severity,
+      physical_neglect_severity,
+      denial_score,
+      minimization_score,
+      total_score,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_ctq:', error);
     throw error;
   }
   return data;
