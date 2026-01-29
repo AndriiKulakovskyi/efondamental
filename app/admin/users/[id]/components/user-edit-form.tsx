@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +25,7 @@ interface UserEditFormProps {
   email: string;
   centers: Center[];
   pathologies: { id: string; name: string; type: string }[];
+  centerPathologyMappings: { center_id: string; pathology_id: string }[];
 }
 
 const ROLES: { value: UserRoleType; label: string }[] = [
@@ -34,7 +35,7 @@ const ROLES: { value: UserRoleType; label: string }[] = [
   { value: "patient", label: "Patient" },
 ];
 
-export function UserEditForm({ user, email, centers, pathologies }: UserEditFormProps) {
+export function UserEditForm({ user, email, centers, pathologies, centerPathologyMappings }: UserEditFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +53,19 @@ export function UserEditForm({ user, email, centers, pathologies }: UserEditForm
   const [selectedPathologies, setSelectedPathologies] = useState<string[]>(
     user.user_pathologies?.map(up => up.pathology_id) || []
   );
+
+  // Clear pathologies that are not assigned to the new center when centerId changes
+  useEffect(() => {
+    if (!centerId) return;
+
+    const validPathologyIds = centerPathologyMappings
+      .filter((m) => m.center_id === centerId)
+      .map((m) => m.pathology_id);
+
+    setSelectedPathologies((prev) => 
+      prev.filter((id) => validPathologyIds.includes(id))
+    );
+  }, [centerId, centerPathologyMappings]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -268,7 +282,17 @@ export function UserEditForm({ user, email, centers, pathologies }: UserEditForm
           Select the pathologies this user is authorized to manage or access.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {pathologies.map((pathology) => (
+          {pathologies
+            .filter((pathology) => {
+              // Administrators see all pathologies.
+              // Other roles are filtered by center if one is selected.
+              if (role === "administrator" || !centerId) return true;
+              
+              return centerPathologyMappings.some(
+                (m) => m.center_id === centerId && m.pathology_id === pathology.id
+              );
+            })
+            .map((pathology) => (
             <div key={pathology.id} className="flex items-center space-x-2">
               <Checkbox
                 id={`pathology-${pathology.id}`}

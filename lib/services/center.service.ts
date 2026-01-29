@@ -133,6 +133,20 @@ export async function getCenterPathologies(centerId: string): Promise<Pathology[
   return data?.map((cp: any) => cp.pathology).filter(Boolean) || [];
 }
 
+export async function getAllCenterPathologies(): Promise<{ center_id: string; pathology_id: string }[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('center_pathologies')
+    .select('center_id, pathology_id');
+
+  if (error) {
+    throw new Error(`Failed to fetch all center pathologies: ${error.message}`);
+  }
+
+  return data || [];
+}
+
 export async function addPathologyToCenter(
   centerId: string,
   pathologyId: string

@@ -46,7 +46,7 @@ export {
 
 export {
   BILAN_SOCIAL_SZ_DEFINITION
-} from './initial/social';
+} from './initial/social/index';
 
 export {
   SQOL_SZ_DEFINITION,
