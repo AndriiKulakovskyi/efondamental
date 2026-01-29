@@ -3788,10 +3788,9 @@ if (code === 'FAGERSTROM') {
             {/* Rich Interpretation Card */}
             {(interpretation || data.total_score !== undefined || data.totalScore !== undefined) && (
               <div className={`p-4 rounded-lg border-2 ${
-                getScoreColor() === 'border-green-200 bg-green-50/30' ? 'bg-green-50 border-green-200 text-green-900' :
-                getScoreColor() === 'border-blue-200 bg-blue-50/30' ? 'bg-blue-50 border-blue-200 text-blue-900' :
-                getScoreColor() === 'border-amber-200 bg-amber-50/30' ? 'bg-amber-50 border-amber-200 text-amber-900' :
-                getScoreColor() === 'border-orange-200 bg-orange-50/30' ? 'bg-orange-50 border-orange-200 text-orange-900' :
+                severity === 'success' ? 'bg-green-50 border-green-200 text-green-900' :
+                severity === 'info' ? 'bg-blue-50 border-blue-200 text-blue-900' :
+                severity === 'warning' ? 'bg-orange-50 border-orange-200 text-orange-900' :
                 'bg-red-50 border-red-200 text-red-900'
               }`}>
                 <div className="flex items-start gap-3">

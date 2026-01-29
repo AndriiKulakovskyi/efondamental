@@ -182,7 +182,16 @@ export interface PatientFull extends Patient {
   assigned_to_last_name: string | null;
 }
 
-export type PatientInsert = Omit<Patient, 'id' | 'created_at' | 'updated_at' | 'user_id' | 'deleted_at' | 'deleted_by' | 'fondacode'>;
+// Fields that are auto-generated or optional when creating a patient
+type PatientAutoFields = 'id' | 'created_at' | 'updated_at' | 'user_id' | 'deleted_at' | 'deleted_by' | 'fondacode';
+
+// Comprehensive fields that are optional when creating a patient
+type PatientOptionalFields = 
+  | 'birth_city' | 'birth_department' | 'birth_country' | 'hospital_id' | 'social_security_number' | 'marital_name'
+  | 'street_number_and_name' | 'building_details' | 'postal_code' | 'city' | 'phone_private' | 'phone_professional' | 'phone_mobile'
+  | 'patient_sector' | 'referred_by' | 'visit_purpose' | 'gp_report_consent' | 'psychiatrist_report_consent' | 'center_awareness_source';
+
+export type PatientInsert = Omit<Patient, PatientAutoFields | PatientOptionalFields> & Partial<Pick<Patient, PatientOptionalFields>>;
 export type PatientUpdate = Partial<Omit<Patient, 'id' | 'created_at' | 'updated_at' | 'user_id' | 'deleted_at' | 'deleted_by'>>;
 
 export interface Visit {
