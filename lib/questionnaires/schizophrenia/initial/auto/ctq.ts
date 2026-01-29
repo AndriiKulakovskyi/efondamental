@@ -326,7 +326,7 @@ export const CTQ_QUESTIONS: Question[] = [
     required: false,
     options: CTQ_LIKERT_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Question à score inversé lors du calcul',
+    help: 'Question à score inversé lors du calcul',
   },
   
   // Q3 - Emotional Abuse
@@ -357,7 +357,7 @@ export const CTQ_QUESTIONS: Question[] = [
     required: false,
     options: CTQ_LIKERT_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Question à score inversé lors du calcul',
+    help: 'Question à score inversé lors du calcul',
   },
   
   // Q6 - Physical Neglect
@@ -378,7 +378,7 @@ export const CTQ_QUESTIONS: Question[] = [
     required: false,
     options: CTQ_LIKERT_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Question à score inversé lors du calcul',
+    help: 'Question à score inversé lors du calcul',
   },
   
   // Q8 - Emotional Abuse
@@ -409,7 +409,7 @@ export const CTQ_QUESTIONS: Question[] = [
     required: false,
     options: CTQ_LIKERT_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Item de déni/minimisation',
+    help: 'Item de déni/minimisation',
   },
   
   // Q11 - Physical Abuse
@@ -440,7 +440,7 @@ export const CTQ_QUESTIONS: Question[] = [
     required: false,
     options: CTQ_LIKERT_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Question à score inversé lors du calcul',
+    help: 'Question à score inversé lors du calcul',
   },
   
   // Q14 - Emotional Abuse
@@ -471,7 +471,7 @@ export const CTQ_QUESTIONS: Question[] = [
     required: false,
     options: CTQ_LIKERT_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Item de déni/minimisation',
+    help: 'Item de déni/minimisation',
   },
   
   // Q17 - Physical Abuse
@@ -502,7 +502,7 @@ export const CTQ_QUESTIONS: Question[] = [
     required: false,
     options: CTQ_LIKERT_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Question à score inversé lors du calcul',
+    help: 'Question à score inversé lors du calcul',
   },
   
   // Q20 - Sexual Abuse
@@ -533,7 +533,7 @@ export const CTQ_QUESTIONS: Question[] = [
     required: false,
     options: CTQ_LIKERT_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Item de déni/minimisation',
+    help: 'Item de déni/minimisation',
   },
   
   // Q23 - Sexual Abuse
@@ -574,7 +574,7 @@ export const CTQ_QUESTIONS: Question[] = [
     required: false,
     options: CTQ_LIKERT_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Question à score inversé lors du calcul',
+    help: 'Question à score inversé lors du calcul',
   },
   
   // Q27 - Sexual Abuse
@@ -595,7 +595,7 @@ export const CTQ_QUESTIONS: Question[] = [
     required: false,
     options: CTQ_LIKERT_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Question à score inversé lors du calcul',
+    help: 'Question à score inversé lors du calcul',
   },
 ];
 

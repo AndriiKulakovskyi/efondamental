@@ -200,7 +200,7 @@ export const MARS_SZ_QUESTIONS: Question[] = [
     required: false,
     options: BINARY_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Non = bonne adhésion (1 point)',
+    help: 'Non = bonne adhésion (1 point)',
   },
   {
     id: 'q2',
@@ -209,7 +209,7 @@ export const MARS_SZ_QUESTIONS: Question[] = [
     required: false,
     options: BINARY_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Non = bonne adhésion (1 point)',
+    help: 'Non = bonne adhésion (1 point)',
   },
   {
     id: 'q3',
@@ -218,7 +218,7 @@ export const MARS_SZ_QUESTIONS: Question[] = [
     required: false,
     options: BINARY_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Non = bonne adhésion (1 point)',
+    help: 'Non = bonne adhésion (1 point)',
   },
   {
     id: 'q4',
@@ -227,7 +227,7 @@ export const MARS_SZ_QUESTIONS: Question[] = [
     required: false,
     options: BINARY_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Non = bonne adhésion (1 point)',
+    help: 'Non = bonne adhésion (1 point)',
   },
   
   // Domain 2: Medication Attitude (Q5-Q6)
@@ -238,7 +238,7 @@ export const MARS_SZ_QUESTIONS: Question[] = [
     required: false,
     options: BINARY_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Non = bonne attitude (1 point)',
+    help: 'Non = bonne attitude (1 point)',
   },
   {
     id: 'q6',
@@ -247,7 +247,7 @@ export const MARS_SZ_QUESTIONS: Question[] = [
     required: false,
     options: BINARY_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Non = bonne attitude (1 point)',
+    help: 'Non = bonne attitude (1 point)',
   },
   
   // Domain 3: Perceived Positive Effects (Q7-Q8) - REVERSE SCORED
@@ -258,7 +258,7 @@ export const MARS_SZ_QUESTIONS: Question[] = [
     required: false,
     options: BINARY_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'SCORE INVERSÉ - Oui = perçoit un bénéfice (1 point)',
+    help: 'SCORE INVERSÉ - Oui = perçoit un bénéfice (1 point)',
   },
   {
     id: 'q8',
@@ -267,7 +267,7 @@ export const MARS_SZ_QUESTIONS: Question[] = [
     required: false,
     options: BINARY_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'SCORE INVERSÉ - Oui = perçoit un bénéfice (1 point)',
+    help: 'SCORE INVERSÉ - Oui = perçoit un bénéfice (1 point)',
   },
   
   // Domain 4: Perceived Negative Effects (Q9-Q10)
@@ -278,7 +278,7 @@ export const MARS_SZ_QUESTIONS: Question[] = [
     required: false,
     options: BINARY_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Non = pas d\'effet négatif (1 point)',
+    help: 'Non = pas d\'effet négatif (1 point)',
   },
   {
     id: 'q10',
@@ -287,7 +287,7 @@ export const MARS_SZ_QUESTIONS: Question[] = [
     required: false,
     options: BINARY_OPTIONS,
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-    help_text: 'Non = pas d\'effet négatif (1 point)',
+    help: 'Non = pas d\'effet négatif (1 point)',
   },
 ];
 
