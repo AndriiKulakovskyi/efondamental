@@ -440,6 +440,16 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
       return 'error';                      // Severe excessive
     }
     
+    if (code === 'SQOL_SZ') {
+      // S-QoL: Quality of life (0-100%, higher = better)
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 75) return 'success';   // Good quality of life
+      if (score >= 50) return 'info';      // Moderate quality of life
+      if (score >= 25) return 'warning';   // Low quality of life
+      return 'error';                      // Very low quality of life
+    }
+    
     return 'info';
   };
 
@@ -662,6 +672,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'MATHYS' && 'Résultats MAThyS - États thymiques'}
               {code === 'PSQI' && 'Résultats PSQI - Qualité du Sommeil'}
               {code === 'EPWORTH' && 'Résultats Epworth - Somnolence Diurne'}
+              {code === 'SQOL_SZ' && 'Résultats S-QoL - Qualité de vie (Schizophrénie)'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -743,6 +754,8 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'EPWORTH'
                 ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'SQOL_SZ'
+                ? (data.total_score !== undefined && data.total_score !== null ? `${data.total_score}%` : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM' && '/20'}
               {code === 'QIDS_SR16' && '/27'}
@@ -773,6 +786,7 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               {code === 'BARNES' && '/5'}
               {code === 'SAS' && '/4.0'}
               {code === 'PSP' && '/100'}
+              {code === 'SQOL_SZ' && ''}
             </span>
           </div>
         </div>
@@ -3811,6 +3825,122 @@ export function ScoreDisplay({ code, data }: ScoreDisplayProps) {
               <span className="text-gray-600 font-medium">Score Total:</span>
               <span className={`font-bold text-lg`}>
                 {data.total_score !== null && data.total_score !== undefined ? `${data.total_score}/72` : 'Questionnaire incomplet'}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* S-QoL (Schizophrenia Quality of Life) Details */}
+        {code === 'SQOL_SZ' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Global Score Summary */}
+            <div className={`p-3 rounded-lg ${
+              data.total_score !== null && data.total_score >= 75
+                ? 'bg-green-50 border border-green-200'
+                : data.total_score !== null && data.total_score >= 50
+                ? 'bg-blue-50 border border-blue-200'
+                : data.total_score !== null && data.total_score >= 25
+                ? 'bg-amber-50 border border-amber-200'
+                : 'bg-red-50 border border-red-200'
+            }`}>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Score global de qualité de vie:</span>
+                  <span className="text-lg font-bold">
+                    {data.total_score !== null && data.total_score !== undefined 
+                      ? `${data.total_score}%` 
+                      : 'Non calculable'}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-600">
+                  Plus le score est élevé, meilleure est la qualité de vie perçue (0-100%)
+                </p>
+              </div>
+            </div>
+
+            {/* 8 Subscales */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Scores par dimension</h5>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Vie sentimentale (Q14, Q15):</span>
+                  <span className={`font-semibold ${data.score_vie_sentimentale === null ? 'text-orange-600' : ''}`}>
+                    {data.score_vie_sentimentale !== null && data.score_vie_sentimentale !== undefined 
+                      ? `${data.score_vie_sentimentale}%` 
+                      : 'Pas concerné(e)'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Estime de soi (Q1, Q4):</span>
+                  <span className={`font-semibold ${data.score_estime_de_soi === null ? 'text-orange-600' : ''}`}>
+                    {data.score_estime_de_soi !== null && data.score_estime_de_soi !== undefined 
+                      ? `${data.score_estime_de_soi}%` 
+                      : 'Pas concerné(e)'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Relation famille (Q10, Q11):</span>
+                  <span className={`font-semibold ${data.score_relation_famille === null ? 'text-orange-600' : ''}`}>
+                    {data.score_relation_famille !== null && data.score_relation_famille !== undefined 
+                      ? `${data.score_relation_famille}%` 
+                      : 'Pas concerné(e)'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Relation amis (Q12, Q13):</span>
+                  <span className={`font-semibold ${data.score_relation_amis === null ? 'text-orange-600' : ''}`}>
+                    {data.score_relation_amis !== null && data.score_relation_amis !== undefined 
+                      ? `${data.score_relation_amis}%` 
+                      : 'Pas concerné(e)'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Autonomie (Q5, Q6):</span>
+                  <span className={`font-semibold ${data.score_autonomie === null ? 'text-orange-600' : ''}`}>
+                    {data.score_autonomie !== null && data.score_autonomie !== undefined 
+                      ? `${data.score_autonomie}%` 
+                      : 'Pas concerné(e)'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Bien-être psychologique (Q16-18):</span>
+                  <span className={`font-semibold ${data.score_bien_etre_psychologique === null ? 'text-orange-600' : ''}`}>
+                    {data.score_bien_etre_psychologique !== null && data.score_bien_etre_psychologique !== undefined 
+                      ? `${data.score_bien_etre_psychologique}%` 
+                      : 'Pas concerné(e)'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Bien-être physique (Q8, Q9):</span>
+                  <span className={`font-semibold ${data.score_bien_etre_physique === null ? 'text-orange-600' : ''}`}>
+                    {data.score_bien_etre_physique !== null && data.score_bien_etre_physique !== undefined 
+                      ? `${data.score_bien_etre_physique}%` 
+                      : 'Pas concerné(e)'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Résilience (Q2, Q3, Q7):</span>
+                  <span className={`font-semibold ${data.score_resilience === null ? 'text-orange-600' : ''}`}>
+                    {data.score_resilience !== null && data.score_resilience !== undefined 
+                      ? `${data.score_resilience}%` 
+                      : 'Pas concerné(e)'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Global Score */}
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">Index global S-QoL:</span>
+              <span className={`font-bold text-lg ${
+                data.total_score !== null && data.total_score >= 75 ? 'text-green-600' :
+                data.total_score !== null && data.total_score >= 50 ? 'text-blue-600' :
+                data.total_score !== null && data.total_score >= 25 ? 'text-amber-600' :
+                data.total_score !== null ? 'text-red-600' : 'text-orange-600'
+              }`}>
+                {data.total_score !== null && data.total_score !== undefined 
+                  ? `${data.total_score}%` 
+                  : 'Non calculable'}
               </span>
             </div>
           </div>

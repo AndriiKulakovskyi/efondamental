@@ -143,7 +143,8 @@ import {
   TEA_COFFEE_SZ_DEFINITION,
   EVAL_ADDICTOLOGIQUE_SZ_DEFINITION,
   TROUBLES_COMORBIDES_SZ_DEFINITION,
-  BILAN_SOCIAL_SZ_DEFINITION
+  BILAN_SOCIAL_SZ_DEFINITION,
+  SQOL_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -587,7 +588,19 @@ export default async function VisitDetailPage({
           id: 'mod_auto_sz',
           name: 'Autoquestionnaires',
           description: 'Questionnaires remplis par le patient',
-          questionnaires: []
+          questionnaires: [
+            {
+              // Exclude scoring functions - they cannot be serialized to client components
+              id: SQOL_SZ_DEFINITION.code,
+              code: SQOL_SZ_DEFINITION.code,
+              title: SQOL_SZ_DEFINITION.title,
+              description: SQOL_SZ_DEFINITION.description,
+              questions: SQOL_SZ_DEFINITION.questions,
+              target_role: 'patient',
+              completed: questionnaireStatuses['SQOL_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['SQOL_SZ']?.completed_at,
+            }
+          ]
         },
         {
           id: 'mod_auto_entourage_sz',

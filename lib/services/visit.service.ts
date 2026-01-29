@@ -236,7 +236,8 @@ import {
   SZ_PERINATALITE_DEFINITION,
   EVAL_ADDICTOLOGIQUE_SZ_DEFINITION,
   TROUBLES_COMORBIDES_SZ_DEFINITION,
-  BILAN_SOCIAL_SZ_DEFINITION
+  BILAN_SOCIAL_SZ_DEFINITION,
+  SQOL_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -714,7 +715,14 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           id: 'mod_auto_sz',
           name: 'Autoquestionnaires',
           description: 'Questionnaires remplis par le patient',
-          questionnaires: []
+          questionnaires: [{
+            // Exclude scoring functions for client serialization
+            id: SQOL_SZ_DEFINITION.id,
+            code: SQOL_SZ_DEFINITION.code,
+            title: SQOL_SZ_DEFINITION.title,
+            description: SQOL_SZ_DEFINITION.description,
+            questions: SQOL_SZ_DEFINITION.questions,
+          }]
         },
         {
           id: 'mod_auto_entourage_sz',

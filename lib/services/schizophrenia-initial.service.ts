@@ -52,6 +52,9 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   
   // Social module
   'BILAN_SOCIAL_SZ': 'schizophrenia_bilan_social',
+  
+  // Auto module (patient self-administered)
+  'SQOL_SZ': 'schizophrenia_sqol',
 };
 
 // ============================================================================
@@ -252,6 +255,11 @@ export async function getEcvResponse(visitId: string) {
 // Social module
 export async function getBilanSocialSzResponse(visitId: string) {
   return getSchizophreniaInitialResponse('BILAN_SOCIAL_SZ', visitId);
+}
+
+// Auto module (patient self-administered)
+export async function getSqolResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('SQOL_SZ', visitId);
 }
 
 // ============================================================================
@@ -973,5 +981,141 @@ export async function saveEvalAddictologiqueSzResponse(response: any): Promise<a
     .single();
 
   if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// S-QoL (Quality of Life) Scoring
+// ============================================================================
+
+/**
+ * S-QoL subscale definitions
+ */
+const SQOL_SUBSCALES = {
+  vie_sentimentale: ['q14', 'q15'],
+  estime_de_soi: ['q1', 'q4'],
+  relation_famille: ['q10', 'q11'],
+  relation_amis: ['q12', 'q13'],
+  autonomie: ['q5', 'q6'],
+  bien_etre_psychologique: ['q16', 'q17', 'q18'],
+  bien_etre_physique: ['q8', 'q9'],
+  resilience: ['q2', 'q3', 'q7'],
+};
+
+/**
+ * Calculate a single S-QoL subscale score as percentage (0-100%)
+ * Excludes items marked as "Pas concerné(e)"
+ */
+function calculateSqolSubscale(
+  responses: Record<string, any>,
+  questionIds: string[]
+): number | null {
+  let sum = 0;
+  let validCount = 0;
+  
+  for (const qId of questionIds) {
+    const notConcerned = responses[`${qId}_not_concerned`];
+    if (notConcerned === true) continue; // Skip excluded items
+    
+    const value = responses[qId];
+    if (value !== null && value !== undefined && typeof value === 'number') {
+      sum += value;
+      validCount++;
+    }
+  }
+  
+  if (validCount === 0) return null; // All "Pas concerné"
+  
+  // Score = (sum / max_possible) * 100
+  const percentage = (sum / (validCount * 4)) * 100;
+  return Math.round(percentage * 100) / 100;
+}
+
+/**
+ * Calculate S-QoL global score as mean of valid subscale scores
+ */
+function calculateSqolGlobal(subscaleScores: Record<string, number | null>): number | null {
+  const validScores = Object.values(subscaleScores).filter(
+    (s): s is number => s !== null
+  );
+  
+  if (validScores.length === 0) return null;
+  
+  const mean = validScores.reduce((a, b) => a + b, 0) / validScores.length;
+  return Math.round(mean * 100) / 100;
+}
+
+/**
+ * Save S-QoL response with subscale and global scoring
+ */
+export async function saveSqolResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // If questionnaire not done, just save the status
+  if (response.questionnaire_done === 'Non fait') {
+    const { data, error } = await supabase
+      .from('schizophrenia_sqol')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        questionnaire_done: response.questionnaire_done,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving schizophrenia_sqol:', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Calculate all subscale scores
+  const subscaleScores = {
+    score_vie_sentimentale: calculateSqolSubscale(response, SQOL_SUBSCALES.vie_sentimentale),
+    score_estime_de_soi: calculateSqolSubscale(response, SQOL_SUBSCALES.estime_de_soi),
+    score_relation_famille: calculateSqolSubscale(response, SQOL_SUBSCALES.relation_famille),
+    score_relation_amis: calculateSqolSubscale(response, SQOL_SUBSCALES.relation_amis),
+    score_autonomie: calculateSqolSubscale(response, SQOL_SUBSCALES.autonomie),
+    score_bien_etre_psychologique: calculateSqolSubscale(response, SQOL_SUBSCALES.bien_etre_psychologique),
+    score_bien_etre_physique: calculateSqolSubscale(response, SQOL_SUBSCALES.bien_etre_physique),
+    score_resilience: calculateSqolSubscale(response, SQOL_SUBSCALES.resilience),
+  };
+  
+  // Calculate global score
+  const total_score = calculateSqolGlobal(subscaleScores);
+  
+  // Generate interpretation
+  const interpretation = total_score !== null
+    ? `Score global de qualité de vie: ${total_score}% (plus le score est élevé, meilleure est la qualité de vie)`
+    : 'Score non calculable (questionnaire incomplet ou toutes les questions marquées "Pas concerné(e)")';
+  
+  // Remove instruction fields before saving
+  const { 
+    instruction_title, 
+    instruction_consigne, 
+    instruction_actuellement, 
+    instruction_actuellement2,
+    ...responseData 
+  } = response;
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_sqol')
+    .upsert({
+      ...responseData,
+      ...subscaleScores,
+      total_score,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_sqol:', error);
+    throw error;
+  }
   return data;
 }

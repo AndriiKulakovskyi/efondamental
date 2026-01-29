@@ -3,7 +3,7 @@
 // Export all initial evaluation questionnaire modules
 // ============================================================================
 //
-// Total: 21 questionnaires across 5 modules
+// Total: 22 questionnaires across 6 modules
 // All questionnaires save to schizophrenia_* tables via schizophrenia-initial.service.ts
 //
 // ============================================================================
@@ -31,3 +31,8 @@ export * as addictologie from './addictologie';
 // Social situation assessment
 // Bilan social
 export * as social from './social';
+
+// Auto module (1 questionnaire)
+// Self-administered questionnaires
+// S-QoL (Quality of Life)
+export * as auto from './auto';

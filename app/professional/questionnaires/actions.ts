@@ -158,7 +158,8 @@ import {
   savePspResponse as saveSchizophreniaPspResponse,
   saveDossierInfirmierSzResponse as saveSchizophreniaDossierInfirmierResponse,
   saveBilanBiologiqueSzResponse as saveSchizophreniaBilanBiologiqueResponse,
-  saveEvalAddictologiqueSzResponse as saveSchizophreniaEvalAddictologiqueResponse
+  saveEvalAddictologiqueSzResponse as saveSchizophreniaEvalAddictologiqueResponse,
+  saveSqolResponse as saveSchizophreniaSqolResponse
 } from '@/lib/services/schizophrenia-initial.service';
 import { 
   getVisitCompletionStatus,
@@ -751,6 +752,15 @@ export async function submitProfessionalQuestionnaireAction(
           visit_id: visitId,
           patient_id: patientId,
           ...bilanSocialData
+        });
+        break;
+
+      // Schizophrenia Auto module (patient self-administered)
+      case 'SQOL_SZ':
+        result = await saveSchizophreniaSqolResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
         });
         break;
 

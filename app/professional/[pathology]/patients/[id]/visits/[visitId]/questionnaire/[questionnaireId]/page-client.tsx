@@ -138,7 +138,8 @@ export function QuestionnairePageClient({
         'SOCIAL',
         'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA',
         'PANSS', 'CDSS', 'BARS', 'SUMD', 'AIMS', 'BARNES', 'SAS', 'PSP',
-        'ISA_FOLLOWUP'
+        'ISA_FOLLOWUP',
+        'SQOL_SZ'
       ].includes(questionnaire.code);
 
       console.log('[QuestionnairePageClient] Submit success:', {

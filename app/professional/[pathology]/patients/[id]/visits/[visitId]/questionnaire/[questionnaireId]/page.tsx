@@ -135,7 +135,8 @@ import {
   TEA_COFFEE_SZ_DEFINITION,
   EVAL_ADDICTOLOGIQUE_SZ_DEFINITION,
   TROUBLES_COMORBIDES_SZ_DEFINITION,
-  BILAN_SOCIAL_SZ_DEFINITION
+  BILAN_SOCIAL_SZ_DEFINITION,
+  SQOL_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { 
   getAsrmResponse, 
@@ -270,7 +271,8 @@ import {
   getPerinataliteSzResponse,
   getTeaCoffeeSzResponse,
   getEvalAddictologiqueSzResponse,
-  getBilanSocialSzResponse
+  getBilanSocialSzResponse,
+  getSqolResponse
 } from "@/lib/services/questionnaire-schizophrenia.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -575,6 +577,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === EVAL_ADDICTOLOGIQUE_SZ_DEFINITION.code) questionnaire = EVAL_ADDICTOLOGIQUE_SZ_DEFINITION;
   // Schizophrenia social module
   else if (code === BILAN_SOCIAL_SZ_DEFINITION.code) questionnaire = BILAN_SOCIAL_SZ_DEFINITION;
+  // Schizophrenia auto module (patient self-administered)
+  else if (code === SQOL_SZ_DEFINITION.code) questionnaire = SQOL_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -723,6 +727,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === EVAL_ADDICTOLOGIQUE_SZ_DEFINITION.code) existingResponse = await getEvalAddictologiqueSzResponse(visitId);
   // Schizophrenia social module
   else if (code === BILAN_SOCIAL_SZ_DEFINITION.code) existingResponse = await getBilanSocialSzResponse(visitId);
+  // Schizophrenia auto module (patient self-administered)
+  else if (code === SQOL_SZ_DEFINITION.code) existingResponse = await getSqolResponse(visitId);
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).
@@ -998,27 +1004,31 @@ export default async function ProfessionalQuestionnairePage({
     }
   }
 
+  // Strip out scoring functions - they cannot be serialized to client components
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { scoringFunction, interpretationFunction, ...serializableQuestionnaire } = questionnaire as any;
+  
   // Filter out score sections from WAIS4_DIGIT_SPAN questionnaire
   // These sections should only appear on the score page, not in the input form
-  let filteredQuestionnaire = questionnaire;
+  let filteredQuestionnaire = serializableQuestionnaire;
   if (code === 'WAIS4_DIGIT_SPAN') {
     const scoreSections = ['Totaux par section', 'Empans', 'Scores globaux'];
     filteredQuestionnaire = {
-      ...questionnaire,
-      questions: questionnaire.questions.filter(q => {
+      ...serializableQuestionnaire,
+      questions: serializableQuestionnaire.questions.filter((q: any) => {
         // Keep questions that don't have a section or have a section not in the score sections list
         return !q.section || !scoreSections.includes(q.section);
       })
     };
-    console.log('[WAIS4 Digit Span Debug] Filtered out score sections. Original questions:', questionnaire.questions.length, 'Filtered:', filteredQuestionnaire.questions.length);
+    console.log('[WAIS4 Digit Span Debug] Filtered out score sections. Original questions:', serializableQuestionnaire.questions.length, 'Filtered:', filteredQuestionnaire.questions.length);
   }
 
   // Filter out score fields from CVLT questionnaire
   // Score fields (readonly with indentLevel: 1) should only appear on the score page, not in the input form
   if (code === 'CVLT') {
     filteredQuestionnaire = {
-      ...questionnaire,
-      questions: questionnaire.questions.filter(q => {
+      ...serializableQuestionnaire,
+      questions: serializableQuestionnaire.questions.filter((q: any) => {
         // Remove readonly fields with indentLevel (these are calculated scores)
         if (q.readonly && q.indentLevel === 1) {
           return false;
@@ -1027,7 +1037,7 @@ export default async function ProfessionalQuestionnairePage({
         return true;
       })
     };
-    console.log('[CVLT Debug] Filtered out score fields. Original questions:', questionnaire.questions.length, 'Filtered:', filteredQuestionnaire.questions.length);
+    console.log('[CVLT Debug] Filtered out score fields. Original questions:', serializableQuestionnaire.questions.length, 'Filtered:', filteredQuestionnaire.questions.length);
   }
 
   // Filter out score fields from Fluences Verbales questionnaire
@@ -1042,8 +1052,8 @@ export default async function ProfessionalQuestionnairePage({
       'fv_anim_tot_correct_pc'
     ];
     filteredQuestionnaire = {
-      ...questionnaire,
-      questions: questionnaire.questions.filter(q => {
+      ...serializableQuestionnaire,
+      questions: serializableQuestionnaire.questions.filter((q: any) => {
         // Remove readonly score fields
         if (q.readonly && scoreFieldIds.includes(q.id)) {
           return false;
@@ -1052,7 +1062,7 @@ export default async function ProfessionalQuestionnairePage({
         return true;
       })
     };
-    console.log('[Fluences Verbales Debug] Filtered out score fields. Original questions:', questionnaire.questions.length, 'Filtered:', filteredQuestionnaire.questions.length);
+    console.log('[Fluences Verbales Debug] Filtered out score fields. Original questions:', serializableQuestionnaire.questions.length, 'Filtered:', filteredQuestionnaire.questions.length);
   }
 
   return (
