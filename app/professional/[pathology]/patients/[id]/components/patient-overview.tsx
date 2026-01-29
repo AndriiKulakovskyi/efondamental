@@ -40,6 +40,7 @@ export function PatientOverview({ patient }: PatientOverviewProps) {
               <dt className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Nom complet</dt>
               <dd className="text-sm text-slate-900 font-medium mt-0.5">
                 {patient.first_name} {patient.last_name}
+                {patient.gender === 'F' && patient.maiden_name && ` (${patient.maiden_name})`}
               </dd>
             </div>
           </div>

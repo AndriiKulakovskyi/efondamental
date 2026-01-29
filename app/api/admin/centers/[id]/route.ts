@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/rbac/middleware";
-import { getCenterById } from "@/lib/services/center.service";
+import { getCenterById, setCenterPathologies, getPathologyByType } from "@/lib/services/center.service";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(
@@ -67,28 +67,27 @@ export async function PATCH(
 
     // Update pathologies if provided
     if (pathologies && Array.isArray(pathologies)) {
-      // First, delete all existing pathology assignments
-      await supabase
-        .from("center_pathologies")
-        .delete()
-        .eq("center_id", id);
-
-      // Then, add new pathology assignments
-      if (pathologies.length > 0) {
-        // Get pathology IDs from types
-        const { data: pathologyData } = await supabase
-          .from("pathologies")
-          .select("id, type")
-          .in("type", pathologies);
-
-        if (pathologyData) {
-          const centerPathologies = pathologyData.map((p) => ({
-            center_id: id,
-            pathology_id: p.id,
-          }));
-
-          await supabase.from("center_pathologies").insert(centerPathologies);
+      try {
+        // Get pathology IDs for the requested types
+        const pathologyIds: string[] = [];
+        for (const type of pathologies) {
+          const pathology = await getPathologyByType(type);
+          if (pathology) {
+            pathologyIds.push(pathology.id);
+          }
         }
+
+        // Set the pathologies for the center
+        await setCenterPathologies(id, pathologyIds);
+      } catch (pathologyError) {
+        console.error("Failed to update center pathologies:", pathologyError);
+        // We continue because base center info was already updated, 
+        // but we should probably inform the client or rollback.
+        // For now, let's include it in the response.
+        return NextResponse.json(
+          { error: "Basic info updated, but failed to update pathologies" },
+          { status: 200 } // Or 207 Multi-Status
+        );
       }
     }
 

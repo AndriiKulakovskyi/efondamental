@@ -260,6 +260,12 @@ export const DIAGNOSTIC_QUESTIONS: Question[] = [
     metadata: { default: 'today' }
   },
   {
+    id: 'evaluator_name',
+    text: 'Nom du médecin évaluateur',
+    type: 'text',
+    required: false,
+  },
+  {
     id: 'diag_prealable',
     text: 'Diagnostic de trouble bipolaire posé préalablement',
     type: 'single_choice',
