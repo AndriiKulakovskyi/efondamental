@@ -127,7 +127,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
   {
     id: 'section_a_header',
     text: 'A Capacités cognitives',
-    type: 'label',
+    type: 'instruction',
     required: false,
     section: 'A - Capacités cognitives',
     help_text: 'Cette rubrique concerne la manière dont les aptitudes cognitives (capacités d\'organisation, adaptation au contexte de la situation, attention, mémorisation) interfèrent avec les activités de la vie quotidienne. Le score retenu doit se baser sur le meilleur niveau de réalisation atteint, même si la personne a bénéficié d\'une stimulation extérieure. Les exemples de situations retenus ne doivent pas impliquer directement d\'interaction avec autrui.'
@@ -209,7 +209,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
   {
     id: 'section_b_header',
     text: 'B Motivation',
-    type: 'label',
+    type: 'instruction',
     required: false,
     section: 'B - Motivation'
   },
@@ -290,7 +290,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
   {
     id: 'section_c_header',
     text: 'C Capacités de communication et de compréhension des autres',
-    type: 'label',
+    type: 'instruction',
     required: false,
     section: 'C - Communication'
   },
@@ -353,7 +353,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
   {
     id: 'section_d_header',
     text: 'D Capacité d\'autoévaluation de ses capacités et de prise en compte de ses limites',
-    type: 'label',
+    type: 'instruction',
     required: false,
     section: 'D - Auto-évaluation'
   },
