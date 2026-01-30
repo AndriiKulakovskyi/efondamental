@@ -63,6 +63,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'YBOCS_SZ': 'schizophrenia_ybocs',
   'WURS25_SZ': 'schizophrenia_wurs25',
   'STORI_SZ': 'schizophrenia_stori',
+  'SOGS_SZ': 'schizophrenia_sogs',
 };
 
 // ============================================================================
@@ -2250,6 +2251,177 @@ export async function saveStoriSzResponse(response: any): Promise<any> {
 
   if (error) {
     console.error('Error saving schizophrenia_stori:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// SOGS (South Oaks Gambling Screen) Functions
+// ============================================================================
+
+// Clinical thresholds
+const SOGS_THRESHOLDS = {
+  NO_PROBLEM: { min: 0, max: 2, label: 'Pas de problème de jeu', severity: 'no_problem' },
+  AT_RISK: { min: 3, max: 4, label: 'Joueur à risque', severity: 'at_risk' },
+  PATHOLOGICAL: { min: 5, max: 20, label: 'Joueur pathologique probable', severity: 'pathological' },
+};
+
+/**
+ * Score Q4: Any response except "Jamais" = 1 point
+ */
+function scoreSogsQ4(value: string | null | undefined): number {
+  if (!value || value === 'Jamais') return 0;
+  return 1;
+}
+
+/**
+ * Score Q5, Q6: First option = 0, others = 1
+ */
+function scoreSogsQ5Q6(value: string | null | undefined, firstOption: string): number {
+  if (!value) return 0;
+  return value === firstOption ? 0 : 1;
+}
+
+/**
+ * Score Yes/No questions: Oui = 1, Non = 0
+ */
+function scoreSogsYesNo(value: string | null | undefined): number {
+  return value === 'Oui' ? 1 : 0;
+}
+
+/**
+ * Get SOGS response
+ */
+export async function getSogsSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('SOGS_SZ', visitId);
+}
+
+/**
+ * Save SOGS response with complex scoring (3 functions)
+ * - Total score: 0-20 (11 base + 9 conditional)
+ * - Interpretation based on thresholds
+ */
+export async function saveSogsSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // If questionnaire not done, just save the status
+  if (response.questionnaire_done === 'Non fait') {
+    const { data, error } = await supabase
+      .from('schizophrenia_sogs')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        questionnaire_done: response.questionnaire_done,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving schizophrenia_sogs (not done):', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Calculate total score using 3 different scoring functions
+  let total_score = 0;
+  
+  // Q4: Any non-"Jamais" response = 1
+  total_score += scoreSogsQ4(response.rad_sogs4);
+  
+  // Q5: First option "Jamais (ou je n'ai jamais joué)" = 0, others = 1
+  total_score += scoreSogsQ5Q6(response.rad_sogs5, "Jamais (ou je n'ai jamais joué)");
+  
+  // Q6: First option "Non" = 0, others = 1
+  total_score += scoreSogsQ5Q6(response.rad_sogs6, 'Non');
+  
+  // Q7-Q11: Yes/No scoring
+  total_score += scoreSogsYesNo(response.rad_sogs7);
+  total_score += scoreSogsYesNo(response.rad_sogs8);
+  total_score += scoreSogsYesNo(response.rad_sogs9);
+  total_score += scoreSogsYesNo(response.rad_sogs10);
+  total_score += scoreSogsYesNo(response.rad_sogs11);
+  
+  // Q12 is NOT scored (filter question)
+  
+  // Q13-Q15: Yes/No scoring
+  total_score += scoreSogsYesNo(response.rad_sogs13);
+  total_score += scoreSogsYesNo(response.rad_sogs14);
+  total_score += scoreSogsYesNo(response.rad_sogs15);
+  
+  // Q16 sub-items: Only scored if Q16 = "Oui"
+  if (response.rad_sogs16 === 'Oui') {
+    total_score += scoreSogsYesNo(response.rad_sogs16a);
+    total_score += scoreSogsYesNo(response.rad_sogs16b);
+    total_score += scoreSogsYesNo(response.rad_sogs16c);
+    total_score += scoreSogsYesNo(response.rad_sogs16d);
+    total_score += scoreSogsYesNo(response.rad_sogs16e);
+    total_score += scoreSogsYesNo(response.rad_sogs16f);
+    total_score += scoreSogsYesNo(response.rad_sogs16g);
+    total_score += scoreSogsYesNo(response.rad_sogs16h);
+    total_score += scoreSogsYesNo(response.rad_sogs16i);
+    // Q16j and Q16k are NOT scored
+  }
+  
+  // Determine severity
+  let gambling_severity: string;
+  let severityLabel: string;
+  
+  if (total_score <= SOGS_THRESHOLDS.NO_PROBLEM.max) {
+    gambling_severity = SOGS_THRESHOLDS.NO_PROBLEM.severity;
+    severityLabel = SOGS_THRESHOLDS.NO_PROBLEM.label;
+  } else if (total_score <= SOGS_THRESHOLDS.AT_RISK.max) {
+    gambling_severity = SOGS_THRESHOLDS.AT_RISK.severity;
+    severityLabel = SOGS_THRESHOLDS.AT_RISK.label;
+  } else {
+    gambling_severity = SOGS_THRESHOLDS.PATHOLOGICAL.severity;
+    severityLabel = SOGS_THRESHOLDS.PATHOLOGICAL.label;
+  }
+  
+  // Generate interpretation
+  let interpretation = `Score SOGS : ${total_score}/20\n`;
+  interpretation += `Classification : ${severityLabel}\n\n`;
+  
+  if (total_score <= 2) {
+    interpretation += 'Le score ne suggère pas de problème de jeu significatif. ';
+    interpretation += 'Cependant, une vigilance peut être maintenue si des facteurs de risque sont présents.';
+  } else if (total_score <= 4) {
+    interpretation += 'Le score suggère un comportement de jeu à risque. ';
+    interpretation += 'Une évaluation plus approfondie est recommandée pour déterminer si une intervention préventive est nécessaire.';
+  } else {
+    interpretation += 'Le score suggère un jeu pathologique probable (≥5 points). ';
+    interpretation += 'Une évaluation clinique complète et une prise en charge spécialisée en addictologie sont recommandées. ';
+    interpretation += 'Le SOGS est un outil de dépistage ; un diagnostic formel nécessite un entretien clinique.';
+  }
+  
+  // Remove section and instruction fields before saving
+  const { 
+    section_types_jeux,
+    section_montant,
+    section_antecedents,
+    section_items_scores,
+    section_emprunts,
+    instruction_q16_sources,
+    ...responseData 
+  } = response;
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_sogs')
+    .upsert({
+      ...responseData,
+      total_score,
+      gambling_severity,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_sogs:', error);
     throw error;
   }
   return data;

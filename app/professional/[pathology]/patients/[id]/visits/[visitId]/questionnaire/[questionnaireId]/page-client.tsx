@@ -148,7 +148,7 @@ export function QuestionnairePageClient({
         'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA',
         'PANSS', 'CDSS', 'BARS', 'SUMD', 'AIMS', 'BARNES', 'SAS', 'PSP',
         'ISA_FOLLOWUP',
-        'SQOL_SZ', 'CTQ_SZ', 'MARS_SZ', 'BIS_SZ', 'EQ5D5L_SZ', 'IPAQ_SZ', 'YBOCS_SZ', 'WURS25_SZ', 'STORI_SZ'
+        'SQOL_SZ', 'CTQ_SZ', 'MARS_SZ', 'BIS_SZ', 'EQ5D5L_SZ', 'IPAQ_SZ', 'YBOCS_SZ', 'WURS25_SZ', 'STORI_SZ', 'SOGS_SZ'
       ].includes(questionnaire.code);
 
       console.log('[QuestionnairePageClient] Submit success:', {

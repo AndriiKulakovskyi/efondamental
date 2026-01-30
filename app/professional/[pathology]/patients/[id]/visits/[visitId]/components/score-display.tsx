@@ -152,6 +152,16 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'info';
     }
     
+    if (code === 'SOGS_SZ') {
+      // SOGS: Gambling severity (0-20)
+      // 0-2 = no problem, 3-4 = at risk, 5+ = pathological
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score <= 2) return 'success';     // No gambling problem
+      if (score <= 4) return 'warning';     // At risk gambler
+      return 'error';                       // Pathological gambler probable
+    }
+    
     if (code === 'CSM') {
       // CSM: Chronotype classification (13-55)
       // Morning types (48-55) and evening types (13-21) are notable
@@ -723,6 +733,7 @@ if (code === 'FAGERSTROM') {
               {(code === 'MARS' || code === 'MARS_SZ') && 'Résultats MARS - Observance thérapeutique'}
               {code === 'BIS_SZ' && "Résultats BIS - Échelle d'Insight de Birchwood"}
               {code === 'YBOCS_SZ' && 'Résultats Y-BOCS - Obsessions-Compulsions'}
+              {code === 'SOGS_SZ' && 'Résultats SOGS - Jeu Pathologique'}
               {code === 'MATHYS' && 'Résultats MAThyS - États thymiques'}
               {code === 'PSQI' && 'Résultats PSQI - Qualité du Sommeil'}
               {code === 'EPWORTH' && 'Résultats Epworth - Somnolence Diurne'}
@@ -808,6 +819,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.total_score !== undefined ? `${parseFloat(data.total_score).toFixed(1)}/12` : '-')
                 : code === 'YBOCS_SZ'
                 ? (data.total_score !== undefined ? `${data.total_score}/40` : '-')
+                : code === 'SOGS_SZ'
+                ? (data.total_score !== undefined ? `${data.total_score}/20` : '-')
                 : code === 'IPAQ_SZ'
                 ? (data.total_met_minutes !== undefined ? `${Math.round(data.total_met_minutes)} MET-min/sem` : '-')
                 : code === 'MATHYS'
@@ -1422,6 +1435,72 @@ if (code === 'FAGERSTROM') {
               <p className="mt-1"><strong>Cotation:</strong> 50 items (0-5). 10 items par stade. Score par stade: 0-50.</p>
               <p className="mt-1"><strong>Modèle:</strong> Andresen Recovery Model (5 stades)</p>
               <p className="mt-1"><strong>Référence:</strong> Andresen R et al. Aust N Z J Psychiatry. 2006</p>
+            </div>
+          </div>
+        )}
+
+        {/* SOGS (South Oaks Gambling Screen) Details */}
+        {code === 'SOGS_SZ' && (
+          <div className="text-sm space-y-2 mt-2 pt-2 border-t">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Score total:</span>
+              <span className={`font-semibold ${
+                data.total_score !== null && data.total_score !== undefined
+                  ? data.total_score <= 2 ? 'text-green-600'
+                    : data.total_score <= 4 ? 'text-orange-600'
+                    : 'text-red-600'
+                  : ''
+              }`}>
+                {data.total_score ?? '-'}/20
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Classification:</span>
+              <span className={`font-semibold ${
+                data.gambling_severity === 'no_problem' ? 'text-green-600' :
+                data.gambling_severity === 'at_risk' ? 'text-orange-600' :
+                data.gambling_severity === 'pathological' ? 'text-red-600' : ''
+              }`}>
+                {data.gambling_severity === 'no_problem' && 'Pas de problème de jeu'}
+                {data.gambling_severity === 'at_risk' && 'Joueur à risque'}
+                {data.gambling_severity === 'pathological' && 'Joueur pathologique probable'}
+                {!data.gambling_severity && '-'}
+              </span>
+            </div>
+            {/* Clinical Thresholds */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2 text-xs">Seuils cliniques</h5>
+              <div className="space-y-1 text-xs text-gray-600">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <span><strong>0-2:</strong> Pas de problème de jeu</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-orange-500" />
+                  <span><strong>3-4:</strong> Joueur à risque</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500" />
+                  <span><strong>5+:</strong> Joueur pathologique probable</span>
+                </div>
+              </div>
+            </div>
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg ${
+                data.gambling_severity === 'no_problem' ? 'bg-green-50 border border-green-200 text-green-800' :
+                data.gambling_severity === 'at_risk' ? 'bg-orange-50 border border-orange-200 text-orange-800' :
+                data.gambling_severity === 'pathological' ? 'bg-red-50 border border-red-200 text-red-800' :
+                'bg-gray-50 border border-gray-200 text-gray-800'
+              }`}>
+                <p className="text-xs whitespace-pre-line">{data.interpretation}</p>
+              </div>
+            )}
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>SOGS:</strong> South Oaks Gambling Screen - Dépistage du jeu pathologique</p>
+              <p className="mt-1"><strong>Cotation:</strong> 20 items cotés (11 base + 9 conditionnels)</p>
+              <p className="mt-1"><strong>Référence:</strong> Lesieur HR, Blume SB. Am J Psychiatry. 1987 / Adaptation: Lejoyeux 1999</p>
             </div>
           </div>
         )}

@@ -103,3 +103,13 @@ export {
   type SchizophreniaStoriResponseInsert,
   type StoriSzScoreResult,
 } from './stori';
+
+export {
+  SOGS_SZ_QUESTIONS,
+  SOGS_SZ_DEFINITION,
+  computeSogsSzScores,
+  interpretSogsSzScore,
+  type SchizophreniaSogsResponse,
+  type SchizophreniaSogsResponseInsert,
+  type SogsSzScoreResult,
+} from './sogs';
