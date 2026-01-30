@@ -2,7 +2,8 @@
 // Schizophrenia Initial Evaluation - Auto Module
 // FTND - Fagerström Test for Nicotine Dependence
 
-import { Question, QuestionnaireDefinition } from '@/lib/types/database.types';
+import { Question } from '@/lib/types/database.types';
+import { QuestionnaireDefinition } from '@/lib/constants/questionnaires';
 
 // ============================================================================
 // Types
