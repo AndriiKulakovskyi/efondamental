@@ -65,6 +65,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'STORI_SZ': 'schizophrenia_stori',
   'SOGS_SZ': 'schizophrenia_sogs',
   'PSQI_SZ': 'schizophrenia_psqi',
+  'PRESENTEISME_SZ': 'schizophrenia_presenteisme',
 };
 
 // ============================================================================
@@ -2641,6 +2642,207 @@ export async function savePsqiSzResponse(response: any): Promise<any> {
 
   if (error) {
     console.error('Error saving schizophrenia_psqi:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// WHO-HPQ Présentéisme Functions
+// ============================================================================
+
+/**
+ * Get Présentéisme response
+ */
+export async function getPresenteismeSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('PRESENTEISME_SZ', visitId);
+}
+
+/**
+ * Interpret WHO-HPQ scores for absenteeism and presenteeism
+ */
+function interpretPresenteismeScore(
+  absenteismeAbsolu: number,
+  absenteismeRelatif: number,
+  performanceRelative: number,
+  pertePerformance: number,
+  productivitePct: number
+): string {
+  const sections: string[] = [];
+  
+  // Absenteeism interpretation
+  sections.push('=== ABSENTÉISME ===');
+  if (absenteismeAbsolu === 0) {
+    sections.push(`Absentéisme absolu: ${absenteismeAbsolu} jour(s) - Aucune absence pour raison de santé.`);
+  } else if (absenteismeAbsolu <= 2) {
+    sections.push(`Absentéisme absolu: ${absenteismeAbsolu} jour(s) - Absentéisme faible.`);
+  } else if (absenteismeAbsolu <= 5) {
+    sections.push(`Absentéisme absolu: ${absenteismeAbsolu} jour(s) - Absentéisme modéré.`);
+  } else {
+    sections.push(`Absentéisme absolu: ${absenteismeAbsolu} jour(s) - Absentéisme élevé.`);
+  }
+  
+  if (absenteismeRelatif <= 0) {
+    sections.push(`Absentéisme relatif: ${absenteismeRelatif.toFixed(1)}% - Heures conformes ou supérieures aux attentes.`);
+  } else if (absenteismeRelatif <= 10) {
+    sections.push(`Absentéisme relatif: ${absenteismeRelatif.toFixed(1)}% - Légère réduction des heures.`);
+  } else if (absenteismeRelatif <= 25) {
+    sections.push(`Absentéisme relatif: ${absenteismeRelatif.toFixed(1)}% - Réduction modérée des heures.`);
+  } else {
+    sections.push(`Absentéisme relatif: ${absenteismeRelatif.toFixed(1)}% - Réduction importante des heures.`);
+  }
+  
+  // Performance interpretation
+  sections.push('\n=== PRÉSENTÉISME ===');
+  
+  if (performanceRelative > 0) {
+    sections.push(`Performance relative: +${performanceRelative} vs collègues - Supérieure aux collègues.`);
+  } else if (performanceRelative === 0) {
+    sections.push(`Performance relative: ${performanceRelative} vs collègues - Similaire aux collègues.`);
+  } else {
+    sections.push(`Performance relative: ${performanceRelative} vs collègues - Inférieure aux collègues.`);
+  }
+  
+  if (pertePerformance > 0) {
+    sections.push(`Perte de performance: ${pertePerformance} point(s) - Déclin récent (présentéisme).`);
+  } else if (pertePerformance === 0) {
+    sections.push(`Perte de performance: ${pertePerformance} point(s) - Performance stable.`);
+  } else {
+    sections.push(`Perte de performance: ${pertePerformance} point(s) - Amélioration récente.`);
+  }
+  
+  // Productivity
+  sections.push(`\nProductivité globale: ${productivitePct.toFixed(0)}%`);
+  if (productivitePct >= 80) {
+    sections.push('Niveau satisfaisant.');
+  } else if (productivitePct >= 60) {
+    sections.push('Niveau modérément réduit.');
+  } else if (productivitePct >= 40) {
+    sections.push('Niveau significativement réduit.');
+  } else {
+    sections.push('Niveau très réduit. Intervention recommandée.');
+  }
+  
+  // Summary
+  sections.push('\n=== SYNTHÈSE ===');
+  const hasAbsenteeism = absenteismeAbsolu > 2 || absenteismeRelatif > 10;
+  const hasPresenteeism = pertePerformance > 1 || productivitePct < 60;
+  
+  if (!hasAbsenteeism && !hasPresenteeism) {
+    sections.push('Fonctionnement professionnel préservé.');
+  } else if (hasAbsenteeism && hasPresenteeism) {
+    sections.push('Impact significatif : absentéisme ET présentéisme présents.');
+  } else if (hasAbsenteeism) {
+    sections.push('Absentéisme notable sans présentéisme majeur.');
+  } else {
+    sections.push('Présentéisme notable : performance réduite malgré présence au travail.');
+  }
+  
+  return sections.join('\n');
+}
+
+/**
+ * Save WHO-HPQ Présentéisme response with computed scores
+ * 
+ * Computed measures:
+ * - Absentéisme absolu: B5a + B5c (days missed for health)
+ * - Absentéisme relatif: ((B4 × 4) - B6) / (B4 × 4) × 100
+ * - Performance relative: B11 - B9 (vs colleagues)
+ * - Perte de performance: B10 - B11 (presenteeism indicator)
+ * - Productivité %: (B11/10) × 100
+ */
+export async function savePresenteismeSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // If questionnaire not done, just save the status
+  if (response.questionnaire_done === 'Non fait') {
+    const { data, error } = await supabase
+      .from('schizophrenia_presenteisme')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        questionnaire_done: response.questionnaire_done,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving schizophrenia_presenteisme (not done):', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Calculate derived measures
+  
+  // Absentéisme absolu: B5a + B5c (total days missed for health)
+  const b5a = response.abs_b5a ?? 0;
+  const b5c = response.abs_b5c ?? 0;
+  const absenteisme_absolu = b5a + b5c;
+  
+  // Absentéisme relatif: ((B4 × 4) - B6) / (B4 × 4) × 100
+  const b4 = response.abs_b4 ?? 0;
+  const b6 = response.abs_b6 ?? 0;
+  const expectedHours = b4 * 4; // Expected hours over 4 weeks
+  let absenteisme_relatif_pct = 0;
+  if (expectedHours > 0) {
+    absenteisme_relatif_pct = ((expectedHours - b6) / expectedHours) * 100;
+    // Clamp to reasonable range
+    absenteisme_relatif_pct = Math.max(-100, Math.min(100, absenteisme_relatif_pct));
+    absenteisme_relatif_pct = Math.round(absenteisme_relatif_pct * 100) / 100;
+  }
+  
+  // Performance scores
+  const b9 = response.rad_abs_b9 ?? 0;   // Colleague reference
+  const b10 = response.rad_abs_b10 ?? 0; // Historical self
+  const b11 = response.rad_abs_b11 ?? 0; // Recent self
+  
+  // Performance relative: B11 - B9 (vs colleagues)
+  const performance_relative = b11 - b9;
+  
+  // Perte de performance: B10 - B11 (presenteeism indicator)
+  const perte_performance = b10 - b11;
+  
+  // Productivité %: (B11/10) × 100
+  const productivite_pct = (b11 / 10) * 100;
+  
+  // Generate interpretation
+  const interpretation = interpretPresenteismeScore(
+    absenteisme_absolu,
+    absenteisme_relatif_pct,
+    performance_relative,
+    perte_performance,
+    productivite_pct
+  );
+  
+  // Remove section and instruction fields before saving
+  const { 
+    titre_abs,
+    section_heures,
+    titre_b5,
+    section_performance,
+    ...responseData 
+  } = response;
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_presenteisme')
+    .upsert({
+      ...responseData,
+      absenteisme_absolu,
+      absenteisme_relatif_pct,
+      performance_relative,
+      perte_performance,
+      productivite_pct,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_presenteisme:', error);
     throw error;
   }
   return data;

@@ -154,7 +154,8 @@ import {
   WURS25_SZ_DEFINITION,
   STORI_SZ_DEFINITION,
   SOGS_SZ_DEFINITION,
-  PSQI_SZ_DEFINITION
+  PSQI_SZ_DEFINITION,
+  PRESENTEISME_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -709,6 +710,16 @@ export default async function VisitDetailPage({
               target_role: 'patient',
               completed: questionnaireStatuses['PSQI_SZ']?.completed || false,
               completedAt: questionnaireStatuses['PSQI_SZ']?.completed_at,
+            },
+            {
+              id: PRESENTEISME_SZ_DEFINITION.code,
+              code: PRESENTEISME_SZ_DEFINITION.code,
+              title: PRESENTEISME_SZ_DEFINITION.title,
+              description: PRESENTEISME_SZ_DEFINITION.description,
+              questions: PRESENTEISME_SZ_DEFINITION.questions,
+              target_role: 'patient',
+              completed: questionnaireStatuses['PRESENTEISME_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['PRESENTEISME_SZ']?.completed_at,
             }
           ]
         },

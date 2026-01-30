@@ -247,7 +247,8 @@ import {
   WURS25_SZ_DEFINITION,
   STORI_SZ_DEFINITION,
   SOGS_SZ_DEFINITION,
-  PSQI_SZ_DEFINITION
+  PSQI_SZ_DEFINITION,
+  PRESENTEISME_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -803,6 +804,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               title: PSQI_SZ_DEFINITION.title,
               description: PSQI_SZ_DEFINITION.description,
               questions: PSQI_SZ_DEFINITION.questions,
+            },
+            {
+              id: PRESENTEISME_SZ_DEFINITION.id,
+              code: PRESENTEISME_SZ_DEFINITION.code,
+              title: PRESENTEISME_SZ_DEFINITION.title,
+              description: PRESENTEISME_SZ_DEFINITION.description,
+              questions: PRESENTEISME_SZ_DEFINITION.questions,
             }
           ]
         },

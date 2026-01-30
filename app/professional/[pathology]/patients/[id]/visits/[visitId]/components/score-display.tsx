@@ -172,6 +172,16 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'error';                       // Poor/very poor sleep quality
     }
     
+    if (code === 'PRESENTEISME_SZ') {
+      // WHO-HPQ Presenteeism: Productivity percentage (0-100%)
+      // 80-100% = good, 60-79% = moderate, 40-59% = reduced, <40% = severely reduced
+      const productivity = data.productivite_pct;
+      if (productivity === null || productivity === undefined) return 'info';
+      if (productivity >= 80) return 'success';   // Good productivity
+      if (productivity >= 60) return 'warning';   // Moderate reduction
+      return 'error';                              // Significant reduction
+    }
+    
     if (code === 'CSM') {
       // CSM: Chronotype classification (13-55)
       // Morning types (48-55) and evening types (13-21) are notable
@@ -745,6 +755,7 @@ if (code === 'FAGERSTROM') {
               {code === 'YBOCS_SZ' && 'Résultats Y-BOCS - Obsessions-Compulsions'}
               {code === 'SOGS_SZ' && 'Résultats SOGS - Jeu Pathologique'}
               {code === 'PSQI_SZ' && 'Résultats PSQI - Qualité du Sommeil'}
+              {code === 'PRESENTEISME_SZ' && 'Résultats WHO-HPQ - Absentéisme et Présentéisme'}
               {code === 'MATHYS' && 'Résultats MAThyS - États thymiques'}
               {code === 'PSQI' && 'Résultats PSQI - Qualité du Sommeil'}
               {code === 'EPWORTH' && 'Résultats Epworth - Somnolence Diurne'}
@@ -834,6 +845,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.total_score !== undefined ? `${data.total_score}/20` : '-')
                 : code === 'PSQI_SZ'
                 ? (data.total_score !== undefined ? `${data.total_score}/21` : '-')
+                : code === 'PRESENTEISME_SZ'
+                ? (data.productivite_pct !== undefined ? `${data.productivite_pct.toFixed(0)}%` : '-')
                 : code === 'IPAQ_SZ'
                 ? (data.total_met_minutes !== undefined ? `${Math.round(data.total_met_minutes)} MET-min/sem` : '-')
                 : code === 'MATHYS'
@@ -1664,6 +1677,130 @@ if (code === 'FAGERSTROM') {
               <p><strong>PSQI:</strong> Pittsburgh Sleep Quality Index - Indice de qualité du sommeil</p>
               <p className="mt-1"><strong>Seuil clinique:</strong> Score &gt;5 indique une mauvaise qualité de sommeil (sensibilité ~90%, spécificité ~86%)</p>
               <p className="mt-1"><strong>Référence:</strong> Buysse DJ et al. Psychiatry Res. 1989</p>
+            </div>
+          </div>
+        )}
+
+        {/* WHO-HPQ Présentéisme Details */}
+        {code === 'PRESENTEISME_SZ' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            {/* Main Score - Productivity */}
+            <div className="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
+              <span className="text-gray-700 font-semibold">Productivité globale:</span>
+              <span className={`font-bold text-lg ${
+                data.productivite_pct !== null && data.productivite_pct !== undefined
+                  ? data.productivite_pct >= 80 ? 'text-green-600'
+                    : data.productivite_pct >= 60 ? 'text-orange-600'
+                    : 'text-red-600'
+                  : ''
+              }`}>
+                {data.productivite_pct !== undefined ? `${data.productivite_pct.toFixed(0)}%` : '-'}
+              </span>
+            </div>
+
+            {/* Absenteeism Section */}
+            <div className="space-y-2">
+              <h5 className="font-semibold text-gray-700 text-xs border-b pb-1">Absentéisme</h5>
+              
+              {/* Absentéisme absolu */}
+              <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                <span className="text-gray-600">Jours d&apos;absence (santé):</span>
+                <span className={`font-semibold ${
+                  data.absenteisme_absolu === 0 ? 'text-green-600' :
+                  data.absenteisme_absolu <= 2 ? 'text-yellow-600' :
+                  data.absenteisme_absolu <= 5 ? 'text-orange-600' :
+                  'text-red-600'
+                }`}>
+                  {data.absenteisme_absolu ?? '-'} jour(s)
+                </span>
+              </div>
+              
+              {/* Absentéisme relatif */}
+              <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                <span className="text-gray-600">Heures non travaillées (%):</span>
+                <span className={`font-semibold ${
+                  data.absenteisme_relatif_pct <= 0 ? 'text-green-600' :
+                  data.absenteisme_relatif_pct <= 10 ? 'text-yellow-600' :
+                  data.absenteisme_relatif_pct <= 25 ? 'text-orange-600' :
+                  'text-red-600'
+                }`}>
+                  {data.absenteisme_relatif_pct !== undefined ? `${data.absenteisme_relatif_pct.toFixed(1)}%` : '-'}
+                </span>
+              </div>
+            </div>
+
+            {/* Presenteeism Section */}
+            <div className="space-y-2">
+              <h5 className="font-semibold text-gray-700 text-xs border-b pb-1">Présentéisme</h5>
+              
+              {/* Performance relative */}
+              <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                <span className="text-gray-600">Performance vs collègues:</span>
+                <span className={`font-semibold ${
+                  data.performance_relative > 0 ? 'text-green-600' :
+                  data.performance_relative === 0 ? 'text-gray-600' :
+                  data.performance_relative >= -2 ? 'text-orange-600' :
+                  'text-red-600'
+                }`}>
+                  {data.performance_relative !== undefined 
+                    ? (data.performance_relative > 0 ? `+${data.performance_relative}` : data.performance_relative) 
+                    : '-'} point(s)
+                </span>
+              </div>
+              
+              {/* Perte de performance */}
+              <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                <span className="text-gray-600">Perte de performance récente:</span>
+                <span className={`font-semibold ${
+                  data.perte_performance <= 0 ? 'text-green-600' :
+                  data.perte_performance <= 1 ? 'text-yellow-600' :
+                  data.perte_performance <= 3 ? 'text-orange-600' :
+                  'text-red-600'
+                }`}>
+                  {data.perte_performance !== undefined 
+                    ? (data.perte_performance > 0 ? `+${data.perte_performance}` : data.perte_performance) 
+                    : '-'} point(s)
+                </span>
+              </div>
+            </div>
+            
+            {/* Clinical Thresholds */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2 text-xs">Interprétation des indicateurs</h5>
+              <div className="space-y-1 text-xs text-gray-600">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <span><strong>Productivité ≥80%:</strong> Niveau satisfaisant</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-orange-500" />
+                  <span><strong>Productivité 60-79%:</strong> Réduction modérée</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500" />
+                  <span><strong>Productivité &lt;60%:</strong> Réduction significative</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg ${
+                data.productivite_pct >= 80 ? 'bg-green-50 border border-green-200 text-green-800' :
+                data.productivite_pct >= 60 ? 'bg-orange-50 border border-orange-200 text-orange-800' :
+                'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                <p className="text-xs whitespace-pre-line">{data.interpretation}</p>
+              </div>
+            )}
+            
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>WHO-HPQ:</strong> World Health Organization Health and Work Performance Questionnaire</p>
+              <p className="mt-1"><strong>Absentéisme absolu:</strong> Jours d&apos;absence pour raison de santé (B5a + B5c)</p>
+              <p className="mt-1"><strong>Performance relative:</strong> Auto-évaluation vs collègues (B11 - B9)</p>
+              <p className="mt-1"><strong>Perte de performance:</strong> Déclin récent vs historique (B10 - B11)</p>
+              <p className="mt-1"><strong>Référence:</strong> Kessler RC et al. J Occup Environ Med. 2003</p>
             </div>
           </div>
         )}

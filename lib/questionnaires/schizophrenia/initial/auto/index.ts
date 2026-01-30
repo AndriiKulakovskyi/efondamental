@@ -123,3 +123,13 @@ export {
   type SchizophreniaPsqiResponseInsert,
   type PsqiSzScoreResult,
 } from './psqi';
+
+export {
+  PRESENTEISME_SZ_QUESTIONS,
+  PRESENTEISME_SZ_DEFINITION,
+  computePresenteismeSzScores,
+  interpretPresenteismeSzScore,
+  type SchizophreniaPresenteismeResponse,
+  type SchizophreniaPresenteismeResponseInsert,
+  type PresenteismeSzScoreResult,
+} from './presenteisme';
