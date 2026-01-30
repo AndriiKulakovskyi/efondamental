@@ -24,6 +24,49 @@ function validateGender(gender: string | null | undefined): boolean {
   return gender === 'M' || gender === 'F';
 }
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    await requireProfessional();
+    const context = await getUserContext();
+
+    if (!context?.profile.center_id) {
+      return NextResponse.json(
+        { error: "No center assigned" },
+        { status: 400 }
+      );
+    }
+
+    const { id } = await params;
+    const patient = await getPatientById(id);
+
+    if (!patient) {
+      return NextResponse.json(
+        { error: "Patient not found" },
+        { status: 404 }
+      );
+    }
+
+    // Verify patient belongs to the professional's center
+    if (patient.center_id !== context.profile.center_id) {
+      return NextResponse.json(
+        { error: "Unauthorized: Patient does not belong to your center" },
+        { status: 403 }
+      );
+    }
+
+    return NextResponse.json({ patient });
+  } catch (error) {
+    console.error("Failed to fetch patient:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to fetch patient" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
