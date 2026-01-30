@@ -39,9 +39,14 @@ import { computeEpworthScores, type BipolarEpworthResponse } from '@/lib/questio
 import { scoreQids, type BipolarQidsResponse } from '@/lib/questionnaires/bipolar/screening/auto/qids';
 
 // Nurse module calculation imports
+import { analyzeTobacco, interpretTobacco } from '@/lib/questionnaires/bipolar/nurse/tobacco';
 import { analyzePhysicalParams } from '@/lib/questionnaires/bipolar/nurse/physical-params';
 import { analyzeBloodPressure } from '@/lib/questionnaires/bipolar/nurse/blood-pressure';
 import { scoreSleepApnea } from '@/lib/questionnaires/bipolar/nurse/sleep-apnea';
+import { analyzeBiologicalAssessment, interpretBiologicalAssessment } from '@/lib/questionnaires/bipolar/nurse/biological-assessment';
+import { scoreFagerstrom } from '@/lib/questionnaires/bipolar/nurse/fagerstrom';
+
+import { getPatientById } from '@/lib/services/patient.service';
 
 // ============================================================================
 // Generic Types for Bipolar Initial Questionnaires
@@ -248,9 +253,32 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
   // FAST needs to compute and persist domain subscores, total_score, and interpretation.
   // This ensures that when "Validate questionnaire" is clicked, scoring is computed
-  // server-side and stored in Supabase (consistent across initial/annual visits).
+  // and stored on the server side correctly.
   if (questionnaireCode === 'FAST') {
     return await saveFastResponse(response as any as FastResponseInsert) as any as T;
+  }
+
+  // FAGERSTROM needs to compute total score, dependence level and interpretation.
+  if (questionnaireCode === 'FAGERSTROM') {
+    const scores = scoreFagerstrom(response as any);
+    const dataToSave = {
+      ...response,
+      ...scores
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(dataToSave, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving FAGERSTROM response:', error);
+      throw error;
+    }
+
+    return data as T;
   }
 
   // DSM5_COMORBID needs special handling because some environments had BOOLEAN columns
@@ -968,7 +996,36 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
   // Nurse Module Questionnaires with Calculations
   // ============================================================================
 
-  // PHYSICAL_PARAMS needs BMI calculation
+  // TOBACCO needs analysis and interpretation
+  if (questionnaireCode === 'TOBACCO') {
+    const analysisInput = {
+      smoking_status: response.smoking_status ?? null,
+      pack_years: response.pack_years ?? null,
+      pack_years_ex: response.pack_years_ex ?? null
+    };
+    const analysis = analyzeTobacco(analysisInput);
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert({
+        ...response,
+        pack_years: analysis.pack_years,
+        interpretation: analysis.interpretation,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving TOBACCO response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // PHYSICAL_PARAMS needs BMI calculation and interpretation
   if (questionnaireCode === 'PHYSICAL_PARAMS') {
     const analysis = analyzePhysicalParams({
       height_cm: response.height_cm ?? null,
@@ -981,6 +1038,8 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
       .upsert({
         ...response,
         bmi: analysis.bmi,
+        bmi_category: analysis.bmi_category,
+        interpretation: analysis.interpretation,
         updated_at: new Date().toISOString()
       }, { onConflict: 'visit_id' })
       .select()
@@ -994,7 +1053,7 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
     return data as T;
   }
 
-  // BLOOD_PRESSURE needs tension string formatting
+  // BLOOD_PRESSURE needs tension string formatting and interpretation
   if (questionnaireCode === 'BLOOD_PRESSURE') {
     const analysis = analyzeBloodPressure({
       bp_lying_systolic: response.bp_lying_systolic ?? null,
@@ -1010,6 +1069,7 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
         ...response,
         tension_lying: analysis.tension_lying,
         tension_standing: analysis.tension_standing,
+        interpretation: analysis.interpretation,
         updated_at: new Date().toISOString()
       }, { onConflict: 'visit_id' })
       .select()
@@ -1094,7 +1154,7 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
     return data as T;
   }
 
-  // BIOLOGICAL_ASSESSMENT needs HDL ratio and corrected calcium calculations
+  // BIOLOGICAL_ASSESSMENT needs HDL ratio, corrected calcium and interpretation
   if (questionnaireCode === 'BIOLOGICAL_ASSESSMENT') {
     // Compute rapport Total/HDL if both values exist
     let rapport_total_hdl = null;
@@ -1107,6 +1167,20 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
     if (response.calcemie && response.protidemie) {
       calcemie_corrigee = Math.round((response.calcemie / 0.55 + response.protidemie / 160) * 100) / 100;
     }
+
+    // Get interpretation
+    const interpretation = interpretBiologicalAssessment({
+      glycemie_a_jeun: response.glycemie_a_jeun ?? null,
+      glycemie_a_jeun_unit: response.glycemie_a_jeun_unit ?? null,
+      tsh: response.tsh ?? null,
+      asat: response.asat ?? null,
+      alat: response.alat ?? null,
+      ggt: response.ggt ?? null,
+      creatinine: response.creatinine ?? null,
+      cholesterol_total: response.cholesterol_total ?? null,
+      triglycerides: response.triglycerides ?? null,
+      lithium_plasma: response.lithium_plasma ?? null
+    });
     
     const supabase = await createClient();
     const { data, error } = await supabase
@@ -1115,6 +1189,7 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
         ...response,
         rapport_total_hdl,
         calcemie_corrigee,
+        interpretation,
         updated_at: new Date().toISOString()
       }, { onConflict: 'visit_id' })
       .select()
@@ -1127,6 +1202,7 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     return data as T;
   }
+
 
   const supabase = await createClient();
   const { data, error } = await supabase
