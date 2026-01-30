@@ -130,7 +130,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
     type: 'instruction',
     required: false,
     section: 'A - Capacités cognitives',
-    help_text: 'Cette rubrique concerne la manière dont les aptitudes cognitives (capacités d\'organisation, adaptation au contexte de la situation, attention, mémorisation) interfèrent avec les activités de la vie quotidienne. Le score retenu doit se baser sur le meilleur niveau de réalisation atteint, même si la personne a bénéficié d\'une stimulation extérieure. Les exemples de situations retenus ne doivent pas impliquer directement d\'interaction avec autrui.'
+    help: 'Cette rubrique concerne la manière dont les aptitudes cognitives (capacités d\'organisation, adaptation au contexte de la situation, attention, mémorisation) interfèrent avec les activités de la vie quotidienne. Le score retenu doit se baser sur le meilleur niveau de réalisation atteint, même si la personne a bénéficié d\'une stimulation extérieure. Les exemples de situations retenus ne doivent pas impliquer directement d\'interaction avec autrui.'
   },
   {
     id: 'a1',
@@ -147,7 +147,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
       { code: 4, label: '4 - Capable d\'activités plus complexes impliquant de faire deux choses en même temps, si rien ne perturbe', score: 4 },
       { code: 5, label: '5', score: 5 },
       { code: 6, label: '6 - Capable de réaliser tous les actes routiniers, même avec nombreuses séquences successives', score: 6 },
-      { code: 7, label: '7 - Non évaluable', score: null }
+      { code: 7, label: '7 - Non évaluable' }
     ]
   },
   {
@@ -165,7 +165,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
       { code: 4, label: '4 - Capable d\'activités non routinières plus complexes', score: 4 },
       { code: 5, label: '5', score: 5 },
       { code: 6, label: '6 - Très bon niveau de réalisation dans des situations non routinières complexes', score: 6 },
-      { code: 7, label: '7 - Non évaluable', score: null }
+      { code: 7, label: '7 - Non évaluable' }
     ]
   },
   {
@@ -183,7 +183,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
       { code: 4, label: '4 - Capacités réelles dans certains domaines mais progrès facilement remis en cause', score: 4 },
       { code: 5, label: '5', score: 5 },
       { code: 6, label: '6 - Excellentes capacités d\'apprentissage', score: 6 },
-      { code: 7, label: '7 - Non évaluable', score: null }
+      { code: 7, label: '7 - Non évaluable' }
     ]
   },
   {
@@ -201,7 +201,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
       { code: 4, label: '4 - Capable de fixer son attention le temps d\'un film mais fatigable', score: 4 },
       { code: 5, label: '5', score: 5 },
       { code: 6, label: '6 - Pas de difficulté notable dans les situations motivantes', score: 6 },
-      { code: 7, label: '7 - Non évaluable', score: null }
+      { code: 7, label: '7 - Non évaluable' }
     ]
   },
 
@@ -228,7 +228,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
       { code: 4, label: '4 - Suffisamment entreprenant pour besoins courants mais manque d\'initiative', score: 4 },
       { code: 5, label: '5', score: 5 },
       { code: 6, label: '6 - Pas de difficulté particulière, niveau d\'énergie correct', score: 6 },
-      { code: 7, label: '7 - Non évaluable', score: null }
+      { code: 7, label: '7 - Non évaluable' }
     ]
   },
   {
@@ -246,7 +246,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
       { code: 4, label: '4 - Capable d\'initiatives mais manque de persévérance', score: 4 },
       { code: 5, label: '5', score: 5 },
       { code: 6, label: '6 - Ne manque pas de motivation, persévère même face aux difficultés', score: 6 },
-      { code: 7, label: '7 - Non évaluable', score: null }
+      { code: 7, label: '7 - Non évaluable' }
     ]
   },
   {
@@ -264,7 +264,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
       { code: 4, label: '4 - Passe trop de temps mais moins de la moitié à ne rien faire', score: 4 },
       { code: 5, label: '5', score: 5 },
       { code: 6, label: '6 - Absence d\'inactivité excessive', score: 6 },
-      { code: 7, label: '7 - Non évaluable', score: null }
+      { code: 7, label: '7 - Non évaluable' }
     ]
   },
   {
@@ -282,7 +282,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
       { code: 4, label: '4 - Quelques sujets de curiosité avec effort pour mieux les connaître', score: 4 },
       { code: 5, label: '5', score: 5 },
       { code: 6, label: '6 - Curiosité pour de nombreux sujets avec effort évident', score: 6 },
-      { code: 7, label: '7 - Non évaluable', score: null }
+      { code: 7, label: '7 - Non évaluable' }
     ]
   },
 
@@ -309,7 +309,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
       { code: 4, label: '4 - Parvient plus régulièrement mais commet souvent des erreurs', score: 4 },
       { code: 5, label: '5', score: 5 },
       { code: 6, label: '6 - Prend spontanément en considération la situation d\'autrui', score: 6 },
-      { code: 7, label: '7 - Non évaluable', score: null }
+      { code: 7, label: '7 - Non évaluable' }
     ]
   },
   {
@@ -327,7 +327,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
       { code: 4, label: '4 - Manifeste plus régulièrement sa sensibilité, parfois chaleureux', score: 4 },
       { code: 5, label: '5', score: 5 },
       { code: 6, label: '6 - Ressent intuitivement, chaleureux, tolérant, fait preuve de tact', score: 6 },
-      { code: 7, label: '7 - Non évaluable', score: null }
+      { code: 7, label: '7 - Non évaluable' }
     ]
   },
   {
@@ -345,7 +345,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
       { code: 4, label: '4 - Identifie les situations les plus courantes avec compréhension', score: 4 },
       { code: 5, label: '5', score: 5 },
       { code: 6, label: '6 - Aucune difficulté pour se repérer dans les interactions sociales', score: 6 },
-      { code: 7, label: '7 - Non évaluable', score: null }
+      { code: 7, label: '7 - Non évaluable' }
     ]
   },
 
@@ -372,7 +372,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
       { code: 4, label: '4 - Perçoit ses difficultés dans certains domaines mais les minimise ou amplifie', score: 4 },
       { code: 5, label: '5', score: 5 },
       { code: 6, label: '6 - Réelle connaissance de ses difficultés, capable de décrire précisément', score: 6 },
-      { code: 7, label: '7 - Non évaluable', score: null }
+      { code: 7, label: '7 - Non évaluable' }
     ]
   },
   {
@@ -390,7 +390,7 @@ export const EPHP_SZ_QUESTIONS: Question[] = [
       { code: 4, label: '4 - Capable de demander de l\'aide, exprime des attentes, coopérant stable', score: 4 },
       { code: 5, label: '5', score: 5 },
       { code: 6, label: '6 - Demande de l\'aide de manière adaptée, collabore activement aux soins', score: 6 },
-      { code: 7, label: '7 - Non évaluable', score: null }
+      { code: 7, label: '7 - Non évaluable' }
     ]
   }
 ];
@@ -544,7 +544,7 @@ export const EPHP_SZ_DEFINITION: QuestionnaireDefinition = {
   metadata: {
     singleColumn: true,
     pathologies: ['schizophrenia'],
-    target_role: 'entourage',
+    target_role: 'patient',
     reference: 'Fondation Fondamental - Autoquestionnaires Entourage'
   }
 };
