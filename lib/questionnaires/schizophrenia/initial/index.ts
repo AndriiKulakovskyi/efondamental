@@ -32,7 +32,12 @@ export * as addictologie from './addictologie';
 // Bilan social
 export * as social from './social';
 
-// Auto module (1 questionnaire)
+// Auto module (patient self-administered questionnaires)
 // Self-administered questionnaires
-// S-QoL (Quality of Life)
+// S-QoL, CTQ, MARS, BIS, EQ5D5L, IPAQ, YBOCS, WURS25, STORI, SOGS, PSQI, Présentéisme, Fagerstrom
 export * as auto from './auto';
+
+// Entourage module (caregiver-administered questionnaires)
+// Questionnaires completed by caregiver/entourage
+// EPHP (Handicap Psychique)
+export * as entourage from './entourage';

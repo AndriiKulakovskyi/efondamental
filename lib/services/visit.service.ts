@@ -249,7 +249,8 @@ import {
   SOGS_SZ_DEFINITION,
   PSQI_SZ_DEFINITION,
   PRESENTEISME_SZ_DEFINITION,
-  FAGERSTROM_SZ_DEFINITION
+  FAGERSTROM_SZ_DEFINITION,
+  EPHP_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -826,7 +827,15 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           id: 'mod_auto_entourage_sz',
           name: 'Autoquestionnaires entourage',
           description: 'Questionnaires remplis par l\'entourage du patient',
-          questionnaires: []
+          questionnaires: [
+            {
+              id: EPHP_SZ_DEFINITION.id,
+              code: EPHP_SZ_DEFINITION.code,
+              title: EPHP_SZ_DEFINITION.title,
+              description: EPHP_SZ_DEFINITION.description,
+              questions: EPHP_SZ_DEFINITION.questions,
+            }
+          ]
         }
       ];
     }

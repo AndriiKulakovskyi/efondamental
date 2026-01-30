@@ -1,5 +1,9 @@
 import { getUserContext } from "@/lib/rbac/middleware";
 import { notFound, redirect } from "next/navigation";
+
+// Force dynamic rendering to ensure fresh data after questionnaire submission
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 import { submitProfessionalQuestionnaireAction } from "@/app/professional/questionnaires/actions";
 import { 
   ASRM_DEFINITION, 
@@ -148,7 +152,8 @@ import {
   SOGS_SZ_DEFINITION,
   PSQI_SZ_DEFINITION,
   PRESENTEISME_SZ_DEFINITION,
-  FAGERSTROM_SZ_DEFINITION
+  FAGERSTROM_SZ_DEFINITION,
+  EPHP_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { 
   getAsrmResponse, 
@@ -298,7 +303,8 @@ import {
   getSogsSzResponse,
   getPsqiSzResponse,
   getPresenteismeSzResponse,
-  getFagerstromSzResponse
+  getFagerstromSzResponse,
+  getEphpSzResponse
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -617,6 +623,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === PSQI_SZ_DEFINITION.code) questionnaire = PSQI_SZ_DEFINITION;
   else if (code === PRESENTEISME_SZ_DEFINITION.code) questionnaire = PRESENTEISME_SZ_DEFINITION;
   else if (code === FAGERSTROM_SZ_DEFINITION.code) questionnaire = FAGERSTROM_SZ_DEFINITION;
+  // Schizophrenia entourage module (caregiver-administered)
+  else if (code === EPHP_SZ_DEFINITION.code) questionnaire = EPHP_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -779,6 +787,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === PSQI_SZ_DEFINITION.code) existingResponse = await getPsqiSzResponse(visitId);
   else if (code === PRESENTEISME_SZ_DEFINITION.code) existingResponse = await getPresenteismeSzResponse(visitId);
   else if (code === FAGERSTROM_SZ_DEFINITION.code) existingResponse = await getFagerstromSzResponse(visitId);
+  // Schizophrenia entourage module (caregiver-administered)
+  else if (code === EPHP_SZ_DEFINITION.code) existingResponse = await getEphpSzResponse(visitId);
   
   // Debug logging for PSQI_SZ
   if (code === 'PSQI_SZ') {

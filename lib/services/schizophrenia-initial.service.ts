@@ -67,6 +67,9 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'PSQI_SZ': 'schizophrenia_psqi',
   'PRESENTEISME_SZ': 'schizophrenia_presenteisme',
   'FAGERSTROM_SZ': 'schizophrenia_fagerstrom',
+  
+  // Entourage module (caregiver-administered)
+  'EPHP_SZ': 'schizophrenia_ephp',
 };
 
 // ============================================================================
@@ -3030,4 +3033,195 @@ function generateFagerstromInterpretation(
   }
 
   return interpretation;
+}
+
+// ============================================================================
+// EPHP (Entourage module - Handicap Psychique)
+// ============================================================================
+
+/**
+ * Get EPHP response for a visit
+ */
+export async function getEphpSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('EPHP_SZ', visitId);
+}
+
+/**
+ * Helper function to sum EPHP items, excluding value 7 (non évaluable)
+ */
+function sumEphpItemsExcludingNonEvaluable(
+  responses: Record<string, any>,
+  items: string[]
+): number {
+  let sum = 0;
+  for (const item of items) {
+    const value = responses[item];
+    if (typeof value === 'number' && value >= 0 && value <= 6) {
+      sum += value;
+    }
+  }
+  return sum;
+}
+
+/**
+ * Generate EPHP interpretation text
+ */
+function generateEphpInterpretation(
+  totalScore: number,
+  scoreCognitiv: number,
+  scoreMotiv: number,
+  scoreComm: number,
+  scoreEval: number,
+  excludedCount: number
+): string {
+  const percentage = Math.round((totalScore / 78) * 100);
+  
+  let interpretation = `Score global EPHP: ${totalScore}/78 (${percentage}%).`;
+  
+  // Overall functioning level (higher = better)
+  if (percentage >= 75) {
+    interpretation += ' Bon niveau de fonctionnement global.';
+  } else if (percentage >= 50) {
+    interpretation += ' Niveau de fonctionnement modéré avec des difficultés dans certains domaines.';
+  } else if (percentage >= 25) {
+    interpretation += ' Niveau de fonctionnement altéré avec des difficultés significatives.';
+  } else {
+    interpretation += ' Niveau de fonctionnement très altéré, handicap psychique important.';
+  }
+  
+  // Domain-specific insights
+  const domainAnalysis: string[] = [];
+  
+  // Cognitif (max 24)
+  const cognitivPct = Math.round((scoreCognitiv / 24) * 100);
+  if (cognitivPct < 50) {
+    domainAnalysis.push('capacités cognitives altérées');
+  }
+  
+  // Motivation (max 24)
+  const motivPct = Math.round((scoreMotiv / 24) * 100);
+  if (motivPct < 50) {
+    domainAnalysis.push('déficit motivationnel');
+  }
+  
+  // Communication (max 18)
+  const commPct = Math.round((scoreComm / 18) * 100);
+  if (commPct < 50) {
+    domainAnalysis.push('difficultés de communication');
+  }
+  
+  // Auto-évaluation (max 12)
+  const evalPct = Math.round((scoreEval / 12) * 100);
+  if (evalPct < 50) {
+    domainAnalysis.push('insight et demande d\'aide limités');
+  }
+  
+  if (domainAnalysis.length > 0) {
+    interpretation += ` Points d'attention: ${domainAnalysis.join(', ')}.`;
+  }
+  
+  // Note excluded items
+  if (excludedCount > 0) {
+    interpretation += ` Note: ${excludedCount} item(s) non évaluable(s) exclu(s) du calcul.`;
+  }
+  
+  return interpretation;
+}
+
+/**
+ * Save EPHP response with domain and global scores
+ */
+export async function saveEphpSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Domain definitions
+  const COGNITIV_ITEMS = ['a1', 'a2', 'a3', 'a4'];
+  const MOTIV_ITEMS = ['b5', 'b6', 'b7', 'b8'];
+  const COMM_ITEMS = ['c9', 'c10', 'c11'];
+  const EVAL_ITEMS = ['d12', 'd13'];
+  
+  // Handle case where questionnaire is not completed
+  if (response.questionnaire_done === 'Non fait') {
+    const { data, error } = await supabase
+      .from('schizophrenia_ephp')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        questionnaire_done: response.questionnaire_done,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error saving schizophrenia_ephp:', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Count excluded items (value 7)
+  let excludedCount = 0;
+  const allItems = [...COGNITIV_ITEMS, ...MOTIV_ITEMS, ...COMM_ITEMS, ...EVAL_ITEMS];
+  for (const item of allItems) {
+    if (response[item] === 7) {
+      excludedCount++;
+    }
+  }
+  
+  // Calculate domain subscores (excluding value 7)
+  const score_cognitiv = sumEphpItemsExcludingNonEvaluable(response, COGNITIV_ITEMS);
+  const score_motiv = sumEphpItemsExcludingNonEvaluable(response, MOTIV_ITEMS);
+  const score_comm = sumEphpItemsExcludingNonEvaluable(response, COMM_ITEMS);
+  const score_eval = sumEphpItemsExcludingNonEvaluable(response, EVAL_ITEMS);
+  
+  // Calculate global score
+  const total_score = score_cognitiv + score_motiv + score_comm + score_eval;
+  
+  // Generate interpretation
+  const interpretation = generateEphpInterpretation(
+    total_score,
+    score_cognitiv,
+    score_motiv,
+    score_comm,
+    score_eval,
+    excludedCount
+  );
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_ephp')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      questionnaire_done: response.questionnaire_done,
+      a1: response.a1,
+      a2: response.a2,
+      a3: response.a3,
+      a4: response.a4,
+      b5: response.b5,
+      b6: response.b6,
+      b7: response.b7,
+      b8: response.b8,
+      c9: response.c9,
+      c10: response.c10,
+      c11: response.c11,
+      d12: response.d12,
+      d13: response.d13,
+      score_cognitiv,
+      score_motiv,
+      score_comm,
+      score_eval,
+      total_score,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_ephp:', error);
+    throw error;
+  }
+  return data;
 }

@@ -538,6 +538,17 @@ if (code === 'FAGERSTROM') {
       if (score === 5) return 'warning';   // Dépendance moyenne
       return 'error';                      // Dépendance forte (≥6)
     }
+
+    if (code === 'EPHP_SZ') {
+      // EPHP: Handicap Psychique (0-78), HIGHER = BETTER
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      const pct = (score / 78) * 100;
+      if (pct >= 75) return 'success';     // Bon fonctionnement
+      if (pct >= 50) return 'info';        // Fonctionnement modéré
+      if (pct >= 25) return 'warning';     // Fonctionnement altéré
+      return 'error';                       // Fonctionnement très altéré
+    }
     
     return 'info';
   };
@@ -771,6 +782,7 @@ if (code === 'FAGERSTROM') {
               {code === 'EPWORTH' && 'Résultats Epworth - Somnolence Diurne'}
               {code === 'FAGERSTROM' && 'Résultats FTND - Test de Fagerström'}
               {code === 'FAGERSTROM_SZ' && 'Résultats FTND - Test de Fagerström'}
+              {code === 'EPHP_SZ' && 'Résultats EPHP - Handicap Psychique (Entourage)'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -872,6 +884,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.total_score ?? data.totalScore ?? '-')
                 : code === 'FAGERSTROM_SZ'
                 ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'EPHP_SZ'
+                ? (data.total_score !== undefined ? data.total_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM' && '/20'}
               {code === 'QIDS_SR16' && '/27'}
@@ -879,6 +893,7 @@ if (code === 'FAGERSTROM') {
               {code === 'EPWORTH' && '/24'}
               {code === 'FAGERSTROM' && '/10'}
               {code === 'FAGERSTROM_SZ' && '/10'}
+              {code === 'EPHP_SZ' && '/78'}
               {(code === 'CTQ' || code === 'CTQ_SZ') && '/125'}
               {code === 'BIS10' && '/4.0'}
               {code === 'CSM' && '/55'}
@@ -4923,6 +4938,202 @@ if (code === 'FAGERSTROM') {
 
             <div className="text-[10px] text-gray-400 italic pt-2 text-right">
               FTND : Fagerström Test for Nicotine Dependence | HSI : Heaviness of Smoking Index
+            </div>
+          </div>
+        )}
+
+        {/* EPHP_SZ (Handicap Psychique - Entourage) Details */}
+        {code === 'EPHP_SZ' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Global Score Summary */}
+            <div className={`p-4 rounded-lg border-2 ${
+              data.total_score !== null && data.total_score !== undefined
+                ? ((data.total_score / 78) * 100) >= 75
+                  ? 'bg-green-50 border-green-200'
+                  : ((data.total_score / 78) * 100) >= 50
+                  ? 'bg-blue-50 border-blue-200'
+                  : ((data.total_score / 78) * 100) >= 25
+                  ? 'bg-amber-50 border-amber-200'
+                  : 'bg-red-50 border-red-200'
+                : 'bg-gray-50 border-gray-200'
+            }`}>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Score global:</span>
+                  <span className="text-lg font-bold">
+                    {data.total_score !== null && data.total_score !== undefined 
+                      ? `${data.total_score}/78 (${Math.round((data.total_score / 78) * 100)}%)` 
+                      : 'Non calculable'}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-600">
+                  Plus le score est élevé, meilleur est le fonctionnement (0-78)
+                </p>
+              </div>
+            </div>
+
+            {/* Domain Subscores */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-3">Scores par domaine</h5>
+              <div className="space-y-3">
+                {/* Cognitif (A1-A4, max 24) */}
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700 font-medium">Capacités cognitives</span>
+                    <span className={`font-semibold ${
+                      data.score_cognitiv !== null && data.score_cognitiv !== undefined
+                        ? ((data.score_cognitiv / 24) * 100) >= 50 ? 'text-green-600' : 'text-orange-600'
+                        : 'text-gray-400'
+                    }`}>
+                      {data.score_cognitiv !== null && data.score_cognitiv !== undefined 
+                        ? `${data.score_cognitiv}/24` 
+                        : '-'}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full transition-all ${
+                        ((data.score_cognitiv ?? 0) / 24) * 100 >= 50 ? 'bg-green-500' : 'bg-orange-500'
+                      }`}
+                      style={{ width: `${Math.min(((data.score_cognitiv ?? 0) / 24) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-[10px] text-gray-500">Organisation, adaptation, apprentissage, attention</p>
+                </div>
+
+                {/* Motivation (B5-B8, max 24) */}
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700 font-medium">Motivations</span>
+                    <span className={`font-semibold ${
+                      data.score_motiv !== null && data.score_motiv !== undefined
+                        ? ((data.score_motiv / 24) * 100) >= 50 ? 'text-green-600' : 'text-orange-600'
+                        : 'text-gray-400'
+                    }`}>
+                      {data.score_motiv !== null && data.score_motiv !== undefined 
+                        ? `${data.score_motiv}/24` 
+                        : '-'}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full transition-all ${
+                        ((data.score_motiv ?? 0) / 24) * 100 >= 50 ? 'bg-green-500' : 'bg-orange-500'
+                      }`}
+                      style={{ width: `${Math.min(((data.score_motiv ?? 0) / 24) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-[10px] text-gray-500">Initiative, projet, utilisation du temps, curiosité</p>
+                </div>
+
+                {/* Communication (C9-C11, max 18) */}
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700 font-medium">Capacités de communication et de compréhension des autres</span>
+                    <span className={`font-semibold ${
+                      data.score_comm !== null && data.score_comm !== undefined
+                        ? ((data.score_comm / 18) * 100) >= 50 ? 'text-green-600' : 'text-orange-600'
+                        : 'text-gray-400'
+                    }`}>
+                      {data.score_comm !== null && data.score_comm !== undefined 
+                        ? `${data.score_comm}/18` 
+                        : '-'}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full transition-all ${
+                        ((data.score_comm ?? 0) / 18) * 100 >= 50 ? 'bg-green-500' : 'bg-orange-500'
+                      }`}
+                      style={{ width: `${Math.min(((data.score_comm ?? 0) / 18) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-[10px] text-gray-500">Empathie cognitive/émotionnelle, rôles sociaux</p>
+                </div>
+
+                {/* Auto-évaluation (D12-D13, max 12) */}
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700 font-medium">Capacité d'autoévaluation de ses capacités et de prise en compte de ses limites</span>
+                    <span className={`font-semibold ${
+                      data.score_eval !== null && data.score_eval !== undefined
+                        ? ((data.score_eval / 12) * 100) >= 50 ? 'text-green-600' : 'text-orange-600'
+                        : 'text-gray-400'
+                    }`}>
+                      {data.score_eval !== null && data.score_eval !== undefined 
+                        ? `${data.score_eval}/12` 
+                        : '-'}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full transition-all ${
+                        ((data.score_eval ?? 0) / 12) * 100 >= 50 ? 'bg-green-500' : 'bg-orange-500'
+                      }`}
+                      style={{ width: `${Math.min(((data.score_eval ?? 0) / 12) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-[10px] text-gray-500">Insight, demande d'aide, coopération aux soins</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Clinical Interpretation */}
+            {interpretation && (
+              <div className={`p-4 rounded-lg border-2 ${
+                severity === 'success' ? 'bg-green-50 border-green-200 text-green-900' :
+                severity === 'info' ? 'bg-blue-50 border-blue-200 text-blue-900' :
+                severity === 'warning' ? 'bg-orange-50 border-orange-200 text-orange-900' :
+                'bg-red-50 border-red-200 text-red-900'
+              }`}>
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5">{getAlertIcon()}</div>
+                  <div className="space-y-2">
+                    <p className="font-bold text-base leading-tight">
+                      Interprétation clinique
+                    </p>
+                    <p className="text-sm leading-relaxed font-medium">
+                      {interpretation}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Clinical Thresholds */}
+            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2">Niveaux de fonctionnement</p>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                  <span>≥75%: Bon fonctionnement</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+                  <span>50-74%: Modéré</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-orange-500"></span>
+                  <span>25-49%: Altéré</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-red-500"></span>
+                  <span>&lt;25%: Très altéré</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Clinical Note */}
+            <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <p className="text-xs text-blue-800">
+                <span className="font-semibold">Note clinique:</span> L'EPHP est un outil d'évaluation du handicap psychique 
+                rempli par l'entourage/aidant. Les scores élevés indiquent un meilleur fonctionnement. 
+                Cette échelle est utile pour les demandes PCH/AAH et le suivi en réhabilitation.
+              </p>
+            </div>
+
+            <div className="text-[10px] text-gray-400 italic pt-2 text-right">
+              EPHP : Échelle d'Évaluation du Handicap Psychique par l'Entourage | Score 0-78
             </div>
           </div>
         )}

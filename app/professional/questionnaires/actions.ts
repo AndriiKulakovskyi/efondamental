@@ -171,7 +171,8 @@ import {
   saveSogsSzResponse as saveSchizophreniaSogsResponse,
   savePsqiSzResponse as saveSchizophreniaPsqiResponse,
   savePresenteismeSzResponse as saveSchizophreniaPresenteismeResponse,
-  saveFagerstromSzResponse as saveSchizophreniaFagerstromResponse
+  saveFagerstromSzResponse as saveSchizophreniaFagerstromResponse,
+  saveEphpSzResponse as saveSchizophreniaEphpResponse
 } from '@/lib/services/schizophrenia-initial.service';
 import { 
   getVisitCompletionStatus,
@@ -866,6 +867,15 @@ export async function submitProfessionalQuestionnaireAction(
 
       case 'FAGERSTROM_SZ':
         result = await saveSchizophreniaFagerstromResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        });
+        break;
+
+      // Initial Evaluation - ENTOURAGE (caregiver-administered)
+      case 'EPHP_SZ':
+        result = await saveSchizophreniaEphpResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any

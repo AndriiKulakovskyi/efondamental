@@ -156,7 +156,8 @@ import {
   SOGS_SZ_DEFINITION,
   PSQI_SZ_DEFINITION,
   PRESENTEISME_SZ_DEFINITION,
-  FAGERSTROM_SZ_DEFINITION
+  FAGERSTROM_SZ_DEFINITION,
+  EPHP_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -738,7 +739,18 @@ export default async function VisitDetailPage({
           id: 'mod_auto_entourage_sz',
           name: 'Autoquestionnaires entourage',
           description: 'Questionnaires remplis par l\'entourage du patient',
-          questionnaires: []
+          questionnaires: [
+            {
+              id: EPHP_SZ_DEFINITION.code,
+              code: EPHP_SZ_DEFINITION.code,
+              title: EPHP_SZ_DEFINITION.title,
+              description: EPHP_SZ_DEFINITION.description,
+              questions: EPHP_SZ_DEFINITION.questions,
+              target_role: 'entourage',
+              completed: questionnaireStatuses['EPHP_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['EPHP_SZ']?.completed_at,
+            }
+          ]
         }
       ];
     } else {

@@ -63,3 +63,7 @@ export {
   PRESENTEISME_SZ_DEFINITION,
   FAGERSTROM_SZ_DEFINITION
 } from './initial/auto';
+
+export {
+  EPHP_SZ_DEFINITION
+} from './initial/entourage';
