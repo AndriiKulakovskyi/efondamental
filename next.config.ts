@@ -39,6 +39,19 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  async rewrites() {
+    return [
+      {
+        source: '/api/proxy/medications/search/:query',
+        destination: 'https://medicaments-api.giygas.dev/medicament/:query',
+      },
+      {
+        source: '/api/proxy/medications/details/:id',
+        destination: 'https://medicaments-api.giygas.dev/medicament/id/:id',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

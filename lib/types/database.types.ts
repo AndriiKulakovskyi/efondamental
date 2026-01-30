@@ -4273,6 +4273,11 @@ export interface PatientMedication {
   start_date: string;
   is_ongoing: boolean;
   end_date: string | null;
+  // Dosage fields
+  dosage_type?: 'regular' | 'injectable' | null;
+  daily_units?: string | null;
+  ampoule_count?: string | null;
+  weeks_interval?: string | null;
   created_at?: string;
   updated_at?: string;
   created_by?: string;

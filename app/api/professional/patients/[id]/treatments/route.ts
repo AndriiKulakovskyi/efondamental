@@ -71,6 +71,11 @@ export async function POST(
           start_date: data.start_date,
           is_ongoing: data.is_ongoing,
           end_date: data.end_date || null,
+          // Dosage fields
+          dosage_type: data.dosage_type || null,
+          daily_units: data.daily_units || null,
+          ampoule_count: data.ampoule_count || null,
+          weeks_interval: data.weeks_interval || null,
         });
         break;
 

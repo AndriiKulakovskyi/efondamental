@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MoreVertical, UserCog, Mail, Trash2 } from "lucide-react";
+import { MoreVertical, UserCog, Mail, Trash2, Pill } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { ReassignPatientDialog } from "./reassign-patient-dialog";
 import { EditPatientEmail } from "./edit-patient-email";
 import { DeletePatientDialog } from "./delete-patient-dialog";
+import { AddTreatmentDialog } from "./add-treatment-dialog";
 
 interface Doctor {
   id: string;
@@ -46,6 +47,7 @@ export function QuickActionsMenu({
   const [showReassignDialog, setShowReassignDialog] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showTreatmentDialog, setShowTreatmentDialog] = useState(false);
 
   const patientName = `${patientFirstName} ${patientLastName}`;
 
@@ -68,6 +70,12 @@ export function QuickActionsMenu({
               <DropdownMenuSeparator />
             </>
           )}
+          
+          <DropdownMenuItem onClick={() => setShowTreatmentDialog(true)}>
+            <Pill className="mr-2 h-4 w-4" />
+            Ajouter un traitement
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           
           <DropdownMenuItem onClick={() => setShowEmailDialog(true)}>
             <Mail className="mr-2 h-4 w-4" />
@@ -114,6 +122,15 @@ export function QuickActionsMenu({
           patientFirstName={patientFirstName}
           patientLastName={patientLastName}
           pathology={pathology}
+        />
+      )}
+
+      {showTreatmentDialog && (
+        <AddTreatmentDialog
+          patientId={patientId}
+          patientName={patientName}
+          open={showTreatmentDialog}
+          onOpenChange={setShowTreatmentDialog}
         />
       )}
     </>
