@@ -64,6 +64,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'WURS25_SZ': 'schizophrenia_wurs25',
   'STORI_SZ': 'schizophrenia_stori',
   'SOGS_SZ': 'schizophrenia_sogs',
+  'PSQI_SZ': 'schizophrenia_psqi',
 };
 
 // ============================================================================
@@ -2422,6 +2423,224 @@ export async function saveSogsSzResponse(response: any): Promise<any> {
 
   if (error) {
     console.error('Error saving schizophrenia_sogs:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// PSQI (Pittsburgh Sleep Quality Index)
+// ============================================================================
+
+/**
+ * Get PSQI response
+ */
+export async function getPsqiSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('PSQI_SZ', visitId);
+}
+
+/**
+ * Parse HH:MM time string to decimal hours
+ */
+function parseHoursMinutes(timeStr: string | null | undefined): number {
+  if (!timeStr) return 0;
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  return (hours || 0) + (minutes || 0) / 60;
+}
+
+/**
+ * Calculate time difference between two HH:MM times (accounting for overnight)
+ */
+function calculateTimeDifferencePsqi(start: string, end: string): number {
+  const startHours = parseHoursMinutes(start);
+  const endHours = parseHoursMinutes(end);
+  
+  let diff = endHours - startHours;
+  if (diff < 0) diff += 24; // Overnight adjustment
+  
+  return diff;
+}
+
+/**
+ * Generate clinical interpretation based on PSQI total score
+ * Score >5 indicates poor sleep quality (~90% sensitivity/specificity)
+ */
+function interpretPsqiScore(totalScore: number): string {
+  if (totalScore <= 5) {
+    return `Score PSQI : ${totalScore}/21 - Bonne qualité de sommeil\n\n` +
+      'Interprétation : Sommeil de qualité satisfaisante sans plainte cliniquement significative. ' +
+      'Les habitudes de sommeil sont adaptées et le retentissement diurne est absent ou minime.\n\n' +
+      'Seuil clinique : Un score ≤5 indique une bonne qualité de sommeil (sensibilité ~90%, spécificité ~86%).';
+  }
+  
+  if (totalScore <= 10) {
+    return `Score PSQI : ${totalScore}/21 - Qualité de sommeil altérée\n\n` +
+      'Interprétation : Difficultés de sommeil modérées. Présence de plaintes subjectives avec ' +
+      'retentissement possible sur le fonctionnement quotidien.\n\n' +
+      'Recommandations : Évaluation des facteurs contributifs recommandée (anxiété, hygiène du sommeil, ' +
+      'traitements médicamenteux, consommation de substances).\n\n' +
+      'Seuil clinique : Score >5 suggère une mauvaise qualité de sommeil.';
+  }
+  
+  if (totalScore <= 15) {
+    return `Score PSQI : ${totalScore}/21 - Mauvaise qualité de sommeil\n\n` +
+      'Interprétation : Troubles du sommeil marqués avec impact significatif sur la qualité de vie. ' +
+      'Plusieurs composantes du sommeil sont perturbées.\n\n' +
+      'Recommandations : Intervention thérapeutique recommandée :\n' +
+      '• TCC-I (thérapie cognitivo-comportementale de l\'insomnie)\n' +
+      '• Révision des traitements psychotropes\n' +
+      '• Bilan des comorbidités somatiques et psychiatriques\n' +
+      '• Évaluation des facteurs de maintien (hygiène du sommeil, anxiété anticipatoire)';
+  }
+  
+  return `Score PSQI : ${totalScore}/21 - Très mauvaise qualité de sommeil\n\n` +
+    'Interprétation : Insomnie sévère avec retentissement majeur. Dysfonctionnement important ' +
+    'sur le plan diurne (somnolence, difficultés de concentration, troubles de l\'humeur).\n\n' +
+    'Recommandations :\n' +
+    '• Prise en charge multidisciplinaire nécessaire\n' +
+    '• Rechercher un trouble du sommeil primaire (apnée du sommeil, syndrome des jambes sans repos)\n' +
+    '• Évaluer l\'impact des symptômes psychiatriques sur le sommeil\n' +
+    '• Orientation vers une consultation spécialisée du sommeil si besoin\n' +
+    '• Envisager une polysomnographie si suspicion de trouble respiratoire du sommeil';
+}
+
+/**
+ * Save PSQI response with all 7 component scores and global scoring
+ * 
+ * Component scoring (0-3 each):
+ * - C1: Subjective quality (Q6 direct)
+ * - C2: Latency (Q2 minutes + Q5a mapped)
+ * - C3: Duration (Q4 hours mapped: ≥7h=0, 6-7h=1, 5-6h=2, <5h=3)
+ * - C4: Efficiency ((Sleep hours / Time in bed) × 100: ≥85%=0, 75-84%=1, 65-74%=2, <65%=3)
+ * - C5: Disturbances (Sum Q5b-Q5j: 0=0, 1-9=1, 10-18=2, 19-27=3)
+ * - C6: Medication (Q7 direct)
+ * - C7: Daytime dysfunction (Sum Q8+Q9: 0=0, 1-2=1, 3-4=2, 5-6=3)
+ * 
+ * Global score: 0-21 (sum of components)
+ * Clinical cutoff: >5 indicates poor sleep quality (~90% sensitivity)
+ */
+export async function savePsqiSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // If questionnaire not done, just save the status
+  if (response.questionnaire_done === 'Non fait') {
+    const { data, error } = await supabase
+      .from('schizophrenia_psqi')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        questionnaire_done: response.questionnaire_done,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving schizophrenia_psqi (not done):', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Component 1: Subjective sleep quality (Q6)
+  const c1 = response.q6 ?? 0;
+  
+  // Component 2: Sleep latency (Q2 + Q5a)
+  const q2Minutes = response.q2_minutes_to_sleep ?? 0;
+  let q2Score = 0;
+  if (q2Minutes <= 15) q2Score = 0;
+  else if (q2Minutes <= 30) q2Score = 1;
+  else if (q2Minutes <= 60) q2Score = 2;
+  else q2Score = 3;
+  
+  const q5a = response.q5a ?? 0;
+  const latencySum = q2Score + q5a;
+  let c2 = 0;
+  if (latencySum === 0) c2 = 0;
+  else if (latencySum <= 2) c2 = 1;
+  else if (latencySum <= 4) c2 = 2;
+  else c2 = 3;
+  
+  // Component 3: Sleep duration (Q4)
+  const sleepHours = parseHoursMinutes(response.q4_hours_sleep);
+  let c3 = 0;
+  if (sleepHours >= 7) c3 = 0;
+  else if (sleepHours >= 6) c3 = 1;
+  else if (sleepHours >= 5) c3 = 2;
+  else c3 = 3;
+  
+  // Component 4: Habitual sleep efficiency
+  const bedtime = response.q1_bedtime;
+  const waketime = response.q3_waketime;
+  const timeInBed = bedtime && waketime ? calculateTimeDifferencePsqi(bedtime, waketime) : 8;
+  const efficiency = timeInBed > 0 ? (sleepHours / timeInBed) * 100 : 0;
+  
+  let c4 = 0;
+  if (efficiency >= 85) c4 = 0;
+  else if (efficiency >= 75) c4 = 1;
+  else if (efficiency >= 65) c4 = 2;
+  else c4 = 3;
+  
+  // Component 5: Sleep disturbances (Q5b-Q5j sum)
+  const disturbanceSum = 
+    (response.q5b ?? 0) + (response.q5c ?? 0) + (response.q5d ?? 0) +
+    (response.q5e ?? 0) + (response.q5f ?? 0) + (response.q5g ?? 0) +
+    (response.q5h ?? 0) + (response.q5i ?? 0) + (response.q5j ?? 0);
+  
+  let c5 = 0;
+  if (disturbanceSum === 0) c5 = 0;
+  else if (disturbanceSum <= 9) c5 = 1;
+  else if (disturbanceSum <= 18) c5 = 2;
+  else c5 = 3;
+  
+  // Component 6: Use of sleep medication (Q7)
+  const c6 = response.q7 ?? 0;
+  
+  // Component 7: Daytime dysfunction (Q8 + Q9)
+  const daySum = (response.q8 ?? 0) + (response.q9 ?? 0);
+  let c7 = 0;
+  if (daySum === 0) c7 = 0;
+  else if (daySum <= 2) c7 = 1;
+  else if (daySum <= 4) c7 = 2;
+  else c7 = 3;
+  
+  // Total score (0-21)
+  const total_score = c1 + c2 + c3 + c4 + c5 + c6 + c7;
+  const interpretation = interpretPsqiScore(total_score);
+  
+  // Remove section and instruction fields before saving
+  const { 
+    instructions,
+    section_q5,
+    section_quality,
+    section_bed_partner,
+    instruction_q10_details,
+    ...responseData 
+  } = response;
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_psqi')
+    .upsert({
+      ...responseData,
+      c1_subjective_quality: c1,
+      c2_latency: c2,
+      c3_duration: c3,
+      c4_efficiency: c4,
+      c5_disturbances: c5,
+      c6_medication: c6,
+      c7_daytime_dysfunction: c7,
+      time_in_bed_hours: parseFloat(timeInBed.toFixed(2)),
+      sleep_efficiency_pct: parseFloat(efficiency.toFixed(2)),
+      total_score,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_psqi:', error);
     throw error;
   }
   return data;

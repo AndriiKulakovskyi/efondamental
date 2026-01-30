@@ -162,6 +162,16 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'error';                       // Pathological gambler probable
     }
     
+    if (code === 'PSQI_SZ') {
+      // PSQI: Pittsburgh Sleep Quality Index (0-21)
+      // 0-5 = good sleep, 6-10 = moderate, 11-15 = poor, 16-21 = very poor
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score <= 5) return 'success';     // Good sleep quality
+      if (score <= 10) return 'warning';    // Moderate sleep problems
+      return 'error';                       // Poor/very poor sleep quality
+    }
+    
     if (code === 'CSM') {
       // CSM: Chronotype classification (13-55)
       // Morning types (48-55) and evening types (13-21) are notable
@@ -734,6 +744,7 @@ if (code === 'FAGERSTROM') {
               {code === 'BIS_SZ' && "Résultats BIS - Échelle d'Insight de Birchwood"}
               {code === 'YBOCS_SZ' && 'Résultats Y-BOCS - Obsessions-Compulsions'}
               {code === 'SOGS_SZ' && 'Résultats SOGS - Jeu Pathologique'}
+              {code === 'PSQI_SZ' && 'Résultats PSQI - Qualité du Sommeil'}
               {code === 'MATHYS' && 'Résultats MAThyS - États thymiques'}
               {code === 'PSQI' && 'Résultats PSQI - Qualité du Sommeil'}
               {code === 'EPWORTH' && 'Résultats Epworth - Somnolence Diurne'}
@@ -821,6 +832,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.total_score !== undefined ? `${data.total_score}/40` : '-')
                 : code === 'SOGS_SZ'
                 ? (data.total_score !== undefined ? `${data.total_score}/20` : '-')
+                : code === 'PSQI_SZ'
+                ? (data.total_score !== undefined ? `${data.total_score}/21` : '-')
                 : code === 'IPAQ_SZ'
                 ? (data.total_met_minutes !== undefined ? `${Math.round(data.total_met_minutes)} MET-min/sem` : '-')
                 : code === 'MATHYS'
@@ -1501,6 +1514,156 @@ if (code === 'FAGERSTROM') {
               <p><strong>SOGS:</strong> South Oaks Gambling Screen - Dépistage du jeu pathologique</p>
               <p className="mt-1"><strong>Cotation:</strong> 20 items cotés (11 base + 9 conditionnels)</p>
               <p className="mt-1"><strong>Référence:</strong> Lesieur HR, Blume SB. Am J Psychiatry. 1987 / Adaptation: Lejoyeux 1999</p>
+            </div>
+          </div>
+        )}
+
+        {/* PSQI (Pittsburgh Sleep Quality Index) Details */}
+        {code === 'PSQI_SZ' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            {/* 7 Component Scores with labels matching bipolar PSQI */}
+            <div className="space-y-2">
+              {/* Score sur la qualité du sommeil */}
+              <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                <span className="text-gray-600">Score sur la qualité du sommeil:</span>
+                <span className={`font-semibold ${
+                  data.c1_subjective_quality === 0 ? 'text-green-600' :
+                  data.c1_subjective_quality === 1 ? 'text-yellow-600' :
+                  data.c1_subjective_quality === 2 ? 'text-orange-600' :
+                  'text-red-600'
+                }`}>
+                  {data.c1_subjective_quality ?? '-'}/3
+                </span>
+              </div>
+              
+              {/* Score latence avant sommeil */}
+              <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                <span className="text-gray-600">Score latence avant sommeil:</span>
+                <span className={`font-semibold ${
+                  data.c2_latency === 0 ? 'text-green-600' :
+                  data.c2_latency === 1 ? 'text-yellow-600' :
+                  data.c2_latency === 2 ? 'text-orange-600' :
+                  'text-red-600'
+                }`}>
+                  {data.c2_latency ?? '-'}/3
+                </span>
+              </div>
+              
+              {/* Score durée de sommeil */}
+              <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                <span className="text-gray-600">Score durée de sommeil:</span>
+                <span className={`font-semibold ${
+                  data.c3_duration === 0 ? 'text-green-600' :
+                  data.c3_duration === 1 ? 'text-yellow-600' :
+                  data.c3_duration === 2 ? 'text-orange-600' :
+                  'text-red-600'
+                }`}>
+                  {data.c3_duration ?? '-'}/3
+                </span>
+              </div>
+              
+              {/* Score efficience sommeil */}
+              <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                <span className="text-gray-600">Score efficience sommeil:</span>
+                <span className={`font-semibold ${
+                  data.c4_efficiency === 0 ? 'text-green-600' :
+                  data.c4_efficiency === 1 ? 'text-yellow-600' :
+                  data.c4_efficiency === 2 ? 'text-orange-600' :
+                  'text-red-600'
+                }`}>
+                  {data.c4_efficiency ?? '-'}/3
+                </span>
+              </div>
+              
+              {/* Score du trouble du sommeil */}
+              <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                <span className="text-gray-600">Score du trouble du sommeil:</span>
+                <span className={`font-semibold ${
+                  data.c5_disturbances === 0 ? 'text-green-600' :
+                  data.c5_disturbances === 1 ? 'text-yellow-600' :
+                  data.c5_disturbances === 2 ? 'text-orange-600' :
+                  'text-red-600'
+                }`}>
+                  {data.c5_disturbances ?? '-'}/3
+                </span>
+              </div>
+              
+              {/* Score médication */}
+              <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                <span className="text-gray-600">Score médication:</span>
+                <span className={`font-semibold ${
+                  data.c6_medication === 0 ? 'text-green-600' :
+                  data.c6_medication === 1 ? 'text-yellow-600' :
+                  data.c6_medication === 2 ? 'text-orange-600' :
+                  'text-red-600'
+                }`}>
+                  {data.c6_medication ?? '-'}/3
+                </span>
+              </div>
+              
+              {/* Score de dysfonctionnement dû au sommeil */}
+              <div className="flex justify-between items-center py-1 border-b border-gray-100">
+                <span className="text-gray-600">Score de dysfonctionnement dû au sommeil:</span>
+                <span className={`font-semibold ${
+                  data.c7_daytime_dysfunction === 0 ? 'text-green-600' :
+                  data.c7_daytime_dysfunction === 1 ? 'text-yellow-600' :
+                  data.c7_daytime_dysfunction === 2 ? 'text-orange-600' :
+                  'text-red-600'
+                }`}>
+                  {data.c7_daytime_dysfunction ?? '-'}/3
+                </span>
+              </div>
+              
+              {/* Score total */}
+              <div className="flex justify-between items-center py-2 mt-2 bg-gray-50 rounded-lg px-3">
+                <span className="text-gray-700 font-semibold">Score total:</span>
+                <span className={`font-bold text-lg ${
+                  data.total_score !== null && data.total_score !== undefined
+                    ? data.total_score <= 5 ? 'text-green-600'
+                      : data.total_score <= 10 ? 'text-orange-600'
+                      : 'text-red-600'
+                    : ''
+                }`}>
+                  {data.total_score ?? '-'}/21
+                </span>
+              </div>
+            </div>
+            
+            {/* Clinical Thresholds */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2 text-xs">Seuils cliniques (score global)</h5>
+              <div className="space-y-1 text-xs text-gray-600">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <span><strong>0-5:</strong> Bonne qualité de sommeil</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-orange-500" />
+                  <span><strong>6-10:</strong> Qualité altérée</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500" />
+                  <span><strong>11-21:</strong> Mauvaise qualité de sommeil</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg ${
+                data.total_score <= 5 ? 'bg-green-50 border border-green-200 text-green-800' :
+                data.total_score <= 10 ? 'bg-orange-50 border border-orange-200 text-orange-800' :
+                'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                <p className="text-xs whitespace-pre-line">{data.interpretation}</p>
+              </div>
+            )}
+            
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>PSQI:</strong> Pittsburgh Sleep Quality Index - Indice de qualité du sommeil</p>
+              <p className="mt-1"><strong>Seuil clinique:</strong> Score &gt;5 indique une mauvaise qualité de sommeil (sensibilité ~90%, spécificité ~86%)</p>
+              <p className="mt-1"><strong>Référence:</strong> Buysse DJ et al. Psychiatry Res. 1989</p>
             </div>
           </div>
         )}

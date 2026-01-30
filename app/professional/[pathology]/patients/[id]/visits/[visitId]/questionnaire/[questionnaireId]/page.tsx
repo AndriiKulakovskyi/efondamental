@@ -145,7 +145,8 @@ import {
   YBOCS_SZ_DEFINITION,
   WURS25_SZ_DEFINITION,
   STORI_SZ_DEFINITION,
-  SOGS_SZ_DEFINITION
+  SOGS_SZ_DEFINITION,
+  PSQI_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { 
   getAsrmResponse, 
@@ -292,7 +293,8 @@ import {
   getYbocsResponse as getYbocsSzResponse,
   getWurs25SzResponse,
   getStoriSzResponse,
-  getSogsSzResponse
+  getSogsSzResponse,
+  getPsqiSzResponse
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -608,6 +610,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WURS25_SZ_DEFINITION.code) questionnaire = WURS25_SZ_DEFINITION;
   else if (code === STORI_SZ_DEFINITION.code) questionnaire = STORI_SZ_DEFINITION;
   else if (code === SOGS_SZ_DEFINITION.code) questionnaire = SOGS_SZ_DEFINITION;
+  else if (code === PSQI_SZ_DEFINITION.code) questionnaire = PSQI_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -767,6 +770,12 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WURS25_SZ_DEFINITION.code) existingResponse = await getWurs25SzResponse(visitId);
   else if (code === STORI_SZ_DEFINITION.code) existingResponse = await getStoriSzResponse(visitId);
   else if (code === SOGS_SZ_DEFINITION.code) existingResponse = await getSogsSzResponse(visitId);
+  else if (code === PSQI_SZ_DEFINITION.code) existingResponse = await getPsqiSzResponse(visitId);
+  
+  // Debug logging for PSQI_SZ
+  if (code === 'PSQI_SZ') {
+    console.log('[Page.tsx] PSQI_SZ existingResponse:', existingResponse ? 'Found' : 'Not found', existingResponse?.total_score);
+  }
 
   // Map DB response to initialResponses (key-value map)
   // For ASRM/QIDS/MDQ, keys match columns (q1, q2...).

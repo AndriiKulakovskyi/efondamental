@@ -153,7 +153,8 @@ import {
   YBOCS_SZ_DEFINITION,
   WURS25_SZ_DEFINITION,
   STORI_SZ_DEFINITION,
-  SOGS_SZ_DEFINITION
+  SOGS_SZ_DEFINITION,
+  PSQI_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -698,6 +699,16 @@ export default async function VisitDetailPage({
               target_role: 'patient',
               completed: questionnaireStatuses['SOGS_SZ']?.completed || false,
               completedAt: questionnaireStatuses['SOGS_SZ']?.completed_at,
+            },
+            {
+              id: PSQI_SZ_DEFINITION.code,
+              code: PSQI_SZ_DEFINITION.code,
+              title: PSQI_SZ_DEFINITION.title,
+              description: PSQI_SZ_DEFINITION.description,
+              questions: PSQI_SZ_DEFINITION.questions,
+              target_role: 'patient',
+              completed: questionnaireStatuses['PSQI_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['PSQI_SZ']?.completed_at,
             }
           ]
         },

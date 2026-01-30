@@ -148,7 +148,7 @@ export function QuestionnairePageClient({
         'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA',
         'PANSS', 'CDSS', 'BARS', 'SUMD', 'AIMS', 'BARNES', 'SAS', 'PSP',
         'ISA_FOLLOWUP',
-        'SQOL_SZ', 'CTQ_SZ', 'MARS_SZ', 'BIS_SZ', 'EQ5D5L_SZ', 'IPAQ_SZ', 'YBOCS_SZ', 'WURS25_SZ', 'STORI_SZ', 'SOGS_SZ'
+        'SQOL_SZ', 'CTQ_SZ', 'MARS_SZ', 'BIS_SZ', 'EQ5D5L_SZ', 'IPAQ_SZ', 'YBOCS_SZ', 'WURS25_SZ', 'STORI_SZ', 'SOGS_SZ', 'PSQI_SZ'
       ].includes(questionnaire.code);
 
       console.log('[QuestionnairePageClient] Submit success:', {
@@ -165,12 +165,21 @@ export function QuestionnairePageClient({
 
       // For questionnaires with scoring, show the score page
       // Use URL param to persist state across Next.js revalidation
+      console.log('[QuestionnairePageClient] Setting submitted data and showing score page:', {
+        code: questionnaire.code,
+        hasResultData: !!result.data,
+        resultDataKeys: result.data ? Object.keys(result.data) : []
+      });
+      
       setSubmittedData(result.data);
       setJustSubmitted(true);
       
       // Navigate to same page with ?submitted=true to persist state across revalidation
+      // Use setTimeout to ensure state updates are committed before navigation
       const currentPath = window.location.pathname;
-      router.replace(`${currentPath}?submitted=true`);
+      setTimeout(() => {
+        router.replace(`${currentPath}?submitted=true`);
+      }, 100);
 
     } catch (err) {
       setError("Une erreur est survenue lors de l'envoi du questionnaire.");
@@ -186,6 +195,18 @@ export function QuestionnairePageClient({
   // The showScoreFromUrl check ensures score page persists even after Next.js revalidates
   // Use existingData as fallback when showScoreFromUrl is true (handles page reload after submission)
   const scoreData = submittedData || (showScoreFromUrl ? existingData : null);
+  
+  // Debug logging for score page display
+  console.log('[QuestionnairePageClient] Score page check:', {
+    code: questionnaire.code,
+    justSubmitted,
+    showScoreFromUrl,
+    hasSubmittedData: !!submittedData,
+    hasExistingData: !!existingData,
+    hasScoreData: !!scoreData,
+    willShowScorePage: (justSubmitted || showScoreFromUrl) && !!scoreData
+  });
+  
   if ((justSubmitted || showScoreFromUrl) && scoreData) {
     return (
       <div className="min-h-screen bg-[#FDFBFA]">
