@@ -66,6 +66,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'SOGS_SZ': 'schizophrenia_sogs',
   'PSQI_SZ': 'schizophrenia_psqi',
   'PRESENTEISME_SZ': 'schizophrenia_presenteisme',
+  'FAGERSTROM_SZ': 'schizophrenia_fagerstrom',
 };
 
 // ============================================================================
@@ -2846,4 +2847,187 @@ export async function savePresenteismeSzResponse(response: any): Promise<any> {
     throw error;
   }
   return data;
+}
+
+// ============================================================================
+// FAGERSTROM_SZ - Fagerström Test for Nicotine Dependence
+// ============================================================================
+
+/**
+ * Get Fagerstrom response for a visit
+ */
+export async function getFagerstromSzResponse(visitId: string): Promise<any | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('schizophrenia_fagerstrom')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') {
+    console.error('Error fetching schizophrenia_fagerstrom:', error);
+    throw error;
+  }
+
+  return data || null;
+}
+
+/**
+ * Save Fagerstrom response with computed scores
+ * - Total score: Q1 + Q2 + Q3 + Q4 + Q5 + Q6 (0-10)
+ * - HSI score: Q1 + Q4 (Heaviness of Smoking Index, 0-6)
+ * - Dependence level: Based on total score thresholds
+ * - Treatment guidance: Specific recommendations per level
+ */
+export async function saveFagerstromSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // If questionnaire not done, just save the status
+  if (response.questionnaire_done === 'Non fait') {
+    const { data, error } = await supabase
+      .from('schizophrenia_fagerstrom')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        questionnaire_done: response.questionnaire_done,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving schizophrenia_fagerstrom (not done):', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Calculate scores
+  const q1 = typeof response.q1 === 'number' ? response.q1 : 0;
+  const q2 = typeof response.q2 === 'number' ? response.q2 : 0;
+  const q3 = typeof response.q3 === 'number' ? response.q3 : 0;
+  const q4 = typeof response.q4 === 'number' ? response.q4 : 0;
+  const q5 = typeof response.q5 === 'number' ? response.q5 : 0;
+  const q6 = typeof response.q6 === 'number' ? response.q6 : 0;
+
+  // Total score (0-10)
+  const total_score = q1 + q2 + q3 + q4 + q5 + q6;
+
+  // HSI - Heaviness of Smoking Index (0-6)
+  // Most predictive items: Q1 (time to first cigarette) + Q4 (cigarettes per day)
+  const hsi_score = q1 + q4;
+
+  // Get dependence level and treatment based on score
+  let dependence_level: string;
+  let treatment_guidance: string;
+  
+  if (total_score <= 2) {
+    dependence_level = 'aucune_tres_faible';
+    treatment_guidance = 'Thérapie comportementale';
+  } else if (total_score <= 4) {
+    dependence_level = 'faible';
+    treatment_guidance = 'Substituts nicotiniques standard';
+  } else if (total_score === 5) {
+    dependence_level = 'moyenne';
+    treatment_guidance = 'Substituts forte dose/combinés';
+  } else {
+    dependence_level = 'forte';
+    treatment_guidance = 'Thérapie combinée (substituts + médicaments)';
+  }
+
+  // Generate interpretation
+  const interpretation = generateFagerstromInterpretation(
+    total_score,
+    hsi_score,
+    dependence_level,
+    treatment_guidance,
+    { q1, q2, q3, q4, q5, q6 }
+  );
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_fagerstrom')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      questionnaire_done: response.questionnaire_done,
+      q1: response.q1,
+      q2: response.q2,
+      q3: response.q3,
+      q4: response.q4,
+      q5: response.q5,
+      q6: response.q6,
+      total_score,
+      hsi_score,
+      dependence_level,
+      treatment_guidance,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_fagerstrom:', error);
+    throw error;
+  }
+  return data;
+}
+
+/**
+ * Generate interpretation text for Fagerstrom
+ */
+function generateFagerstromInterpretation(
+  totalScore: number,
+  hsiScore: number,
+  dependenceLevel: string,
+  treatmentGuidance: string,
+  responses: { q1: number; q2: number; q3: number; q4: number; q5: number; q6: number }
+): string {
+  // Get level label
+  const levelLabels: Record<string, string> = {
+    'aucune_tres_faible': 'Pas de dépendance ou dépendance très faible',
+    'faible': 'Dépendance faible',
+    'moyenne': 'Dépendance moyenne',
+    'forte': 'Dépendance forte'
+  };
+  const levelLabel = levelLabels[dependenceLevel] || dependenceLevel;
+
+  let interpretation = `Score FTND: ${totalScore}/10. ${levelLabel}.`;
+  interpretation += ` Score HSI (indice de sévérité): ${hsiScore}/6.`;
+  interpretation += ` Traitement suggéré: ${treatmentGuidance}.`;
+
+  // Add specific item interpretations
+  const details: string[] = [];
+
+  // Q1 - Time to first cigarette (most predictive)
+  if (responses.q1 >= 2) {
+    details.push('cigarette matinale précoce (indicateur de forte dépendance physique)');
+  }
+
+  // Q3 - First cigarette hardest to give up
+  if (responses.q3 === 1) {
+    details.push('première cigarette difficilement remplaçable');
+  }
+
+  // Q4 - Heavy smoking (most predictive)
+  if (responses.q4 >= 2) {
+    details.push(`consommation importante (${responses.q4 === 2 ? '21-30' : '>30'} cigarettes/jour)`);
+  }
+
+  // Q5 - Morning heavier smoking
+  if (responses.q5 === 1) {
+    details.push('rythme plus soutenu le matin');
+  }
+
+  if (details.length > 0) {
+    interpretation += ` Éléments notables: ${details.join(', ')}.`;
+  }
+
+  // Add HSI interpretation
+  if (hsiScore >= 4) {
+    interpretation += ' Le score HSI élevé indique une dépendance physique importante nécessitant une substitution nicotinique adaptée.';
+  }
+
+  return interpretation;
 }

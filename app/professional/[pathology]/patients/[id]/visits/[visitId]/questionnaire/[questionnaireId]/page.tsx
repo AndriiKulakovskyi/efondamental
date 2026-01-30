@@ -147,7 +147,8 @@ import {
   STORI_SZ_DEFINITION,
   SOGS_SZ_DEFINITION,
   PSQI_SZ_DEFINITION,
-  PRESENTEISME_SZ_DEFINITION
+  PRESENTEISME_SZ_DEFINITION,
+  FAGERSTROM_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { 
   getAsrmResponse, 
@@ -296,7 +297,8 @@ import {
   getStoriSzResponse,
   getSogsSzResponse,
   getPsqiSzResponse,
-  getPresenteismeSzResponse
+  getPresenteismeSzResponse,
+  getFagerstromSzResponse
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -614,6 +616,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === SOGS_SZ_DEFINITION.code) questionnaire = SOGS_SZ_DEFINITION;
   else if (code === PSQI_SZ_DEFINITION.code) questionnaire = PSQI_SZ_DEFINITION;
   else if (code === PRESENTEISME_SZ_DEFINITION.code) questionnaire = PRESENTEISME_SZ_DEFINITION;
+  else if (code === FAGERSTROM_SZ_DEFINITION.code) questionnaire = FAGERSTROM_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -775,6 +778,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === SOGS_SZ_DEFINITION.code) existingResponse = await getSogsSzResponse(visitId);
   else if (code === PSQI_SZ_DEFINITION.code) existingResponse = await getPsqiSzResponse(visitId);
   else if (code === PRESENTEISME_SZ_DEFINITION.code) existingResponse = await getPresenteismeSzResponse(visitId);
+  else if (code === FAGERSTROM_SZ_DEFINITION.code) existingResponse = await getFagerstromSzResponse(visitId);
   
   // Debug logging for PSQI_SZ
   if (code === 'PSQI_SZ') {

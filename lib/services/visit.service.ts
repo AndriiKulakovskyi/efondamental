@@ -248,7 +248,8 @@ import {
   STORI_SZ_DEFINITION,
   SOGS_SZ_DEFINITION,
   PSQI_SZ_DEFINITION,
-  PRESENTEISME_SZ_DEFINITION
+  PRESENTEISME_SZ_DEFINITION,
+  FAGERSTROM_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -811,6 +812,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               title: PRESENTEISME_SZ_DEFINITION.title,
               description: PRESENTEISME_SZ_DEFINITION.description,
               questions: PRESENTEISME_SZ_DEFINITION.questions,
+            },
+            {
+              id: FAGERSTROM_SZ_DEFINITION.id,
+              code: FAGERSTROM_SZ_DEFINITION.code,
+              title: FAGERSTROM_SZ_DEFINITION.title,
+              description: FAGERSTROM_SZ_DEFINITION.description,
+              questions: FAGERSTROM_SZ_DEFINITION.questions,
             }
           ]
         },

@@ -133,3 +133,18 @@ export {
   type SchizophreniaPresenteismeResponseInsert,
   type PresenteismeSzScoreResult,
 } from './presenteisme';
+
+export {
+  FAGERSTROM_SZ_QUESTIONS,
+  FAGERSTROM_SZ_DEFINITION,
+  FAGERSTROM_SZ_THRESHOLDS,
+  computeFagerstromSzScores,
+  interpretFagerstromSzScore,
+  getFagerstromSzDependenceLevel,
+  getFagerstromSzTreatmentGuidance,
+  getFagerstromSzDependenceLevelLabel,
+  type SchizophreniaFagerstromResponse,
+  type SchizophreniaFagerstromResponseInsert,
+  type FagerstromSzScoreResult,
+  type FagerstromSzDependenceLevel,
+} from './fagerstrom';

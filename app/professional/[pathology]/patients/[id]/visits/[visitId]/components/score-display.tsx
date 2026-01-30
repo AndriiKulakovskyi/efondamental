@@ -528,6 +528,16 @@ if (code === 'FAGERSTROM') {
       if (score <= 6) return 'warning';    // Dépendance moyenne (Strong in some interpretations, but app uses warning for 5-6)
       return 'error';                      // Dépendance forte/très forte
     }
+
+    if (code === 'FAGERSTROM_SZ') {
+      // Fagerstrom SZ (FTND): Nicotine dependence (0-10)
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score <= 2) return 'success';    // Aucune/très faible
+      if (score <= 4) return 'info';       // Dépendance faible
+      if (score === 5) return 'warning';   // Dépendance moyenne
+      return 'error';                      // Dépendance forte (≥6)
+    }
     
     return 'info';
   };
@@ -760,6 +770,7 @@ if (code === 'FAGERSTROM') {
               {code === 'PSQI' && 'Résultats PSQI - Qualité du Sommeil'}
               {code === 'EPWORTH' && 'Résultats Epworth - Somnolence Diurne'}
               {code === 'FAGERSTROM' && 'Résultats FTND - Test de Fagerström'}
+              {code === 'FAGERSTROM_SZ' && 'Résultats FTND - Test de Fagerström'}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -859,12 +870,15 @@ if (code === 'FAGERSTROM') {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'FAGERSTROM'
                 ? (data.total_score ?? data.totalScore ?? '-')
+                : code === 'FAGERSTROM_SZ'
+                ? (data.total_score !== undefined ? data.total_score : '-')
                 : (data.total_score !== undefined ? data.total_score : '-')}
               {code === 'ASRM' && '/20'}
               {code === 'QIDS_SR16' && '/27'}
               {code === 'PSQI' && '/21'}
               {code === 'EPWORTH' && '/24'}
               {code === 'FAGERSTROM' && '/10'}
+              {code === 'FAGERSTROM_SZ' && '/10'}
               {(code === 'CTQ' || code === 'CTQ_SZ') && '/125'}
               {code === 'BIS10' && '/4.0'}
               {code === 'CSM' && '/55'}
@@ -4756,6 +4770,159 @@ if (code === 'FAGERSTROM') {
 
             <div className="text-[10px] text-gray-400 italic pt-2 text-right">
               FTND : Fagerström Test for Nicotine Dependence
+            </div>
+          </div>
+        )}
+
+        {code === 'FAGERSTROM_SZ' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Main Scores Section */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Total Score */}
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Score Total FTND</p>
+                <p className={`text-2xl font-bold ${
+                  (data.total_score ?? 0) <= 2 ? 'text-green-600' :
+                  (data.total_score ?? 0) <= 4 ? 'text-blue-600' :
+                  (data.total_score ?? 0) === 5 ? 'text-orange-600' :
+                  'text-red-600'
+                }`}>
+                  {data.total_score !== undefined ? `${data.total_score}/10` : '-'}
+                </p>
+              </div>
+              {/* HSI Score */}
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Score HSI (Indice de sévérité)</p>
+                <p className={`text-2xl font-bold ${
+                  (data.hsi_score ?? 0) <= 2 ? 'text-green-600' :
+                  (data.hsi_score ?? 0) <= 3 ? 'text-blue-600' :
+                  (data.hsi_score ?? 0) <= 4 ? 'text-orange-600' :
+                  'text-red-600'
+                }`}>
+                  {data.hsi_score !== undefined ? `${data.hsi_score}/6` : '-'}
+                </p>
+                <p className="text-[10px] text-gray-400 mt-1">Q1 + Q4 (items les plus prédictifs)</p>
+              </div>
+            </div>
+
+            {/* Dependence Level & Treatment */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Dependence Level */}
+              <div className={`p-3 rounded-lg border-2 ${
+                data.dependence_level === 'aucune_tres_faible' ? 'bg-green-50 border-green-200' :
+                data.dependence_level === 'faible' ? 'bg-blue-50 border-blue-200' :
+                data.dependence_level === 'moyenne' ? 'bg-orange-50 border-orange-200' :
+                'bg-red-50 border-red-200'
+              }`}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-1 opacity-70">Niveau de dépendance</p>
+                <p className={`text-sm font-bold ${
+                  data.dependence_level === 'aucune_tres_faible' ? 'text-green-700' :
+                  data.dependence_level === 'faible' ? 'text-blue-700' :
+                  data.dependence_level === 'moyenne' ? 'text-orange-700' :
+                  'text-red-700'
+                }`}>
+                  {data.dependence_level === 'aucune_tres_faible' ? 'Pas de dépendance ou très faible' :
+                   data.dependence_level === 'faible' ? 'Dépendance faible' :
+                   data.dependence_level === 'moyenne' ? 'Dépendance moyenne' :
+                   data.dependence_level === 'forte' ? 'Dépendance forte' :
+                   '-'}
+                </p>
+              </div>
+              {/* Treatment Guidance */}
+              <div className={`p-3 rounded-lg border-2 ${
+                data.dependence_level === 'aucune_tres_faible' ? 'bg-green-50 border-green-200' :
+                data.dependence_level === 'faible' ? 'bg-blue-50 border-blue-200' :
+                data.dependence_level === 'moyenne' ? 'bg-orange-50 border-orange-200' :
+                'bg-red-50 border-red-200'
+              }`}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-1 opacity-70">Traitement suggéré</p>
+                <p className={`text-sm font-bold ${
+                  data.dependence_level === 'aucune_tres_faible' ? 'text-green-700' :
+                  data.dependence_level === 'faible' ? 'text-blue-700' :
+                  data.dependence_level === 'moyenne' ? 'text-orange-700' :
+                  'text-red-700'
+                }`}>
+                  {data.treatment_guidance || '-'}
+                </p>
+              </div>
+            </div>
+
+            {/* Clinical Highlights */}
+            {data.q1 !== undefined && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                  <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Première cigarette</p>
+                  <p className={`text-sm font-medium ${
+                    data.q1 >= 2 ? 'text-red-600' : data.q1 === 1 ? 'text-orange-600' : 'text-green-600'
+                  }`}>
+                    {data.q1 === 3 ? "Dans les 5 minutes (très précoce)" :
+                     data.q1 === 2 ? "6-30 minutes (précoce)" :
+                     data.q1 === 1 ? "31-60 minutes" :
+                     "Après 60 minutes"}
+                  </p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                  <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Consommation quotidienne</p>
+                  <p className={`text-sm font-medium ${
+                    data.q4 >= 2 ? 'text-red-600' : data.q4 === 1 ? 'text-orange-600' : 'text-green-600'
+                  }`}>
+                    {data.q4 === 0 ? "≤ 10 cigarettes/jour" :
+                     data.q4 === 1 ? "11-20 cigarettes/jour" :
+                     data.q4 === 2 ? "21-30 cigarettes/jour" :
+                     data.q4 === 3 ? "≥ 31 cigarettes/jour" :
+                     "-"}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Clinical Interpretation */}
+            {interpretation && (
+              <div className={`p-4 rounded-lg border-2 ${
+                severity === 'success' ? 'bg-green-50 border-green-200 text-green-900' :
+                severity === 'info' ? 'bg-blue-50 border-blue-200 text-blue-900' :
+                severity === 'warning' ? 'bg-orange-50 border-orange-200 text-orange-900' :
+                'bg-red-50 border-red-200 text-red-900'
+              }`}>
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5">{getAlertIcon()}</div>
+                  <div className="space-y-2">
+                    <p className="font-bold text-base leading-tight">
+                      Interprétation clinique
+                    </p>
+                    <p className="text-sm leading-relaxed font-medium">
+                      {interpretation}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Clinical Thresholds */}
+            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2">Seuils cliniques</p>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                  <span>0-2: Aucune/très faible</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+                  <span>3-4: Faible</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-orange-500"></span>
+                  <span>5: Moyenne</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-red-500"></span>
+                  <span>≥6: Forte</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-[10px] text-gray-400 italic pt-2 text-right">
+              FTND : Fagerström Test for Nicotine Dependence | HSI : Heaviness of Smoking Index
             </div>
           </div>
         )}

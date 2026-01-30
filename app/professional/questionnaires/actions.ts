@@ -170,7 +170,8 @@ import {
   saveStoriSzResponse as saveSchizophreniaStoriResponse,
   saveSogsSzResponse as saveSchizophreniaSogsResponse,
   savePsqiSzResponse as saveSchizophreniaPsqiResponse,
-  savePresenteismeSzResponse as saveSchizophreniaPresenteismeResponse
+  savePresenteismeSzResponse as saveSchizophreniaPresenteismeResponse,
+  saveFagerstromSzResponse as saveSchizophreniaFagerstromResponse
 } from '@/lib/services/schizophrenia-initial.service';
 import { 
   getVisitCompletionStatus,
@@ -857,6 +858,14 @@ export async function submitProfessionalQuestionnaireAction(
 
       case 'PRESENTEISME_SZ':
         result = await saveSchizophreniaPresenteismeResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        });
+        break;
+
+      case 'FAGERSTROM_SZ':
+        result = await saveSchizophreniaFagerstromResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
