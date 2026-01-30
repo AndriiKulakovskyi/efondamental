@@ -361,7 +361,6 @@ export const SOGS_SZ_QUESTIONS: Question[] = [
     text: '2. Quel est le plus gros montant d\'argent que vous avez joué ou parié en une seule journée ?',
     type: 'text',
     required: false,
-    placeholder: 'Ex: 50€, 100€...',
     display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
     section: 'montant',
   },
