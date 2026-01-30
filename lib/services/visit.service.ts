@@ -242,7 +242,8 @@ import {
   MARS_SZ_DEFINITION,
   BIS_SZ_DEFINITION,
   EQ5D5L_SZ_DEFINITION,
-  IPAQ_SZ_DEFINITION
+  IPAQ_SZ_DEFINITION,
+  YBOCS_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -763,6 +764,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               title: IPAQ_SZ_DEFINITION.title,
               description: IPAQ_SZ_DEFINITION.description,
               questions: IPAQ_SZ_DEFINITION.questions,
+            },
+            {
+              id: YBOCS_SZ_DEFINITION.id,
+              code: YBOCS_SZ_DEFINITION.code,
+              title: YBOCS_SZ_DEFINITION.title,
+              description: YBOCS_SZ_DEFINITION.description,
+              questions: YBOCS_SZ_DEFINITION.questions,
             }
           ]
         },

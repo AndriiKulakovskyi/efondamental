@@ -60,6 +60,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'BIS_SZ': 'schizophrenia_bis',
   'EQ5D5L_SZ': 'schizophrenia_eq5d5l',
   'IPAQ_SZ': 'schizophrenia_ipaq',
+  'YBOCS_SZ': 'schizophrenia_ybocs',
 };
 
 // ============================================================================
@@ -1895,6 +1896,120 @@ export async function saveIpaqSzResponse(response: any): Promise<any> {
 
   if (error) {
     console.error('Error saving schizophrenia_ipaq:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// Y-BOCS (Yale-Brown Obsessive-Compulsive Scale) Scoring
+// ============================================================================
+
+/**
+ * Interpret Y-BOCS total score
+ */
+function interpretYbocsScore(totalScore: number): string {
+  if (totalScore <= 7) {
+    return 'Symptômes sous-cliniques. Les obsessions et/ou compulsions sont minimes ou absentes. Aucune interférence significative avec le fonctionnement quotidien.';
+  }
+  if (totalScore <= 15) {
+    return 'TOC léger. Présence de symptômes obsessionnels-compulsifs occasionnant une gêne légère. Le fonctionnement quotidien reste globalement préservé.';
+  }
+  if (totalScore <= 23) {
+    return 'TOC modéré. Symptômes obsessionnels-compulsifs significatifs avec impact notable sur le fonctionnement social et/ou professionnel. Un traitement est généralement indiqué.';
+  }
+  if (totalScore <= 31) {
+    return 'TOC sévère. Symptômes envahissants causant une altération importante du fonctionnement. Détresse marquée. Prise en charge spécialisée fortement recommandée.';
+  }
+  return 'TOC extrême. Symptômes très sévères et invalidants. Altération majeure du fonctionnement dans tous les domaines. Prise en charge intensive urgente requise.';
+}
+
+/**
+ * Get Y-BOCS response
+ */
+export async function getYbocsResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('YBOCS_SZ', visitId);
+}
+
+/**
+ * Save Y-BOCS response with scoring
+ * - Obsessions subscale: Q1-Q5 (0-20)
+ * - Compulsions subscale: Q6-Q10 (0-20)
+ * - Total score: 0-40
+ */
+export async function saveYbocsResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // If questionnaire not done, just save the status
+  if (response.questionnaire_done === 'Non fait') {
+    const { data, error } = await supabase
+      .from('schizophrenia_ybocs')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        questionnaire_done: response.questionnaire_done,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving schizophrenia_ybocs (not done):', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Calculate subscale scores
+  let obsessions_score = 0;
+  let compulsions_score = 0;
+  
+  // Obsessions subscale: Q1-Q5
+  for (let i = 1; i <= 5; i++) {
+    const qKey = `q${i}`;
+    const value = response[qKey];
+    if (typeof value === 'number' && !isNaN(value)) {
+      obsessions_score += value;
+    }
+  }
+  
+  // Compulsions subscale: Q6-Q10
+  for (let i = 6; i <= 10; i++) {
+    const qKey = `q${i}`;
+    const value = response[qKey];
+    if (typeof value === 'number' && !isNaN(value)) {
+      compulsions_score += value;
+    }
+  }
+  
+  const total_score = obsessions_score + compulsions_score;
+  const interpretation = interpretYbocsScore(total_score);
+  
+  // Remove section and instruction fields before saving
+  const { 
+    instruction_consigne,
+    section_obsessions,
+    section_compulsions,
+    section_score_auto,
+    ...responseData 
+  } = response;
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_ybocs')
+    .upsert({
+      ...responseData,
+      obsessions_score,
+      compulsions_score,
+      total_score,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_ybocs:', error);
     throw error;
   }
   return data;

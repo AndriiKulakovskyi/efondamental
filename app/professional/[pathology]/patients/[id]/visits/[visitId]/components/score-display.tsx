@@ -419,6 +419,16 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'error';                       // Poor insight
     }
     
+    if (code === 'YBOCS_SZ') {
+      // Y-BOCS: OCD severity (0-40)
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score <= 7) return 'success';     // Subclinical
+      if (score <= 15) return 'info';       // Mild OCD
+      if (score <= 23) return 'warning';    // Moderate OCD
+      return 'error';                       // Severe/Extreme OCD
+    }
+    
     if (code === 'MATHYS') {
       // MAThyS: Thymic state (0-200, ~100 = euthymic)
       const score = data.total_score;
@@ -692,6 +702,7 @@ if (code === 'FAGERSTROM') {
               {code === 'STAI_YA' && 'Résultats STAI-YA - Anxiété état'}
               {(code === 'MARS' || code === 'MARS_SZ') && 'Résultats MARS - Observance thérapeutique'}
               {code === 'BIS_SZ' && "Résultats BIS - Échelle d'Insight de Birchwood"}
+              {code === 'YBOCS_SZ' && 'Résultats Y-BOCS - Obsessions-Compulsions'}
               {code === 'MATHYS' && 'Résultats MAThyS - États thymiques'}
               {code === 'PSQI' && 'Résultats PSQI - Qualité du Sommeil'}
               {code === 'EPWORTH' && 'Résultats Epworth - Somnolence Diurne'}
@@ -771,6 +782,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.total_score !== undefined ? `${data.total_score}/10` : '-')
                 : code === 'BIS_SZ'
                 ? (data.total_score !== undefined ? `${parseFloat(data.total_score).toFixed(1)}/12` : '-')
+                : code === 'YBOCS_SZ'
+                ? (data.total_score !== undefined ? `${data.total_score}/40` : '-')
                 : code === 'IPAQ_SZ'
                 ? (data.total_met_minutes !== undefined ? `${Math.round(data.total_met_minutes)} MET-min/sem` : '-')
                 : code === 'MATHYS'
@@ -3608,6 +3621,107 @@ if (code === 'FAGERSTROM') {
               <p><strong>BIS:</strong> Échelle d'Insight de Birchwood - Évalue la conscience de la maladie chez les patients psychotiques</p>
               <p className="mt-1"><strong>Cotation:</strong> 8 items ternaires. Items positifs (1,4,5,7,8): D'accord=2. Items négatifs (2,3,6): Pas d'accord=2.</p>
               <p className="mt-1"><strong>Seuils:</strong> ≥10 (très bon insight) | 7-9 (bon) | 4-6 (modéré) | &lt;4 (pauvre)</p>
+            </div>
+          </div>
+        )}
+
+        {/* Y-BOCS (Yale-Brown Obsessive-Compulsive Scale) Details */}
+        {code === 'YBOCS_SZ' && (
+          <div className="text-sm space-y-4 mt-4 pt-4 border-t-2 border-gray-200">
+            {/* Score Grid - 3 scores prominently displayed */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-3">Scores Y-BOCS - Obsessions-Compulsions</h5>
+              <div className="grid grid-cols-3 gap-3">
+                {/* Total Score */}
+                <div className="text-center p-3 bg-gray-100 rounded-lg border-2 border-gray-300">
+                  <div className="text-2xl font-bold text-gray-900">{data.total_score !== null && data.total_score !== undefined ? data.total_score : '-'}</div>
+                  <div className="text-xs font-semibold text-gray-700 mt-1">Score total</div>
+                  <div className="text-xs text-gray-500">/40</div>
+                </div>
+                {/* Obsessions Score */}
+                <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="text-2xl font-bold text-blue-700">{data.obsessions_score !== null && data.obsessions_score !== undefined ? data.obsessions_score : '-'}</div>
+                  <div className="text-xs font-medium text-blue-800 mt-1">Obsessions</div>
+                  <div className="text-xs text-gray-500">/20</div>
+                </div>
+                {/* Compulsions Score */}
+                <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
+                  <div className="text-2xl font-bold text-purple-700">{data.compulsions_score !== null && data.compulsions_score !== undefined ? data.compulsions_score : '-'}</div>
+                  <div className="text-xs font-medium text-purple-800 mt-1">Compulsions</div>
+                  <div className="text-xs text-gray-500">/20</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg ${
+                data.total_score <= 7
+                  ? 'bg-green-50 border border-green-200 text-green-800'
+                  : data.total_score <= 15
+                  ? 'bg-blue-50 border border-blue-200 text-blue-800'
+                  : data.total_score <= 23
+                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                <p className="font-medium">{data.interpretation}</p>
+              </div>
+            )}
+
+            {/* Severity Badge */}
+            <div className="flex justify-center">
+              <span className={`px-4 py-2 rounded-full text-sm font-medium ${
+                data.total_score <= 7
+                  ? 'bg-green-100 text-green-800'
+                  : data.total_score <= 15
+                  ? 'bg-blue-100 text-blue-800'
+                  : data.total_score <= 23
+                  ? 'bg-amber-100 text-amber-800'
+                  : data.total_score <= 31
+                  ? 'bg-red-100 text-red-800'
+                  : 'bg-red-200 text-red-900'
+              }`}>
+                {data.total_score <= 7 ? 'Sous-clinique'
+                  : data.total_score <= 15 ? 'TOC léger'
+                  : data.total_score <= 23 ? 'TOC modéré'
+                  : data.total_score <= 31 ? 'TOC sévère'
+                  : 'TOC extrême'}
+              </span>
+            </div>
+
+            {/* Dimensions explanation */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Dimensions évaluées</h5>
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div>
+                  <p className="font-medium text-blue-700 mb-1">Obsessions (Q1-Q5)</p>
+                  <ul className="text-gray-600 space-y-0.5 list-disc list-inside">
+                    <li>Temps occupé</li>
+                    <li>Interférence</li>
+                    <li>Détresse</li>
+                    <li>Résistance</li>
+                    <li>Contrôle</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-medium text-purple-700 mb-1">Compulsions (Q6-Q10)</p>
+                  <ul className="text-gray-600 space-y-0.5 list-disc list-inside">
+                    <li>Temps passé</li>
+                    <li>Interférence</li>
+                    <li>Détresse</li>
+                    <li>Résistance</li>
+                    <li>Contrôle</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>Y-BOCS:</strong> Échelle de Yale-Brown pour les Obsessions-Compulsions - Évalue la sévérité du TOC</p>
+              <p className="mt-1"><strong>Cotation:</strong> 10 items (0-4). Sous-total obsessions (Q1-5): 0-20. Sous-total compulsions (Q6-10): 0-20.</p>
+              <p className="mt-1"><strong>Seuils:</strong> 0-7 (sous-clinique) | 8-15 (léger) | 16-23 (modéré) | 24-31 (sévère) | 32-40 (extrême)</p>
+              <p className="mt-1"><strong>Seuil clinique:</strong> ≥16 généralement considéré comme cliniquement significatif</p>
             </div>
           </div>
         )}

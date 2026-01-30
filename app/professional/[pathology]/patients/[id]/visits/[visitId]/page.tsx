@@ -149,7 +149,8 @@ import {
   MARS_SZ_DEFINITION,
   BIS_SZ_DEFINITION,
   EQ5D5L_SZ_DEFINITION,
-  IPAQ_SZ_DEFINITION
+  IPAQ_SZ_DEFINITION,
+  YBOCS_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -654,6 +655,16 @@ export default async function VisitDetailPage({
               target_role: 'patient',
               completed: questionnaireStatuses['IPAQ_SZ']?.completed || false,
               completedAt: questionnaireStatuses['IPAQ_SZ']?.completed_at,
+            },
+            {
+              id: YBOCS_SZ_DEFINITION.code,
+              code: YBOCS_SZ_DEFINITION.code,
+              title: YBOCS_SZ_DEFINITION.title,
+              description: YBOCS_SZ_DEFINITION.description,
+              questions: YBOCS_SZ_DEFINITION.questions,
+              target_role: 'patient',
+              completed: questionnaireStatuses['YBOCS_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['YBOCS_SZ']?.completed_at,
             }
           ]
         },

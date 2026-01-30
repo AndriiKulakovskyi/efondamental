@@ -72,3 +72,13 @@ export {
   type SchizophreniaIpaqResponseInsert,
   type IpaqSzScoreResult,
 } from './ipaq';
+
+export {
+  YBOCS_SZ_QUESTIONS,
+  YBOCS_SZ_DEFINITION,
+  computeYbocsSzScores,
+  interpretYbocsSzScore,
+  type SchizophreniaYbocsResponse,
+  type SchizophreniaYbocsResponseInsert,
+  type YbocsSzScoreResult,
+} from './ybocs';
