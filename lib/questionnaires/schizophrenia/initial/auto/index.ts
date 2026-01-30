@@ -82,3 +82,13 @@ export {
   type SchizophreniaYbocsResponseInsert,
   type YbocsSzScoreResult,
 } from './ybocs';
+
+export {
+  WURS25_SZ_QUESTIONS,
+  WURS25_SZ_DEFINITION,
+  computeWurs25SzScores,
+  interpretWurs25SzScore,
+  type SchizophreniaWurs25Response,
+  type SchizophreniaWurs25ResponseInsert,
+  type Wurs25SzScoreResult,
+} from './wurs25';

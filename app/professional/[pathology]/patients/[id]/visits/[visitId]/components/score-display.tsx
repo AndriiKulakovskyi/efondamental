@@ -134,6 +134,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'info';
     }
     
+    if (code === 'WURS25_SZ') {
+      // WURS-25 (Schizophrenia): Clinical cutoff >= 46 suggests childhood ADHD
+      if (data.adhd_likely || data.total_score >= 46) return 'warning';
+      return 'info';
+    }
+    
     if (code === 'CSM') {
       // CSM: Chronotype classification (13-55)
       // Morning types (48-55) and evening types (13-21) are notable
@@ -669,6 +675,7 @@ if (code === 'FAGERSTROM') {
               {(code === 'CTQ' || code === 'CTQ_SZ') && 'Résultats CTQ'}
               {code === 'BIS10' && 'Résultats BIS-10'}
               {code === 'WURS25' && 'Résultats WURS-25'}
+              {code === 'WURS25_SZ' && 'Résultats WURS-25 - TDAH Enfance'}
               {code === 'CSM' && 'Résultats CSM - Chronotype'}
               {code === 'CTI' && 'Résultats CTI - Type Circadien'}
               {code === 'ALS18' && 'Résultats ALS-18 - Apathie'}
@@ -721,6 +728,8 @@ if (code === 'FAGERSTROM') {
                 : code === 'BIS10'
                 ? (data.overall_impulsivity !== undefined && data.overall_impulsivity !== null ? parseFloat(data.overall_impulsivity).toFixed(2) : '-')
                 : code === 'WURS25'
+                ? (data.adhd_likely ? 'POSITIF' : 'NÉGATIF')
+                : code === 'WURS25_SZ'
                 ? (data.adhd_likely ? 'POSITIF' : 'NÉGATIF')
                 : code === 'CSM'
                 ? (data.total_score !== undefined ? data.total_score : '-')
@@ -1196,6 +1205,76 @@ if (code === 'FAGERSTROM') {
                 Le score ne suggère pas de symptômes significatifs de TDAH dans l'enfance.
               </p>
             )}
+          </div>
+        )}
+
+        {/* WURS-25 (Schizophrenia) Details */}
+        {code === 'WURS25_SZ' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Score total:</span>
+              <span className="font-semibold">{data.total_score ?? '-'}/100</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Seuil clinique:</span>
+              <span className="font-semibold">46</span>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">TDAH dans l'enfance:</span>
+              <span className={`font-bold text-lg ${data.adhd_likely ? 'text-orange-700' : 'text-blue-700'}`}>
+                {data.adhd_likely ? 'Probable' : 'Peu probable'}
+              </span>
+            </div>
+            
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg ${
+                data.adhd_likely
+                  ? 'bg-amber-50 border border-amber-200 text-amber-800'
+                  : 'bg-blue-50 border border-blue-200 text-blue-800'
+              }`}>
+                <p className="text-xs">{data.interpretation}</p>
+              </div>
+            )}
+            
+            {/* Domain explanation */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2 text-xs">8 domaines évalués</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                <div>
+                  <span className="font-medium">Attention:</span> Q3, Q6, Q10
+                </div>
+                <div>
+                  <span className="font-medium">Hyperactivité:</span> Q5
+                </div>
+                <div>
+                  <span className="font-medium">Impulsivité/Colère:</span> Q7, Q9, Q17, Q21, Q24, Q27
+                </div>
+                <div>
+                  <span className="font-medium">Anxiété/Humeur:</span> Q4, Q12, Q20
+                </div>
+                <div>
+                  <span className="font-medium">Comportement:</span> Q11, Q15, Q25, Q28, Q41
+                </div>
+                <div>
+                  <span className="font-medium">Estime de soi:</span> Q16, Q26
+                </div>
+                <div>
+                  <span className="font-medium">Social:</span> Q29, Q40
+                </div>
+                <div>
+                  <span className="font-medium">Scolaire:</span> Q51, Q56, Q59
+                </div>
+              </div>
+            </div>
+            
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>WURS-25:</strong> Échelle de Wender Utah - Évaluation rétrospective du TDAH dans l'enfance</p>
+              <p className="mt-1"><strong>Cotation:</strong> 25 items (0-4). Score total: 0-100.</p>
+              <p className="mt-1"><strong>Seuil clinique:</strong> ≥46 (sensibilité/spécificité: 96%)</p>
+              <p className="mt-1"><strong>Référence:</strong> Ward MF et al. Am J Psychiatry. 1993</p>
+            </div>
           </div>
         )}
 

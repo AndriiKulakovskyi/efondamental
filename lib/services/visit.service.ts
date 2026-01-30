@@ -243,7 +243,8 @@ import {
   BIS_SZ_DEFINITION,
   EQ5D5L_SZ_DEFINITION,
   IPAQ_SZ_DEFINITION,
-  YBOCS_SZ_DEFINITION
+  YBOCS_SZ_DEFINITION,
+  WURS25_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -771,6 +772,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               title: YBOCS_SZ_DEFINITION.title,
               description: YBOCS_SZ_DEFINITION.description,
               questions: YBOCS_SZ_DEFINITION.questions,
+            },
+            {
+              id: WURS25_SZ_DEFINITION.id,
+              code: WURS25_SZ_DEFINITION.code,
+              title: WURS25_SZ_DEFINITION.title,
+              description: WURS25_SZ_DEFINITION.description,
+              questions: WURS25_SZ_DEFINITION.questions,
             }
           ]
         },

@@ -61,6 +61,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'EQ5D5L_SZ': 'schizophrenia_eq5d5l',
   'IPAQ_SZ': 'schizophrenia_ipaq',
   'YBOCS_SZ': 'schizophrenia_ybocs',
+  'WURS25_SZ': 'schizophrenia_wurs25',
 };
 
 // ============================================================================
@@ -2010,6 +2011,99 @@ export async function saveYbocsResponse(response: any): Promise<any> {
 
   if (error) {
     console.error('Error saving schizophrenia_ybocs:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// WURS-25 (Wender Utah Rating Scale) Functions
+// ============================================================================
+
+const WURS25_CLINICAL_CUTOFF = 46;
+
+/**
+ * Interpret WURS-25 score (schizophrenia version with cutoff 46)
+ */
+function interpretWurs25SzScore(totalScore: number): string {
+  if (totalScore >= WURS25_CLINICAL_CUTOFF) {
+    return `Score ≥${WURS25_CLINICAL_CUTOFF} : Ce résultat suggère fortement la présence de symptômes de TDAH durant l'enfance. ` +
+      'Le seuil de 46 possède une sensibilité et une spécificité de 96% pour le diagnostic rétrospectif du TDAH de l\'enfance. ' +
+      'Une évaluation complémentaire est recommandée (ASRS pour symptômes actuels, entretien clinique).';
+  }
+  return `Score <${WURS25_CLINICAL_CUTOFF} : Ce résultat ne suggère pas la présence de symptômes significatifs de TDAH durant l'enfance. ` +
+    'Cependant, ce questionnaire est un outil de dépistage rétrospectif et ne constitue pas un diagnostic définitif.';
+}
+
+/**
+ * Get WURS-25 response
+ */
+export async function getWurs25SzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('WURS25_SZ', visitId);
+}
+
+/**
+ * Save WURS-25 response with scoring
+ * - Total score: sum of q1-q25 (0-100)
+ * - ADHD likely: total_score >= 46
+ */
+export async function saveWurs25SzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // If questionnaire not done, just save the status
+  if (response.questionnaire_done === 'Non fait') {
+    const { data, error } = await supabase
+      .from('schizophrenia_wurs25')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        questionnaire_done: response.questionnaire_done,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving schizophrenia_wurs25 (not done):', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Calculate total score (sum of q1-q25)
+  let total_score = 0;
+  for (let i = 1; i <= 25; i++) {
+    const qKey = `q${i}`;
+    const value = response[qKey];
+    if (typeof value === 'number' && !isNaN(value)) {
+      total_score += value;
+    }
+  }
+  
+  const adhd_likely = total_score >= WURS25_CLINICAL_CUTOFF;
+  const interpretation = interpretWurs25SzScore(total_score);
+  
+  // Remove instruction field before saving
+  const { 
+    instruction_consigne,
+    ...responseData 
+  } = response;
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_wurs25')
+    .upsert({
+      ...responseData,
+      total_score,
+      adhd_likely,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_wurs25:', error);
     throw error;
   }
   return data;
