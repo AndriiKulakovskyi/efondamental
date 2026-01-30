@@ -230,14 +230,16 @@ export interface StopBangScoreInput {
 export function computeStopBangScore(responses: StopBangScoreInput): number {
   let score = 0;
   
-  if (responses.snoring === 'yes') score++;
-  if (responses.tiredness === 'yes') score++;
-  if (responses.observed_apnea === 'yes') score++;
-  if (responses.hypertension === 'yes') score++;
-  if (responses.bmi_over_35 === 'yes') score++;
-  if (responses.age_over_50 === 'yes') score++;
-  if (responses.large_neck === 'yes') score++;
-  if (responses.male_gender === 'M' || responses.male_gender === 'yes') score++;
+  const isYes = (val: string | null) => val === 'yes' || val === 'oui';
+  
+  if (isYes(responses.snoring)) score++;
+  if (isYes(responses.tiredness)) score++;
+  if (isYes(responses.observed_apnea)) score++;
+  if (isYes(responses.hypertension)) score++;
+  if (isYes(responses.bmi_over_35)) score++;
+  if (isYes(responses.age_over_50)) score++;
+  if (isYes(responses.large_neck)) score++;
+  if (isYes(responses.male_gender) || responses.male_gender === 'M') score++;
   
   return score;
 }
