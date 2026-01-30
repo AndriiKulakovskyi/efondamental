@@ -151,7 +151,8 @@ import {
   EQ5D5L_SZ_DEFINITION,
   IPAQ_SZ_DEFINITION,
   YBOCS_SZ_DEFINITION,
-  WURS25_SZ_DEFINITION
+  WURS25_SZ_DEFINITION,
+  STORI_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -676,6 +677,16 @@ export default async function VisitDetailPage({
               target_role: 'patient',
               completed: questionnaireStatuses['WURS25_SZ']?.completed || false,
               completedAt: questionnaireStatuses['WURS25_SZ']?.completed_at,
+            },
+            {
+              id: STORI_SZ_DEFINITION.code,
+              code: STORI_SZ_DEFINITION.code,
+              title: STORI_SZ_DEFINITION.title,
+              description: STORI_SZ_DEFINITION.description,
+              questions: STORI_SZ_DEFINITION.questions,
+              target_role: 'patient',
+              completed: questionnaireStatuses['STORI_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['STORI_SZ']?.completed_at,
             }
           ]
         },

@@ -140,6 +140,18 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'info';
     }
     
+    if (code === 'STORI_SZ') {
+      // STORI: Recovery stages - color based on dominant stage
+      // Stage 1 (Moratoire) = concern, Stage 5 (Croissance) = positive
+      const stage = data.dominant_stage;
+      if (stage === 1) return 'error';      // Moratoire - needs support
+      if (stage === 2) return 'warning';    // Conscience - emerging hope
+      if (stage === 3) return 'info';       // Préparation - learning
+      if (stage === 4) return 'info';       // Reconstruction - active work
+      if (stage === 5) return 'success';    // Croissance - thriving
+      return 'info';
+    }
+    
     if (code === 'CSM') {
       // CSM: Chronotype classification (13-55)
       // Morning types (48-55) and evening types (13-21) are notable
@@ -676,6 +688,7 @@ if (code === 'FAGERSTROM') {
               {code === 'BIS10' && 'Résultats BIS-10'}
               {code === 'WURS25' && 'Résultats WURS-25'}
               {code === 'WURS25_SZ' && 'Résultats WURS-25 - TDAH Enfance'}
+              {code === 'STORI_SZ' && 'Résultats STORI - Stades de Rétablissement'}
               {code === 'CSM' && 'Résultats CSM - Chronotype'}
               {code === 'CTI' && 'Résultats CTI - Type Circadien'}
               {code === 'ALS18' && 'Résultats ALS-18 - Apathie'}
@@ -731,6 +744,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.adhd_likely ? 'POSITIF' : 'NÉGATIF')
                 : code === 'WURS25_SZ'
                 ? (data.adhd_likely ? 'POSITIF' : 'NÉGATIF')
+                : code === 'STORI_SZ'
+                ? (data.dominant_stage ? `Étape ${data.dominant_stage}` : '-')
                 : code === 'CSM'
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'CTI'
@@ -1274,6 +1289,139 @@ if (code === 'FAGERSTROM') {
               <p className="mt-1"><strong>Cotation:</strong> 25 items (0-4). Score total: 0-100.</p>
               <p className="mt-1"><strong>Seuil clinique:</strong> ≥46 (sensibilité/spécificité: 96%)</p>
               <p className="mt-1"><strong>Référence:</strong> Ward MF et al. Am J Psychiatry. 1993</p>
+            </div>
+          </div>
+        )}
+
+        {/* STORI (Stages of Recovery) Details */}
+        {code === 'STORI_SZ' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            {/* Dominant Stage Header */}
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600 font-medium">Stade dominant:</span>
+              <span className={`font-bold text-lg ${
+                data.dominant_stage === 1 ? 'text-red-600' :
+                data.dominant_stage === 2 ? 'text-orange-600' :
+                data.dominant_stage === 3 ? 'text-yellow-600' :
+                data.dominant_stage === 4 ? 'text-lime-600' :
+                data.dominant_stage === 5 ? 'text-green-600' : 'text-gray-600'
+              }`}>
+                {data.dominant_stage === 1 && 'Moratoire'}
+                {data.dominant_stage === 2 && 'Conscience'}
+                {data.dominant_stage === 3 && 'Préparation'}
+                {data.dominant_stage === 4 && 'Reconstruction'}
+                {data.dominant_stage === 5 && 'Croissance'}
+                {!data.dominant_stage && '-'}
+              </span>
+            </div>
+            
+            {/* 5 Stage Scores with Visual Bars */}
+            <div className="space-y-2 pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 text-xs">Scores par stade (0-50)</h5>
+              
+              {/* Stage 1 - Moratoire */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600 w-28">1. Moratoire</span>
+                <div className="flex-1 bg-gray-200 rounded-full h-3 relative">
+                  <div 
+                    className={`h-3 rounded-full ${data.dominant_stage === 1 ? 'bg-red-500' : 'bg-red-300'}`}
+                    style={{ width: `${((data.stori_etap1 ?? 0) / 50) * 100}%` }}
+                  />
+                </div>
+                <span className={`text-xs font-semibold w-8 text-right ${data.dominant_stage === 1 ? 'text-red-600' : 'text-gray-600'}`}>
+                  {data.stori_etap1 ?? '-'}
+                </span>
+              </div>
+              
+              {/* Stage 2 - Conscience */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600 w-28">2. Conscience</span>
+                <div className="flex-1 bg-gray-200 rounded-full h-3 relative">
+                  <div 
+                    className={`h-3 rounded-full ${data.dominant_stage === 2 ? 'bg-orange-500' : 'bg-orange-300'}`}
+                    style={{ width: `${((data.stori_etap2 ?? 0) / 50) * 100}%` }}
+                  />
+                </div>
+                <span className={`text-xs font-semibold w-8 text-right ${data.dominant_stage === 2 ? 'text-orange-600' : 'text-gray-600'}`}>
+                  {data.stori_etap2 ?? '-'}
+                </span>
+              </div>
+              
+              {/* Stage 3 - Préparation */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600 w-28">3. Préparation</span>
+                <div className="flex-1 bg-gray-200 rounded-full h-3 relative">
+                  <div 
+                    className={`h-3 rounded-full ${data.dominant_stage === 3 ? 'bg-yellow-500' : 'bg-yellow-300'}`}
+                    style={{ width: `${((data.stori_etap3 ?? 0) / 50) * 100}%` }}
+                  />
+                </div>
+                <span className={`text-xs font-semibold w-8 text-right ${data.dominant_stage === 3 ? 'text-yellow-600' : 'text-gray-600'}`}>
+                  {data.stori_etap3 ?? '-'}
+                </span>
+              </div>
+              
+              {/* Stage 4 - Reconstruction */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600 w-28">4. Reconstruction</span>
+                <div className="flex-1 bg-gray-200 rounded-full h-3 relative">
+                  <div 
+                    className={`h-3 rounded-full ${data.dominant_stage === 4 ? 'bg-lime-500' : 'bg-lime-300'}`}
+                    style={{ width: `${((data.stori_etap4 ?? 0) / 50) * 100}%` }}
+                  />
+                </div>
+                <span className={`text-xs font-semibold w-8 text-right ${data.dominant_stage === 4 ? 'text-lime-600' : 'text-gray-600'}`}>
+                  {data.stori_etap4 ?? '-'}
+                </span>
+              </div>
+              
+              {/* Stage 5 - Croissance */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600 w-28">5. Croissance</span>
+                <div className="flex-1 bg-gray-200 rounded-full h-3 relative">
+                  <div 
+                    className={`h-3 rounded-full ${data.dominant_stage === 5 ? 'bg-green-500' : 'bg-green-300'}`}
+                    style={{ width: `${((data.stori_etap5 ?? 0) / 50) * 100}%` }}
+                  />
+                </div>
+                <span className={`text-xs font-semibold w-8 text-right ${data.dominant_stage === 5 ? 'text-green-600' : 'text-gray-600'}`}>
+                  {data.stori_etap5 ?? '-'}
+                </span>
+              </div>
+            </div>
+            
+            {/* Interpretation */}
+            {data.interpretation && (
+              <div className={`p-3 rounded-lg ${
+                data.dominant_stage === 1 ? 'bg-red-50 border border-red-200 text-red-800' :
+                data.dominant_stage === 2 ? 'bg-orange-50 border border-orange-200 text-orange-800' :
+                data.dominant_stage === 3 ? 'bg-yellow-50 border border-yellow-200 text-yellow-800' :
+                data.dominant_stage === 4 ? 'bg-lime-50 border border-lime-200 text-lime-800' :
+                data.dominant_stage === 5 ? 'bg-green-50 border border-green-200 text-green-800' :
+                'bg-gray-50 border border-gray-200 text-gray-800'
+              }`}>
+                <p className="text-xs whitespace-pre-line">{data.interpretation}</p>
+              </div>
+            )}
+            
+            {/* Stage Descriptions */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2 text-xs">Description des stades</h5>
+              <div className="space-y-1 text-xs text-gray-600">
+                <p><span className="font-medium text-red-600">1. Moratoire:</span> Repli, perte, confusion, impuissance</p>
+                <p><span className="font-medium text-orange-600">2. Conscience:</span> Première lueur d'espoir</p>
+                <p><span className="font-medium text-yellow-600">3. Préparation:</span> Apprentissage des compétences</p>
+                <p><span className="font-medium text-lime-600">4. Reconstruction:</span> Travail actif vers un style de vie positif</p>
+                <p><span className="font-medium text-green-600">5. Croissance:</span> Vie pleinement satisfaisante</p>
+              </div>
+            </div>
+            
+            {/* Legend */}
+            <div className="text-xs text-gray-500 pt-2 border-t">
+              <p><strong>STORI:</strong> Stages of Recovery Instrument - Évaluation du rétablissement psychologique</p>
+              <p className="mt-1"><strong>Cotation:</strong> 50 items (0-5). 10 items par stade. Score par stade: 0-50.</p>
+              <p className="mt-1"><strong>Modèle:</strong> Andresen Recovery Model (5 stades)</p>
+              <p className="mt-1"><strong>Référence:</strong> Andresen R et al. Aust N Z J Psychiatry. 2006</p>
             </div>
           </div>
         )}

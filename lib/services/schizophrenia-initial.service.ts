@@ -62,6 +62,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'IPAQ_SZ': 'schizophrenia_ipaq',
   'YBOCS_SZ': 'schizophrenia_ybocs',
   'WURS25_SZ': 'schizophrenia_wurs25',
+  'STORI_SZ': 'schizophrenia_stori',
 };
 
 // ============================================================================
@@ -2104,6 +2105,151 @@ export async function saveWurs25SzResponse(response: any): Promise<any> {
 
   if (error) {
     console.error('Error saving schizophrenia_wurs25:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// STORI (Stages of Recovery Instrument) Functions
+// ============================================================================
+
+// Stage definitions for STORI
+const STORI_STAGES_INFO = {
+  1: { label: 'Moratoire', description: 'Période de repli caractérisée par un sentiment de perte, de confusion et d\'impuissance.' },
+  2: { label: 'Conscience', description: 'Première lueur d\'espoir que le rétablissement est possible.' },
+  3: { label: 'Préparation', description: 'La personne commence à travailler sur ses compétences de rétablissement.' },
+  4: { label: 'Reconstruction', description: 'Travail actif vers un style de vie positif.' },
+  5: { label: 'Croissance', description: 'Vie pleinement satisfaisante avec un sens de soi positif.' },
+} as const;
+
+/**
+ * Get STORI response
+ */
+export async function getStoriSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('STORI_SZ', visitId);
+}
+
+/**
+ * Calculate stage score (sum of 10 items for a given stage)
+ * Pattern: Item n maps to Stage (n % 5), where n%5=0 maps to Stage 5
+ */
+function calculateStoriStageScore(responses: Record<string, any>, stage: number): number {
+  let score = 0;
+  for (let i = 1; i <= 50; i++) {
+    const itemStage = i % 5 === 0 ? 5 : i % 5;
+    if (itemStage === stage) {
+      const value = responses[`q${i}`];
+      if (typeof value === 'number' && !isNaN(value)) {
+        score += value;
+      }
+    }
+  }
+  return score;
+}
+
+/**
+ * Save STORI response with 5-stage scoring
+ * - 5 stage scores (0-50 each)
+ * - Dominant stage (highest score)
+ */
+export async function saveStoriSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // If questionnaire not done, just save the status
+  if (response.questionnaire_done === 'Non fait') {
+    const { data, error } = await supabase
+      .from('schizophrenia_stori')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        questionnaire_done: response.questionnaire_done,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving schizophrenia_stori (not done):', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Calculate 5 stage scores
+  const stori_etap1 = calculateStoriStageScore(response, 1); // Moratoire
+  const stori_etap2 = calculateStoriStageScore(response, 2); // Conscience
+  const stori_etap3 = calculateStoriStageScore(response, 3); // Préparation
+  const stori_etap4 = calculateStoriStageScore(response, 4); // Reconstruction
+  const stori_etap5 = calculateStoriStageScore(response, 5); // Croissance
+  
+  // Determine dominant stage (highest score)
+  // Note: When scores are equal, select the MORE ADVANCED stage (higher stage number)
+  // as per Andresen et al. STORI scoring guidelines
+  const stageScores = [
+    { stage: 1, score: stori_etap1 },
+    { stage: 2, score: stori_etap2 },
+    { stage: 3, score: stori_etap3 },
+    { stage: 4, score: stori_etap4 },
+    { stage: 5, score: stori_etap5 },
+  ];
+  
+  let maxScore = -1;
+  let dominant_stage = 1;
+  for (const { stage, score } of stageScores) {
+    // Use >= to select the more advanced stage when scores are equal
+    if (score > maxScore || (score === maxScore && stage > dominant_stage)) {
+      maxScore = score;
+      dominant_stage = stage;
+    }
+  }
+  
+  // Generate interpretation
+  const stageInfo = STORI_STAGES_INFO[dominant_stage as keyof typeof STORI_STAGES_INFO];
+  let interpretation = `Stade dominant : ${stageInfo.label} (Étape ${dominant_stage}/5)\n\n`;
+  interpretation += `${stageInfo.description}\n\n`;
+  
+  // Check for ties and note them (dominant_stage is already the most advanced)
+  const sortedScores = [...stageScores].sort((a, b) => b.score - a.score);
+  const topScore = sortedScores[0].score;
+  const tiedStages = sortedScores.filter(s => s.score === topScore);
+  
+  if (tiedStages.length > 1 && topScore > 0) {
+    const tiedLabels = tiedStages.map(s => 
+      STORI_STAGES_INFO[s.stage as keyof typeof STORI_STAGES_INFO].label
+    ).join(', ');
+    interpretation += `Note : Scores égaux entre les stades ${tiedLabels}. Le stade le plus avancé (${stageInfo.label}) a été sélectionné selon les directives de cotation STORI.`;
+  }
+  
+  // Remove UI-only fields and computed fields before saving
+  // (total_score may be passed by the form but STORI uses 5 stage scores instead)
+  const { 
+    instruction_consigne,
+    section_group1, section_group2, section_group3, section_group4, section_group5,
+    section_group6, section_group7, section_group8, section_group9, section_group10,
+    total_score, // Exclude - STORI uses 5 stage scores, not a single total
+    ...responseData 
+  } = response;
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_stori')
+    .upsert({
+      ...responseData,
+      stori_etap1,
+      stori_etap2,
+      stori_etap3,
+      stori_etap4,
+      stori_etap5,
+      dominant_stage,
+      interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_stori:', error);
     throw error;
   }
   return data;

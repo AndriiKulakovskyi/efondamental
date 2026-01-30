@@ -244,7 +244,8 @@ import {
   EQ5D5L_SZ_DEFINITION,
   IPAQ_SZ_DEFINITION,
   YBOCS_SZ_DEFINITION,
-  WURS25_SZ_DEFINITION
+  WURS25_SZ_DEFINITION,
+  STORI_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -779,6 +780,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               title: WURS25_SZ_DEFINITION.title,
               description: WURS25_SZ_DEFINITION.description,
               questions: WURS25_SZ_DEFINITION.questions,
+            },
+            {
+              id: STORI_SZ_DEFINITION.id,
+              code: STORI_SZ_DEFINITION.code,
+              title: STORI_SZ_DEFINITION.title,
+              description: STORI_SZ_DEFINITION.description,
+              questions: STORI_SZ_DEFINITION.questions,
             }
           ]
         },
