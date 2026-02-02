@@ -158,7 +158,8 @@ import {
   TMT_SZ_DEFINITION,
   COMMISSIONS_SZ_DEFINITION,
   LIS_SZ_DEFINITION,
-  WAIS4_CRITERIA_SZ_DEFINITION
+  WAIS4_CRITERIA_SZ_DEFINITION,
+  WAIS4_EFFICIENCE_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { 
   getAsrmResponse, 
@@ -314,7 +315,8 @@ import {
   getTmtSzResponse,
   getCommissionsSzResponse,
   getLisSzResponse,
-  getWais4CriteriaSzResponse
+  getWais4CriteriaSzResponse,
+  getWais4EfficienceSzResponse
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -643,6 +645,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === COMMISSIONS_SZ_DEFINITION.code) questionnaire = COMMISSIONS_SZ_DEFINITION;
   else if (code === LIS_SZ_DEFINITION.code) questionnaire = LIS_SZ_DEFINITION;
   else if (code === WAIS4_CRITERIA_SZ_DEFINITION.code) questionnaire = WAIS4_CRITERIA_SZ_DEFINITION;
+  else if (code === WAIS4_EFFICIENCE_SZ_DEFINITION.code) questionnaire = WAIS4_EFFICIENCE_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -813,6 +816,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === COMMISSIONS_SZ_DEFINITION.code) existingResponse = await getCommissionsSzResponse(visitId);
   else if (code === LIS_SZ_DEFINITION.code) existingResponse = await getLisSzResponse(visitId);
   else if (code === WAIS4_CRITERIA_SZ_DEFINITION.code) existingResponse = await getWais4CriteriaSzResponse(visitId);
+  else if (code === WAIS4_EFFICIENCE_SZ_DEFINITION.code) existingResponse = await getWais4EfficienceSzResponse(visitId);
   
   // Debug logging for PSQI_SZ
   if (code === 'PSQI_SZ') {

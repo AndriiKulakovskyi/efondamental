@@ -80,6 +80,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   
   // Neuropsy module - WAIS-IV (Neuropsychological assessments)
   'WAIS4_CRITERIA_SZ': 'schizophrenia_wais4_criteria',
+  'WAIS4_EFFICIENCE_SZ': 'schizophrenia_wais4_efficience',
 };
 
 // ============================================================================
@@ -3827,6 +3828,180 @@ export async function saveWais4CriteriaSzResponse(response: any): Promise<any> {
   
   if (error) {
     console.error('Error saving schizophrenia_wais4_criteria:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// WAIS-IV Efficience Intellectuelle Functions (Neuropsy - WAIS-IV submodule)
+// ============================================================================
+
+/**
+ * Get WAIS4_EFFICIENCE_SZ response for a visit
+ * WAIS-IV Efficience Intellectuelle - Denney 2015 QI Estimation and Barona Index
+ */
+export async function getWais4EfficienceSzResponse(visitId: string): Promise<any | null> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_wais4_efficience')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') return null; // Not found
+    console.error('Error getting schizophrenia_wais4_efficience:', error);
+    throw error;
+  }
+  return data;
+}
+
+/**
+ * Save WAIS4_EFFICIENCE_SZ response with scoring
+ * Calculates Denney indices (QI, ICV, IRP, IMT, IVT) and Barona expected IQ
+ */
+export async function saveWais4EfficienceSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Dynamically import scoring functions to avoid circular dependencies
+  const { calculateDenneyIndices, calculateBaronaExpectedIQ, areAllDenneyInputsValid, areBaronaInputsValid } = 
+    await import('@/lib/services/wais4-efficience-scoring');
+  
+  // Fetch patient data for Barona calculation
+  let patientSex = 'M';
+  let patientAge = 30;
+  
+  if (response.patient_id) {
+    const { data: patient } = await supabase
+      .from('patients')
+      .select('gender, date_of_birth')
+      .eq('id', response.patient_id)
+      .single();
+    
+    if (patient) {
+      patientSex = patient.gender || 'M';
+      if (patient.date_of_birth) {
+        const birthDate = new Date(patient.date_of_birth);
+        const today = new Date();
+        patientAge = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          patientAge--;
+        }
+      }
+    }
+  }
+  
+  // Prepare Denney inputs
+  const denneyInputs = {
+    info_std: response.info_std != null ? Number(response.info_std) : 0,
+    wais_simi_std: response.wais_simi_std != null ? Number(response.wais_simi_std) : 0,
+    wais_mat_std: response.wais_mat_std != null ? Number(response.wais_mat_std) : 0,
+    compl_im_std: response.compl_im_std != null ? Number(response.compl_im_std) : 0,
+    wais_mc_std: response.wais_mc_std != null ? Number(response.wais_mc_std) : 0,
+    wais_arith_std: response.wais_arith_std != null ? Number(response.wais_arith_std) : 0,
+    wais_cod_std: response.wais_cod_std != null ? Number(response.wais_cod_std) : 0,
+  };
+  
+  // Calculate Denney indices if all inputs are valid
+  let denneyResults = null;
+  if (areAllDenneyInputsValid(denneyInputs)) {
+    denneyResults = calculateDenneyIndices(denneyInputs);
+  }
+  
+  // Convert barona_test_done from radio value to boolean
+  const baronaTestDone = response.barona_test_done === 'oui' || response.barona_test_done === true;
+  
+  // Calculate Barona expected IQ if test was done and inputs are valid
+  let baronaResults = null;
+  let qitDifference = null;
+  
+  if (baronaTestDone) {
+    const baronaInputs = {
+      sexe: patientSex,
+      age: patientAge,
+      rad_barona_etude: response.rad_barona_etude != null ? Number(response.rad_barona_etude) : 0,
+      rad_barona_profession: response.rad_barona_profession != null ? Number(response.rad_barona_profession) : 0,
+    };
+    
+    if (areBaronaInputsValid(baronaInputs)) {
+      baronaResults = calculateBaronaExpectedIQ(baronaInputs);
+      
+      // Calculate difference if we have both Barona and Denney results
+      if (denneyResults) {
+        qitDifference = baronaResults.qit_attendu - denneyResults.qi.indice;
+      }
+    }
+  }
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_wais4_efficience')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      
+      // Denney inputs (subtest standard scores)
+      info_std: denneyInputs.info_std || null,
+      wais_simi_std: denneyInputs.wais_simi_std || null,
+      wais_mat_std: denneyInputs.wais_mat_std || null,
+      compl_im_std: denneyInputs.compl_im_std || null,
+      wais_mc_std: denneyInputs.wais_mc_std || null,
+      wais_arith_std: denneyInputs.wais_arith_std || null,
+      wais_cod_std: denneyInputs.wais_cod_std || null,
+      
+      // Denney computed indices - QI
+      qi_sum_std: denneyResults?.qi.sum_std ?? null,
+      qi_indice: denneyResults?.qi.indice ?? null,
+      qi_rang: denneyResults?.qi.rang ?? null,
+      qi_ci95: denneyResults?.qi.ci95 ?? null,
+      qi_interpretation: denneyResults?.qi.interpretation ?? null,
+      
+      // Denney computed indices - ICV
+      icv_sum_std: denneyResults?.icv.sum_std ?? null,
+      icv_indice: denneyResults?.icv.indice ?? null,
+      icv_rang: denneyResults?.icv.rang ?? null,
+      icv_ci95: denneyResults?.icv.ci95 ?? null,
+      icv_interpretation: denneyResults?.icv.interpretation ?? null,
+      
+      // Denney computed indices - IRP
+      irp_sum_std: denneyResults?.irp.sum_std ?? null,
+      irp_indice: denneyResults?.irp.indice ?? null,
+      irp_rang: denneyResults?.irp.rang ?? null,
+      irp_ci95: denneyResults?.irp.ci95 ?? null,
+      irp_interpretation: denneyResults?.irp.interpretation ?? null,
+      
+      // Denney computed indices - IMT
+      imt_sum_std: denneyResults?.imt.sum_std ?? null,
+      imt_indice: denneyResults?.imt.indice ?? null,
+      imt_rang: denneyResults?.imt.rang ?? null,
+      imt_ci95: denneyResults?.imt.ci95 ?? null,
+      imt_interpretation: denneyResults?.imt.interpretation ?? null,
+      
+      // Denney computed indices - IVT
+      ivt_sum_std: denneyResults?.ivt.sum_std ?? null,
+      ivt_indice: denneyResults?.ivt.indice ?? null,
+      ivt_rang: denneyResults?.ivt.rang ?? null,
+      ivt_ci95: denneyResults?.ivt.ci95 ?? null,
+      ivt_interpretation: denneyResults?.ivt.interpretation ?? null,
+      
+      // Barona section
+      barona_test_done: baronaTestDone,
+      rad_barona_profession: response.rad_barona_profession != null ? Number(response.rad_barona_profession) : null,
+      rad_barona_etude: response.rad_barona_etude != null ? Number(response.rad_barona_etude) : null,
+      barona_qit_attendu: baronaResults?.qit_attendu ?? null,
+      barona_qit_difference: qitDifference ?? null,
+      
+      // Metadata
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_wais4_efficience:', error);
     throw error;
   }
   return data;

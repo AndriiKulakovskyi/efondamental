@@ -162,7 +162,8 @@ import {
   TMT_SZ_DEFINITION,
   COMMISSIONS_SZ_DEFINITION,
   LIS_SZ_DEFINITION,
-  WAIS4_CRITERIA_SZ_DEFINITION
+  WAIS4_CRITERIA_SZ_DEFINITION,
+  WAIS4_EFFICIENCE_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -647,6 +648,16 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['WAIS4_CRITERIA_SZ']?.completed || false,
                   completedAt: questionnaireStatuses['WAIS4_CRITERIA_SZ']?.completed_at,
+                },
+                {
+                  id: WAIS4_EFFICIENCE_SZ_DEFINITION.code,
+                  code: WAIS4_EFFICIENCE_SZ_DEFINITION.code,
+                  title: WAIS4_EFFICIENCE_SZ_DEFINITION.title,
+                  description: WAIS4_EFFICIENCE_SZ_DEFINITION.description,
+                  questions: WAIS4_EFFICIENCE_SZ_DEFINITION.questions,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['WAIS4_EFFICIENCE_SZ']?.completed || false,
+                  completedAt: questionnaireStatuses['WAIS4_EFFICIENCE_SZ']?.completed_at,
                 }
               ]
             }

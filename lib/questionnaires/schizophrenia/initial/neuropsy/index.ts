@@ -23,3 +23,5 @@ export type { SchizophreniaLisResponse, SchizophreniaLisResponseInsert } from '.
 // WAIS-IV
 export { WAIS4_CRITERIA_SZ_DEFINITION, WAIS4_CRITERIA_SZ_QUESTIONS } from './wais4';
 export type { SchizophreniaWais4CriteriaResponse, SchizophreniaWais4CriteriaResponseInsert } from './wais4';
+export { WAIS4_EFFICIENCE_SZ_DEFINITION, WAIS4_EFFICIENCE_SZ_QUESTIONS } from './wais4';
+export type { SchizophreniaWais4EfficienceResponse, SchizophreniaWais4EfficienceResponseInsert } from './wais4';

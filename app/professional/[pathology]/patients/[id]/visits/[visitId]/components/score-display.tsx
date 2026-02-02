@@ -319,6 +319,17 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'error';                      // Difficulties with social cognition
     }
     
+    if (code === 'WAIS4_EFFICIENCE_SZ') {
+      // WAIS-IV Efficience Intellectuelle: Use QI index as main score
+      // Index scoring: 50-150 scale, mean=100, SD=15
+      const qi = data.qi_indice;
+      if (qi === null || qi === undefined) return 'info';
+      if (qi >= 110) return 'success';    // High Average to Superior
+      if (qi >= 90) return 'info';        // Average
+      if (qi >= 80) return 'warning';     // Low Average
+      return 'error';                     // Below 80 = Borderline or lower
+    }
+    
     if (code === 'WAIS4_CODE' || code === 'WAIS_IV_CODE_SYMBOLES_IVT') {
       // WAIS-IV Code/Symboles/IVT: Use IVT composite if available, else Code standard score
       if (data.wais_ivt !== null && data.wais_ivt !== undefined) {
@@ -787,6 +798,7 @@ if (code === 'FAGERSTROM') {
               {code === 'TMT_SZ' && 'Résultats TMT (Trail Making Test)'}
               {code === 'COMMISSIONS_SZ' && 'Résultats Test des Commissions'}
               {code === 'LIS_SZ' && 'Résultats LIS (Lecture d\'Intentions Sociales)'}
+              {code === 'WAIS4_EFFICIENCE_SZ' && 'Résultats Efficience Intellectuelle - WAIS-IV'}
               {code === 'FLUENCES_VERBALES' && 'Résultats Fluences Verbales (Cardebat et al., 1990)'}
               {code === 'WAIS4_CODE' && 'Résultats WAIS-IV Code'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && 'Résultats WAIS-IV Code, Symboles & IVT'}
@@ -870,6 +882,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.com01 !== undefined ? `${data.com01} min` : '-')
                 : code === 'LIS_SZ'
                 ? (data.lis_score !== undefined && data.lis_score !== null ? data.lis_score.toFixed(2) : '-')
+                : code === 'WAIS4_EFFICIENCE_SZ'
+                ? (data.qi_indice !== undefined && data.qi_indice !== null ? data.qi_indice : '-')
                 : code === 'WAIS4_CODE'
                 ? (data.wais_cod_std !== undefined ? data.wais_cod_std : '-')
                 : code === 'WAIS_IV_CODE_SYMBOLES_IVT'
@@ -949,6 +963,7 @@ if (code === 'FAGERSTROM') {
               {code === 'TMT_SZ' && ' (Partie A)'}
               {code === 'COMMISSIONS_SZ' && ' (Temps)'}
               {code === 'LIS_SZ' && ' (Score déviation)'}
+              {code === 'WAIS4_EFFICIENCE_SZ' && ' (QI - Indice)'}
               {code === 'WAIS4_CODE' && '/19'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && (data.wais_ivt !== undefined && data.wais_ivt !== null ? '/150' : '/19')}
               {code === 'PANSS' && '/210'}
@@ -2838,6 +2853,194 @@ if (code === 'FAGERSTROM') {
                       {[data.lis_f1, data.lis_f2, data.lis_f3, data.lis_f4, data.lis_f5].filter(v => v != null).join(', ') || '-'}
                     </span>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* WAIS-IV Efficience Intellectuelle Details */}
+        {code === 'WAIS4_EFFICIENCE_SZ' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            {/* QI Interpretation */}
+            <div className={`p-3 rounded-lg ${
+              data.qi_indice !== null && data.qi_indice >= 110
+                ? 'bg-green-50 border border-green-200'
+                : data.qi_indice !== null && data.qi_indice >= 90
+                ? 'bg-blue-50 border border-blue-200'
+                : data.qi_indice !== null && data.qi_indice >= 80
+                ? 'bg-amber-50 border border-amber-200'
+                : 'bg-red-50 border border-red-200'
+            }`}>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-base">
+                    {data.qi_interpretation || 
+                     (data.qi_indice === null || data.qi_indice === undefined ? 'Non calculé' :
+                      data.qi_indice >= 130 ? 'Très supérieur' :
+                      data.qi_indice >= 120 ? 'Supérieur' :
+                      data.qi_indice >= 110 ? 'Moyenne haute' :
+                      data.qi_indice >= 90 ? 'Moyenne' :
+                      data.qi_indice >= 80 ? 'Moyenne basse' :
+                      data.qi_indice >= 70 ? 'Limite' :
+                      'Extrêmement bas')}
+                  </span>
+                  <span className="text-lg font-bold">
+                    QI: {data.qi_indice ?? '-'}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-600">
+                  Estimation du QI selon Denney 2015 à partir des notes standard des 7 subtests WAIS-IV
+                </p>
+              </div>
+            </div>
+
+            {/* All Indices Table */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Indices cognitifs (Denney 2015)</h5>
+              <div className="space-y-2">
+                {/* QI - Full Scale IQ */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-medium text-gray-700">QI (Quotient Intellectuel)</span>
+                    <span className="text-gray-900 font-semibold">
+                      {data.qi_indice ?? '-'} ({data.qi_rang ? `P${data.qi_rang}` : '-'})
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    Somme: {data.qi_sum_std ?? '-'} | IC95%: {data.qi_ci95 ?? '-'}
+                  </div>
+                </div>
+                
+                {/* ICV - Verbal Comprehension Index */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-medium text-gray-700">ICV (Compréhension Verbale)</span>
+                    <span className="text-gray-900 font-semibold">
+                      {data.icv_indice ?? '-'} ({data.icv_rang ? `P${data.icv_rang}` : '-'})
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    Somme: {data.icv_sum_std ?? '-'} | IC95%: {data.icv_ci95 ?? '-'}
+                  </div>
+                </div>
+                
+                {/* IRP - Perceptual Reasoning Index */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-medium text-gray-700">IRP (Raisonnement Perceptif)</span>
+                    <span className="text-gray-900 font-semibold">
+                      {data.irp_indice ?? '-'} ({data.irp_rang ? `P${data.irp_rang}` : '-'})
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    Somme: {data.irp_sum_std ?? '-'} | IC95%: {data.irp_ci95 ?? '-'}
+                  </div>
+                </div>
+                
+                {/* IMT - Working Memory Index */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-medium text-gray-700">IMT (Mémoire de Travail)</span>
+                    <span className="text-gray-900 font-semibold">
+                      {data.imt_indice ?? '-'} ({data.imt_rang ? `P${data.imt_rang}` : '-'})
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    Somme: {data.imt_sum_std ?? '-'} | IC95%: {data.imt_ci95 ?? '-'}
+                  </div>
+                </div>
+                
+                {/* IVT - Processing Speed Index */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-medium text-gray-700">IVT (Vitesse de Traitement)</span>
+                    <span className="text-gray-900 font-semibold">
+                      {data.ivt_indice ?? '-'} ({data.ivt_rang ? `P${data.ivt_rang}` : '-'})
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    Somme: {data.ivt_sum_std ?? '-'} | IC95%: {data.ivt_ci95 ?? '-'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Barona Section (if test was done) */}
+            {data.barona_test_done && (
+              <div className="pt-2 border-t">
+                <h5 className="font-semibold text-gray-700 mb-2">Indice de Barona (Gregory, 1987)</h5>
+                <div className="space-y-2">
+                  <div className="p-2 bg-gray-50 rounded">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-medium text-gray-700">QI attendu (Barona)</span>
+                      <span className="text-gray-900 font-semibold">
+                        {data.barona_qit_attendu != null ? Number(data.barona_qit_attendu).toFixed(1) : '-'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Estimation du QI prémorbide basée sur les facteurs démographiques
+                    </p>
+                  </div>
+                  
+                  <div className={`p-2 rounded ${
+                    data.barona_qit_difference != null && Math.abs(Number(data.barona_qit_difference)) >= 19
+                      ? 'bg-red-50'
+                      : data.barona_qit_difference != null && Math.abs(Number(data.barona_qit_difference)) >= 16
+                      ? 'bg-amber-50'
+                      : 'bg-gray-50'
+                  }`}>
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-medium text-gray-700">Différence (QI attendu - QI observé)</span>
+                      <span className={`font-semibold ${
+                        data.barona_qit_difference != null && Number(data.barona_qit_difference) > 0
+                          ? 'text-red-600'
+                          : 'text-gray-900'
+                      }`}>
+                        {data.barona_qit_difference != null ? (Number(data.barona_qit_difference) > 0 ? '+' : '') + Number(data.barona_qit_difference).toFixed(1) : '-'}
+                      </span>
+                    </div>
+                    {data.barona_qit_difference != null && Number(data.barona_qit_difference) >= 19 && (
+                      <p className="text-xs text-red-600 mt-1 font-medium">
+                        Différence significative (p &lt; 0.05) - Possible détérioration cognitive
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Subtest Standard Scores */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Notes standard des subtests</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-gray-600">Information</span>
+                  <span className="font-semibold">{data.info_std ?? '-'}</span>
+                </div>
+                <div className="flex justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-gray-600">Similitudes</span>
+                  <span className="font-semibold">{data.wais_simi_std ?? '-'}</span>
+                </div>
+                <div className="flex justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-gray-600">Matrices</span>
+                  <span className="font-semibold">{data.wais_mat_std ?? '-'}</span>
+                </div>
+                <div className="flex justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-gray-600">Compl. Images</span>
+                  <span className="font-semibold">{data.compl_im_std ?? '-'}</span>
+                </div>
+                <div className="flex justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-gray-600">Mém. Chiffres</span>
+                  <span className="font-semibold">{data.wais_mc_std ?? '-'}</span>
+                </div>
+                <div className="flex justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-gray-600">Arithmétique</span>
+                  <span className="font-semibold">{data.wais_arith_std ?? '-'}</span>
+                </div>
+                <div className="flex justify-between p-2 bg-gray-50 rounded">
+                  <span className="text-gray-600">Code</span>
+                  <span className="font-semibold">{data.wais_cod_std ?? '-'}</span>
                 </div>
               </div>
             </div>
