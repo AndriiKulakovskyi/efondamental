@@ -378,6 +378,7 @@ export async function savePanssResponse(response: any): Promise<any> {
 
   // Remove section fields that shouldn't be saved to DB
   const {
+    questionnaire_done,
     section_positive,
     section_negative,
     section_general,
@@ -456,6 +457,7 @@ export async function savePanssResponse(response: any): Promise<any> {
     .from('schizophrenia_panss')
     .upsert({
       ...responseData,
+      questionnaire_done,
       positive_score,
       negative_score,
       general_score,
