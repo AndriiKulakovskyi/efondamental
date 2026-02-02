@@ -75,6 +75,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   // Neuropsy module - Bloc 2 (Neuropsychological assessments)
   'CVLT_SZ': 'schizophrenia_cvlt',
   'TMT_SZ': 'schizophrenia_tmt',
+  'COMMISSIONS_SZ': 'schizophrenia_commissions',
 };
 
 // ============================================================================
@@ -3519,6 +3520,117 @@ export async function saveTmtSzResponse(response: any): Promise<any> {
   
   if (error) {
     console.error('Error saving schizophrenia_tmt:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// Neuropsy Module - Bloc 2: Test des Commissions (COMMISSIONS_SZ)
+// ============================================================================
+
+/**
+ * Get Commissions response for a visit
+ */
+export async function getCommissionsSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('COMMISSIONS_SZ', visitId);
+}
+
+/**
+ * Save Commissions response with computed Z-scores and percentiles
+ * Uses the dedicated commissions scoring service
+ */
+export async function saveCommissionsSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Convert test_done from UI format to boolean
+  // UI: 'oui' = test was done, 'non' = test was not done
+  // DB: test_done: true = test was done, false = test was not done
+  const testDone = response.test_done === 'oui' || response.test_done === true;
+  
+  // Handle case where test was not done
+  if (!testDone) {
+    const { data, error } = await supabase
+      .from('schizophrenia_commissions')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        test_done: false,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error saving schizophrenia_commissions:', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Import the scoring function dynamically to avoid circular imports
+  const { calculateCommissionsScores, CommissionsRawData } = await import('./commissions-scoring');
+  
+  // Prepare raw data for scoring (only if we have required demographics and raw inputs)
+  let computedScores: any = {};
+  
+  if (
+    response.patient_age != null && 
+    response.nsc != null &&
+    response.com01 != null
+  ) {
+    const rawData: CommissionsRawData = {
+      patient_age: response.patient_age,
+      nsc: response.nsc,
+      com01: response.com01,
+      com02: response.com02 ?? 0,
+      com03: response.com03 ?? 0,
+      com04: response.com04 ?? 0
+    };
+    
+    computedScores = calculateCommissionsScores(rawData);
+  }
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_commissions')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      // Demographics
+      patient_age: response.patient_age,
+      nsc: response.nsc,
+      // Raw inputs
+      com01: response.com01,
+      com02: response.com02,
+      com03: response.com03,
+      com04: response.com04,
+      com05: response.com05,
+      // Time scores
+      com01s1: computedScores.com01s1 ?? null,
+      com01s2: computedScores.com01s2 ?? null,
+      // Detours scores
+      com02s1: computedScores.com02s1 ?? null,
+      com02s2: computedScores.com02s2 ?? null,
+      // Schedule violations scores
+      com03s1: computedScores.com03s1 ?? null,
+      com03s2: computedScores.com03s2 ?? null,
+      // Logic errors scores
+      com04s1: computedScores.com04s1 ?? null,
+      com04s2: computedScores.com04s2 ?? null,
+      // Total errors
+      com04s3: computedScores.com04s3 ?? null,
+      com04s4: computedScores.com04s4 ?? null,
+      com04s5: computedScores.com04s5 ?? null,
+      // Status and metadata
+      test_done: true,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_commissions:', error);
     throw error;
   }
   return data;

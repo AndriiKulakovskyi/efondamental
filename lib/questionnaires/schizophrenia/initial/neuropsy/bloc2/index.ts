@@ -1,6 +1,6 @@
 // ============================================================================
 // eFondaMental Platform - Schizophrenia Neuropsy Module - Bloc 2
-// California Verbal Learning Test, Trail Making Test, and related assessments
+// California Verbal Learning Test, Trail Making Test, Test des Commissions, and related assessments
 // ============================================================================
 
 export {
@@ -16,3 +16,10 @@ export {
   type SchizophreniaTmtResponse,
   type SchizophreniaTmtResponseInsert
 } from './tmt';
+
+export {
+  COMMISSIONS_SZ_QUESTIONS,
+  COMMISSIONS_SZ_DEFINITION,
+  type SchizophreniaCommissionsResponse,
+  type SchizophreniaCommissionsResponseInsert
+} from './commissions';

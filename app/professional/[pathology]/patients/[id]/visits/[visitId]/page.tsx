@@ -159,7 +159,8 @@ import {
   FAGERSTROM_SZ_DEFINITION,
   EPHP_SZ_DEFINITION,
   SZ_CVLT_DEFINITION,
-  TMT_SZ_DEFINITION
+  TMT_SZ_DEFINITION,
+  COMMISSIONS_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -608,6 +609,16 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['TMT_SZ']?.completed || false,
                   completedAt: questionnaireStatuses['TMT_SZ']?.completed_at,
+                },
+                {
+                  id: COMMISSIONS_SZ_DEFINITION.code,
+                  code: COMMISSIONS_SZ_DEFINITION.code,
+                  title: COMMISSIONS_SZ_DEFINITION.title,
+                  description: COMMISSIONS_SZ_DEFINITION.description,
+                  questions: COMMISSIONS_SZ_DEFINITION.questions,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['COMMISSIONS_SZ']?.completed || false,
+                  completedAt: questionnaireStatuses['COMMISSIONS_SZ']?.completed_at,
                 }
               ]
             }

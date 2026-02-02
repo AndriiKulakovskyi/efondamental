@@ -252,7 +252,8 @@ import {
   FAGERSTROM_SZ_DEFINITION,
   EPHP_SZ_DEFINITION,
   SZ_CVLT_DEFINITION,
-  TMT_SZ_DEFINITION
+  TMT_SZ_DEFINITION,
+  COMMISSIONS_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -736,6 +737,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
                   title: TMT_SZ_DEFINITION.title,
                   description: TMT_SZ_DEFINITION.description,
                   questions: TMT_SZ_DEFINITION.questions
+                },
+                {
+                  id: COMMISSIONS_SZ_DEFINITION.id,
+                  code: COMMISSIONS_SZ_DEFINITION.code,
+                  title: COMMISSIONS_SZ_DEFINITION.title,
+                  description: COMMISSIONS_SZ_DEFINITION.description,
+                  questions: COMMISSIONS_SZ_DEFINITION.questions
                 }
               ]
             }

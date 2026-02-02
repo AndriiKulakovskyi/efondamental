@@ -299,6 +299,15 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
+    if (code === 'COMMISSIONS_SZ') {
+      // Commissions: Use total errors Z-score for severity (higher Z = better)
+      const score = data.com04s5;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 0) return 'success';
+      if (score >= -1) return 'info';
+      return 'warning';
+    }
+    
     if (code === 'WAIS4_CODE' || code === 'WAIS_IV_CODE_SYMBOLES_IVT') {
       // WAIS-IV Code/Symboles/IVT: Use IVT composite if available, else Code standard score
       if (data.wais_ivt !== null && data.wais_ivt !== undefined) {
@@ -765,6 +774,7 @@ if (code === 'FAGERSTROM') {
               {code === 'WAIS3_MATRICES' && 'Score WAIS-III Matrices'}
               {(code === 'CVLT' || code === 'CVLT_SZ') && 'Résultats CVLT'}
               {code === 'TMT_SZ' && 'Résultats TMT (Trail Making Test)'}
+              {code === 'COMMISSIONS_SZ' && 'Résultats Test des Commissions'}
               {code === 'FLUENCES_VERBALES' && 'Résultats Fluences Verbales (Cardebat et al., 1990)'}
               {code === 'WAIS4_CODE' && 'Résultats WAIS-IV Code'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && 'Résultats WAIS-IV Code, Symboles & IVT'}
@@ -844,6 +854,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.total_1_5 !== undefined ? data.total_1_5 : '-')
                 : code === 'TMT_SZ'
                 ? (data.tmta_tps !== undefined ? `${data.tmta_tps}s` : '-')
+                : code === 'COMMISSIONS_SZ'
+                ? (data.com01 !== undefined ? `${data.com01} min` : '-')
                 : code === 'WAIS4_CODE'
                 ? (data.wais_cod_std !== undefined ? data.wais_cod_std : '-')
                 : code === 'WAIS_IV_CODE_SYMBOLES_IVT'
@@ -921,6 +933,7 @@ if (code === 'FAGERSTROM') {
               {code === 'WAIS4_DIGIT_SPAN' && '/19'}
               {(code === 'CVLT' || code === 'CVLT_SZ') && '/80'}
               {code === 'TMT_SZ' && ' (Partie A)'}
+              {code === 'COMMISSIONS_SZ' && ' (Temps)'}
               {code === 'WAIS4_CODE' && '/19'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && (data.wais_ivt !== undefined && data.wais_ivt !== null ? '/150' : '/19')}
               {code === 'PANSS' && '/210'}
@@ -2618,6 +2631,94 @@ if (code === 'FAGERSTROM') {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* COMMISSIONS Details */}
+        {code === 'COMMISSIONS_SZ' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            {/* Demographics */}
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Age:</span>
+                <span className="font-medium">{data.patient_age ?? '-'} ans</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Niveau d&apos;étude (NSC):</span>
+                <span className="font-medium">{data.nsc === 0 ? 'Inférieur (< Bac)' : data.nsc === 1 ? 'Supérieur (≥ Bac)' : '-'}</span>
+              </div>
+            </div>
+
+            {/* Time Scores */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Temps de réalisation</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Temps:</span>
+                  <span className="font-medium">{data.com01 ?? '-'} min</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score / Percentile:</span>
+                  <span className="font-medium">{data.com01s2 ?? '-'} / {data.com01s1 ?? '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Error Scores */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Erreurs</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Détours inutiles:</span>
+                  <span className="font-medium">{data.com02 ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score / Percentile:</span>
+                  <span className="font-medium">{data.com02s2 ?? '-'} / {data.com02s1 ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Non respect des horaires:</span>
+                  <span className="font-medium">{data.com03 ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score / Percentile:</span>
+                  <span className="font-medium">{data.com03s2 ?? '-'} / {data.com03s1 ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Erreurs logiques:</span>
+                  <span className="font-medium">{data.com04 ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score / Percentile:</span>
+                  <span className="font-medium">{data.com04s2 ?? '-'} / {data.com04s1 ?? '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Total Errors */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Score total des erreurs</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Erreurs totales:</span>
+                  <span className="font-medium">{data.com04s3 ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score / Percentile:</span>
+                  <span className="font-medium">{data.com04s5 ?? '-'} / {data.com04s4 ?? '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Sequence (if recorded) */}
+            {data.com05 && (
+              <div className="pt-2 border-t">
+                <h5 className="font-semibold text-gray-700 mb-2">Séquence des commissions</h5>
+                <div className="text-xs text-gray-600 whitespace-pre-wrap bg-gray-50 p-2 rounded">
+                  {data.com05}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

@@ -155,7 +155,8 @@ import {
   FAGERSTROM_SZ_DEFINITION,
   EPHP_SZ_DEFINITION,
   SZ_CVLT_DEFINITION,
-  TMT_SZ_DEFINITION
+  TMT_SZ_DEFINITION,
+  COMMISSIONS_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { 
   getAsrmResponse, 
@@ -308,7 +309,8 @@ import {
   getFagerstromSzResponse,
   getEphpSzResponse,
   getCvltSzResponse,
-  getTmtSzResponse
+  getTmtSzResponse,
+  getCommissionsSzResponse
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -632,6 +634,7 @@ export default async function ProfessionalQuestionnairePage({
   // Schizophrenia neuropsy module
   else if (code === SZ_CVLT_DEFINITION.code) questionnaire = SZ_CVLT_DEFINITION;
   else if (code === TMT_SZ_DEFINITION.code) questionnaire = TMT_SZ_DEFINITION;
+  else if (code === COMMISSIONS_SZ_DEFINITION.code) questionnaire = COMMISSIONS_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -799,6 +802,7 @@ export default async function ProfessionalQuestionnairePage({
   // Schizophrenia neuropsy module
   else if (code === SZ_CVLT_DEFINITION.code) existingResponse = await getCvltSzResponse(visitId);
   else if (code === TMT_SZ_DEFINITION.code) existingResponse = await getTmtSzResponse(visitId);
+  else if (code === COMMISSIONS_SZ_DEFINITION.code) existingResponse = await getCommissionsSzResponse(visitId);
   
   // Debug logging for PSQI_SZ
   if (code === 'PSQI_SZ') {
@@ -881,6 +885,12 @@ export default async function ProfessionalQuestionnairePage({
   // TMT_SZ: Set default value for new responses (no existing data)
   // Default to 'non' so questionnaire fields are hidden initially
   if (code === 'TMT_SZ' && !existingResponse) {
+    initialResponses.test_done = 'non';
+  }
+
+  // COMMISSIONS_SZ: Set default value for new responses (no existing data)
+  // Default to 'non' so questionnaire fields are hidden initially
+  if (code === 'COMMISSIONS_SZ' && !existingResponse) {
     initialResponses.test_done = 'non';
   }
 

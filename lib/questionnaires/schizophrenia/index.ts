@@ -70,5 +70,6 @@ export {
 
 export {
   SZ_CVLT_DEFINITION,
-  TMT_SZ_DEFINITION
+  TMT_SZ_DEFINITION,
+  COMMISSIONS_SZ_DEFINITION
 } from './initial/neuropsy';
