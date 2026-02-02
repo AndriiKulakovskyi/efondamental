@@ -260,7 +260,8 @@ import {
   WAIS4_SIMILITUDES_SZ_DEFINITION,
   WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION,
   WAIS4_MATRICES_SZ_DEFINITION,
-  SSTICS_SZ_DEFINITION
+  SSTICS_SZ_DEFINITION,
+  CBQ_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -726,6 +727,15 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           id: 'mod_neuropsy_sz',
           name: 'Evaluation Neuropsychologique',
           description: 'Évaluation neuropsychologique',
+          questionnaires: [
+            {
+              id: CBQ_SZ_DEFINITION.id,
+              code: CBQ_SZ_DEFINITION.code,
+              title: CBQ_SZ_DEFINITION.title,
+              description: CBQ_SZ_DEFINITION.description,
+              questions: CBQ_SZ_DEFINITION.questions
+            }
+          ],
           sections: [
             {
               id: 'bloc2',

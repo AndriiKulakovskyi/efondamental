@@ -282,6 +282,15 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
+    if (code === 'CBQ_SZ') {
+      // CBQ: Z-score based (positive = more cognitive biases)
+      // Z > 1.65 = clinically significant (error), Z > 1.0 = elevated (warning)
+      if (data.cbq_total_z > 1.65) return 'error';
+      if (data.cbq_total_z > 1.0) return 'warning';
+      if (data.cbq_total_z > 0.5) return 'info';
+      return 'success';
+    }
+    
     if (code === 'WAIS3_VOCABULAIRE') {
       // WAIS-III Vocabulaire: Standard score 8-12 is average (mean=10, SD=3)
       if (data.standard_score >= 13) return 'success';
@@ -663,6 +672,20 @@ if (code === 'FAGERSTROM') {
     }
   }
   
+  if (code === 'CBQ_SZ' && !interpretation && data.cbq_total_z !== undefined) {
+    if (data.cbq_total_z > 1.65) {
+      interpretation = 'Biais cognitifs cliniquement significatifs (Z > 1.65)';
+    } else if (data.cbq_total_z > 1.0) {
+      interpretation = 'Biais cognitifs modérément élevés';
+    } else if (data.cbq_total_z > 0.5) {
+      interpretation = 'Biais cognitifs légèrement élevés';
+    } else if (data.cbq_total_z >= -0.5) {
+      interpretation = 'Biais cognitifs dans la normale';
+    } else {
+      interpretation = 'Biais cognitifs inférieurs à la moyenne';
+    }
+  }
+  
   if (code === 'WAIS3_VOCABULAIRE' && !interpretation && data.standard_score !== undefined) {
     if (data.standard_score >= 13) {
       interpretation = 'Connaissances lexicales supérieures à la moyenne';
@@ -833,6 +856,7 @@ if (code === 'FAGERSTROM') {
               {code === 'WAIS4_MATRICES' && 'Résultats WAIS-IV Matrices'}
               {code === 'WAIS4_MATRICES_SZ' && 'Résultats WAIS-IV Matrices'}
               {code === 'SSTICS_SZ' && 'Résultats SSTICS - Plaintes Cognitives Subjectives'}
+              {code === 'CBQ_SZ' && 'Résultats CBQ - Biais Cognitifs'}
               {(code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') && 'Résultats WAIS-IV Mémoire des chiffres (Digit Span)'}
               {(code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') && 'Résultats WAIS-IV Similitudes'}
               {code === 'WAIS3_VOCABULAIRE' && 'Score WAIS-III Vocabulaire'}
@@ -913,6 +937,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.wais_mat_std !== undefined ? data.wais_mat_std : '-')
                 : code === 'SSTICS_SZ'
                 ? (data.sstics_scorez !== undefined && data.sstics_scorez !== null ? data.sstics_scorez.toFixed(2) : '-')
+                : code === 'CBQ_SZ'
+                ? (data.cbq_total_z !== undefined && data.cbq_total_z !== null ? Number(data.cbq_total_z).toFixed(2) : '-')
                 : (code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ')
                 ? (data.wais_mc_std !== undefined ? data.wais_mc_std : '-')
                 : (code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ')
@@ -1007,6 +1033,7 @@ if (code === 'FAGERSTROM') {
               {code === 'WAIS4_MATRICES' && '/19'}
               {code === 'WAIS4_MATRICES_SZ' && '/19'}
               {code === 'SSTICS_SZ' && ' (Z-score)'}
+              {code === 'CBQ_SZ' && ' (Z-score)'}
               {(code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') && '/19'}
               {(code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') && '/19'}
               {(code === 'CVLT' || code === 'CVLT_SZ') && '/80'}
@@ -2508,6 +2535,154 @@ if (code === 'FAGERSTROM') {
             {/* Interpretation note */}
             <div className="mt-2 p-2 bg-blue-50 rounded text-blue-800 text-xs">
               <strong>Interprétation:</strong> Un Z-score négatif indique plus de plaintes cognitives subjectives que la population de référence (Moyenne = 13.1, ET = 6.2).
+            </div>
+          </div>
+        )}
+
+        {/* CBQ Details */}
+        {code === 'CBQ_SZ' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Total Score Summary */}
+            <div className="bg-slate-50 p-3 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-semibold text-gray-700">Score Total CBQ</span>
+                <span className={`text-lg font-bold ${data.cbq_total_z > 1.65 ? 'text-red-600' : 'text-slate-700'}`}>
+                  {data.cbq_total ?? '-'}/90
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 text-xs">Z-score (vs. groupe contrôle)</span>
+                <span className={`font-semibold ${data.cbq_total_z > 1.65 ? 'text-red-600' : ''}`}>
+                  Z = {data.cbq_total_z !== null && data.cbq_total_z !== undefined ? Number(data.cbq_total_z).toFixed(2) : '-'}
+                  {data.cbq_total_z > 1.65 && <span className="ml-1 text-xs">(cliniquement significatif)</span>}
+                </span>
+              </div>
+            </div>
+
+            {/* Subscale Scores with Z-scores */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Scores par sous-échelle (5 types de biais cognitifs)</h5>
+              <div className="space-y-2 text-xs">
+                {/* Intentionalisation - 6 items */}
+                <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Intentionalisation</span>
+                    <span className="text-gray-500 ml-1">(6 items: Q1,3,11,13,16,21)</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-semibold">{data.cbq_intentionalisation ?? '-'}/18</span>
+                    <span className={`ml-2 ${data.cbq_intentionalisation_z > 1.65 ? 'text-red-600 font-bold' : 'text-gray-600'}`}>
+                      Z: {data.cbq_intentionalisation_z !== null && data.cbq_intentionalisation_z !== undefined ? Number(data.cbq_intentionalisation_z).toFixed(2) : '-'}
+                      {data.cbq_intentionalisation_z > 1.65 && ' ⚠'}
+                    </span>
+                  </div>
+                </div>
+                {/* Catastrophisation - 5 items */}
+                <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Catastrophisation</span>
+                    <span className="text-gray-500 ml-1">(5 items: Q2,4,12,14,22)</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-semibold">{data.cbq_catastrophisation ?? '-'}/15</span>
+                    <span className={`ml-2 ${data.cbq_catastrophisation_z > 1.65 ? 'text-red-600 font-bold' : 'text-gray-600'}`}>
+                      Z: {data.cbq_catastrophisation_z !== null && data.cbq_catastrophisation_z !== undefined ? Number(data.cbq_catastrophisation_z).toFixed(2) : '-'}
+                      {data.cbq_catastrophisation_z > 1.65 && ' ⚠'}
+                    </span>
+                  </div>
+                </div>
+                {/* Pensée dichotomique - 6 items */}
+                <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Pensée dichotomique</span>
+                    <span className="text-gray-500 ml-1">(6 items: Q5,8,18,23,26,28)</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-semibold">{data.cbq_pensee_dichotomique ?? '-'}/18</span>
+                    <span className={`ml-2 ${data.cbq_pensee_dichotomique_z > 1.65 ? 'text-red-600 font-bold' : 'text-gray-600'}`}>
+                      Z: {data.cbq_pensee_dichotomique_z !== null && data.cbq_pensee_dichotomique_z !== undefined ? Number(data.cbq_pensee_dichotomique_z).toFixed(2) : '-'}
+                      {data.cbq_pensee_dichotomique_z > 1.65 && ' ⚠'}
+                    </span>
+                  </div>
+                </div>
+                {/* Sauter aux conclusions - 6 items */}
+                <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Sauter aux conclusions (JTC)</span>
+                    <span className="text-gray-500 ml-1">(6 items: Q6,10,15,20,24,30)</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-semibold">{data.cbq_sauter_conclusions ?? '-'}/18</span>
+                    <span className={`ml-2 ${data.cbq_sauter_conclusions_z > 1.65 ? 'text-red-600 font-bold' : 'text-gray-600'}`}>
+                      Z: {data.cbq_sauter_conclusions_z !== null && data.cbq_sauter_conclusions_z !== undefined ? Number(data.cbq_sauter_conclusions_z).toFixed(2) : '-'}
+                      {data.cbq_sauter_conclusions_z > 1.65 && ' ⚠'}
+                    </span>
+                  </div>
+                </div>
+                {/* Raisonnement émotionnel - 7 items */}
+                <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Raisonnement émotionnel</span>
+                    <span className="text-gray-500 ml-1">(7 items: Q7,9,17,19,25,27,29)</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-semibold">{data.cbq_raisonnement_emotionnel ?? '-'}/21</span>
+                    <span className={`ml-2 ${data.cbq_raisonnement_emotionnel_z > 1.65 ? 'text-red-600 font-bold' : 'text-gray-600'}`}>
+                      Z: {data.cbq_raisonnement_emotionnel_z !== null && data.cbq_raisonnement_emotionnel_z !== undefined ? Number(data.cbq_raisonnement_emotionnel_z).toFixed(2) : '-'}
+                      {data.cbq_raisonnement_emotionnel_z > 1.65 && ' ⚠'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Thematic Dimensions */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Dimensions thématiques (2 thèmes)</h5>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="text-gray-700 font-medium">Thème 1: Événement Menaçant</div>
+                  <div className="text-gray-500 text-xs mb-1">Items Q1-Q15 (15 items)</div>
+                  <div className="font-semibold text-base">{data.cbq_evenement_menacant ?? '-'}/45</div>
+                </div>
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="text-gray-700 font-medium">Thème 2: Perception Anormale</div>
+                  <div className="text-gray-500 text-xs mb-1">Items Q16-Q30 (15 items)</div>
+                  <div className="font-semibold text-base">{data.cbq_perception_anormale ?? '-'}/45</div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Clinical threshold indicator */}
+            {(data.cbq_total_z > 1.65 || 
+              data.cbq_intentionalisation_z > 1.65 || 
+              data.cbq_catastrophisation_z > 1.65 || 
+              data.cbq_pensee_dichotomique_z > 1.65 || 
+              data.cbq_sauter_conclusions_z > 1.65 || 
+              data.cbq_raisonnement_emotionnel_z > 1.65) && (
+              <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded text-red-800 text-xs">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <strong>Biais cognitifs cliniquement significatifs détectés</strong>
+                    <p className="mt-1">
+                      Un ou plusieurs scores Z dépassent le seuil clinique de +1.65 (marqués par ⚠), 
+                      indiquant des biais cognitifs significativement plus élevés que la population contrôle.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Scoring explanation */}
+            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded text-blue-800 text-xs">
+              <div className="font-semibold mb-1">Interprétation des scores</div>
+              <ul className="list-disc list-inside space-y-1">
+                <li><strong>Score par item:</strong> 1 = absence de biais, 2 = biais possible, 3 = biais manifeste</li>
+                <li><strong>Calcul du Z-score:</strong> Z = (Score brut - Moyenne contrôle) / Écart-type contrôle</li>
+                <li><strong>Seuil clinique:</strong> Z &gt; +1.65 indique des biais cognitifs cliniquement significatifs</li>
+                <li><strong>Normes contrôles:</strong> Moyenne totale = 36.5, ET = 2.7</li>
+              </ul>
             </div>
           </div>
         )}

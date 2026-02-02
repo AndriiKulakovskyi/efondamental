@@ -4761,3 +4761,121 @@ export async function saveSchizophreniaSsticsSzResponse(response: any): Promise<
   }
   return data;
 }
+
+// ============================================================================
+// CBQ Functions (Neuropsy Module - Root Level)
+// ============================================================================
+
+/**
+ * Get CBQ_SZ response for a visit
+ * CBQ - Cognitive Biases Questionnaire (Questionnaire de Biais Cognitifs)
+ * Self-report questionnaire assessing cognitive biases associated with psychosis
+ */
+export async function getCbqSzResponse(visitId: string): Promise<any | null> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_cbq')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') return null; // Not found
+    console.error('Error getting schizophrenia_cbq:', error);
+    throw error;
+  }
+  return data;
+}
+
+/**
+ * Save CBQ_SZ response with scoring
+ * Calculates subscale scores, thematic dimensions, total score, and Z-scores
+ */
+export async function saveSchizophreniaCbqSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Dynamically import scoring functions
+  const { computeCbqScores } = await import('@/lib/questionnaires/schizophrenia/initial/neuropsy/cbq');
+  
+  // Extract item scores
+  const itemResponses: Record<string, any> = {};
+  for (let i = 1; i <= 30; i++) {
+    const key = `q${i}`;
+    itemResponses[key] = response[key] != null ? Number(response[key]) : null;
+  }
+  
+  // Calculate scores
+  const scores = computeCbqScores(itemResponses);
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_cbq')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      
+      // Item scores
+      q1: itemResponses.q1,
+      q2: itemResponses.q2,
+      q3: itemResponses.q3,
+      q4: itemResponses.q4,
+      q5: itemResponses.q5,
+      q6: itemResponses.q6,
+      q7: itemResponses.q7,
+      q8: itemResponses.q8,
+      q9: itemResponses.q9,
+      q10: itemResponses.q10,
+      q11: itemResponses.q11,
+      q12: itemResponses.q12,
+      q13: itemResponses.q13,
+      q14: itemResponses.q14,
+      q15: itemResponses.q15,
+      q16: itemResponses.q16,
+      q17: itemResponses.q17,
+      q18: itemResponses.q18,
+      q19: itemResponses.q19,
+      q20: itemResponses.q20,
+      q21: itemResponses.q21,
+      q22: itemResponses.q22,
+      q23: itemResponses.q23,
+      q24: itemResponses.q24,
+      q25: itemResponses.q25,
+      q26: itemResponses.q26,
+      q27: itemResponses.q27,
+      q28: itemResponses.q28,
+      q29: itemResponses.q29,
+      q30: itemResponses.q30,
+      
+      // Subscale scores
+      cbq_intentionalisation: scores.cbq_intentionalisation,
+      cbq_catastrophisation: scores.cbq_catastrophisation,
+      cbq_pensee_dichotomique: scores.cbq_pensee_dichotomique,
+      cbq_sauter_conclusions: scores.cbq_sauter_conclusions,
+      cbq_raisonnement_emotionnel: scores.cbq_raisonnement_emotionnel,
+      
+      // Thematic dimension scores
+      cbq_evenement_menacant: scores.cbq_evenement_menacant,
+      cbq_perception_anormale: scores.cbq_perception_anormale,
+      
+      // Total and Z-scores
+      cbq_total: scores.cbq_total,
+      cbq_total_z: scores.cbq_total_z,
+      cbq_intentionalisation_z: scores.cbq_intentionalisation_z,
+      cbq_catastrophisation_z: scores.cbq_catastrophisation_z,
+      cbq_pensee_dichotomique_z: scores.cbq_pensee_dichotomique_z,
+      cbq_sauter_conclusions_z: scores.cbq_sauter_conclusions_z,
+      cbq_raisonnement_emotionnel_z: scores.cbq_raisonnement_emotionnel_z,
+      
+      // Metadata
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_cbq:', error);
+    throw error;
+  }
+  return data;
+}

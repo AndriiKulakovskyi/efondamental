@@ -33,3 +33,7 @@ export { WAIS4_MATRICES_SZ_DEFINITION, WAIS4_MATRICES_SZ_QUESTIONS } from './wai
 export type { SchizophreniaWais4MatricesResponse, SchizophreniaWais4MatricesResponseInsert } from './wais4';
 export { SSTICS_SZ_DEFINITION, SSTICS_SZ_QUESTIONS, computeSsticsScores, interpretSsticsZScore, SSTICS_DOMAINS, SSTICS_NORMS } from './wais4';
 export type { SchizophreniaSsticsResponse, SchizophreniaSsticsResponseInsert, SsticsScoreResult } from './wais4';
+
+// CBQ - Cognitive Bias Questionnaire (root level)
+export { CBQ_SZ_DEFINITION, CBQ_SZ_QUESTIONS, computeCbqScores, interpretCbqZScore, CBQ_SUBSCALES, CBQ_NORMS, CBQ_CLINICAL_THRESHOLD, isSubscaleClinicallySignificant } from './cbq';
+export type { SchizophreniaCbqResponse, SchizophreniaCbqResponseInsert, CbqScoreResult } from './cbq';

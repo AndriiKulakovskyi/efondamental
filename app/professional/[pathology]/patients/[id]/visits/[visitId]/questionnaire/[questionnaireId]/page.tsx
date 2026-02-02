@@ -163,7 +163,8 @@ import {
   WAIS4_SIMILITUDES_SZ_DEFINITION,
   WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION,
   WAIS4_MATRICES_SZ_DEFINITION,
-  SSTICS_SZ_DEFINITION
+  SSTICS_SZ_DEFINITION,
+  CBQ_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { 
   getAsrmResponse, 
@@ -324,7 +325,8 @@ import {
   getWais4SimilitudesSzResponse,
   getWais4MemoireChiffresSzResponse,
   getWais4MatricesSzResponse,
-  getSsticsSzResponse
+  getSsticsSzResponse,
+  getCbqSzResponse
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -658,6 +660,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION.code) questionnaire = WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION;
   else if (code === WAIS4_MATRICES_SZ_DEFINITION.code) questionnaire = WAIS4_MATRICES_SZ_DEFINITION;
   else if (code === SSTICS_SZ_DEFINITION.code) questionnaire = SSTICS_SZ_DEFINITION;
+  else if (code === CBQ_SZ_DEFINITION.code) questionnaire = CBQ_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -833,6 +836,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION.code) existingResponse = await getWais4MemoireChiffresSzResponse(visitId);
   else if (code === WAIS4_MATRICES_SZ_DEFINITION.code) existingResponse = await getWais4MatricesSzResponse(visitId);
   else if (code === SSTICS_SZ_DEFINITION.code) existingResponse = await getSsticsSzResponse(visitId);
+  else if (code === CBQ_SZ_DEFINITION.code) existingResponse = await getCbqSzResponse(visitId);
   
   // Debug logging for PSQI_SZ
   if (code === 'PSQI_SZ') {

@@ -38,7 +38,7 @@ const QUESTIONNAIRES_WITH_SCORING = new Set([
   'EQ5D5L', 'PRISE_M', 'STAI_YA', 'MARS', 'MATHYS', 'PSQI', 'EPWORTH',
   'ASRS', 'CTQ', 'BIS10', 'ALS18', 'AIM', 'WURS25', 'AQ12', 'CSM', 'CTI',
   'MADRS', 'YMRS', 'CGI', 'EGF', 'ALDA', 'ETAT_PATIENT', 'FAST',
-  'WAIS4_MATRICES', 'WAIS4_MATRICES_SZ', 'WAIS4_SIMILITUDES', 'WAIS4_SIMILITUDES_SZ', 'WAIS4_MEMOIRE_CHIFFRES_SZ', 'SSTICS_SZ',
+  'WAIS4_MATRICES', 'WAIS4_MATRICES_SZ', 'WAIS4_SIMILITUDES', 'WAIS4_SIMILITUDES_SZ', 'WAIS4_MEMOIRE_CHIFFRES_SZ', 'SSTICS_SZ', 'CBQ_SZ',
   'WAIS4_CRITERIA', 'WAIS4_LEARNING', 'CVLT', 'CVLT_SZ', 'TMT_SZ', 'COMMISSIONS_SZ',
   'LIS_SZ', 'WAIS4_EFFICIENCE_SZ', 'WAIS4_CODE', 'WAIS_IV_CODE_SYMBOLES_IVT',
   'WAIS4_DIGIT_SPAN', 'FLUENCES_VERBALES',
@@ -214,13 +214,15 @@ export function QuestionnairePageClient({
 
       // If no scoring (Diagnostic/Orientation), redirect immediately without showing score page
       // Use the Set defined at module level for O(1) lookup
-      // Also add explicit fallbacks for WAIS4 questionnaires to ensure they always show scores
-      const code = questionnaire.code;
+      // Also add explicit fallbacks to ensure they always show scores
+      // Normalize code to uppercase for consistent comparison
+      const code = questionnaire.code?.toUpperCase() || '';
       const hasScoring = QUESTIONNAIRES_WITH_SCORING.has(code) || 
                          code === 'WAIS4_MEMOIRE_CHIFFRES_SZ' ||  // Explicit fallback
                          code === 'WAIS4_SIMILITUDES_SZ' ||       // Explicit fallback
                          code === 'WAIS4_MATRICES_SZ' ||          // Explicit fallback
-                         code === 'SSTICS_SZ';                    // Explicit fallback
+                         code === 'SSTICS_SZ' ||                  // Explicit fallback
+                         code === 'CBQ_SZ';                       // Explicit fallback
 
       if (!hasScoring) {
         // No score page for this questionnaire - redirect back to visit

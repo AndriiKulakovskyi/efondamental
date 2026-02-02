@@ -167,7 +167,8 @@ import {
   WAIS4_SIMILITUDES_SZ_DEFINITION,
   WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION,
   WAIS4_MATRICES_SZ_DEFINITION,
-  SSTICS_SZ_DEFINITION
+  SSTICS_SZ_DEFINITION,
+  CBQ_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -591,7 +592,18 @@ export default async function VisitDetailPage({
           id: 'mod_neuropsy_sz',
           name: 'Evaluation Neuropsychologique',
           description: 'Évaluation neuropsychologique',
-          questionnaires: [],
+          questionnaires: [
+            {
+              id: CBQ_SZ_DEFINITION.code,
+              code: CBQ_SZ_DEFINITION.code,
+              title: CBQ_SZ_DEFINITION.title,
+              description: CBQ_SZ_DEFINITION.description,
+              questions: CBQ_SZ_DEFINITION.questions,
+              target_role: 'patient',
+              completed: questionnaireStatuses['CBQ_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['CBQ_SZ']?.completed_at,
+            }
+          ],
           sections: [
             {
               id: 'bloc2',
