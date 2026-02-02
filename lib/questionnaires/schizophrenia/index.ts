@@ -69,5 +69,6 @@ export {
 } from './initial/entourage';
 
 export {
-  SZ_CVLT_DEFINITION
+  SZ_CVLT_DEFINITION,
+  TMT_SZ_DEFINITION
 } from './initial/neuropsy';

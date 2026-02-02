@@ -251,7 +251,8 @@ import {
   PRESENTEISME_SZ_DEFINITION,
   FAGERSTROM_SZ_DEFINITION,
   EPHP_SZ_DEFINITION,
-  SZ_CVLT_DEFINITION
+  SZ_CVLT_DEFINITION,
+  TMT_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -728,6 +729,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
                   title: SZ_CVLT_DEFINITION.title,
                   description: SZ_CVLT_DEFINITION.description,
                   questions: SZ_CVLT_DEFINITION.questions
+                },
+                {
+                  id: TMT_SZ_DEFINITION.id,
+                  code: TMT_SZ_DEFINITION.code,
+                  title: TMT_SZ_DEFINITION.title,
+                  description: TMT_SZ_DEFINITION.description,
+                  questions: TMT_SZ_DEFINITION.questions
                 }
               ]
             }

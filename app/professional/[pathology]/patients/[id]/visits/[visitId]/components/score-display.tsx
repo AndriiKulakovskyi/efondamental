@@ -290,6 +290,15 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
+    if (code === 'TMT_SZ') {
+      // TMT: Use Part A time Z-score for severity (higher Z = better)
+      const score = data.tmta_tps_z;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 0) return 'success';
+      if (score >= -1) return 'info';
+      return 'warning';
+    }
+    
     if (code === 'WAIS4_CODE' || code === 'WAIS_IV_CODE_SYMBOLES_IVT') {
       // WAIS-IV Code/Symboles/IVT: Use IVT composite if available, else Code standard score
       if (data.wais_ivt !== null && data.wais_ivt !== undefined) {
@@ -755,6 +764,7 @@ if (code === 'FAGERSTROM') {
               {code === 'WAIS3_VOCABULAIRE' && 'Score WAIS-III Vocabulaire'}
               {code === 'WAIS3_MATRICES' && 'Score WAIS-III Matrices'}
               {(code === 'CVLT' || code === 'CVLT_SZ') && 'Résultats CVLT'}
+              {code === 'TMT_SZ' && 'Résultats TMT (Trail Making Test)'}
               {code === 'FLUENCES_VERBALES' && 'Résultats Fluences Verbales (Cardebat et al., 1990)'}
               {code === 'WAIS4_CODE' && 'Résultats WAIS-IV Code'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && 'Résultats WAIS-IV Code, Symboles & IVT'}
@@ -832,6 +842,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.standard_score !== undefined ? data.standard_score : '-')
                 : (code === 'CVLT' || code === 'CVLT_SZ')
                 ? (data.total_1_5 !== undefined ? data.total_1_5 : '-')
+                : code === 'TMT_SZ'
+                ? (data.tmta_tps !== undefined ? `${data.tmta_tps}s` : '-')
                 : code === 'WAIS4_CODE'
                 ? (data.wais_cod_std !== undefined ? data.wais_cod_std : '-')
                 : code === 'WAIS_IV_CODE_SYMBOLES_IVT'
@@ -908,6 +920,7 @@ if (code === 'FAGERSTROM') {
               {code === 'WAIS4_MATRICES' && '/19'}
               {code === 'WAIS4_DIGIT_SPAN' && '/19'}
               {(code === 'CVLT' || code === 'CVLT_SZ') && '/80'}
+              {code === 'TMT_SZ' && ' (Partie A)'}
               {code === 'WAIS4_CODE' && '/19'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && (data.wais_ivt !== undefined && data.wais_ivt !== null ? '/150' : '/19')}
               {code === 'PANSS' && '/210'}
@@ -2511,6 +2524,100 @@ if (code === 'FAGERSTROM') {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* TMT Details */}
+        {code === 'TMT_SZ' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            {/* Demographics */}
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Age:</span>
+                <span className="font-medium">{data.patient_age ?? '-'} ans</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Education:</span>
+                <span className="font-medium">{data.years_of_education ?? '-'} ans</span>
+              </div>
+            </div>
+
+            {/* Part A Scores */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Partie A (Chiffres)</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Temps:</span>
+                  <span className="font-medium">{data.tmta_tps ?? '-'}s</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score / Percentile:</span>
+                  <span className="font-medium">{data.tmta_tps_z ?? '-'} / {data.tmta_tps_pc ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Erreurs totales:</span>
+                  <span className="font-medium">{data.tmta_errtot ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score / Percentile:</span>
+                  <span className="font-medium">{data.tmta_errtot_z ?? '-'} / {data.tmta_errtot_pc ?? '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Part B Scores */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Partie B (Chiffres-Lettres)</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Temps:</span>
+                  <span className="font-medium">{data.tmtb_tps ?? '-'}s</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score / Percentile:</span>
+                  <span className="font-medium">{data.tmtb_tps_z ?? '-'} / {data.tmtb_tps_pc ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Erreurs totales:</span>
+                  <span className="font-medium">{data.tmtb_errtot ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score / Percentile:</span>
+                  <span className="font-medium">{data.tmtb_errtot_z ?? '-'} / {data.tmtb_errtot_pc ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Erreurs persév:</span>
+                  <span className="font-medium">{data.tmtb_err_persev ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score / Percentile:</span>
+                  <span className="font-medium">{data.tmtb_err_persev_z ?? '-'} / {data.tmtb_err_persev_pc ?? '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* B-A Difference Scores */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">B - A (Flexibilité cognitive)</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Différence temps:</span>
+                  <span className="font-medium">{data.tmt_b_a_tps ?? '-'}s</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score / Percentile:</span>
+                  <span className="font-medium">{data.tmt_b_a_tps_z ?? '-'} / {data.tmt_b_a_tps_pc ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Différence erreurs:</span>
+                  <span className="font-medium">{data.tmt_b_a_err ?? '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score / Percentile:</span>
+                  <span className="font-medium">{data.tmt_b_a_err_z ?? '-'} / {data.tmt_b_a_err_pc ?? '-'}</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 

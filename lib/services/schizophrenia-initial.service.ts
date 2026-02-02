@@ -74,6 +74,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   
   // Neuropsy module - Bloc 2 (Neuropsychological assessments)
   'CVLT_SZ': 'schizophrenia_cvlt',
+  'TMT_SZ': 'schizophrenia_tmt',
 };
 
 // ============================================================================
@@ -3391,6 +3392,133 @@ export async function saveCvltSzResponse(response: any): Promise<any> {
   
   if (error) {
     console.error('Error saving schizophrenia_cvlt:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// TMT (Trail Making Test) - Neuropsy Bloc 2
+// ============================================================================
+
+/**
+ * Get TMT response for a visit
+ */
+export async function getTmtSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('TMT_SZ', visitId);
+}
+
+/**
+ * Save TMT response with computed Z-scores and percentiles
+ * Uses the shared TMT scoring service
+ */
+export async function saveTmtSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Convert test_done from UI format to boolean
+  // UI: 'oui' = test was done, 'non' = test was not done
+  // DB: test_done: true = test was done, false = test was not done
+  const testDone = response.test_done === 'oui' || response.test_done === true;
+  
+  // Handle case where test was not done
+  if (!testDone) {
+    const { data, error } = await supabase
+      .from('schizophrenia_tmt')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        test_done: false,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error saving schizophrenia_tmt:', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Import the scoring function dynamically to avoid circular imports
+  const { calculateTmtScores, TmtRawData } = await import('./tmt-scoring');
+  
+  // Prepare raw data for scoring (only if we have required demographics and raw inputs)
+  let computedScores: any = {};
+  
+  if (
+    response.patient_age != null && 
+    response.years_of_education != null &&
+    response.tmta_tps != null &&
+    response.tmta_err != null &&
+    response.tmtb_tps != null &&
+    response.tmtb_err != null &&
+    response.tmtb_err_persev != null
+  ) {
+    const rawData: TmtRawData = {
+      patient_age: response.patient_age,
+      years_of_education: response.years_of_education,
+      tmta_tps: response.tmta_tps,
+      tmta_err: response.tmta_err,
+      tmta_cor: response.tmta_cor ?? 0,
+      tmtb_tps: response.tmtb_tps,
+      tmtb_err: response.tmtb_err,
+      tmtb_cor: response.tmtb_cor ?? 0,
+      tmtb_err_persev: response.tmtb_err_persev
+    };
+    
+    computedScores = calculateTmtScores(rawData);
+  }
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_tmt')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      // Demographics
+      patient_age: response.patient_age,
+      years_of_education: response.years_of_education,
+      // Part A raw inputs
+      tmta_tps: response.tmta_tps,
+      tmta_err: response.tmta_err,
+      tmta_cor: response.tmta_cor,
+      // Part B raw inputs
+      tmtb_tps: response.tmtb_tps,
+      tmtb_err: response.tmtb_err,
+      tmtb_cor: response.tmtb_cor,
+      tmtb_err_persev: response.tmtb_err_persev,
+      // Computed totals
+      tmta_errtot: computedScores.tmta_errtot ?? null,
+      tmtb_errtot: computedScores.tmtb_errtot ?? null,
+      tmt_b_a_tps: computedScores.tmt_b_a_tps ?? null,
+      tmt_b_a_err: computedScores.tmt_b_a_err ?? null,
+      // Part A standardized scores
+      tmta_tps_z: computedScores.tmta_tps_z ?? null,
+      tmta_tps_pc: computedScores.tmta_tps_pc ?? null,
+      tmta_errtot_z: computedScores.tmta_errtot_z ?? null,
+      tmta_errtot_pc: computedScores.tmta_errtot_pc ?? null,
+      // Part B standardized scores
+      tmtb_tps_z: computedScores.tmtb_tps_z ?? null,
+      tmtb_tps_pc: computedScores.tmtb_tps_pc ?? null,
+      tmtb_errtot_z: computedScores.tmtb_errtot_z ?? null,
+      tmtb_errtot_pc: computedScores.tmtb_errtot_pc ?? null,
+      tmtb_err_persev_z: computedScores.tmtb_err_persev_z ?? null,
+      tmtb_err_persev_pc: computedScores.tmtb_err_persev_pc ?? null,
+      // B-A standardized scores
+      tmt_b_a_tps_z: computedScores.tmt_b_a_tps_z ?? null,
+      tmt_b_a_tps_pc: computedScores.tmt_b_a_tps_pc ?? null,
+      tmt_b_a_err_z: computedScores.tmt_b_a_err_z ?? null,
+      tmt_b_a_err_pc: computedScores.tmt_b_a_err_pc ?? null,
+      // Status and metadata
+      test_done: true,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_tmt:', error);
     throw error;
   }
   return data;

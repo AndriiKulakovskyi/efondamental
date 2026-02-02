@@ -158,7 +158,8 @@ import {
   PRESENTEISME_SZ_DEFINITION,
   FAGERSTROM_SZ_DEFINITION,
   EPHP_SZ_DEFINITION,
-  SZ_CVLT_DEFINITION
+  SZ_CVLT_DEFINITION,
+  TMT_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -597,6 +598,16 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['CVLT_SZ']?.completed || false,
                   completedAt: questionnaireStatuses['CVLT_SZ']?.completed_at,
+                },
+                {
+                  id: TMT_SZ_DEFINITION.code,
+                  code: TMT_SZ_DEFINITION.code,
+                  title: TMT_SZ_DEFINITION.title,
+                  description: TMT_SZ_DEFINITION.description,
+                  questions: TMT_SZ_DEFINITION.questions,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['TMT_SZ']?.completed || false,
+                  completedAt: questionnaireStatuses['TMT_SZ']?.completed_at,
                 }
               ]
             }

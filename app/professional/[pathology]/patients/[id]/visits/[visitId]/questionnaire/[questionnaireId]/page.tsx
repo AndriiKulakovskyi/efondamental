@@ -154,7 +154,8 @@ import {
   PRESENTEISME_SZ_DEFINITION,
   FAGERSTROM_SZ_DEFINITION,
   EPHP_SZ_DEFINITION,
-  SZ_CVLT_DEFINITION
+  SZ_CVLT_DEFINITION,
+  TMT_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { 
   getAsrmResponse, 
@@ -306,7 +307,8 @@ import {
   getPresenteismeSzResponse,
   getFagerstromSzResponse,
   getEphpSzResponse,
-  getCvltSzResponse
+  getCvltSzResponse,
+  getTmtSzResponse
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -629,6 +631,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === EPHP_SZ_DEFINITION.code) questionnaire = EPHP_SZ_DEFINITION;
   // Schizophrenia neuropsy module
   else if (code === SZ_CVLT_DEFINITION.code) questionnaire = SZ_CVLT_DEFINITION;
+  else if (code === TMT_SZ_DEFINITION.code) questionnaire = TMT_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -795,6 +798,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === EPHP_SZ_DEFINITION.code) existingResponse = await getEphpSzResponse(visitId);
   // Schizophrenia neuropsy module
   else if (code === SZ_CVLT_DEFINITION.code) existingResponse = await getCvltSzResponse(visitId);
+  else if (code === TMT_SZ_DEFINITION.code) existingResponse = await getTmtSzResponse(visitId);
   
   // Debug logging for PSQI_SZ
   if (code === 'PSQI_SZ') {
@@ -871,6 +875,12 @@ export default async function ProfessionalQuestionnairePage({
   // CVLT_SZ: Set default value for new responses (no existing data)
   // Default to 'non' so questionnaire fields are hidden initially
   if (code === 'CVLT_SZ' && !existingResponse) {
+    initialResponses.test_done = 'non';
+  }
+
+  // TMT_SZ: Set default value for new responses (no existing data)
+  // Default to 'non' so questionnaire fields are hidden initially
+  if (code === 'TMT_SZ' && !existingResponse) {
     initialResponses.test_done = 'non';
   }
 

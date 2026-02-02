@@ -173,7 +173,8 @@ import {
   savePresenteismeSzResponse as saveSchizophreniaPresenteismeResponse,
   saveFagerstromSzResponse as saveSchizophreniaFagerstromResponse,
   saveEphpSzResponse as saveSchizophreniaEphpResponse,
-  saveCvltSzResponse as saveSchizophreniaCvltSzResponse
+  saveCvltSzResponse as saveSchizophreniaCvltSzResponse,
+  saveTmtSzResponse as saveSchizophreniaTmtSzResponse
 } from '@/lib/services/schizophrenia-initial.service';
 import { 
   getVisitCompletionStatus,
@@ -246,6 +247,7 @@ function questionnaireCodeToSchizophreniaKey(code: string): string | null {
     'ECV': 'ECV',
     // Neuropsy module
     'CVLT_SZ': 'CVLT_SZ',
+    'TMT_SZ': 'TMT_SZ',
   };
   return mapping[code] || null;
 }
@@ -888,6 +890,14 @@ export async function submitProfessionalQuestionnaireAction(
       // Initial Evaluation - NEUROPSY (neuropsychological assessments)
       case 'CVLT_SZ':
         result = await saveSchizophreniaCvltSzResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        });
+        break;
+
+      case 'TMT_SZ':
+        result = await saveSchizophreniaTmtSzResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any

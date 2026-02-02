@@ -92,6 +92,7 @@ export const QUESTIONNAIRES_REQUIRING_DEMOGRAPHICS: string[] = [
   'CVLT',
   'CVLT_SZ',  // Schizophrenia CVLT
   'TMT',
+  'TMT_SZ',   // Schizophrenia TMT
   'STROOP',
   'FLUENCES_VERBALES',
   'TEST_COMMISSIONS',
@@ -135,6 +136,7 @@ export const QUESTIONNAIRES_USING_EDUCATION: string[] = [
   'CVLT',
   'CVLT_SZ',  // Schizophrenia CVLT
   'TMT',
+  'TMT_SZ',   // Schizophrenia TMT
   'FLUENCES_VERBALES',
 ];
 
