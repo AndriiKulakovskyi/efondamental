@@ -76,6 +76,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'CVLT_SZ': 'schizophrenia_cvlt',
   'TMT_SZ': 'schizophrenia_tmt',
   'COMMISSIONS_SZ': 'schizophrenia_commissions',
+  'LIS_SZ': 'schizophrenia_lis',
 };
 
 // ============================================================================
@@ -3631,6 +3632,125 @@ export async function saveCommissionsSzResponse(response: any): Promise<any> {
   
   if (error) {
     console.error('Error saving schizophrenia_commissions:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// LIS (Lecture d'Intentions Sociales) - Social Cognition Test
+// ============================================================================
+
+/**
+ * Get LIS response for a visit
+ */
+export async function getLisSzResponse(visitId: string): Promise<any | null> {
+  return getSchizophreniaInitialResponse('LIS_SZ', visitId);
+}
+
+/**
+ * Save LIS response with computed deviation score
+ * Uses the dedicated LIS scoring service
+ */
+export async function saveLisSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Convert test_done from UI format to boolean
+  // UI: 'oui' = test was done, 'non' = test was not done
+  // DB: test_done: true = test was done, false = test was not done
+  const testDone = response.test_done === 'oui' || response.test_done === true;
+  
+  // Handle case where test was not done
+  if (!testDone) {
+    const { data, error } = await supabase
+      .from('schizophrenia_lis')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        test_done: false,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error saving schizophrenia_lis:', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Import the scoring function dynamically to avoid circular imports
+  const { calculateLisScore } = await import('./lis-scoring');
+  
+  // Extract all 30 item responses
+  const itemResponses: Record<string, number | null> = {};
+  const filmLetters = ['a', 'b', 'c', 'd', 'e', 'f'];
+  
+  for (const letter of filmLetters) {
+    for (let i = 1; i <= 5; i++) {
+      const key = `lis_${letter}${i}`;
+      const value = response[key];
+      itemResponses[key] = value != null ? Number(value) : null;
+    }
+  }
+  
+  // Calculate the total deviation score
+  const lisScore = calculateLisScore(itemResponses as any);
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_lis')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      // Film A responses
+      lis_a1: itemResponses.lis_a1,
+      lis_a2: itemResponses.lis_a2,
+      lis_a3: itemResponses.lis_a3,
+      lis_a4: itemResponses.lis_a4,
+      lis_a5: itemResponses.lis_a5,
+      // Film B responses
+      lis_b1: itemResponses.lis_b1,
+      lis_b2: itemResponses.lis_b2,
+      lis_b3: itemResponses.lis_b3,
+      lis_b4: itemResponses.lis_b4,
+      lis_b5: itemResponses.lis_b5,
+      // Film C responses
+      lis_c1: itemResponses.lis_c1,
+      lis_c2: itemResponses.lis_c2,
+      lis_c3: itemResponses.lis_c3,
+      lis_c4: itemResponses.lis_c4,
+      lis_c5: itemResponses.lis_c5,
+      // Film D responses
+      lis_d1: itemResponses.lis_d1,
+      lis_d2: itemResponses.lis_d2,
+      lis_d3: itemResponses.lis_d3,
+      lis_d4: itemResponses.lis_d4,
+      lis_d5: itemResponses.lis_d5,
+      // Film E responses
+      lis_e1: itemResponses.lis_e1,
+      lis_e2: itemResponses.lis_e2,
+      lis_e3: itemResponses.lis_e3,
+      lis_e4: itemResponses.lis_e4,
+      lis_e5: itemResponses.lis_e5,
+      // Film F responses
+      lis_f1: itemResponses.lis_f1,
+      lis_f2: itemResponses.lis_f2,
+      lis_f3: itemResponses.lis_f3,
+      lis_f4: itemResponses.lis_f4,
+      lis_f5: itemResponses.lis_f5,
+      // Computed score
+      lis_score: lisScore,
+      // Status and metadata
+      test_done: true,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_lis:', error);
     throw error;
   }
   return data;

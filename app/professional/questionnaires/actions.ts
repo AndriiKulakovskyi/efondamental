@@ -175,7 +175,8 @@ import {
   saveEphpSzResponse as saveSchizophreniaEphpResponse,
   saveCvltSzResponse as saveSchizophreniaCvltSzResponse,
   saveTmtSzResponse as saveSchizophreniaTmtSzResponse,
-  saveCommissionsSzResponse as saveSchizophreniaCommissionsSzResponse
+  saveCommissionsSzResponse as saveSchizophreniaCommissionsSzResponse,
+  saveLisSzResponse as saveSchizophreniaLisSzResponse
 } from '@/lib/services/schizophrenia-initial.service';
 import { 
   getVisitCompletionStatus,
@@ -907,6 +908,14 @@ export async function submitProfessionalQuestionnaireAction(
 
       case 'COMMISSIONS_SZ':
         result = await saveSchizophreniaCommissionsSzResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        });
+        break;
+
+      case 'LIS_SZ':
+        result = await saveSchizophreniaLisSzResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any

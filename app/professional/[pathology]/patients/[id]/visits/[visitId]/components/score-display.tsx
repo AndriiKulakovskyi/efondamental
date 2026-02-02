@@ -308,6 +308,17 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
+    if (code === 'LIS_SZ') {
+      // LIS: Total deviation score where lower is better
+      // 0 = perfect match, higher = more deviation from normative values
+      const score = data.lis_score;
+      if (score === null || score === undefined) return 'info';
+      if (score <= 10) return 'success';   // Excellent social cognition
+      if (score <= 20) return 'info';      // Good social cognition
+      if (score <= 30) return 'warning';   // Moderate social cognition
+      return 'error';                      // Difficulties with social cognition
+    }
+    
     if (code === 'WAIS4_CODE' || code === 'WAIS_IV_CODE_SYMBOLES_IVT') {
       // WAIS-IV Code/Symboles/IVT: Use IVT composite if available, else Code standard score
       if (data.wais_ivt !== null && data.wais_ivt !== undefined) {
@@ -775,6 +786,7 @@ if (code === 'FAGERSTROM') {
               {(code === 'CVLT' || code === 'CVLT_SZ') && 'Résultats CVLT'}
               {code === 'TMT_SZ' && 'Résultats TMT (Trail Making Test)'}
               {code === 'COMMISSIONS_SZ' && 'Résultats Test des Commissions'}
+              {code === 'LIS_SZ' && 'Résultats LIS (Lecture d\'Intentions Sociales)'}
               {code === 'FLUENCES_VERBALES' && 'Résultats Fluences Verbales (Cardebat et al., 1990)'}
               {code === 'WAIS4_CODE' && 'Résultats WAIS-IV Code'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && 'Résultats WAIS-IV Code, Symboles & IVT'}
@@ -856,6 +868,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.tmta_tps !== undefined ? `${data.tmta_tps}s` : '-')
                 : code === 'COMMISSIONS_SZ'
                 ? (data.com01 !== undefined ? `${data.com01} min` : '-')
+                : code === 'LIS_SZ'
+                ? (data.lis_score !== undefined && data.lis_score !== null ? data.lis_score.toFixed(2) : '-')
                 : code === 'WAIS4_CODE'
                 ? (data.wais_cod_std !== undefined ? data.wais_cod_std : '-')
                 : code === 'WAIS_IV_CODE_SYMBOLES_IVT'
@@ -934,6 +948,7 @@ if (code === 'FAGERSTROM') {
               {(code === 'CVLT' || code === 'CVLT_SZ') && '/80'}
               {code === 'TMT_SZ' && ' (Partie A)'}
               {code === 'COMMISSIONS_SZ' && ' (Temps)'}
+              {code === 'LIS_SZ' && ' (Score déviation)'}
               {code === 'WAIS4_CODE' && '/19'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && (data.wais_ivt !== undefined && data.wais_ivt !== null ? '/150' : '/19')}
               {code === 'PANSS' && '/210'}
@@ -2719,6 +2734,113 @@ if (code === 'FAGERSTROM') {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* LIS Details */}
+        {code === 'LIS_SZ' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            {/* Score Interpretation */}
+            <div className={`p-3 rounded-lg ${
+              data.lis_score !== null && data.lis_score <= 10
+                ? 'bg-green-50 border border-green-200'
+                : data.lis_score !== null && data.lis_score <= 20
+                ? 'bg-blue-50 border border-blue-200'
+                : data.lis_score !== null && data.lis_score <= 30
+                ? 'bg-amber-50 border border-amber-200'
+                : 'bg-red-50 border border-red-200'
+            }`}>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold text-base">
+                    {data.lis_score === null || data.lis_score === undefined ? 'Questionnaire incomplet' :
+                     data.lis_score === 0 ? 'Parfait - Correspondance exacte' :
+                     data.lis_score <= 10 ? 'Excellente cognition sociale' :
+                     data.lis_score <= 20 ? 'Bonne cognition sociale' :
+                     data.lis_score <= 30 ? 'Cognition sociale modérée' :
+                     data.lis_score <= 45 ? 'Difficultés de cognition sociale' :
+                     'Difficultés importantes de cognition sociale'}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-600">
+                  Score de déviation = Somme des écarts absolus par rapport aux valeurs normatives. Plus le score est bas, meilleure est la cognition sociale.
+                </p>
+              </div>
+            </div>
+
+            {/* Total Score */}
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <div className="flex justify-between items-center">
+                <span className="font-semibold text-gray-700">Score total de déviation</span>
+                <span className="text-xl font-bold text-gray-900">
+                  {data.lis_score !== null && data.lis_score !== undefined ? data.lis_score.toFixed(2) : '-'}
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Basé sur 30 items (6 films × 5 explications)
+              </p>
+            </div>
+
+            {/* Film Breakdown */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">Réponses par film</h5>
+              <div className="space-y-2">
+                {/* Film A */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-medium text-gray-700">Film A: L'amende</span>
+                    <span className="text-gray-500">
+                      {[data.lis_a1, data.lis_a2, data.lis_a3, data.lis_a4, data.lis_a5].filter(v => v != null).join(', ') || '-'}
+                    </span>
+                  </div>
+                </div>
+                {/* Film B */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-medium text-gray-700">Film B: Le hoquet</span>
+                    <span className="text-gray-500">
+                      {[data.lis_b1, data.lis_b2, data.lis_b3, data.lis_b4, data.lis_b5].filter(v => v != null).join(', ') || '-'}
+                    </span>
+                  </div>
+                </div>
+                {/* Film C */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-medium text-gray-700">Film C: La blessure</span>
+                    <span className="text-gray-500">
+                      {[data.lis_c1, data.lis_c2, data.lis_c3, data.lis_c4, data.lis_c5].filter(v => v != null).join(', ') || '-'}
+                    </span>
+                  </div>
+                </div>
+                {/* Film D */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-medium text-gray-700">Film D: Le col remonté</span>
+                    <span className="text-gray-500">
+                      {[data.lis_d1, data.lis_d2, data.lis_d3, data.lis_d4, data.lis_d5].filter(v => v != null).join(', ') || '-'}
+                    </span>
+                  </div>
+                </div>
+                {/* Film E */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-medium text-gray-700">Film E: Les cafés</span>
+                    <span className="text-gray-500">
+                      {[data.lis_e1, data.lis_e2, data.lis_e3, data.lis_e4, data.lis_e5].filter(v => v != null).join(', ') || '-'}
+                    </span>
+                  </div>
+                </div>
+                {/* Film F */}
+                <div className="p-2 bg-gray-50 rounded">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-medium text-gray-700">Film F: La salle de bain</span>
+                    <span className="text-gray-500">
+                      {[data.lis_f1, data.lis_f2, data.lis_f3, data.lis_f4, data.lis_f5].filter(v => v != null).join(', ') || '-'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
