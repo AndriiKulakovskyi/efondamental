@@ -123,6 +123,7 @@ export const SZ_DOSSIER_INFIRMIER_QUESTIONS: Question[] = [
     text: 'Tension couche',
     type: 'text',
     required: false,
+    readonly: true,
     min: 10,
     max: 400
   },

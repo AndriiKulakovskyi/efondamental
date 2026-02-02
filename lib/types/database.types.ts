@@ -5429,6 +5429,7 @@ export interface PanssResponse {
   vandergaag_depressed?: number | null; // G2+G6+G3+G4 (4-28)
 
   // Metadata
+  questionnaire_done?: string | null;
   completed_by?: string | null;
   completed_at?: string | null;
   created_at?: string;

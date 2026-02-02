@@ -128,6 +128,60 @@ export async function saveSchizophreniaInitialResponse<T extends SchizophreniaQu
     throw new Error(`Unknown schizophrenia initial questionnaire code: ${questionnaireCode}`);
   }
 
+  // Specialized routing for questionnaires with scoring/custom logic
+  switch (questionnaireCode) {
+    case 'DOSSIER_INFIRMIER_SZ':
+      return await saveDossierInfirmierSzResponse(response) as any as T;
+    case 'BILAN_BIOLOGIQUE_SZ':
+      return await saveBilanBiologiqueSzResponse(response) as any as T;
+    case 'PANSS':
+      return await savePanssResponse(response) as any as T;
+    case 'CDSS':
+      return await saveCdssResponse(response) as any as T;
+    case 'BARS':
+      return await saveBarsResponse(response) as any as T;
+    case 'SUMD':
+      return await saveSumdResponse(response) as any as T;
+    case 'AIMS':
+      return await saveAimsResponse(response) as any as T;
+    case 'BARNES':
+      return await saveBarnesResponse(response) as any as T;
+    case 'SAS':
+      return await saveSasResponse(response) as any as T;
+    case 'PSP':
+      return await savePspResponse(response) as any as T;
+    case 'BILAN_SOCIAL_SZ':
+      return await saveBilanSocialSzResponse(response) as any as T;
+    case 'SQOL_SZ':
+      return await saveSqolResponse(response) as any as T;
+    case 'CTQ':
+      return await saveCtqResponse(response) as any as T;
+    case 'MARS_SZ':
+      return await saveMarsResponse(response) as any as T;
+    case 'BIS_SZ':
+      return await saveBisResponse(response) as any as T;
+    case 'EQ5D5L_SZ':
+      return await saveEq5d5lSzResponse(response) as any as T;
+    case 'IPAQ_SZ':
+      return await saveIpaqSzResponse(response) as any as T;
+    case 'YBOCS_SZ':
+      return await saveYbocsResponse(response) as any as T;
+    case 'WURS25_SZ':
+      return await saveWurs25SzResponse(response) as any as T;
+    case 'STORI_SZ':
+      return await saveStoriSzResponse(response) as any as T;
+    case 'SOGS_SZ':
+      return await saveSogsSzResponse(response) as any as T;
+    case 'PSQI_SZ':
+      return await savePsqiSzResponse(response) as any as T;
+    case 'PRESENTEISME_SZ':
+      return await savePresenteismeSzResponse(response) as any as T;
+    case 'FAGERSTROM_SZ':
+      return await saveFagerstromSzResponse(response) as any as T;
+    case 'EPHP_SZ':
+      return await saveEphpSzResponse(response) as any as T;
+  }
+
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
@@ -285,6 +339,36 @@ export async function getBilanSocialSzResponse(visitId: string) {
   return getSchizophreniaInitialResponse('BILAN_SOCIAL_SZ', visitId);
 }
 
+/**
+ * Save Bilan Social SZ response
+ */
+export async function saveBilanSocialSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  const dataToSave = { ...response };
+  
+  // Convert number to boolean for justice_safeguard if it's 1 (migration from actions.ts)
+  if (dataToSave.justice_safeguard === 1) {
+    dataToSave.justice_safeguard = true;
+  }
+
+  const { data, error } = await supabase
+    .from('schizophrenia_bilan_social')
+    .upsert({
+      ...dataToSave,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_bilan_social:', error);
+    throw error;
+  }
+  return data;
+}
+
 // Auto module (patient self-administered)
 export async function getSqolResponse(visitId: string) {
   return getSchizophreniaInitialResponse('SQOL_SZ', visitId);
@@ -307,6 +391,7 @@ export async function savePanssResponse(response: any): Promise<any> {
 
   // Remove section fields that shouldn't be saved to DB
   const {
+    questionnaire_done,
     section_positive,
     section_negative,
     section_general,
@@ -385,6 +470,7 @@ export async function savePanssResponse(response: any): Promise<any> {
     .from('schizophrenia_panss')
     .upsert({
       ...responseData,
+      questionnaire_done,
       positive_score,
       negative_score,
       general_score,
@@ -422,6 +508,7 @@ export async function saveCdssResponse(response: any): Promise<any> {
 
   const {
     cdss_instructions,
+    questionnaire_done,
     ...responseData
   } = response;
 
@@ -448,6 +535,7 @@ export async function saveCdssResponse(response: any): Promise<any> {
     .from('schizophrenia_cdss')
     .upsert({
       ...responseData,
+      questionnaire_done,
       total_score,
       has_depressive_syndrome,
       interpretation,
