@@ -23,3 +23,10 @@ export {
   type SchizophreniaWais4SimilitudesResponse,
   type SchizophreniaWais4SimilitudesResponseInsert
 } from './similitudes';
+
+export {
+  WAIS4_MEMOIRE_CHIFFRES_SZ_QUESTIONS,
+  WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION,
+  type SchizophreniaWais4MemoireChiffresResponse,
+  type SchizophreniaWais4MemoireChiffresResponseInsert
+} from './memoire-chiffres';

@@ -32,6 +32,27 @@ interface QuestionnairePageClientProps {
   submitAction: SubmitProfessionalQuestionnaireAction;
 }
 
+// Define questionnaires with scoring as a Set for O(1) lookup
+const QUESTIONNAIRES_WITH_SCORING = new Set([
+  'ASRM', 'QIDS_SR16', 'MDQ',
+  'EQ5D5L', 'PRISE_M', 'STAI_YA', 'MARS', 'MATHYS', 'PSQI', 'EPWORTH',
+  'ASRS', 'CTQ', 'BIS10', 'ALS18', 'AIM', 'WURS25', 'AQ12', 'CSM', 'CTI',
+  'MADRS', 'YMRS', 'CGI', 'EGF', 'ALDA', 'ETAT_PATIENT', 'FAST',
+  'WAIS4_MATRICES', 'WAIS4_SIMILITUDES', 'WAIS4_SIMILITUDES_SZ', 'WAIS4_MEMOIRE_CHIFFRES_SZ',
+  'WAIS4_CRITERIA', 'WAIS4_LEARNING', 'CVLT', 'CVLT_SZ', 'TMT_SZ', 'COMMISSIONS_SZ',
+  'LIS_SZ', 'WAIS4_EFFICIENCE_SZ', 'WAIS4_CODE', 'WAIS_IV_CODE_SYMBOLES_IVT',
+  'WAIS4_DIGIT_SPAN', 'FLUENCES_VERBALES',
+  'WAIS3_VOCABULAIRE', 'WAIS3_VOCABULAIRE_FR',
+  'WAIS3_MATRICES', 'WAIS3_MATRICES_FR',
+  'SOCIAL',
+  'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA',
+  'PANSS', 'CDSS', 'BARS', 'SUMD', 'AIMS', 'BARNES', 'SAS', 'PSP',
+  'ISA_FOLLOWUP',
+  'SQOL_SZ', 'CTQ_SZ', 'MARS_SZ', 'BIS_SZ', 'EQ5D5L_SZ', 'IPAQ_SZ', 'YBOCS_SZ',
+  'WURS25_SZ', 'STORI_SZ', 'SOGS_SZ', 'PSQI_SZ', 'PRESENTEISME_SZ', 'FAGERSTROM_SZ',
+  'EPHP_SZ'
+]);
+
 export function QuestionnairePageClient({
   questionnaire,
   visitId,
@@ -192,27 +213,12 @@ export function QuestionnairePageClient({
       }
 
       // If no scoring (Diagnostic/Orientation), redirect immediately without showing score page
-      const hasScoring = [
-        'ASRM', 'QIDS_SR16', 'MDQ',
-        'EQ5D5L', 'PRISE_M', 'STAI_YA', 'MARS', 'MATHYS', 'PSQI', 'EPWORTH',
-        'ASRS', 'CTQ', 'BIS10', 'ALS18', 'AIM', 'WURS25', 'AQ12', 'CSM', 'CTI',
-        'MADRS', 'YMRS', 'CGI', 'EGF', 'ALDA', 'ETAT_PATIENT', 'FAST',
-        'WAIS4_MATRICES', 'WAIS4_SIMILITUDES', 'WAIS4_SIMILITUDES_SZ', 'WAIS4_CRITERIA', 'WAIS4_LEARNING', 'CVLT', 'CVLT_SZ', 'TMT_SZ', 'COMMISSIONS_SZ', 'LIS_SZ', 'WAIS4_EFFICIENCE_SZ', 'WAIS4_CODE', 'WAIS_IV_CODE_SYMBOLES_IVT', 'WAIS4_DIGIT_SPAN', 'FLUENCES_VERBALES',
-        'WAIS3_VOCABULAIRE', 'WAIS3_VOCABULAIRE_FR',
-        'WAIS3_MATRICES', 'WAIS3_MATRICES_FR',
-        'SOCIAL',
-        'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA',
-        'PANSS', 'CDSS', 'BARS', 'SUMD', 'AIMS', 'BARNES', 'SAS', 'PSP',
-        'ISA_FOLLOWUP',
-        'SQOL_SZ', 'CTQ_SZ', 'MARS_SZ', 'BIS_SZ', 'EQ5D5L_SZ', 'IPAQ_SZ', 'YBOCS_SZ', 'WURS25_SZ', 'STORI_SZ', 'SOGS_SZ', 'PSQI_SZ', 'PRESENTEISME_SZ', 'FAGERSTROM_SZ',
-        'EPHP_SZ'
-      ].includes(questionnaire.code);
-
-      console.log('[QuestionnairePageClient] Submit success:', {
-        code: questionnaire.code,
-        hasScoring,
-        willRedirect: !hasScoring
-      });
+      // Use the Set defined at module level for O(1) lookup
+      // Also add explicit fallbacks for WAIS4 questionnaires to ensure they always show scores
+      const code = questionnaire.code;
+      const hasScoring = QUESTIONNAIRES_WITH_SCORING.has(code) || 
+                         code === 'WAIS4_MEMOIRE_CHIFFRES_SZ' ||  // Explicit fallback
+                         code === 'WAIS4_SIMILITUDES_SZ';         // Explicit fallback
 
       if (!hasScoring) {
         // No score page for this questionnaire - redirect back to visit
@@ -222,12 +228,6 @@ export function QuestionnairePageClient({
 
       // For questionnaires with scoring, show the score page
       // Use URL param to persist state across Next.js revalidation
-      console.log('[QuestionnairePageClient] Setting submitted data and showing score page:', {
-        code: questionnaire.code,
-        hasResultData: !!result.data,
-        resultDataKeys: result.data ? Object.keys(result.data) : []
-      });
-      
       setSubmittedData(result.data);
       setJustSubmitted(true);
       
@@ -252,17 +252,6 @@ export function QuestionnairePageClient({
   // The showScoreFromUrl check ensures score page persists even after Next.js revalidates
   // Use existingData as fallback when showScoreFromUrl is true (handles page reload after submission)
   const scoreData = submittedData || (showScoreFromUrl ? existingData : null);
-  
-  // Debug logging for score page display
-  console.log('[QuestionnairePageClient] Score page check:', {
-    code: questionnaire.code,
-    justSubmitted,
-    showScoreFromUrl,
-    hasSubmittedData: !!submittedData,
-    hasExistingData: !!existingData,
-    hasScoreData: !!scoreData,
-    willShowScorePage: (justSubmitted || showScoreFromUrl) && !!scoreData
-  });
   
   if ((justSubmitted || showScoreFromUrl) && scoreData) {
     return (

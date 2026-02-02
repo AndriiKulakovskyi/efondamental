@@ -82,6 +82,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'WAIS4_CRITERIA_SZ': 'schizophrenia_wais4_criteria',
   'WAIS4_EFFICIENCE_SZ': 'schizophrenia_wais4_efficience',
   'WAIS4_SIMILITUDES_SZ': 'schizophrenia_wais4_similitudes',
+  'WAIS4_MEMOIRE_CHIFFRES_SZ': 'schizophrenia_wais4_memoire_chiffres',
 };
 
 // ============================================================================
@@ -4152,6 +4153,265 @@ export async function saveWais4SimilitudesSzResponse(response: any): Promise<any
   
   if (error) {
     console.error('Error saving schizophrenia_wais4_similitudes:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// WAIS-IV Mémoire des Chiffres (Digit Span) Functions
+// ============================================================================
+
+/**
+ * Get WAIS4_MEMOIRE_CHIFFRES_SZ response for a visit
+ */
+export async function getWais4MemoireChiffresSzResponse(visitId: string): Promise<any | null> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_wais4_memoire_chiffres')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error && error.code !== 'PGRST116') {
+    console.error('Error fetching schizophrenia_wais4_memoire_chiffres:', error);
+    throw error;
+  }
+  
+  return data;
+}
+
+/**
+ * Save WAIS4_MEMOIRE_CHIFFRES_SZ response with scoring
+ * Calculates section totals, spans, span Z-scores, and standardized scores
+ */
+export async function saveWais4MemoireChiffresSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Dynamically import scoring functions
+  const { calculateDigitSpanScores } = await import('@/lib/services/wais4-digit-span-scoring');
+  
+  // Convert test_done from radio value to boolean
+  const testDone = response.test_done === 'oui' || response.test_done === true;
+  
+  // Get patient age for normative scoring
+  // Use injected patient_age from demographics (preferred), or fetch from patients table as fallback
+  let patientAge = 30; // Default age
+  
+  if (response.patient_age != null && Number(response.patient_age) > 0) {
+    // Use injected patient_age from patient demographics
+    patientAge = Number(response.patient_age);
+    console.log('[WAIS4_MEMOIRE_CHIFFRES_SZ] Using injected patient_age:', patientAge);
+  } else if (response.patient_id) {
+    // Fallback: fetch from patients table if patient_age not injected
+    console.log('[WAIS4_MEMOIRE_CHIFFRES_SZ] No injected patient_age, fetching from patients table');
+    const { data: patient } = await supabase
+      .from('patients')
+      .select('date_of_birth')
+      .eq('id', response.patient_id)
+      .single();
+    
+    if (patient?.date_of_birth) {
+      const birthDate = new Date(patient.date_of_birth);
+      const today = new Date();
+      patientAge = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        patientAge--;
+      }
+      console.log('[WAIS4_MEMOIRE_CHIFFRES_SZ] Calculated patient_age from DOB:', patientAge);
+    }
+  }
+  
+  // Prepare trial scores (map from questionnaire field names to scoring service input)
+  // The scoring service uses wais4_mcod_Xa/b format, questionnaire uses rad_wais_mcod_Xa/b
+  const scoringInput = {
+    patient_age: patientAge,
+    // Direct order trials
+    wais4_mcod_1a: response.rad_wais_mcod_1a != null ? Number(response.rad_wais_mcod_1a) : 0,
+    wais4_mcod_1b: response.rad_wais_mcod_1b != null ? Number(response.rad_wais_mcod_1b) : 0,
+    wais4_mcod_2a: response.rad_wais_mcod_2a != null ? Number(response.rad_wais_mcod_2a) : null,
+    wais4_mcod_2b: response.rad_wais_mcod_2b != null ? Number(response.rad_wais_mcod_2b) : null,
+    wais4_mcod_3a: response.rad_wais_mcod_3a != null ? Number(response.rad_wais_mcod_3a) : null,
+    wais4_mcod_3b: response.rad_wais_mcod_3b != null ? Number(response.rad_wais_mcod_3b) : null,
+    wais4_mcod_4a: response.rad_wais_mcod_4a != null ? Number(response.rad_wais_mcod_4a) : null,
+    wais4_mcod_4b: response.rad_wais_mcod_4b != null ? Number(response.rad_wais_mcod_4b) : null,
+    wais4_mcod_5a: response.rad_wais_mcod_5a != null ? Number(response.rad_wais_mcod_5a) : null,
+    wais4_mcod_5b: response.rad_wais_mcod_5b != null ? Number(response.rad_wais_mcod_5b) : null,
+    wais4_mcod_6a: response.rad_wais_mcod_6a != null ? Number(response.rad_wais_mcod_6a) : null,
+    wais4_mcod_6b: response.rad_wais_mcod_6b != null ? Number(response.rad_wais_mcod_6b) : null,
+    wais4_mcod_7a: response.rad_wais_mcod_7a != null ? Number(response.rad_wais_mcod_7a) : null,
+    wais4_mcod_7b: response.rad_wais_mcod_7b != null ? Number(response.rad_wais_mcod_7b) : null,
+    wais4_mcod_8a: response.rad_wais_mcod_8a != null ? Number(response.rad_wais_mcod_8a) : null,
+    wais4_mcod_8b: response.rad_wais_mcod_8b != null ? Number(response.rad_wais_mcod_8b) : null,
+    // Inverse order trials
+    wais4_mcoi_1a: response.rad_wais_mcoi_1a != null ? Number(response.rad_wais_mcoi_1a) : 0,
+    wais4_mcoi_1b: response.rad_wais_mcoi_1b != null ? Number(response.rad_wais_mcoi_1b) : 0,
+    wais4_mcoi_2a: response.rad_wais_mcoi_2a != null ? Number(response.rad_wais_mcoi_2a) : null,
+    wais4_mcoi_2b: response.rad_wais_mcoi_2b != null ? Number(response.rad_wais_mcoi_2b) : null,
+    wais4_mcoi_3a: response.rad_wais_mcoi_3a != null ? Number(response.rad_wais_mcoi_3a) : null,
+    wais4_mcoi_3b: response.rad_wais_mcoi_3b != null ? Number(response.rad_wais_mcoi_3b) : null,
+    wais4_mcoi_4a: response.rad_wais_mcoi_4a != null ? Number(response.rad_wais_mcoi_4a) : null,
+    wais4_mcoi_4b: response.rad_wais_mcoi_4b != null ? Number(response.rad_wais_mcoi_4b) : null,
+    wais4_mcoi_5a: response.rad_wais_mcoi_5a != null ? Number(response.rad_wais_mcoi_5a) : null,
+    wais4_mcoi_5b: response.rad_wais_mcoi_5b != null ? Number(response.rad_wais_mcoi_5b) : null,
+    wais4_mcoi_6a: response.rad_wais_mcoi_6a != null ? Number(response.rad_wais_mcoi_6a) : null,
+    wais4_mcoi_6b: response.rad_wais_mcoi_6b != null ? Number(response.rad_wais_mcoi_6b) : null,
+    wais4_mcoi_7a: response.rad_wais_mcoi_7a != null ? Number(response.rad_wais_mcoi_7a) : null,
+    wais4_mcoi_7b: response.rad_wais_mcoi_7b != null ? Number(response.rad_wais_mcoi_7b) : null,
+    wais4_mcoi_8a: response.rad_wais_mcoi_8a != null ? Number(response.rad_wais_mcoi_8a) : null,
+    wais4_mcoi_8b: response.rad_wais_mcoi_8b != null ? Number(response.rad_wais_mcoi_8b) : null,
+    // Croissant (ascending) order trials
+    wais4_mcoc_1a: response.rad_wais_mcoc_1a != null ? Number(response.rad_wais_mcoc_1a) : 0,
+    wais4_mcoc_1b: response.rad_wais_mcoc_1b != null ? Number(response.rad_wais_mcoc_1b) : 0,
+    wais4_mcoc_2a: response.rad_wais_mcoc_2a != null ? Number(response.rad_wais_mcoc_2a) : null,
+    wais4_mcoc_2b: response.rad_wais_mcoc_2b != null ? Number(response.rad_wais_mcoc_2b) : null,
+    wais4_mcoc_3a: response.rad_wais_mcoc_3a != null ? Number(response.rad_wais_mcoc_3a) : null,
+    wais4_mcoc_3b: response.rad_wais_mcoc_3b != null ? Number(response.rad_wais_mcoc_3b) : null,
+    wais4_mcoc_4a: response.rad_wais_mcoc_4a != null ? Number(response.rad_wais_mcoc_4a) : null,
+    wais4_mcoc_4b: response.rad_wais_mcoc_4b != null ? Number(response.rad_wais_mcoc_4b) : null,
+    wais4_mcoc_5a: response.rad_wais_mcoc_5a != null ? Number(response.rad_wais_mcoc_5a) : null,
+    wais4_mcoc_5b: response.rad_wais_mcoc_5b != null ? Number(response.rad_wais_mcoc_5b) : null,
+    wais4_mcoc_6a: response.rad_wais_mcoc_6a != null ? Number(response.rad_wais_mcoc_6a) : null,
+    wais4_mcoc_6b: response.rad_wais_mcoc_6b != null ? Number(response.rad_wais_mcoc_6b) : null,
+    wais4_mcoc_7a: response.rad_wais_mcoc_7a != null ? Number(response.rad_wais_mcoc_7a) : null,
+    wais4_mcoc_7b: response.rad_wais_mcoc_7b != null ? Number(response.rad_wais_mcoc_7b) : null,
+    wais4_mcoc_8a: response.rad_wais_mcoc_8a != null ? Number(response.rad_wais_mcoc_8a) : null,
+    wais4_mcoc_8b: response.rad_wais_mcoc_8b != null ? Number(response.rad_wais_mcoc_8b) : null,
+  };
+  
+  // Calculate scores only if test was done
+  let scores = null;
+  if (testDone) {
+    scores = calculateDigitSpanScores(scoringInput);
+    console.log('[WAIS4_MEMOIRE_CHIFFRES_SZ] Calculated scores:', scores);
+  }
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_wais4_memoire_chiffres')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      
+      // Demographics for scoring (stored for audit/replication)
+      patient_age: patientAge,
+      
+      // Test status
+      test_done: testDone,
+      
+      // Direct order trials
+      rad_wais_mcod_1a: testDone ? scoringInput.wais4_mcod_1a : null,
+      rad_wais_mcod_1b: testDone ? scoringInput.wais4_mcod_1b : null,
+      rad_wais_mcod_2a: testDone ? scoringInput.wais4_mcod_2a : null,
+      rad_wais_mcod_2b: testDone ? scoringInput.wais4_mcod_2b : null,
+      rad_wais_mcod_3a: testDone ? scoringInput.wais4_mcod_3a : null,
+      rad_wais_mcod_3b: testDone ? scoringInput.wais4_mcod_3b : null,
+      rad_wais_mcod_4a: testDone ? scoringInput.wais4_mcod_4a : null,
+      rad_wais_mcod_4b: testDone ? scoringInput.wais4_mcod_4b : null,
+      rad_wais_mcod_5a: testDone ? scoringInput.wais4_mcod_5a : null,
+      rad_wais_mcod_5b: testDone ? scoringInput.wais4_mcod_5b : null,
+      rad_wais_mcod_6a: testDone ? scoringInput.wais4_mcod_6a : null,
+      rad_wais_mcod_6b: testDone ? scoringInput.wais4_mcod_6b : null,
+      rad_wais_mcod_7a: testDone ? scoringInput.wais4_mcod_7a : null,
+      rad_wais_mcod_7b: testDone ? scoringInput.wais4_mcod_7b : null,
+      rad_wais_mcod_8a: testDone ? scoringInput.wais4_mcod_8a : null,
+      rad_wais_mcod_8b: testDone ? scoringInput.wais4_mcod_8b : null,
+      
+      // Inverse order trials
+      rad_wais_mcoi_1a: testDone ? scoringInput.wais4_mcoi_1a : null,
+      rad_wais_mcoi_1b: testDone ? scoringInput.wais4_mcoi_1b : null,
+      rad_wais_mcoi_2a: testDone ? scoringInput.wais4_mcoi_2a : null,
+      rad_wais_mcoi_2b: testDone ? scoringInput.wais4_mcoi_2b : null,
+      rad_wais_mcoi_3a: testDone ? scoringInput.wais4_mcoi_3a : null,
+      rad_wais_mcoi_3b: testDone ? scoringInput.wais4_mcoi_3b : null,
+      rad_wais_mcoi_4a: testDone ? scoringInput.wais4_mcoi_4a : null,
+      rad_wais_mcoi_4b: testDone ? scoringInput.wais4_mcoi_4b : null,
+      rad_wais_mcoi_5a: testDone ? scoringInput.wais4_mcoi_5a : null,
+      rad_wais_mcoi_5b: testDone ? scoringInput.wais4_mcoi_5b : null,
+      rad_wais_mcoi_6a: testDone ? scoringInput.wais4_mcoi_6a : null,
+      rad_wais_mcoi_6b: testDone ? scoringInput.wais4_mcoi_6b : null,
+      rad_wais_mcoi_7a: testDone ? scoringInput.wais4_mcoi_7a : null,
+      rad_wais_mcoi_7b: testDone ? scoringInput.wais4_mcoi_7b : null,
+      rad_wais_mcoi_8a: testDone ? scoringInput.wais4_mcoi_8a : null,
+      rad_wais_mcoi_8b: testDone ? scoringInput.wais4_mcoi_8b : null,
+      
+      // Croissant order trials
+      rad_wais_mcoc_1a: testDone ? scoringInput.wais4_mcoc_1a : null,
+      rad_wais_mcoc_1b: testDone ? scoringInput.wais4_mcoc_1b : null,
+      rad_wais_mcoc_2a: testDone ? scoringInput.wais4_mcoc_2a : null,
+      rad_wais_mcoc_2b: testDone ? scoringInput.wais4_mcoc_2b : null,
+      rad_wais_mcoc_3a: testDone ? scoringInput.wais4_mcoc_3a : null,
+      rad_wais_mcoc_3b: testDone ? scoringInput.wais4_mcoc_3b : null,
+      rad_wais_mcoc_4a: testDone ? scoringInput.wais4_mcoc_4a : null,
+      rad_wais_mcoc_4b: testDone ? scoringInput.wais4_mcoc_4b : null,
+      rad_wais_mcoc_5a: testDone ? scoringInput.wais4_mcoc_5a : null,
+      rad_wais_mcoc_5b: testDone ? scoringInput.wais4_mcoc_5b : null,
+      rad_wais_mcoc_6a: testDone ? scoringInput.wais4_mcoc_6a : null,
+      rad_wais_mcoc_6b: testDone ? scoringInput.wais4_mcoc_6b : null,
+      rad_wais_mcoc_7a: testDone ? scoringInput.wais4_mcoc_7a : null,
+      rad_wais_mcoc_7b: testDone ? scoringInput.wais4_mcoc_7b : null,
+      rad_wais_mcoc_8a: testDone ? scoringInput.wais4_mcoc_8a : null,
+      rad_wais_mcoc_8b: testDone ? scoringInput.wais4_mcoc_8b : null,
+      
+      // Computed item scores (trial_a + trial_b)
+      wais_mcod_1: scores?.wais_mcod_1 ?? null,
+      wais_mcod_2: scores?.wais_mcod_2 ?? null,
+      wais_mcod_3: scores?.wais_mcod_3 ?? null,
+      wais_mcod_4: scores?.wais_mcod_4 ?? null,
+      wais_mcod_5: scores?.wais_mcod_5 ?? null,
+      wais_mcod_6: scores?.wais_mcod_6 ?? null,
+      wais_mcod_7: scores?.wais_mcod_7 ?? null,
+      wais_mcod_8: scores?.wais_mcod_8 ?? null,
+      
+      wais_mcoi_1: scores?.wais_mcoi_1 ?? null,
+      wais_mcoi_2: scores?.wais_mcoi_2 ?? null,
+      wais_mcoi_3: scores?.wais_mcoi_3 ?? null,
+      wais_mcoi_4: scores?.wais_mcoi_4 ?? null,
+      wais_mcoi_5: scores?.wais_mcoi_5 ?? null,
+      wais_mcoi_6: scores?.wais_mcoi_6 ?? null,
+      wais_mcoi_7: scores?.wais_mcoi_7 ?? null,
+      wais_mcoi_8: scores?.wais_mcoi_8 ?? null,
+      
+      wais_mcoc_1: scores?.wais_mcoc_1 ?? null,
+      wais_mcoc_2: scores?.wais_mcoc_2 ?? null,
+      wais_mcoc_3: scores?.wais_mcoc_3 ?? null,
+      wais_mcoc_4: scores?.wais_mcoc_4 ?? null,
+      wais_mcoc_5: scores?.wais_mcoc_5 ?? null,
+      wais_mcoc_6: scores?.wais_mcoc_6 ?? null,
+      wais_mcoc_7: scores?.wais_mcoc_7 ?? null,
+      wais_mcoc_8: scores?.wais_mcoc_8 ?? null,
+      
+      // Section totals
+      wais_mcod_tot: scores?.wais_mcod_tot ?? null,
+      wais_mcoi_tot: scores?.wais_mcoi_tot ?? null,
+      wais_mcoc_tot: scores?.wais_mcoc_tot ?? null,
+      
+      // Spans
+      wais_mc_end: scores?.wais_mc_end ?? null,
+      wais_mc_env: scores?.wais_mc_env ?? null,
+      wais_mc_cro: scores?.wais_mc_cro ?? null,
+      wais_mc_emp: scores?.wais_mc_emp ?? null,
+      
+      // Span Z-scores
+      wais_mc_end_std: scores?.wais_mc_end_std ?? null,
+      wais_mc_env_std: scores?.wais_mc_env_std ?? null,
+      wais_mc_cro_std: scores?.wais_mc_cro_std ?? null,
+      
+      // Total scores
+      wais_mc_tot: scores?.wais_mc_tot ?? null,
+      wais_mc_std: scores?.wais_mc_std ?? null,
+      wais_mc_cr: scores?.wais_mc_cr ?? null,
+      
+      // Metadata
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_wais4_memoire_chiffres:', error);
     throw error;
   }
   return data;

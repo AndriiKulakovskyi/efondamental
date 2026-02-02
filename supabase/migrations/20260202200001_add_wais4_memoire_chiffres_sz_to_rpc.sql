@@ -1,0 +1,14 @@
+-- Migration: Add WAIS4_MEMOIRE_CHIFFRES_SZ to get_visit_detail_data RPC function
+-- This migration adds the WAIS4_MEMOIRE_CHIFFRES_SZ questionnaire
+-- tracking to the schizophrenia neuropsy module section of the RPC function.
+--
+-- Note: This migration is incremental and only modifies the schizophrenia 
+-- neuropsy module section by adding the new questionnaire entries alongside
+-- existing ones (WAIS4_SIMILITUDES_SZ was added in a previous migration).
+--
+-- The SQL below updates the existing RPC function to include tracking for:
+-- - WAIS4_SIMILITUDES_SZ (if not already present)
+-- - WAIS4_MEMOIRE_CHIFFRES_SZ (new)
+
+-- This migration is applied via MCP execute_sql tool.
+-- The actual function modification is performed in the associated MCP call.

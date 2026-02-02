@@ -91,6 +91,7 @@ export const QUESTIONNAIRES_REQUIRING_DEMOGRAPHICS: string[] = [
   // Schizophrenia WAIS-IV questionnaires (use neuro_age for scoring)
   'WAIS4_CRITERIA_SZ',
   'WAIS4_SIMILITUDES_SZ',  // Uses patient_age for age-based norm tables
+  'WAIS4_MEMOIRE_CHIFFRES_SZ',  // Uses patient_age for age-based norm tables and span Z-scores
   
   // Cognitive assessments (require age/sex/education for scoring)
   'CVLT',

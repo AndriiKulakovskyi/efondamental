@@ -241,7 +241,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
-    if (code === 'WAIS4_DIGIT_SPAN') {
+    if (code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') {
       // WAIS-IV Digit Span: Standardized score 8-12 is average (mean=10, SD=3)
       if (data.wais_mc_std >= 13) return 'success';
       if (data.wais_mc_std >= 8) return 'info';
@@ -658,7 +658,7 @@ if (code === 'FAGERSTROM') {
     }
   }
   
-  if (code === 'WAIS4_DIGIT_SPAN' && !interpretation && data.wais_mc_std !== undefined) {
+  if ((code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') && !interpretation && data.wais_mc_std !== undefined) {
     if (data.wais_mc_std >= 13) {
       interpretation = 'Mémoire de travail supérieure à la moyenne';
     } else if (data.wais_mc_std >= 8) {
@@ -790,7 +790,7 @@ if (code === 'FAGERSTROM') {
               {code === 'MADRS' && 'Résultats MADRS - Échelle de Dépression'}
               {code === 'YMRS' && 'Résultats YMRS - Échelle de Manie'}
               {code === 'WAIS4_MATRICES' && 'Résultats WAIS-IV Matrices'}
-              {code === 'WAIS4_DIGIT_SPAN' && 'Résultats WAIS-IV Mémoire des chiffres (Digit Span)'}
+              {(code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') && 'Résultats WAIS-IV Mémoire des chiffres (Digit Span)'}
               {(code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') && 'Résultats WAIS-IV Similitudes'}
               {code === 'WAIS3_VOCABULAIRE' && 'Score WAIS-III Vocabulaire'}
               {code === 'WAIS3_MATRICES' && 'Score WAIS-III Matrices'}
@@ -866,7 +866,7 @@ if (code === 'FAGERSTROM') {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'WAIS4_MATRICES'
                 ? (data.standardized_score !== undefined ? data.standardized_score : '-')
-                : code === 'WAIS4_DIGIT_SPAN'
+                : (code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ')
                 ? (data.wais_mc_std !== undefined ? data.wais_mc_std : '-')
                 : (code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ')
                 ? (data.standard_score !== undefined ? data.standard_score : '-')
@@ -958,7 +958,7 @@ if (code === 'FAGERSTROM') {
               {code === 'MADRS' && '/60'}
               {code === 'YMRS' && '/60'}
               {code === 'WAIS4_MATRICES' && '/19'}
-              {code === 'WAIS4_DIGIT_SPAN' && '/19'}
+              {(code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') && '/19'}
               {(code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') && '/19'}
               {(code === 'CVLT' || code === 'CVLT_SZ') && '/80'}
               {code === 'TMT_SZ' && ' (Partie A)'}
@@ -3177,7 +3177,7 @@ if (code === 'FAGERSTROM') {
         )}
 
         {/* WAIS-IV Digit Span Details */}
-        {code === 'WAIS4_DIGIT_SPAN' && (
+        {(code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') && (
           <div className="text-sm space-y-3 mt-2 pt-2 border-t">
             {/* Section Totals */}
             <div>

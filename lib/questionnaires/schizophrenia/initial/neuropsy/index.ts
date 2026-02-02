@@ -27,3 +27,5 @@ export { WAIS4_EFFICIENCE_SZ_DEFINITION, WAIS4_EFFICIENCE_SZ_QUESTIONS } from '.
 export type { SchizophreniaWais4EfficienceResponse, SchizophreniaWais4EfficienceResponseInsert } from './wais4';
 export { WAIS4_SIMILITUDES_SZ_DEFINITION, WAIS4_SIMILITUDES_SZ_QUESTIONS } from './wais4';
 export type { SchizophreniaWais4SimilitudesResponse, SchizophreniaWais4SimilitudesResponseInsert } from './wais4';
+export { WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION, WAIS4_MEMOIRE_CHIFFRES_SZ_QUESTIONS } from './wais4';
+export type { SchizophreniaWais4MemoireChiffresResponse, SchizophreniaWais4MemoireChiffresResponseInsert } from './wais4';

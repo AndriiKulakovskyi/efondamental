@@ -179,7 +179,8 @@ import {
   saveLisSzResponse as saveSchizophreniaLisSzResponse,
   saveWais4CriteriaSzResponse as saveSchizophreniaWais4CriteriaSzResponse,
   saveWais4EfficienceSzResponse as saveSchizophreniaWais4EfficienceSzResponse,
-  saveWais4SimilitudesSzResponse as saveSchizophreniaWais4SimilitudesSzResponse
+  saveWais4SimilitudesSzResponse as saveSchizophreniaWais4SimilitudesSzResponse,
+  saveWais4MemoireChiffresSzResponse as saveSchizophreniaWais4MemoireChiffresSzResponse
 } from '@/lib/services/schizophrenia-initial.service';
 import { 
   getVisitCompletionStatus,
@@ -947,6 +948,16 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...responses as any
         });
+        break;
+
+      case 'WAIS4_MEMOIRE_CHIFFRES_SZ':
+        console.log('[Server Action] WAIS4_MEMOIRE_CHIFFRES_SZ - saving response');
+        result = await saveSchizophreniaWais4MemoireChiffresSzResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        });
+        console.log('[Server Action] WAIS4_MEMOIRE_CHIFFRES_SZ - result:', result ? 'success' : 'null', 'wais_mc_std:', result?.wais_mc_std);
         break;
 
       // Initial Evaluation - ETAT (using bipolar-initial.service.ts)

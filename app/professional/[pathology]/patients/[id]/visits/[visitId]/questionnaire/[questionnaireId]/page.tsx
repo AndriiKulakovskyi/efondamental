@@ -160,7 +160,8 @@ import {
   LIS_SZ_DEFINITION,
   WAIS4_CRITERIA_SZ_DEFINITION,
   WAIS4_EFFICIENCE_SZ_DEFINITION,
-  WAIS4_SIMILITUDES_SZ_DEFINITION
+  WAIS4_SIMILITUDES_SZ_DEFINITION,
+  WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { 
   getAsrmResponse, 
@@ -318,7 +319,8 @@ import {
   getLisSzResponse,
   getWais4CriteriaSzResponse,
   getWais4EfficienceSzResponse,
-  getWais4SimilitudesSzResponse
+  getWais4SimilitudesSzResponse,
+  getWais4MemoireChiffresSzResponse
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -649,6 +651,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS4_CRITERIA_SZ_DEFINITION.code) questionnaire = WAIS4_CRITERIA_SZ_DEFINITION;
   else if (code === WAIS4_EFFICIENCE_SZ_DEFINITION.code) questionnaire = WAIS4_EFFICIENCE_SZ_DEFINITION;
   else if (code === WAIS4_SIMILITUDES_SZ_DEFINITION.code) questionnaire = WAIS4_SIMILITUDES_SZ_DEFINITION;
+  else if (code === WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION.code) questionnaire = WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -821,10 +824,23 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === WAIS4_CRITERIA_SZ_DEFINITION.code) existingResponse = await getWais4CriteriaSzResponse(visitId);
   else if (code === WAIS4_EFFICIENCE_SZ_DEFINITION.code) existingResponse = await getWais4EfficienceSzResponse(visitId);
   else if (code === WAIS4_SIMILITUDES_SZ_DEFINITION.code) existingResponse = await getWais4SimilitudesSzResponse(visitId);
+  else if (code === WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION.code) existingResponse = await getWais4MemoireChiffresSzResponse(visitId);
   
   // Debug logging for PSQI_SZ
   if (code === 'PSQI_SZ') {
     console.log('[Page.tsx] PSQI_SZ existingResponse:', existingResponse ? 'Found' : 'Not found', existingResponse?.total_score);
+  }
+  
+  // Debug logging for WAIS4_MEMOIRE_CHIFFRES_SZ
+  if (code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') {
+    console.log('[Page.tsx] WAIS4_MEMOIRE_CHIFFRES_SZ existingResponse:', existingResponse ? 'Found' : 'Not found');
+    if (existingResponse) {
+      console.log('[Page.tsx] WAIS4_MEMOIRE_CHIFFRES_SZ scores:', {
+        wais_mc_std: existingResponse.wais_mc_std,
+        wais_mc_tot: existingResponse.wais_mc_tot,
+        wais_mc_cr: existingResponse.wais_mc_cr
+      });
+    }
   }
 
   // Map DB response to initialResponses (key-value map)
@@ -1236,6 +1252,18 @@ export default async function ProfessionalQuestionnairePage({
       })
     };
     console.log('[Fluences Verbales Debug] Filtered out score fields. Original questions:', serializableQuestionnaire.questions.length, 'Filtered:', filteredQuestionnaire.questions.length);
+  }
+
+  // Debug logging for questionnaire being passed to client
+  if (code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') {
+    console.log('[Page.tsx] Passing to client:', {
+      questionnaireCode: filteredQuestionnaire.code,
+      hasExistingResponse: !!existingResponse,
+      existingResponseHasScores: existingResponse ? {
+        wais_mc_std: existingResponse.wais_mc_std,
+        wais_mc_tot: existingResponse.wais_mc_tot
+      } : null
+    });
   }
 
   return (
