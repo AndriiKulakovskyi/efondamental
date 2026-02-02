@@ -29,3 +29,7 @@ export { WAIS4_SIMILITUDES_SZ_DEFINITION, WAIS4_SIMILITUDES_SZ_QUESTIONS } from 
 export type { SchizophreniaWais4SimilitudesResponse, SchizophreniaWais4SimilitudesResponseInsert } from './wais4';
 export { WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION, WAIS4_MEMOIRE_CHIFFRES_SZ_QUESTIONS } from './wais4';
 export type { SchizophreniaWais4MemoireChiffresResponse, SchizophreniaWais4MemoireChiffresResponseInsert } from './wais4';
+export { WAIS4_MATRICES_SZ_DEFINITION, WAIS4_MATRICES_SZ_QUESTIONS } from './wais4';
+export type { SchizophreniaWais4MatricesResponse, SchizophreniaWais4MatricesResponseInsert } from './wais4';
+export { SSTICS_SZ_DEFINITION, SSTICS_SZ_QUESTIONS, computeSsticsScores, interpretSsticsZScore, SSTICS_DOMAINS, SSTICS_NORMS } from './wais4';
+export type { SchizophreniaSsticsResponse, SchizophreniaSsticsResponseInsert, SsticsScoreResult } from './wais4';

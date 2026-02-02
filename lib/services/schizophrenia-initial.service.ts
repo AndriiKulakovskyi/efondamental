@@ -4416,3 +4416,260 @@ export async function saveWais4MemoireChiffresSzResponse(response: any): Promise
   }
   return data;
 }
+
+// ============================================================================
+// WAIS-IV Matrices Functions (Neuropsy - WAIS-IV submodule)
+// ============================================================================
+
+/**
+ * Get WAIS4_MATRICES_SZ response for a visit
+ * WAIS-IV Matrices subtest - Perceptual reasoning test assessing fluid intelligence
+ */
+export async function getWais4MatricesSzResponse(visitId: string): Promise<any | null> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_wais4_matrices')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') return null; // Not found
+    console.error('Error getting schizophrenia_wais4_matrices:', error);
+    throw error;
+  }
+  return data;
+}
+
+/**
+ * Save WAIS4_MATRICES_SZ response with scoring
+ * Calculates total raw score, age-based standard score, and z-score
+ * Applies discontinuation rule: null scores if 4 consecutive zeros or 4/5 zeros
+ */
+export async function saveSchizophreniaWais4MatricesSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Dynamically import scoring functions
+  const { calculateWais4MatricesSzScores } = await import('@/lib/services/wais4-matrices-sz-scoring');
+  
+  // Convert test_done from radio value to boolean
+  const testDone = response.test_done === 'oui' || response.test_done === true;
+  
+  // Get patient age - prefer injected value, fallback to patient DOB
+  let patientAge = 30; // Default fallback
+  if (response.patient_age != null && Number(response.patient_age) > 0) {
+    patientAge = Number(response.patient_age);
+  } else if (response.patient_id) {
+    // Fallback: fetch from patients table
+    const { data: patient } = await supabase
+      .from('patients')
+      .select('date_of_birth')
+      .eq('id', response.patient_id)
+      .single();
+    
+    if (patient?.date_of_birth) {
+      const birthDate = new Date(patient.date_of_birth);
+      const today = new Date();
+      patientAge = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        patientAge--;
+      }
+    }
+  }
+  
+  // Extract item scores
+  const items = [
+    response.rad_wais_mat1,
+    response.rad_wais_mat2,
+    response.rad_wais_mat3,
+    response.rad_wais_mat4,
+    response.rad_wais_mat5,
+    response.rad_wais_mat6,
+    response.rad_wais_mat7,
+    response.rad_wais_mat8,
+    response.rad_wais_mat9,
+    response.rad_wais_mat10,
+    response.rad_wais_mat11,
+    response.rad_wais_mat12,
+    response.rad_wais_mat13,
+    response.rad_wais_mat14,
+    response.rad_wais_mat15,
+    response.rad_wais_mat16,
+    response.rad_wais_mat17,
+    response.rad_wais_mat18,
+    response.rad_wais_mat19,
+    response.rad_wais_mat20,
+    response.rad_wais_mat21,
+    response.rad_wais_mat22,
+    response.rad_wais_mat23,
+    response.rad_wais_mat24,
+    response.rad_wais_mat25,
+    response.rad_wais_mat26,
+  ].map(item => item != null ? Number(item) : null);
+  
+  // Calculate scores only if test was done
+  let scores = null;
+  if (testDone) {
+    scores = calculateWais4MatricesSzScores({
+      patient_age: patientAge,
+      items
+    });
+  }
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_wais4_matrices')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      patient_age: patientAge,
+      test_done: testDone,
+      
+      // Item scores (null if test not done)
+      rad_wais_mat1: testDone ? items[0] : null,
+      rad_wais_mat2: testDone ? items[1] : null,
+      rad_wais_mat3: testDone ? items[2] : null,
+      rad_wais_mat4: testDone ? items[3] : null,
+      rad_wais_mat5: testDone ? items[4] : null,
+      rad_wais_mat6: testDone ? items[5] : null,
+      rad_wais_mat7: testDone ? items[6] : null,
+      rad_wais_mat8: testDone ? items[7] : null,
+      rad_wais_mat9: testDone ? items[8] : null,
+      rad_wais_mat10: testDone ? items[9] : null,
+      rad_wais_mat11: testDone ? items[10] : null,
+      rad_wais_mat12: testDone ? items[11] : null,
+      rad_wais_mat13: testDone ? items[12] : null,
+      rad_wais_mat14: testDone ? items[13] : null,
+      rad_wais_mat15: testDone ? items[14] : null,
+      rad_wais_mat16: testDone ? items[15] : null,
+      rad_wais_mat17: testDone ? items[16] : null,
+      rad_wais_mat18: testDone ? items[17] : null,
+      rad_wais_mat19: testDone ? items[18] : null,
+      rad_wais_mat20: testDone ? items[19] : null,
+      rad_wais_mat21: testDone ? items[20] : null,
+      rad_wais_mat22: testDone ? items[21] : null,
+      rad_wais_mat23: testDone ? items[22] : null,
+      rad_wais_mat24: testDone ? items[23] : null,
+      rad_wais_mat25: testDone ? items[24] : null,
+      rad_wais_mat26: testDone ? items[25] : null,
+      
+      // Computed scores
+      wais_mat_tot: scores?.wais_mat_tot ?? null,
+      wais_mat_std: scores?.wais_mat_std ?? null,
+      wais_mat_cr: scores?.wais_mat_cr ?? null,
+      
+      // Metadata
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_wais4_matrices:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// SSTICS Functions (Neuropsy - WAIS-IV submodule)
+// ============================================================================
+
+/**
+ * Get SSTICS_SZ response for a visit
+ * SSTICS - Subjective Scale to Investigate Cognition in Schizophrenia
+ * Self-report questionnaire assessing subjective cognitive complaints
+ */
+export async function getSsticsSzResponse(visitId: string): Promise<any | null> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_sstics')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') return null; // Not found
+    console.error('Error getting schizophrenia_sstics:', error);
+    throw error;
+  }
+  return data;
+}
+
+/**
+ * Save SSTICS_SZ response with scoring
+ * Calculates domain subscores, total score, and Z-score
+ */
+export async function saveSchizophreniaSsticsSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Dynamically import scoring functions
+  const { computeSsticsScores } = await import('@/lib/questionnaires/schizophrenia/initial/neuropsy/wais4/sstics');
+  
+  // Extract item scores
+  const itemResponses: Record<string, any> = {};
+  for (let i = 1; i <= 21; i++) {
+    const key = `q${i}`;
+    itemResponses[key] = response[key] != null ? Number(response[key]) : null;
+  }
+  
+  // Calculate scores
+  const scores = computeSsticsScores(itemResponses);
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_sstics')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      
+      // Item scores
+      q1: itemResponses.q1,
+      q2: itemResponses.q2,
+      q3: itemResponses.q3,
+      q4: itemResponses.q4,
+      q5: itemResponses.q5,
+      q6: itemResponses.q6,
+      q7: itemResponses.q7,
+      q8: itemResponses.q8,
+      q9: itemResponses.q9,
+      q10: itemResponses.q10,
+      q11: itemResponses.q11,
+      q12: itemResponses.q12,
+      q13: itemResponses.q13,
+      q14: itemResponses.q14,
+      q15: itemResponses.q15,
+      q16: itemResponses.q16,
+      q17: itemResponses.q17,
+      q18: itemResponses.q18,
+      q19: itemResponses.q19,
+      q20: itemResponses.q20,
+      q21: itemResponses.q21,
+      
+      // Domain subscores
+      sstics_memt: scores.sstics_memt,
+      sstics_memexp: scores.sstics_memexp,
+      sstics_att: scores.sstics_att,
+      sstics_fe: scores.sstics_fe,
+      sstics_lang: scores.sstics_lang,
+      sstics_prax: scores.sstics_prax,
+      
+      // Total and Z-score
+      sstics_score: scores.sstics_score,
+      sstics_scorez: scores.sstics_scorez,
+      
+      // Metadata
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_sstics:', error);
+    throw error;
+  }
+  return data;
+}

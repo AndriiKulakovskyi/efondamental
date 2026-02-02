@@ -36,7 +36,7 @@ import {
   calculateStandardizedScore,
   calculatePercentileRank,
   calculateDeviationFromMean
-} from "@/lib/services/wais4-matrices-scoring";
+} from "@/lib/services/wais4-matrices-bp-scoring";
 import { calculateWais4CodeSymbolesScores } from "@/lib/services/wais4-code-scoring";
 import { calculateDigitSpanScores } from "@/lib/services/wais4-digit-span-scoring";
 import { Loader2, ChevronDown, Info } from "lucide-react";

@@ -30,3 +30,22 @@ export {
   type SchizophreniaWais4MemoireChiffresResponse,
   type SchizophreniaWais4MemoireChiffresResponseInsert
 } from './memoire-chiffres';
+
+export {
+  WAIS4_MATRICES_SZ_QUESTIONS,
+  WAIS4_MATRICES_SZ_DEFINITION,
+  type SchizophreniaWais4MatricesResponse,
+  type SchizophreniaWais4MatricesResponseInsert
+} from './matrices';
+
+export {
+  SSTICS_SZ_QUESTIONS,
+  SSTICS_SZ_DEFINITION,
+  computeSsticsScores,
+  interpretSsticsZScore,
+  SSTICS_DOMAINS,
+  SSTICS_NORMS,
+  type SchizophreniaSsticsResponse,
+  type SchizophreniaSsticsResponseInsert,
+  type SsticsScoreResult
+} from './sstics';

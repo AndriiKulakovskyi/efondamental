@@ -165,7 +165,9 @@ import {
   WAIS4_CRITERIA_SZ_DEFINITION,
   WAIS4_EFFICIENCE_SZ_DEFINITION,
   WAIS4_SIMILITUDES_SZ_DEFINITION,
-  WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION
+  WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION,
+  WAIS4_MATRICES_SZ_DEFINITION,
+  SSTICS_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -680,6 +682,26 @@ export default async function VisitDetailPage({
                   target_role: 'healthcare_professional',
                   completed: questionnaireStatuses['WAIS4_MEMOIRE_CHIFFRES_SZ']?.completed || false,
                   completedAt: questionnaireStatuses['WAIS4_MEMOIRE_CHIFFRES_SZ']?.completed_at,
+                },
+                {
+                  id: WAIS4_MATRICES_SZ_DEFINITION.code,
+                  code: WAIS4_MATRICES_SZ_DEFINITION.code,
+                  title: WAIS4_MATRICES_SZ_DEFINITION.title,
+                  description: WAIS4_MATRICES_SZ_DEFINITION.description,
+                  questions: WAIS4_MATRICES_SZ_DEFINITION.questions,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['WAIS4_MATRICES_SZ']?.completed || false,
+                  completedAt: questionnaireStatuses['WAIS4_MATRICES_SZ']?.completed_at,
+                },
+                {
+                  id: SSTICS_SZ_DEFINITION.code,
+                  code: SSTICS_SZ_DEFINITION.code,
+                  title: SSTICS_SZ_DEFINITION.title,
+                  description: SSTICS_SZ_DEFINITION.description,
+                  questions: SSTICS_SZ_DEFINITION.questions,
+                  target_role: 'patient',
+                  completed: questionnaireStatuses['SSTICS_SZ']?.completed || false,
+                  completedAt: questionnaireStatuses['SSTICS_SZ']?.completed_at,
                 }
               ]
             }

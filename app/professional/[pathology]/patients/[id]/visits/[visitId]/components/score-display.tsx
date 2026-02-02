@@ -267,6 +267,21 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
+    if (code === 'WAIS4_MATRICES_SZ') {
+      // WAIS-IV Matrices: Standard score 8-12 is average (mean=10, SD=3)
+      if (data.wais_mat_std >= 13) return 'success';
+      if (data.wais_mat_std >= 8) return 'info';
+      return 'warning';
+    }
+    
+    if (code === 'SSTICS_SZ') {
+      // SSTICS: Z-score based (negative = more complaints)
+      // Z >= 0.5 = fewer complaints (good), Z < -0.5 = more complaints (warning)
+      if (data.sstics_scorez >= 0.5) return 'success';
+      if (data.sstics_scorez >= -0.5) return 'info';
+      return 'warning';
+    }
+    
     if (code === 'WAIS3_VOCABULAIRE') {
       // WAIS-III Vocabulaire: Standard score 8-12 is average (mean=10, SD=3)
       if (data.standard_score >= 13) return 'success';
@@ -622,6 +637,32 @@ if (code === 'FAGERSTROM') {
     }
   }
   
+  if (code === 'WAIS4_MATRICES_SZ' && !interpretation && data.wais_mat_std !== undefined) {
+    if (data.wais_mat_std >= 13) {
+      interpretation = 'Intelligence fluide supérieure à la moyenne';
+    } else if (data.wais_mat_std >= 8) {
+      interpretation = 'Intelligence fluide dans la moyenne';
+    } else if (data.wais_mat_std >= 4) {
+      interpretation = 'Intelligence fluide inférieure à la moyenne';
+    } else {
+      interpretation = 'Intelligence fluide significativement inférieure à la moyenne';
+    }
+  }
+  
+  if (code === 'SSTICS_SZ' && !interpretation && data.sstics_scorez !== undefined) {
+    if (data.sstics_scorez >= 1.5) {
+      interpretation = 'Plaintes cognitives nettement inférieures à la population de référence';
+    } else if (data.sstics_scorez >= 0.5) {
+      interpretation = 'Plaintes cognitives inférieures à la population de référence';
+    } else if (data.sstics_scorez >= -0.5) {
+      interpretation = 'Plaintes cognitives comparables à la population de référence';
+    } else if (data.sstics_scorez >= -1.5) {
+      interpretation = 'Plaintes cognitives supérieures à la population de référence';
+    } else {
+      interpretation = 'Plaintes cognitives nettement supérieures à la population de référence';
+    }
+  }
+  
   if (code === 'WAIS3_VOCABULAIRE' && !interpretation && data.standard_score !== undefined) {
     if (data.standard_score >= 13) {
       interpretation = 'Connaissances lexicales supérieures à la moyenne';
@@ -790,6 +831,8 @@ if (code === 'FAGERSTROM') {
               {code === 'MADRS' && 'Résultats MADRS - Échelle de Dépression'}
               {code === 'YMRS' && 'Résultats YMRS - Échelle de Manie'}
               {code === 'WAIS4_MATRICES' && 'Résultats WAIS-IV Matrices'}
+              {code === 'WAIS4_MATRICES_SZ' && 'Résultats WAIS-IV Matrices'}
+              {code === 'SSTICS_SZ' && 'Résultats SSTICS - Plaintes Cognitives Subjectives'}
               {(code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') && 'Résultats WAIS-IV Mémoire des chiffres (Digit Span)'}
               {(code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') && 'Résultats WAIS-IV Similitudes'}
               {code === 'WAIS3_VOCABULAIRE' && 'Score WAIS-III Vocabulaire'}
@@ -866,6 +909,10 @@ if (code === 'FAGERSTROM') {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'WAIS4_MATRICES'
                 ? (data.standardized_score !== undefined ? data.standardized_score : '-')
+                : code === 'WAIS4_MATRICES_SZ'
+                ? (data.wais_mat_std !== undefined ? data.wais_mat_std : '-')
+                : code === 'SSTICS_SZ'
+                ? (data.sstics_scorez !== undefined && data.sstics_scorez !== null ? data.sstics_scorez.toFixed(2) : '-')
                 : (code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ')
                 ? (data.wais_mc_std !== undefined ? data.wais_mc_std : '-')
                 : (code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ')
@@ -958,6 +1005,8 @@ if (code === 'FAGERSTROM') {
               {code === 'MADRS' && '/60'}
               {code === 'YMRS' && '/60'}
               {code === 'WAIS4_MATRICES' && '/19'}
+              {code === 'WAIS4_MATRICES_SZ' && '/19'}
+              {code === 'SSTICS_SZ' && ' (Z-score)'}
               {(code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') && '/19'}
               {(code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') && '/19'}
               {(code === 'CVLT' || code === 'CVLT_SZ') && '/80'}
@@ -2375,6 +2424,90 @@ if (code === 'FAGERSTROM') {
             <div className="flex justify-between">
               <span className="text-gray-600">Age du patient:</span>
               <span className="font-semibold">{data.patient_age ?? '-'} ans</span>
+            </div>
+          </div>
+        )}
+
+        {/* WAIS4 Matrices Details */}
+        {code === 'WAIS4_MATRICES_SZ' && (
+          <div className="text-sm space-y-2 mt-2 pt-2 border-t">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Score Brut Total:</span>
+                <span className="font-semibold">{data.wais_mat_tot ?? '-'}/26</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Note Standard:</span>
+                <span className="font-semibold">{data.wais_mat_std ?? '-'}/19</span>
+              </div>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600">Valeur Standardisée (Z-score):</span>
+              <span className="font-semibold">{data.wais_mat_cr !== null && data.wais_mat_cr !== undefined ? Number(data.wais_mat_cr).toFixed(2) : '-'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Age du patient:</span>
+              <span className="font-semibold">{data.patient_age ?? '-'} ans</span>
+            </div>
+            {data.wais_mat_std === null && data.wais_mat_tot !== null && (
+              <div className="mt-2 p-2 bg-yellow-50 rounded text-yellow-800 text-xs">
+                Note: Le score standard est nul car la règle d'arrêt a été atteinte (4 items consécutifs à 0 ou 4/5 items à 0).
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* SSTICS Details */}
+        {code === 'SSTICS_SZ' && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            {/* Domain Subscores */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Scores par domaine</h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Mémoire de travail:</span>
+                  <span className="font-semibold">{data.sstics_memt ?? '-'}/8</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Mémoire explicite:</span>
+                  <span className="font-semibold">{data.sstics_memexp ?? '-'}/36</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Attention:</span>
+                  <span className="font-semibold">{data.sstics_att ?? '-'}/20</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Fonctions exécutives:</span>
+                  <span className="font-semibold">{data.sstics_fe ?? '-'}/12</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Langage:</span>
+                  <span className="font-semibold">{data.sstics_lang ?? '-'}/4</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Praxies:</span>
+                  <span className="font-semibold">{data.sstics_prax ?? '-'}/4</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Total and Z-score */}
+            <div className="pt-2 border-t">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Score Total:</span>
+                  <span className="font-semibold">{data.sstics_score ?? '-'}/84</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Z-score:</span>
+                  <span className="font-semibold">{data.sstics_scorez !== null && data.sstics_scorez !== undefined ? Number(data.sstics_scorez).toFixed(2) : '-'}</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Interpretation note */}
+            <div className="mt-2 p-2 bg-blue-50 rounded text-blue-800 text-xs">
+              <strong>Interprétation:</strong> Un Z-score négatif indique plus de plaintes cognitives subjectives que la population de référence (Moyenne = 13.1, ET = 6.2).
             </div>
           </div>
         )}

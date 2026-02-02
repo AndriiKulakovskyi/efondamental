@@ -395,7 +395,7 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
   // WAIS4_MATRICES needs to calculate scores based on age and items
   if (questionnaireCode === 'WAIS4_MATRICES') {
-    const { calculateStandardizedScore, calculatePercentileRank, calculateDeviationFromMean } = await import('./wais4-matrices-scoring');
+    const { calculateStandardizedScore, calculatePercentileRank, calculateDeviationFromMean } = await import('./wais4-matrices-bp-scoring');
     
     // Calculate raw score (sum of items 1-26)
     // Note: Items are stored as item_01, item_02, etc. (with underscore and zero-padding)

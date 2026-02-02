@@ -89,7 +89,7 @@ import {
   Wais3FluencesVerbalesResponse,
   Wais3FluencesVerbalesResponseInsert
 } from '@/lib/types/database.types';
-import { calculateStandardizedScore, calculatePercentileRank, calculateDeviationFromMean } from './wais4-matrices-scoring';
+import { calculateStandardizedScore, calculatePercentileRank, calculateDeviationFromMean } from './wais4-matrices-bp-scoring';
 import { calculateTmtScores } from './tmt-scoring';
 import { calculateStroopScores } from './stroop-scoring';
 import { calculateFluencesVerbalesScores } from './fluences-verbales-scoring';

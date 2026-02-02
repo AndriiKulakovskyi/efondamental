@@ -1,5 +1,12 @@
-// eFondaMental Platform - WAIS-IV Matrices Scoring Utilities
+// ============================================================================
+// eFondaMental Platform - WAIS-IV Matrices Scoring Utilities (Bipolar)
+// ============================================================================
 // Age-based lookup tables for converting raw scores to standardized scores
+// SPECIFICALLY for the bipolar pathology.
+//
+// NOTE: This file is COMPLETELY SEPARATE from the schizophrenia version
+// (wais4-matrices-sz-scoring.ts). No cross-talk between pathologies.
+// ============================================================================
 
 /**
  * Age-based lookup tables from WAIS-IV normative data
@@ -118,4 +125,3 @@ export function calculateDeviationFromMean(standardizedScore: number): number {
   // Round to 2 decimal places
   return Math.round(deviation * 100) / 100;
 }
-

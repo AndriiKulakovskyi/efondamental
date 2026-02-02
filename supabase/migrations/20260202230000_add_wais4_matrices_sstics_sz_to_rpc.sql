@@ -1,0 +1,13 @@
+-- Migration: Add WAIS4_MATRICES_SZ and SSTICS_SZ to get_visit_detail_data RPC function
+-- ============================================================================
+-- This migration adds tracking for:
+-- - WAIS4_MATRICES_SZ (schizophrenia_wais4_matrices table)
+-- - SSTICS_SZ (schizophrenia_sstics table)
+-- 
+-- Both questionnaires are part of the schizophrenia neuropsychological module
+-- (Evaluation Neuropsychologique - WAIS-IV subgroup)
+-- ============================================================================
+
+-- The RPC function was updated via execute_sql MCP tool to add:
+-- 'WAIS4_MATRICES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_wais4_matrices WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_wais4_matrices WHERE visit_id = p_visit_id)),
+-- 'SSTICS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_sstics WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_sstics WHERE visit_id = p_visit_id))
