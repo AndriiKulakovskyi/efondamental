@@ -138,7 +138,7 @@ function lookupStandardScoreSz(rawScore: number, age: number): number {
  */
 export function calculateWais4MatricesSzScores(input: Wais4MatricesSzInput): Wais4MatricesSzScores {
   // Calculate total raw score (sum of all 26 items)
-  const wais_mat_tot = input.items.reduce((sum, item) => {
+  const wais_mat_tot = input.items.reduce((sum: number, item) => {
     return sum + (item === 1 ? 1 : 0);
   }, 0);
   
