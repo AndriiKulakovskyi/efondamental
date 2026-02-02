@@ -80,40 +80,96 @@ export function QuestionnairePageClient({
     );
   }, [currentResponses, questionnaire]);
 
-  // Live score calculation for WAIS-IV Matrices
+  // Live score calculation for questionnaires
   const liveScores = useMemo(() => {
-    if (questionnaire.code !== 'WAIS4_MATRICES') return null;
-    
-    // Calculate raw score from item responses
-    let rawScore = 0;
-    let itemCount = 0;
-    for (let i = 1; i <= 26; i++) {
-      const key = `item_${String(i).padStart(2, '0')}`;
-      const value = currentResponses[key];
-      if (typeof value === 'number') {
-        rawScore += value;
-        itemCount++;
+    // Live score calculation for WAIS-IV Matrices
+    if (questionnaire.code === 'WAIS4_MATRICES') {
+      // Calculate raw score from item responses
+      let rawScore = 0;
+      let itemCount = 0;
+      for (let i = 1; i <= 26; i++) {
+        const key = `item_${String(i).padStart(2, '0')}`;
+        const value = currentResponses[key];
+        if (typeof value === 'number') {
+          rawScore += value;
+          itemCount++;
+        }
       }
+      
+      const patientAge = currentResponses.patient_age;
+      
+      // Calculate standardized score if we have age
+      let standardizedScore: number | null = null;
+      let percentileRank: number | null = null;
+      
+      if (patientAge && typeof patientAge === 'number' && patientAge >= 16) {
+        standardizedScore = calculateStandardizedScore(rawScore, patientAge);
+        percentileRank = calculatePercentileRank(standardizedScore);
+      }
+      
+      return {
+        type: 'WAIS4_MATRICES',
+        rawScore,
+        itemCount,
+        standardizedScore,
+        percentileRank,
+        hasAge: !!patientAge && typeof patientAge === 'number'
+      };
     }
-    
-    const patientAge = currentResponses.patient_age;
-    
-    // Calculate standardized score if we have age
-    let standardizedScore: number | null = null;
-    let percentileRank: number | null = null;
-    
-    if (patientAge && typeof patientAge === 'number' && patientAge >= 16) {
-      standardizedScore = calculateStandardizedScore(rawScore, patientAge);
-      percentileRank = calculatePercentileRank(standardizedScore);
+
+    // Live score calculation for CGI
+    if (questionnaire.code === 'CGI') {
+      const therapeuticEffect = currentResponses.therapeutic_effect;
+      const sideEffects = currentResponses.side_effects;
+
+      let therapeuticIndex: number | null = null;
+      let label = '';
+      let color = 'text-slate-900';
+      let bg = 'bg-slate-50';
+
+      if (Number(therapeuticEffect) === 0) {
+        therapeuticIndex = 0;
+        label = 'Non évalué';
+      } else if (
+        therapeuticEffect !== undefined && therapeuticEffect !== null &&
+        sideEffects !== undefined && sideEffects !== null
+      ) {
+        const te = Number(therapeuticEffect);
+        const se = Number(sideEffects);
+        
+        if (te >= 1 && te <= 4 && se >= 0 && se <= 3) {
+          therapeuticIndex = se + (4 * (te - 1)) + 1;
+          
+          if (therapeuticIndex <= 4) {
+            label = 'Très bon rapport bénéfice/risque';
+            color = 'text-green-700';
+            bg = 'bg-green-50';
+          } else if (therapeuticIndex <= 8) {
+            label = 'Bon rapport bénéfice/risque';
+            color = 'text-blue-700';
+            bg = 'bg-blue-50';
+          } else if (therapeuticIndex <= 12) {
+            label = 'Rapport bénéfice/risque modéré';
+            color = 'text-amber-700';
+            bg = 'bg-amber-50';
+          } else {
+            label = 'Mauvais rapport bénéfice/risque';
+            color = 'text-red-700';
+            bg = 'bg-red-50';
+          }
+        }
+      }
+
+      return {
+        type: 'CGI',
+        therapeuticIndex,
+        label,
+        color,
+        bg
+      };
     }
-    
-    return {
-      rawScore,
-      itemCount,
-      standardizedScore,
-      percentileRank,
-      hasAge: !!patientAge && typeof patientAge === 'number'
-    };
+
+    return null;
   }, [currentResponses, questionnaire.code]);
 
   // Memoized callback to prevent unnecessary re-renders
@@ -296,63 +352,87 @@ export function QuestionnairePageClient({
         />
       </div>
       
-      {/* Live Score Display for WAIS-IV Matrices */}
+      {/* Live Score Display */}
       {liveScores && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg z-50">
           <div className="max-w-4xl mx-auto px-8 py-4">
-            <div className="flex items-center justify-between gap-6">
-              <div className="flex items-center gap-6">
-                {/* Raw Score */}
-                <div className="text-center">
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Note Brute</div>
-                  <div className="text-2xl font-bold text-slate-900">
-                    {liveScores.rawScore}
-                    <span className="text-sm font-normal text-slate-400">/26</span>
+            {liveScores.type === 'WAIS4_MATRICES' ? (
+              <div className="flex items-center justify-between gap-6">
+                <div className="flex items-center gap-6">
+                  {/* Raw Score */}
+                  <div className="text-center">
+                    <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Note Brute</div>
+                    <div className="text-2xl font-bold text-slate-900">
+                      {liveScores.rawScore}
+                      <span className="text-sm font-normal text-slate-400">/26</span>
+                    </div>
+                    <div className="text-xs text-slate-400">{liveScores.itemCount}/26 items</div>
                   </div>
-                  <div className="text-xs text-slate-400">{liveScores.itemCount}/26 items</div>
+                  
+                  {/* Separator */}
+                  <div className="h-12 w-px bg-slate-200"></div>
+                  
+                  {/* Standardized Score */}
+                  <div className="text-center">
+                    <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Note Standard</div>
+                    {liveScores.hasAge ? (
+                      <div className="text-2xl font-bold text-brand">
+                        {liveScores.standardizedScore}
+                        <span className="text-sm font-normal text-slate-400">/19</span>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-slate-400">Entrez l'age</div>
+                    )}
+                  </div>
+                  
+                  {/* Separator */}
+                  <div className="h-12 w-px bg-slate-200"></div>
+                  
+                  {/* Percentile */}
+                  <div className="text-center">
+                    <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Rang Percentile</div>
+                    {liveScores.percentileRank !== null && liveScores.percentileRank !== undefined ? (
+                      <div className="text-2xl font-bold text-slate-700">
+                        {liveScores.percentileRank > 0 ? '+' : ''}{liveScores.percentileRank}%
+                      </div>
+                    ) : (
+                      <div className="text-sm text-slate-400">-</div>
+                    )}
+                  </div>
                 </div>
                 
-                {/* Separator */}
-                <div className="h-12 w-px bg-slate-200"></div>
-                
-                {/* Standardized Score */}
-                <div className="text-center">
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Note Standard</div>
-                  {liveScores.hasAge ? (
-                    <div className="text-2xl font-bold text-brand">
-                      {liveScores.standardizedScore}
-                      <span className="text-sm font-normal text-slate-400">/19</span>
-                    </div>
-                  ) : (
-                    <div className="text-sm text-slate-400">Entrez l'age</div>
-                  )}
-                </div>
-                
-                {/* Separator */}
-                <div className="h-12 w-px bg-slate-200"></div>
-                
-                {/* Percentile */}
-                <div className="text-center">
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Rang Percentile</div>
-                  {liveScores.percentileRank !== null ? (
-                    <div className="text-2xl font-bold text-slate-700">
-                      {liveScores.percentileRank > 0 ? '+' : ''}{liveScores.percentileRank}%
-                    </div>
-                  ) : (
-                    <div className="text-sm text-slate-400">-</div>
-                  )}
-                </div>
+                {/* Interpretation */}
+                {liveScores.standardizedScore !== null && liveScores.standardizedScore !== undefined && (
+                  <div className={`px-4 py-2 rounded-lg ${getScoreInterpretation(liveScores.standardizedScore)?.bg}`}>
+                    <span className={`text-sm font-medium ${getScoreInterpretation(liveScores.standardizedScore)?.color}`}>
+                      {getScoreInterpretation(liveScores.standardizedScore)?.text}
+                    </span>
+                  </div>
+                )}
               </div>
-              
-              {/* Interpretation */}
-              {liveScores.standardizedScore !== null && (
-                <div className={`px-4 py-2 rounded-lg ${getScoreInterpretation(liveScores.standardizedScore)?.bg}`}>
-                  <span className={`text-sm font-medium ${getScoreInterpretation(liveScores.standardizedScore)?.color}`}>
-                    {getScoreInterpretation(liveScores.standardizedScore)?.text}
-                  </span>
+            ) : liveScores.type === 'CGI' ? (
+              <div className="flex items-center justify-between gap-6">
+                <div className="flex items-center gap-6">
+                  {/* Therapeutic Index Score */}
+                  <div className="text-center">
+                    <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Index Thérapeutique</div>
+                    <div className="text-2xl font-bold text-slate-900">
+                      {liveScores.therapeuticIndex !== null ? liveScores.therapeuticIndex : '-'}
+                      <span className="text-sm font-normal text-slate-400">/16</span>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
+                
+                {/* Interpretation Label */}
+                {liveScores.label && (
+                  <div className={`px-4 py-2 rounded-lg ${liveScores.bg}`}>
+                    <span className={`text-sm font-medium ${liveScores.color}`}>
+                      {liveScores.label}
+                    </span>
+                  </div>
+                )}
+              </div>
+            ) : null}
           </div>
         </div>
       )}

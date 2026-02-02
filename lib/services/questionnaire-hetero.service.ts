@@ -317,13 +317,10 @@ export async function saveCgiResponse(
            sideEffects !== undefined && sideEffects !== null &&
            sideEffects >= 0 && sideEffects <= 3) {
     
-    // Calculate using weights:
-    // therapeutic_weight = therapeutic_effect - 1 (so 0, 1, 2, 3 for values 1, 2, 3, 4)
-    // side_effect_weight = side_effects + 1 (so 1, 2, 3, 4 for values 0, 1, 2, 3)
+    // Formula: 4 * (Effet - 1) + SideEffects + 1
+    // Range: 1 to 16
     const therapeuticWeight = therapeuticEffect - 1;
-    const sideEffectWeight = sideEffects + 1;
-    
-    therapeuticIndex = (4 * therapeuticWeight) + sideEffectWeight;
+    therapeuticIndex = sideEffects + (4 * therapeuticWeight) + 1;
     
     // Determine label based on index value (1-16)
     if (therapeuticIndex <= 4) {

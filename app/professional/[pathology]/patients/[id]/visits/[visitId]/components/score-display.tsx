@@ -815,7 +815,7 @@ if (code === 'FAGERSTROM') {
                 : code === 'ALDA'
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
                 : code === 'CGI'
-                ? (data.cgi_s !== undefined ? data.cgi_s : '-')
+                ? (data.therapeutic_index !== undefined && data.therapeutic_index !== null ? data.therapeutic_index : (data.cgi_s !== undefined ? data.cgi_s : '-'))
                 : code === 'MADRS'
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'YMRS'
@@ -902,7 +902,7 @@ if (code === 'FAGERSTROM') {
               {code === 'AIM' && '/120'}
               {code === 'AQ12' && '/72'}
               {code === 'ALDA' && '/10'}
-              {code === 'CGI' && '/7'}
+              {code === 'CGI' && (data.therapeutic_index !== undefined && data.therapeutic_index !== null ? '/16' : '/7')}
               {code === 'MADRS' && '/60'}
               {code === 'YMRS' && '/60'}
               {code === 'WAIS4_MATRICES' && '/19'}

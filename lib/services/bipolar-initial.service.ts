@@ -7,12 +7,14 @@ import { getQuestionnaireFieldTypes } from '@/lib/utils/questionnaire-field-defi
 import { 
   saveMadrsResponse, 
   saveYmrsResponse,
+  saveCgiResponse,
   saveAldaResponse,
   saveEtatPatientResponse,
   saveFastResponse,
   saveDivaResponse,
   type MadrsResponseInsert,
   type YmrsResponseInsert,
+  type CgiResponseInsert,
   type AldaResponseInsert,
   type EtatPatientResponseInsert,
   type FastResponseInsert,
@@ -238,6 +240,11 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
   
   if (questionnaireCode === 'YMRS') {
     return await saveYmrsResponse(response as any as YmrsResponseInsert) as any as T;
+  }
+
+  // CGI needs to calculate therapeutic_index and therapeutic_index_label
+  if (questionnaireCode === 'CGI') {
+    return await saveCgiResponse(response as any as CgiResponseInsert) as any as T;
   }
 
   // ALDA needs to calculate score_a, score_b and alda_score (A - B)
