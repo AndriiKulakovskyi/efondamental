@@ -155,8 +155,6 @@ export const COMMISSIONS_SZ_QUESTIONS: Question[] = [
     text: 'Séquence des commissions réalisées par le patient',
     type: 'text',
     required: false,
-    placeholder: 'Notez l\'ordre des commissions telles que planifiées par le patient...',
-    help: 'Champ libre pour noter la séquence réelle des commissions planifiées',
     display_if: SHOW_WHEN_TEST_DONE
   }
 ];

@@ -3444,7 +3444,7 @@ export async function saveTmtSzResponse(response: any): Promise<any> {
   }
   
   // Import the scoring function dynamically to avoid circular imports
-  const { calculateTmtScores, TmtRawData } = await import('./tmt-scoring');
+  const { calculateTmtScores } = await import('./tmt-scoring');
   
   // Prepare raw data for scoring (only if we have required demographics and raw inputs)
   let computedScores: any = {};
@@ -3458,7 +3458,7 @@ export async function saveTmtSzResponse(response: any): Promise<any> {
     response.tmtb_err != null &&
     response.tmtb_err_persev != null
   ) {
-    const rawData: TmtRawData = {
+    const rawData = {
       patient_age: response.patient_age,
       years_of_education: response.years_of_education,
       tmta_tps: response.tmta_tps,
@@ -3571,7 +3571,7 @@ export async function saveCommissionsSzResponse(response: any): Promise<any> {
   }
   
   // Import the scoring function dynamically to avoid circular imports
-  const { calculateCommissionsScores, CommissionsRawData } = await import('./commissions-scoring');
+  const { calculateCommissionsScores } = await import('./commissions-scoring');
   
   // Prepare raw data for scoring (only if we have required demographics and raw inputs)
   let computedScores: any = {};
@@ -3581,7 +3581,7 @@ export async function saveCommissionsSzResponse(response: any): Promise<any> {
     response.nsc != null &&
     response.com01 != null
   ) {
-    const rawData: CommissionsRawData = {
+    const rawData = {
       patient_age: response.patient_age,
       nsc: response.nsc,
       com01: response.com01,
