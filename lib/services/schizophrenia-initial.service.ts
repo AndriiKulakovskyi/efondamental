@@ -81,6 +81,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   // Neuropsy module - WAIS-IV (Neuropsychological assessments)
   'WAIS4_CRITERIA_SZ': 'schizophrenia_wais4_criteria',
   'WAIS4_EFFICIENCE_SZ': 'schizophrenia_wais4_efficience',
+  'WAIS4_SIMILITUDES_SZ': 'schizophrenia_wais4_similitudes',
 };
 
 // ============================================================================
@@ -4002,6 +4003,155 @@ export async function saveWais4EfficienceSzResponse(response: any): Promise<any>
   
   if (error) {
     console.error('Error saving schizophrenia_wais4_efficience:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// WAIS-IV Similitudes Functions (Neuropsy - WAIS-IV submodule)
+// ============================================================================
+
+/**
+ * Get WAIS4_SIMILITUDES_SZ response for a visit
+ * WAIS-IV Similitudes subtest - Verbal comprehension test assessing abstract reasoning
+ */
+export async function getWais4SimilitudesSzResponse(visitId: string): Promise<any | null> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_wais4_similitudes')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') return null; // Not found
+    console.error('Error getting schizophrenia_wais4_similitudes:', error);
+    throw error;
+  }
+  return data;
+}
+
+/**
+ * Save WAIS4_SIMILITUDES_SZ response with scoring
+ * Calculates total raw score, age-based standard score, and standardized value (z-score)
+ */
+export async function saveWais4SimilitudesSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Dynamically import scoring functions
+  const { calculateWais4SimilitudesScores } = await import('@/lib/services/wais4-similitudes-scoring');
+  
+  // Convert test_done from radio value to boolean
+  const testDone = response.test_done === 'oui' || response.test_done === true;
+  
+  // Prepare item scores (default to 0 if not provided)
+  const items = {
+    item1: response.item_1 != null ? Number(response.item_1) : 0,
+    item2: response.item_2 != null ? Number(response.item_2) : 0,
+    item3: response.item_3 != null ? Number(response.item_3) : 0,
+    item4: response.item_4 != null ? Number(response.item_4) : 0,
+    item5: response.item_5 != null ? Number(response.item_5) : 0,
+    item6: response.item_6 != null ? Number(response.item_6) : 0,
+    item7: response.item_7 != null ? Number(response.item_7) : 0,
+    item8: response.item_8 != null ? Number(response.item_8) : 0,
+    item9: response.item_9 != null ? Number(response.item_9) : 0,
+    item10: response.item_10 != null ? Number(response.item_10) : 0,
+    item11: response.item_11 != null ? Number(response.item_11) : 0,
+    item12: response.item_12 != null ? Number(response.item_12) : 0,
+    item13: response.item_13 != null ? Number(response.item_13) : 0,
+    item14: response.item_14 != null ? Number(response.item_14) : 0,
+    item15: response.item_15 != null ? Number(response.item_15) : 0,
+    item16: response.item_16 != null ? Number(response.item_16) : 0,
+    item17: response.item_17 != null ? Number(response.item_17) : 0,
+    item18: response.item_18 != null ? Number(response.item_18) : 0,
+  };
+  
+  // Get patient age for normative scoring
+  // Use injected patient_age from demographics (preferred), or fetch from patients table as fallback
+  let patientAge = 30; // Default age
+  
+  if (response.patient_age != null && Number(response.patient_age) > 0) {
+    // Use injected patient_age from patient demographics
+    patientAge = Number(response.patient_age);
+    console.log('[WAIS4_SIMILITUDES_SZ] Using injected patient_age:', patientAge);
+  } else if (response.patient_id) {
+    // Fallback: fetch from patients table if patient_age not injected
+    console.log('[WAIS4_SIMILITUDES_SZ] No injected patient_age, fetching from patients table');
+    const { data: patient } = await supabase
+      .from('patients')
+      .select('date_of_birth')
+      .eq('id', response.patient_id)
+      .single();
+    
+    if (patient?.date_of_birth) {
+      const birthDate = new Date(patient.date_of_birth);
+      const today = new Date();
+      patientAge = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        patientAge--;
+      }
+      console.log('[WAIS4_SIMILITUDES_SZ] Calculated patient_age from DOB:', patientAge);
+    }
+  }
+  
+  // Calculate scores only if test was done
+  let scores = null;
+  if (testDone) {
+    scores = calculateWais4SimilitudesScores({
+      patient_age: patientAge,
+      ...items,
+    });
+  }
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_wais4_similitudes')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      
+      // Demographics for scoring (stored for audit/replication)
+      patient_age: patientAge,
+      
+      // Test status
+      test_done: testDone,
+      
+      // Item scores
+      item_1: testDone ? items.item1 : null,
+      item_2: testDone ? items.item2 : null,
+      item_3: testDone ? items.item3 : null,
+      item_4: testDone ? items.item4 : null,
+      item_5: testDone ? items.item5 : null,
+      item_6: testDone ? items.item6 : null,
+      item_7: testDone ? items.item7 : null,
+      item_8: testDone ? items.item8 : null,
+      item_9: testDone ? items.item9 : null,
+      item_10: testDone ? items.item10 : null,
+      item_11: testDone ? items.item11 : null,
+      item_12: testDone ? items.item12 : null,
+      item_13: testDone ? items.item13 : null,
+      item_14: testDone ? items.item14 : null,
+      item_15: testDone ? items.item15 : null,
+      item_16: testDone ? items.item16 : null,
+      item_17: testDone ? items.item17 : null,
+      item_18: testDone ? items.item18 : null,
+      
+      // Computed scores
+      total_raw_score: scores?.total_raw_score ?? null,
+      standard_score: scores?.standard_score ?? null,
+      standardized_value: scores?.standardized_value ?? null,
+      
+      // Metadata
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_wais4_similitudes:', error);
     throw error;
   }
   return data;

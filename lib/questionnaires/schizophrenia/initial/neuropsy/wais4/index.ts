@@ -16,3 +16,10 @@ export {
   type SchizophreniaWais4EfficienceResponse,
   type SchizophreniaWais4EfficienceResponseInsert
 } from './efficience-intellectuelle';
+
+export {
+  WAIS4_SIMILITUDES_SZ_QUESTIONS,
+  WAIS4_SIMILITUDES_SZ_DEFINITION,
+  type SchizophreniaWais4SimilitudesResponse,
+  type SchizophreniaWais4SimilitudesResponseInsert
+} from './similitudes';

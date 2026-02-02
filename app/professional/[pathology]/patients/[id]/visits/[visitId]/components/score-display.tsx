@@ -260,7 +260,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
-    if (code === 'WAIS4_SIMILITUDES') {
+    if (code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') {
       // WAIS-IV Similitudes: Standard score 8-12 is average (mean=10, SD=3)
       if (data.standard_score >= 13) return 'success';
       if (data.standard_score >= 8) return 'info';
@@ -610,7 +610,7 @@ if (code === 'FAGERSTROM') {
     }
   }
   
-  if (code === 'WAIS4_SIMILITUDES' && !interpretation && data.standard_score !== undefined) {
+  if ((code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') && !interpretation && data.standard_score !== undefined) {
     if (data.standard_score >= 13) {
       interpretation = 'Raisonnement verbal supérieur à la moyenne';
     } else if (data.standard_score >= 8) {
@@ -791,7 +791,7 @@ if (code === 'FAGERSTROM') {
               {code === 'YMRS' && 'Résultats YMRS - Échelle de Manie'}
               {code === 'WAIS4_MATRICES' && 'Résultats WAIS-IV Matrices'}
               {code === 'WAIS4_DIGIT_SPAN' && 'Résultats WAIS-IV Mémoire des chiffres (Digit Span)'}
-              {code === 'WAIS4_SIMILITUDES' && 'Résultats WAIS-IV Similitudes'}
+              {(code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') && 'Résultats WAIS-IV Similitudes'}
               {code === 'WAIS3_VOCABULAIRE' && 'Score WAIS-III Vocabulaire'}
               {code === 'WAIS3_MATRICES' && 'Score WAIS-III Matrices'}
               {(code === 'CVLT' || code === 'CVLT_SZ') && 'Résultats CVLT'}
@@ -868,7 +868,7 @@ if (code === 'FAGERSTROM') {
                 ? (data.standardized_score !== undefined ? data.standardized_score : '-')
                 : code === 'WAIS4_DIGIT_SPAN'
                 ? (data.wais_mc_std !== undefined ? data.wais_mc_std : '-')
-                : code === 'WAIS4_SIMILITUDES'
+                : (code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ')
                 ? (data.standard_score !== undefined ? data.standard_score : '-')
                 : code === 'WAIS3_VOCABULAIRE'
                 ? (data.standard_score !== undefined ? data.standard_score : '-')
@@ -959,6 +959,7 @@ if (code === 'FAGERSTROM') {
               {code === 'YMRS' && '/60'}
               {code === 'WAIS4_MATRICES' && '/19'}
               {code === 'WAIS4_DIGIT_SPAN' && '/19'}
+              {(code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') && '/19'}
               {(code === 'CVLT' || code === 'CVLT_SZ') && '/80'}
               {code === 'TMT_SZ' && ' (Partie A)'}
               {code === 'COMMISSIONS_SZ' && ' (Temps)'}
@@ -2355,7 +2356,7 @@ if (code === 'FAGERSTROM') {
         )}
 
         {/* WAIS4 Similitudes Details */}
-        {code === 'WAIS4_SIMILITUDES' && (
+        {(code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') && (
           <div className="text-sm space-y-2 mt-2 pt-2 border-t">
             <div className="grid grid-cols-2 gap-2">
               <div className="flex justify-between">

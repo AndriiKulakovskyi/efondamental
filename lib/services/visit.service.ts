@@ -256,7 +256,8 @@ import {
   COMMISSIONS_SZ_DEFINITION,
   LIS_SZ_DEFINITION,
   WAIS4_CRITERIA_SZ_DEFINITION,
-  WAIS4_EFFICIENCE_SZ_DEFINITION
+  WAIS4_EFFICIENCE_SZ_DEFINITION,
+  WAIS4_SIMILITUDES_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -774,6 +775,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
                   title: WAIS4_EFFICIENCE_SZ_DEFINITION.title,
                   description: WAIS4_EFFICIENCE_SZ_DEFINITION.description,
                   questions: WAIS4_EFFICIENCE_SZ_DEFINITION.questions
+                },
+                {
+                  id: WAIS4_SIMILITUDES_SZ_DEFINITION.id,
+                  code: WAIS4_SIMILITUDES_SZ_DEFINITION.code,
+                  title: WAIS4_SIMILITUDES_SZ_DEFINITION.title,
+                  description: WAIS4_SIMILITUDES_SZ_DEFINITION.description,
+                  questions: WAIS4_SIMILITUDES_SZ_DEFINITION.questions
                 }
               ]
             }
