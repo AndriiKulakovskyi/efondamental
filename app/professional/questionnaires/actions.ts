@@ -244,7 +244,16 @@ function questionnaireCodeToSchizophreniaKey(code: string): string | null {
     'EVAL_ADDICTOLOGIQUE_SZ': 'EVAL_ADDICTOLOGIQUE_SZ',
     'ECV': 'ECV',
   };
-  return mapping[code] || null;
+  
+  const mappedKey = mapping[code];
+  if (mappedKey) return mappedKey;
+  
+  // If the code is already a key in SCHIZOPHRENIA_INITIAL_TABLES, return it
+  if (SCHIZOPHRENIA_INITIAL_TABLES[code]) {
+    return code;
+  }
+  
+  return null;
 }
 
 // Map questionnaire codes to BIPOLAR_INITIAL_TABLES keys
@@ -544,6 +553,28 @@ export async function submitProfessionalQuestionnaireAction(
       }
     }
     
+    // Check if this questionnaire should be routed to schizophrenia_* tables
+    // (for schizophrenia initial evaluation visits)
+    const useSchizophreniaTables = await shouldUseSchizophreniaTables(visitId, questionnaireCode);
+    
+    if (useSchizophreniaTables) {
+      const schizophreniaKey = questionnaireCodeToSchizophreniaKey(questionnaireCode);
+      if (schizophreniaKey) {
+        // Filter out fields that are injected for form computation but may not be DB columns
+        const { patient_gender, male_gender, patient_age, weight_kg, years_of_education, ...filteredResponses } = responses;
+        
+        const result = await saveSchizophreniaInitialResponse(schizophreniaKey, {
+          visit_id: visitId,
+          patient_id: patientId,
+          completed_by: completedBy,
+          ...filteredResponses
+        });
+        
+        revalidatePath('/professional');
+        return { success: true, data: result };
+      }
+    }
+    
     let result;
     switch (questionnaireCode) {
       // Bipolar Screening Questionnaires - use new public.bipolar_* tables
@@ -608,145 +639,6 @@ export async function submitProfessionalQuestionnaireAction(
         });
         break;
 
-      // Schizophrenia Initial Evaluation - Dossier Infirmier (use new schizophrenia_* tables)
-      case 'INF_DOSSIER_INFIRMIER':
-        result = await saveSchizophreniaDossierInfirmierResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      // Schizophrenia Initial Evaluation - Bilan Biologique (use new schizophrenia_* tables)
-      case 'INF_BILAN_BIOLOGIQUE_SZ':
-        result = await saveSchizophreniaBilanBiologiqueResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      // Schizophrenia Hetero-questionnaires (use new schizophrenia_* tables)
-      case 'PANSS':
-        result = await saveSchizophreniaPanssResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'CDSS':
-        result = await saveSchizophreniaCdssResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'BARS':
-        result = await saveSchizophreniaBarsResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'SUMD':
-        result = await saveSchizophreniaSumdResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'AIMS':
-        result = await saveSchizophreniaAimsResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'BARNES':
-        result = await saveSchizophreniaBarnesResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'SAS':
-        result = await saveSchizophreniaSasResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'PSP':
-        result = await saveSchizophreniaPspResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'ECV':
-        result = await saveSchizophreniaInitialResponse('ECV', {
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'TROUBLES_PSYCHOTIQUES':
-        result = await saveSchizophreniaInitialResponse('TROUBLES_PSYCHOTIQUES', {
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'TROUBLES_COMORBIDES_SZ':
-        result = await saveSchizophreniaInitialResponse('TROUBLES_COMORBIDES_SZ', {
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'SUICIDE_HISTORY_SZ':
-        result = await saveSchizophreniaInitialResponse('SUICIDE_HISTORY_SZ', {
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'ANTECEDENTS_FAMILIAUX_PSY_SZ':
-        result = await saveSchizophreniaInitialResponse('ANTECEDENTS_FAMILIAUX_PSY_SZ', {
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'PERINATALITE_SZ':
-        result = await saveSchizophreniaInitialResponse('PERINATALITE_SZ', {
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'TEA_COFFEE_SZ':
-        result = await saveSchizophreniaInitialResponse('TEA_COFFEE_SZ', {
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
       case 'EVAL_ADDICTOLOGIQUE_SZ':
         result = await saveSchizophreniaEvalAddictologiqueResponse({
           visit_id: visitId,
@@ -755,134 +647,7 @@ export async function submitProfessionalQuestionnaireAction(
         });
         break;
 
-      case 'BILAN_SOCIAL_SZ':
-        // Convert numeric codes to boolean for justice_safeguard field
-        const bilanSocialData = { ...responses as any };
-        if (bilanSocialData.justice_safeguard !== undefined && bilanSocialData.justice_safeguard !== null) {
-          bilanSocialData.justice_safeguard = bilanSocialData.justice_safeguard === 1;
-        }
-        result = await saveSchizophreniaInitialResponse('BILAN_SOCIAL_SZ', {
-          visit_id: visitId,
-          patient_id: patientId,
-          ...bilanSocialData
-        });
-        break;
-
-      // Schizophrenia Auto module (patient self-administered)
-      case 'SQOL_SZ':
-        result = await saveSchizophreniaSqolResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'CTQ':
-        result = await saveSchizophreniaCtqResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'MARS_SZ':
-        result = await saveSchizophreniaMarsResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'BIS_SZ':
-        result = await saveSchizophreniaBisResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'EQ5D5L_SZ':
-        result = await saveSchizophreniaEq5d5lResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'IPAQ_SZ':
-        result = await saveSchizophreniaIpaqResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'YBOCS_SZ':
-        result = await saveSchizophreniaYbocsResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'WURS25_SZ':
-        result = await saveSchizophreniaWurs25Response({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'STORI_SZ':
-        result = await saveSchizophreniaStoriResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'SOGS_SZ':
-        result = await saveSchizophreniaSogsResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'PSQI_SZ':
-        result = await saveSchizophreniaPsqiResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'PRESENTEISME_SZ':
-        result = await saveSchizophreniaPresenteismeResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      case 'FAGERSTROM_SZ':
-        result = await saveSchizophreniaFagerstromResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      // Initial Evaluation - ENTOURAGE (caregiver-administered)
-      case 'EPHP_SZ':
-        result = await saveSchizophreniaEphpResponse({
-          visit_id: visitId,
-          patient_id: patientId,
-          ...responses as any
-        });
-        break;
-
-      // Initial Evaluation - ETAT (using bipolar-initial.service.ts)
+      // Evaluation Initial - ETAT (using bipolar-initial.service.ts or fallback generic mapping)
       case 'EQ5D5L':
         result = await saveBipolarInitialResponse('EQ5D5L', {
           visit_id: visitId,
