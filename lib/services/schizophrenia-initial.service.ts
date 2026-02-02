@@ -495,6 +495,7 @@ export async function saveCdssResponse(response: any): Promise<any> {
 
   const {
     cdss_instructions,
+    questionnaire_done,
     ...responseData
   } = response;
 
@@ -521,6 +522,7 @@ export async function saveCdssResponse(response: any): Promise<any> {
     .from('schizophrenia_cdss')
     .upsert({
       ...responseData,
+      questionnaire_done,
       total_score,
       has_depressive_syndrome,
       interpretation,
