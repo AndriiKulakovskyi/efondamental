@@ -67,13 +67,13 @@ export const LIS_FILMS: LisFilm[] = [
       {
         id: 'lis_a4',
         ordre: 4,
-        text: "4.parce qu'il est fier de son fils",
+        text: "4. parce qu'il est fier de son fils",
         normativeValue: 1.466667
       },
       {
         id: 'lis_a5',
         ordre: 5,
-        text: "5.parce qu'il n'a pas remarqué qu'il parle à un policier",
+        text: "5. parce qu'il n'a pas remarqué qu'il parle à un policier",
         normativeValue: 1.0
       }
     ]
@@ -245,7 +245,7 @@ export const LIS_FILMS: LisFilm[] = [
       {
         id: 'lis_f2',
         ordre: 2,
-        text: "2.parce qu'il est en retard",
+        text: "2. parce qu'il est en retard",
         normativeValue: 1.133333
       },
       {
@@ -257,13 +257,13 @@ export const LIS_FILMS: LisFilm[] = [
       {
         id: 'lis_f4',
         ordre: 4,
-        text: "4.pour que la femme qui arrive ne sache pas qu'il dormait avec elle",
+        text: "4. pour que la femme qui arrive ne sache pas qu'il dormait avec elle",
         normativeValue: 3.666667
       },
       {
         id: 'lis_f5',
         ordre: 5,
-        text: "5.pour qu'elle se lave",
+        text: "5. pour qu'elle se lave",
         normativeValue: 1.066667
       }
     ]
