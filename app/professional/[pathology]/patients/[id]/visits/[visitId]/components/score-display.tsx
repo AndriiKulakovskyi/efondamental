@@ -281,7 +281,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'warning';
     }
     
-    if (code === 'CVLT') {
+    if (code === 'CVLT' || code === 'CVLT_SZ') {
       // CVLT: Use Total 1-5 standard score for severity
       const score = data.total_1_5_std;
       if (score === null || score === undefined) return 'info';
@@ -754,7 +754,7 @@ if (code === 'FAGERSTROM') {
               {code === 'WAIS4_SIMILITUDES' && 'Résultats WAIS-IV Similitudes'}
               {code === 'WAIS3_VOCABULAIRE' && 'Score WAIS-III Vocabulaire'}
               {code === 'WAIS3_MATRICES' && 'Score WAIS-III Matrices'}
-              {code === 'CVLT' && 'Résultats CVLT'}
+              {(code === 'CVLT' || code === 'CVLT_SZ') && 'Résultats CVLT'}
               {code === 'FLUENCES_VERBALES' && 'Résultats Fluences Verbales (Cardebat et al., 1990)'}
               {code === 'WAIS4_CODE' && 'Résultats WAIS-IV Code'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && 'Résultats WAIS-IV Code, Symboles & IVT'}
@@ -830,7 +830,7 @@ if (code === 'FAGERSTROM') {
                 ? (data.standard_score !== undefined ? data.standard_score : '-')
                 : code === 'WAIS3_MATRICES'
                 ? (data.standard_score !== undefined ? data.standard_score : '-')
-                : code === 'CVLT'
+                : (code === 'CVLT' || code === 'CVLT_SZ')
                 ? (data.total_1_5 !== undefined ? data.total_1_5 : '-')
                 : code === 'WAIS4_CODE'
                 ? (data.wais_cod_std !== undefined ? data.wais_cod_std : '-')
@@ -907,7 +907,7 @@ if (code === 'FAGERSTROM') {
               {code === 'YMRS' && '/60'}
               {code === 'WAIS4_MATRICES' && '/19'}
               {code === 'WAIS4_DIGIT_SPAN' && '/19'}
-              {code === 'CVLT' && '/80'}
+              {(code === 'CVLT' || code === 'CVLT_SZ') && '/80'}
               {code === 'WAIS4_CODE' && '/19'}
               {code === 'WAIS_IV_CODE_SYMBOLES_IVT' && (data.wais_ivt !== undefined && data.wais_ivt !== null ? '/150' : '/19')}
               {code === 'PANSS' && '/210'}
@@ -2415,7 +2415,7 @@ if (code === 'FAGERSTROM') {
         )}
 
         {/* CVLT Details */}
-        {code === 'CVLT' && (
+        {(code === 'CVLT' || code === 'CVLT_SZ') && (
           <div className="text-sm space-y-3 mt-2 pt-2 border-t">
             {/* Demographics */}
             <div className="grid grid-cols-3 gap-2 text-xs">

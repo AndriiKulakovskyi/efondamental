@@ -3,7 +3,7 @@
 // Export all initial evaluation questionnaire modules
 // ============================================================================
 //
-// Total: 22 questionnaires across 6 modules
+// Total: 23 questionnaires across 8 modules
 // All questionnaires save to schizophrenia_* tables via schizophrenia-initial.service.ts
 //
 // ============================================================================
@@ -41,3 +41,7 @@ export * as auto from './auto';
 // Questionnaires completed by caregiver/entourage
 // EPHP (Handicap Psychique)
 export * as entourage from './entourage';
+
+// Neuropsy module (Neuropsychological assessments)
+// Bloc 2: CVLT (California Verbal Learning Test)
+export * as neuropsy from './neuropsy';

@@ -153,7 +153,8 @@ import {
   PSQI_SZ_DEFINITION,
   PRESENTEISME_SZ_DEFINITION,
   FAGERSTROM_SZ_DEFINITION,
-  EPHP_SZ_DEFINITION
+  EPHP_SZ_DEFINITION,
+  SZ_CVLT_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { 
   getAsrmResponse, 
@@ -304,7 +305,8 @@ import {
   getPsqiSzResponse,
   getPresenteismeSzResponse,
   getFagerstromSzResponse,
-  getEphpSzResponse
+  getEphpSzResponse,
+  getCvltSzResponse
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -625,6 +627,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === FAGERSTROM_SZ_DEFINITION.code) questionnaire = FAGERSTROM_SZ_DEFINITION;
   // Schizophrenia entourage module (caregiver-administered)
   else if (code === EPHP_SZ_DEFINITION.code) questionnaire = EPHP_SZ_DEFINITION;
+  // Schizophrenia neuropsy module
+  else if (code === SZ_CVLT_DEFINITION.code) questionnaire = SZ_CVLT_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -789,6 +793,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === FAGERSTROM_SZ_DEFINITION.code) existingResponse = await getFagerstromSzResponse(visitId);
   // Schizophrenia entourage module (caregiver-administered)
   else if (code === EPHP_SZ_DEFINITION.code) existingResponse = await getEphpSzResponse(visitId);
+  // Schizophrenia neuropsy module
+  else if (code === SZ_CVLT_DEFINITION.code) existingResponse = await getCvltSzResponse(visitId);
   
   // Debug logging for PSQI_SZ
   if (code === 'PSQI_SZ') {
@@ -804,6 +810,7 @@ export default async function ProfessionalQuestionnairePage({
   if (existingResponse) {
     // Destructure to remove metadata if needed, but passing everything is usually fine as extra keys are ignored by Renderer if not in questions list.
     initialResponses = { ...existingResponse };
+    
     initialResponses = normalizeResponseForQuestionnaireForm(questionnaire, initialResponses) as Record<string, any>;
   }
   
@@ -859,6 +866,12 @@ export default async function ProfessionalQuestionnairePage({
       return val;
     };
     initialResponses.justice_safeguard = boolToNum(initialResponses.justice_safeguard);
+  }
+
+  // CVLT_SZ: Set default value for new responses (no existing data)
+  // Default to 'non' so questionnaire fields are hidden initially
+  if (code === 'CVLT_SZ' && !existingResponse) {
+    initialResponses.test_done = 'non';
   }
 
   // Remove calculated score fields from WAIS4_SIMILITUDES initial responses
@@ -944,6 +957,30 @@ export default async function ProfessionalQuestionnairePage({
     delete initialResponses.recency_std;
     delete initialResponses.bias_std;
     console.log('[CVLT Debug] Removed calculated score fields from form');
+  }
+
+  // Remove calculated score fields from CVLT_SZ initial responses (Schizophrenia)
+  // These are calculated automatically on save and should only be displayed on score page
+  if (code === 'CVLT_SZ' && existingResponse) {
+    delete initialResponses.trial_1_std;
+    delete initialResponses.trial_5_std;
+    delete initialResponses.total_1_5_std;
+    delete initialResponses.list_b_std;
+    delete initialResponses.sdfr_std;
+    delete initialResponses.sdcr_std;
+    delete initialResponses.ldfr_std;
+    delete initialResponses.ldcr_std;
+    delete initialResponses.semantic_std;
+    delete initialResponses.serial_std;
+    delete initialResponses.persev_std;
+    delete initialResponses.intru_std;
+    delete initialResponses.recog_std;
+    delete initialResponses.false_recog_std;
+    delete initialResponses.discrim_std;
+    delete initialResponses.primacy_std;
+    delete initialResponses.recency_std;
+    delete initialResponses.bias_std;
+    console.log('[CVLT_SZ Debug] Removed calculated score fields from form');
   }
 
   // Remove calculated score fields from Fluences Verbales initial responses

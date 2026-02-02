@@ -1979,7 +1979,34 @@ export function QuestionnaireRenderer({
         }
       }
 
-      // Compute CVLT scores
+      // Compute CVLT Lundi Total (sum of trials 1-5) - runs as soon as any trial is filled
+      const hasAnyTrialInput = 
+        prev.trial_1 !== undefined || prev.trial_2 !== undefined ||
+        prev.trial_3 !== undefined || prev.trial_4 !== undefined ||
+        prev.trial_5 !== undefined;
+
+      if (hasAnyTrialInput) {
+        const trial1 = Number(prev.trial_1) || 0;
+        const trial2 = Number(prev.trial_2) || 0;
+        const trial3 = Number(prev.trial_3) || 0;
+        const trial4 = Number(prev.trial_4) || 0;
+        const trial5 = Number(prev.trial_5) || 0;
+
+        const lundiTotal = trial1 + trial2 + trial3 + trial4 + trial5;
+
+        // Update total_1_5 field (used by both CVLT and CVLT_SZ)
+        if (updated.total_1_5 !== lundiTotal) {
+          updated.total_1_5 = lundiTotal;
+          hasChanges = true;
+        }
+        // Also update trials_1_5_total for backward compatibility
+        if (updated.trials_1_5_total !== lundiTotal) {
+          updated.trials_1_5_total = lundiTotal;
+          hasChanges = true;
+        }
+      }
+
+      // Compute CVLT standard scores (requires all inputs including demographics)
       const hasCvltInputs =
         prev.trial_1 !== undefined && prev.trial_2 !== undefined &&
         prev.trial_3 !== undefined && prev.trial_4 !== undefined &&
@@ -1990,21 +2017,13 @@ export function QuestionnaireRenderer({
         prev.patient_sex !== undefined;
 
       if (hasCvltInputs) {
-        // 1. Calculate Lundi Total (sum of trials 1-5)
         const trial1 = Number(prev.trial_1) || 0;
         const trial2 = Number(prev.trial_2) || 0;
         const trial3 = Number(prev.trial_3) || 0;
         const trial4 = Number(prev.trial_4) || 0;
         const trial5 = Number(prev.trial_5) || 0;
 
-        const lundiTotal = trial1 + trial2 + trial3 + trial4 + trial5;
-
-        if (updated.trials_1_5_total !== lundiTotal) {
-          updated.trials_1_5_total = lundiTotal;
-          hasChanges = true;
-        }
-
-        // 2. Calculate full CVLT standard scores
+        // Calculate full CVLT standard scores
         const cvltScores = calculateCvltScores({
           patient_age: Number(prev.patient_age),
           years_of_education: Number(prev.years_of_education),

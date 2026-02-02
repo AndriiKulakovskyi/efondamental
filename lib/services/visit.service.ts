@@ -250,7 +250,8 @@ import {
   PSQI_SZ_DEFINITION,
   PRESENTEISME_SZ_DEFINITION,
   FAGERSTROM_SZ_DEFINITION,
-  EPHP_SZ_DEFINITION
+  EPHP_SZ_DEFINITION,
+  SZ_CVLT_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -716,7 +717,21 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           id: 'mod_neuropsy_sz',
           name: 'Evaluation Neuropsychologique',
           description: 'Évaluation neuropsychologique',
-          questionnaires: []
+          sections: [
+            {
+              id: 'bloc2',
+              name: 'Bloc 2',
+              questionnaires: [
+                {
+                  id: SZ_CVLT_DEFINITION.id,
+                  code: SZ_CVLT_DEFINITION.code,
+                  title: SZ_CVLT_DEFINITION.title,
+                  description: SZ_CVLT_DEFINITION.description,
+                  questions: SZ_CVLT_DEFINITION.questions
+                }
+              ]
+            }
+          ]
         },
         {
           id: 'mod_social_sz',

@@ -90,6 +90,7 @@ export const QUESTIONNAIRES_REQUIRING_DEMOGRAPHICS: string[] = [
   
   // Cognitive assessments (require age/sex/education for scoring)
   'CVLT',
+  'CVLT_SZ',  // Schizophrenia CVLT
   'TMT',
   'STROOP',
   'FLUENCES_VERBALES',
@@ -123,7 +124,29 @@ export const QUESTIONNAIRES_USING_AGE_FIELD: string[] = [
  */
 export const QUESTIONNAIRES_USING_PATIENT_SEX: string[] = [
   'CVLT',
+  'CVLT_SZ',  // Schizophrenia CVLT
 ];
+
+/**
+ * Questionnaires that use years_of_education field.
+ * These questionnaires need education level from patient profile for scoring.
+ */
+export const QUESTIONNAIRES_USING_EDUCATION: string[] = [
+  'CVLT',
+  'CVLT_SZ',  // Schizophrenia CVLT
+  'TMT',
+  'FLUENCES_VERBALES',
+];
+
+/**
+ * Check if a questionnaire uses years_of_education field.
+ * 
+ * @param questionnaireCode - The questionnaire code to check
+ * @returns True if the questionnaire uses years_of_education
+ */
+export function questionnaireUsesEducation(questionnaireCode: string): boolean {
+  return QUESTIONNAIRES_USING_EDUCATION.includes(questionnaireCode);
+}
 
 /**
  * Check if a questionnaire requires patient demographics.

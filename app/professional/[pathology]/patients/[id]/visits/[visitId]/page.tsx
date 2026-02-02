@@ -157,7 +157,8 @@ import {
   PSQI_SZ_DEFINITION,
   PRESENTEISME_SZ_DEFINITION,
   FAGERSTROM_SZ_DEFINITION,
-  EPHP_SZ_DEFINITION
+  EPHP_SZ_DEFINITION,
+  SZ_CVLT_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -581,7 +582,25 @@ export default async function VisitDetailPage({
           id: 'mod_neuropsy_sz',
           name: 'Evaluation Neuropsychologique',
           description: 'Évaluation neuropsychologique',
-          questionnaires: []
+          questionnaires: [],
+          sections: [
+            {
+              id: 'bloc2',
+              name: 'Bloc 2',
+              questionnaires: [
+                {
+                  id: SZ_CVLT_DEFINITION.code,
+                  code: SZ_CVLT_DEFINITION.code,
+                  title: SZ_CVLT_DEFINITION.title,
+                  description: SZ_CVLT_DEFINITION.description,
+                  questions: SZ_CVLT_DEFINITION.questions,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses['CVLT_SZ']?.completed || false,
+                  completedAt: questionnaireStatuses['CVLT_SZ']?.completed_at,
+                }
+              ]
+            }
+          ]
         },
         {
           id: 'mod_social_sz',

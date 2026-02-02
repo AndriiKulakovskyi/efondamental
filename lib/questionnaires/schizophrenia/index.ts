@@ -67,3 +67,7 @@ export {
 export {
   EPHP_SZ_DEFINITION
 } from './initial/entourage';
+
+export {
+  SZ_CVLT_DEFINITION
+} from './initial/neuropsy';

@@ -2,6 +2,7 @@
 // Handles all questionnaire data operations for schizophrenia initial visits
 
 import { createClient } from '@/lib/supabase/server';
+import { calculateCvltScores, CvltRawData } from '@/lib/services/cvlt-scoring';
 
 // ============================================================================
 // Generic Types for Schizophrenia Initial Questionnaires
@@ -70,6 +71,9 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   
   // Entourage module (caregiver-administered)
   'EPHP_SZ': 'schizophrenia_ephp',
+  
+  // Neuropsy module - Bloc 2 (Neuropsychological assessments)
+  'CVLT_SZ': 'schizophrenia_cvlt',
 };
 
 // ============================================================================
@@ -3221,6 +3225,172 @@ export async function saveEphpSzResponse(response: any): Promise<any> {
   
   if (error) {
     console.error('Error saving schizophrenia_ephp:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// CVLT (California Verbal Learning Test) - Neuropsy Bloc 2
+// ============================================================================
+
+/**
+ * Get CVLT response for a visit
+ */
+export async function getCvltSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse('CVLT_SZ', visitId);
+}
+
+/**
+ * Save CVLT response with computed Z-scores and percentiles
+ * Uses the shared CVLT scoring service (Deweer et al. 2008 French norms)
+ */
+export async function saveCvltSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Convert test_done from UI format to boolean
+  // UI: 'oui' = test was done, 'non' = test was not done
+  // DB: test_done: true = test was done, false = test was not done
+  const testDone = response.test_done === 'oui' || response.test_done === true;
+  
+  // Handle case where test was not done
+  if (!testDone) {
+    const { data, error } = await supabase
+      .from('schizophrenia_cvlt')
+      .upsert({
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        test_done: false,
+        completed_by: user.data.user?.id
+      }, { onConflict: 'visit_id' })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error saving schizophrenia_cvlt:', error);
+      throw error;
+    }
+    return data;
+  }
+  
+  // Calculate total_1_5 if not provided
+  const total_1_5 = response.total_1_5 ?? (
+    (response.trial_1 ?? 0) + 
+    (response.trial_2 ?? 0) + 
+    (response.trial_3 ?? 0) + 
+    (response.trial_4 ?? 0) + 
+    (response.trial_5 ?? 0)
+  );
+  
+  // Prepare raw data for scoring (only if we have required demographics)
+  let computedScores: any = {};
+  
+  if (
+    response.patient_age != null && 
+    response.years_of_education != null && 
+    response.patient_sex != null &&
+    response.trial_1 != null &&
+    response.trial_2 != null &&
+    response.trial_3 != null &&
+    response.trial_4 != null &&
+    response.trial_5 != null &&
+    response.list_b != null &&
+    response.sdfr != null &&
+    response.sdcr != null &&
+    response.ldfr != null &&
+    response.ldcr != null
+  ) {
+    const rawData: CvltRawData = {
+      patient_age: response.patient_age,
+      years_of_education: response.years_of_education,
+      patient_sex: response.patient_sex as 'F' | 'M',
+      trial_1: response.trial_1,
+      trial_2: response.trial_2,
+      trial_3: response.trial_3,
+      trial_4: response.trial_4,
+      trial_5: response.trial_5,
+      total_1_5: total_1_5,
+      list_b: response.list_b,
+      sdfr: response.sdfr,
+      sdcr: response.sdcr,
+      ldfr: response.ldfr,
+      ldcr: response.ldcr,
+      semantic_clustering: response.semantic_clustering,
+      serial_clustering: response.serial_clustering,
+      perseverations: response.perseverations,
+      intrusions: response.intrusions,
+      recognition_hits: response.recognition_hits,
+      false_positives: response.false_positives,
+      discriminability: response.discriminability,
+      primacy: response.primacy,
+      recency: response.recency,
+      response_bias: response.response_bias
+    };
+    
+    computedScores = calculateCvltScores(rawData);
+  }
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_cvlt')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      // Demographics
+      patient_age: response.patient_age,
+      years_of_education: response.years_of_education,
+      patient_sex: response.patient_sex,
+      // Raw inputs
+      trial_1: response.trial_1,
+      trial_2: response.trial_2,
+      trial_3: response.trial_3,
+      trial_4: response.trial_4,
+      trial_5: response.trial_5,
+      total_1_5: total_1_5,
+      list_b: response.list_b,
+      sdfr: response.sdfr,
+      sdcr: response.sdcr,
+      ldfr: response.ldfr,
+      ldcr: response.ldcr,
+      semantic_clustering: response.semantic_clustering,
+      serial_clustering: response.serial_clustering,
+      perseverations: response.perseverations,
+      intrusions: response.intrusions,
+      recognition_hits: response.recognition_hits,
+      false_positives: response.false_positives,
+      discriminability: response.discriminability,
+      primacy: response.primacy,
+      recency: response.recency,
+      response_bias: response.response_bias,
+      cvlt_delai: response.cvlt_delai,
+      // Computed scores
+      trial_1_std: computedScores.trial_1_std ?? null,
+      trial_5_std: computedScores.trial_5_std ?? null,
+      total_1_5_std: computedScores.total_1_5_std ?? null,
+      list_b_std: computedScores.list_b_std ?? null,
+      sdfr_std: computedScores.sdfr_std ?? null,
+      sdcr_std: computedScores.sdcr_std ?? null,
+      ldfr_std: computedScores.ldfr_std ?? null,
+      ldcr_std: computedScores.ldcr_std ?? null,
+      semantic_std: computedScores.semantic_std ?? null,
+      serial_std: computedScores.serial_std ?? null,
+      persev_std: computedScores.persev_std ?? null,
+      intru_std: computedScores.intru_std ?? null,
+      recog_std: computedScores.recog_std ?? null,
+      false_recog_std: computedScores.false_recog_std ?? null,
+      discrim_std: computedScores.discrim_std ?? null,
+      primacy_std: computedScores.primacy_std ?? null,
+      recency_std: computedScores.recency_std ?? null,
+      bias_std: computedScores.bias_std ?? null,
+      // Status and metadata
+      test_done: true,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_cvlt:', error);
     throw error;
   }
   return data;

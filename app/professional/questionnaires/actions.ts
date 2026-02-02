@@ -172,7 +172,8 @@ import {
   savePsqiSzResponse as saveSchizophreniaPsqiResponse,
   savePresenteismeSzResponse as saveSchizophreniaPresenteismeResponse,
   saveFagerstromSzResponse as saveSchizophreniaFagerstromResponse,
-  saveEphpSzResponse as saveSchizophreniaEphpResponse
+  saveEphpSzResponse as saveSchizophreniaEphpResponse,
+  saveCvltSzResponse as saveSchizophreniaCvltSzResponse
 } from '@/lib/services/schizophrenia-initial.service';
 import { 
   getVisitCompletionStatus,
@@ -243,6 +244,8 @@ function questionnaireCodeToSchizophreniaKey(code: string): string | null {
     'TEA_COFFEE_SZ': 'TEA_COFFEE_SZ',
     'EVAL_ADDICTOLOGIQUE_SZ': 'EVAL_ADDICTOLOGIQUE_SZ',
     'ECV': 'ECV',
+    // Neuropsy module
+    'CVLT_SZ': 'CVLT_SZ',
   };
   return mapping[code] || null;
 }
@@ -876,6 +879,15 @@ export async function submitProfessionalQuestionnaireAction(
       // Initial Evaluation - ENTOURAGE (caregiver-administered)
       case 'EPHP_SZ':
         result = await saveSchizophreniaEphpResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        });
+        break;
+
+      // Initial Evaluation - NEUROPSY (neuropsychological assessments)
+      case 'CVLT_SZ':
+        result = await saveSchizophreniaCvltSzResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
