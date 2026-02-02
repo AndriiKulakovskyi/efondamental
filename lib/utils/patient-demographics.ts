@@ -88,6 +88,9 @@ export const QUESTIONNAIRES_REQUIRING_DEMOGRAPHICS: string[] = [
   'WAIS3_DIGIT_SPAN',
   'WAIS3_CPT2',
   
+  // Schizophrenia WAIS-IV questionnaires (use neuro_age for scoring)
+  'WAIS4_CRITERIA_SZ',
+  
   // Cognitive assessments (require age/sex/education for scoring)
   'CVLT',
   'CVLT_SZ',  // Schizophrenia CVLT
@@ -142,6 +145,24 @@ export const QUESTIONNAIRES_USING_EDUCATION: string[] = [
 ];
 
 /**
+ * Questionnaires that use 'neuro_age' field instead of 'patient_age' or 'age'.
+ * These need special handling to inject the age into the 'neuro_age' field.
+ * Used by schizophrenia WAIS-IV questionnaires.
+ */
+export const QUESTIONNAIRES_USING_NEURO_AGE_FIELD: string[] = [
+  'WAIS4_CRITERIA_SZ',
+];
+
+/**
+ * Questionnaires that use 'annees_etudes' field instead of 'years_of_education'.
+ * These need special handling to inject years of education from patient profile.
+ * Used by schizophrenia neuropsy questionnaires.
+ */
+export const QUESTIONNAIRES_USING_ANNEES_ETUDES_FIELD: string[] = [
+  'WAIS4_CRITERIA_SZ',
+];
+
+/**
  * Check if a questionnaire uses years_of_education field.
  * 
  * @param questionnaireCode - The questionnaire code to check
@@ -179,5 +200,25 @@ export function questionnaireUsesPatientSex(questionnaireCode: string): boolean 
  */
 export function questionnaireUsesAgeField(questionnaireCode: string): boolean {
   return QUESTIONNAIRES_USING_AGE_FIELD.includes(questionnaireCode);
+}
+
+/**
+ * Check if a questionnaire uses 'neuro_age' field instead of 'patient_age'.
+ * 
+ * @param questionnaireCode - The questionnaire code to check
+ * @returns True if the questionnaire uses the 'neuro_age' field
+ */
+export function questionnaireUsesNeuroAgeField(questionnaireCode: string): boolean {
+  return QUESTIONNAIRES_USING_NEURO_AGE_FIELD.includes(questionnaireCode);
+}
+
+/**
+ * Check if a questionnaire uses 'annees_etudes' field instead of 'years_of_education'.
+ * 
+ * @param questionnaireCode - The questionnaire code to check
+ * @returns True if the questionnaire uses the 'annees_etudes' field
+ */
+export function questionnaireUsesAnneesEtudesField(questionnaireCode: string): boolean {
+  return QUESTIONNAIRES_USING_ANNEES_ETUDES_FIELD.includes(questionnaireCode);
 }
 

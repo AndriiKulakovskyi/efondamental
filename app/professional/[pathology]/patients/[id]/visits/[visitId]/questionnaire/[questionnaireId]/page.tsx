@@ -157,7 +157,8 @@ import {
   SZ_CVLT_DEFINITION,
   TMT_SZ_DEFINITION,
   COMMISSIONS_SZ_DEFINITION,
-  LIS_SZ_DEFINITION
+  LIS_SZ_DEFINITION,
+  WAIS4_CRITERIA_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { 
   getAsrmResponse, 
@@ -312,7 +313,8 @@ import {
   getCvltSzResponse,
   getTmtSzResponse,
   getCommissionsSzResponse,
-  getLisSzResponse
+  getLisSzResponse,
+  getWais4CriteriaSzResponse
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -322,7 +324,9 @@ import {
   normalizeGender,
   questionnaireRequiresDemographics,
   questionnaireUsesPatientSex,
-  questionnaireUsesAgeField
+  questionnaireUsesAgeField,
+  questionnaireUsesNeuroAgeField,
+  questionnaireUsesAnneesEtudesField
 } from "@/lib/utils/patient-demographics";
 import { normalizeResponseForQuestionnaireForm } from "@/lib/utils/questionnaire-prefill";
 
@@ -638,6 +642,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === TMT_SZ_DEFINITION.code) questionnaire = TMT_SZ_DEFINITION;
   else if (code === COMMISSIONS_SZ_DEFINITION.code) questionnaire = COMMISSIONS_SZ_DEFINITION;
   else if (code === LIS_SZ_DEFINITION.code) questionnaire = LIS_SZ_DEFINITION;
+  else if (code === WAIS4_CRITERIA_SZ_DEFINITION.code) questionnaire = WAIS4_CRITERIA_SZ_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -807,6 +812,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === TMT_SZ_DEFINITION.code) existingResponse = await getTmtSzResponse(visitId);
   else if (code === COMMISSIONS_SZ_DEFINITION.code) existingResponse = await getCommissionsSzResponse(visitId);
   else if (code === LIS_SZ_DEFINITION.code) existingResponse = await getLisSzResponse(visitId);
+  else if (code === WAIS4_CRITERIA_SZ_DEFINITION.code) existingResponse = await getWais4CriteriaSzResponse(visitId);
   
   // Debug logging for PSQI_SZ
   if (code === 'PSQI_SZ') {
@@ -1051,6 +1057,12 @@ export default async function ProfessionalQuestionnairePage({
           initialResponses = { ...initialResponses, age: calculatedAge };
           console.log('[Demographics Debug] Also injecting into "age" field for criteria questionnaire');
         }
+        
+        // Schizophrenia WAIS-IV questionnaires use 'neuro_age' field
+        if (questionnaireUsesNeuroAgeField(code)) {
+          initialResponses = { ...initialResponses, neuro_age: calculatedAge };
+          console.log('[Demographics Debug] Also injecting into "neuro_age" field for SZ WAIS-IV questionnaire');
+        }
       } else {
         console.log('[Demographics Debug] Patient has no date_of_birth!');
       }
@@ -1088,11 +1100,23 @@ export default async function ProfessionalQuestionnairePage({
           initialResponses = { ...initialResponses, education_level: educationLevel };
           console.log('[Demographics Debug] Converted to education_level category:', educationLevel);
         }
+        
+        // Schizophrenia WAIS-IV questionnaires use 'annees_etudes' field
+        if (questionnaireUsesAnneesEtudesField(code)) {
+          initialResponses = { ...initialResponses, annees_etudes: patient.years_of_education };
+          console.log('[Demographics Debug] Also injecting into "annees_etudes" field for SZ WAIS-IV questionnaire');
+        }
       } else {
         // For WAIS Criteria, always inject years_of_education field (null if not set)
         if (code === 'WAIS3_CRITERIA' || code === 'WAIS4_CRITERIA') {
           initialResponses = { ...initialResponses, years_of_education: null };
           console.log('[Demographics Debug] Years of education not set in patient profile (will show as empty)');
+        }
+        
+        // For SZ WAIS-IV Criteria, always inject annees_etudes field (null if not set)
+        if (questionnaireUsesAnneesEtudesField(code)) {
+          initialResponses = { ...initialResponses, annees_etudes: null };
+          console.log('[Demographics Debug] Annees etudes not set in patient profile (will show as empty)');
         }
       }
     }
@@ -1106,6 +1130,15 @@ export default async function ProfessionalQuestionnairePage({
       const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
       initialResponses = { ...initialResponses, collection_date: today };
       console.log('[Demographics Debug] Set default collection_date to today:', today);
+    }
+  }
+  
+  // For WAIS4_CRITERIA_SZ, set default date_neuropsychologie to today
+  if (code === 'WAIS4_CRITERIA_SZ') {
+    if (!initialResponses.date_neuropsychologie) {
+      const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+      initialResponses = { ...initialResponses, date_neuropsychologie: today };
+      console.log('[Demographics Debug] Set default date_neuropsychologie to today:', today);
     }
   }
 

@@ -77,6 +77,9 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'TMT_SZ': 'schizophrenia_tmt',
   'COMMISSIONS_SZ': 'schizophrenia_commissions',
   'LIS_SZ': 'schizophrenia_lis',
+  
+  // Neuropsy module - WAIS-IV (Neuropsychological assessments)
+  'WAIS4_CRITERIA_SZ': 'schizophrenia_wais4_criteria',
 };
 
 // ============================================================================
@@ -3751,6 +3754,79 @@ export async function saveLisSzResponse(response: any): Promise<any> {
   
   if (error) {
     console.error('Error saving schizophrenia_lis:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// WAIS-IV Criteria Functions (Neuropsy - WAIS-IV submodule)
+// ============================================================================
+
+/**
+ * Get WAIS4_CRITERIA_SZ response for a visit
+ * WAIS-IV Clinical Criteria - Pre-evaluation screening for neuropsychological testing eligibility
+ */
+export async function getWais4CriteriaSzResponse(visitId: string): Promise<any | null> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_wais4_criteria')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') return null; // Not found
+    console.error('Error getting schizophrenia_wais4_criteria:', error);
+    throw error;
+  }
+  return data;
+}
+
+/**
+ * Save WAIS4_CRITERIA_SZ response
+ * This questionnaire has no scoring - it's a pre-evaluation screening checklist
+ */
+export async function saveWais4CriteriaSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Convert accepted_for_neuropsy_evaluation from radio value to boolean if needed
+  let acceptedForEvaluation: boolean | null = null;
+  if (response.accepted_for_neuropsy_evaluation !== undefined && response.accepted_for_neuropsy_evaluation !== null) {
+    acceptedForEvaluation = response.accepted_for_neuropsy_evaluation === 1 || response.accepted_for_neuropsy_evaluation === true;
+  }
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_wais4_criteria')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      // General Information
+      date_neuropsychologie: response.date_neuropsychologie || null,
+      neuro_age: response.neuro_age != null ? Number(response.neuro_age) : null,
+      rad_dernier_eval: response.rad_dernier_eval || null,
+      annees_etudes: response.annees_etudes != null ? Number(response.annees_etudes) : null,
+      // Clinical Criteria
+      rad_neuro_lang: response.rad_neuro_lang != null ? Number(response.rad_neuro_lang) : null,
+      rad_neuro_normo: response.rad_neuro_normo != null ? Number(response.rad_neuro_normo) : null,
+      rad_neuro_dalt: response.rad_neuro_dalt != null ? Number(response.rad_neuro_dalt) : null,
+      rad_neuro_tbaud: response.rad_neuro_tbaud != null ? Number(response.rad_neuro_tbaud) : null,
+      rad_neuro_sismo: response.rad_neuro_sismo != null ? Number(response.rad_neuro_sismo) : null,
+      rad_abs_ep_3month: response.rad_abs_ep_3month != null ? Number(response.rad_abs_ep_3month) : null,
+      chk_sismo_choix: response.chk_sismo_choix || null,
+      rad_neuro_psychotrope: response.rad_neuro_psychotrope != null ? Number(response.rad_neuro_psychotrope) : null,
+      // Acceptance for evaluation
+      accepted_for_neuropsy_evaluation: acceptedForEvaluation,
+      // Metadata
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_wais4_criteria:', error);
     throw error;
   }
   return data;
