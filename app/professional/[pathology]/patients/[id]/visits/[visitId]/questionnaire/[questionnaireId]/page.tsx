@@ -131,6 +131,10 @@ import {
   BARNES_DEFINITION,
   SAS_DEFINITION,
   PSP_DEFINITION,
+  BRIEF_A_SZ_DEFINITION,
+  YMRS_SZ_DEFINITION,
+  CGI_SZ_DEFINITION,
+  EGF_SZ_DEFINITION,
   ECV_DEFINITION,
   TROUBLES_PSYCHOTIQUES_DEFINITION,
   SUICIDE_HISTORY_SZ_DEFINITION,
@@ -328,7 +332,9 @@ import {
   getWais4MatricesSzResponse,
   getSsticsSzResponse,
   getCbqSzResponse,
-  getDacobsSzResponse
+  getDacobsSzResponse,
+  getBriefASzResponse,
+  getSchizophreniaInitialResponse
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
@@ -624,6 +630,10 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === BARNES_DEFINITION.code) questionnaire = BARNES_DEFINITION;
   else if (code === SAS_DEFINITION.code) questionnaire = SAS_DEFINITION;
   else if (code === PSP_DEFINITION.code) questionnaire = PSP_DEFINITION;
+  else if (code === BRIEF_A_SZ_DEFINITION.code) questionnaire = BRIEF_A_SZ_DEFINITION;
+  else if (code === YMRS_SZ_DEFINITION.code) questionnaire = YMRS_SZ_DEFINITION;
+  else if (code === CGI_SZ_DEFINITION.code) questionnaire = CGI_SZ_DEFINITION;
+  else if (code === EGF_SZ_DEFINITION.code) questionnaire = EGF_SZ_DEFINITION;
   // Schizophrenia medical evaluation
   else if (code === ECV_DEFINITION.code) questionnaire = ECV_DEFINITION;
   else if (code === TROUBLES_PSYCHOTIQUES_DEFINITION.code) questionnaire = TROUBLES_PSYCHOTIQUES_DEFINITION;
@@ -801,6 +811,10 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === BARNES_DEFINITION.code) existingResponse = await getBarnesResponse(visitId);
   else if (code === SAS_DEFINITION.code) existingResponse = await getSasResponse(visitId);
   else if (code === PSP_DEFINITION.code) existingResponse = await getPspResponse(visitId);
+  else if (code === BRIEF_A_SZ_DEFINITION.code) existingResponse = await getBriefASzResponse(visitId);
+  else if (code === YMRS_SZ_DEFINITION.code) existingResponse = await getSchizophreniaInitialResponse('YMRS_SZ', visitId);
+  else if (code === CGI_SZ_DEFINITION.code) existingResponse = await getSchizophreniaInitialResponse('CGI_SZ', visitId);
+  else if (code === EGF_SZ_DEFINITION.code) existingResponse = await getSchizophreniaInitialResponse('EGF_SZ', visitId);
   // Schizophrenia medical evaluation
   else if (code === ECV_DEFINITION.code) existingResponse = await getEcvResponse(visitId);
   else if (code === TROUBLES_PSYCHOTIQUES_DEFINITION.code) existingResponse = await getTroublesPsychotiquesResponse(visitId);

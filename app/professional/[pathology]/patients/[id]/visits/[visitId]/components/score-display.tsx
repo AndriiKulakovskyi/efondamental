@@ -301,6 +301,46 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'success';
     }
     
+    if (code === 'BRIEF_A_SZ') {
+      // BRIEF-A: GEC score based (75-225)
+      // Higher scores indicate more executive dysfunction
+      if (data.brief_a_gec > 187) return 'error';
+      if (data.brief_a_gec > 150) return 'warning';
+      if (data.brief_a_gec > 112) return 'info';
+      return 'success';
+    }
+    
+    if (code === 'YMRS_SZ') {
+      // YMRS: Total score range 0-60
+      // Severity based on standard thresholds
+      const score = data.total_score;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 26) return 'error';    // Severe mania
+      if (score >= 20) return 'warning';  // Moderate mania
+      if (score >= 13) return 'info';     // Mild symptoms
+      return 'success';                   // Euthymia or minimal symptoms
+    }
+    
+    if (code === 'CGI_SZ') {
+      // CGI: Severity score (cgi_s) range 0-7
+      const score = data.cgi_s;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 6) return 'error';     // Gravely/extremely ill
+      if (score >= 4) return 'warning';   // Moderately ill
+      if (score >= 2) return 'info';      // Borderline/mildly ill
+      return 'success';                   // Normal/not ill
+    }
+    
+    if (code === 'EGF_SZ') {
+      // EGF: Score 1-100, higher = better functioning
+      const score = data.egf_score;
+      if (score === null || score === undefined) return 'info';
+      if (score >= 71) return 'success';  // Good functioning
+      if (score >= 51) return 'info';     // Moderate symptoms
+      if (score >= 41) return 'warning';  // Important symptoms
+      return 'error';                     // Major impairment
+    }
+    
     if (code === 'WAIS3_VOCABULAIRE') {
       // WAIS-III Vocabulaire: Standard score 8-12 is average (mean=10, SD=3)
       if (data.standard_score >= 13) return 'success';
@@ -709,6 +749,18 @@ if (code === 'FAGERSTROM') {
     }
   }
   
+  if (code === 'BRIEF_A_SZ' && !interpretation && data.brief_a_gec !== undefined) {
+    if (data.brief_a_gec > 187) {
+      interpretation = 'Difficultés exécutives sévères';
+    } else if (data.brief_a_gec > 150) {
+      interpretation = 'Difficultés exécutives modérées';
+    } else if (data.brief_a_gec > 112) {
+      interpretation = 'Difficultés exécutives légères';
+    } else {
+      interpretation = 'Fonctions exécutives dans la norme';
+    }
+  }
+  
   if (code === 'WAIS3_VOCABULAIRE' && !interpretation && data.standard_score !== undefined) {
     if (data.standard_score >= 13) {
       interpretation = 'Connaissances lexicales supérieures à la moyenne';
@@ -881,6 +933,7 @@ if (code === 'FAGERSTROM') {
               {code === 'SSTICS_SZ' && 'Résultats SSTICS - Plaintes Cognitives Subjectives'}
               {code === 'CBQ_SZ' && 'Résultats CBQ - Biais Cognitifs'}
               {code === 'DACOBS_SZ' && 'Résultats DACOBS - Biais Cognitifs et Comportements'}
+              {code === 'BRIEF_A_SZ' && 'Résultats BRIEF-A - Fonctions Exécutives'}
               {(code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') && 'Résultats WAIS-IV Mémoire des chiffres (Digit Span)'}
               {(code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') && 'Résultats WAIS-IV Similitudes'}
               {code === 'WAIS3_VOCABULAIRE' && 'Score WAIS-III Vocabulaire'}
@@ -965,6 +1018,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.cbq_total_z !== undefined && data.cbq_total_z !== null ? Number(data.cbq_total_z).toFixed(2) : '-')
                 : code === 'DACOBS_SZ'
                 ? (data.dacobs_total !== undefined && data.dacobs_total !== null ? data.dacobs_total : '-')
+                : code === 'BRIEF_A_SZ'
+                ? (data.brief_a_gec !== undefined && data.brief_a_gec !== null ? data.brief_a_gec : '-')
                 : (code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ')
                 ? (data.wais_mc_std !== undefined ? data.wais_mc_std : '-')
                 : (code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ')
@@ -1061,6 +1116,7 @@ if (code === 'FAGERSTROM') {
               {code === 'SSTICS_SZ' && ' (Z-score)'}
               {code === 'CBQ_SZ' && ' (Z-score)'}
               {code === 'DACOBS_SZ' && '/294'}
+              {code === 'BRIEF_A_SZ' && '/225 (GEC)'}
               {(code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') && '/19'}
               {(code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') && '/19'}
               {(code === 'CVLT' || code === 'CVLT_SZ') && '/80'}
@@ -2825,6 +2881,178 @@ if (code === 'FAGERSTROM') {
                 <li><strong>Section 2 (Limitations cognitives):</strong> 2 sous-échelles × 42 = 84 points max</li>
                 <li><strong>Section 3 (Comportements de sûreté):</strong> 1 sous-échelle × 42 = 42 points max</li>
                 <li><strong>Score total:</strong> Somme des 42 items (range 42-294)</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* BRIEF-A Details */}
+        {code === 'BRIEF_A_SZ' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Global Executive Composite Summary */}
+            <div className="bg-slate-50 p-3 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-semibold text-gray-700">Score Exécutif Global (GEC)</span>
+                <span className="text-lg font-bold text-slate-700">
+                  {data.brief_a_gec ?? '-'}/225
+                </span>
+              </div>
+              <div className="text-xs text-gray-600">
+                Score de 75 (minimum) à 225 (maximum). Plus le score est élevé, plus les difficultés exécutives sont importantes.
+              </div>
+            </div>
+
+            {/* Behavioral Regulation Index (BRI) */}
+            <div className="bg-blue-50 p-3 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-semibold text-blue-800">Indice de Régulation Comportementale (BRI)</span>
+                <span className="font-bold text-blue-700">
+                  {data.brief_a_bri ?? '-'}/90
+                </span>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Inhibition</span>
+                    <span className="text-gray-500 ml-1">(8 items)</span>
+                  </div>
+                  <span className="font-semibold">{data.brief_a_inhibit ?? '-'}/24</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Flexibilité</span>
+                    <span className="text-gray-500 ml-1">(6 items)</span>
+                  </div>
+                  <span className="font-semibold">{data.brief_a_shift ?? '-'}/18</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Contrôle émotionnel</span>
+                    <span className="text-gray-500 ml-1">(10 items)</span>
+                  </div>
+                  <span className="font-semibold">{data.brief_a_emotional_control ?? '-'}/30</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Auto-contrôle</span>
+                    <span className="text-gray-500 ml-1">(6 items)</span>
+                  </div>
+                  <span className="font-semibold">{data.brief_a_self_monitor ?? '-'}/18</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Metacognition Index (MI) */}
+            <div className="bg-amber-50 p-3 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-semibold text-amber-800">Indice de Métacognition (MI)</span>
+                <span className="font-bold text-amber-700">
+                  {data.brief_a_mi ?? '-'}/120
+                </span>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Initiation</span>
+                    <span className="text-gray-500 ml-1">(8 items)</span>
+                  </div>
+                  <span className="font-semibold">{data.brief_a_initiate ?? '-'}/24</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Mémoire de travail</span>
+                    <span className="text-gray-500 ml-1">(8 items)</span>
+                  </div>
+                  <span className="font-semibold">{data.brief_a_working_memory ?? '-'}/24</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Planification/Organisation</span>
+                    <span className="text-gray-500 ml-1">(10 items)</span>
+                  </div>
+                  <span className="font-semibold">{data.brief_a_plan_organize ?? '-'}/30</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Contrôle de la tâche</span>
+                    <span className="text-gray-500 ml-1">(6 items)</span>
+                  </div>
+                  <span className="font-semibold">{data.brief_a_task_monitor ?? '-'}/18</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Organisation du matériel</span>
+                    <span className="text-gray-500 ml-1">(8 items)</span>
+                  </div>
+                  <span className="font-semibold">{data.brief_a_organization_materials ?? '-'}/24</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Validity Scales */}
+            <div className="bg-gray-50 p-3 rounded-lg">
+              <div className="font-semibold text-gray-700 mb-2">Échelles de validité</div>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Négativité</span>
+                    <span className="text-gray-500 ml-1">(élevé si ≥6)</span>
+                  </div>
+                  <span className={`font-semibold ${(data.brief_a_negativity ?? 0) >= 6 ? 'text-red-600' : ''}`}>
+                    {data.brief_a_negativity ?? '-'}/10
+                    {(data.brief_a_negativity ?? 0) >= 6 && ' ⚠'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Incohérence</span>
+                    <span className="text-gray-500 ml-1">(élevé si ≥8)</span>
+                  </div>
+                  <span className={`font-semibold ${(data.brief_a_inconsistency ?? 0) >= 8 ? 'text-red-600' : ''}`}>
+                    {data.brief_a_inconsistency ?? '-'}/20
+                    {(data.brief_a_inconsistency ?? 0) >= 8 && ' ⚠'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Rareté</span>
+                    <span className="text-gray-500 ml-1">(suspect si ≥3)</span>
+                  </div>
+                  <span className={`font-semibold ${(data.brief_a_infrequency ?? 0) >= 3 ? 'text-orange-600' : ''}`}>
+                    {data.brief_a_infrequency ?? '-'}/5
+                    {(data.brief_a_infrequency ?? 0) >= 3 && ' ⚠'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Validity warning */}
+            {((data.brief_a_negativity ?? 0) >= 6 || 
+              (data.brief_a_inconsistency ?? 0) >= 8 || 
+              (data.brief_a_infrequency ?? 0) >= 3) && (
+              <div className="mt-2 p-3 bg-orange-50 border border-orange-200 rounded text-orange-800 text-xs">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <strong>Attention: Échelles de validité élevées</strong>
+                    <p className="mt-1">
+                      Une ou plusieurs échelles de validité dépassent le seuil critique. 
+                      Les résultats doivent être interprétés avec prudence.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Scoring explanation */}
+            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded text-blue-800 text-xs">
+              <div className="font-semibold mb-1">Interprétation des scores</div>
+              <ul className="list-disc list-inside space-y-1">
+                <li><strong>Échelle:</strong> 1 (Jamais) à 3 (Souvent)</li>
+                <li><strong>BRI:</strong> Inhibition + Flexibilité + Contrôle émotionnel + Auto-contrôle</li>
+                <li><strong>MI:</strong> Initiation + Mémoire de travail + Planification + Contrôle de la tâche + Organisation du matériel</li>
+                <li><strong>GEC:</strong> BRI + MI (score total des 75 items)</li>
+                <li><strong>Interprétation:</strong> Scores plus élevés = plus de difficultés exécutives</li>
               </ul>
             </div>
           </div>

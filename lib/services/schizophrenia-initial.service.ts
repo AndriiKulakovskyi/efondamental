@@ -39,6 +39,9 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'BARNES': 'schizophrenia_barnes',
   'SAS': 'schizophrenia_sas',
   'PSP': 'schizophrenia_psp',
+  'YMRS_SZ': 'schizophrenia_ymrs',
+  'CGI_SZ': 'schizophrenia_cgi',
+  'EGF_SZ': 'schizophrenia_egf',
   
   // Medical evaluation module
   'TROUBLES_PSYCHOTIQUES': 'schizophrenia_troubles_psychotiques',
@@ -150,6 +153,12 @@ export async function saveSchizophreniaInitialResponse<T extends SchizophreniaQu
       return await saveSasResponse(response) as any as T;
     case 'PSP':
       return await savePspResponse(response) as any as T;
+    case 'YMRS_SZ':
+      return await saveYmrsSzResponse(response) as any as T;
+    case 'CGI_SZ':
+      return await saveCgiSzResponse(response) as any as T;
+    case 'EGF_SZ':
+      return await saveEgfSzResponse(response) as any as T;
     case 'BILAN_SOCIAL_SZ':
       return await saveBilanSocialSzResponse(response) as any as T;
     case 'SQOL_SZ':
@@ -5002,6 +5011,217 @@ export async function saveSchizophreniaDacobsSzResponse(response: any): Promise<
   
   if (error) {
     console.error('Error saving schizophrenia_dacobs:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// BRIEF-A Functions (Hetero Module)
+// ============================================================================
+
+/**
+ * Get BRIEF_A_SZ response for a visit
+ * BRIEF-A - Behavior Rating Inventory of Executive Function - Adult
+ * Hetero-questionnaire assessing executive functions through observed behaviors
+ */
+export async function getBriefASzResponse(visitId: string): Promise<any | null> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_brief_a')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') return null; // Not found
+    console.error('Error getting schizophrenia_brief_a:', error);
+    throw error;
+  }
+  return data;
+}
+
+/**
+ * Save BRIEF_A_SZ response with scoring
+ * Calculates 9 scale scores, 3 index scores, and 3 validity scores
+ */
+export async function saveSchizophreniaBriefASzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Dynamically import scoring functions
+  const { computeBriefAScores } = await import('@/lib/questionnaires/schizophrenia/initial/hetero/brief-a');
+  
+  // Extract item scores
+  const itemResponses: Record<string, any> = {};
+  for (let i = 1; i <= 75; i++) {
+    const key = `q${i}`;
+    itemResponses[key] = response[key] != null ? Number(response[key]) : null;
+  }
+  
+  // Calculate scores
+  const scores = computeBriefAScores(itemResponses);
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_brief_a')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      
+      // Demographics
+      subject_name: response.subject_name || null,
+      subject_sex: response.subject_sex || null,
+      subject_age: response.subject_age != null ? Number(response.subject_age) : null,
+      relationship: response.relationship || null,
+      years_known: response.years_known != null ? Number(response.years_known) : null,
+      
+      // Item scores (q1-q75)
+      ...itemResponses,
+      
+      // Scale scores
+      brief_a_inhibit: scores.brief_a_inhibit,
+      brief_a_shift: scores.brief_a_shift,
+      brief_a_emotional_control: scores.brief_a_emotional_control,
+      brief_a_self_monitor: scores.brief_a_self_monitor,
+      brief_a_initiate: scores.brief_a_initiate,
+      brief_a_working_memory: scores.brief_a_working_memory,
+      brief_a_plan_organize: scores.brief_a_plan_organize,
+      brief_a_task_monitor: scores.brief_a_task_monitor,
+      brief_a_organization_materials: scores.brief_a_organization_materials,
+      
+      // Index scores
+      brief_a_bri: scores.brief_a_bri,
+      brief_a_mi: scores.brief_a_mi,
+      brief_a_gec: scores.brief_a_gec,
+      
+      // Validity scores
+      brief_a_negativity: scores.brief_a_negativity,
+      brief_a_inconsistency: scores.brief_a_inconsistency,
+      brief_a_infrequency: scores.brief_a_infrequency,
+      
+      // Metadata
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_brief_a:', error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// YMRS, CGI, EGF Functions (Hetero Module)
+// ============================================================================
+
+/**
+ * Save YMRS_SZ response with scoring
+ */
+export async function saveYmrsSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  // Import scoring function
+  const { scoreYmrs } = await import('@/lib/questionnaires/schizophrenia/initial/hetero/ymrs');
+  
+  const scores = scoreYmrs(response);
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_ymrs')
+    .upsert({
+      ...response,
+      total_score: scores.total_score,
+      severity: scores.severity,
+      interpretation: scores.interpretation,
+      completed_by: user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_ymrs:', error);
+    throw error;
+  }
+  return data;
+}
+
+/**
+ * Save CGI_SZ response with interpretation
+ */
+export async function saveCgiSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  // Import interpretation function
+  const { interpretCgi } = await import('@/lib/questionnaires/schizophrenia/initial/hetero/cgi');
+  
+  // Calculate therapeutic index if both therapeutic_effect and side_effects are provided
+  let therapeutic_index = null;
+  let therapeutic_index_label = null;
+  
+  if (response.therapeutic_effect != null && response.side_effects != null) {
+    therapeutic_index = response.therapeutic_effect - response.side_effects;
+    
+    if (therapeutic_index >= 3) {
+      therapeutic_index_label = 'Effet therapeutique excellent';
+    } else if (therapeutic_index >= 1) {
+      therapeutic_index_label = 'Effet therapeutique satisfaisant';
+    } else if (therapeutic_index >= -1) {
+      therapeutic_index_label = 'Effet therapeutique modere';
+    } else {
+      therapeutic_index_label = 'Effet therapeutique insuffisant';
+    }
+  }
+  
+  // Interpret CGI scores
+  const interpretation = interpretCgi(response.cgi_s, response.cgi_i);
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_cgi')
+    .upsert({
+      ...response,
+      interpretation: interpretation.interpretation,
+      therapeutic_index,
+      therapeutic_index_label,
+      completed_by: user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_cgi:', error);
+    throw error;
+  }
+  return data;
+}
+
+/**
+ * Save EGF_SZ response with interpretation
+ */
+export async function saveEgfSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  // Import scoring function
+  const { scoreEgf } = await import('@/lib/questionnaires/schizophrenia/initial/hetero/egf');
+  
+  const scores = scoreEgf(response.egf_score);
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_egf')
+    .upsert({
+      ...response,
+      interpretation: scores.interpretation,
+      completed_by: user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_egf:', error);
     throw error;
   }
   return data;

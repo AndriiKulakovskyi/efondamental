@@ -229,6 +229,10 @@ import {
   BARNES_DEFINITION,
   SAS_DEFINITION,
   PSP_DEFINITION,
+  BRIEF_A_SZ_DEFINITION,
+  YMRS_SZ_DEFINITION,
+  CGI_SZ_DEFINITION,
+  EGF_SZ_DEFINITION,
   TROUBLES_PSYCHOTIQUES_DEFINITION,
   SUICIDE_HISTORY_SZ_DEFINITION,
   TEA_COFFEE_SZ_DEFINITION,
@@ -690,7 +694,20 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           id: 'mod_hetero',
           name: 'Hetero-questionnaires',
           description: 'Questionnaires d\'evaluation clinique',
-          questionnaires: [PANSS_DEFINITION, CDSS_DEFINITION, BARS_DEFINITION, SUMD_DEFINITION, AIMS_DEFINITION, BARNES_DEFINITION, SAS_DEFINITION, PSP_DEFINITION]
+          questionnaires: [
+            PANSS_DEFINITION, 
+            CDSS_DEFINITION, 
+            BARS_DEFINITION, 
+            SUMD_DEFINITION, 
+            AIMS_DEFINITION, 
+            BARNES_DEFINITION, 
+            SAS_DEFINITION, 
+            PSP_DEFINITION, 
+            BRIEF_A_SZ_DEFINITION,
+            YMRS_SZ_DEFINITION,
+            CGI_SZ_DEFINITION,
+            EGF_SZ_DEFINITION
+          ]
         },
         {
           id: 'mod_medical_eval',

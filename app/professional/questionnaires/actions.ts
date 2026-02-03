@@ -184,7 +184,11 @@ import {
   saveSchizophreniaWais4MatricesSzResponse,
   saveSchizophreniaSsticsSzResponse,
   saveSchizophreniaCbqSzResponse,
-  saveSchizophreniaDacobsSzResponse
+  saveSchizophreniaDacobsSzResponse,
+  saveSchizophreniaBriefASzResponse,
+  saveYmrsSzResponse,
+  saveCgiSzResponse,
+  saveEgfSzResponse
 } from '@/lib/services/schizophrenia-initial.service';
 import { 
   getVisitCompletionStatus,
@@ -245,6 +249,9 @@ function questionnaireCodeToSchizophreniaKey(code: string): string | null {
     'BARNES': 'BARNES',
     'SAS': 'SAS',
     'PSP': 'PSP',
+    'YMRS_SZ': 'YMRS_SZ',
+    'CGI_SZ': 'CGI_SZ',
+    'EGF_SZ': 'EGF_SZ',
     // Medical evaluation
     'TROUBLES_PSYCHOTIQUES': 'TROUBLES_PSYCHOTIQUES',
     'TROUBLES_COMORBIDES_SZ': 'TROUBLES_COMORBIDES_SZ',
@@ -882,6 +889,14 @@ export async function submitProfessionalQuestionnaireAction(
 
       case 'DACOBS_SZ':
         result = await saveSchizophreniaDacobsSzResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        });
+        break;
+
+      case 'BRIEF_A_SZ':
+        result = await saveSchizophreniaBriefASzResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any

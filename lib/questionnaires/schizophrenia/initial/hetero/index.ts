@@ -82,3 +82,59 @@ export {
   type SchizophreniaPspResponse,
   type SchizophreniaPspResponseInsert
 } from './psp';
+
+// BRIEF-A (Behavior Rating Inventory of Executive Function - Adult)
+export {
+  BRIEF_A_SZ_QUESTIONS,
+  BRIEF_A_SZ_DEFINITION,
+  computeBriefAScores,
+  interpretBriefAScore,
+  isValidityElevated,
+  BRIEF_A_SCALES,
+  BRIEF_A_INDICES,
+  BRIEF_A_VALIDITY_SCALES,
+  BRIEF_A_LIKERT_OPTIONS,
+  type SchizophreniaBriefAResponse,
+  type SchizophreniaBriefAResponseInsert,
+  type BriefAScoreResult
+} from './brief-a';
+
+// YMRS (Young Mania Rating Scale)
+export {
+  YMRS_SZ_QUESTIONS,
+  YMRS_SZ_DEFINITION,
+  computeYmrsScore,
+  getYmrsSeverity,
+  interpretYmrsScore,
+  scoreYmrs,
+  type SchizophreniaYmrsResponse,
+  type SchizophreniaYmrsResponseInsert,
+  type YmrsScoreInput,
+  type YmrsSeverity,
+  type YmrsScoringResult
+} from './ymrs';
+
+// CGI (Clinical Global Impressions)
+export {
+  CGI_SZ_QUESTIONS,
+  CGI_SZ_DEFINITION,
+  interpretCgiSeverity,
+  interpretCgiImprovement,
+  interpretCgi,
+  type SchizophreniaCgiResponse,
+  type SchizophreniaCgiResponseInsert,
+  type CgiInterpretationResult
+} from './cgi';
+
+// EGF (Echelle Globale de Fonctionnement - Global Functioning Scale)
+export {
+  EGF_SZ_QUESTIONS,
+  EGF_SZ_DEFINITION,
+  getEgfLevel,
+  interpretEgfScore,
+  scoreEgf,
+  type SchizophreniaEgfResponse,
+  type SchizophreniaEgfResponseInsert,
+  type EgfLevel,
+  type EgfScoringResult
+} from './egf';
