@@ -38,7 +38,7 @@ const QUESTIONNAIRES_WITH_SCORING = new Set([
   'EQ5D5L', 'PRISE_M', 'STAI_YA', 'MARS', 'MATHYS', 'PSQI', 'EPWORTH',
   'ASRS', 'CTQ', 'BIS10', 'ALS18', 'AIM', 'WURS25', 'AQ12', 'CSM', 'CTI',
   'MADRS', 'YMRS', 'CGI', 'EGF', 'ALDA', 'ETAT_PATIENT', 'FAST',
-  'WAIS4_MATRICES', 'WAIS4_MATRICES_SZ', 'WAIS4_SIMILITUDES', 'WAIS4_SIMILITUDES_SZ', 'WAIS4_MEMOIRE_CHIFFRES_SZ', 'SSTICS_SZ', 'CBQ_SZ',
+  'WAIS4_MATRICES', 'WAIS4_MATRICES_SZ', 'WAIS4_SIMILITUDES', 'WAIS4_SIMILITUDES_SZ', 'WAIS4_MEMOIRE_CHIFFRES_SZ', 'SSTICS_SZ', 'CBQ_SZ', 'DACOBS_SZ',
   'WAIS4_CRITERIA', 'WAIS4_LEARNING', 'CVLT', 'CVLT_SZ', 'TMT_SZ', 'COMMISSIONS_SZ',
   'LIS_SZ', 'WAIS4_EFFICIENCE_SZ', 'WAIS4_CODE', 'WAIS_IV_CODE_SYMBOLES_IVT',
   'WAIS4_DIGIT_SPAN', 'FLUENCES_VERBALES',
@@ -222,7 +222,8 @@ export function QuestionnairePageClient({
                          code === 'WAIS4_SIMILITUDES_SZ' ||       // Explicit fallback
                          code === 'WAIS4_MATRICES_SZ' ||          // Explicit fallback
                          code === 'SSTICS_SZ' ||                  // Explicit fallback
-                         code === 'CBQ_SZ';                       // Explicit fallback
+                         code === 'CBQ_SZ' ||                     // Explicit fallback
+                         code === 'DACOBS_SZ';                    // Explicit fallback
 
       if (!hasScoring) {
         // No score page for this questionnaire - redirect back to visit

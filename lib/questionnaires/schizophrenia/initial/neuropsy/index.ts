@@ -37,3 +37,7 @@ export type { SchizophreniaSsticsResponse, SchizophreniaSsticsResponseInsert, Ss
 // CBQ - Cognitive Bias Questionnaire (root level)
 export { CBQ_SZ_DEFINITION, CBQ_SZ_QUESTIONS, computeCbqScores, interpretCbqZScore, CBQ_SUBSCALES, CBQ_NORMS, CBQ_CLINICAL_THRESHOLD, isSubscaleClinicallySignificant } from './cbq';
 export type { SchizophreniaCbqResponse, SchizophreniaCbqResponseInsert, CbqScoreResult } from './cbq';
+
+// DACOBS - Davos Assessment of Cognitive Biases Scale (root level)
+export { DACOBS_SZ_DEFINITION, DACOBS_SZ_QUESTIONS, computeDacobsScores, interpretDacobsScore, DACOBS_SUBSCALES, DACOBS_SECTIONS, DACOBS_LIKERT_OPTIONS } from './dacobs';
+export type { SchizophreniaDacobsResponse, SchizophreniaDacobsResponseInsert, DacobsScoreResult } from './dacobs';

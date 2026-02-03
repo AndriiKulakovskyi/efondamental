@@ -291,6 +291,16 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return 'success';
     }
     
+    if (code === 'DACOBS_SZ') {
+      // DACOBS: Total score based (42-294)
+      // Higher scores indicate more cognitive biases and safety behaviors
+      const percentage = ((data.dacobs_total - 42) / (294 - 42)) * 100;
+      if (percentage > 75) return 'error';
+      if (percentage > 50) return 'warning';
+      if (percentage > 25) return 'info';
+      return 'success';
+    }
+    
     if (code === 'WAIS3_VOCABULAIRE') {
       // WAIS-III Vocabulaire: Standard score 8-12 is average (mean=10, SD=3)
       if (data.standard_score >= 13) return 'success';
@@ -686,6 +696,19 @@ if (code === 'FAGERSTROM') {
     }
   }
   
+  if (code === 'DACOBS_SZ' && !interpretation && data.dacobs_total !== undefined) {
+    const percentage = ((data.dacobs_total - 42) / (294 - 42)) * 100;
+    if (percentage > 75) {
+      interpretation = 'Biais cognitifs et comportements de sûreté très élevés';
+    } else if (percentage > 50) {
+      interpretation = 'Biais cognitifs et comportements de sûreté élevés';
+    } else if (percentage > 25) {
+      interpretation = 'Biais cognitifs et comportements de sûreté modérés';
+    } else {
+      interpretation = 'Biais cognitifs et comportements de sûreté faibles';
+    }
+  }
+  
   if (code === 'WAIS3_VOCABULAIRE' && !interpretation && data.standard_score !== undefined) {
     if (data.standard_score >= 13) {
       interpretation = 'Connaissances lexicales supérieures à la moyenne';
@@ -857,6 +880,7 @@ if (code === 'FAGERSTROM') {
               {code === 'WAIS4_MATRICES_SZ' && 'Résultats WAIS-IV Matrices'}
               {code === 'SSTICS_SZ' && 'Résultats SSTICS - Plaintes Cognitives Subjectives'}
               {code === 'CBQ_SZ' && 'Résultats CBQ - Biais Cognitifs'}
+              {code === 'DACOBS_SZ' && 'Résultats DACOBS - Biais Cognitifs et Comportements'}
               {(code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') && 'Résultats WAIS-IV Mémoire des chiffres (Digit Span)'}
               {(code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') && 'Résultats WAIS-IV Similitudes'}
               {code === 'WAIS3_VOCABULAIRE' && 'Score WAIS-III Vocabulaire'}
@@ -939,6 +963,8 @@ if (code === 'FAGERSTROM') {
                 ? (data.sstics_scorez !== undefined && data.sstics_scorez !== null ? data.sstics_scorez.toFixed(2) : '-')
                 : code === 'CBQ_SZ'
                 ? (data.cbq_total_z !== undefined && data.cbq_total_z !== null ? Number(data.cbq_total_z).toFixed(2) : '-')
+                : code === 'DACOBS_SZ'
+                ? (data.dacobs_total !== undefined && data.dacobs_total !== null ? data.dacobs_total : '-')
                 : (code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ')
                 ? (data.wais_mc_std !== undefined ? data.wais_mc_std : '-')
                 : (code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ')
@@ -1034,6 +1060,7 @@ if (code === 'FAGERSTROM') {
               {code === 'WAIS4_MATRICES_SZ' && '/19'}
               {code === 'SSTICS_SZ' && ' (Z-score)'}
               {code === 'CBQ_SZ' && ' (Z-score)'}
+              {code === 'DACOBS_SZ' && '/294'}
               {(code === 'WAIS4_DIGIT_SPAN' || code === 'WAIS4_MEMOIRE_CHIFFRES_SZ') && '/19'}
               {(code === 'WAIS4_SIMILITUDES' || code === 'WAIS4_SIMILITUDES_SZ') && '/19'}
               {(code === 'CVLT' || code === 'CVLT_SZ') && '/80'}
@@ -2682,6 +2709,122 @@ if (code === 'FAGERSTROM') {
                 <li><strong>Calcul du Z-score:</strong> Z = (Score brut - Moyenne contrôle) / Écart-type contrôle</li>
                 <li><strong>Seuil clinique:</strong> Z &gt; +1.65 indique des biais cognitifs cliniquement significatifs</li>
                 <li><strong>Normes contrôles:</strong> Moyenne totale = 36.5, ET = 2.7</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* DACOBS Details */}
+        {code === 'DACOBS_SZ' && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Total Score Summary */}
+            <div className="bg-slate-50 p-3 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-semibold text-gray-700">Score Total DACOBS</span>
+                <span className="text-lg font-bold text-slate-700">
+                  {data.dacobs_total ?? '-'}/294
+                </span>
+              </div>
+              <div className="text-xs text-gray-600">
+                Score de 42 (minimum) à 294 (maximum). Plus le score est élevé, plus les biais cognitifs et comportements de sûreté sont présents.
+              </div>
+            </div>
+
+            {/* Section 1: Cognitive Biases */}
+            <div className="bg-blue-50 p-3 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-semibold text-blue-800">Section 1: Biais cognitifs</span>
+                <span className="font-bold text-blue-700">
+                  {data.dacobs_cognitive_biases ?? '-'}/168
+                </span>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Saut aux conclusions (JTC)</span>
+                    <span className="text-gray-500 ml-1">(Q3,8,16,18,25,30)</span>
+                  </div>
+                  <span className="font-semibold">{data.dacobs_jtc ?? '-'}/42</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Biais d&apos;inflexibilité (BI)</span>
+                    <span className="text-gray-500 ml-1">(Q13,15,26,34,38,41)</span>
+                  </div>
+                  <span className="font-semibold">{data.dacobs_bi ?? '-'}/42</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Attention à la menace (AT)</span>
+                    <span className="text-gray-500 ml-1">(Q1,2,6,10,20,37)</span>
+                  </div>
+                  <span className="font-semibold">{data.dacobs_at ?? '-'}/42</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Attribution externe (EA)</span>
+                    <span className="text-gray-500 ml-1">(Q7,12,17,22,24,29)</span>
+                  </div>
+                  <span className="font-semibold">{data.dacobs_ea ?? '-'}/42</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 2: Cognitive Limitations */}
+            <div className="bg-amber-50 p-3 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-semibold text-amber-800">Section 2: Limitations cognitives</span>
+                <span className="font-bold text-amber-700">
+                  {data.dacobs_cognitive_limitations ?? '-'}/84
+                </span>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Problèmes sociaux cognitifs (SC)</span>
+                    <span className="text-gray-500 ml-1">(Q4,9,11,14,19,39)</span>
+                  </div>
+                  <span className="font-semibold">{data.dacobs_sc ?? '-'}/42</span>
+                </div>
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Problèmes cognitifs subjectifs (CP)</span>
+                    <span className="text-gray-500 ml-1">(Q5,21,28,32,36,40)</span>
+                  </div>
+                  <span className="font-semibold">{data.dacobs_cp ?? '-'}/42</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Safety Behaviors */}
+            <div className="bg-purple-50 p-3 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-semibold text-purple-800">Section 3: Comportements de sûreté</span>
+                <span className="font-bold text-purple-700">
+                  {data.dacobs_safety_behaviors ?? '-'}/42
+                </span>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between items-center p-2 bg-white rounded">
+                  <div>
+                    <span className="text-gray-700 font-medium">Comportements de sûreté (SB)</span>
+                    <span className="text-gray-500 ml-1">(Q23,27,31,33,35,42)</span>
+                  </div>
+                  <span className="font-semibold">{data.dacobs_sb ?? '-'}/42</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Scoring explanation */}
+            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded text-blue-800 text-xs">
+              <div className="font-semibold mb-1">Interprétation des scores</div>
+              <ul className="list-disc list-inside space-y-1">
+                <li><strong>Échelle:</strong> 1 (Fortement en désaccord) à 7 (Fortement d&apos;accord)</li>
+                <li><strong>Chaque sous-échelle:</strong> 6 items × 7 points max = 42 points</li>
+                <li><strong>Section 1 (Biais cognitifs):</strong> 4 sous-échelles × 42 = 168 points max</li>
+                <li><strong>Section 2 (Limitations cognitives):</strong> 2 sous-échelles × 42 = 84 points max</li>
+                <li><strong>Section 3 (Comportements de sûreté):</strong> 1 sous-échelle × 42 = 42 points max</li>
+                <li><strong>Score total:</strong> Somme des 42 items (range 42-294)</li>
               </ul>
             </div>
           </div>

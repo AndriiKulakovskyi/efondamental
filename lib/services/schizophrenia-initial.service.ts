@@ -4879,3 +4879,130 @@ export async function saveSchizophreniaCbqSzResponse(response: any): Promise<any
   }
   return data;
 }
+
+// ============================================================================
+// DACOBS Functions (Neuropsy Module - Root Level)
+// ============================================================================
+
+/**
+ * Get DACOBS_SZ response for a visit
+ * DACOBS - Davos Assessment of Cognitive Biases Scale (Livet et al., 2022)
+ * Self-report questionnaire assessing cognitive biases, limitations, and safety behaviors
+ */
+export async function getDacobsSzResponse(visitId: string): Promise<any | null> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_dacobs')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+  
+  if (error) {
+    if (error.code === 'PGRST116') return null; // Not found
+    console.error('Error getting schizophrenia_dacobs:', error);
+    throw error;
+  }
+  return data;
+}
+
+/**
+ * Save DACOBS_SZ response with scoring
+ * Calculates subscale scores, section totals, and total score
+ */
+export async function saveSchizophreniaDacobsSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Dynamically import scoring functions
+  const { computeDacobsScores } = await import('@/lib/questionnaires/schizophrenia/initial/neuropsy/dacobs');
+  
+  // Extract item scores
+  const itemResponses: Record<string, any> = {};
+  for (let i = 1; i <= 42; i++) {
+    const key = `q${i}`;
+    itemResponses[key] = response[key] != null ? Number(response[key]) : null;
+  }
+  
+  // Calculate scores
+  const scores = computeDacobsScores(itemResponses);
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_dacobs')
+    .upsert({
+      visit_id: response.visit_id,
+      patient_id: response.patient_id,
+      
+      // Item scores
+      q1: itemResponses.q1,
+      q2: itemResponses.q2,
+      q3: itemResponses.q3,
+      q4: itemResponses.q4,
+      q5: itemResponses.q5,
+      q6: itemResponses.q6,
+      q7: itemResponses.q7,
+      q8: itemResponses.q8,
+      q9: itemResponses.q9,
+      q10: itemResponses.q10,
+      q11: itemResponses.q11,
+      q12: itemResponses.q12,
+      q13: itemResponses.q13,
+      q14: itemResponses.q14,
+      q15: itemResponses.q15,
+      q16: itemResponses.q16,
+      q17: itemResponses.q17,
+      q18: itemResponses.q18,
+      q19: itemResponses.q19,
+      q20: itemResponses.q20,
+      q21: itemResponses.q21,
+      q22: itemResponses.q22,
+      q23: itemResponses.q23,
+      q24: itemResponses.q24,
+      q25: itemResponses.q25,
+      q26: itemResponses.q26,
+      q27: itemResponses.q27,
+      q28: itemResponses.q28,
+      q29: itemResponses.q29,
+      q30: itemResponses.q30,
+      q31: itemResponses.q31,
+      q32: itemResponses.q32,
+      q33: itemResponses.q33,
+      q34: itemResponses.q34,
+      q35: itemResponses.q35,
+      q36: itemResponses.q36,
+      q37: itemResponses.q37,
+      q38: itemResponses.q38,
+      q39: itemResponses.q39,
+      q40: itemResponses.q40,
+      q41: itemResponses.q41,
+      q42: itemResponses.q42,
+      
+      // Subscale scores
+      dacobs_jtc: scores.dacobs_jtc,
+      dacobs_bi: scores.dacobs_bi,
+      dacobs_at: scores.dacobs_at,
+      dacobs_ea: scores.dacobs_ea,
+      dacobs_sc: scores.dacobs_sc,
+      dacobs_cp: scores.dacobs_cp,
+      dacobs_sb: scores.dacobs_sb,
+      
+      // Section totals
+      dacobs_cognitive_biases: scores.dacobs_cognitive_biases,
+      dacobs_cognitive_limitations: scores.dacobs_cognitive_limitations,
+      dacobs_safety_behaviors: scores.dacobs_safety_behaviors,
+      
+      // Total score
+      dacobs_total: scores.dacobs_total,
+      
+      // Metadata
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error saving schizophrenia_dacobs:', error);
+    throw error;
+  }
+  return data;
+}

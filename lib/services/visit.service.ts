@@ -261,7 +261,8 @@ import {
   WAIS4_MEMOIRE_CHIFFRES_SZ_DEFINITION,
   WAIS4_MATRICES_SZ_DEFINITION,
   SSTICS_SZ_DEFINITION,
-  CBQ_SZ_DEFINITION
+  CBQ_SZ_DEFINITION,
+  DACOBS_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -734,6 +735,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               title: CBQ_SZ_DEFINITION.title,
               description: CBQ_SZ_DEFINITION.description,
               questions: CBQ_SZ_DEFINITION.questions
+            },
+            {
+              id: DACOBS_SZ_DEFINITION.id,
+              code: DACOBS_SZ_DEFINITION.code,
+              title: DACOBS_SZ_DEFINITION.title,
+              description: DACOBS_SZ_DEFINITION.description,
+              questions: DACOBS_SZ_DEFINITION.questions
             }
           ],
           sections: [
