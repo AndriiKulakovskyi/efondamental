@@ -66,6 +66,25 @@ export interface ImportResult {
   warnings: string[];
 }
 
+function normalizeIdentityPart(v: unknown): string {
+  if (v === null || v === undefined) return '';
+  return String(v).trim().toLowerCase();
+}
+
+function patientIdentityKey(p: {
+  first_name?: unknown;
+  last_name?: unknown;
+  date_of_birth?: unknown;
+  place_of_birth?: unknown;
+}): string {
+  return [
+    normalizeIdentityPart(p.first_name),
+    normalizeIdentityPart(p.last_name),
+    String(p.date_of_birth ?? ''),
+    normalizeIdentityPart(p.place_of_birth),
+  ].join('|');
+}
+
 // Map questionnaire codes to their database table names
 // Uses normalized codes (without _FR suffix) as the canonical key
 const QUESTIONNAIRE_TABLE_MAP: Record<string, string> = {
@@ -170,14 +189,24 @@ const QUESTIONNAIRE_TABLE_MAP: Record<string, string> = {
   'DSM5_HUMEUR_ACTUELS': 'bipolar_diag_psy_sem_humeur_actuels',
   'DSM5_HUMEUR_DEPUIS_VISITE': 'bipolar_diag_psy_sem_humeur_depuis_visite',
   'DSM5_PSYCHOTIQUES': 'bipolar_diag_psy_sem_psychotiques',
-  'ISA_SUIVI': 'bipolar_isa_suivi',
-  'SUICIDE_BEHAVIOR_FOLLOWUP': 'bipolar_suicide_behavior_followup',
-  'SUIVI_RECOMMANDATIONS': 'bipolar_psy_traitement_semestriel',
-  'RECOURS_AUX_SOINS': 'bipolar_psy_traitement_semestriel',
-  'TRAITEMENT_NON_PHARMACOLOGIQUE': 'bipolar_non_pharmacologic',
-  'ARRETS_DE_TRAVAIL': 'bipolar_psy_traitement_semestriel',
-  'SOMATIQUE_CONTRACEPTIF': 'bipolar_psy_traitement_semestriel',
-  'STATUT_PROFESSIONNEL': 'bipolar_psy_traitement_semestriel',
+
+  // Semestrial/Follow-up (biannual_followup) - live DB tables are bipolar_followup_*
+  'HUMEUR_ACTUELS': 'bipolar_followup_humeur_actuels',
+  'HUMEUR_DEPUIS_VISITE': 'bipolar_followup_humeur_depuis_visite',
+  'PSYCHOTIQUES': 'bipolar_followup_psychotiques',
+
+  // Suicide follow-up (keep legacy alias ISA_SUIVI)
+  'ISA_FOLLOWUP': 'bipolar_followup_isa',
+  'ISA_SUIVI': 'bipolar_followup_isa',
+  'SUICIDE_BEHAVIOR_FOLLOWUP': 'bipolar_followup_suicide_behavior',
+
+  // Soin / suivi / arrêt de travail (separate follow-up tables)
+  'SUIVI_RECOMMANDATIONS': 'bipolar_followup_suivi_recommandations',
+  'RECOURS_AUX_SOINS': 'bipolar_followup_recours_aux_soins',
+  'TRAITEMENT_NON_PHARMACOLOGIQUE': 'bipolar_followup_traitement_non_pharma',
+  'ARRETS_DE_TRAVAIL': 'bipolar_followup_arrets_travail',
+  'SOMATIQUE_CONTRACEPTIF': 'bipolar_followup_somatique_contraceptif',
+  'STATUT_PROFESSIONNEL': 'bipolar_followup_statut_professionnel',
 };
 
 /**
@@ -235,7 +264,7 @@ export async function importPatientData(
     
     try {
       // Check if patient with same MRN already exists in this center
-      const { data: existingPatient, error: checkError } = await supabase
+      const { data: existingPatientByMrn, error: checkError } = await supabase
         .from('patients')
         .select('id')
         .eq('center_id', centerId)
@@ -247,50 +276,94 @@ export async function importPatientData(
         continue;
       }
 
-      if (existingPatient) {
-        result.warnings.push(`Patient ${i + 1}: Patient with MRN ${patientData.medical_record_number} already exists, skipping`);
-        continue;
+      // Try to reuse an existing patient by identity (matches DB unique index semantics)
+      // Unique identity = center + normalized(first/last/DOB/place_of_birth)
+      let patientId: string | null = existingPatientByMrn?.id ?? null;
+
+      if (patientId) {
+        result.warnings.push(
+          `Patient ${i + 1}: Patient with MRN ${patientData.medical_record_number} already exists; importing visits into existing patient`
+        );
       }
 
-      // Determine doctor assignment: per-patient takes precedence over default
-      const assignedTo = patientData.assigned_to || defaultAssignedTo || null;
+      if (!patientId) {
+        const firstName = patientData.first_name?.trim();
+        const lastName = patientData.last_name?.trim();
 
-      // Insert the patient
-      const { data: newPatient, error: patientError } = await supabase
-        .from('patients')
-        .insert({
-          center_id: centerId,
-          pathology_id: pathologyId,
-          medical_record_number: patientData.medical_record_number,
-          first_name: patientData.first_name,
-          last_name: patientData.last_name,
-          date_of_birth: patientData.date_of_birth,
-          gender: patientData.gender,
-          email: patientData.email,
-          phone: patientData.phone,
-          address: patientData.address,
-          place_of_birth: patientData.place_of_birth,
-          years_of_education: patientData.years_of_education,
-          emergency_contact: patientData.emergency_contact,
-          assigned_to: assignedTo,  // Optional doctor assignment
-          metadata: {
-            ...patientData.metadata,
-            imported: true,
-            imported_at: new Date().toISOString(),
-            imported_by: importedBy,
-          },
-          created_by: importedBy,
-          active: true,
-        })
-        .select()
-        .single();
+        // Fetch candidates and compare normalized identity client-side (handles trimming like the DB index).
+        const { data: identityCandidates, error: identityError } = await supabase
+          .from('patients')
+          .select('id, first_name, last_name, date_of_birth, place_of_birth')
+          .eq('center_id', centerId)
+          .eq('active', true)
+          .is('deleted_at', null)
+          .eq('date_of_birth', patientData.date_of_birth)
+          .ilike('first_name', `%${firstName}%`)
+          .ilike('last_name', `%${lastName}%`);
 
-      if (patientError || !newPatient) {
-        result.errors.push(`Patient ${i + 1}: Failed to create patient: ${patientError?.message}`);
-        continue;
+        if (identityError) {
+          result.errors.push(`Patient ${i + 1}: Error checking identity duplicate: ${identityError.message}`);
+          continue;
+        }
+
+        const targetKey = patientIdentityKey(patientData);
+        const existingByIdentity = (identityCandidates || []).find((p) => patientIdentityKey(p) === targetKey);
+
+        if (existingByIdentity?.id) {
+          patientId = existingByIdentity.id;
+          result.warnings.push(
+            `Patient ${i + 1}: Patient identity already exists (unique identity index); importing visits into existing patient`
+          );
+        }
       }
 
-      result.importedPatients++;
+      // Create the patient if not found by MRN nor identity
+      if (!patientId) {
+        // Determine doctor assignment: per-patient takes precedence over default
+        const assignedTo = patientData.assigned_to || defaultAssignedTo || null;
+
+        const { data: newPatient, error: patientError } = await supabase
+          .from('patients')
+          .insert({
+            center_id: centerId,
+            pathology_id: pathologyId,
+            medical_record_number: patientData.medical_record_number,
+            first_name: patientData.first_name,
+            last_name: patientData.last_name,
+            date_of_birth: patientData.date_of_birth,
+            gender: patientData.gender,
+            email: patientData.email,
+            phone: patientData.phone,
+            address: patientData.address,
+            place_of_birth: patientData.place_of_birth,
+            years_of_education: patientData.years_of_education,
+            emergency_contact: patientData.emergency_contact,
+            assigned_to: assignedTo, // Optional doctor assignment
+            metadata: {
+              ...patientData.metadata,
+              imported: true,
+              imported_at: new Date().toISOString(),
+              imported_by: importedBy,
+            },
+            created_by: importedBy,
+            active: true,
+          })
+          .select('id')
+          .single();
+
+        if (patientError || !newPatient) {
+          result.errors.push(`Patient ${i + 1}: Failed to create patient: ${patientError?.message}`);
+          continue;
+        }
+
+        patientId = newPatient.id;
+        result.importedPatients++;
+      }
+
+      if (!patientId) {
+        result.errors.push(`Patient ${i + 1}: Failed to resolve patient id`);
+        continue;
+      }
 
       // Process visits for this patient
       if (patientData.visits && patientData.visits.length > 0) {
@@ -304,35 +377,61 @@ export async function importPatientData(
               continue;
             }
 
-            // Insert the visit
-            // visit_number is optional - DB trigger auto-assigns if not provided
-            const { data: newVisit, error: visitError } = await supabase
+            // Idempotent visit creation:
+            // If a visit already exists for the same patient + type (+ number when provided), reuse it.
+            const visitNumber = visitData.visit_number || null;
+            let existingVisitId: string | null = null;
+
+            const baseVisitQuery = supabase
               .from('visits')
-              .insert({
-                patient_id: newPatient.id,
-                visit_template_id: visitTemplateId,
-                visit_type: visitData.visit_type as VisitType,
-                visit_number: visitData.visit_number || null,
-                scheduled_date: visitData.scheduled_date,
-                completed_date: visitData.completed_date,
-                status: visitData.status || VisitStatus.COMPLETED,
-                notes: visitData.notes,
-                conducted_by: importedBy,
-                created_by: importedBy,
-                metadata: {
-                  imported: true,
-                  imported_at: new Date().toISOString(),
-                },
-              })
-              .select()
-              .single();
+              .select('id')
+              .eq('patient_id', patientId)
+              .eq('visit_type', visitData.visit_type as VisitType);
+
+            const { data: existingVisit, error: existingVisitError } = visitNumber
+              ? await baseVisitQuery.eq('visit_number', visitNumber).single()
+              : await baseVisitQuery.eq('scheduled_date', visitData.scheduled_date).single();
+
+            if (existingVisitError && existingVisitError.code !== 'PGRST116') {
+              result.errors.push(`Patient ${i + 1}, Visit ${j + 1}: Error checking existing visit: ${existingVisitError.message}`);
+              continue;
+            }
+
+            if (existingVisit?.id) {
+              existingVisitId = existingVisit.id;
+              result.warnings.push(`Patient ${i + 1}, Visit ${j + 1}: Visit already exists; importing responses into existing visit`);
+            }
+
+            // Insert visit if missing (visit_number is optional - DB trigger auto-assigns if not provided)
+            const { data: newVisit, error: visitError } = existingVisitId
+              ? { data: { id: existingVisitId }, error: null }
+              : await supabase
+                  .from('visits')
+                  .insert({
+                    patient_id: patientId,
+                    visit_template_id: visitTemplateId,
+                    visit_type: visitData.visit_type as VisitType,
+                    visit_number: visitNumber,
+                    scheduled_date: visitData.scheduled_date,
+                    completed_date: visitData.completed_date,
+                    status: visitData.status || VisitStatus.COMPLETED,
+                    notes: visitData.notes,
+                    conducted_by: importedBy,
+                    created_by: importedBy,
+                    metadata: {
+                      imported: true,
+                      imported_at: new Date().toISOString(),
+                    },
+                  })
+                  .select('id')
+                  .single();
 
             if (visitError || !newVisit) {
               result.errors.push(`Patient ${i + 1}, Visit ${j + 1}: Failed to create visit: ${visitError?.message}`);
               continue;
             }
 
-            result.importedVisits++;
+            if (!existingVisitId) result.importedVisits++;
 
             // Process questionnaire responses for this visit
             if (visitData.questionnaires && visitData.questionnaires.length > 0) {
@@ -350,16 +449,16 @@ export async function importPatientData(
                   // Extract only raw response data (exclude any pre-computed scores)
                   const rawResponses = extractRawResponses(normalizedCode, questionnaireData.responses);
 
-                  // Insert raw questionnaire response
+                  // Upsert raw questionnaire response (idempotent on visit_id)
                   const { data: insertedResponse, error: responseError } = await supabase
                     .from(tableName)
-                    .insert({
+                    .upsert({
                       visit_id: newVisit.id,
-                      patient_id: newPatient.id,
+                      patient_id: patientId,
                       ...rawResponses,
                       completed_at: visitData.completed_date || new Date().toISOString(),
                       completed_by: importedBy,
-                    })
+                    }, { onConflict: 'visit_id' })
                     .select('id')
                     .single();
 

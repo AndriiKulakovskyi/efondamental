@@ -1,6 +1,6 @@
 [
   {
-    "medical_record_number": "BP-TEST-092",
+    "medical_record_number": "BP-TEST-091",
     "first_name": "Sophie",
     "last_name": "Bernard",
     "date_of_birth": "1986-05-22",
@@ -18,11 +18,77 @@
         "completed_date": "2023-01-15T11:30:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM", "responses": { "q1": 1, "q2": 2, "q3": 1, "q4": 2, "q5": 1 } },
-          { "code": "QIDS_SR16", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 0, "q5": 2, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 1, "q12": 0, "q13": 1, "q14": 2, "q15": 1, "q16": 0 } },
-          { "code": "MDQ", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 0, "q1_9": 0, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 2 } },
-          { "code": "BIPOLAR_DIAGNOSTIC", "responses": { "date_recueil": "2023-01-15", "diag_prealable": "oui", "diag_evoque": "oui", "bilan_programme": "oui", "lettre_information": "oui" } },
-          { "code": "BIPOLAR_ORIENTATION", "responses": { "trouble_bipolaire_ou_suspicion": "oui", "etat_thymique_compatible": "oui", "prise_en_charge_100_ou_accord": "oui", "accord_evaluation_centre_expert": "oui", "accord_transmission_cr": "oui" } }
+          {
+            "code": "ASRM",
+            "responses": {
+              "q1": 1,
+              "q2": 2,
+              "q3": 1,
+              "q4": 2,
+              "q5": 1
+            }
+          },
+          {
+            "code": "QIDS_SR16",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 0,
+              "q4": 0,
+              "q5": 2,
+              "q6": 1,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 1,
+              "q11": 1,
+              "q12": 0,
+              "q13": 1,
+              "q14": 2,
+              "q15": 1,
+              "q16": 0
+            }
+          },
+          {
+            "code": "MDQ",
+            "responses": {
+              "q1_1": 1,
+              "q1_2": 1,
+              "q1_3": 1,
+              "q1_4": 1,
+              "q1_5": 1,
+              "q1_6": 1,
+              "q1_7": 1,
+              "q1_8": 0,
+              "q1_9": 0,
+              "q1_10": 0,
+              "q1_11": 0,
+              "q1_12": 0,
+              "q1_13": 0,
+              "q2": 1,
+              "q3": 2
+            }
+          },
+          {
+            "code": "BIPOLAR_DIAGNOSTIC",
+            "responses": {
+              "date_recueil": "2023-01-15",
+              "diag_prealable": "oui",
+              "diag_evoque": "oui",
+              "bilan_programme": "oui",
+              "lettre_information": "oui"
+            }
+          },
+          {
+            "code": "BIPOLAR_ORIENTATION",
+            "responses": {
+              "trouble_bipolaire_ou_suspicion": "oui",
+              "etat_thymique_compatible": "oui",
+              "prise_en_charge_100_ou_accord": "oui",
+              "accord_evaluation_centre_expert": "oui",
+              "accord_transmission_cr": "oui"
+            }
+          }
         ]
       },
       {
@@ -32,20 +98,447 @@
         "completed_date": "2023-02-20T18:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "TOBACCO", "responses": { "smoking_status": "current_smoker", "pack_years": 10, "smoking_start_age": "18" } },
-          { "code": "PHYSICAL_PARAMS", "responses": { "height_cm": 165, "weight_kg": 68.5, "abdominal_circumference_cm": 82 } },
-          { "code": "BLOOD_PRESSURE", "responses": { "bp_lying_systolic": 125, "bp_lying_diastolic": 82, "heart_rate_lying": 72, "bp_standing_systolic": 122, "bp_standing_diastolic": 80, "heart_rate_standing": 70 } },
-          { "code": "SLEEP_APNEA", "responses": { "diagnosed_sleep_apnea": "no", "snoring": "oui", "tiredness": "oui", "observed_apnea": "non", "hypertension": "non", "bmi_over_35": "non", "age_over_50": "non", "large_neck": "non", "male_gender": "non" } },
-          { "code": "BIOLOGICAL_ASSESSMENT", "responses": { "collection_date": "2023-02-20", "hemoglobine": 13.5, "leucocytes": 7.2, "plaquettes": 250, "creatinine": 90, "glycemie_a_jeun": 5.3, "cholesterol_total": 5.0, "triglycerides": 1.4, "tsh": 2.1, "lithium_plasma": 0.8 } },
-          { "code": "MADRS", "responses": { "q1": 2, "q2": 2, "q3": 1, "q4": 2, "q5": 1, "q6": 2, "q7": 1, "q8": 1, "q9": 1, "q10": 0 } },
-          { "code": "YMRS", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 1, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI", "responses": { "cgi_s": 3, "cgi_i": 0 } },
-          { "code": "EGF", "responses": { "egf_score": 65 } },
-          { "code": "FAST", "responses": { "q1": 1, "q2": 1, "q3": 2, "q4": 1, "q5": 1, "q6": 2, "q7": 1, "q8": 1, "q9": 1, "q10": 1, "q11": 2, "q12": 1, "q13": 1, "q14": 0, "q15": 1, "q16": 1, "q17": 1, "q18": 1, "q19": 0, "q20": 0, "q21": 1, "q22": 1, "q23": 1, "q24": 0 } },
-          { "code": "ALDA", "responses": { "q0": 1, "qa": 1, "qb1": 0, "qb2": 0, "qb3": 0, "qb4": 0, "qb5": 0 } },
-          { "code": "EQ5D5L", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 2, "pain_discomfort": 2, "anxiety_depression": 3, "vas_score": 65 } },
-          { "code": "STAI_YA", "responses": { "q1": 2, "q2": 2, "q3": 2, "q4": 2, "q5": 2, "q6": 2, "q7": 2, "q8": 2, "q9": 2, "q10": 2, "q11": 2, "q12": 2, "q13": 2, "q14": 2, "q15": 2, "q16": 2, "q17": 2, "q18": 2, "q19": 2, "q20": 2 } },
-          { "code": "MARS", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 0, "q5": 1, "q6": 1, "q7": 1, "q8": 1, "q9": 1, "q10": 1 } }
+          {
+            "code": "TOBACCO",
+            "responses": {
+              "smoking_status": "current_smoker",
+              "pack_years": 10,
+              "smoking_start_age": "18"
+            }
+          },
+          {
+            "code": "PHYSICAL_PARAMS",
+            "responses": {
+              "height_cm": 165,
+              "weight_kg": 68.5,
+              "abdominal_circumference_cm": 82
+            }
+          },
+          {
+            "code": "BLOOD_PRESSURE",
+            "responses": {
+              "bp_lying_systolic": 125,
+              "bp_lying_diastolic": 82,
+              "heart_rate_lying": 72,
+              "bp_standing_systolic": 122,
+              "bp_standing_diastolic": 80,
+              "heart_rate_standing": 70
+            }
+          },
+          {
+            "code": "SLEEP_APNEA",
+            "responses": {
+              "diagnosed_sleep_apnea": "no",
+              "snoring": "oui",
+              "tiredness": "oui",
+              "observed_apnea": "non",
+              "hypertension": "non",
+              "bmi_over_35": "non",
+              "age_over_50": "non",
+              "large_neck": "non",
+              "male_gender": "non"
+            }
+          },
+          {
+            "code": "BIOLOGICAL_ASSESSMENT",
+            "responses": {
+              "collection_date": "2023-02-20",
+              "hemoglobine": 13.5,
+              "leucocytes": 7.2,
+              "plaquettes": 250,
+              "creatinine": 90,
+              "glycemie_a_jeun": 5.3,
+              "cholesterol_total": 5,
+              "triglycerides": 1.4,
+              "tsh": 2.1,
+              "lithium_plasma": 0.8
+            }
+          },
+          {
+            "code": "MADRS",
+            "responses": {
+              "q1": 2,
+              "q2": 2,
+              "q3": 1,
+              "q4": 2,
+              "q5": 1,
+              "q6": 2,
+              "q7": 1,
+              "q8": 1,
+              "q9": 1,
+              "q10": 0
+            }
+          },
+          {
+            "code": "YMRS",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 0,
+              "q4": 1,
+              "q5": 0,
+              "q6": 0,
+              "q7": 1,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 0
+            }
+          },
+          {
+            "code": "CGI",
+            "responses": {
+              "cgi_s": 3,
+              "cgi_i": 0
+            }
+          },
+          {
+            "code": "EGF",
+            "responses": {
+              "egf_score": 65
+            }
+          },
+          {
+            "code": "FAST",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 2,
+              "q4": 1,
+              "q5": 1,
+              "q6": 2,
+              "q7": 1,
+              "q8": 1,
+              "q9": 1,
+              "q10": 1,
+              "q11": 2,
+              "q12": 1,
+              "q13": 1,
+              "q14": 0,
+              "q15": 1,
+              "q16": 1,
+              "q17": 1,
+              "q18": 1,
+              "q19": 0,
+              "q20": 0,
+              "q21": 1,
+              "q22": 1,
+              "q23": 1,
+              "q24": 0
+            }
+          },
+          {
+            "code": "ALDA",
+            "responses": {
+              "q0": 1,
+              "qa": 1,
+              "qb1": 0,
+              "qb2": 0,
+              "qb3": 0,
+              "qb4": 0,
+              "qb5": 0
+            }
+          },
+          {
+            "code": "EQ5D5L",
+            "responses": {
+              "mobility": 1,
+              "self_care": 1,
+              "usual_activities": 2,
+              "pain_discomfort": 2,
+              "anxiety_depression": 3,
+              "vas_score": 65
+            }
+          },
+          {
+            "code": "STAI_YA",
+            "responses": {
+              "q1": 2,
+              "q2": 2,
+              "q3": 2,
+              "q4": 2,
+              "q5": 2,
+              "q6": 2,
+              "q7": 2,
+              "q8": 2,
+              "q9": 2,
+              "q10": 2,
+              "q11": 2,
+              "q12": 2,
+              "q13": 2,
+              "q14": 2,
+              "q15": 2,
+              "q16": 2,
+              "q17": 2,
+              "q18": 2,
+              "q19": 2,
+              "q20": 2
+            }
+          },
+          {
+            "code": "MARS",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 1,
+              "q4": 0,
+              "q5": 1,
+              "q6": 1,
+              "q7": 1,
+              "q8": 1,
+              "q9": 1,
+              "q10": 1
+            }
+          },
+          {
+            "code": "FAGERSTROM",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0
+            }
+          },
+          {
+            "code": "ECG",
+            "responses": {
+              "ecg_performed": ""
+            }
+          },
+          {
+            "code": "ETAT_PATIENT",
+            "responses": {}
+          },
+          {
+            "code": "PRISE_M",
+            "responses": {}
+          },
+          {
+            "code": "MATHYS",
+            "responses": {}
+          },
+          {
+            "code": "PSQI",
+            "responses": {}
+          },
+          {
+            "code": "EPWORTH",
+            "responses": {}
+          },
+          {
+            "code": "QIDS_SR16",
+            "responses": {}
+          },
+          {
+            "code": "ASRS",
+            "responses": {}
+          },
+          {
+            "code": "CTQ",
+            "responses": {}
+          },
+          {
+            "code": "BIS10",
+            "responses": {}
+          },
+          {
+            "code": "ALS18",
+            "responses": {}
+          },
+          {
+            "code": "AIM",
+            "responses": {}
+          },
+          {
+            "code": "WURS25",
+            "responses": {}
+          },
+          {
+            "code": "AQ12",
+            "responses": {}
+          },
+          {
+            "code": "CSM",
+            "responses": {}
+          },
+          {
+            "code": "CTI",
+            "responses": {}
+          },
+          {
+            "code": "SOCIAL",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_HUMEUR",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_PSYCHOTIC",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_COMORBID",
+            "responses": {}
+          },
+          {
+            "code": "DIVA",
+            "responses": {}
+          },
+          {
+            "code": "FAMILY_HISTORY",
+            "responses": {}
+          },
+          {
+            "code": "CSSRS",
+            "responses": {}
+          },
+          {
+            "code": "ISA",
+            "responses": {}
+          },
+          {
+            "code": "SIS",
+            "responses": {}
+          },
+          {
+            "code": "SUICIDE_HISTORY",
+            "responses": {}
+          },
+          {
+            "code": "PERINATALITE",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_NEURO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_CARDIO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_ENDOC",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_DERMATO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_URINAIRE",
+            "responses": {}
+          },
+          {
+            "code": "ANTECEDENTS_GYNECO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_HEPATO_GASTRO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_ALLERGIQUE",
+            "responses": {}
+          },
+          {
+            "code": "AUTRES_PATHO",
+            "responses": {}
+          },
+          {
+            "code": "CVLT",
+            "responses": {}
+          },
+          {
+            "code": "TMT",
+            "responses": {}
+          },
+          {
+            "code": "STROOP",
+            "responses": {}
+          },
+          {
+            "code": "FLUENCES_VERBALES",
+            "responses": {}
+          },
+          {
+            "code": "MEM3_SPATIAL",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_CRITERIA",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_LEARNING",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_MATRICES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_CODE",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_DIGIT_SPAN",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_SIMILITUDES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CRITERIA",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_LEARNING",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_VOCABULAIRE",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_MATRICES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CODE_SYMBOLES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_DIGIT_SPAN",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CPT2",
+            "responses": {}
+          },
+          {
+            "code": "COBRA",
+            "responses": {}
+          },
+          {
+            "code": "CPT3",
+            "responses": {}
+          },
+          {
+            "code": "SCIP",
+            "responses": {}
+          },
+          {
+            "code": "TEST_COMMISSIONS",
+            "responses": {}
+          },
+          {
+            "code": "ASRM",
+            "responses": {}
+          }
         ]
       },
       {
@@ -55,22 +548,292 @@
         "completed_date": "2023-08-20T14:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "TOBACCO", "responses": { "smoking_status": "current_smoker", "pack_years": 10, "smoking_start_age": "18" } },
-          { "code": "PHYSICAL_PARAMS", "responses": { "height_cm": 165, "weight_kg": 67.0, "abdominal_circumference_cm": 80 } },
-          { "code": "BLOOD_PRESSURE", "responses": { "bp_lying_systolic": 120, "bp_lying_diastolic": 78, "heart_rate_lying": 68, "bp_standing_systolic": 118, "bp_standing_diastolic": 76, "heart_rate_standing": 66 } },
-          { "code": "SLEEP_APNEA", "responses": { "diagnosed_sleep_apnea": "no", "snoring": "oui", "tiredness": "non", "observed_apnea": "non", "hypertension": "non", "bmi_over_35": "non", "age_over_50": "non", "large_neck": "non", "male_gender": "non" } },
-          { "code": "BIOLOGICAL_ASSESSMENT", "responses": { "collection_date": "2023-08-20", "hemoglobine": 13.8, "leucocytes": 6.9, "plaquettes": 245, "creatinine": 85, "glycemie_a_jeun": 5.1, "cholesterol_total": 4.9, "triglycerides": 1.3, "tsh": 2.0, "lithium_plasma": 0.75 } },
-          { "code": "MADRS", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 0, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI", "responses": { "cgi_s": 2, "cgi_i": 2 } },
-          { "code": "EGF", "responses": { "egf_score": 72 } },
-          { "code": "FAST", "responses": { "q1": 0, "q2": 1, "q3": 1, "q4": 0, "q5": 0, "q6": 1, "q7": 0, "q8": 0, "q9": 1, "q10": 0, "q11": 1, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0, "q17": 0, "q18": 0, "q19": 0, "q20": 0, "q21": 0, "q22": 0, "q23": 0, "q24": 0 } },
-          { "code": "ALDA", "responses": { "q0": 1, "qa": 2, "qb1": 0, "qb2": 0, "qb3": 0, "qb4": 0, "qb5": 0 } },
-          { "code": "ASRM", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 1, "q5": 0 } },
-          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 1, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 1, "q15": 0, "q16": 0 } },
-          { "code": "EQ5D5L", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 1, "pain_discomfort": 1, "anxiety_depression": 2, "vas_score": 75 } },
-          { "code": "STAI_YA", "responses": { "q1": 1, "q2": 1, "q3": 2, "q4": 1, "q5": 2, "q6": 1, "q7": 2, "q8": 1, "q9": 2, "q10": 1, "q11": 2, "q12": 1, "q13": 2, "q14": 1, "q15": 2, "q16": 1, "q17": 2, "q18": 1, "q19": 2, "q20": 1 } },
-          { "code": "MARS", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 1, "q6": 1, "q7": 1, "q8": 1, "q9": 1, "q10": 1 } }
+          {
+            "code": "TOBACCO",
+            "responses": {
+              "smoking_status": "current_smoker",
+              "pack_years": 10,
+              "smoking_start_age": "18"
+            }
+          },
+          {
+            "code": "PHYSICAL_PARAMS",
+            "responses": {
+              "height_cm": 165,
+              "weight_kg": 67,
+              "abdominal_circumference_cm": 80
+            }
+          },
+          {
+            "code": "BLOOD_PRESSURE",
+            "responses": {
+              "bp_lying_systolic": 120,
+              "bp_lying_diastolic": 78,
+              "heart_rate_lying": 68,
+              "bp_standing_systolic": 118,
+              "bp_standing_diastolic": 76,
+              "heart_rate_standing": 66
+            }
+          },
+          {
+            "code": "SLEEP_APNEA",
+            "responses": {
+              "diagnosed_sleep_apnea": "no",
+              "snoring": "oui",
+              "tiredness": "non",
+              "observed_apnea": "non",
+              "hypertension": "non",
+              "bmi_over_35": "non",
+              "age_over_50": "non",
+              "large_neck": "non",
+              "male_gender": "non"
+            }
+          },
+          {
+            "code": "BIOLOGICAL_ASSESSMENT",
+            "responses": {
+              "collection_date": "2023-08-20",
+              "hemoglobine": 13.8,
+              "leucocytes": 6.9,
+              "plaquettes": 245,
+              "creatinine": 85,
+              "glycemie_a_jeun": 5.1,
+              "cholesterol_total": 4.9,
+              "triglycerides": 1.3,
+              "tsh": 2,
+              "lithium_plasma": 0.75
+            }
+          },
+          {
+            "code": "MADRS",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 0,
+              "q4": 1,
+              "q5": 0,
+              "q6": 1,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0
+            }
+          },
+          {
+            "code": "YMRS",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 0
+            }
+          },
+          {
+            "code": "CGI",
+            "responses": {
+              "cgi_s": 2,
+              "cgi_i": 2
+            }
+          },
+          {
+            "code": "EGF",
+            "responses": {
+              "egf_score": 72
+            }
+          },
+          {
+            "code": "FAST",
+            "responses": {
+              "q1": 0,
+              "q2": 1,
+              "q3": 1,
+              "q4": 0,
+              "q5": 0,
+              "q6": 1,
+              "q7": 0,
+              "q8": 0,
+              "q9": 1,
+              "q10": 0,
+              "q11": 1,
+              "q12": 0,
+              "q13": 0,
+              "q14": 0,
+              "q15": 0,
+              "q16": 0,
+              "q17": 0,
+              "q18": 0,
+              "q19": 0,
+              "q20": 0,
+              "q21": 0,
+              "q22": 0,
+              "q23": 0,
+              "q24": 0
+            }
+          },
+          {
+            "code": "ALDA",
+            "responses": {
+              "q0": 1,
+              "qa": 2,
+              "qb1": 0,
+              "qb2": 0,
+              "qb3": 0,
+              "qb4": 0,
+              "qb5": 0
+            }
+          },
+          {
+            "code": "ASRM",
+            "responses": {
+              "q1": 0,
+              "q2": 1,
+              "q3": 0,
+              "q4": 1,
+              "q5": 0
+            }
+          },
+          {
+            "code": "QIDS_SR16",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 1,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 0,
+              "q12": 0,
+              "q13": 0,
+              "q14": 1,
+              "q15": 0,
+              "q16": 0
+            }
+          },
+          {
+            "code": "EQ5D5L",
+            "responses": {
+              "mobility": 1,
+              "self_care": 1,
+              "usual_activities": 1,
+              "pain_discomfort": 1,
+              "anxiety_depression": 2,
+              "vas_score": 75
+            }
+          },
+          {
+            "code": "STAI_YA",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 2,
+              "q4": 1,
+              "q5": 2,
+              "q6": 1,
+              "q7": 2,
+              "q8": 1,
+              "q9": 2,
+              "q10": 1,
+              "q11": 2,
+              "q12": 1,
+              "q13": 2,
+              "q14": 1,
+              "q15": 2,
+              "q16": 1,
+              "q17": 2,
+              "q18": 1,
+              "q19": 2,
+              "q20": 1
+            }
+          },
+          {
+            "code": "MARS",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 1,
+              "q4": 1,
+              "q5": 1,
+              "q6": 1,
+              "q7": 1,
+              "q8": 1,
+              "q9": 1,
+              "q10": 1
+            }
+          },
+          {
+            "code": "FAGERSTROM",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0
+            }
+          },
+          {
+            "code": "ETAT_PATIENT",
+            "responses": {}
+          },
+          {
+            "code": "HUMEUR_ACTUELS",
+            "responses": {}
+          },
+          {
+            "code": "HUMEUR_DEPUIS_VISITE",
+            "responses": {}
+          },
+          {
+            "code": "PSYCHOTIQUES",
+            "responses": {}
+          },
+          {
+            "code": "ISA_FOLLOWUP",
+            "responses": {}
+          },
+          {
+            "code": "SUICIDE_BEHAVIOR_FOLLOWUP",
+            "responses": {}
+          },
+          {
+            "code": "CSSRS",
+            "responses": {}
+          },
+          {
+            "code": "SUIVI_RECOMMANDATIONS",
+            "responses": {}
+          },
+          {
+            "code": "RECOURS_AUX_SOINS",
+            "responses": {}
+          },
+          {
+            "code": "TRAITEMENT_NON_PHARMACOLOGIQUE",
+            "responses": {}
+          },
+          {
+            "code": "ARRETS_DE_TRAVAIL",
+            "responses": {}
+          },
+          {
+            "code": "SOMATIQUE_CONTRACEPTIF",
+            "responses": {}
+          },
+          {
+            "code": "STATUT_PROFESSIONNEL",
+            "responses": {}
+          }
         ]
       },
       {
@@ -80,22 +843,455 @@
         "completed_date": "2024-02-20T17:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "TOBACCO", "responses": { "smoking_status": "ex_smoker", "pack_years_ex": 10, "smoking_start_age_ex": "18", "smoking_end_age": "38" } },
-          { "code": "PHYSICAL_PARAMS", "responses": { "height_cm": 165, "weight_kg": 66.0, "abdominal_circumference_cm": 78 } },
-          { "code": "BLOOD_PRESSURE", "responses": { "bp_lying_systolic": 118, "bp_lying_diastolic": 76, "heart_rate_lying": 65, "bp_standing_systolic": 116, "bp_standing_diastolic": 74, "heart_rate_standing": 64 } },
-          { "code": "SLEEP_APNEA", "responses": { "diagnosed_sleep_apnea": "no", "snoring": "non", "tiredness": "non", "observed_apnea": "non", "hypertension": "non", "bmi_over_35": "non", "age_over_50": "non", "large_neck": "non", "male_gender": "non" } },
-          { "code": "BIOLOGICAL_ASSESSMENT", "responses": { "collection_date": "2024-02-20", "hemoglobine": 14.0, "leucocytes": 6.5, "plaquettes": 240, "creatinine": 82, "glycemie_a_jeun": 4.9, "cholesterol_total": 4.7, "triglycerides": 1.2, "tsh": 1.9, "lithium_plasma": 0.72 } },
-          { "code": "MADRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI", "responses": { "cgi_s": 1, "cgi_i": 1 } },
-          { "code": "EGF", "responses": { "egf_score": 80 } },
-          { "code": "FAST", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0, "q17": 0, "q18": 0, "q19": 0, "q20": 0, "q21": 0, "q22": 0, "q23": 0, "q24": 0 } },
-          { "code": "ALDA", "responses": { "q0": 1, "qa": 2, "qb1": 0, "qb2": 0, "qb3": 0, "qb4": 0, "qb5": 0 } },
-          { "code": "EQ5D5L", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 1, "pain_discomfort": 1, "anxiety_depression": 1, "vas_score": 85 } },
-          { "code": "STAI_YA", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 1, "q6": 1, "q7": 1, "q8": 1, "q9": 1, "q10": 1, "q11": 1, "q12": 1, "q13": 1, "q14": 1, "q15": 1, "q16": 1, "q17": 1, "q18": 1, "q19": 1, "q20": 1 } },
-          { "code": "MARS", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 1, "q6": 1, "q7": 1, "q8": 1, "q9": 1, "q10": 1 } },
-          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } }
+          {
+            "code": "TOBACCO",
+            "responses": {
+              "smoking_status": "ex_smoker",
+              "pack_years_ex": 10,
+              "smoking_start_age_ex": "18",
+              "smoking_end_age": "38"
+            }
+          },
+          {
+            "code": "PHYSICAL_PARAMS",
+            "responses": {
+              "height_cm": 165,
+              "weight_kg": 66,
+              "abdominal_circumference_cm": 78
+            }
+          },
+          {
+            "code": "BLOOD_PRESSURE",
+            "responses": {
+              "bp_lying_systolic": 118,
+              "bp_lying_diastolic": 76,
+              "heart_rate_lying": 65,
+              "bp_standing_systolic": 116,
+              "bp_standing_diastolic": 74,
+              "heart_rate_standing": 64
+            }
+          },
+          {
+            "code": "SLEEP_APNEA",
+            "responses": {
+              "diagnosed_sleep_apnea": "no",
+              "snoring": "non",
+              "tiredness": "non",
+              "observed_apnea": "non",
+              "hypertension": "non",
+              "bmi_over_35": "non",
+              "age_over_50": "non",
+              "large_neck": "non",
+              "male_gender": "non"
+            }
+          },
+          {
+            "code": "BIOLOGICAL_ASSESSMENT",
+            "responses": {
+              "collection_date": "2024-02-20",
+              "hemoglobine": 14,
+              "leucocytes": 6.5,
+              "plaquettes": 240,
+              "creatinine": 82,
+              "glycemie_a_jeun": 4.9,
+              "cholesterol_total": 4.7,
+              "triglycerides": 1.2,
+              "tsh": 1.9,
+              "lithium_plasma": 0.72
+            }
+          },
+          {
+            "code": "MADRS",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0
+            }
+          },
+          {
+            "code": "YMRS",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 0
+            }
+          },
+          {
+            "code": "CGI",
+            "responses": {
+              "cgi_s": 1,
+              "cgi_i": 1
+            }
+          },
+          {
+            "code": "EGF",
+            "responses": {
+              "egf_score": 80
+            }
+          },
+          {
+            "code": "FAST",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 0,
+              "q12": 0,
+              "q13": 0,
+              "q14": 0,
+              "q15": 0,
+              "q16": 0,
+              "q17": 0,
+              "q18": 0,
+              "q19": 0,
+              "q20": 0,
+              "q21": 0,
+              "q22": 0,
+              "q23": 0,
+              "q24": 0
+            }
+          },
+          {
+            "code": "ALDA",
+            "responses": {
+              "q0": 1,
+              "qa": 2,
+              "qb1": 0,
+              "qb2": 0,
+              "qb3": 0,
+              "qb4": 0,
+              "qb5": 0
+            }
+          },
+          {
+            "code": "EQ5D5L",
+            "responses": {
+              "mobility": 1,
+              "self_care": 1,
+              "usual_activities": 1,
+              "pain_discomfort": 1,
+              "anxiety_depression": 1,
+              "vas_score": 85
+            }
+          },
+          {
+            "code": "STAI_YA",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 1,
+              "q4": 1,
+              "q5": 1,
+              "q6": 1,
+              "q7": 1,
+              "q8": 1,
+              "q9": 1,
+              "q10": 1,
+              "q11": 1,
+              "q12": 1,
+              "q13": 1,
+              "q14": 1,
+              "q15": 1,
+              "q16": 1,
+              "q17": 1,
+              "q18": 1,
+              "q19": 1,
+              "q20": 1
+            }
+          },
+          {
+            "code": "MARS",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 1,
+              "q4": 1,
+              "q5": 1,
+              "q6": 1,
+              "q7": 1,
+              "q8": 1,
+              "q9": 1,
+              "q10": 1
+            }
+          },
+          {
+            "code": "ASRM",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0
+            }
+          },
+          {
+            "code": "QIDS_SR16",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 0,
+              "q12": 0,
+              "q13": 0,
+              "q14": 0,
+              "q15": 0,
+              "q16": 0
+            }
+          },
+          {
+            "code": "FAGERSTROM",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0
+            }
+          },
+          {
+            "code": "ECG",
+            "responses": {
+              "ecg_performed": "no"
+            }
+          },
+          {
+            "code": "ETAT_PATIENT",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_HUMEUR",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_PSYCHOTIC",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_COMORBID",
+            "responses": {}
+          },
+          {
+            "code": "DIVA",
+            "responses": {}
+          },
+          {
+            "code": "FAMILY_HISTORY",
+            "responses": {}
+          },
+          {
+            "code": "CSSRS",
+            "responses": {}
+          },
+          {
+            "code": "ISA_FOLLOWUP",
+            "responses": {}
+          },
+          {
+            "code": "SIS",
+            "responses": {}
+          },
+          {
+            "code": "SUICIDE_HISTORY",
+            "responses": {}
+          },
+          {
+            "code": "PERINATALITE",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_NEURO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_CARDIO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_ENDOC",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_DERMATO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_URINAIRE",
+            "responses": {}
+          },
+          {
+            "code": "ANTECEDENTS_GYNECO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_HEPATO_GASTRO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_ALLERGIQUE",
+            "responses": {}
+          },
+          {
+            "code": "AUTRES_PATHO",
+            "responses": {}
+          },
+          {
+            "code": "SUIVI_RECOMMANDATIONS",
+            "responses": {}
+          },
+          {
+            "code": "RECOURS_AUX_SOINS",
+            "responses": {}
+          },
+          {
+            "code": "TRAITEMENT_NON_PHARMACOLOGIQUE",
+            "responses": {}
+          },
+          {
+            "code": "ARRETS_DE_TRAVAIL",
+            "responses": {}
+          },
+          {
+            "code": "SOMATIQUE_CONTRACEPTIF",
+            "responses": {}
+          },
+          {
+            "code": "STATUT_PROFESSIONNEL",
+            "responses": {}
+          },
+          {
+            "code": "CVLT",
+            "responses": {}
+          },
+          {
+            "code": "TMT",
+            "responses": {}
+          },
+          {
+            "code": "STROOP",
+            "responses": {}
+          },
+          {
+            "code": "FLUENCES_VERBALES",
+            "responses": {}
+          },
+          {
+            "code": "MEM3_SPATIAL",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CRITERIA",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_LEARNING",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_VOCABULAIRE",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_MATRICES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CODE_SYMBOLES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_DIGIT_SPAN",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CPT2",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_CRITERIA",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_LEARNING",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_MATRICES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_CODE",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_DIGIT_SPAN",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_SIMILITUDES",
+            "responses": {}
+          },
+          {
+            "code": "COBRA",
+            "responses": {}
+          },
+          {
+            "code": "CPT3",
+            "responses": {}
+          },
+          {
+            "code": "TEST_COMMISSIONS",
+            "responses": {}
+          },
+          {
+            "code": "SCIP",
+            "responses": {}
+          },
+          {
+            "code": "PRISE_M",
+            "responses": {}
+          },
+          {
+            "code": "MATHYS",
+            "responses": {}
+          },
+          {
+            "code": "PSQI",
+            "responses": {}
+          },
+          {
+            "code": "EPWORTH",
+            "responses": {}
+          }
         ]
       },
       {
@@ -105,28 +1301,461 @@
         "completed_date": "2025-02-20T17:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "TOBACCO", "responses": { "smoking_status": "ex_smoker", "pack_years_ex": 10, "smoking_start_age_ex": "18", "smoking_end_age": "38" } },
-          { "code": "PHYSICAL_PARAMS", "responses": { "height_cm": 165, "weight_kg": 65.5, "abdominal_circumference_cm": 76 } },
-          { "code": "BLOOD_PRESSURE", "responses": { "bp_lying_systolic": 115, "bp_lying_diastolic": 74, "heart_rate_lying": 62, "bp_standing_systolic": 114, "bp_standing_diastolic": 72, "heart_rate_standing": 60 } },
-          { "code": "SLEEP_APNEA", "responses": { "diagnosed_sleep_apnea": "no", "snoring": "non", "tiredness": "non", "observed_apnea": "non", "hypertension": "non", "bmi_over_35": "non", "age_over_50": "non", "large_neck": "non", "male_gender": "non" } },
-          { "code": "BIOLOGICAL_ASSESSMENT", "responses": { "collection_date": "2025-02-20", "hemoglobine": 14.2, "leucocytes": 6.2, "plaquettes": 235, "creatinine": 80, "glycemie_a_jeun": 4.7, "cholesterol_total": 4.5, "triglycerides": 1.1, "tsh": 1.8, "lithium_plasma": 0.70 } },
-          { "code": "MADRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI", "responses": { "cgi_s": 1, "cgi_i": 1 } },
-          { "code": "EGF", "responses": { "egf_score": 85 } },
-          { "code": "FAST", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0, "q17": 0, "q18": 0, "q19": 0, "q20": 0, "q21": 0, "q22": 0, "q23": 0, "q24": 0 } },
-          { "code": "ALDA", "responses": { "q0": 1, "qa": 3, "qb1": 0, "qb2": 0, "qb3": 0, "qb4": 0, "qb5": 0 } },
-          { "code": "EQ5D5L", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 1, "pain_discomfort": 1, "anxiety_depression": 1, "vas_score": 90 } },
-          { "code": "STAI_YA", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 1, "q6": 1, "q7": 1, "q8": 1, "q9": 1, "q10": 1, "q11": 1, "q12": 1, "q13": 1, "q14": 1, "q15": 1, "q16": 1, "q17": 1, "q18": 1, "q19": 1, "q20": 1 } },
-          { "code": "MARS", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 1, "q6": 1, "q7": 1, "q8": 1, "q9": 1, "q10": 1 } },
-          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } }
+          {
+            "code": "TOBACCO",
+            "responses": {
+              "smoking_status": "ex_smoker",
+              "pack_years_ex": 10,
+              "smoking_start_age_ex": "18",
+              "smoking_end_age": "38"
+            }
+          },
+          {
+            "code": "PHYSICAL_PARAMS",
+            "responses": {
+              "height_cm": 165,
+              "weight_kg": 65.5,
+              "abdominal_circumference_cm": 76
+            }
+          },
+          {
+            "code": "BLOOD_PRESSURE",
+            "responses": {
+              "bp_lying_systolic": 115,
+              "bp_lying_diastolic": 74,
+              "heart_rate_lying": 62,
+              "bp_standing_systolic": 114,
+              "bp_standing_diastolic": 72,
+              "heart_rate_standing": 60
+            }
+          },
+          {
+            "code": "SLEEP_APNEA",
+            "responses": {
+              "diagnosed_sleep_apnea": "no",
+              "snoring": "non",
+              "tiredness": "non",
+              "observed_apnea": "non",
+              "hypertension": "non",
+              "bmi_over_35": "non",
+              "age_over_50": "non",
+              "large_neck": "non",
+              "male_gender": "non"
+            }
+          },
+          {
+            "code": "BIOLOGICAL_ASSESSMENT",
+            "responses": {
+              "collection_date": "2025-02-20",
+              "hemoglobine": 14.2,
+              "leucocytes": 6.2,
+              "plaquettes": 235,
+              "creatinine": 80,
+              "glycemie_a_jeun": 4.7,
+              "cholesterol_total": 4.5,
+              "triglycerides": 1.1,
+              "tsh": 1.8,
+              "lithium_plasma": 0.7
+            }
+          },
+          {
+            "code": "MADRS",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0
+            }
+          },
+          {
+            "code": "YMRS",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 0
+            }
+          },
+          {
+            "code": "CGI",
+            "responses": {
+              "cgi_s": 1,
+              "cgi_i": 1
+            }
+          },
+          {
+            "code": "EGF",
+            "responses": {
+              "egf_score": 85
+            }
+          },
+          {
+            "code": "FAST",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 0,
+              "q12": 0,
+              "q13": 0,
+              "q14": 0,
+              "q15": 0,
+              "q16": 0,
+              "q17": 0,
+              "q18": 0,
+              "q19": 0,
+              "q20": 0,
+              "q21": 0,
+              "q22": 0,
+              "q23": 0,
+              "q24": 0
+            }
+          },
+          {
+            "code": "ALDA",
+            "responses": {
+              "q0": 1,
+              "qa": 3,
+              "qb1": 0,
+              "qb2": 0,
+              "qb3": 0,
+              "qb4": 0,
+              "qb5": 0
+            }
+          },
+          {
+            "code": "EQ5D5L",
+            "responses": {
+              "mobility": 1,
+              "self_care": 1,
+              "usual_activities": 1,
+              "pain_discomfort": 1,
+              "anxiety_depression": 1,
+              "vas_score": 90
+            }
+          },
+          {
+            "code": "STAI_YA",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 1,
+              "q4": 1,
+              "q5": 1,
+              "q6": 1,
+              "q7": 1,
+              "q8": 1,
+              "q9": 1,
+              "q10": 1,
+              "q11": 1,
+              "q12": 1,
+              "q13": 1,
+              "q14": 1,
+              "q15": 1,
+              "q16": 1,
+              "q17": 1,
+              "q18": 1,
+              "q19": 1,
+              "q20": 1
+            }
+          },
+          {
+            "code": "MARS",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 1,
+              "q4": 1,
+              "q5": 1,
+              "q6": 1,
+              "q7": 1,
+              "q8": 1,
+              "q9": 1,
+              "q10": 1
+            }
+          },
+          {
+            "code": "ASRM",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0
+            }
+          },
+          {
+            "code": "QIDS_SR16",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 0,
+              "q12": 0,
+              "q13": 0,
+              "q14": 0,
+              "q15": 0,
+              "q16": 0
+            }
+          },
+          {
+            "code": "FAGERSTROM",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0
+            }
+          },
+          {
+            "code": "ECG",
+            "responses": {
+              "ecg_performed": "no"
+            }
+          },
+          {
+            "code": "ETAT_PATIENT",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_HUMEUR",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_PSYCHOTIC",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_COMORBID",
+            "responses": {}
+          },
+          {
+            "code": "DIVA",
+            "responses": {}
+          },
+          {
+            "code": "FAMILY_HISTORY",
+            "responses": {}
+          },
+          {
+            "code": "CSSRS",
+            "responses": {}
+          },
+          {
+            "code": "ISA_FOLLOWUP",
+            "responses": {}
+          },
+          {
+            "code": "SIS",
+            "responses": {}
+          },
+          {
+            "code": "SUICIDE_HISTORY",
+            "responses": {}
+          },
+          {
+            "code": "PERINATALITE",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_NEURO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_CARDIO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_ENDOC",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_DERMATO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_URINAIRE",
+            "responses": {}
+          },
+          {
+            "code": "ANTECEDENTS_GYNECO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_HEPATO_GASTRO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_ALLERGIQUE",
+            "responses": {}
+          },
+          {
+            "code": "AUTRES_PATHO",
+            "responses": {}
+          },
+          {
+            "code": "SUIVI_RECOMMANDATIONS",
+            "responses": {}
+          },
+          {
+            "code": "RECOURS_AUX_SOINS",
+            "responses": {}
+          },
+          {
+            "code": "TRAITEMENT_NON_PHARMACOLOGIQUE",
+            "responses": {}
+          },
+          {
+            "code": "ARRETS_DE_TRAVAIL",
+            "responses": {}
+          },
+          {
+            "code": "SOMATIQUE_CONTRACEPTIF",
+            "responses": {}
+          },
+          {
+            "code": "STATUT_PROFESSIONNEL",
+            "responses": {}
+          },
+          {
+            "code": "CVLT",
+            "responses": {}
+          },
+          {
+            "code": "TMT",
+            "responses": {}
+          },
+          {
+            "code": "STROOP",
+            "responses": {}
+          },
+          {
+            "code": "FLUENCES_VERBALES",
+            "responses": {}
+          },
+          {
+            "code": "MEM3_SPATIAL",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CRITERIA",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_LEARNING",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_VOCABULAIRE",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_MATRICES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CODE_SYMBOLES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_DIGIT_SPAN",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CPT2",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_CRITERIA",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_LEARNING",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_MATRICES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_CODE",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_DIGIT_SPAN",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_SIMILITUDES",
+            "responses": {}
+          },
+          {
+            "code": "COBRA",
+            "responses": {}
+          },
+          {
+            "code": "CPT3",
+            "responses": {}
+          },
+          {
+            "code": "TEST_COMMISSIONS",
+            "responses": {}
+          },
+          {
+            "code": "SCIP",
+            "responses": {}
+          },
+          {
+            "code": "PRISE_M",
+            "responses": {}
+          },
+          {
+            "code": "MATHYS",
+            "responses": {}
+          },
+          {
+            "code": "PSQI",
+            "responses": {}
+          },
+          {
+            "code": "EPWORTH",
+            "responses": {}
+          }
         ]
       }
     ]
   },
   {
-    "medical_record_number": "BP-TEST-093",
+    "medical_record_number": "BP-TEST-090",
     "first_name": "Pierre",
     "last_name": "Lefevre",
     "date_of_birth": "1979-09-18",
@@ -144,11 +1773,77 @@
         "completed_date": "2022-06-10T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM", "responses": { "q1": 3, "q2": 3, "q3": 2, "q4": 3, "q5": 2 } },
-          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 1, "q8": 0, "q9": 1, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
-          { "code": "MDQ", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 1, "q1_9": 1, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 3 } },
-          { "code": "BIPOLAR_DIAGNOSTIC", "responses": { "date_recueil": "2022-06-10", "diag_prealable": "oui", "diag_evoque": "oui", "bilan_programme": "oui", "lettre_information": "oui" } },
-          { "code": "BIPOLAR_ORIENTATION", "responses": { "trouble_bipolaire_ou_suspicion": "oui", "etat_thymique_compatible": "oui", "prise_en_charge_100_ou_accord": "oui", "accord_evaluation_centre_expert": "oui", "accord_transmission_cr": "oui" } }
+          {
+            "code": "ASRM",
+            "responses": {
+              "q1": 3,
+              "q2": 3,
+              "q3": 2,
+              "q4": 3,
+              "q5": 2
+            }
+          },
+          {
+            "code": "QIDS_SR16",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 1,
+              "q5": 0,
+              "q6": 0,
+              "q7": 1,
+              "q8": 0,
+              "q9": 1,
+              "q10": 0,
+              "q11": 0,
+              "q12": 0,
+              "q13": 0,
+              "q14": 0,
+              "q15": 0,
+              "q16": 0
+            }
+          },
+          {
+            "code": "MDQ",
+            "responses": {
+              "q1_1": 1,
+              "q1_2": 1,
+              "q1_3": 1,
+              "q1_4": 1,
+              "q1_5": 1,
+              "q1_6": 1,
+              "q1_7": 1,
+              "q1_8": 1,
+              "q1_9": 1,
+              "q1_10": 0,
+              "q1_11": 0,
+              "q1_12": 0,
+              "q1_13": 0,
+              "q2": 1,
+              "q3": 3
+            }
+          },
+          {
+            "code": "BIPOLAR_DIAGNOSTIC",
+            "responses": {
+              "date_recueil": "2022-06-10",
+              "diag_prealable": "oui",
+              "diag_evoque": "oui",
+              "bilan_programme": "oui",
+              "lettre_information": "oui"
+            }
+          },
+          {
+            "code": "BIPOLAR_ORIENTATION",
+            "responses": {
+              "trouble_bipolaire_ou_suspicion": "oui",
+              "etat_thymique_compatible": "oui",
+              "prise_en_charge_100_ou_accord": "oui",
+              "accord_evaluation_centre_expert": "oui",
+              "accord_transmission_cr": "oui"
+            }
+          }
         ]
       },
       {
@@ -158,18 +1853,413 @@
         "completed_date": "2022-07-15T17:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "TOBACCO", "responses": { "smoking_status": "non_smoker" } },
-          { "code": "PHYSICAL_PARAMS", "responses": { "height_cm": 178, "weight_kg": 85.0, "abdominal_circumference_cm": 98 } },
-          { "code": "BLOOD_PRESSURE", "responses": { "bp_lying_systolic": 135, "bp_lying_diastolic": 88, "heart_rate_lying": 78, "bp_standing_systolic": 132, "bp_standing_diastolic": 86, "heart_rate_standing": 76 } },
-          { "code": "SLEEP_APNEA", "responses": { "diagnosed_sleep_apnea": "no", "snoring": "oui", "tiredness": "oui", "observed_apnea": "oui", "hypertension": "oui", "bmi_over_35": "non", "age_over_50": "non", "large_neck": "oui", "male_gender": "oui" } },
-          { "code": "BIOLOGICAL_ASSESSMENT", "responses": { "collection_date": "2022-07-15", "hemoglobine": 15.2, "leucocytes": 7.8, "plaquettes": 280, "creatinine": 100, "glycemie_a_jeun": 5.8, "cholesterol_total": 5.7, "triglycerides": 1.8, "tsh": 2.5, "valproic_acid": 85 } },
-          { "code": "MADRS", "responses": { "q1": 1, "q2": 0, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS", "responses": { "q1": 2, "q2": 2, "q3": 1, "q4": 2, "q5": 2, "q6": 2, "q7": 2, "q8": 2, "q9": 2, "q10": 1, "q11": 1 } },
-          { "code": "CGI", "responses": { "cgi_s": 4, "cgi_i": 0 } },
-          { "code": "EGF", "responses": { "egf_score": 55 } },
-          { "code": "FAST", "responses": { "q1": 2, "q2": 2, "q3": 2, "q4": 2, "q5": 2, "q6": 2, "q7": 2, "q8": 2, "q9": 2, "q10": 2, "q11": 2, "q12": 2, "q13": 2, "q14": 1, "q15": 2, "q16": 2, "q17": 2, "q18": 2, "q19": 1, "q20": 1, "q21": 2, "q22": 2, "q23": 2, "q24": 1 } },
-          { "code": "ALDA", "responses": { "q0": 0, "qa": 0, "qb1": 1, "qb2": 1, "qb3": 1, "qb4": 0, "qb5": 0 } },
-          { "code": "EQ5D5L", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 2, "pain_discomfort": 1, "anxiety_depression": 2, "vas_score": 70 } }
+          {
+            "code": "TOBACCO",
+            "responses": {
+              "smoking_status": "non_smoker"
+            }
+          },
+          {
+            "code": "PHYSICAL_PARAMS",
+            "responses": {
+              "height_cm": 178,
+              "weight_kg": 85,
+              "abdominal_circumference_cm": 98
+            }
+          },
+          {
+            "code": "BLOOD_PRESSURE",
+            "responses": {
+              "bp_lying_systolic": 135,
+              "bp_lying_diastolic": 88,
+              "heart_rate_lying": 78,
+              "bp_standing_systolic": 132,
+              "bp_standing_diastolic": 86,
+              "heart_rate_standing": 76
+            }
+          },
+          {
+            "code": "SLEEP_APNEA",
+            "responses": {
+              "diagnosed_sleep_apnea": "no",
+              "snoring": "oui",
+              "tiredness": "oui",
+              "observed_apnea": "oui",
+              "hypertension": "oui",
+              "bmi_over_35": "non",
+              "age_over_50": "non",
+              "large_neck": "oui",
+              "male_gender": "oui"
+            }
+          },
+          {
+            "code": "BIOLOGICAL_ASSESSMENT",
+            "responses": {
+              "collection_date": "2022-07-15",
+              "hemoglobine": 15.2,
+              "leucocytes": 7.8,
+              "plaquettes": 280,
+              "creatinine": 100,
+              "glycemie_a_jeun": 5.8,
+              "cholesterol_total": 5.7,
+              "triglycerides": 1.8,
+              "tsh": 2.5,
+              "valproic_acid": 85
+            }
+          },
+          {
+            "code": "MADRS",
+            "responses": {
+              "q1": 1,
+              "q2": 0,
+              "q3": 0,
+              "q4": 1,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0
+            }
+          },
+          {
+            "code": "YMRS",
+            "responses": {
+              "q1": 2,
+              "q2": 2,
+              "q3": 1,
+              "q4": 2,
+              "q5": 2,
+              "q6": 2,
+              "q7": 2,
+              "q8": 2,
+              "q9": 2,
+              "q10": 1,
+              "q11": 1
+            }
+          },
+          {
+            "code": "CGI",
+            "responses": {
+              "cgi_s": 4,
+              "cgi_i": 0
+            }
+          },
+          {
+            "code": "EGF",
+            "responses": {
+              "egf_score": 55
+            }
+          },
+          {
+            "code": "FAST",
+            "responses": {
+              "q1": 2,
+              "q2": 2,
+              "q3": 2,
+              "q4": 2,
+              "q5": 2,
+              "q6": 2,
+              "q7": 2,
+              "q8": 2,
+              "q9": 2,
+              "q10": 2,
+              "q11": 2,
+              "q12": 2,
+              "q13": 2,
+              "q14": 1,
+              "q15": 2,
+              "q16": 2,
+              "q17": 2,
+              "q18": 2,
+              "q19": 1,
+              "q20": 1,
+              "q21": 2,
+              "q22": 2,
+              "q23": 2,
+              "q24": 1
+            }
+          },
+          {
+            "code": "ALDA",
+            "responses": {
+              "q0": 0,
+              "qa": 0,
+              "qb1": 1,
+              "qb2": 1,
+              "qb3": 1,
+              "qb4": 0,
+              "qb5": 0
+            }
+          },
+          {
+            "code": "EQ5D5L",
+            "responses": {
+              "mobility": 1,
+              "self_care": 1,
+              "usual_activities": 2,
+              "pain_discomfort": 1,
+              "anxiety_depression": 2,
+              "vas_score": 70
+            }
+          },
+          {
+            "code": "FAGERSTROM",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0
+            }
+          },
+          {
+            "code": "ECG",
+            "responses": {
+              "ecg_performed": ""
+            }
+          },
+          {
+            "code": "ETAT_PATIENT",
+            "responses": {}
+          },
+          {
+            "code": "PRISE_M",
+            "responses": {}
+          },
+          {
+            "code": "STAI_YA",
+            "responses": {}
+          },
+          {
+            "code": "MARS",
+            "responses": {}
+          },
+          {
+            "code": "MATHYS",
+            "responses": {}
+          },
+          {
+            "code": "PSQI",
+            "responses": {}
+          },
+          {
+            "code": "EPWORTH",
+            "responses": {}
+          },
+          {
+            "code": "QIDS_SR16",
+            "responses": {}
+          },
+          {
+            "code": "ASRS",
+            "responses": {}
+          },
+          {
+            "code": "CTQ",
+            "responses": {}
+          },
+          {
+            "code": "BIS10",
+            "responses": {}
+          },
+          {
+            "code": "ALS18",
+            "responses": {}
+          },
+          {
+            "code": "AIM",
+            "responses": {}
+          },
+          {
+            "code": "WURS25",
+            "responses": {}
+          },
+          {
+            "code": "AQ12",
+            "responses": {}
+          },
+          {
+            "code": "CSM",
+            "responses": {}
+          },
+          {
+            "code": "CTI",
+            "responses": {}
+          },
+          {
+            "code": "SOCIAL",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_HUMEUR",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_PSYCHOTIC",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_COMORBID",
+            "responses": {}
+          },
+          {
+            "code": "DIVA",
+            "responses": {}
+          },
+          {
+            "code": "FAMILY_HISTORY",
+            "responses": {}
+          },
+          {
+            "code": "CSSRS",
+            "responses": {}
+          },
+          {
+            "code": "ISA",
+            "responses": {}
+          },
+          {
+            "code": "SIS",
+            "responses": {}
+          },
+          {
+            "code": "SUICIDE_HISTORY",
+            "responses": {}
+          },
+          {
+            "code": "PERINATALITE",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_NEURO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_CARDIO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_ENDOC",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_DERMATO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_URINAIRE",
+            "responses": {}
+          },
+          {
+            "code": "ANTECEDENTS_GYNECO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_HEPATO_GASTRO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_ALLERGIQUE",
+            "responses": {}
+          },
+          {
+            "code": "AUTRES_PATHO",
+            "responses": {}
+          },
+          {
+            "code": "CVLT",
+            "responses": {}
+          },
+          {
+            "code": "TMT",
+            "responses": {}
+          },
+          {
+            "code": "STROOP",
+            "responses": {}
+          },
+          {
+            "code": "FLUENCES_VERBALES",
+            "responses": {}
+          },
+          {
+            "code": "MEM3_SPATIAL",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_CRITERIA",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_LEARNING",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_MATRICES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_CODE",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_DIGIT_SPAN",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_SIMILITUDES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CRITERIA",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_LEARNING",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_VOCABULAIRE",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_MATRICES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CODE_SYMBOLES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_DIGIT_SPAN",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CPT2",
+            "responses": {}
+          },
+          {
+            "code": "COBRA",
+            "responses": {}
+          },
+          {
+            "code": "CPT3",
+            "responses": {}
+          },
+          {
+            "code": "SCIP",
+            "responses": {}
+          },
+          {
+            "code": "TEST_COMMISSIONS",
+            "responses": {}
+          },
+          {
+            "code": "ASRM",
+            "responses": {}
+          }
         ]
       },
       {
@@ -179,17 +2269,234 @@
         "completed_date": "2023-01-15T13:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "PHYSICAL_PARAMS", "responses": { "height_cm": 178, "weight_kg": 82.0, "abdominal_circumference_cm": 95 } },
-          { "code": "BLOOD_PRESSURE", "responses": { "bp_lying_systolic": 128, "bp_lying_diastolic": 82, "heart_rate_lying": 72, "bp_standing_systolic": 126, "bp_standing_diastolic": 80, "heart_rate_standing": 70 } },
-          { "code": "BIOLOGICAL_ASSESSMENT", "responses": { "collection_date": "2023-01-15", "hemoglobine": 15.0, "leucocytes": 7.2, "plaquettes": 270, "creatinine": 95, "glycemie_a_jeun": 5.4, "cholesterol_total": 5.3, "triglycerides": 1.6, "tsh": 2.3, "valproic_acid": 80 } },
-          { "code": "MADRS", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 1, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI", "responses": { "cgi_s": 3, "cgi_i": 2 } },
-          { "code": "EGF", "responses": { "egf_score": 62 } },
-          { "code": "FAST", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 1, "q6": 1, "q7": 1, "q8": 1, "q9": 1, "q10": 1, "q11": 1, "q12": 1, "q13": 1, "q14": 0, "q15": 1, "q16": 1, "q17": 1, "q18": 1, "q19": 0, "q20": 0, "q21": 1, "q22": 1, "q23": 1, "q24": 0 } },
-          { "code": "ASRM", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 1 } },
-          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 1, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 0, "q12": 0, "q13": 0, "q14": 1, "q15": 0, "q16": 0 } },
-          { "code": "EQ5D5L", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 1, "pain_discomfort": 1, "anxiety_depression": 2, "vas_score": 72 } }
+          {
+            "code": "PHYSICAL_PARAMS",
+            "responses": {
+              "height_cm": 178,
+              "weight_kg": 82,
+              "abdominal_circumference_cm": 95
+            }
+          },
+          {
+            "code": "BLOOD_PRESSURE",
+            "responses": {
+              "bp_lying_systolic": 128,
+              "bp_lying_diastolic": 82,
+              "heart_rate_lying": 72,
+              "bp_standing_systolic": 126,
+              "bp_standing_diastolic": 80,
+              "heart_rate_standing": 70
+            }
+          },
+          {
+            "code": "BIOLOGICAL_ASSESSMENT",
+            "responses": {
+              "collection_date": "2023-01-15",
+              "hemoglobine": 15,
+              "leucocytes": 7.2,
+              "plaquettes": 270,
+              "creatinine": 95,
+              "glycemie_a_jeun": 5.4,
+              "cholesterol_total": 5.3,
+              "triglycerides": 1.6,
+              "tsh": 2.3,
+              "valproic_acid": 80
+            }
+          },
+          {
+            "code": "MADRS",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 0,
+              "q4": 1,
+              "q5": 1,
+              "q6": 1,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0
+            }
+          },
+          {
+            "code": "YMRS",
+            "responses": {
+              "q1": 0,
+              "q2": 1,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 0
+            }
+          },
+          {
+            "code": "CGI",
+            "responses": {
+              "cgi_s": 3,
+              "cgi_i": 2
+            }
+          },
+          {
+            "code": "EGF",
+            "responses": {
+              "egf_score": 62
+            }
+          },
+          {
+            "code": "FAST",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 1,
+              "q4": 1,
+              "q5": 1,
+              "q6": 1,
+              "q7": 1,
+              "q8": 1,
+              "q9": 1,
+              "q10": 1,
+              "q11": 1,
+              "q12": 1,
+              "q13": 1,
+              "q14": 0,
+              "q15": 1,
+              "q16": 1,
+              "q17": 1,
+              "q18": 1,
+              "q19": 0,
+              "q20": 0,
+              "q21": 1,
+              "q22": 1,
+              "q23": 1,
+              "q24": 0
+            }
+          },
+          {
+            "code": "ASRM",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 1,
+              "q4": 1,
+              "q5": 1
+            }
+          },
+          {
+            "code": "QIDS_SR16",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 1,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 1,
+              "q11": 0,
+              "q12": 0,
+              "q13": 0,
+              "q14": 1,
+              "q15": 0,
+              "q16": 0
+            }
+          },
+          {
+            "code": "EQ5D5L",
+            "responses": {
+              "mobility": 1,
+              "self_care": 1,
+              "usual_activities": 1,
+              "pain_discomfort": 1,
+              "anxiety_depression": 2,
+              "vas_score": 72
+            }
+          },
+          {
+            "code": "TOBACCO",
+            "responses": {
+              "smoking_status": ""
+            }
+          },
+          {
+            "code": "FAGERSTROM",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0
+            }
+          },
+          {
+            "code": "SLEEP_APNEA",
+            "responses": {
+              "diagnosed_sleep_apnea": ""
+            }
+          },
+          {
+            "code": "ALDA",
+            "responses": {}
+          },
+          {
+            "code": "ETAT_PATIENT",
+            "responses": {}
+          },
+          {
+            "code": "HUMEUR_ACTUELS",
+            "responses": {}
+          },
+          {
+            "code": "HUMEUR_DEPUIS_VISITE",
+            "responses": {}
+          },
+          {
+            "code": "PSYCHOTIQUES",
+            "responses": {}
+          },
+          {
+            "code": "ISA_FOLLOWUP",
+            "responses": {}
+          },
+          {
+            "code": "SUICIDE_BEHAVIOR_FOLLOWUP",
+            "responses": {}
+          },
+          {
+            "code": "CSSRS",
+            "responses": {}
+          },
+          {
+            "code": "SUIVI_RECOMMANDATIONS",
+            "responses": {}
+          },
+          {
+            "code": "RECOURS_AUX_SOINS",
+            "responses": {}
+          },
+          {
+            "code": "TRAITEMENT_NON_PHARMACOLOGIQUE",
+            "responses": {}
+          },
+          {
+            "code": "ARRETS_DE_TRAVAIL",
+            "responses": {}
+          },
+          {
+            "code": "SOMATIQUE_CONTRACEPTIF",
+            "responses": {}
+          },
+          {
+            "code": "STATUT_PROFESSIONNEL",
+            "responses": {}
+          }
         ]
       },
       {
@@ -199,19 +2506,433 @@
         "completed_date": "2023-07-15T16:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "PHYSICAL_PARAMS", "responses": { "height_cm": 178, "weight_kg": 80.0, "abdominal_circumference_cm": 92 } },
-          { "code": "BLOOD_PRESSURE", "responses": { "bp_lying_systolic": 124, "bp_lying_diastolic": 80, "heart_rate_lying": 70, "bp_standing_systolic": 122, "bp_standing_diastolic": 78, "heart_rate_standing": 68 } },
-          { "code": "BIOLOGICAL_ASSESSMENT", "responses": { "collection_date": "2023-07-15", "hemoglobine": 15.1, "leucocytes": 7.0, "plaquettes": 265, "creatinine": 92, "glycemie_a_jeun": 5.3, "cholesterol_total": 5.1, "triglycerides": 1.5, "tsh": 2.2, "valproic_acid": 78 } },
-          { "code": "MADRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI", "responses": { "cgi_s": 2, "cgi_i": 1 } },
-          { "code": "EGF", "responses": { "egf_score": 75 } },
-          { "code": "FAST", "responses": { "q1": 0, "q2": 0, "q3": 1, "q4": 0, "q5": 0, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 1, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0, "q17": 0, "q18": 0, "q19": 0, "q20": 0, "q21": 0, "q22": 0, "q23": 0, "q24": 0 } },
-          { "code": "ALDA", "responses": { "q0": 1, "qa": 1, "qb1": 0, "qb2": 0, "qb3": 0, "qb4": 0, "qb5": 0 } },
-          { "code": "EQ5D5L", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 1, "pain_discomfort": 1, "anxiety_depression": 1, "vas_score": 78 } },
-          { "code": "STAI_YA", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 2, "q6": 1, "q7": 2, "q8": 1, "q9": 2, "q10": 1, "q11": 2, "q12": 1, "q13": 2, "q14": 1, "q15": 2, "q16": 1, "q17": 2, "q18": 1, "q19": 2, "q20": 1 } },
-          { "code": "ASRM", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } }
+          {
+            "code": "PHYSICAL_PARAMS",
+            "responses": {
+              "height_cm": 178,
+              "weight_kg": 80,
+              "abdominal_circumference_cm": 92
+            }
+          },
+          {
+            "code": "BLOOD_PRESSURE",
+            "responses": {
+              "bp_lying_systolic": 124,
+              "bp_lying_diastolic": 80,
+              "heart_rate_lying": 70,
+              "bp_standing_systolic": 122,
+              "bp_standing_diastolic": 78,
+              "heart_rate_standing": 68
+            }
+          },
+          {
+            "code": "BIOLOGICAL_ASSESSMENT",
+            "responses": {
+              "collection_date": "2023-07-15",
+              "hemoglobine": 15.1,
+              "leucocytes": 7,
+              "plaquettes": 265,
+              "creatinine": 92,
+              "glycemie_a_jeun": 5.3,
+              "cholesterol_total": 5.1,
+              "triglycerides": 1.5,
+              "tsh": 2.2,
+              "valproic_acid": 78
+            }
+          },
+          {
+            "code": "MADRS",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0
+            }
+          },
+          {
+            "code": "YMRS",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 0
+            }
+          },
+          {
+            "code": "CGI",
+            "responses": {
+              "cgi_s": 2,
+              "cgi_i": 1
+            }
+          },
+          {
+            "code": "EGF",
+            "responses": {
+              "egf_score": 75
+            }
+          },
+          {
+            "code": "FAST",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 1,
+              "q4": 0,
+              "q5": 0,
+              "q6": 1,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 1,
+              "q12": 0,
+              "q13": 0,
+              "q14": 0,
+              "q15": 0,
+              "q16": 0,
+              "q17": 0,
+              "q18": 0,
+              "q19": 0,
+              "q20": 0,
+              "q21": 0,
+              "q22": 0,
+              "q23": 0,
+              "q24": 0
+            }
+          },
+          {
+            "code": "ALDA",
+            "responses": {
+              "q0": 1,
+              "qa": 1,
+              "qb1": 0,
+              "qb2": 0,
+              "qb3": 0,
+              "qb4": 0,
+              "qb5": 0
+            }
+          },
+          {
+            "code": "EQ5D5L",
+            "responses": {
+              "mobility": 1,
+              "self_care": 1,
+              "usual_activities": 1,
+              "pain_discomfort": 1,
+              "anxiety_depression": 1,
+              "vas_score": 78
+            }
+          },
+          {
+            "code": "STAI_YA",
+            "responses": {
+              "q1": 1,
+              "q2": 1,
+              "q3": 1,
+              "q4": 1,
+              "q5": 2,
+              "q6": 1,
+              "q7": 2,
+              "q8": 1,
+              "q9": 2,
+              "q10": 1,
+              "q11": 2,
+              "q12": 1,
+              "q13": 2,
+              "q14": 1,
+              "q15": 2,
+              "q16": 1,
+              "q17": 2,
+              "q18": 1,
+              "q19": 2,
+              "q20": 1
+            }
+          },
+          {
+            "code": "ASRM",
+            "responses": {
+              "q1": 0,
+              "q2": 1,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0
+            }
+          },
+          {
+            "code": "QIDS_SR16",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 0,
+              "q12": 0,
+              "q13": 0,
+              "q14": 0,
+              "q15": 0,
+              "q16": 0
+            }
+          },
+          {
+            "code": "TOBACCO",
+            "responses": {
+              "smoking_status": "unknown"
+            }
+          },
+          {
+            "code": "FAGERSTROM",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0
+            }
+          },
+          {
+            "code": "ECG",
+            "responses": {
+              "ecg_performed": "no"
+            }
+          },
+          {
+            "code": "SLEEP_APNEA",
+            "responses": {
+              "diagnosed_sleep_apnea": "unknown"
+            }
+          },
+          {
+            "code": "ETAT_PATIENT",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_HUMEUR",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_PSYCHOTIC",
+            "responses": {}
+          },
+          {
+            "code": "DSM5_COMORBID",
+            "responses": {}
+          },
+          {
+            "code": "DIVA",
+            "responses": {}
+          },
+          {
+            "code": "FAMILY_HISTORY",
+            "responses": {}
+          },
+          {
+            "code": "CSSRS",
+            "responses": {}
+          },
+          {
+            "code": "ISA_FOLLOWUP",
+            "responses": {}
+          },
+          {
+            "code": "SIS",
+            "responses": {}
+          },
+          {
+            "code": "SUICIDE_HISTORY",
+            "responses": {}
+          },
+          {
+            "code": "PERINATALITE",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_NEURO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_CARDIO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_ENDOC",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_DERMATO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_URINAIRE",
+            "responses": {}
+          },
+          {
+            "code": "ANTECEDENTS_GYNECO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_HEPATO_GASTRO",
+            "responses": {}
+          },
+          {
+            "code": "PATHO_ALLERGIQUE",
+            "responses": {}
+          },
+          {
+            "code": "AUTRES_PATHO",
+            "responses": {}
+          },
+          {
+            "code": "SUIVI_RECOMMANDATIONS",
+            "responses": {}
+          },
+          {
+            "code": "RECOURS_AUX_SOINS",
+            "responses": {}
+          },
+          {
+            "code": "TRAITEMENT_NON_PHARMACOLOGIQUE",
+            "responses": {}
+          },
+          {
+            "code": "ARRETS_DE_TRAVAIL",
+            "responses": {}
+          },
+          {
+            "code": "SOMATIQUE_CONTRACEPTIF",
+            "responses": {}
+          },
+          {
+            "code": "STATUT_PROFESSIONNEL",
+            "responses": {}
+          },
+          {
+            "code": "CVLT",
+            "responses": {}
+          },
+          {
+            "code": "TMT",
+            "responses": {}
+          },
+          {
+            "code": "STROOP",
+            "responses": {}
+          },
+          {
+            "code": "FLUENCES_VERBALES",
+            "responses": {}
+          },
+          {
+            "code": "MEM3_SPATIAL",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CRITERIA",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_LEARNING",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_VOCABULAIRE",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_MATRICES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CODE_SYMBOLES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_DIGIT_SPAN",
+            "responses": {}
+          },
+          {
+            "code": "WAIS3_CPT2",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_CRITERIA",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_LEARNING",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_MATRICES",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_CODE",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_DIGIT_SPAN",
+            "responses": {}
+          },
+          {
+            "code": "WAIS4_SIMILITUDES",
+            "responses": {}
+          },
+          {
+            "code": "COBRA",
+            "responses": {}
+          },
+          {
+            "code": "CPT3",
+            "responses": {}
+          },
+          {
+            "code": "TEST_COMMISSIONS",
+            "responses": {}
+          },
+          {
+            "code": "SCIP",
+            "responses": {}
+          },
+          {
+            "code": "PRISE_M",
+            "responses": {}
+          },
+          {
+            "code": "MARS",
+            "responses": {}
+          },
+          {
+            "code": "MATHYS",
+            "responses": {}
+          },
+          {
+            "code": "PSQI",
+            "responses": {}
+          },
+          {
+            "code": "EPWORTH",
+            "responses": {}
+          }
         ]
       },
       {
@@ -221,16 +2942,209 @@
         "completed_date": "2024-01-15T13:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "PHYSICAL_PARAMS", "responses": { "height_cm": 178, "weight_kg": 79.0, "abdominal_circumference_cm": 90 } },
-          { "code": "BLOOD_PRESSURE", "responses": { "bp_lying_systolic": 122, "bp_lying_diastolic": 78, "heart_rate_lying": 68, "bp_standing_systolic": 120, "bp_standing_diastolic": 76, "heart_rate_standing": 66 } },
-          { "code": "BIOLOGICAL_ASSESSMENT", "responses": { "collection_date": "2024-01-15", "hemoglobine": 15.0, "leucocytes": 6.8, "plaquettes": 260, "creatinine": 90, "glycemie_a_jeun": 5.1, "cholesterol_total": 4.9, "triglycerides": 1.4, "tsh": 2.1, "valproic_acid": 75 } },
-          { "code": "MADRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI", "responses": { "cgi_s": 1, "cgi_i": 1 } },
-          { "code": "EGF", "responses": { "egf_score": 82 } },
-          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
-          { "code": "EQ5D5L", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 1, "pain_discomfort": 1, "anxiety_depression": 1, "vas_score": 82 } }
+          {
+            "code": "PHYSICAL_PARAMS",
+            "responses": {
+              "height_cm": 178,
+              "weight_kg": 79,
+              "abdominal_circumference_cm": 90
+            }
+          },
+          {
+            "code": "BLOOD_PRESSURE",
+            "responses": {
+              "bp_lying_systolic": 122,
+              "bp_lying_diastolic": 78,
+              "heart_rate_lying": 68,
+              "bp_standing_systolic": 120,
+              "bp_standing_diastolic": 76,
+              "heart_rate_standing": 66
+            }
+          },
+          {
+            "code": "BIOLOGICAL_ASSESSMENT",
+            "responses": {
+              "collection_date": "2024-01-15",
+              "hemoglobine": 15,
+              "leucocytes": 6.8,
+              "plaquettes": 260,
+              "creatinine": 90,
+              "glycemie_a_jeun": 5.1,
+              "cholesterol_total": 4.9,
+              "triglycerides": 1.4,
+              "tsh": 2.1,
+              "valproic_acid": 75
+            }
+          },
+          {
+            "code": "MADRS",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0
+            }
+          },
+          {
+            "code": "YMRS",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 0
+            }
+          },
+          {
+            "code": "CGI",
+            "responses": {
+              "cgi_s": 1,
+              "cgi_i": 1
+            }
+          },
+          {
+            "code": "EGF",
+            "responses": {
+              "egf_score": 82
+            }
+          },
+          {
+            "code": "ASRM",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0
+            }
+          },
+          {
+            "code": "QIDS_SR16",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0,
+              "q7": 0,
+              "q8": 0,
+              "q9": 0,
+              "q10": 0,
+              "q11": 0,
+              "q12": 0,
+              "q13": 0,
+              "q14": 0,
+              "q15": 0,
+              "q16": 0
+            }
+          },
+          {
+            "code": "EQ5D5L",
+            "responses": {
+              "mobility": 1,
+              "self_care": 1,
+              "usual_activities": 1,
+              "pain_discomfort": 1,
+              "anxiety_depression": 1,
+              "vas_score": 82
+            }
+          },
+          {
+            "code": "TOBACCO",
+            "responses": {
+              "smoking_status": ""
+            }
+          },
+          {
+            "code": "FAGERSTROM",
+            "responses": {
+              "q1": 0,
+              "q2": 0,
+              "q3": 0,
+              "q4": 0,
+              "q5": 0,
+              "q6": 0
+            }
+          },
+          {
+            "code": "SLEEP_APNEA",
+            "responses": {
+              "diagnosed_sleep_apnea": ""
+            }
+          },
+          {
+            "code": "ALDA",
+            "responses": {}
+          },
+          {
+            "code": "ETAT_PATIENT",
+            "responses": {}
+          },
+          {
+            "code": "FAST",
+            "responses": {}
+          },
+          {
+            "code": "HUMEUR_ACTUELS",
+            "responses": {}
+          },
+          {
+            "code": "HUMEUR_DEPUIS_VISITE",
+            "responses": {}
+          },
+          {
+            "code": "PSYCHOTIQUES",
+            "responses": {}
+          },
+          {
+            "code": "ISA_FOLLOWUP",
+            "responses": {}
+          },
+          {
+            "code": "SUICIDE_BEHAVIOR_FOLLOWUP",
+            "responses": {}
+          },
+          {
+            "code": "CSSRS",
+            "responses": {}
+          },
+          {
+            "code": "SUIVI_RECOMMANDATIONS",
+            "responses": {}
+          },
+          {
+            "code": "RECOURS_AUX_SOINS",
+            "responses": {}
+          },
+          {
+            "code": "TRAITEMENT_NON_PHARMACOLOGIQUE",
+            "responses": {}
+          },
+          {
+            "code": "ARRETS_DE_TRAVAIL",
+            "responses": {}
+          },
+          {
+            "code": "SOMATIQUE_CONTRACEPTIF",
+            "responses": {}
+          },
+          {
+            "code": "STATUT_PROFESSIONNEL",
+            "responses": {}
+          }
         ]
       }
     ]
