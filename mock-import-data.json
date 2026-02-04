@@ -17,9 +17,9 @@
         "completed_date": "2023-01-15T11:30:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 1, "q2": 2, "q3": 1, "q4": 2, "q5": 1 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 0, "q5": 2, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 1, "q12": 0, "q13": 1, "q14": 2, "q15": 1, "q16": 0 } },
-          { "code": "MDQ_FR", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 0, "q1_9": 0, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 2 } }
+          { "code": "ASRM", "responses": { "q1": 1, "q2": 2, "q3": 1, "q4": 2, "q5": 1 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 0, "q5": 2, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 1, "q12": 0, "q13": 1, "q14": 2, "q15": 1, "q16": 0 } },
+          { "code": "MDQ", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 0, "q1_9": 0, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 2 } }
         ]
       },
       {
@@ -28,11 +28,11 @@
         "completed_date": "2023-02-20T16:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "MADRS_FR", "responses": { "q1": 2, "q2": 2, "q3": 1, "q4": 2, "q5": 1, "q6": 2, "q7": 1, "q8": 1, "q9": 1, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 1, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 3, "cgi_i": 0, "visit_type": "baseline" } },
-          { "code": "FAST_FR", "responses": { "q1": 1, "q2": 1, "q3": 2, "q4": 1, "q5": 1, "q6": 2, "q7": 1, "q8": 1, "q9": 1, "q10": 1, "q11": 2, "q12": 1, "q13": 1, "q14": 0, "q15": 1, "q16": 1, "q17": 1, "q18": 1, "q19": 0, "q20": 0, "q21": 1, "q22": 1, "q23": 1, "q24": 0 } },
-          { "code": "EQ5D5L_FR", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 2, "pain_discomfort": 2, "anxiety_depression": 3, "vas_score": 65 } }
+          { "code": "MADRS", "responses": { "q1": 2, "q2": 2, "q3": 1, "q4": 2, "q5": 1, "q6": 2, "q7": 1, "q8": 1, "q9": 1, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 1, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 3, "cgi_i": 0, "visit_type": "baseline" } },
+          { "code": "FAST", "responses": { "q1": 1, "q2": 1, "q3": 2, "q4": 1, "q5": 1, "q6": 2, "q7": 1, "q8": 1, "q9": 1, "q10": 1, "q11": 2, "q12": 1, "q13": 1, "q14": 0, "q15": 1, "q16": 1, "q17": 1, "q18": 1, "q19": 0, "q20": 0, "q21": 1, "q22": 1, "q23": 1, "q24": 0 } },
+          { "code": "EQ5D5L", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 2, "pain_discomfort": 2, "anxiety_depression": 3, "vas_score": 65 } }
         ]
       },
       {
@@ -41,9 +41,9 @@
         "completed_date": "2023-08-20T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 1, "q5": 0 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 1, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 1, "q15": 0, "q16": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 1, "q5": 0 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 1, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 1, "q15": 0, "q16": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
         ]
       },
       {
@@ -52,11 +52,11 @@
         "completed_date": "2024-02-20T15:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
-          { "code": "MADRS_FR", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 0, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 2, "cgi_i": 1, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
+          { "code": "MADRS", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 0, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 2, "cgi_i": 1, "visit_type": "followup" } }
         ]
       }
     ]
@@ -79,9 +79,9 @@
         "completed_date": "2022-06-10T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 3, "q2": 3, "q3": 2, "q4": 3, "q5": 2 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 1, "q8": 0, "q9": 1, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
-          { "code": "MDQ_FR", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 1, "q1_9": 1, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 3 } }
+          { "code": "ASRM", "responses": { "q1": 3, "q2": 3, "q3": 2, "q4": 3, "q5": 2 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 1, "q8": 0, "q9": 1, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
+          { "code": "MDQ", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 1, "q1_9": 1, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 3 } }
         ]
       },
       {
@@ -90,10 +90,10 @@
         "completed_date": "2022-07-15T17:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "MADRS_FR", "responses": { "q1": 1, "q2": 0, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 2, "q2": 2, "q3": 1, "q4": 2, "q5": 2, "q6": 2, "q7": 2, "q8": 2, "q9": 2, "q10": 1, "q11": 1 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 4, "cgi_i": 0, "visit_type": "baseline" } },
-          { "code": "EQ5D5L_FR", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 2, "pain_discomfort": 1, "anxiety_depression": 2, "vas_score": 70 } }
+          { "code": "MADRS", "responses": { "q1": 1, "q2": 0, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 2, "q2": 2, "q3": 1, "q4": 2, "q5": 2, "q6": 2, "q7": 2, "q8": 2, "q9": 2, "q10": 1, "q11": 1 } },
+          { "code": "CGI", "responses": { "cgi_s": 4, "cgi_i": 0, "visit_type": "baseline" } },
+          { "code": "EQ5D5L", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 2, "pain_discomfort": 1, "anxiety_depression": 2, "vas_score": 70 } }
         ]
       },
       {
@@ -102,9 +102,9 @@
         "completed_date": "2023-01-15T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 1 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 1, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 0, "q12": 0, "q13": 0, "q14": 1, "q15": 0, "q16": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 3, "cgi_i": 2, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 1 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 1, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 0, "q12": 0, "q13": 0, "q14": 1, "q15": 0, "q16": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 3, "cgi_i": 2, "visit_type": "followup" } }
         ]
       },
       {
@@ -113,11 +113,11 @@
         "completed_date": "2023-07-15T15:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
-          { "code": "MADRS_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 2, "cgi_i": 1, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
+          { "code": "MADRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 2, "cgi_i": 1, "visit_type": "followup" } }
         ]
       },
       {
@@ -126,9 +126,9 @@
         "completed_date": "2024-01-15T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
         ]
       }
     ]
@@ -150,9 +150,9 @@
         "completed_date": "2023-09-05T16:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 2, "q2": 2, "q3": 2, "q4": 1, "q5": 2 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 2, "q2": 2, "q3": 1, "q4": 0, "q5": 2, "q6": 2, "q7": 0, "q8": 1, "q9": 0, "q10": 2, "q11": 2, "q12": 1, "q13": 2, "q14": 2, "q15": 1, "q16": 0 } },
-          { "code": "MDQ_FR", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 0, "q1_6": 1, "q1_7": 1, "q1_8": 1, "q1_9": 0, "q1_10": 1, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 2 } }
+          { "code": "ASRM", "responses": { "q1": 2, "q2": 2, "q3": 2, "q4": 1, "q5": 2 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 2, "q2": 2, "q3": 1, "q4": 0, "q5": 2, "q6": 2, "q7": 0, "q8": 1, "q9": 0, "q10": 2, "q11": 2, "q12": 1, "q13": 2, "q14": 2, "q15": 1, "q16": 0 } },
+          { "code": "MDQ", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 0, "q1_6": 1, "q1_7": 1, "q1_8": 1, "q1_9": 0, "q1_10": 1, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 2 } }
         ]
       },
       {
@@ -161,11 +161,11 @@
         "completed_date": "2023-10-10T16:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "MADRS_FR", "responses": { "q1": 3, "q2": 3, "q3": 2, "q4": 3, "q5": 2, "q6": 3, "q7": 2, "q8": 2, "q9": 2, "q10": 1 } },
-          { "code": "YMRS_FR", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 0, "q6": 0, "q7": 1, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 4, "cgi_i": 0, "visit_type": "baseline" } },
-          { "code": "FAST_FR", "responses": { "q1": 2, "q2": 2, "q3": 3, "q4": 2, "q5": 2, "q6": 3, "q7": 2, "q8": 2, "q9": 2, "q10": 2, "q11": 3, "q12": 2, "q13": 2, "q14": 1, "q15": 2, "q16": 2, "q17": 2, "q18": 2, "q19": 1, "q20": 1, "q21": 2, "q22": 2, "q23": 2, "q24": 1 } },
-          { "code": "EQ5D5L_FR", "responses": { "mobility": 2, "self_care": 2, "usual_activities": 3, "pain_discomfort": 2, "anxiety_depression": 4, "vas_score": 45 } }
+          { "code": "MADRS", "responses": { "q1": 3, "q2": 3, "q3": 2, "q4": 3, "q5": 2, "q6": 3, "q7": 2, "q8": 2, "q9": 2, "q10": 1 } },
+          { "code": "YMRS", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 0, "q6": 0, "q7": 1, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 4, "cgi_i": 0, "visit_type": "baseline" } },
+          { "code": "FAST", "responses": { "q1": 2, "q2": 2, "q3": 3, "q4": 2, "q5": 2, "q6": 3, "q7": 2, "q8": 2, "q9": 2, "q10": 2, "q11": 3, "q12": 2, "q13": 2, "q14": 1, "q15": 2, "q16": 2, "q17": 2, "q18": 2, "q19": 1, "q20": 1, "q21": 2, "q22": 2, "q23": 2, "q24": 1 } },
+          { "code": "EQ5D5L", "responses": { "mobility": 2, "self_care": 2, "usual_activities": 3, "pain_discomfort": 2, "anxiety_depression": 4, "vas_score": 45 } }
         ]
       }
     ]
@@ -188,9 +188,9 @@
         "completed_date": "2021-03-20T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 0, "q5": 1 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 0, "q5": 2, "q6": 1, "q7": 0, "q8": 1, "q9": 0, "q10": 1, "q11": 1, "q12": 0, "q13": 1, "q14": 2, "q15": 1, "q16": 0 } },
-          { "code": "MDQ_FR", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 0, "q1_9": 0, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 2 } }
+          { "code": "ASRM", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 0, "q5": 1 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 0, "q5": 2, "q6": 1, "q7": 0, "q8": 1, "q9": 0, "q10": 1, "q11": 1, "q12": 0, "q13": 1, "q14": 2, "q15": 1, "q16": 0 } },
+          { "code": "MDQ", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 0, "q1_9": 0, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 2 } }
         ]
       },
       {
@@ -199,9 +199,9 @@
         "completed_date": "2021-04-25T16:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "MADRS_FR", "responses": { "q1": 2, "q2": 2, "q3": 2, "q4": 2, "q5": 1, "q6": 2, "q7": 1, "q8": 1, "q9": 1, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 3, "cgi_i": 0, "visit_type": "baseline" } }
+          { "code": "MADRS", "responses": { "q1": 2, "q2": 2, "q3": 2, "q4": 2, "q5": 1, "q6": 2, "q7": 1, "q8": 1, "q9": 1, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 3, "cgi_i": 0, "visit_type": "baseline" } }
         ]
       },
       {
@@ -210,9 +210,9 @@
         "completed_date": "2021-10-25T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 1, "q2": 0, "q3": 0, "q4": 0, "q5": 1, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 0, "q12": 0, "q13": 0, "q14": 1, "q15": 0, "q16": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 1, "q2": 0, "q3": 0, "q4": 0, "q5": 1, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 0, "q12": 0, "q13": 0, "q14": 1, "q15": 0, "q16": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
         ]
       },
       {
@@ -221,11 +221,11 @@
         "completed_date": "2022-04-25T15:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
-          { "code": "MADRS_FR", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 0, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
+          { "code": "MADRS", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 0, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
         ]
       },
       {
@@ -234,9 +234,9 @@
         "completed_date": "2022-10-25T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
         ]
       },
       {
@@ -245,11 +245,11 @@
         "completed_date": "2023-04-25T15:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
-          { "code": "MADRS_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
+          { "code": "MADRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
         ]
       },
       {
@@ -258,8 +258,8 @@
         "completed_date": "2023-10-25T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
         ]
       }
     ]
@@ -282,9 +282,9 @@
         "completed_date": "2024-01-08T13:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 2, "q2": 3, "q3": 2, "q4": 2, "q5": 3 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 1, "q8": 0, "q9": 1, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 1 } },
-          { "code": "MDQ_FR", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 1, "q1_9": 1, "q1_10": 1, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 3 } }
+          { "code": "ASRM", "responses": { "q1": 2, "q2": 3, "q3": 2, "q4": 2, "q5": 3 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 1, "q8": 0, "q9": 1, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 1 } },
+          { "code": "MDQ", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 1, "q1_9": 1, "q1_10": 1, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 3 } }
         ]
       }
     ]
@@ -306,9 +306,9 @@
         "completed_date": "2022-11-15T11:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 1, "q5": 0 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 2, "q2": 2, "q3": 2, "q4": 0, "q5": 3, "q6": 2, "q7": 0, "q8": 2, "q9": 0, "q10": 2, "q11": 2, "q12": 1, "q13": 2, "q14": 3, "q15": 2, "q16": 0 } },
-          { "code": "MDQ_FR", "responses": { "q1_1": 1, "q1_2": 0, "q1_3": 1, "q1_4": 0, "q1_5": 1, "q1_6": 0, "q1_7": 1, "q1_8": 0, "q1_9": 1, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 1 } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 1, "q5": 0 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 2, "q2": 2, "q3": 2, "q4": 0, "q5": 3, "q6": 2, "q7": 0, "q8": 2, "q9": 0, "q10": 2, "q11": 2, "q12": 1, "q13": 2, "q14": 3, "q15": 2, "q16": 0 } },
+          { "code": "MDQ", "responses": { "q1_1": 1, "q1_2": 0, "q1_3": 1, "q1_4": 0, "q1_5": 1, "q1_6": 0, "q1_7": 1, "q1_8": 0, "q1_9": 1, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 1 } }
         ]
       },
       {
@@ -317,11 +317,11 @@
         "completed_date": "2022-12-20T16:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "MADRS_FR", "responses": { "q1": 4, "q2": 4, "q3": 3, "q4": 4, "q5": 3, "q6": 4, "q7": 3, "q8": 3, "q9": 2, "q10": 2 } },
-          { "code": "YMRS_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 5, "cgi_i": 0, "visit_type": "baseline" } },
-          { "code": "FAST_FR", "responses": { "q1": 3, "q2": 3, "q3": 3, "q4": 3, "q5": 2, "q6": 3, "q7": 3, "q8": 2, "q9": 3, "q10": 2, "q11": 3, "q12": 3, "q13": 2, "q14": 2, "q15": 3, "q16": 2, "q17": 2, "q18": 2, "q19": 2, "q20": 1, "q21": 2, "q22": 2, "q23": 3, "q24": 2 } },
-          { "code": "EQ5D5L_FR", "responses": { "mobility": 2, "self_care": 3, "usual_activities": 4, "pain_discomfort": 3, "anxiety_depression": 5, "vas_score": 25 } }
+          { "code": "MADRS", "responses": { "q1": 4, "q2": 4, "q3": 3, "q4": 4, "q5": 3, "q6": 4, "q7": 3, "q8": 3, "q9": 2, "q10": 2 } },
+          { "code": "YMRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 5, "cgi_i": 0, "visit_type": "baseline" } },
+          { "code": "FAST", "responses": { "q1": 3, "q2": 3, "q3": 3, "q4": 3, "q5": 2, "q6": 3, "q7": 3, "q8": 2, "q9": 3, "q10": 2, "q11": 3, "q12": 3, "q13": 2, "q14": 2, "q15": 3, "q16": 2, "q17": 2, "q18": 2, "q19": 2, "q20": 1, "q21": 2, "q22": 2, "q23": 3, "q24": 2 } },
+          { "code": "EQ5D5L", "responses": { "mobility": 2, "self_care": 3, "usual_activities": 4, "pain_discomfort": 3, "anxiety_depression": 5, "vas_score": 25 } }
         ]
       },
       {
@@ -330,9 +330,9 @@
         "completed_date": "2023-06-20T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 0, "q5": 2, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 1, "q12": 0, "q13": 1, "q14": 1, "q15": 1, "q16": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 3, "cgi_i": 2, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 0, "q5": 2, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 1, "q12": 0, "q13": 1, "q14": 1, "q15": 1, "q16": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 3, "cgi_i": 2, "visit_type": "followup" } }
         ]
       }
     ]
@@ -355,9 +355,9 @@
         "completed_date": "2023-04-12T16:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 1 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 0, "q5": 1, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 1, "q12": 0, "q13": 1, "q14": 1, "q15": 0, "q16": 0 } },
-          { "code": "MDQ_FR", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 0, "q1_9": 0, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 2 } }
+          { "code": "ASRM", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 1 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 0, "q5": 1, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 1, "q12": 0, "q13": 1, "q14": 1, "q15": 0, "q16": 0 } },
+          { "code": "MDQ", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 0, "q1_9": 0, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 2 } }
         ]
       },
       {
@@ -366,10 +366,10 @@
         "completed_date": "2023-05-18T16:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "MADRS_FR", "responses": { "q1": 2, "q2": 2, "q3": 1, "q4": 2, "q5": 1, "q6": 2, "q7": 1, "q8": 1, "q9": 1, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 1, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 3, "cgi_i": 0, "visit_type": "baseline" } },
-          { "code": "EQ5D5L_FR", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 2, "pain_discomfort": 1, "anxiety_depression": 2, "vas_score": 70 } }
+          { "code": "MADRS", "responses": { "q1": 2, "q2": 2, "q3": 1, "q4": 2, "q5": 1, "q6": 2, "q7": 1, "q8": 1, "q9": 1, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 1, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 3, "cgi_i": 0, "visit_type": "baseline" } },
+          { "code": "EQ5D5L", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 2, "pain_discomfort": 1, "anxiety_depression": 2, "vas_score": 70 } }
         ]
       },
       {
@@ -378,9 +378,9 @@
         "completed_date": "2023-11-18T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 1, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 1, "q15": 0, "q16": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 1, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 1, "q15": 0, "q16": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
         ]
       }
     ]
@@ -403,9 +403,9 @@
         "completed_date": "2023-07-20T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 4, "q2": 3, "q3": 3, "q4": 4, "q5": 3 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 2, "q5": 0, "q6": 0, "q7": 2, "q8": 0, "q9": 2, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 2 } },
-          { "code": "MDQ_FR", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 1, "q1_9": 1, "q1_10": 1, "q1_11": 1, "q1_12": 1, "q1_13": 0, "q2": 1, "q3": 3 } }
+          { "code": "ASRM", "responses": { "q1": 4, "q2": 3, "q3": 3, "q4": 4, "q5": 3 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 2, "q5": 0, "q6": 0, "q7": 2, "q8": 0, "q9": 2, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 2 } },
+          { "code": "MDQ", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 1, "q1_9": 1, "q1_10": 1, "q1_11": 1, "q1_12": 1, "q1_13": 0, "q2": 1, "q3": 3 } }
         ]
       },
       {
@@ -414,10 +414,10 @@
         "completed_date": "2023-08-25T16:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "MADRS_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 3, "q2": 3, "q3": 2, "q4": 3, "q5": 2, "q6": 2, "q7": 3, "q8": 2, "q9": 2, "q10": 2, "q11": 2 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 5, "cgi_i": 0, "visit_type": "baseline" } },
-          { "code": "EQ5D5L_FR", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 3, "pain_discomfort": 1, "anxiety_depression": 2, "vas_score": 80 } }
+          { "code": "MADRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 3, "q2": 3, "q3": 2, "q4": 3, "q5": 2, "q6": 2, "q7": 3, "q8": 2, "q9": 2, "q10": 2, "q11": 2 } },
+          { "code": "CGI", "responses": { "cgi_s": 5, "cgi_i": 0, "visit_type": "baseline" } },
+          { "code": "EQ5D5L", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 3, "pain_discomfort": 1, "anxiety_depression": 2, "vas_score": 80 } }
         ]
       },
       {
@@ -426,9 +426,9 @@
         "completed_date": "2024-02-25T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 1 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 1 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
         ]
       }
     ]
@@ -450,9 +450,9 @@
         "completed_date": "2023-02-10T11:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 1, "q2": 2, "q3": 1, "q4": 1, "q5": 1 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 0, "q5": 2, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 1, "q12": 0, "q13": 1, "q14": 1, "q15": 1, "q16": 0 } },
-          { "code": "MDQ_FR", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 0, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 1, "q1_9": 0, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 2 } }
+          { "code": "ASRM", "responses": { "q1": 1, "q2": 2, "q3": 1, "q4": 1, "q5": 1 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 0, "q5": 2, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 1, "q12": 0, "q13": 1, "q14": 1, "q15": 1, "q16": 0 } },
+          { "code": "MDQ", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 0, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 1, "q1_9": 0, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 2 } }
         ]
       },
       {
@@ -461,11 +461,11 @@
         "completed_date": "2023-03-15T16:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "MADRS_FR", "responses": { "q1": 2, "q2": 2, "q3": 2, "q4": 2, "q5": 2, "q6": 2, "q7": 1, "q8": 1, "q9": 1, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 0, "q6": 0, "q7": 1, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 3, "cgi_i": 0, "visit_type": "baseline" } },
-          { "code": "FAST_FR", "responses": { "q1": 1, "q2": 2, "q3": 2, "q4": 1, "q5": 1, "q6": 2, "q7": 1, "q8": 1, "q9": 2, "q10": 1, "q11": 2, "q12": 1, "q13": 1, "q14": 1, "q15": 1, "q16": 1, "q17": 1, "q18": 1, "q19": 0, "q20": 0, "q21": 1, "q22": 1, "q23": 1, "q24": 1 } },
-          { "code": "EQ5D5L_FR", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 2, "pain_discomfort": 1, "anxiety_depression": 3, "vas_score": 60 } }
+          { "code": "MADRS", "responses": { "q1": 2, "q2": 2, "q3": 2, "q4": 2, "q5": 2, "q6": 2, "q7": 1, "q8": 1, "q9": 1, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 1, "q2": 1, "q3": 1, "q4": 1, "q5": 0, "q6": 0, "q7": 1, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 3, "cgi_i": 0, "visit_type": "baseline" } },
+          { "code": "FAST", "responses": { "q1": 1, "q2": 2, "q3": 2, "q4": 1, "q5": 1, "q6": 2, "q7": 1, "q8": 1, "q9": 2, "q10": 1, "q11": 2, "q12": 1, "q13": 1, "q14": 1, "q15": 1, "q16": 1, "q17": 1, "q18": 1, "q19": 0, "q20": 0, "q21": 1, "q22": 1, "q23": 1, "q24": 1 } },
+          { "code": "EQ5D5L", "responses": { "mobility": 1, "self_care": 1, "usual_activities": 2, "pain_discomfort": 1, "anxiety_depression": 3, "vas_score": 60 } }
         ]
       },
       {
@@ -474,9 +474,9 @@
         "completed_date": "2023-09-15T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 1, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 1, "q15": 0, "q16": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 1, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 1, "q15": 0, "q16": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
         ]
       },
       {
@@ -485,11 +485,11 @@
         "completed_date": "2024-03-15T15:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
-          { "code": "MADRS_FR", "responses": { "q1": 1, "q2": 0, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0, "q12": 0, "q13": 0, "q14": 0, "q15": 0, "q16": 0 } },
+          { "code": "MADRS", "responses": { "q1": 1, "q2": 0, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
         ]
       }
     ]
@@ -512,9 +512,9 @@
         "completed_date": "2020-05-10T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 2, "q2": 2, "q3": 1, "q4": 2, "q5": 2 } },
-          { "code": "QIDS_SR16_FR", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 0, "q5": 1, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 1, "q12": 0, "q13": 1, "q14": 1, "q15": 0, "q16": 0 } },
-          { "code": "MDQ_FR", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 0, "q1_9": 0, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 2 } }
+          { "code": "ASRM", "responses": { "q1": 2, "q2": 2, "q3": 1, "q4": 2, "q5": 2 } },
+          { "code": "QIDS_SR16", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 0, "q5": 1, "q6": 1, "q7": 0, "q8": 0, "q9": 0, "q10": 1, "q11": 1, "q12": 0, "q13": 1, "q14": 1, "q15": 0, "q16": 0 } },
+          { "code": "MDQ", "responses": { "q1_1": 1, "q1_2": 1, "q1_3": 1, "q1_4": 1, "q1_5": 1, "q1_6": 1, "q1_7": 1, "q1_8": 0, "q1_9": 0, "q1_10": 0, "q1_11": 0, "q1_12": 0, "q1_13": 0, "q2": 1, "q3": 2 } }
         ]
       },
       {
@@ -523,9 +523,9 @@
         "completed_date": "2020-06-15T16:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "MADRS_FR", "responses": { "q1": 2, "q2": 1, "q3": 1, "q4": 2, "q5": 1, "q6": 1, "q7": 1, "q8": 1, "q9": 0, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 2, "q2": 1, "q3": 1, "q4": 2, "q5": 2, "q6": 2, "q7": 1, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 3, "cgi_i": 0, "visit_type": "baseline" } }
+          { "code": "MADRS", "responses": { "q1": 2, "q2": 1, "q3": 1, "q4": 2, "q5": 1, "q6": 1, "q7": 1, "q8": 1, "q9": 0, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 2, "q2": 1, "q3": 1, "q4": 2, "q5": 2, "q6": 2, "q7": 1, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 3, "cgi_i": 0, "visit_type": "baseline" } }
         ]
       },
       {
@@ -534,8 +534,8 @@
         "completed_date": "2020-12-15T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 1 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 1 } },
+          { "code": "CGI", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
         ]
       },
       {
@@ -544,10 +544,10 @@
         "completed_date": "2021-06-15T15:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "MADRS_FR", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 1, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "MADRS", "responses": { "q1": 1, "q2": 1, "q3": 0, "q4": 1, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 2, "cgi_i": 2, "visit_type": "followup" } }
         ]
       },
       {
@@ -556,8 +556,8 @@
         "completed_date": "2021-12-15T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 2, "cgi_i": 1, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 2, "cgi_i": 1, "visit_type": "followup" } }
         ]
       },
       {
@@ -566,10 +566,10 @@
         "completed_date": "2022-06-15T15:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "MADRS_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "MADRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
         ]
       },
       {
@@ -578,8 +578,8 @@
         "completed_date": "2022-12-15T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
         ]
       },
       {
@@ -588,10 +588,10 @@
         "completed_date": "2023-06-15T15:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "MADRS_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
-          { "code": "YMRS_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "MADRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0 } },
+          { "code": "YMRS", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0, "q10": 0, "q11": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
         ]
       },
       {
@@ -600,8 +600,8 @@
         "completed_date": "2023-12-15T12:00:00Z",
         "status": "completed",
         "questionnaires": [
-          { "code": "ASRM_FR", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
-          { "code": "CGI_FR", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
+          { "code": "ASRM", "responses": { "q1": 0, "q2": 0, "q3": 0, "q4": 0, "q5": 0 } },
+          { "code": "CGI", "responses": { "cgi_s": 1, "cgi_i": 1, "visit_type": "followup" } }
         ]
       }
     ]
