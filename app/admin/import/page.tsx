@@ -309,8 +309,8 @@ export default function ImportPage() {
                     <span className="text-slate-400 font-normal ml-1">(optional)</span>
                   </label>
                   <Select 
-                    value={selectedDoctor} 
-                    onValueChange={setSelectedDoctor}
+                    value={selectedDoctor || "none"} 
+                    onValueChange={(value) => setSelectedDoctor(value === "none" ? "" : value)}
                     disabled={!selectedCenter || isLoadingDoctors}
                   >
                     <SelectTrigger>
@@ -324,7 +324,7 @@ export default function ImportPage() {
                       )}
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">
+                      <SelectItem value="none">
                         <span className="text-slate-500">No assignment</span>
                       </SelectItem>
                       {doctors.map((doctor) => (
