@@ -172,6 +172,7 @@ import {
   savePsqiSzResponse as saveSchizophreniaPsqiResponse,
   savePresenteismeSzResponse as saveSchizophreniaPresenteismeResponse,
   saveFagerstromSzResponse as saveSchizophreniaFagerstromResponse,
+  saveBriefAAutoSzResponse as saveSchizophreniaBriefAAutoResponse,
   saveEphpSzResponse as saveSchizophreniaEphpResponse,
   saveCvltSzResponse as saveSchizophreniaCvltSzResponse,
   saveTmtSzResponse as saveSchizophreniaTmtSzResponse,
@@ -788,11 +789,11 @@ export async function submitProfessionalQuestionnaireAction(
         break;
       
       case 'BRIEF_A_AUTO_SZ':
-        result = await saveSchizophreniaInitialResponse({
+        result = await saveSchizophreniaBriefAAutoResponse({
           visit_id: visitId,
           patient_id: patientId,
           ...responses as any
-        }, 'BRIEF_A_AUTO_SZ');
+        });
         break;
 
       // Initial Evaluation - ENTOURAGE (caregiver-administered)
