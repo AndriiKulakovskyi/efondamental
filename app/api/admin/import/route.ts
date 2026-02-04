@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file") as File | null;
     const centerId = formData.get("centerId") as string;
     const pathologyId = formData.get("pathologyId") as string;
+    const assignedTo = formData.get("assignedTo") as string | null;  // Optional doctor assignment
 
     // Validate required fields
     if (!file || !centerId || !pathologyId) {
@@ -62,12 +63,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Import the data
-    const result = await importPatientData(
-      patients,
+    const result = await importPatientData(patients, {
       centerId,
       pathologyId,
-      profile.id
-    );
+      importedBy: profile.id,
+      defaultAssignedTo: assignedTo || undefined,  // Optional doctor assignment
+    });
 
     // Log audit event
     await logAuditEvent({
@@ -77,6 +78,7 @@ export async function POST(request: NextRequest) {
       centerId: centerId,
       metadata: {
         pathologyId: pathologyId,
+        defaultAssignedTo: assignedTo || null,  // Track doctor assignment in audit
         fileName: file.name,
         fileSize: file.size,
         patientsAttempted: patients.length,

@@ -22,6 +22,7 @@ export interface ImportQuestionnaireResponse {
 
 export interface ImportVisit {
   visit_type: string;
+  visit_number?: number;  // Optional - auto-assigned by DB trigger if not provided
   scheduled_date: string;
   completed_date?: string;
   status: string;
@@ -47,6 +48,14 @@ export interface ImportPatient {
   };
   metadata?: Record<string, any>;
   visits?: ImportVisit[];
+  assigned_to?: string;  // Optional: UUID of the doctor to assign this patient to (overrides default)
+}
+
+export interface ImportOptions {
+  centerId: string;              // Required: Center to assign patients to
+  pathologyId: string;           // Required: Pathology for these patients
+  importedBy: string;            // Required: User performing the import
+  defaultAssignedTo?: string;    // Optional: Default doctor to assign patients to (if not specified per-patient)
 }
 
 export interface ImportResult {
@@ -187,16 +196,13 @@ function getTableName(code: string): string | undefined {
 /**
  * Import patient data from JSON
  * @param patients Array of patient data to import
- * @param centerId Target center ID
- * @param pathologyId Target pathology ID
- * @param importedBy User ID of the admin performing the import
+ * @param options Import options including center, pathology, and optional doctor assignment
  */
 export async function importPatientData(
   patients: ImportPatient[],
-  centerId: string,
-  pathologyId: string,
-  importedBy: string
+  options: ImportOptions
 ): Promise<ImportResult> {
+  const { centerId, pathologyId, importedBy, defaultAssignedTo } = options;
   const supabase = createAdminClient();
   
   const result: ImportResult = {
@@ -246,6 +252,9 @@ export async function importPatientData(
         continue;
       }
 
+      // Determine doctor assignment: per-patient takes precedence over default
+      const assignedTo = patientData.assigned_to || defaultAssignedTo || null;
+
       // Insert the patient
       const { data: newPatient, error: patientError } = await supabase
         .from('patients')
@@ -263,6 +272,7 @@ export async function importPatientData(
           place_of_birth: patientData.place_of_birth,
           years_of_education: patientData.years_of_education,
           emergency_contact: patientData.emergency_contact,
+          assigned_to: assignedTo,  // Optional doctor assignment
           metadata: {
             ...patientData.metadata,
             imported: true,
@@ -295,12 +305,14 @@ export async function importPatientData(
             }
 
             // Insert the visit
+            // visit_number is optional - DB trigger auto-assigns if not provided
             const { data: newVisit, error: visitError } = await supabase
               .from('visits')
               .insert({
                 patient_id: newPatient.id,
                 visit_template_id: visitTemplateId,
                 visit_type: visitData.visit_type as VisitType,
+                visit_number: visitData.visit_number || null, // Auto-assigned by trigger if null
                 scheduled_date: visitData.scheduled_date,
                 completed_date: visitData.completed_date,
                 status: visitData.status || VisitStatus.COMPLETED,

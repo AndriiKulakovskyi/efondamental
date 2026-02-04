@@ -146,6 +146,7 @@ export interface VisitSummary {
   id: string;
   visitType: VisitType;
   visitTypeName: string;
+  visitNumber: number | null;  // Sequential number for visits of same type (e.g., Annual #1, #2)
   scheduledDate: string | null;
   completedDate: string | null;
   status: VisitStatus;
@@ -259,6 +260,7 @@ export interface VisitTimelineEntry {
   date: string;
   visitType: VisitType;
   visitTypeName: string;
+  visitNumber: number | null;  // Sequential number for visits of same type
   status: VisitStatus;
   keyFindings: string;
 }

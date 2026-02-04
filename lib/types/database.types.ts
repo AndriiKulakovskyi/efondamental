@@ -199,6 +199,7 @@ export interface Visit {
   patient_id: string;
   visit_template_id: string;
   visit_type: string;
+  visit_number: number | null;  // Sequential number for visits of same type per patient (e.g., Annual #1, #2)
   scheduled_date: string | null;
   completed_date: string | null;
   status: string;
@@ -225,7 +226,7 @@ export interface VisitFull extends Visit {
   conducted_by_last_name: string | null;
 }
 
-export type VisitInsert = Omit<Visit, 'id' | 'created_at' | 'updated_at' | 'completion_percentage' | 'completed_questionnaires' | 'total_questionnaires' | 'completion_updated_at'>;
+export type VisitInsert = Omit<Visit, 'id' | 'created_at' | 'updated_at' | 'completion_percentage' | 'completed_questionnaires' | 'total_questionnaires' | 'completion_updated_at' | 'visit_number'> & { visit_number?: number | null };
 export type VisitUpdate = Partial<Omit<Visit, 'id' | 'created_at' | 'updated_at'>>;
 
 export interface AuditLog {

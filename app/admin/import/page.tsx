@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Upload, FileJson, AlertCircle, CheckCircle2, Loader2, Users, Calendar, FileText, AlertTriangle } from "lucide-react";
+import { Upload, FileJson, AlertCircle, CheckCircle2, Loader2, Users, Calendar, FileText, AlertTriangle, UserRound } from "lucide-react";
 
 interface Center {
   id: string;
@@ -22,6 +22,13 @@ interface Pathology {
   id: string;
   name: string;
   type: string;
+}
+
+interface Doctor {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
 }
 
 interface ImportResult {
@@ -46,16 +53,20 @@ interface PatientPreview {
 export default function ImportPage() {
   const [centers, setCenters] = useState<Center[]>([]);
   const [pathologies, setPathologies] = useState<Pathology[]>([]);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [selectedCenter, setSelectedCenter] = useState<string>("");
   const [selectedPathology, setSelectedPathology] = useState<string>("");
+  const [selectedDoctor, setSelectedDoctor] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
   const [patientPreview, setPatientPreview] = useState<PatientPreview[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDoctors, setIsLoadingDoctors] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
 
+  // Fetch initial data (centers and pathologies)
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
@@ -82,6 +93,37 @@ export default function ImportPage() {
     }
     fetchData();
   }, []);
+
+  // Fetch doctors when center is selected
+  useEffect(() => {
+    async function fetchDoctors() {
+      if (!selectedCenter) {
+        setDoctors([]);
+        setSelectedDoctor("");
+        return;
+      }
+
+      setIsLoadingDoctors(true);
+      try {
+        const response = await fetch(`/api/admin/centers/${selectedCenter}/professionals`);
+        if (response.ok) {
+          const data = await response.json();
+          // Filter for healthcare professionals only
+          const healthcareProfessionals = (data.professionals || []).filter(
+            (p: any) => p.role === 'healthcare_professional'
+          );
+          setDoctors(healthcareProfessionals);
+        } else {
+          setDoctors([]);
+        }
+      } catch (err) {
+        setDoctors([]);
+      } finally {
+        setIsLoadingDoctors(false);
+      }
+    }
+    fetchDoctors();
+  }, [selectedCenter]);
 
   const handleFileChange = useCallback((selectedFile: File | null) => {
     setError(null);
@@ -167,6 +209,10 @@ export default function ImportPage() {
       formData.append("file", file);
       formData.append("centerId", selectedCenter);
       formData.append("pathologyId", selectedPathology);
+      // Add optional doctor assignment
+      if (selectedDoctor) {
+        formData.append("assignedTo", selectedDoctor);
+      }
 
       const response = await fetch("/api/admin/import", {
         method: "POST",
@@ -220,13 +266,13 @@ export default function ImportPage() {
             <CardHeader>
               <CardTitle>Configuration</CardTitle>
               <CardDescription>
-                Select the target center and pathology for imported patients
+                Select the target center, pathology, and optionally assign a doctor for imported patients
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Center</label>
+                  <label className="text-sm font-medium text-slate-700">Center *</label>
                   <Select value={selectedCenter} onValueChange={setSelectedCenter}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a center" />
@@ -242,7 +288,7 @@ export default function ImportPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Pathology</label>
+                  <label className="text-sm font-medium text-slate-700">Pathology *</label>
                   <Select value={selectedPathology} onValueChange={setSelectedPathology}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a pathology" />
@@ -255,6 +301,45 @@ export default function ImportPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">
+                    Assign to Doctor
+                    <span className="text-slate-400 font-normal ml-1">(optional)</span>
+                  </label>
+                  <Select 
+                    value={selectedDoctor} 
+                    onValueChange={setSelectedDoctor}
+                    disabled={!selectedCenter || isLoadingDoctors}
+                  >
+                    <SelectTrigger>
+                      {isLoadingDoctors ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span>Loading...</span>
+                        </div>
+                      ) : (
+                        <SelectValue placeholder="Select a doctor (optional)" />
+                      )}
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">
+                        <span className="text-slate-500">No assignment</span>
+                      </SelectItem>
+                      {doctors.map((doctor) => (
+                        <SelectItem key={doctor.id} value={doctor.id}>
+                          <div className="flex items-center gap-2">
+                            <UserRound className="h-4 w-4 text-slate-400" />
+                            <span>Dr. {doctor.last_name} {doctor.first_name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedCenter && doctors.length === 0 && !isLoadingDoctors && (
+                    <p className="text-xs text-slate-500">No doctors available in this center</p>
+                  )}
                 </div>
               </div>
             </CardContent>

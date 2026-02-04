@@ -13,6 +13,7 @@
     "visits": [
       {
         "visit_type": "screening",
+        "visit_number": 1,
         "scheduled_date": "2023-01-15T09:00:00Z",
         "completed_date": "2023-01-15T11:30:00Z",
         "status": "completed",
@@ -24,6 +25,7 @@
       },
       {
         "visit_type": "initial_evaluation",
+        "visit_number": 1,
         "scheduled_date": "2023-02-20T09:00:00Z",
         "completed_date": "2023-02-20T16:00:00Z",
         "status": "completed",
@@ -37,6 +39,7 @@
       },
       {
         "visit_type": "biannual_followup",
+        "visit_number": 1,
         "scheduled_date": "2023-08-20T09:00:00Z",
         "completed_date": "2023-08-20T12:00:00Z",
         "status": "completed",
@@ -48,6 +51,7 @@
       },
       {
         "visit_type": "annual_evaluation",
+        "visit_number": 1,
         "scheduled_date": "2024-02-20T09:00:00Z",
         "completed_date": "2024-02-20T15:00:00Z",
         "status": "completed",
@@ -75,6 +79,7 @@
     "visits": [
       {
         "visit_type": "screening",
+        "visit_number": 1,
         "scheduled_date": "2022-06-10T10:00:00Z",
         "completed_date": "2022-06-10T12:00:00Z",
         "status": "completed",
@@ -86,6 +91,7 @@
       },
       {
         "visit_type": "initial_evaluation",
+        "visit_number": 1,
         "scheduled_date": "2022-07-15T09:00:00Z",
         "completed_date": "2022-07-15T17:00:00Z",
         "status": "completed",
@@ -98,6 +104,7 @@
       },
       {
         "visit_type": "biannual_followup",
+        "visit_number": 1,
         "scheduled_date": "2023-01-15T09:00:00Z",
         "completed_date": "2023-01-15T12:00:00Z",
         "status": "completed",
@@ -109,6 +116,7 @@
       },
       {
         "visit_type": "annual_evaluation",
+        "visit_number": 1,
         "scheduled_date": "2023-07-15T09:00:00Z",
         "completed_date": "2023-07-15T15:00:00Z",
         "status": "completed",
@@ -122,6 +130,7 @@
       },
       {
         "visit_type": "biannual_followup",
+        "visit_number": 2,
         "scheduled_date": "2024-01-15T09:00:00Z",
         "completed_date": "2024-01-15T12:00:00Z",
         "status": "completed",
@@ -146,6 +155,7 @@
     "visits": [
       {
         "visit_type": "screening",
+        "visit_number": 1,
         "scheduled_date": "2023-09-05T14:00:00Z",
         "completed_date": "2023-09-05T16:00:00Z",
         "status": "completed",
@@ -157,6 +167,7 @@
       },
       {
         "visit_type": "initial_evaluation",
+        "visit_number": 1,
         "scheduled_date": "2023-10-10T09:00:00Z",
         "completed_date": "2023-10-10T16:00:00Z",
         "status": "completed",
@@ -184,6 +195,7 @@
     "visits": [
       {
         "visit_type": "screening",
+        "visit_number": 1,
         "scheduled_date": "2021-03-20T10:00:00Z",
         "completed_date": "2021-03-20T12:00:00Z",
         "status": "completed",
@@ -195,6 +207,7 @@
       },
       {
         "visit_type": "initial_evaluation",
+        "visit_number": 1,
         "scheduled_date": "2021-04-25T09:00:00Z",
         "completed_date": "2021-04-25T16:00:00Z",
         "status": "completed",
@@ -206,6 +219,7 @@
       },
       {
         "visit_type": "biannual_followup",
+        "visit_number": 1,
         "scheduled_date": "2021-10-25T09:00:00Z",
         "completed_date": "2021-10-25T12:00:00Z",
         "status": "completed",
@@ -217,6 +231,7 @@
       },
       {
         "visit_type": "annual_evaluation",
+        "visit_number": 1,
         "scheduled_date": "2022-04-25T09:00:00Z",
         "completed_date": "2022-04-25T15:00:00Z",
         "status": "completed",
@@ -230,6 +245,7 @@
       },
       {
         "visit_type": "biannual_followup",
+        "visit_number": 2,
         "scheduled_date": "2022-10-25T09:00:00Z",
         "completed_date": "2022-10-25T12:00:00Z",
         "status": "completed",
@@ -241,6 +257,7 @@
       },
       {
         "visit_type": "annual_evaluation",
+        "visit_number": 2,
         "scheduled_date": "2023-04-25T09:00:00Z",
         "completed_date": "2023-04-25T15:00:00Z",
         "status": "completed",
@@ -254,6 +271,7 @@
       },
       {
         "visit_type": "biannual_followup",
+        "visit_number": 3,
         "scheduled_date": "2023-10-25T09:00:00Z",
         "completed_date": "2023-10-25T12:00:00Z",
         "status": "completed",
@@ -278,6 +296,7 @@
     "visits": [
       {
         "visit_type": "screening",
+        "visit_number": 1,
         "scheduled_date": "2024-01-08T11:00:00Z",
         "completed_date": "2024-01-08T13:00:00Z",
         "status": "completed",
@@ -302,6 +321,7 @@
     "visits": [
       {
         "visit_type": "screening",
+        "visit_number": 1,
         "scheduled_date": "2022-11-15T09:00:00Z",
         "completed_date": "2022-11-15T11:00:00Z",
         "status": "completed",
@@ -313,6 +333,7 @@
       },
       {
         "visit_type": "initial_evaluation",
+        "visit_number": 1,
         "scheduled_date": "2022-12-20T09:00:00Z",
         "completed_date": "2022-12-20T16:00:00Z",
         "status": "completed",
@@ -326,6 +347,7 @@
       },
       {
         "visit_type": "biannual_followup",
+        "visit_number": 1,
         "scheduled_date": "2023-06-20T09:00:00Z",
         "completed_date": "2023-06-20T12:00:00Z",
         "status": "completed",
@@ -351,6 +373,7 @@
     "visits": [
       {
         "visit_type": "screening",
+        "visit_number": 1,
         "scheduled_date": "2023-04-12T14:00:00Z",
         "completed_date": "2023-04-12T16:00:00Z",
         "status": "completed",
@@ -362,6 +385,7 @@
       },
       {
         "visit_type": "initial_evaluation",
+        "visit_number": 1,
         "scheduled_date": "2023-05-18T09:00:00Z",
         "completed_date": "2023-05-18T16:00:00Z",
         "status": "completed",
@@ -374,6 +398,7 @@
       },
       {
         "visit_type": "biannual_followup",
+        "visit_number": 1,
         "scheduled_date": "2023-11-18T09:00:00Z",
         "completed_date": "2023-11-18T12:00:00Z",
         "status": "completed",
@@ -399,6 +424,7 @@
     "visits": [
       {
         "visit_type": "screening",
+        "visit_number": 1,
         "scheduled_date": "2023-07-20T10:00:00Z",
         "completed_date": "2023-07-20T12:00:00Z",
         "status": "completed",
@@ -410,6 +436,7 @@
       },
       {
         "visit_type": "initial_evaluation",
+        "visit_number": 1,
         "scheduled_date": "2023-08-25T09:00:00Z",
         "completed_date": "2023-08-25T16:00:00Z",
         "status": "completed",
@@ -422,6 +449,7 @@
       },
       {
         "visit_type": "biannual_followup",
+        "visit_number": 1,
         "scheduled_date": "2024-02-25T09:00:00Z",
         "completed_date": "2024-02-25T12:00:00Z",
         "status": "completed",
@@ -446,6 +474,7 @@
     "visits": [
       {
         "visit_type": "screening",
+        "visit_number": 1,
         "scheduled_date": "2023-02-10T09:00:00Z",
         "completed_date": "2023-02-10T11:00:00Z",
         "status": "completed",
@@ -457,6 +486,7 @@
       },
       {
         "visit_type": "initial_evaluation",
+        "visit_number": 1,
         "scheduled_date": "2023-03-15T09:00:00Z",
         "completed_date": "2023-03-15T16:00:00Z",
         "status": "completed",
@@ -470,6 +500,7 @@
       },
       {
         "visit_type": "biannual_followup",
+        "visit_number": 1,
         "scheduled_date": "2023-09-15T09:00:00Z",
         "completed_date": "2023-09-15T12:00:00Z",
         "status": "completed",
@@ -481,6 +512,7 @@
       },
       {
         "visit_type": "annual_evaluation",
+        "visit_number": 1,
         "scheduled_date": "2024-03-15T09:00:00Z",
         "completed_date": "2024-03-15T15:00:00Z",
         "status": "completed",
@@ -508,6 +540,7 @@
     "visits": [
       {
         "visit_type": "screening",
+        "visit_number": 1,
         "scheduled_date": "2020-05-10T10:00:00Z",
         "completed_date": "2020-05-10T12:00:00Z",
         "status": "completed",
@@ -519,6 +552,7 @@
       },
       {
         "visit_type": "initial_evaluation",
+        "visit_number": 1,
         "scheduled_date": "2020-06-15T09:00:00Z",
         "completed_date": "2020-06-15T16:00:00Z",
         "status": "completed",
@@ -530,6 +564,7 @@
       },
       {
         "visit_type": "biannual_followup",
+        "visit_number": 1,
         "scheduled_date": "2020-12-15T09:00:00Z",
         "completed_date": "2020-12-15T12:00:00Z",
         "status": "completed",
@@ -540,6 +575,7 @@
       },
       {
         "visit_type": "annual_evaluation",
+        "visit_number": 1,
         "scheduled_date": "2021-06-15T09:00:00Z",
         "completed_date": "2021-06-15T15:00:00Z",
         "status": "completed",
@@ -552,6 +588,7 @@
       },
       {
         "visit_type": "biannual_followup",
+        "visit_number": 2,
         "scheduled_date": "2021-12-15T09:00:00Z",
         "completed_date": "2021-12-15T12:00:00Z",
         "status": "completed",
@@ -562,6 +599,7 @@
       },
       {
         "visit_type": "annual_evaluation",
+        "visit_number": 2,
         "scheduled_date": "2022-06-15T09:00:00Z",
         "completed_date": "2022-06-15T15:00:00Z",
         "status": "completed",
@@ -574,6 +612,7 @@
       },
       {
         "visit_type": "biannual_followup",
+        "visit_number": 3,
         "scheduled_date": "2022-12-15T09:00:00Z",
         "completed_date": "2022-12-15T12:00:00Z",
         "status": "completed",
@@ -584,6 +623,7 @@
       },
       {
         "visit_type": "annual_evaluation",
+        "visit_number": 3,
         "scheduled_date": "2023-06-15T09:00:00Z",
         "completed_date": "2023-06-15T15:00:00Z",
         "status": "completed",
@@ -596,6 +636,7 @@
       },
       {
         "visit_type": "biannual_followup",
+        "visit_number": 4,
         "scheduled_date": "2023-12-15T09:00:00Z",
         "completed_date": "2023-12-15T12:00:00Z",
         "status": "completed",
