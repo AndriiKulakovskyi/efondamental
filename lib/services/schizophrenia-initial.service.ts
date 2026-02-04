@@ -71,6 +71,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   'PSQI_SZ': 'schizophrenia_psqi',
   'PRESENTEISME_SZ': 'schizophrenia_presenteisme',
   'FAGERSTROM_SZ': 'schizophrenia_fagerstrom',
+  'BRIEF_A_AUTO_SZ': 'schizophrenia_brief_a_auto',
   
   // Entourage module (caregiver-administered)
   'EPHP_SZ': 'schizophrenia_ephp',
@@ -187,6 +188,8 @@ export async function saveSchizophreniaInitialResponse<T extends SchizophreniaQu
       return await savePresenteismeSzResponse(response) as any as T;
     case 'FAGERSTROM_SZ':
       return await saveFagerstromSzResponse(response) as any as T;
+    case 'BRIEF_A_AUTO_SZ':
+      return await saveBriefAAutoSzResponse(response) as any as T;
     case 'EPHP_SZ':
       return await saveEphpSzResponse(response) as any as T;
   }
@@ -3236,6 +3239,45 @@ function generateEphpInterpretation(
   }
   
   return interpretation;
+}
+
+/**
+ * Save BRIEF-A Auto-Evaluation response with scoring
+ */
+export async function saveBriefAAutoSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  
+  // Import scoring functions
+  const { computeBriefAAutoScores } = await import('@/lib/questionnaires/schizophrenia/initial/auto/brief-a-auto');
+  
+  // Calculate all scores
+  const scores = computeBriefAAutoScores(response);
+  
+  // Remove UI-only fields and computed fields before saving
+  // BRIEF-A uses brief_a_* scores, not total_score
+  const {
+    total_score, // Exclude - BRIEF-A uses GEC/BRI/MI, not total_score
+    instructions,
+    instruction_consigne,
+    ...responseData
+  } = response;
+  
+  const { data, error } = await supabase
+    .from('schizophrenia_brief_a_auto')
+    .upsert({
+      ...responseData,
+      ...scores,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving schizophrenia_brief_a_auto:', error);
+    throw error;
+  }
+  return data;
 }
 
 /**

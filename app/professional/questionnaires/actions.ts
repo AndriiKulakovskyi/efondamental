@@ -786,6 +786,14 @@ export async function submitProfessionalQuestionnaireAction(
           ...responses as any
         });
         break;
+      
+      case 'BRIEF_A_AUTO_SZ':
+        result = await saveSchizophreniaInitialResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...responses as any
+        }, 'BRIEF_A_AUTO_SZ');
+        break;
 
       // Initial Evaluation - ENTOURAGE (caregiver-administered)
       case 'EPHP_SZ':

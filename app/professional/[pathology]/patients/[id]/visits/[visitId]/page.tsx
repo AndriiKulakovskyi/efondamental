@@ -161,6 +161,7 @@ import {
   PSQI_SZ_DEFINITION,
   PRESENTEISME_SZ_DEFINITION,
   FAGERSTROM_SZ_DEFINITION,
+  BRIEF_A_AUTO_SZ_DEFINITION,
   EPHP_SZ_DEFINITION,
   SZ_CVLT_DEFINITION,
   TMT_SZ_DEFINITION,
@@ -888,6 +889,16 @@ export default async function VisitDetailPage({
               target_role: 'patient',
               completed: questionnaireStatuses['FAGERSTROM_SZ']?.completed || false,
               completedAt: questionnaireStatuses['FAGERSTROM_SZ']?.completed_at,
+            },
+            {
+              id: BRIEF_A_AUTO_SZ_DEFINITION.code,
+              code: BRIEF_A_AUTO_SZ_DEFINITION.code,
+              title: BRIEF_A_AUTO_SZ_DEFINITION.title,
+              description: BRIEF_A_AUTO_SZ_DEFINITION.description,
+              questions: BRIEF_A_AUTO_SZ_DEFINITION.questions,
+              target_role: 'patient',
+              completed: questionnaireStatuses['BRIEF_A_AUTO_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['BRIEF_A_AUTO_SZ']?.completed_at,
             }
           ]
         },

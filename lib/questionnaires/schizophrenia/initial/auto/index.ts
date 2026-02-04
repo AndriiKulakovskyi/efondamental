@@ -148,3 +148,16 @@ export {
   type FagerstromSzScoreResult,
   type FagerstromSzDependenceLevel,
 } from './fagerstrom';
+
+export {
+  BRIEF_A_AUTO_SZ_QUESTIONS,
+  BRIEF_A_AUTO_SZ_DEFINITION,
+  BRIEF_A_AUTO_SCALES,
+  BRIEF_A_AUTO_INDICES,
+  BRIEF_A_AUTO_VALIDITY_SCALES,
+  computeBriefAAutoScores,
+  interpretBriefAAutoScore,
+  type SchizophreniaBriefAAutoResponse,
+  type SchizophreniaBriefAAutoResponseInsert,
+  type BriefAAutoScoreResult,
+} from './brief-a-auto';

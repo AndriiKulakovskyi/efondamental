@@ -254,6 +254,7 @@ import {
   PSQI_SZ_DEFINITION,
   PRESENTEISME_SZ_DEFINITION,
   FAGERSTROM_SZ_DEFINITION,
+  BRIEF_A_AUTO_SZ_DEFINITION,
   EPHP_SZ_DEFINITION,
   SZ_CVLT_DEFINITION,
   TMT_SZ_DEFINITION,
@@ -946,6 +947,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               title: FAGERSTROM_SZ_DEFINITION.title,
               description: FAGERSTROM_SZ_DEFINITION.description,
               questions: FAGERSTROM_SZ_DEFINITION.questions,
+            },
+            {
+              id: BRIEF_A_AUTO_SZ_DEFINITION.id,
+              code: BRIEF_A_AUTO_SZ_DEFINITION.code,
+              title: BRIEF_A_AUTO_SZ_DEFINITION.title,
+              description: BRIEF_A_AUTO_SZ_DEFINITION.description,
+              questions: BRIEF_A_AUTO_SZ_DEFINITION.questions,
             }
           ]
         },
