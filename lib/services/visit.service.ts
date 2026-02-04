@@ -745,22 +745,6 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           id: 'mod_neuropsy_sz',
           name: 'Evaluation Neuropsychologique',
           description: 'Évaluation neuropsychologique',
-          questionnaires: [
-            {
-              id: CBQ_SZ_DEFINITION.id,
-              code: CBQ_SZ_DEFINITION.code,
-              title: CBQ_SZ_DEFINITION.title,
-              description: CBQ_SZ_DEFINITION.description,
-              questions: CBQ_SZ_DEFINITION.questions
-            },
-            {
-              id: DACOBS_SZ_DEFINITION.id,
-              code: DACOBS_SZ_DEFINITION.code,
-              title: DACOBS_SZ_DEFINITION.title,
-              description: DACOBS_SZ_DEFINITION.description,
-              questions: DACOBS_SZ_DEFINITION.questions
-            }
-          ],
           sections: [
             {
               id: 'bloc2',
@@ -857,6 +841,20 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           name: 'Autoquestionnaires',
           description: 'Questionnaires remplis par le patient',
           questionnaires: [
+            {
+              id: CBQ_SZ_DEFINITION.id,
+              code: CBQ_SZ_DEFINITION.code,
+              title: CBQ_SZ_DEFINITION.title,
+              description: CBQ_SZ_DEFINITION.description,
+              questions: CBQ_SZ_DEFINITION.questions
+            },
+            {
+              id: DACOBS_SZ_DEFINITION.id,
+              code: DACOBS_SZ_DEFINITION.code,
+              title: DACOBS_SZ_DEFINITION.title,
+              description: DACOBS_SZ_DEFINITION.description,
+              questions: DACOBS_SZ_DEFINITION.questions
+            },
             {
               // Exclude scoring functions for client serialization
               id: SQOL_SZ_DEFINITION.id,

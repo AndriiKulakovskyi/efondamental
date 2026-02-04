@@ -604,28 +604,6 @@ export default async function VisitDetailPage({
           id: 'mod_neuropsy_sz',
           name: 'Evaluation Neuropsychologique',
           description: 'Évaluation neuropsychologique',
-          questionnaires: [
-            {
-              id: CBQ_SZ_DEFINITION.code,
-              code: CBQ_SZ_DEFINITION.code,
-              title: CBQ_SZ_DEFINITION.title,
-              description: CBQ_SZ_DEFINITION.description,
-              questions: CBQ_SZ_DEFINITION.questions,
-              target_role: 'patient',
-              completed: questionnaireStatuses['CBQ_SZ']?.completed || false,
-              completedAt: questionnaireStatuses['CBQ_SZ']?.completed_at,
-            },
-            {
-              id: DACOBS_SZ_DEFINITION.code,
-              code: DACOBS_SZ_DEFINITION.code,
-              title: DACOBS_SZ_DEFINITION.title,
-              description: DACOBS_SZ_DEFINITION.description,
-              questions: DACOBS_SZ_DEFINITION.questions,
-              target_role: 'patient',
-              completed: questionnaireStatuses['DACOBS_SZ']?.completed || false,
-              completedAt: questionnaireStatuses['DACOBS_SZ']?.completed_at,
-            }
-          ],
           sections: [
             {
               id: 'bloc2',
@@ -760,6 +738,26 @@ export default async function VisitDetailPage({
           name: 'Autoquestionnaires',
           description: 'Questionnaires remplis par le patient',
           questionnaires: [
+            {
+              id: CBQ_SZ_DEFINITION.code,
+              code: CBQ_SZ_DEFINITION.code,
+              title: CBQ_SZ_DEFINITION.title,
+              description: CBQ_SZ_DEFINITION.description,
+              questions: CBQ_SZ_DEFINITION.questions,
+              target_role: 'patient',
+              completed: questionnaireStatuses['CBQ_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['CBQ_SZ']?.completed_at,
+            },
+            {
+              id: DACOBS_SZ_DEFINITION.code,
+              code: DACOBS_SZ_DEFINITION.code,
+              title: DACOBS_SZ_DEFINITION.title,
+              description: DACOBS_SZ_DEFINITION.description,
+              questions: DACOBS_SZ_DEFINITION.questions,
+              target_role: 'patient',
+              completed: questionnaireStatuses['DACOBS_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['DACOBS_SZ']?.completed_at,
+            },
             {
               // Exclude scoring functions - they cannot be serialized to client components
               id: SQOL_SZ_DEFINITION.code,
