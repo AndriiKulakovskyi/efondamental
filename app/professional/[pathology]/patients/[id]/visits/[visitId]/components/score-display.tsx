@@ -925,9 +925,10 @@ if (code === 'FAGERSTROM') {
               {code === 'AIM' && 'Résultats AIM-20 - Intensité Affective'}
               {code === 'AQ12' && 'Résultats AQ-12 - Agressivité'}
               {code === 'ALDA' && 'Score Alda'}
-              {code === 'CGI' && 'Résultats CGI'}
+              {(code === 'CGI' || code === 'CGI_SZ') && 'Résultats CGI'}
               {code === 'MADRS' && 'Résultats MADRS - Échelle de Dépression'}
-              {code === 'YMRS' && 'Résultats YMRS - Échelle de Manie'}
+              {(code === 'YMRS' || code === 'YMRS_SZ') && 'Résultats YMRS - Échelle de Manie'}
+              {code === 'EGF_SZ' && 'Résultats EGF - Échelle Globale de Fonctionnement'}
               {code === 'WAIS4_MATRICES' && 'Résultats WAIS-IV Matrices'}
               {code === 'WAIS4_MATRICES_SZ' && 'Résultats WAIS-IV Matrices'}
               {code === 'SSTICS_SZ' && 'Résultats SSTICS - Plaintes Cognitives Subjectives'}
@@ -1002,12 +1003,14 @@ if (code === 'FAGERSTROM') {
                 ? (data.total_score !== undefined ? data.total_score : '-')
                 : code === 'ALDA'
                 ? (data.alda_score !== undefined ? data.alda_score : '-')
-                : code === 'CGI'
+                : (code === 'CGI' || code === 'CGI_SZ')
                 ? (data.therapeutic_index !== undefined && data.therapeutic_index !== null ? data.therapeutic_index : (data.cgi_s !== undefined ? data.cgi_s : '-'))
                 : code === 'MADRS'
                 ? (data.total_score !== undefined ? data.total_score : '-')
-                : code === 'YMRS'
+                : (code === 'YMRS' || code === 'YMRS_SZ')
                 ? (data.total_score !== undefined ? data.total_score : '-')
+                : code === 'EGF_SZ'
+                ? (data.egf_score !== undefined ? data.egf_score : '-')
                 : code === 'WAIS4_MATRICES'
                 ? (data.standardized_score !== undefined ? data.standardized_score : '-')
                 : code === 'WAIS4_MATRICES_SZ'
@@ -1108,9 +1111,10 @@ if (code === 'FAGERSTROM') {
               {code === 'AIM' && '/120'}
               {code === 'AQ12' && '/72'}
               {code === 'ALDA' && '/10'}
-              {code === 'CGI' && (data.therapeutic_index !== undefined && data.therapeutic_index !== null ? '/16' : '/7')}
+              {(code === 'CGI' || code === 'CGI_SZ') && (data.therapeutic_index !== undefined && data.therapeutic_index !== null ? '/16' : '/7')}
               {code === 'MADRS' && '/60'}
-              {code === 'YMRS' && '/60'}
+              {(code === 'YMRS' || code === 'YMRS_SZ') && '/60'}
+              {code === 'EGF_SZ' && '/100'}
               {code === 'WAIS4_MATRICES' && '/19'}
               {code === 'WAIS4_MATRICES_SZ' && '/19'}
               {code === 'SSTICS_SZ' && ' (Z-score)'}
@@ -1257,7 +1261,7 @@ if (code === 'FAGERSTROM') {
         )}
 
         {/* CGI Details */}
-        {code === 'CGI' && (
+        {(code === 'CGI' || code === 'CGI_SZ') && (
           <div className="text-sm space-y-3 mt-2 pt-2 border-t">
             {/* CGI-S: Severity */}
             <div>
@@ -2366,7 +2370,7 @@ if (code === 'FAGERSTROM') {
         )}
 
         {/* YMRS Details */}
-        {code === 'YMRS' && (
+        {(code === 'YMRS' || code === 'YMRS_SZ') && (
           <div className="text-sm space-y-4 mt-2 pt-2 border-t">
             {/* Clinical Description */}
             <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
@@ -2486,6 +2490,48 @@ if (code === 'FAGERSTROM') {
                 <p>• <strong>≥ 26 points :</strong> Manie sévère - Indication hospitalisation fréquente</p>
               </div>
               <p className="mt-2 pt-2 border-t"><em>Note: Items 5, 6, 8, 9 sont pondérés x2 (cotés 0-8 au lieu de 0-4)</em></p>
+            </div>
+          </div>
+        )}
+
+        {/* EGF Details */}
+        {code === 'EGF_SZ' && (
+          <div className="space-y-4 pt-4 border-t border-slate-100">
+            <h5 className="font-semibold text-gray-700 mb-1">Détail de l'EGF</h5>
+            <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 relative overflow-hidden">
+              <div className="absolute right-0 top-0 w-24 h-24 bg-brand/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
+              <div className="flex items-center justify-between relative z-10">
+                <div className="flex-1">
+                  <span className="text-gray-600 text-sm block mb-1">Niveau de fonctionnement global</span>
+                  <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden max-w-md">
+                    <div 
+                      className={`h-full ${
+                        data.egf_score >= 71 ? 'bg-teal-500' :
+                        data.egf_score >= 51 ? 'bg-blue-500' :
+                        data.egf_score >= 41 ? 'bg-amber-500' : 'bg-red-500'
+                      }`}
+                      style={{ width: `${data.egf_score || 0}%` }}
+                    />
+                  </div>
+                </div>
+                <div className="text-right pl-6 border-l border-slate-200">
+                  <span className="block text-[10px] uppercase text-slate-400 font-bold tracking-wider">Score EGF</span>
+                  <span className={`text-3xl font-black ${
+                    data.egf_score >= 71 ? 'text-teal-600' :
+                    data.egf_score >= 51 ? 'text-blue-600' :
+                    data.egf_score >= 41 ? 'text-amber-600' : 'text-red-600'
+                  }`}>
+                    {data.egf_score ?? '-'}
+                  </span>
+                  <span className="text-slate-400 text-sm font-bold">/100</span>
+                </div>
+              </div>
+            </div>
+            {/* EGF Interpretation Text */}
+            <div className="mt-3 p-3 bg-white rounded-lg border border-slate-100 shadow-sm">
+              <p className="text-xs text-slate-600 italic leading-relaxed">
+                L'Échelle Globale de Fonctionnement (EGF) évalue le fonctionnement psychologique, social et professionnel du patient sur une échelle de 1 à 100. Un score plus élevé indique un meilleur fonctionnement.
+              </p>
             </div>
           </div>
         )}
@@ -4369,9 +4415,15 @@ if (code === 'FAGERSTROM') {
             </div>
 
             {/* Adherence Score */}
-            <div className="flex justify-between pt-2 border-t">
-              <span className="text-gray-600 font-medium">Estimation de l'observance:</span>
-              <span className="font-bold text-lg">{data.adherence_score ?? '-'}%</span>
+            <div className="flex flex-col gap-2 pt-2 border-t">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 font-medium">Calcul de l'observance (formule BARS):</span>
+                <span className="font-bold text-lg">{data.adherence_score ?? '-'}%</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 font-medium">Estimation manuelle de l'observance:</span>
+                <span className="font-bold text-lg text-brand">{data.estimation_observance ?? '-'}%</span>
+              </div>
             </div>
           </div>
         )}

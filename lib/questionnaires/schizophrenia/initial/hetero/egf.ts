@@ -13,6 +13,7 @@ export interface SchizophreniaEgfResponse {
   patient_id: string;
   egf_score: number;
   interpretation: string | null;
+  test_done?: boolean;
   completed_by: string | null;
   completed_at: string;
   created_at: string;
@@ -30,10 +31,23 @@ export type SchizophreniaEgfResponseInsert = Omit<
 // Questions Dictionary
 // ============================================================================
 
+const SHOW_WHEN_TEST_DONE = { '==': [{ 'var': 'test_done' }, 'oui'] };
+
 export const EGF_SZ_QUESTIONS: Question[] = [
+  {
+    id: 'test_done',
+    text: 'Passation du questionnaire fait',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui', score: 0 },
+      { code: 'non', label: 'Non', score: 1 }
+    ]
+  },
   {
     id: 'egf_score',
     text: 'Score a l\'echelle EGF',
+    display_if: SHOW_WHEN_TEST_DONE,
     help: `Consignes : Evaluer le fonctionnement psychologique, social et professionnel. Ne pas tenir compte d'un handicap du a des facteurs physiques ou environnementaux.
 
 GUIDE DE COTATION :

@@ -27,6 +27,7 @@ export interface SchizophreniaSumdResponse {
   attribu8?: number | null;
   conscience9?: number | null;
   attribu9?: number | null;
+  test_done?: boolean;
   completed_by?: string | null;
   completed_at?: string | null;
   created_at?: string;
@@ -60,48 +61,60 @@ const SUMD_ATTRIBUTION_OPTIONS = [
 // Questions
 // ============================================================================
 
+const SHOW_WHEN_TEST_DONE = { '==': [{ 'var': 'test_done' }, 'oui'] };
+
 export const SUMD_QUESTIONS: Question[] = [
+  {
+    id: 'test_done',
+    text: 'Passation du questionnaire fait',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui', score: 0 },
+      { code: 'non', label: 'Non', score: 1 }
+    ]
+  },
   // Domain 1: Conscience d'un trouble mental
-  { id: 'section_domain1', text: 'Conscience d\'un trouble mental', help: 'D\'une maniere generale, le patient croit-il presenter un trouble mental ?', type: 'section', required: false },
-  { id: 'conscience1', text: '1. Conscience du trouble', help: 'D\'une maniere generale, le patient croit-il presenter un trouble mental ?', type: 'single_choice', required: false, options: SUMD_CONSCIENCE_OPTIONS },
+  { id: 'section_domain1', text: 'Conscience d\'un trouble mental', help: 'D\'une maniere generale, le patient croit-il presenter un trouble mental ?', type: 'section', required: false, display_if: SHOW_WHEN_TEST_DONE },
+  { id: 'conscience1', text: '1. Conscience du trouble', help: 'D\'une maniere generale, le patient croit-il presenter un trouble mental ?', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_CONSCIENCE_OPTIONS },
   
   // Domain 2: Conscience des consequences
-  { id: 'section_domain2', text: 'Conscience des consequences de ce trouble', type: 'section', required: false },
-  { id: 'conscience2', text: '2. Conscience du trouble', help: 'Quelles sont les croyances du sujet concernant les raisons pour lesquelles il se retrouve hospitalise, renvoye de son travail, blesse, endette... etc... ?', type: 'single_choice', required: false, options: SUMD_CONSCIENCE_OPTIONS },
+  { id: 'section_domain2', text: 'Conscience des consequences de ce trouble', type: 'section', required: false, display_if: SHOW_WHEN_TEST_DONE },
+  { id: 'conscience2', text: '2. Conscience du trouble', help: 'Quelles sont les croyances du sujet concernant les raisons pour lesquelles il se retrouve hospitalise, renvoye de son travail, blesse, endette... etc... ?', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_CONSCIENCE_OPTIONS },
   
   // Domain 3: Conscience des effets du traitement
-  { id: 'section_domain3', text: 'Conscience des effets du traitement', type: 'section', required: false },
-  { id: 'conscience3', text: '3. Conscience du trouble', help: 'Le sujet croit-il que les traitements ont diminue la severite de ses symptomes ?', type: 'single_choice', required: false, options: SUMD_CONSCIENCE_OPTIONS },
+  { id: 'section_domain3', text: 'Conscience des effets du traitement', type: 'section', required: false, display_if: SHOW_WHEN_TEST_DONE },
+  { id: 'conscience3', text: '3. Conscience du trouble', help: 'Le sujet croit-il que les traitements ont diminue la severite de ses symptomes ?', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_CONSCIENCE_OPTIONS },
   
   // Domain 4: Conscience d'une experience hallucinatoire
-  { id: 'section_domain4', text: 'Conscience d\'une experience hallucinatoire', type: 'section', required: false },
-  { id: 'conscience4', text: '4.1. Conscience du trouble', help: 'Le sujet reconnait-il ses hallucinations en tant que telles ?', type: 'single_choice', required: false, options: SUMD_CONSCIENCE_OPTIONS },
-  { id: 'attribu4', text: '4.2. Attribution des symptomes', help: 'Si conscience = 0 ou 3, l\'attribution est automatiquement "Non cotable".', type: 'single_choice', required: false, options: SUMD_ATTRIBUTION_OPTIONS },
+  { id: 'section_domain4', text: 'Conscience d\'une experience hallucinatoire', type: 'section', required: false, display_if: SHOW_WHEN_TEST_DONE },
+  { id: 'conscience4', text: '4.1. Conscience du trouble', help: 'Le sujet reconnait-il ses hallucinations en tant que telles ?', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_CONSCIENCE_OPTIONS },
+  { id: 'attribu4', text: '4.2. Attribution des symptomes', help: 'Si conscience = 0 ou 3, l\'attribution est automatiquement "Non cotable".', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_ATTRIBUTION_OPTIONS },
   
   // Domain 5: Conscience du delire
-  { id: 'section_domain5', text: 'Conscience du delire', type: 'section', required: false },
-  { id: 'conscience5', text: '5.1. Conscience du trouble', help: 'Le sujet reconnait-il son delire en tant que production interne de croyances erronees ?', type: 'single_choice', required: false, options: SUMD_CONSCIENCE_OPTIONS },
-  { id: 'attribu5', text: '5.2. Attribution des symptomes', type: 'single_choice', required: false, options: SUMD_ATTRIBUTION_OPTIONS },
+  { id: 'section_domain5', text: 'Conscience du delire', type: 'section', required: false, display_if: SHOW_WHEN_TEST_DONE },
+  { id: 'conscience5', text: '5.1. Conscience du trouble', help: 'Le sujet reconnait-il son delire en tant que production interne de croyances erronees ?', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_CONSCIENCE_OPTIONS },
+  { id: 'attribu5', text: '5.2. Attribution des symptomes', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_ATTRIBUTION_OPTIONS },
   
   // Domain 6: Conscience d'un trouble de la pensee
-  { id: 'section_domain6', text: 'Conscience d\'un trouble de la pensee', type: 'section', required: false },
-  { id: 'conscience6', text: '6.1. Conscience du trouble', help: 'Le sujet croit-il que ses communications avec les autres sont perturbees ?', type: 'single_choice', required: false, options: SUMD_CONSCIENCE_OPTIONS },
-  { id: 'attribu6', text: '6.2. Attribution des symptomes', type: 'single_choice', required: false, options: SUMD_ATTRIBUTION_OPTIONS },
+  { id: 'section_domain6', text: 'Conscience d\'un trouble de la pensee', type: 'section', required: false, display_if: SHOW_WHEN_TEST_DONE },
+  { id: 'conscience6', text: '6.1. Conscience du trouble', help: 'Le sujet croit-il que ses communications avec les autres sont perturbees ?', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_CONSCIENCE_OPTIONS },
+  { id: 'attribu6', text: '6.2. Attribution des symptomes', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_ATTRIBUTION_OPTIONS },
   
   // Domain 7: Conscience d'un emoussement affectif
-  { id: 'section_domain7', text: 'Conscience d\'un emoussement affectif', type: 'section', required: false },
-  { id: 'conscience7', text: '7.1. Conscience du trouble', help: 'Le sujet a-t-il conscience de ses affects communiques par le biais de ses expressions, sa voix, sa gesticulation ?', type: 'single_choice', required: false, options: SUMD_CONSCIENCE_OPTIONS },
-  { id: 'attribu7', text: '7.2. Attribution des symptomes', type: 'single_choice', required: false, options: SUMD_ATTRIBUTION_OPTIONS },
+  { id: 'section_domain7', text: 'Conscience d\'un emoussement affectif', type: 'section', required: false, display_if: SHOW_WHEN_TEST_DONE },
+  { id: 'conscience7', text: '7.1. Conscience du trouble', help: 'Le sujet a-t-il conscience de ses affects communiques par le biais de ses expressions, sa voix, sa gesticulation ?', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_CONSCIENCE_OPTIONS },
+  { id: 'attribu7', text: '7.2. Attribution des symptomes', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_ATTRIBUTION_OPTIONS },
   
   // Domain 8: Conscience de l'anhedonie
-  { id: 'section_domain8', text: 'Conscience de l\'anhedonie', type: 'section', required: false },
-  { id: 'conscience8', text: '8.1. Conscience du trouble', help: 'Le sujet est-il conscient de la diminution de son plaisir a participer a des activites suscitant normalement le plaisir ?', type: 'single_choice', required: false, options: SUMD_CONSCIENCE_OPTIONS },
-  { id: 'attribu8', text: '8.2. Attribution des symptomes', type: 'single_choice', required: false, options: SUMD_ATTRIBUTION_OPTIONS },
+  { id: 'section_domain8', text: 'Conscience de l\'anhedonie', type: 'section', required: false, display_if: SHOW_WHEN_TEST_DONE },
+  { id: 'conscience8', text: '8.1. Conscience du trouble', help: 'Le sujet est-il conscient de la diminution de son plaisir a participer a des activites suscitant normalement le plaisir ?', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_CONSCIENCE_OPTIONS },
+  { id: 'attribu8', text: '8.2. Attribution des symptomes', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_ATTRIBUTION_OPTIONS },
   
   // Domain 9: Conscience de l'asociabilite
-  { id: 'section_domain9', text: 'Conscience de l\'asociabilite', type: 'section', required: false },
-  { id: 'conscience9', text: '9.1. Conscience du trouble', help: 'Le patient est-il conscient qu\'il ne montre pas d\'interet pour les relations sociales ?', type: 'single_choice', required: false, options: SUMD_CONSCIENCE_OPTIONS },
-  { id: 'attribu9', text: '9.2. Attribution des symptomes', type: 'single_choice', required: false, options: SUMD_ATTRIBUTION_OPTIONS }
+  { id: 'section_domain9', text: 'Conscience de l\'asociabilite', type: 'section', required: false, display_if: SHOW_WHEN_TEST_DONE },
+  { id: 'conscience9', text: '9.1. Conscience du trouble', help: 'Le patient est-il conscient qu\'il ne montre pas d\'interet pour les relations sociales ?', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_CONSCIENCE_OPTIONS },
+  { id: 'attribu9', text: '9.2. Attribution des symptomes', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: SUMD_ATTRIBUTION_OPTIONS }
 ];
 
 // ============================================================================

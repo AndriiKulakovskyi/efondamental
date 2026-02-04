@@ -18,6 +18,7 @@ export interface SchizophreniaPspResponse {
   domain_d?: string | null;
   interval_selection?: number | null;
   final_score?: number | null;
+  test_done?: boolean;
   completed_by?: string | null;
   completed_at?: string | null;
   created_at?: string;
@@ -46,20 +47,33 @@ const PSP_SEVERITY_OPTIONS = [
 // Questions
 // ============================================================================
 
+const SHOW_WHEN_TEST_DONE = { '==': [{ 'var': 'test_done' }, 'oui'] };
+
 export const PSP_QUESTIONS: Question[] = [
-  { id: 'psp_instructions', text: 'Instructions', help: 'Evaluez le fonctionnement du patient au cours du mois dernier selon un processus en 3 etapes.', type: 'instruction', required: false },
+  {
+    id: 'test_done',
+    text: 'Passation du questionnaire fait',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui', score: 0 },
+      { code: 'non', label: 'Non', score: 1 }
+    ]
+  },
+  { id: 'psp_instructions', text: 'Instructions', help: 'Evaluez le fonctionnement du patient au cours du mois dernier selon un processus en 3 etapes.', type: 'instruction', required: false, display_if: SHOW_WHEN_TEST_DONE },
   
-  { id: 'step1_header', text: 'Etape 1: Evaluer le niveau de fonctionnement dans les 4 domaines', type: 'section', required: false },
-  { id: 'domain_a', text: '(a) Activites socialement utiles', help: 'Incluant le travail, les etudes, le maintien du domicile, le travail volontaire, les passe-temps utiles.', type: 'single_choice', required: false, options: PSP_SEVERITY_OPTIONS },
-  { id: 'domain_b', text: '(b) Relations personnelles et sociales', help: 'Relations avec un partenaire, des proches, ainsi que les relations sociales.', type: 'single_choice', required: false, options: PSP_SEVERITY_OPTIONS },
-  { id: 'domain_c', text: '(c) Souci de soi', help: 'Hygiene personnelle, apparence, habillement.', type: 'single_choice', required: false, options: PSP_SEVERITY_OPTIONS },
-  { id: 'domain_d', text: '(d) Comportements perturbateurs et agressifs', help: 'Frequent = comportement survenu plus d\'une fois ou pouvant probablement survenir dans les 6 mois.', type: 'single_choice', required: false, options: PSP_SEVERITY_OPTIONS },
+  { id: 'step1_header', text: 'Etape 1: Evaluer le niveau de fonctionnement dans les 4 domaines', type: 'section', required: false, display_if: SHOW_WHEN_TEST_DONE },
+  { id: 'domain_a', text: '(a) Activites socialement utiles', help: 'Incluant le travail, les etudes, le maintien du domicile, le travail volontaire, les passe-temps utiles.', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: PSP_SEVERITY_OPTIONS },
+  { id: 'domain_b', text: '(b) Relations personnelles et sociales', help: 'Relations avec un partenaire, des proches, ainsi que les relations sociales.', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: PSP_SEVERITY_OPTIONS },
+  { id: 'domain_c', text: '(c) Souci de soi', help: 'Hygiene personnelle, apparence, habillement.', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: PSP_SEVERITY_OPTIONS },
+  { id: 'domain_d', text: '(d) Comportements perturbateurs et agressifs', help: 'Frequent = comportement survenu plus d\'une fois ou pouvant probablement survenir dans les 6 mois.', type: 'single_choice', required: false, display_if: SHOW_WHEN_TEST_DONE, options: PSP_SEVERITY_OPTIONS },
   
-  { id: 'step2_header', text: 'Etape 2: Choisir un intervalle de 10 points', type: 'section', required: false },
+  { id: 'step2_header', text: 'Etape 2: Choisir un intervalle de 10 points', type: 'section', required: false, display_if: SHOW_WHEN_TEST_DONE },
   {
     id: 'interval_selection', text: 'Intervalle de 10 points',
     help: 'Selectionnez l\'intervalle correspondant au profil de severite du patient.',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 1, label: '91-100: Tres bon fonctionnement dans les 4 domaines', score: 1 },
       { code: 2, label: '81-90: Bon fonctionnement, difficultes courantes seulement', score: 2 },
@@ -74,8 +88,8 @@ export const PSP_QUESTIONS: Question[] = [
     ]
   },
   
-  { id: 'step3_header', text: 'Etape 3: Ajuster le score final', help: 'Ajustez le score en tenant compte d\'autres domaines: sante, logement, activites menageres, relations intimes, soins aux enfants, reseau social, regles sociales, interets, gestion financiere, transports, capacite a affronter les crises.', type: 'section', required: false },
-  { id: 'final_score', text: 'Score PSP final (1-100)', help: 'Entrez le score final entre 1 et 100.', type: 'number', required: false }
+  { id: 'step3_header', text: 'Etape 3: Ajuster le score final', help: 'Ajustez le score en tenant compte d\'autres domaines: sante, logement, activites menageres, relations intimes, soins aux enfants, reseau social, regles sociales, interets, gestion financiere, transports, capacite a affronter les crises.', type: 'section', required: false, display_if: SHOW_WHEN_TEST_DONE },
+  { id: 'final_score', text: 'Score PSP final (1-100)', help: 'Entrez le score final entre 1 et 100.', type: 'number', required: false, display_if: SHOW_WHEN_TEST_DONE }
 ];
 
 // ============================================================================

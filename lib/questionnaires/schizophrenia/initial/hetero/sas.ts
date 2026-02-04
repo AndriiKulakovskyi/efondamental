@@ -24,6 +24,7 @@ export interface SchizophreniaSasResponse {
   q10?: number | null;
   total_score?: number | null;
   mean_score?: number | null;
+  test_done?: boolean;
   completed_by?: string | null;
   completed_at?: string | null;
   created_at?: string;
@@ -39,13 +40,26 @@ export type SchizophreniaSasResponseInsert = Omit<
 // Questions
 // ============================================================================
 
+const SHOW_WHEN_TEST_DONE = { '==': [{ 'var': 'test_done' }, 'oui'] };
+
 export const SAS_QUESTIONS: Question[] = [
-  { id: 'sas_instructions', text: 'Instructions', help: 'L\'examinateur effectue une serie de tests physiques et d\'observations pour evaluer les signes extrapyramidaux. Le score total est la moyenne des 10 items (somme / 10).', type: 'instruction', required: false },
+  {
+    id: 'test_done',
+    text: 'Passation du questionnaire fait',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui', score: 0 },
+      { code: 'non', label: 'Non', score: 1 }
+    ]
+  },
+  { id: 'sas_instructions', text: 'Instructions', help: 'L\'examinateur effectue une serie de tests physiques et d\'observations pour evaluer les signes extrapyramidaux. Le score total est la moyenne des 10 items (somme / 10).', type: 'instruction', required: false, display_if: SHOW_WHEN_TEST_DONE },
   
   {
     id: 'q1', text: '1. Demarche',
     help: 'Le patient est examine pendant qu\'il marche dans la salle d\'examen.',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Normal', score: 0 },
       { code: 1, label: 'Diminution du ballant des bras a la marche', score: 1 },
@@ -58,6 +72,7 @@ export const SAS_QUESTIONS: Question[] = [
     id: 'q2', text: '2. Chute des bras',
     help: 'Le patient et l\'examinateur levent tous les deux les bras jusqu\'a la hauteur des epaules et les laissent tomber sur les cotes.',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Normal. Chute libre avec fort claquement et rebond', score: 0 },
       { code: 1, label: 'Chute legerement ralentie avec contact moins audible et petit rebond', score: 1 },
@@ -70,6 +85,7 @@ export const SAS_QUESTIONS: Question[] = [
     id: 'q3', text: '3. Mouvements passifs de l\'epaule',
     help: 'Les coudes sont maintenus flechis a angle droit et les bras sont pris l\'un apres l\'autre par l\'examinateur.',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Normal', score: 0 },
       { code: 1, label: 'Rigidite et resistance legeres', score: 1 },
@@ -82,6 +98,7 @@ export const SAS_QUESTIONS: Question[] = [
     id: 'q4', text: '4. Rigidite du coude',
     help: 'Les deux articulations du coude sont maintenues l\'une apres l\'autre a angle droit puis etendues, flechies d\'une maniere passive.',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Normal', score: 0 },
       { code: 1, label: 'Rigidite et resistance legeres', score: 1 },
@@ -94,6 +111,7 @@ export const SAS_QUESTIONS: Question[] = [
     id: 'q5', text: '5. Maintien des attitudes ou rigidite du poignet',
     help: 'Le poignet est tenu d\'une main et les doigts sont tenus par l\'autre main de l\'examinateur.',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Normal', score: 0 },
       { code: 1, label: 'Rigidite et resistance legeres', score: 1 },
@@ -106,6 +124,7 @@ export const SAS_QUESTIONS: Question[] = [
     id: 'q6', text: '6. Mouvement pendulaire de la jambe',
     help: 'Le patient s\'assoit sur une table avec les jambes pendantes et bougeant librement.',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'La jambe balance librement', score: 0 },
       { code: 1, label: 'Legere diminution du ballant des jambes', score: 1 },
@@ -118,6 +137,7 @@ export const SAS_QUESTIONS: Question[] = [
     id: 'q7', text: '7. Chute de la tete',
     help: 'Le patient s\'allonge sur une table d\'examen bien rembourree et l\'examinateur souleve la tete du patient.',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'La tete tombe completement avec un bruit distinct', score: 0 },
       { code: 1, label: 'Leger ralentissement dans la chute de la tete', score: 1 },
@@ -130,6 +150,7 @@ export const SAS_QUESTIONS: Question[] = [
     id: 'q8', text: '8. Percussion de la glabelle (reflexe naso-palpebral)',
     help: 'On demande au sujet d\'ouvrir grand les yeux et de ne pas cligner des yeux. La glabelle est tapee doucement.',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: '0-5 clignements', score: 0 },
       { code: 1, label: '6-10 clignements', score: 1 },
@@ -142,6 +163,7 @@ export const SAS_QUESTIONS: Question[] = [
     id: 'q9', text: '9. Tremblement',
     help: 'Le patient est observe lorsqu\'il entre dans la salle d\'examen puis il est reexamine.',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Normal', score: 0 },
       { code: 1, label: 'Leger tremblement des doigts', score: 1 },
@@ -154,6 +176,7 @@ export const SAS_QUESTIONS: Question[] = [
     id: 'q10', text: '10. Salivation',
     help: 'Le patient est observe quand il parle. On lui demande d\'ouvrir la bouche et de soulever la langue.',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Normal', score: 0 },
       { code: 1, label: 'Salivation excessive au point qu\'une flaque apparait si la bouche est ouverte', score: 1 },

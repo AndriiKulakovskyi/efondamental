@@ -25,6 +25,7 @@ export interface SchizophreniaYmrsResponse {
   total_score: number | null;
   severity: string | null;
   interpretation: string | null;
+  test_done?: boolean;
   completed_by: string | null;
   completed_at: string;
   created_at: string;
@@ -42,12 +43,25 @@ export type SchizophreniaYmrsResponseInsert = Omit<
 // Questions Dictionary
 // ============================================================================
 
+const SHOW_WHEN_TEST_DONE = { '==': [{ 'var': 'test_done' }, 'oui'] };
+
 export const YMRS_SZ_QUESTIONS: Question[] = [
+  {
+    id: 'test_done',
+    text: 'Passation du questionnaire fait',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui', score: 0 },
+      { code: 'non', label: 'Non', score: 1 }
+    ]
+  },
   {
     id: 'q1',
     text: "1. Elevation de l'humeur",
     type: 'single_choice',
     required: true,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Absente', score: 0 },
       { code: 1, label: "Legerement ou possiblement elevee lorsqu'on l'interroge", score: 1 },
@@ -61,6 +75,7 @@ export const YMRS_SZ_QUESTIONS: Question[] = [
     text: "2. Activite motrice et energie augmentees",
     type: 'single_choice',
     required: true,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Absentes', score: 0 },
       { code: 1, label: 'Subjectivement elevees', score: 1 },
@@ -74,6 +89,7 @@ export const YMRS_SZ_QUESTIONS: Question[] = [
     text: '3. Interet sexuel',
     type: 'single_choice',
     required: true,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Normal, non augmente', score: 0 },
       { code: 1, label: 'Augmentation legere ou possible', score: 1 },
@@ -87,6 +103,7 @@ export const YMRS_SZ_QUESTIONS: Question[] = [
     text: '4. Sommeil',
     type: 'single_choice',
     required: true,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Ne rapporte pas de diminution de sommeil', score: 0 },
       { code: 1, label: "Dort jusqu'a une heure de moins que d'habitude", score: 1 },
@@ -101,6 +118,7 @@ export const YMRS_SZ_QUESTIONS: Question[] = [
     help: 'Cet item est cote sur une echelle de 0 a 8.',
     type: 'single_choice',
     required: true,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Absente', score: 0 },
       { code: 2, label: 'Subjectivement augmentee', score: 2 },
@@ -115,6 +133,7 @@ export const YMRS_SZ_QUESTIONS: Question[] = [
     help: 'Cet item est cote sur une echelle de 0 a 8.',
     type: 'single_choice',
     required: true,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Pas augmente', score: 0 },
       { code: 2, label: 'Se sent bavard', score: 2 },
@@ -128,6 +147,7 @@ export const YMRS_SZ_QUESTIONS: Question[] = [
     text: '7. Langage - troubles de la pensee',
     type: 'single_choice',
     required: true,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Absent', score: 0 },
       { code: 1, label: 'Circonstanciel; legere distractivite; pensees rapides', score: 1 },
@@ -142,6 +162,7 @@ export const YMRS_SZ_QUESTIONS: Question[] = [
     help: 'Cet item est cote sur une echelle de 0 a 8.',
     type: 'single_choice',
     required: true,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Normal', score: 0 },
       { code: 2, label: 'Projets discutables; interets nouveaux', score: 2 },
@@ -156,6 +177,7 @@ export const YMRS_SZ_QUESTIONS: Question[] = [
     help: 'Cet item est cote sur une echelle de 0 a 8.',
     type: 'single_choice',
     required: true,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Absent, cooperatif', score: 0 },
       { code: 2, label: 'Sarcastique; parle fort par moment, sur la defensive', score: 2 },
@@ -169,6 +191,7 @@ export const YMRS_SZ_QUESTIONS: Question[] = [
     text: '10. Apparence',
     type: 'single_choice',
     required: true,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Soignee et habillement adequat', score: 0 },
       { code: 1, label: 'Legerement neglige', score: 1 },
@@ -182,6 +205,7 @@ export const YMRS_SZ_QUESTIONS: Question[] = [
     text: '11. Introspection',
     type: 'single_choice',
     required: true,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Presente; admet etre malade; reconnait le besoin de traitement', score: 0 },
       { code: 1, label: 'Eventuellement malade', score: 1 },

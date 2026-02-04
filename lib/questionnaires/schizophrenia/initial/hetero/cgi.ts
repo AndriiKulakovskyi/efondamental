@@ -23,6 +23,7 @@ export interface SchizophreniaCgiResponse {
   therapeutic_index: number | null;
   therapeutic_index_label: string | null;
   visit_type: string | null;
+  test_done?: boolean;
 }
 
 export type SchizophreniaCgiResponseInsert = Omit<
@@ -36,14 +37,27 @@ export type SchizophreniaCgiResponseInsert = Omit<
 // Questions Dictionary
 // ============================================================================
 
+const SHOW_WHEN_TEST_DONE = { '==': [{ 'var': 'test_done' }, 'oui'] };
+
 export const CGI_SZ_QUESTIONS: Question[] = [
+  {
+    id: 'test_done',
+    text: 'Passation du questionnaire fait',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui', score: 0 },
+      { code: 'non', label: 'Non', score: 1 }
+    ]
+  },
   // CGI - 1ere partie
   {
     id: 'section_cgi_1',
     text: 'CGI - 1ere partie',
     help: 'Completer l\'item (gravite de la maladie) lors de l\'evaluation initiale et des evaluations suivantes.',
     type: 'section',
-    required: false
+    required: false,
+    display_if: SHOW_WHEN_TEST_DONE
   },
   {
     id: 'cgi_s',
@@ -51,6 +65,7 @@ export const CGI_SZ_QUESTIONS: Question[] = [
     help: 'En fonction de votre experience clinique totale avec ce type de patient, quel est le niveau de gravite des troubles mentaux actuels du patient',
     type: 'single_choice',
     required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Non evalue', score: 0 },
       { code: 1, label: 'Normal, pas du tout malade', score: 1 },
@@ -69,7 +84,8 @@ export const CGI_SZ_QUESTIONS: Question[] = [
     text: 'CGI - 2eme partie',
     help: 'Partie a ne completer que dans les visites de suivi',
     type: 'section',
-    required: false
+    required: false,
+    display_if: SHOW_WHEN_TEST_DONE
   },
   {
     id: 'cgi_i',
@@ -77,6 +93,7 @@ export const CGI_SZ_QUESTIONS: Question[] = [
     help: 'Evaluer l\'amelioration totale qu\'elle soit ou non, selon votre opinion, due entierement au traitement medicamenteux. Compare a son etat au debut du traitement, de quelle facon le patient a-t-il change',
     type: 'single_choice',
     required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Non evalue', score: 0 },
       { code: 1, label: 'Tres fortement ameliore', score: 1 },
@@ -95,7 +112,8 @@ export const CGI_SZ_QUESTIONS: Question[] = [
     text: 'CGI - 3eme partie : Index therapeutique',
     help: 'Evaluer cet item uniquement en fonction de l\'effet du medicament.',
     type: 'section',
-    required: false
+    required: false,
+    display_if: SHOW_WHEN_TEST_DONE
   },
   {
     id: 'therapeutic_effect',
@@ -103,6 +121,7 @@ export const CGI_SZ_QUESTIONS: Question[] = [
     help: 'Evaluer cet item uniquement en fonction de l\'effet du medicament.',
     type: 'single_choice',
     required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
       { code: 0, label: 'Non evalue', score: 0 },
       { code: 1, label: 'Important', score: 1 },
@@ -116,7 +135,7 @@ export const CGI_SZ_QUESTIONS: Question[] = [
     text: 'Effets secondaires',
     type: 'single_choice',
     required: false,
-    display_if: { 'in': [{ 'var': 'therapeutic_effect' }, [1, 2, 3, 4]] },
+    display_if: { 'and': [SHOW_WHEN_TEST_DONE, { 'in': [{ 'var': 'therapeutic_effect' }, [1, 2, 3, 4]] }] },
     options: [
       { code: 0, label: 'Aucun', score: 0 },
       { code: 1, label: 'N\'interferent pas significativement avec le fonctionnement du patient', score: 1 },

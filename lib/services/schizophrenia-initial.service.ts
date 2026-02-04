@@ -566,6 +566,7 @@ export async function saveBarsResponse(response: any): Promise<any> {
 
   const {
     bars_instructions,
+    estimation_observance,
     ...responseData
   } = response;
 
@@ -596,6 +597,8 @@ export async function saveBarsResponse(response: any): Promise<any> {
       ...responseData,
       adherence_score,
       interpretation,
+      estimation_observance,
+      test_done: response.test_done === 'oui',
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
@@ -651,6 +654,7 @@ export async function saveSumdResponse(response: any): Promise<any> {
       attribu7,
       attribu8,
       attribu9,
+      test_done: response.test_done === 'oui',
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
@@ -714,6 +718,7 @@ export async function saveAimsResponse(response: any): Promise<any> {
       ...responseData,
       movement_score,
       interpretation,
+      test_done: response.test_done === 'oui',
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
@@ -772,6 +777,7 @@ export async function saveBarnesResponse(response: any): Promise<any> {
       objective_subjective_score,
       global_score,
       interpretation,
+      test_done: response.test_done === 'oui',
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
@@ -827,6 +833,7 @@ export async function saveSasResponse(response: any): Promise<any> {
       ...responseData,
       mean_score,
       interpretation,
+      test_done: response.test_done === 'oui',
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
@@ -883,6 +890,7 @@ export async function savePspResponse(response: any): Promise<any> {
     .upsert({
       ...responseData,
       interpretation,
+      test_done: response.test_done === 'oui',
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()
@@ -5136,6 +5144,7 @@ export async function saveYmrsSzResponse(response: any): Promise<any> {
       total_score: scores.total_score,
       severity: scores.severity,
       interpretation: scores.interpretation,
+      test_done: response.test_done === 'oui',
       completed_by: user?.id
     }, { onConflict: 'visit_id' })
     .select()
@@ -5162,18 +5171,25 @@ export async function saveCgiSzResponse(response: any): Promise<any> {
   let therapeutic_index = null;
   let therapeutic_index_label = null;
   
-  if (response.therapeutic_effect != null && response.side_effects != null) {
-    therapeutic_index = response.therapeutic_effect - response.side_effects;
+  if (response.therapeutic_effect != null && response.side_effects != null && response.therapeutic_effect > 0) {
+    // Formula: 4 * (Effet - 1) + SideEffects + 1
+    // Range: 1 to 16
+    const therapeuticWeight = response.therapeutic_effect - 1;
+    therapeutic_index = response.side_effects + (4 * therapeuticWeight) + 1;
     
-    if (therapeutic_index >= 3) {
-      therapeutic_index_label = 'Effet therapeutique excellent';
-    } else if (therapeutic_index >= 1) {
-      therapeutic_index_label = 'Effet therapeutique satisfaisant';
-    } else if (therapeutic_index >= -1) {
-      therapeutic_index_label = 'Effet therapeutique modere';
+    // Determine label based on index value (1-16)
+    if (therapeutic_index <= 4) {
+      therapeutic_index_label = 'Très bon rapport bénéfice/risque';
+    } else if (therapeutic_index <= 8) {
+      therapeutic_index_label = 'Bon rapport bénéfice/risque';
+    } else if (therapeutic_index <= 12) {
+      therapeutic_index_label = 'Rapport bénéfice/risque modéré';
     } else {
-      therapeutic_index_label = 'Effet therapeutique insuffisant';
+      therapeutic_index_label = 'Mauvais rapport bénéfice/risque';
     }
+  } else if (response.therapeutic_effect === 0) {
+    therapeutic_index = 0;
+    therapeutic_index_label = 'Non évalué';
   }
   
   // Interpret CGI scores
@@ -5186,6 +5202,7 @@ export async function saveCgiSzResponse(response: any): Promise<any> {
       interpretation: interpretation.interpretation,
       therapeutic_index,
       therapeutic_index_label,
+      test_done: response.test_done === 'oui',
       completed_by: user?.id
     }, { onConflict: 'visit_id' })
     .select()
@@ -5215,6 +5232,7 @@ export async function saveEgfSzResponse(response: any): Promise<any> {
     .upsert({
       ...response,
       interpretation: scores.interpretation,
+      test_done: response.test_done === 'oui',
       completed_by: user?.id
     }, { onConflict: 'visit_id' })
     .select()
