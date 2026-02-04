@@ -12,6 +12,8 @@ import { scoreFast } from '@/lib/questionnaires/bipolar/initial/thymic/fast';
 import { scoreAlda } from '@/lib/questionnaires/bipolar/initial/thymic/alda';
 import { scoreEgf } from '@/lib/questionnaires/bipolar/initial/thymic/egf';
 import { scoreEtatPatient } from '@/lib/questionnaires/bipolar/initial/thymic/etat-patient';
+import { interpretCgi } from '@/lib/questionnaires/bipolar/initial/thymic/cgi';
+import { computeEq5d5lScores } from '@/lib/questionnaires/bipolar/initial/auto/etat/eq5d5l';
 import { scoreFagerstrom } from '@/lib/questionnaires/bipolar/initial/nurse/fagerstrom';
 import { scoreStopBang } from '@/lib/questionnaires/bipolar/initial/nurse/sleep-apnea';
 import { scoreIsaFollowup } from '@/lib/questionnaires/bipolar/followup/suicide/isa-followup';
@@ -41,6 +43,18 @@ export const SCORING_FUNCTION_REGISTRY: Record<string, ScoringFunction> = {
   'MDQ': (responses) => scoreMdq(responses as any),
   'QIDS_SR16': (responses) => scoreQids(responses as any),
   
+  // Auto ETAT Module
+  'EQ5D5L': (responses) => {
+    // EQ5D5L - EuroQol 5 Dimensions health state computation
+    const result = computeEq5d5lScores(responses as any);
+    return {
+      health_state: result.profile_string,
+      profile_string: result.profile_string,
+      index_value: result.index_value,
+      interpretation: result.interpretation
+    };
+  },
+  
   // Thymic Module
   'MADRS': (responses) => scoreMadrs(responses as any),
   'YMRS': (responses) => scoreYmrs(responses as any),
@@ -52,6 +66,13 @@ export const SCORING_FUNCTION_REGISTRY: Record<string, ScoringFunction> = {
     return scoreEgf(score);
   },
   'ETAT_PATIENT': (responses) => scoreEtatPatient(responses as any),
+  'CGI': (responses) => {
+    // CGI - Clinical Global Impression interpretation
+    const result = interpretCgi(responses.cgi_s, responses.cgi_i);
+    return {
+      interpretation: result.interpretation
+    };
+  },
   
   // Nurse Module
   'FAGERSTROM': (responses) => scoreFagerstrom(responses as any),
@@ -71,21 +92,22 @@ export const SCORING_FUNCTION_REGISTRY: Record<string, ScoringFunction> = {
  * from raw data insertion and populated via scoring functions.
  */
 export const COMPUTED_FIELDS_BY_QUESTIONNAIRE: Record<string, string[]> = {
-  'ASRM': ['total_score', 'interpretation', 'is_positive'],
-  'MDQ': ['q1_score', 'interpretation', 'is_positive'],
-  'QIDS_SR16': ['total_score', 'interpretation', 'severity', 'domain_scores'],
-  'MADRS': ['total_score', 'severity', 'interpretation'],
-  'YMRS': ['total_score', 'severity', 'interpretation'],
-  'FAST': ['total_score', 'autonomy_score', 'work_score', 'cognitive_score', 'finances_score', 'relationships_score', 'leisure_score', 'severity', 'interpretation'],
-  'ALDA': ['score_a', 'score_b', 'total_score', 'interpretation'],
-  'EGF': ['level', 'interpretation'],
-  'ETAT_PATIENT': ['depressive_count', 'manic_count', 'interpretation'],
-  'FAGERSTROM': ['total_score', 'dependence_level', 'interpretation'],
+  // Only include fields that actually exist in the database tables
+  'ASRM': ['total_score', 'interpretation'],
+  'MDQ': ['q1_score', 'interpretation'],
+  'QIDS_SR16': ['total_score', 'interpretation'],
+  'MADRS': ['total_score', 'interpretation'],
+  'YMRS': ['total_score', 'interpretation'],
+  'FAST': ['total_score', 'autonomy_score', 'work_score', 'cognitive_score', 'finances_score', 'relationships_score', 'leisure_score', 'interpretation'],
+  'ALDA': ['score_a', 'b_total_score', 'total_score', 'alda_score', 'interpretation'],
+  'EGF': ['interpretation'],
+  'ETAT_PATIENT': ['depression_count', 'mania_count', 'interpretation'],
+  'FAGERSTROM': ['total_score', 'interpretation'],
   'SLEEP_APNEA': ['stop_bang_score', 'risk_level', 'interpretation'],
-  'ISA_SUIVI': ['total_score', 'risk_level', 'risk_level_label', 'has_recent_ideation', 'interpretation'],
-  'SUICIDE_BEHAVIOR_FOLLOWUP': ['risk_score', 'risk_level', 'risk_level_label', 'has_self_harm', 'has_interrupted_attempt', 'has_aborted_attempt', 'has_preparations', 'total_attempt_count', 'interpretation'],
-  'CGI': ['interpretation'], // CGI has interpretation but no scoring function
-  'EQ5D5L': ['total_score'], // EQ5D5L may have computed total
+  'ISA_SUIVI': ['total_score', 'interpretation'],
+  'SUICIDE_BEHAVIOR_FOLLOWUP': ['interpretation'],
+  'CGI': ['interpretation'],
+  'EQ5D5L': ['health_state', 'profile_string', 'index_value', 'interpretation'],
 };
 
 // ============================================================================
@@ -170,6 +192,28 @@ export function computeScores(
 }
 
 /**
+ * Fields that scoring functions return but don't exist in database tables.
+ * These will be filtered out before updating.
+ */
+const NON_DB_FIELDS = [
+  'is_positive',      // ASRM, MDQ return this but it's not a DB column
+  'severity',         // QIDS, MADRS, YMRS return this but it's not a DB column
+  'level',            // EGF returns this but it's not a DB column
+  'domain_scores',    // QIDS returns this nested object
+  'risk_level_label', // Some suicide questionnaires return this
+  'has_recent_ideation', // Suicide questionnaires
+  'has_self_harm',    // Suicide questionnaires
+  'has_interrupted_attempt', // Suicide questionnaires
+  'has_aborted_attempt',     // Suicide questionnaires
+  'has_preparations',        // Suicide questionnaires
+  'total_attempt_count',     // Suicide questionnaires
+  'risk_score',              // Mapped to total_score instead
+  'dependence_level',        // Fagerstrom
+  'q2_concurrent',    // MDQ returns this but it's not a DB column
+  'q3_impact_level',  // MDQ returns this but it's not a DB column
+];
+
+/**
  * Map scoring result fields to database column names.
  * Some scoring functions return fields with different names than the database columns.
  */
@@ -180,36 +224,23 @@ export function mapScoringResultToDbColumns(
   const normalizedCode = normalizeQuestionnaireCode(code);
   const mapped: Record<string, any> = { ...scoringResult };
   
+  // Remove fields that don't exist in the database
+  for (const field of NON_DB_FIELDS) {
+    delete mapped[field];
+  }
+  
   // Handle specific field mappings per questionnaire
   switch (normalizedCode) {
     case 'SLEEP_APNEA':
       // Map stop_bang_score to total_score for DB
       if ('stop_bang_score' in mapped) {
-        mapped.total_score = mapped.stop_bang_score;
-        delete mapped.stop_bang_score;
+        mapped.stop_bang_score = mapped.stop_bang_score;
       }
       break;
     case 'ISA_SUIVI':
     case 'SUICIDE_BEHAVIOR_FOLLOWUP':
-      // Map risk_score to total_score if needed
-      if ('risk_score' in mapped && !('total_score' in mapped)) {
-        mapped.total_score = mapped.risk_score;
-      }
-      break;
-    case 'EGF':
-      // EGF scoring returns egf_score, level, interpretation
-      // No mapping needed
-      break;
-    case 'MDQ':
-      // MDQ has specific fields that don't map directly
-      // q1_score is already correctly named
-      break;
-    case 'QIDS_SR16':
-      // domain_scores is a nested object, we may need to flatten or store as JSON
-      // For now, remove it as it may not be a direct column
-      if ('domain_scores' in mapped) {
-        delete mapped.domain_scores;
-      }
+      // These questionnaires map risk_score to total_score
+      // Already removed risk_score above
       break;
     case 'FAST':
       // FAST has all fields correctly mapped

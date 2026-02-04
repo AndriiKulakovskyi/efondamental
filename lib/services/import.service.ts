@@ -312,7 +312,7 @@ export async function importPatientData(
                 patient_id: newPatient.id,
                 visit_template_id: visitTemplateId,
                 visit_type: visitData.visit_type as VisitType,
-                visit_number: visitData.visit_number || null, // Auto-assigned by trigger if null
+                visit_number: visitData.visit_number || null,
                 scheduled_date: visitData.scheduled_date,
                 completed_date: visitData.completed_date,
                 status: visitData.status || VisitStatus.COMPLETED,
