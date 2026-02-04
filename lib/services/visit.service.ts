@@ -290,7 +290,9 @@ import {
 } from './questionnaire-schizophrenia.service';
 import {
   getSchizophreniaInitialCompletionStatus as checkSchizophreniaInitialCompletion,
-  SCHIZOPHRENIA_INITIAL_TABLES
+  SCHIZOPHRENIA_INITIAL_TABLES,
+  getDossierInfirmierSzResponse,
+  getBilanBiologiqueSzResponse
 } from './schizophrenia-initial.service';
 import { getPatientById } from './patient.service';
 
@@ -1151,6 +1153,23 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
   }
 
   if (visit.visit_type === 'annual_evaluation') {
+    // Get patient to determine pathology-specific modules
+    const patient = await getPatientById(visit.patient_id);
+    const pathologyType = patient?.pathology_type;
+    
+    // Schizophrenia annual evaluation - uses same nurse module as initial visit
+    if (pathologyType === 'schizophrenia') {
+      return [
+        {
+          id: 'mod_nurse',
+          name: 'Infirmier',
+          description: 'Évaluation par l\'infirmier',
+          questionnaires: [SZ_DOSSIER_INFIRMIER_DEFINITION, SZ_BILAN_BIOLOGIQUE_DEFINITION]
+        }
+      ];
+    }
+    
+    // Bipolar annual evaluation modules
     return [
       {
         id: 'mod_nurse',
@@ -1581,135 +1600,153 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (somatiqueContraceptif) completed++;
     if (statutProfessionnel) completed++;
   } else if (visit.visit_type === 'annual_evaluation') {
-    // Annual evaluation: 7 infirmier + 7 thymic + 19 medical + 9 auto etat + 6 soin_suivi = 48 total
-    total = 48;
-    totalModules = 5;
-
-    const [
-      // Infirmier questionnaires (7)
-      tobacco, fagerstrom, physicalParams, bloodPressure, ecg, sleepApnea, biologicalAssessment,
-      // Thymic evaluation questionnaires (7)
-      madrs, alda, ymrs, fast, cgi, egf, etatPatient,
-      // Medical evaluation questionnaires (19)
-      dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs, isaFollowup, sis, suicideHistory,
-      perinatalite, pathoNeuro, pathoCardio, pathoEndoc, pathoDermato, pathoUrinaire, antecedentsGyneco, pathoHepatoGastro, pathoAllergique, autresPatho,
-      // Auto-questionnaires ETAT (9)
-      eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,
-      // Soin, suivi et arret de travail questionnaires (separate tables now)
-      suiviRecommandations, recoursAuxSoins, traitementNonPharma, arretsTravail, somatiqueContraceptif, statutProfessionnel
-    ] = await Promise.all([
-      // Infirmier questionnaires
-      getTobaccoResponse(visitId),
-      getFagerstromResponse(visitId),
-      getPhysicalParamsResponse(visitId),
-      getBloodPressureResponse(visitId),
-      getEcgResponse(visitId),
-      getSleepApneaResponse(visitId),
-      getBiologicalAssessmentResponse(visitId),
-      // Thymic evaluation questionnaires
-      getMadrsResponse(visitId),
-      getAldaResponse(visitId),
-      getYmrsResponse(visitId),
-      getFastResponse(visitId),
-      getCgiResponse(visitId),
-      getEgfResponse(visitId),
-      getEtatPatientResponse(visitId),
-      // Medical evaluation questionnaires
-      getDsm5HumeurResponse(visitId),
-      getDsm5PsychoticResponse(visitId),
-      getDsm5ComorbidResponse(visitId),
-      getDivaResponse(visitId),
-      getFamilyHistoryResponse(visitId),
-      getCssrsResponse(visitId),
-      getIsaFollowupResponse(visitId),
-      getSisResponse(visitId),
-      getSuicideHistoryResponse(visitId),
-      getPerinataliteResponse(visitId),
-      getPathoNeuroResponse(visitId),
-      getPathoCardioResponse(visitId),
-      getPathoEndocResponse(visitId),
-      getPathoDermatoResponse(visitId),
-      getPathoUrinaireResponse(visitId),
-      getAntecedentsGynecoResponse(visitId),
-      getPathoHepatoGastroResponse(visitId),
-      getPathoAllergiqueResponse(visitId),
-      getAutresPathoResponse(visitId),
-      // Auto-questionnaires ETAT
-      getEq5d5lResponse(visitId),
-      getPriseMResponse(visitId),
-      getStaiYaResponse(visitId),
-      getMarsResponse(visitId),
-      getMathysResponse(visitId),
-      getAsrmResponse(visitId),
-      getQidsResponse(visitId),
-      getPsqiResponse(visitId),
-      getEpworthResponse(visitId),
-      // Soin, suivi et arret de travail (separate tables now)
-      getSuiviRecommandationsResponse(visitId),
-      getRecoursAuxSoinsResponse(visitId),
-      getTraitementNonPharmaResponse(visitId),
-      getArretsTravailResponse(visitId),
-      getSomatiqueContraceptifResponse(visitId),
-      getStatutProfessionnelResponse(visitId)
-    ]);
-
-    // Count infirmier questionnaires
-    if (tobacco) completed++;
-    if (fagerstrom) completed++;
-    if (physicalParams) completed++;
-    if (bloodPressure) completed++;
-    if (ecg) completed++;
-    if (sleepApnea) completed++;
-    if (biologicalAssessment) completed++;
-
-    // Count thymic evaluation
-    if (madrs) completed++;
-    if (alda) completed++;
-    if (ymrs) completed++;
-    if (fast) completed++;
-    if (cgi) completed++;
-    if (egf) completed++;
-    if (etatPatient) completed++;
+    // Get patient to determine pathology-specific completion tracking
+    const patient = await getPatientById(visit.patient_id);
+    const pathologyType = patient?.pathology_type;
     
-    // Count medical evaluation
-    if (dsm5Humeur) completed++;
-    if (dsm5Psychotic) completed++;
-    if (dsm5Comorbid) completed++;
-    if (diva) completed++;
-    if (familyHistory) completed++;
-    if (cssrs) completed++;
-    if (isaFollowup) completed++;
-    if (sis) completed++;
-    if (suicideHistory) completed++;
-    if (perinatalite) completed++;
-    if (pathoNeuro) completed++;
-    if (pathoCardio) completed++;
-    if (pathoEndoc) completed++;
-    if (pathoDermato) completed++;
-    if (pathoUrinaire) completed++;
-    if (antecedentsGyneco) completed++;
-    if (pathoHepatoGastro) completed++;
-    if (pathoAllergique) completed++;
-    if (autresPatho) completed++;
-    
-    // Count auto-questionnaires ETAT
-    if (eq5d5l) completed++;
-    if (priseM) completed++;
-    if (staiYa) completed++;
-    if (mars) completed++;
-    if (mathys) completed++;
-    if (asrm) completed++;
-    if (qids) completed++;
-    if (psqi) completed++;
-    if (epworth) completed++;
-    
-    // Count soin, suivi et arret de travail (6 separate tables now)
-    if (suiviRecommandations) completed++;
-    if (recoursAuxSoins) completed++;
-    if (traitementNonPharma) completed++;
-    if (arretsTravail) completed++;
-    if (somatiqueContraceptif) completed++;
-    if (statutProfessionnel) completed++;
+    if (pathologyType === 'schizophrenia') {
+      // Schizophrenia annual evaluation: 2 nurse questionnaires
+      total = 2;
+      totalModules = 1;
+      
+      const [dossierInfirmier, bilanBiologique] = await Promise.all([
+        getDossierInfirmierSzResponse(visitId),
+        getBilanBiologiqueSzResponse(visitId)
+      ]);
+      
+      if (dossierInfirmier) completed++;
+      if (bilanBiologique) completed++;
+    } else {
+      // Bipolar annual evaluation: 7 infirmier + 7 thymic + 19 medical + 9 auto etat + 6 soin_suivi = 48 total
+      total = 48;
+      totalModules = 5;
+
+      const [
+        // Infirmier questionnaires (7)
+        tobacco, fagerstrom, physicalParams, bloodPressure, ecg, sleepApnea, biologicalAssessment,
+        // Thymic evaluation questionnaires (7)
+        madrs, alda, ymrs, fast, cgi, egf, etatPatient,
+        // Medical evaluation questionnaires (19)
+        dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs, isaFollowup, sis, suicideHistory,
+        perinatalite, pathoNeuro, pathoCardio, pathoEndoc, pathoDermato, pathoUrinaire, antecedentsGyneco, pathoHepatoGastro, pathoAllergique, autresPatho,
+        // Auto-questionnaires ETAT (9)
+        eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,
+        // Soin, suivi et arret de travail questionnaires (separate tables now)
+        suiviRecommandations, recoursAuxSoins, traitementNonPharma, arretsTravail, somatiqueContraceptif, statutProfessionnel
+      ] = await Promise.all([
+        // Infirmier questionnaires
+        getTobaccoResponse(visitId),
+        getFagerstromResponse(visitId),
+        getPhysicalParamsResponse(visitId),
+        getBloodPressureResponse(visitId),
+        getEcgResponse(visitId),
+        getSleepApneaResponse(visitId),
+        getBiologicalAssessmentResponse(visitId),
+        // Thymic evaluation questionnaires
+        getMadrsResponse(visitId),
+        getAldaResponse(visitId),
+        getYmrsResponse(visitId),
+        getFastResponse(visitId),
+        getCgiResponse(visitId),
+        getEgfResponse(visitId),
+        getEtatPatientResponse(visitId),
+        // Medical evaluation questionnaires
+        getDsm5HumeurResponse(visitId),
+        getDsm5PsychoticResponse(visitId),
+        getDsm5ComorbidResponse(visitId),
+        getDivaResponse(visitId),
+        getFamilyHistoryResponse(visitId),
+        getCssrsResponse(visitId),
+        getIsaFollowupResponse(visitId),
+        getSisResponse(visitId),
+        getSuicideHistoryResponse(visitId),
+        getPerinataliteResponse(visitId),
+        getPathoNeuroResponse(visitId),
+        getPathoCardioResponse(visitId),
+        getPathoEndocResponse(visitId),
+        getPathoDermatoResponse(visitId),
+        getPathoUrinaireResponse(visitId),
+        getAntecedentsGynecoResponse(visitId),
+        getPathoHepatoGastroResponse(visitId),
+        getPathoAllergiqueResponse(visitId),
+        getAutresPathoResponse(visitId),
+        // Auto-questionnaires ETAT
+        getEq5d5lResponse(visitId),
+        getPriseMResponse(visitId),
+        getStaiYaResponse(visitId),
+        getMarsResponse(visitId),
+        getMathysResponse(visitId),
+        getAsrmResponse(visitId),
+        getQidsResponse(visitId),
+        getPsqiResponse(visitId),
+        getEpworthResponse(visitId),
+        // Soin, suivi et arret de travail (separate tables now)
+        getSuiviRecommandationsResponse(visitId),
+        getRecoursAuxSoinsResponse(visitId),
+        getTraitementNonPharmaResponse(visitId),
+        getArretsTravailResponse(visitId),
+        getSomatiqueContraceptifResponse(visitId),
+        getStatutProfessionnelResponse(visitId)
+      ]);
+
+      // Count infirmier questionnaires
+      if (tobacco) completed++;
+      if (fagerstrom) completed++;
+      if (physicalParams) completed++;
+      if (bloodPressure) completed++;
+      if (ecg) completed++;
+      if (sleepApnea) completed++;
+      if (biologicalAssessment) completed++;
+
+      // Count thymic evaluation
+      if (madrs) completed++;
+      if (alda) completed++;
+      if (ymrs) completed++;
+      if (fast) completed++;
+      if (cgi) completed++;
+      if (egf) completed++;
+      if (etatPatient) completed++;
+      
+      // Count medical evaluation
+      if (dsm5Humeur) completed++;
+      if (dsm5Psychotic) completed++;
+      if (dsm5Comorbid) completed++;
+      if (diva) completed++;
+      if (familyHistory) completed++;
+      if (cssrs) completed++;
+      if (isaFollowup) completed++;
+      if (sis) completed++;
+      if (suicideHistory) completed++;
+      if (perinatalite) completed++;
+      if (pathoNeuro) completed++;
+      if (pathoCardio) completed++;
+      if (pathoEndoc) completed++;
+      if (pathoDermato) completed++;
+      if (pathoUrinaire) completed++;
+      if (antecedentsGyneco) completed++;
+      if (pathoHepatoGastro) completed++;
+      if (pathoAllergique) completed++;
+      if (autresPatho) completed++;
+      
+      // Count auto-questionnaires ETAT
+      if (eq5d5l) completed++;
+      if (priseM) completed++;
+      if (staiYa) completed++;
+      if (mars) completed++;
+      if (mathys) completed++;
+      if (asrm) completed++;
+      if (qids) completed++;
+      if (psqi) completed++;
+      if (epworth) completed++;
+      
+      // Count soin, suivi et arret de travail (6 separate tables now)
+      if (suiviRecommandations) completed++;
+      if (recoursAuxSoins) completed++;
+      if (traitementNonPharma) completed++;
+      if (arretsTravail) completed++;
+      if (somatiqueContraceptif) completed++;
+      if (statutProfessionnel) completed++;
+    }
   }
 
   return {

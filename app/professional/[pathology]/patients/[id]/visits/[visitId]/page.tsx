@@ -1929,19 +1929,50 @@ export default async function VisitDetailPage({
     ];
   } else if (visit.visit_type === 'annual_evaluation') {
     // =====================================================================
-    // ANNUAL EVALUATION - Full evaluation with 4 modules
+    // ANNUAL EVALUATION - Full evaluation
     // =====================================================================
     
-    // Build nurse module questionnaires with conditional Fagerstrom
-    const annualNurseQuestionnaires: any[] = [
-      {
-        ...TOBACCO_DEFINITION,
-        id: TOBACCO_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: questionnaireStatuses['TOBACCO']?.completed || false,
-        completedAt: questionnaireStatuses['TOBACCO']?.completed_at,
-      },
-    ];
+    // Check if this is a schizophrenia annual evaluation
+    if (pathology === 'schizophrenia') {
+      // Schizophrenia annual evaluation - uses same nurse module as initial visit
+      modulesWithQuestionnaires = [
+        {
+          id: 'mod_nurse',
+          name: 'Infirmier',
+          description: 'Évaluation par l\'infirmier',
+          questionnaires: [
+            {
+              ...SZ_DOSSIER_INFIRMIER_DEFINITION,
+              id: SZ_DOSSIER_INFIRMIER_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['DOSSIER_INFIRMIER_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['DOSSIER_INFIRMIER_SZ']?.completed_at,
+            },
+            {
+              ...SZ_BILAN_BIOLOGIQUE_DEFINITION,
+              id: SZ_BILAN_BIOLOGIQUE_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['BILAN_BIOLOGIQUE_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['BILAN_BIOLOGIQUE_SZ']?.completed_at,
+            }
+          ]
+        }
+      ];
+    } else {
+      // =====================================================================
+      // BIPOLAR ANNUAL EVALUATION - Full evaluation with 4 modules
+      // =====================================================================
+      
+      // Build nurse module questionnaires with conditional Fagerstrom
+      const annualNurseQuestionnaires: any[] = [
+        {
+          ...TOBACCO_DEFINITION,
+          id: TOBACCO_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['TOBACCO']?.completed || false,
+          completedAt: questionnaireStatuses['TOBACCO']?.completed_at,
+        },
+      ];
     
     // Add Fagerstrom with conditional display properties
     if (!tobaccoAnswered) {
@@ -2631,6 +2662,7 @@ export default async function VisitDetailPage({
         ]
       }
     ];
+    }
   }
 
   // Calculate accurate completion status from constructed modules
