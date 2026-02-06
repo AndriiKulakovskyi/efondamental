@@ -1,7 +1,7 @@
 // eFondaMental Platform - YMRS (Young Mania Rating Scale)
 // Schizophrenia Initial Evaluation - Hetero Module
 
-import { Question } from '@/lib/types/database.types';
+import { Question } from "@/lib/types/database.types";
 
 // ============================================================================
 // Types
@@ -34,7 +34,13 @@ export interface SchizophreniaYmrsResponse {
 
 export type SchizophreniaYmrsResponseInsert = Omit<
   SchizophreniaYmrsResponse,
-  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score' | 'severity' | 'interpretation'
+  | "id"
+  | "created_at"
+  | "updated_at"
+  | "completed_at"
+  | "total_score"
+  | "severity"
+  | "interpretation"
 > & {
   completed_by?: string | null;
 };
@@ -43,177 +49,333 @@ export type SchizophreniaYmrsResponseInsert = Omit<
 // Questions Dictionary
 // ============================================================================
 
-const SHOW_WHEN_TEST_DONE = { '==': [{ 'var': 'test_done' }, 'oui'] };
+const SHOW_WHEN_TEST_DONE = { "==": [{ var: "test_done" }, "oui"] };
 
 export const YMRS_SZ_QUESTIONS: Question[] = [
   {
-    id: 'test_done',
-    text: 'Passation du questionnaire fait',
-    type: 'single_choice',
+    id: "test_done",
+    text: "Passation du questionnaire fait",
+    type: "single_choice",
     required: true,
     options: [
-      { code: 'oui', label: 'Oui', score: 0 },
-      { code: 'non', label: 'Non', score: 1 }
-    ]
+      { code: "oui", label: "Oui", score: 0 },
+      { code: "non", label: "Non", score: 1 },
+    ],
   },
   {
-    id: 'q1',
-    text: "1. Elevation de l'humeur",
-    type: 'single_choice',
+    id: "q1",
+    text: "1. Elevation de l’humeur",
+    type: "single_choice",
     required: true,
     display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Absente', score: 0 },
-      { code: 1, label: "Legerement ou possiblement elevee lorsqu'on l'interroge", score: 1 },
-      { code: 2, label: "Elevation subjective nette; optimiste, plein d'assurance", score: 2 },
-      { code: 3, label: "Elevee, au contenu approprie, plaisantin", score: 3 },
-      { code: 4, label: 'Euphorique; rires inappropries; chante', score: 4 }
-    ]
+      { code: 0, label: "a. Absente", score: 0 },
+      {
+        code: 1,
+        label: "b. Légèrement ou possiblement élevée lorsqu’on l’interroge",
+        score: 1,
+      },
+      {
+        code: 2,
+        label:
+          "c. Elévation subjective nette ; optimiste, plein d’assurance ; gai ; contenu approprié",
+        score: 2,
+      },
+      {
+        code: 3,
+        label: "d. Elevée, au contenu appropriée, plaisantin",
+        score: 3,
+      },
+      {
+        code: 4,
+        label: "e. Euphorique ; rires inappropriés ; chante",
+        score: 4,
+      },
+    ],
   },
   {
-    id: 'q2',
-    text: "2. Activite motrice et energie augmentees",
-    type: 'single_choice',
+    id: "q2",
+    text: "2. Activité motrice et énergie augmentées",
+    type: "single_choice",
     required: true,
     display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Absentes', score: 0 },
-      { code: 1, label: 'Subjectivement elevees', score: 1 },
-      { code: 2, label: 'Anime; expression gestuelle plus elevee', score: 2 },
-      { code: 3, label: 'Energie excessive; parfois hyperactif; agite (peut etre calme)', score: 3 },
-      { code: 4, label: 'Excitation motrice; hyperactivite continuelle (ne peut etre calme)', score: 4 }
-    ]
+      { code: 0, label: "a. Absente", score: 0 },
+      { code: 1, label: "b. Subjectivement élevées", score: 1 },
+      {
+        code: 2,
+        label: "c. Animé ; expression gestuelle plus élevée",
+        score: 2,
+      },
+      {
+        code: 3,
+        label:
+          "d. Energie excessive ; parfois hyperactif ; agité (peut être calmé)",
+        score: 3,
+      },
+      {
+        code: 4,
+        label:
+          "e. Excitation motrice ; hyperactivité continuelle (ne peut être calmé)",
+        score: 4,
+      },
+    ],
   },
   {
-    id: 'q3',
-    text: '3. Interet sexuel',
-    type: 'single_choice',
+    id: "q3",
+    text: "3. Intérêt sexuel",
+    type: "single_choice",
     required: true,
     display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Normal, non augmente', score: 0 },
-      { code: 1, label: 'Augmentation legere ou possible', score: 1 },
-      { code: 2, label: "Clairement augmente lorsqu'on l'interroge", score: 2 },
-      { code: 3, label: "Parle spontanement de la sexualite; se decrit comme etant hyper sexuel", score: 3 },
-      { code: 4, label: "Agissements sexuels manifestes", score: 4 }
-    ]
+      { code: 0, label: "a. Normal, non augmenté", score: 0 },
+      { code: 1, label: "b. Augmentation légère ou possible", score: 1 },
+      {
+        code: 2,
+        label: "c. Clairement augmenté lorsqu’on l’interroge",
+        score: 2,
+      },
+      {
+        code: 3,
+        label:
+          "d. Parle spontanément de la sexualité ; élabore sur des thèmes sexuels ; se décrit comme étant hyper sexuel",
+        score: 3,
+      },
+      {
+        code: 4,
+        label:
+          "e. Agissements sexuels manifestes (envers les patients, les membres de l’équipe, ou l’évaluateur)",
+        score: 4,
+      },
+    ],
   },
   {
-    id: 'q4',
-    text: '4. Sommeil',
-    type: 'single_choice',
+    id: "q4",
+    text: "4. Sommeil",
+    type: "single_choice",
     required: true,
     display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Ne rapporte pas de diminution de sommeil', score: 0 },
-      { code: 1, label: "Dort jusqu'a une heure de moins que d'habitude", score: 1 },
-      { code: 2, label: "Sommeil reduit de plus d'une heure par rapport a d'habitude", score: 2 },
-      { code: 3, label: 'Rapporte un moins grand besoin de sommeil', score: 3 },
-      { code: 4, label: 'Nie le besoin de sommeil', score: 4 }
-    ]
+      {
+        code: 0,
+        label: "a. Ne rapporte pas de diminution de sommeil",
+        score: 0,
+      },
+      {
+        code: 1,
+        label: "b. Dort jusqu’à une heure de moins que d’habitude",
+        score: 1,
+      },
+      {
+        code: 2,
+        label: "c. Sommeil réduit de plus d’une heure par rapport à d’habitude",
+        score: 2,
+      },
+      {
+        code: 3,
+        label: "d. Rapporte un moins grand besoin de sommeil",
+        score: 3,
+      },
+      { code: 4, label: "e. Nie le besoin de sommeil", score: 4 },
+    ],
   },
   {
-    id: 'q5',
-    text: '5. Irritabilite',
-    help: 'Cet item est cote sur une echelle de 0 a 8.',
-    type: 'single_choice',
+    id: "q5",
+    text: "5. Irritabilité",
+    help: "Cet item est coté sur une échelle de 0 à 8.",
+    type: "single_choice",
     required: true,
     display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Absente', score: 0 },
-      { code: 2, label: 'Subjectivement augmentee', score: 2 },
-      { code: 4, label: "Irritable par moment durant l'entretien", score: 4 },
-      { code: 6, label: "Frequemment irritable durant l'entretien; brusque; abrupt", score: 6 },
-      { code: 8, label: 'Hostile, non cooperatif; evaluation impossible', score: 8 }
-    ]
+      { code: 0, label: "a. Absente", score: 0 },
+      { code: 2, label: "b. Subjectivement augmentée", score: 2 },
+      {
+        code: 4,
+        label:
+          "c. Irritable par moment durant l'entretien ; épisodes récents d'énervement ou de colère dans le service",
+        score: 4,
+      },
+      {
+        code: 6,
+        label: "d. Fréquemment irritable durant l'entretien ; brusque ; abrupt",
+        score: 6,
+      },
+      {
+        code: 8,
+        label: "e. Hostile, non coopératif ; évaluation impossible",
+        score: 8,
+      },
+    ],
   },
   {
-    id: 'q6',
-    text: '6. Discours (debit et quantite)',
-    help: 'Cet item est cote sur une echelle de 0 a 8.',
-    type: 'single_choice',
+    id: "q6",
+    text: "6. Discours (débit et quantité)",
+    help: "Cet item est coté sur une échelle de 0 à 8.",
+    type: "single_choice",
     required: true,
     display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Pas augmente', score: 0 },
-      { code: 2, label: 'Se sent bavard', score: 2 },
-      { code: 4, label: 'Augmentation du debit et de la quantite par moment', score: 4 },
-      { code: 6, label: 'Soutenu; augmentation consistante du debit; difficile a interrompre', score: 6 },
-      { code: 8, label: 'Sous pression; impossible a interrompre; discours continu', score: 8 }
-    ]
+      { code: 0, label: "a. Pas augmenté", score: 0 },
+      { code: 2, label: "b. Se sent bavard", score: 2 },
+      {
+        code: 4,
+        label:
+          "c. Augmentation du débit et de la quantité par moment ; prolixe par moment",
+        score: 4,
+      },
+      {
+        code: 6,
+        label:
+          "d. Soutenu ; augmentation consistante du débit ou de la quantité ; difficile à interrompre",
+        score: 6,
+      },
+      {
+        code: 8,
+        label: "e. Sous pression ; impossible à interrompre ; discours continu",
+        score: 8,
+      },
+    ],
   },
   {
-    id: 'q7',
-    text: '7. Langage - troubles de la pensee',
-    type: 'single_choice',
+    id: "q7",
+    text: "7. Langage - troubles de la pensée",
+    type: "single_choice",
     required: true,
     display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Absent', score: 0 },
-      { code: 1, label: 'Circonstanciel; legere distractivite; pensees rapides', score: 1 },
-      { code: 2, label: 'Distractivite; perd le fil de ses idees; change frequemment de sujet', score: 2 },
-      { code: 3, label: "Fuite des idees; reponses hors sujet; difficile a suivre", score: 3 },
-      { code: 4, label: 'Incoherent; communication impossible', score: 4 }
-    ]
+      { code: 0, label: "a. Absent", score: 0 },
+      {
+        code: 1,
+        label: "b. Circonstanciel ; légère distractivité ; pensées rapides",
+        score: 1,
+      },
+      {
+        code: 2,
+        label:
+          "c. Distractivité ; perd le fil de ses idées ; change fréquemment de sujet ; pensées accélérées",
+        score: 2,
+      },
+      {
+        code: 3,
+        label:
+          "d. Fuite des idées ; réponses hors sujet ; difficile à suivre ; fait des rimes ; écholalie",
+        score: 3,
+      },
+      { code: 4, label: "e. Incohérent ; communication impossible", score: 4 },
+    ],
   },
   {
-    id: 'q8',
-    text: '8. Contenu',
-    help: 'Cet item est cote sur une echelle de 0 a 8.',
-    type: 'single_choice',
+    id: "q8",
+    text: "8. Contenu",
+    help: "Cet item est coté sur une échelle de 0 à 8.",
+    type: "single_choice",
     required: true,
     display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Normal', score: 0 },
-      { code: 2, label: 'Projets discutables; interets nouveaux', score: 2 },
-      { code: 4, label: 'Projet(s) particulier(s); hyper religieux', score: 4 },
-      { code: 6, label: 'Idees de grandeur ou de persecution; idees de reference', score: 6 },
-      { code: 8, label: 'Delires; hallucinations', score: 8 }
-    ]
+      { code: 0, label: "a. Normal", score: 0 },
+      {
+        code: 2,
+        label: "b. Projets discutables ; intérêts nouveaux",
+        score: 2,
+      },
+      {
+        code: 4,
+        label: "c. Projet(s) particulier(s) ; hyper religieux",
+        score: 4,
+      },
+      {
+        code: 6,
+        label: "d. Idées de grandeur ou de persécution ; idées de référence",
+        score: 6,
+      },
+      { code: 8, label: "e. Délires ; hallucinations", score: 8 },
+    ],
   },
   {
-    id: 'q9',
-    text: '9. Comportement agressif et perturbateur',
-    help: 'Cet item est cote sur une echelle de 0 a 8.',
-    type: 'single_choice',
+    id: "q9",
+    text: "9. Comportement agressif et perturbateur",
+    help: "Cet item est coté sur une échelle de 0 à 8.",
+    type: "single_choice",
     required: true,
     display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Absent, cooperatif', score: 0 },
-      { code: 2, label: 'Sarcastique; parle fort par moment, sur la defensive', score: 2 },
-      { code: 4, label: 'Exigeant; fait des menaces dans le service', score: 4 },
-      { code: 6, label: "Menace l'evaluateur; crie; evaluation difficile", score: 6 },
-      { code: 8, label: 'Agressif physiquement; destructeur; evaluation impossible', score: 8 }
-    ]
+      { code: 0, label: "a. Absent, coopératif", score: 0 },
+      {
+        code: 2,
+        label: "b. Sarcastique ; parle fort par moment, sur la défensive",
+        score: 2,
+      },
+      {
+        code: 4,
+        label: "c. Exigeant ; fait des menaces dans le service",
+        score: 4,
+      },
+      {
+        code: 6,
+        label: "d. Menace l'évaluateur ; crie ; évaluation difficile",
+        score: 6,
+      },
+      {
+        code: 8,
+        label: "e. Agressif physiquement ; destructeur ; évaluation impossible",
+        score: 8,
+      },
+    ],
   },
   {
-    id: 'q10',
-    text: '10. Apparence',
-    type: 'single_choice',
+    id: "q10",
+    text: "10. Apparence",
+    type: "single_choice",
     required: true,
     display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Soignee et habillement adequat', score: 0 },
-      { code: 1, label: 'Legerement neglige', score: 1 },
-      { code: 2, label: 'Peu soigne; moderement debraille; trop habille', score: 2 },
-      { code: 3, label: 'Debraille; a moitie nu; maquillage criard', score: 3 },
-      { code: 4, label: 'Completement neglige; orne; accoutrement bizarre', score: 4 }
-    ]
+      { code: 0, label: "a. Soignée et habillement adéquat", score: 0 },
+      { code: 1, label: "b. Légèrement négligé", score: 1 },
+      {
+        code: 2,
+        label: "c. Peu soigné ; modérément débraillé ; trop habillé",
+        score: 2,
+      },
+      {
+        code: 3,
+        label: "d. Débraillé ; à moitié nu ; maquillage criarde",
+        score: 3,
+      },
+      {
+        code: 4,
+        label: "e. Complètement négligé ; orné ; accoutrement bizarre",
+        score: 4,
+      },
+    ],
   },
   {
-    id: 'q11',
-    text: '11. Introspection',
-    type: 'single_choice',
+    id: "q11",
+    text: "11. Introspection",
+    type: "single_choice",
     required: true,
     display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Presente; admet etre malade; reconnait le besoin de traitement', score: 0 },
-      { code: 1, label: 'Eventuellement malade', score: 1 },
-      { code: 2, label: 'Admet des changements de comportement, mais nie la maladie', score: 2 },
-      { code: 3, label: 'Admet de possibles changements de comportement, mais nie la maladie', score: 3 },
-      { code: 4, label: 'Nie tout changement de comportement', score: 4 }
-    ]
-  }
+      {
+        code: 0,
+        label:
+          "a. Présente ; admet être malade ; reconnaît le besoin de traitement",
+        score: 0,
+      },
+      { code: 1, label: "b. Eventuellement malade", score: 1 },
+      {
+        code: 2,
+        label: "c. Admet des changements de comportement, mais nie la maladie",
+        score: 2,
+      },
+      {
+        code: 3,
+        label:
+          "d. Admet de possibles changements de comportement, mais nie la maladie",
+        score: 3,
+      },
+      { code: 4, label: "e. Nie tout changement de comportement", score: 4 },
+    ],
+  },
 ];
 
 // ============================================================================
@@ -230,25 +392,27 @@ export interface QuestionnaireDefinition {
   metadata?: {
     singleColumn?: boolean;
     pathologies?: string[];
-    target_role?: 'patient' | 'healthcare_professional';
+    target_role?: "patient" | "healthcare_professional";
     [key: string]: any;
   };
 }
 
 export const YMRS_SZ_DEFINITION: QuestionnaireDefinition = {
-  id: 'ymrs_sz',
-  code: 'YMRS_SZ',
-  title: 'Young Mania Rating Scale (YMRS)',
-  description: 'Echelle d\'evaluation de la manie hetero-administree comportant 11 items.',
-  instructions: "Guide pour attribuer des points aux items: le but de chaque item est d'estimer la severite de cette anomalie chez le patient.",
+  id: "ymrs_sz",
+  code: "YMRS_SZ",
+  title: "Young Mania Rating Scale (YMRS)",
+  description:
+    "Échelle d'évaluation de la manie hétéro-administrée comportant 11 items.",
+  instructions:
+    "Guide pour attribuer des points aux items : le but de chaque item est d’estimer la sévérité de cette anomalie chez le patient. Lorsque plusieurs descriptions sont données pour un degré particulier de sévérité, une seule description est suffisante pour pouvoir attribuer ce degré. Les descriptions données sont des guides. On peut les ignorer si c’est nécessaire pour évaluer la sévérité, mais ceci doit plutôt être l’exception que la règle.",
   questions: YMRS_SZ_QUESTIONS,
   metadata: {
     singleColumn: true,
-    pathologies: ['schizophrenia'],
-    target_role: 'healthcare_professional',
-    version: 'French Version (Favre, Aubry, McQuillan, Bertschy, 2003)',
-    language: 'fr-FR'
-  }
+    pathologies: ["schizophrenia"],
+    target_role: "healthcare_professional",
+    version: "French Version (Favre, Aubry, McQuillan, Bertschy, 2003)",
+    language: "fr-FR",
+  },
 };
 
 // ============================================================================
@@ -270,25 +434,36 @@ export interface YmrsScoreInput {
 }
 
 export function computeYmrsScore(responses: YmrsScoreInput): number {
-  return responses.q1 + responses.q2 + responses.q3 + responses.q4 + responses.q5 +
-         responses.q6 + responses.q7 + responses.q8 + responses.q9 + responses.q10 + responses.q11;
+  return (
+    responses.q1 +
+    responses.q2 +
+    responses.q3 +
+    responses.q4 +
+    responses.q5 +
+    responses.q6 +
+    responses.q7 +
+    responses.q8 +
+    responses.q9 +
+    responses.q10 +
+    responses.q11
+  );
 }
 
 // ============================================================================
 // Score Interpretation
 // ============================================================================
 
-export type YmrsSeverity = 
-  | 'Euthymie ou symptomes minimes'
-  | 'Symptomes maniaques legers'
-  | 'Symptomes maniaques moderes'
-  | 'Symptomes maniaques severes';
+export type YmrsSeverity =
+  | "Euthymie ou symptomes minimes"
+  | "Symptomes maniaques legers"
+  | "Symptomes maniaques moderes"
+  | "Symptomes maniaques severes";
 
 export function getYmrsSeverity(score: number): YmrsSeverity {
-  if (score <= 12) return 'Euthymie ou symptomes minimes';
-  if (score <= 19) return 'Symptomes maniaques legers';
-  if (score <= 25) return 'Symptomes maniaques moderes';
-  return 'Symptomes maniaques severes';
+  if (score <= 12) return "Euthymie ou symptomes minimes";
+  if (score <= 19) return "Symptomes maniaques legers";
+  if (score <= 25) return "Symptomes maniaques moderes";
+  return "Symptomes maniaques severes";
 }
 
 export function interpretYmrsScore(score: number): string {
@@ -314,6 +489,6 @@ export function scoreYmrs(responses: YmrsScoreInput): YmrsScoringResult {
   return {
     total_score,
     severity,
-    interpretation
+    interpretation,
   };
 }
