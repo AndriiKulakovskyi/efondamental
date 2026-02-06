@@ -50,7 +50,7 @@ const QUESTIONNAIRES_WITH_SCORING = new Set([
   'ISA_FOLLOWUP',
   'SQOL_SZ', 'CTQ_SZ', 'MARS_SZ', 'BIS_SZ', 'EQ5D5L_SZ', 'IPAQ_SZ', 'YBOCS_SZ',
   'WURS25_SZ', 'STORI_SZ', 'SOGS_SZ', 'PSQI_SZ', 'PRESENTEISME_SZ', 'FAGERSTROM_SZ',
-  'EPHP_SZ'
+  'EPHP_SZ', 'CGI_SZ', 'YMRS_SZ', 'EGF_SZ'
 ]);
 
 export function QuestionnairePageClient({
@@ -184,6 +184,101 @@ export function QuestionnairePageClient({
       return {
         type: 'CGI',
         therapeuticIndex,
+        label,
+        color,
+        bg
+      };
+    }
+
+    // Live score calculation for CGI_SZ
+    if (questionnaire.code === 'CGI_SZ') {
+      const therapeuticEffect = currentResponses.therapeutic_effect;
+      const sideEffects = currentResponses.side_effects;
+
+      let therapeuticIndex: number | null = null;
+      let label = '';
+      let color = 'text-slate-900';
+      let bg = 'bg-slate-50';
+
+      if (Number(therapeuticEffect) === 0) {
+        therapeuticIndex = 0;
+        label = 'Non évalué';
+      } else if (
+        therapeuticEffect !== undefined && therapeuticEffect !== null &&
+        sideEffects !== undefined && sideEffects !== null
+      ) {
+        const te = Number(therapeuticEffect);
+        const se = Number(sideEffects);
+        
+        if (te >= 1 && te <= 4 && se >= 0 && se <= 3) {
+          // Formula: 4 * (Effet - 1) + SideEffects + 1
+          therapeuticIndex = (4 * (te - 1)) + se + 1;
+          
+          if (therapeuticIndex <= 4) {
+            label = 'Très bon rapport bénéfice/risque';
+            color = 'text-green-700';
+            bg = 'bg-green-50';
+          } else if (therapeuticIndex <= 8) {
+            label = 'Bon rapport bénéfice/risque';
+            color = 'text-blue-700';
+            bg = 'bg-blue-50';
+          } else if (therapeuticIndex <= 12) {
+            label = 'Rapport bénéfice/risque modéré';
+            color = 'text-amber-700';
+            bg = 'bg-amber-50';
+          } else {
+            label = 'Mauvais rapport bénéfice/risque';
+            color = 'text-red-700';
+            bg = 'bg-red-50';
+          }
+        }
+      }
+
+      return {
+        type: 'CGI_SZ',
+        therapeuticIndex,
+        label,
+        color,
+        bg
+      };
+    }
+
+    // Live score calculation for BARS
+    if (questionnaire.code === 'BARS') {
+      const q2 = currentResponses.q2;
+      const q3 = currentResponses.q3;
+
+      let adherenceScore: number | null = null;
+      let label = '';
+      let color = 'text-slate-900';
+      let bg = 'bg-slate-50';
+
+      if (typeof q2 === 'number' && typeof q3 === 'number') {
+        const missedDays = q2 + q3;
+        adherenceScore = Math.max(0, Math.round(((30 - missedDays) / 30) * 100));
+
+        if (adherenceScore >= 91) {
+          label = 'Bonne observance (91-100%)';
+          color = 'text-green-700';
+          bg = 'bg-green-50';
+        } else if (adherenceScore >= 76) {
+          label = 'Observance acceptable (76-90%)';
+          color = 'text-blue-700';
+          bg = 'bg-blue-50';
+        } else if (adherenceScore >= 51) {
+          label = 'Observance partielle (51-75%)';
+          color = 'text-amber-700';
+          bg = 'bg-amber-50';
+        } else {
+          label = 'Observance très faible (0-50%)';
+          color = 'text-red-700';
+          bg = 'bg-red-50';
+        }
+      }
+
+      return {
+        type: 'BARS',
+        adherenceScore,
         label,
         color,
         bg
@@ -414,6 +509,50 @@ export function QuestionnairePageClient({
                     <div className="text-2xl font-bold text-slate-900">
                       {liveScores.therapeuticIndex !== null ? liveScores.therapeuticIndex : '-'}
                       <span className="text-sm font-normal text-slate-400">/16</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Interpretation Label */}
+                {liveScores.label && (
+                  <div className={`px-4 py-2 rounded-lg ${liveScores.bg}`}>
+                    <span className={`text-sm font-medium ${liveScores.color}`}>
+                      {liveScores.label}
+                    </span>
+                  </div>
+                )}
+              </div>
+            ) : liveScores.type === 'CGI_SZ' ? (
+              <div className="flex items-center justify-between gap-6">
+                <div className="flex items-center gap-6">
+                  {/* Therapeutic Index Score */}
+                  <div className="text-center">
+                    <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Index Thérapeutique</div>
+                    <div className="text-2xl font-bold text-slate-900">
+                      {liveScores.therapeuticIndex !== null ? liveScores.therapeuticIndex : '-'}
+                      <span className="text-sm font-normal text-slate-400">/16</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Interpretation Label */}
+                {liveScores.label && (
+                  <div className={`px-4 py-2 rounded-lg ${liveScores.bg}`}>
+                    <span className={`text-sm font-medium ${liveScores.color}`}>
+                      {liveScores.label}
+                    </span>
+                  </div>
+                )}
+              </div>
+            ) : liveScores.type === 'BARS' ? (
+              <div className="flex items-center justify-between gap-6">
+                <div className="flex items-center gap-6">
+                  {/* BARS Adherence Score */}
+                  <div className="text-center">
+                    <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Calcul de l'Observance</div>
+                    <div className="text-2xl font-bold text-slate-900">
+                      {liveScores.adherenceScore !== null ? liveScores.adherenceScore : '-'}
+                      <span className="text-sm font-normal text-slate-400">%</span>
                     </div>
                   </div>
                 </div>

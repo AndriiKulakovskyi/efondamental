@@ -10,7 +10,7 @@ ADD COLUMN IF NOT EXISTS "test_done" BOOLEAN DEFAULT TRUE;
 -- test_not_done = true (test NOT done) → test_done = false
 -- test_not_done = false (test done) → test_done = true
 UPDATE "public"."schizophrenia_cvlt" 
-SET "test_done" = NOT COALESCE("test_not_done", FALSE);
+SET "test_done" = NOT COALESCE("test_done", FALSE);
 
 -- Step 3: Drop the old column
 ALTER TABLE "public"."schizophrenia_cvlt" 

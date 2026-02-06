@@ -24,6 +24,7 @@ export interface SchizophreniaSasResponse {
   q10?: number | null;
   total_score?: number | null;
   mean_score?: number | null;
+  test_done?: boolean;
   completed_by?: string | null;
   completed_at?: string | null;
   created_at?: string;
@@ -39,127 +40,139 @@ export type SchizophreniaSasResponseInsert = Omit<
 // Questions
 // ============================================================================
 
+const SHOW_WHEN_TEST_DONE = { '==': [{ 'var': 'test_done' }, 'oui'] };
+
 export const SAS_QUESTIONS: Question[] = [
-  { id: 'sas_instructions', text: 'Instructions', help: 'L\'examinateur effectue une serie de tests physiques et d\'observations pour evaluer les signes extrapyramidaux. Le score total est la moyenne des 10 items (somme / 10).', type: 'instruction', required: false },
+  {
+    id: 'test_done',
+    text: 'Passation du questionnaire fait',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui', score: 0 },
+      { code: 'non', label: 'Non', score: 1 }
+    ]
+  },
+  { id: 'sas_instructions', text: 'Instructions', help: 'L\'examinateur effectue une serie de tests physiques et d\'observations pour evaluer les signes extrapyramidaux. Le score total est la moyenne des 10 items (somme / 10).', type: 'instruction', required: false, display_if: SHOW_WHEN_TEST_DONE },
   
   {
-    id: 'q1', text: '1. Demarche',
-    help: 'Le patient est examine pendant qu\'il marche dans la salle d\'examen.',
+    id: 'q1', text: '**1. Démarche**\n\nLe patient est examiné pendant qu\'il marche dans la salle d\'examen. Sa démarche, le ballant de ses bras, sa posture générale permettent de coter cet item :',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Normal', score: 0 },
-      { code: 1, label: 'Diminution du ballant des bras a la marche', score: 1 },
-      { code: 2, label: 'Diminution importante du ballant avec une evidente rigidite des bras', score: 2 },
-      { code: 3, label: 'Demarche raide, les bras maintenus de maniere rigide devant l\'abdomen', score: 3 },
-      { code: 4, label: 'Demarche voutee, traine les pieds. Progresse par propulsion et retropulsion', score: 4 }
+      { code: 0, label: '0. Normal', score: 0 },
+      { code: 1, label: '1. Diminution du ballant des bras à la marche', score: 1 },
+      { code: 2, label: '2. Diminution importante du ballant des bras avec une évidente rigidité des bras', score: 2 },
+      { code: 3, label: '3. Démarche raide, les bras maintenus de manière rigide devant l\'abdomen', score: 3 },
+      { code: 4, label: '4. Démarche voûtée, traîne les pieds. Progresse par propulsion et rétropulsion', score: 4 }
     ]
   },
   {
-    id: 'q2', text: '2. Chute des bras',
-    help: 'Le patient et l\'examinateur levent tous les deux les bras jusqu\'a la hauteur des epaules et les laissent tomber sur les cotes.',
+    id: 'q2', text: '**2. Chute des bras.**\n\nLe patient et l\'examinateur lèvent tous les deux les bras jusqu\'à la hauteur des épaules et les laissent tomber sur les cotés. Chez le sujet normal un claquement net est entendu quand les bras frappent les côtes. Chez les patients présentant un syndrome parkinsonien très sévère les bras retombent doucement.',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Normal. Chute libre avec fort claquement et rebond', score: 0 },
-      { code: 1, label: 'Chute legerement ralentie avec contact moins audible et petit rebond', score: 1 },
-      { code: 2, label: 'Chute ralentie. Pas de rebond', score: 2 },
-      { code: 3, label: 'Chute tres ralentie. Pas de claquement du tout', score: 3 },
-      { code: 4, label: 'Les bras tombent comme une resistance', score: 4 }
+      { code: 0, label: '0. Normal. Chute libre avec fort claquement et rebond', score: 0 },
+      { code: 1, label: '1. Chute légèrement ralentie avec contact moins audible et petit rebond', score: 1 },
+      { code: 2, label: '2. Chute ralentie. Pas de rebond', score: 2 },
+      { code: 3, label: '3. Chute très ralentie. Pas de claquement du tout', score: 3 },
+      { code: 4, label: '4. Les bras tombent comme une résistance. Comme à travers de la colle', score: 4 }
     ]
   },
   {
-    id: 'q3', text: '3. Mouvements passifs de l\'epaule',
-    help: 'Les coudes sont maintenus flechis a angle droit et les bras sont pris l\'un apres l\'autre par l\'examinateur.',
+    id: 'q3', text: '**3. Mouvements passifs de l\'épaule**\n\nLes coudes sont maintenus fléchis à angle droit et les bras sont pris l\'un après l\'autre par l\'examinateur. Ce dernier attrape une main du patient et serre avec son autre main le coude du patient. Le bras du sujet est poussé et tiré pendant que l\'humérus subit un mouvement de rotation externe. Le degré de rigidité, du normal à l\'extrême rigidité, est quantifié comme suit :',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Normal', score: 0 },
-      { code: 1, label: 'Rigidite et resistance legeres', score: 1 },
-      { code: 2, label: 'Resistance et rigidite moyennes', score: 2 },
-      { code: 3, label: 'Rigidite importante. Mouvements passifs difficiles', score: 3 },
-      { code: 4, label: 'Resistance et rigidite extremes avec une epaule presque gelee', score: 4 }
+      { code: 0, label: '0. Normal', score: 0 },
+      { code: 1, label: '1. Rigidité et résistance légères', score: 1 },
+      { code: 2, label: '2. Résistance et rigidité moyennes', score: 2 },
+      { code: 3, label: '3. Rigidité importante. Mouvements passifs difficiles', score: 3 },
+      { code: 4, label: '4. Résistance et rigidité extrêmes avec une épaule presque gelée', score: 4 }
     ]
   },
   {
-    id: 'q4', text: '4. Rigidite du coude',
-    help: 'Les deux articulations du coude sont maintenues l\'une apres l\'autre a angle droit puis etendues, flechies d\'une maniere passive.',
+    id: 'q4', text: '**4. Rigidité**\n\nLes deux articulations du coude sont maintenues l\'une après l\'autre à angle droit puis étendues fléchies d\'une manière passive; Le biceps du patient est alors observé et palpé en même temps. La résistance à cette manœuvre est cotée (la présence d\'une roue dentée est notée indépendamment).',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Normal', score: 0 },
-      { code: 1, label: 'Rigidite et resistance legeres', score: 1 },
-      { code: 2, label: 'Resistance et rigidite moyennes', score: 2 },
-      { code: 3, label: 'Rigidite importante. Mouvements passifs difficiles', score: 3 },
-      { code: 4, label: 'Resistance et rigidite extremes', score: 4 }
+      { code: 0, label: '0. Normal', score: 0 },
+      { code: 1, label: '1. Rigidité et résistance légères', score: 1 },
+      { code: 2, label: '2. Résistance et rigidité moyennes', score: 2 },
+      { code: 3, label: '3. Rigidité importante. Mouvements passifs difficiles', score: 3 },
+      { code: 4, label: '4. Résistance et rigidité extrêmes', score: 4 }
     ]
   },
   {
-    id: 'q5', text: '5. Maintien des attitudes ou rigidite du poignet',
-    help: 'Le poignet est tenu d\'une main et les doigts sont tenus par l\'autre main de l\'examinateur.',
+    id: 'q5', text: '**5. Maintien des attitudes ou rigidité du poignet**\n\nLe poignet est tenu d\'une main et les doigts sont tenus par l\'autre main de l\'examinateur; Le poignet est mobilisé en flexion, en extension, en déplacement radial et cubital. La résistance à ces mouvements est cotée comme suit:',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Normal', score: 0 },
-      { code: 1, label: 'Rigidite et resistance legeres', score: 1 },
-      { code: 2, label: 'Resistance et rigidite moyennes', score: 2 },
-      { code: 3, label: 'Rigidite importante. Mouvements passifs difficiles', score: 3 },
-      { code: 4, label: 'Resistance et rigidite extremes', score: 4 }
+      { code: 0, label: '0. Normal', score: 0 },
+      { code: 1, label: '1. Rigidité et résistance légères', score: 1 },
+      { code: 2, label: '2. Résistance et rigidité moyennes', score: 2 },
+      { code: 3, label: '3. Rigidité importante. Mouvements passifs difficiles', score: 3 },
+      { code: 4, label: '4. Résistance et rigidité extrêmes', score: 4 }
     ]
   },
   {
-    id: 'q6', text: '6. Mouvement pendulaire de la jambe',
-    help: 'Le patient s\'assoit sur une table avec les jambes pendantes et bougeant librement.',
+    id: 'q6', text: '**6. Mouvement pendulaire de la jambe**\n\nLe patient s\'assoit sur une table avec les jambes pendantes et bougeant librement. La cheville est attrapée par l\'examinateur et élevée jusqu\'à ce que le genou soit partiellement étendu. On laisse ensuite la jambe tomber. La résistance à la chute et l\'absence de ballant sont à la base de la cotation de cet item :',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'La jambe balance librement', score: 0 },
-      { code: 1, label: 'Legere diminution du ballant des jambes', score: 1 },
-      { code: 2, label: 'Resistance au ballant moyenne', score: 2 },
-      { code: 3, label: 'Resistance et limitation du ballant importantes', score: 3 },
-      { code: 4, label: 'Absence complete de ballant', score: 4 }
+      { code: 0, label: '0. La jambe balance librement', score: 0 },
+      { code: 1, label: '1. Légère diminution du ballant des jambes', score: 1 },
+      { code: 2, label: '2. Résistance au ballant moyenne', score: 2 },
+      { code: 3, label: '3. Résistance et limitation du ballant importantes', score: 3 },
+      { code: 4, label: '4. Absence complète de ballant', score: 4 }
     ]
   },
   {
-    id: 'q7', text: '7. Chute de la tete',
-    help: 'Le patient s\'allonge sur une table d\'examen bien rembourree et l\'examinateur souleve la tete du patient.',
+    id: 'q7', text: '**7. Chute de la tête**\n\nLe patient s\'allonge sur une table d\'examen bien rembourrée et l\'examinateur soulève la tête du patient avec sa main. La main est ensuite relâchée et on laisse la tête retomber. Chez le sujet normal la tête tombera sur la table. Le syndrome est retardé en cas de syndrome extrapyramidal et il est absent en cas de parkinsonisme extrême : les muscles du cou sont rigides et la tête n\'atteint pas la table d\'examen. Coter comme suit :',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'La tete tombe completement avec un bruit distinct', score: 0 },
-      { code: 1, label: 'Leger ralentissement dans la chute de la tete', score: 1 },
-      { code: 2, label: 'Ralentissement modere de la chute', score: 2 },
-      { code: 3, label: 'La tete tombe avec resistance et lentement', score: 3 },
-      { code: 4, label: 'La tete n\'atteint pas la table d\'examen', score: 4 }
+      { code: 0, label: '0. La tête tombe complètement avec un bruit distinct quand elle touche la table', score: 0 },
+      { code: 1, label: '1. Léger ralentissement dans la chute de la tête, surtout observé par l\'absence de claquement quand la tête touche la table', score: 1 },
+      { code: 2, label: '2. ralentissement modéré de la chute, presque visible à l\'œil nu', score: 2 },
+      { code: 3, label: '3. La tête tombe avec résistance et lentement', score: 3 },
+      { code: 4, label: '4. La tête n\'atteint pas la table d\'examen', score: 4 }
     ]
   },
   {
-    id: 'q8', text: '8. Percussion de la glabelle (reflexe naso-palpebral)',
-    help: 'On demande au sujet d\'ouvrir grand les yeux et de ne pas cligner des yeux. La glabelle est tapee doucement.',
+    id: 'q8', text: '**8. Percussion de la glabelle (réflexe naso-palpébral)**\n\nOn demande au sujet d\'ouvrir grand les yeux et de ne pas cligner des yeux; La glabelle est tapée doucement à une vitesse rapide et régulière. Le nombre de fois de suite où le patient cligne des yeux est noté :',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: '0-5 clignements', score: 0 },
-      { code: 1, label: '6-10 clignements', score: 1 },
-      { code: 2, label: '11-15 clignements', score: 2 },
-      { code: 3, label: '16-20 clignements', score: 3 },
-      { code: 4, label: '21 clignements et plus', score: 4 }
+      { code: 0, label: '0. 0-5 clignements', score: 0 },
+      { code: 1, label: '1. 6-10 clignements', score: 1 },
+      { code: 2, label: '2. 11-15 clignements', score: 2 },
+      { code: 3, label: '3. 16-20  clignements', score: 3 },
+      { code: 4, label: '4. 21 clignements et plus', score: 4 }
     ]
   },
   {
-    id: 'q9', text: '9. Tremblement',
-    help: 'Le patient est observe lorsqu\'il entre dans la salle d\'examen puis il est reexamine.',
+    id: 'q9', text: '**9. Tremblement**\n\nLe patient est observé lors qu\'il entre dans la salle d\'examen puis il est réexaminé pour cet item :',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Normal', score: 0 },
-      { code: 1, label: 'Leger tremblement des doigts', score: 1 },
-      { code: 2, label: 'Tremblement de la main ou du bras apparaissant de facon intermittente', score: 2 },
-      { code: 3, label: 'Tremblements persistant d\'un ou de plusieurs membres', score: 3 },
-      { code: 4, label: 'Tremblements de tout le corps', score: 4 }
+      { code: 0, label: '0. Normal', score: 0 },
+      { code: 1, label: '1. Léger tremblement des doigts, évident à la vue et au toucher', score: 1 },
+      { code: 2, label: '2. Tremblement de la main ou du bras apparaissant de façon intermittente', score: 2 },
+      { code: 3, label: '3. Tremblements persistant d\'un ou de plusieurs membres.', score: 3 },
+      { code: 4, label: '4. Tremblements de tout le corps', score: 4 }
     ]
   },
   {
-    id: 'q10', text: '10. Salivation',
-    help: 'Le patient est observe quand il parle. On lui demande d\'ouvrir la bouche et de soulever la langue.',
+    id: 'q10', text: '**10. Salivation**\n\nLe patient est observé quand il parle on lui demande d\'ouvrir la bouche et de soulever la langue; Les cotations suivantes sont données:',
     type: 'single_choice', required: false,
+    display_if: SHOW_WHEN_TEST_DONE,
     options: [
-      { code: 0, label: 'Normal', score: 0 },
-      { code: 1, label: 'Salivation excessive au point qu\'une flaque apparait si la bouche est ouverte', score: 1 },
-      { code: 2, label: 'L\'exces de salivation est present et peut parfois gener la parole', score: 2 },
-      { code: 3, label: 'Parole difficile en raison d\'un exces de salivation', score: 3 },
-      { code: 4, label: 'Franc bavage', score: 4 }
+      { code: 0, label: '0. Normal', score: 0 },
+      { code: 1, label: '1. Salivation excessive au point qu\'une flaque apparaît si la bouche est ouverte et la langue levée', score: 1 },
+      { code: 2, label: '2. L\'excès de salivation est présent et peut parfois gêner la parole', score: 2 },
+      { code: 3, label: '3. Parole difficile en raison d\'un excès de salivation', score: 3 },
+      { code: 4, label: '4. Franc bavage', score: 4 }
     ]
   }
 ];
