@@ -609,7 +609,7 @@ export async function saveBarsResponse(response: any): Promise<any> {
 }
 
 /**
- * Save SUMD response with attribution rule enforcement
+ * Save SUMD response with attribution rule enforcement and score calculation
  */
 export async function saveSumdResponse(response: any): Promise<any> {
   const supabase = await createClient();
@@ -644,6 +644,53 @@ export async function saveSumdResponse(response: any): Promise<any> {
   const attribu8 = applyAttributionRule(responseData.conscience8 ?? null, responseData.attribu8 ?? null);
   const attribu9 = applyAttributionRule(responseData.conscience9 ?? null, responseData.attribu9 ?? null);
 
+  // Calculate scores using the scoring functions
+  const dataWithAttribution = {
+    ...responseData,
+    attribu4,
+    attribu5,
+    attribu6,
+    attribu7,
+    attribu8,
+    attribu9
+  };
+
+  // Compute awareness score (average of conscience items, excluding 0 values)
+  const conscienceItems = [
+    dataWithAttribution.conscience1,
+    dataWithAttribution.conscience2,
+    dataWithAttribution.conscience3,
+    dataWithAttribution.conscience4,
+    dataWithAttribution.conscience5,
+    dataWithAttribution.conscience6,
+    dataWithAttribution.conscience7,
+    dataWithAttribution.conscience8,
+    dataWithAttribution.conscience9
+  ].filter((v): v is number => v !== null && v !== undefined && v > 0);
+  
+  const awareness_score = conscienceItems.length > 0
+    ? conscienceItems.reduce((sum, v) => sum + v, 0) / conscienceItems.length
+    : null;
+
+  // Compute attribution score (average of attribution items, excluding 0 values)
+  const attributionItems = [
+    attribu4,
+    attribu5,
+    attribu6,
+    attribu7,
+    attribu8,
+    attribu9
+  ].filter((v): v is number => v !== null && v !== undefined && v > 0);
+  
+  const attribution_score = attributionItems.length > 0
+    ? attributionItems.reduce((sum, v) => sum + v, 0) / attributionItems.length
+    : null;
+
+  // Store individual conscience scores for items 1-3 (matching v3 behavior)
+  const score_conscience1 = dataWithAttribution.conscience1 ?? null;
+  const score_conscience2 = dataWithAttribution.conscience2 ?? null;
+  const score_conscience3 = dataWithAttribution.conscience3 ?? null;
+
   const { data, error } = await supabase
     .from('schizophrenia_sumd')
     .upsert({
@@ -654,6 +701,11 @@ export async function saveSumdResponse(response: any): Promise<any> {
       attribu7,
       attribu8,
       attribu9,
+      score_conscience1,
+      score_conscience2,
+      score_conscience3,
+      awareness_score,
+      attribution_score,
       test_done: response.test_done === 'oui',
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
