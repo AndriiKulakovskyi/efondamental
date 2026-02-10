@@ -24,8 +24,8 @@ A unified clinical management platform for longitudinal follow-up of patients wi
 
 eFondaMental is a multi-center platform designed to support the management of patients with major psychiatric disorders:
 
-- **Bipolar Disorder** (implementation ongoing)
-- **Schizophrenia** (planned)
+- **Bipolar Disorder** (implementation completed, in testing)
+- **Schizophrenia** (implementation in progress)
 - **Autism Spectrum Disorder - Asperger** (planned)
 - **Depression** (planned)
 
@@ -658,33 +658,50 @@ If you need the latest schema updates, apply migrations in order:
 
 ## Getting Started
 
-### Installation
+### Quick Setup (Recommended)
+
+This project uses **Supabase LOCAL** for development. Everything is automated!
 
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone <repository-url>
 cd efondamental
 
-# Install dependencies
-npm install
-
-# Configure environment variables
-cp .env.example .env.local
-# Edit .env.local with your Supabase credentials
-
-# Complete database setup (see Database Setup section above)
+# 2. Run the setup script (that's it!)
+./setup.sh
 ```
 
----
+**The script will automatically:**
+- Create `.env.local` if it doesn't exist
+- Install npm dependencies
+- Start Supabase local (Docker)
+- Apply all 74 database migrations
+- Create test users with seed data
+- Configure `.env.local` with correct credentials
+- Offer to start the development server
 
-### Development Server
+### That's it!
+
+The setup is **fully automated**. Just run `./setup.sh` and follow the prompts.
+
+If you choose to start the app during setup, it will be available at **http://localhost:3000**
+
+### Manual Start (if needed)
 
 ```bash
-# Start development server with Turbopack
+# Start the Next.js development server
 npm run dev
-
-# Server will start at http://localhost:3000
 ```
+
+### Useful Commands
+
+```bash
+npx supabase status     # Check Supabase status
+npx supabase stop       # Stop Supabase
+npx supabase db reset   # Reset database with fresh data
+```
+
+**Supabase Studio (Web UI):** http://127.0.0.1:54323
 
 ---
 
