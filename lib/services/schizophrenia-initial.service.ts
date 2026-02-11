@@ -3833,13 +3833,14 @@ function generateEphpInterpretation(
 export async function saveBriefAAutoSzResponse(response: any): Promise<any> {
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
-  
+
   // Import scoring functions
-  const { computeBriefAAutoScores } = await import('@/lib/questionnaires/schizophrenia/initial/auto/brief-a-auto');
-  
+  const { computeBriefAAutoScores } =
+    await import("@/lib/questionnaires/schizophrenia/initial/auto/brief-a-auto");
+
   // Calculate all scores
   const scores = computeBriefAAutoScores(response);
-  
+
   // Remove UI-only fields and computed fields before saving
   // BRIEF-A uses brief_a_* scores, not total_score
   const {
@@ -3848,19 +3849,22 @@ export async function saveBriefAAutoSzResponse(response: any): Promise<any> {
     instruction_consigne,
     ...responseData
   } = response;
-  
+
   const { data, error } = await supabase
-    .from('schizophrenia_brief_a_auto')
-    .upsert({
-      ...responseData,
-      ...scores,
-      completed_by: user.data.user?.id
-    }, { onConflict: 'visit_id' })
+    .from("schizophrenia_brief_a_auto")
+    .upsert(
+      {
+        ...responseData,
+        ...scores,
+        completed_by: user.data.user?.id,
+      },
+      { onConflict: "visit_id" },
+    )
     .select()
     .single();
 
   if (error) {
-    console.error('Error saving schizophrenia_brief_a_auto:', error);
+    console.error("Error saving schizophrenia_brief_a_auto:", error);
     throw error;
   }
   return data;
@@ -5971,14 +5975,14 @@ export async function getBriefASzResponse(
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from("schizophrenia_brief_a")
+    .from("schizophrenia_brief_a_hetero")
     .select("*")
     .eq("visit_id", visitId)
     .single();
 
   if (error) {
     if (error.code === "PGRST116") return null; // Not found
-    console.error("Error getting schizophrenia_brief_a:", error);
+    console.error("Error getting schizophrenia_brief_a_hetero:", error);
     throw error;
   }
   return data;
@@ -6071,7 +6075,7 @@ export async function saveSchizophreniaBriefASzResponse(
   const gecNorm = normPoint(norms?.composite.CEG, scores.brief_a_gec);
 
   const { data, error } = await supabase
-    .from("schizophrenia_brief_a")
+    .from("schizophrenia_brief_a_hetero")
     .upsert(
       {
         visit_id: response.visit_id,
@@ -6146,7 +6150,7 @@ export async function saveSchizophreniaBriefASzResponse(
     .single();
 
   if (error) {
-    console.error("Error saving schizophrenia_brief_a:", error);
+    console.error("Error saving schizophrenia_brief_a_hetero:", error);
     throw error;
   }
   return data;

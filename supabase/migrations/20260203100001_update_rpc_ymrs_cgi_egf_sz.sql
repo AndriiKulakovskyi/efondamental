@@ -180,7 +180,7 @@ BEGIN
       'BARNES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_barnes WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_barnes WHERE visit_id = p_visit_id)),
       'SAS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_sas WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_sas WHERE visit_id = p_visit_id)),
       'PSP', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_psp WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_psp WHERE visit_id = p_visit_id)),
-      'BRIEF_A_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_brief_a WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_brief_a WHERE visit_id = p_visit_id)),
+      'BRIEF_A_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_brief_a_hetero WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_brief_a_hetero WHERE visit_id = p_visit_id)),
       'YMRS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_ymrs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_ymrs WHERE visit_id = p_visit_id)),
       'CGI_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_cgi WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_cgi WHERE visit_id = p_visit_id)),
       'EGF_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_egf WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_egf WHERE visit_id = p_visit_id))

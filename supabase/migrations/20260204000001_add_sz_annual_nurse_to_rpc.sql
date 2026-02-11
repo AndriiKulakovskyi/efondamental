@@ -181,7 +181,7 @@ BEGIN
       'BARNES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_barnes WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_barnes WHERE visit_id = p_visit_id)),
       'SAS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_sas WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_sas WHERE visit_id = p_visit_id)),
       'PSP', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_psp WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_psp WHERE visit_id = p_visit_id)),
-      'BRIEF_A_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_brief_a WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_brief_a WHERE visit_id = p_visit_id)),
+      'BRIEF_A_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_brief_a_hetero WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_brief_a_hetero WHERE visit_id = p_visit_id)),
       'YMRS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_ymrs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_ymrs WHERE visit_id = p_visit_id)),
       'CGI_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_cgi WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_cgi WHERE visit_id = p_visit_id)),
       'EGF_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_egf WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_egf WHERE visit_id = p_visit_id))
@@ -270,7 +270,7 @@ BEGIN
     JOIN patients p ON v.patient_id = p.id
     LEFT JOIN pathologies pa ON p.pathology_id = pa.id
     WHERE v.id = p_visit_id;
-    
+
     IF v_pathology_type = 'schizophrenia' THEN
       -- Schizophrenia annual evaluation - track nurse questionnaires
       v_statuses := jsonb_build_object(
@@ -281,7 +281,7 @@ BEGIN
       -- Bipolar annual evaluation - return empty for now (can be extended later)
       v_statuses := jsonb_build_object();
     END IF;
-    
+
     WITH visit_data AS (
       SELECT v.*, p.first_name, p.last_name, p.date_of_birth, p.gender, pa.type as pathology_type
       FROM visits v
