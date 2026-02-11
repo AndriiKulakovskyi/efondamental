@@ -13,6 +13,13 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 
+CREATE EXTENSION IF NOT EXISTS "pg_net" WITH SCHEMA "extensions";
+
+
+
+
+
+
 COMMENT ON SCHEMA "public" IS 'standard public schema';
 
 
@@ -121,7 +128,9 @@ ALTER TYPE "public"."yes_no_en" OWNER TO "postgres";
 
 CREATE TYPE "public"."yes_no_fr" AS ENUM (
     'oui',
-    'non'
+    'non',
+    'yes',
+    'no'
 );
 
 
@@ -146,6 +155,156 @@ CREATE TYPE "public"."yes_no_unknown_fr" AS ENUM (
 
 
 ALTER TYPE "public"."yes_no_unknown_fr" OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."auto_assign_visit_number"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  -- Only auto-assign if visit_number is not provided
+  IF NEW.visit_number IS NULL THEN
+    NEW.visit_number := get_next_visit_number(NEW.patient_id, NEW.visit_type);
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."auto_assign_visit_number"() OWNER TO "postgres";
+
+
+COMMENT ON FUNCTION "public"."auto_assign_visit_number"() IS 'Trigger function to automatically assign visit_number on insert';
+
+
+
+CREATE OR REPLACE FUNCTION "public"."generate_fondacode"("p_center_id" "uuid", "p_pathology_id" "uuid") RETURNS "text"
+    LANGUAGE "plpgsql"
+    AS $$
+DECLARE
+  v_center_code TEXT;
+  v_pathology_code TEXT;
+  v_suffix TEXT;
+  v_fondacode TEXT;
+  v_exists BOOLEAN;
+  v_attempts INTEGER := 0;
+  v_max_attempts INTEGER := 100;
+BEGIN
+  -- Get center code (should be 2 digits)
+  SELECT code INTO v_center_code
+  FROM centers
+  WHERE id = p_center_id;
+  
+  IF v_center_code IS NULL THEN
+    RAISE EXCEPTION 'Center does not have a code assigned';
+  END IF;
+  
+  -- Ensure center code is exactly 2 characters (pad with 0 if needed)
+  v_center_code := LPAD(v_center_code, 2, '0');
+  
+  -- Get pathology code (should be 2 digits)
+  SELECT code INTO v_pathology_code
+  FROM pathologies
+  WHERE id = p_pathology_id;
+  
+  IF v_pathology_code IS NULL THEN
+    RAISE EXCEPTION 'Pathology does not have a code assigned';
+  END IF;
+  
+  -- Ensure pathology code is exactly 2 characters (pad with 0 if needed)
+  v_pathology_code := LPAD(v_pathology_code, 2, '0');
+  
+  -- Generate unique fondacode with random suffix
+  LOOP
+    v_suffix := generate_fondacode_suffix();
+    v_fondacode := v_center_code || v_pathology_code || v_suffix;
+    
+    -- Check if this fondacode already exists
+    SELECT EXISTS(
+      SELECT 1 FROM patients WHERE fondacode = v_fondacode
+    ) INTO v_exists;
+    
+    EXIT WHEN NOT v_exists;
+    
+    v_attempts := v_attempts + 1;
+    IF v_attempts >= v_max_attempts THEN
+      RAISE EXCEPTION 'Unable to generate unique fondacode after % attempts', v_max_attempts;
+    END IF;
+  END LOOP;
+  
+  RETURN v_fondacode;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."generate_fondacode"("p_center_id" "uuid", "p_pathology_id" "uuid") OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."generate_fondacode_suffix"() RETURNS "text"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  RETURN LPAD(FLOOR(RANDOM() * 1000000)::TEXT, 6, '0');
+END;
+$$;
+
+
+ALTER FUNCTION "public"."generate_fondacode_suffix"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."get_longitudinal_comparison"("p_visit_type" "public"."visit_type", "p_questionnaire_table" "text", "p_score_column" "text", "p_visit_numbers" integer[], "p_pathology_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("patient_id" "uuid", "medical_record_number" "text", "visit_number" integer, "score_value" numeric, "scheduled_date" timestamp with time zone)
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $_$
+BEGIN
+  RETURN QUERY EXECUTE format(
+    'SELECT 
+      v.patient_id,
+      p.medical_record_number,
+      v.visit_number,
+      r.%I::NUMERIC as score_value,
+      v.scheduled_date
+     FROM visits v
+     JOIN patients p ON p.id = v.patient_id
+     JOIN %I r ON r.visit_id = v.id
+     WHERE v.visit_type = $1 
+       AND v.visit_number = ANY($2)
+       AND v.status != ''cancelled''
+       AND ($3 IS NULL OR p.pathology_id = $3)
+     ORDER BY p.medical_record_number, v.visit_number',
+    p_score_column,
+    p_questionnaire_table
+  ) USING p_visit_type, p_visit_numbers, p_pathology_id;
+END;
+$_$;
+
+
+ALTER FUNCTION "public"."get_longitudinal_comparison"("p_visit_type" "public"."visit_type", "p_questionnaire_table" "text", "p_score_column" "text", "p_visit_numbers" integer[], "p_pathology_id" "uuid") OWNER TO "postgres";
+
+
+COMMENT ON FUNCTION "public"."get_longitudinal_comparison"("p_visit_type" "public"."visit_type", "p_questionnaire_table" "text", "p_score_column" "text", "p_visit_numbers" integer[], "p_pathology_id" "uuid") IS 'Compare questionnaire scores across multiple visit numbers for longitudinal analysis';
+
+
+
+CREATE OR REPLACE FUNCTION "public"."get_next_visit_number"("p_patient_id" "uuid", "p_visit_type" "public"."visit_type") RETURNS integer
+    LANGUAGE "plpgsql"
+    AS $$
+DECLARE
+  next_num INTEGER;
+BEGIN
+  SELECT COALESCE(MAX(visit_number), 0) + 1 INTO next_num
+  FROM visits
+  WHERE patient_id = p_patient_id
+    AND visit_type = p_visit_type
+    AND status != 'cancelled';
+  RETURN next_num;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."get_next_visit_number"("p_patient_id" "uuid", "p_visit_type" "public"."visit_type") OWNER TO "postgres";
+
+
+COMMENT ON FUNCTION "public"."get_next_visit_number"("p_patient_id" "uuid", "p_visit_type" "public"."visit_type") IS 'Returns the next sequential visit number for a patient and visit type';
+
 
 
 CREATE OR REPLACE FUNCTION "public"."get_patient_profile_data"("p_patient_id" "uuid", "p_center_id" "uuid", "p_from_date" timestamp with time zone DEFAULT NULL::timestamp with time zone) RETURNS "jsonb"
@@ -851,6 +1010,38 @@ COMMENT ON FUNCTION "public"."get_professional_dashboard_data"("p_professional_i
 
 
 
+CREATE OR REPLACE FUNCTION "public"."get_questionnaire_data_by_visit_number"("p_visit_type" "public"."visit_type", "p_visit_number" integer, "p_questionnaire_table" "text", "p_pathology_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("patient_id" "uuid", "visit_id" "uuid", "medical_record_number" "text", "scheduled_date" timestamp with time zone, "response_data" "jsonb")
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $_$
+BEGIN
+  RETURN QUERY EXECUTE format(
+    'SELECT 
+      v.patient_id,
+      v.id as visit_id,
+      p.medical_record_number,
+      v.scheduled_date,
+      to_jsonb(r.*) as response_data
+     FROM visits v
+     JOIN patients p ON p.id = v.patient_id
+     JOIN %I r ON r.visit_id = v.id
+     WHERE v.visit_type = $1 
+       AND v.visit_number = $2
+       AND v.status != ''cancelled''
+       AND ($3 IS NULL OR p.pathology_id = $3)
+     ORDER BY v.scheduled_date',
+    p_questionnaire_table
+  ) USING p_visit_type, p_visit_number, p_pathology_id;
+END;
+$_$;
+
+
+ALTER FUNCTION "public"."get_questionnaire_data_by_visit_number"("p_visit_type" "public"."visit_type", "p_visit_number" integer, "p_questionnaire_table" "text", "p_pathology_id" "uuid") OWNER TO "postgres";
+
+
+COMMENT ON FUNCTION "public"."get_questionnaire_data_by_visit_number"("p_visit_type" "public"."visit_type", "p_visit_number" integer, "p_questionnaire_table" "text", "p_pathology_id" "uuid") IS 'Get questionnaire response data for all patients at a specific visit type and number';
+
+
+
 CREATE OR REPLACE FUNCTION "public"."get_user_center"() RETURNS "uuid"
     LANGUAGE "plpgsql" STABLE SECURITY DEFINER
     AS $$
@@ -933,11 +1124,12 @@ ALTER FUNCTION "public"."get_visit_detail"("p_visit_id" "uuid") OWNER TO "postgr
 
 
 CREATE OR REPLACE FUNCTION "public"."get_visit_detail_data"("p_visit_id" "uuid") RETURNS "jsonb"
-    LANGUAGE "plpgsql" SECURITY DEFINER
+    LANGUAGE "plpgsql" STABLE SECURITY DEFINER
     SET "search_path" TO 'public'
     AS $$
 DECLARE
   v_visit_type TEXT;
+  v_pathology_type TEXT;
   v_result JSONB;
   v_tobacco_smoking_status TEXT;
   v_dsm5_diva_evaluated TEXT;
@@ -947,7 +1139,6 @@ DECLARE
   v_wais3_accepted BOOLEAN;
   v_statuses JSONB;
 BEGIN
-  -- Get visit type
   SELECT visit_type INTO v_visit_type
   FROM visits
   WHERE id = p_visit_id;
@@ -956,7 +1147,6 @@ BEGIN
     RETURN jsonb_build_object('error', 'Visit not found');
   END IF;
 
-  -- Get conditional statuses for Fagerstrom and DIVA
   SELECT smoking_status INTO v_tobacco_smoking_status
   FROM bipolar_nurse_tobacco
   WHERE visit_id = p_visit_id;
@@ -965,7 +1155,6 @@ BEGIN
   FROM bipolar_dsm5_comorbid
   WHERE visit_id = p_visit_id;
 
-  -- Get WAIS criteria acceptance status
   SELECT accepted_for_neuropsy_evaluation INTO v_wais4_accepted
   FROM bipolar_wais4_criteria
   WHERE visit_id = p_visit_id;
@@ -978,7 +1167,6 @@ BEGIN
   v_diva_required := v_dsm5_diva_evaluated = 'oui';
 
   IF v_visit_type = 'screening' THEN
-    -- SCREENING: Questionnaires for screening visits
     WITH visit_data AS (
       SELECT v.*, p.first_name, p.last_name, p.date_of_birth, p.gender, pa.type as pathology_type
       FROM visits v
@@ -1006,7 +1194,6 @@ BEGIN
     ) INTO v_result;
 
   ELSIF v_visit_type = 'initial_evaluation' THEN
-    -- INITIAL EVALUATION: All modules
     v_statuses := jsonb_build_object(
       'TOBACCO', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_tobacco WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_tobacco WHERE visit_id = p_visit_id)),
       'FAGERSTROM', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_fagerstrom WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_fagerstrom WHERE visit_id = p_visit_id)),
@@ -1093,28 +1280,83 @@ BEGIN
       'WURS25', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_wurs25 WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_wurs25 WHERE visit_id = p_visit_id)),
       'AQ12', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_aq12 WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_aq12 WHERE visit_id = p_visit_id)),
       'CSM', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_csm WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_csm WHERE visit_id = p_visit_id)),
-      'CTI', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_cti WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_cti WHERE visit_id = p_visit_id)),
+      'CTI', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_cti WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_cti WHERE visit_id = p_visit_id))
+    );
+
+    v_statuses := v_statuses || jsonb_build_object(
       'DOSSIER_INFIRMIER_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_dossier_infirmier WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_dossier_infirmier WHERE visit_id = p_visit_id)),
-      'BILAN_BIOLOGIQUE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_bilan_biologique WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_bilan_biologique WHERE visit_id = p_visit_id)),
+      'BILAN_BIOLOGIQUE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_bilan_biologique WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_bilan_biologique WHERE visit_id = p_visit_id))
+    );
+
+    -- Schizophrenia hetero module
+    v_statuses := v_statuses || jsonb_build_object(
       'PANSS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_panss WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_panss WHERE visit_id = p_visit_id)),
       'CDSS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_cdss WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_cdss WHERE visit_id = p_visit_id)),
       'BARS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_bars WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_bars WHERE visit_id = p_visit_id)),
       'SUMD', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_sumd WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_sumd WHERE visit_id = p_visit_id)),
       'AIMS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_aims WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_aims WHERE visit_id = p_visit_id)),
-      'BARNES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_barnes WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_barnes WHERE visit_id = p_visit_id))
+      'BARNES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_barnes WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_barnes WHERE visit_id = p_visit_id)),
+      'SAS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_sas WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_sas WHERE visit_id = p_visit_id)),
+      'PSP', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_psp WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_psp WHERE visit_id = p_visit_id)),
+      'BRIEF_A_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_brief_a_hetero WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_brief_a_hetero WHERE visit_id = p_visit_id)),
+      'YMRS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_ymrs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_ymrs WHERE visit_id = p_visit_id)),
+      'CGI_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_cgi WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_cgi WHERE visit_id = p_visit_id)),
+      'EGF_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_egf WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_egf WHERE visit_id = p_visit_id))
     );
 
     v_statuses := v_statuses || jsonb_build_object(
-      'SAS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_sas WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_sas WHERE visit_id = p_visit_id)),
-      'PSP', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_psp WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_psp WHERE visit_id = p_visit_id)),
-      'ECV', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_ecv WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_ecv WHERE visit_id = p_visit_id)),
       'TROUBLES_PSYCHOTIQUES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_psychotiques WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_psychotiques WHERE visit_id = p_visit_id)),
       'TROUBLES_COMORBIDES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_comorbides WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_comorbides WHERE visit_id = p_visit_id)),
       'TEA_COFFEE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_tea_coffee WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_tea_coffee WHERE visit_id = p_visit_id)),
       'EVAL_ADDICTOLOGIQUE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id)),
       'SUICIDE_HISTORY_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_suicide_history WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_suicide_history WHERE visit_id = p_visit_id)),
       'ANTECEDENTS_FAMILIAUX_PSY_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_antecedents_familiaux_psy WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_antecedents_familiaux_psy WHERE visit_id = p_visit_id)),
-      'PERINATALITE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_perinatalite WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_perinatalite WHERE visit_id = p_visit_id))
+      'PERINATALITE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_perinatalite WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_perinatalite WHERE visit_id = p_visit_id)),
+      'ECV', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_ecv WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_ecv WHERE visit_id = p_visit_id))
+    );
+
+    -- Schizophrenia neuropsychological module (Bloc 2 + WAIS-IV + CBQ + DACOBS)
+    v_statuses := v_statuses || jsonb_build_object(
+      'CVLT_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_cvlt WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_cvlt WHERE visit_id = p_visit_id)),
+      'TMT_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_tmt WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_tmt WHERE visit_id = p_visit_id)),
+      'COMMISSIONS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_commissions WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_commissions WHERE visit_id = p_visit_id)),
+      'LIS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_lis WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_lis WHERE visit_id = p_visit_id)),
+      'WAIS4_CRITERIA_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_wais4_criteria WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_wais4_criteria WHERE visit_id = p_visit_id)),
+      'WAIS4_EFFICIENCE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_wais4_efficience WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_wais4_efficience WHERE visit_id = p_visit_id)),
+      'WAIS4_SIMILITUDES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_wais4_similitudes WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_wais4_similitudes WHERE visit_id = p_visit_id)),
+      'WAIS4_MEMOIRE_CHIFFRES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_wais4_memoire_chiffres WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_wais4_memoire_chiffres WHERE visit_id = p_visit_id)),
+      'WAIS4_MATRICES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_wais4_matrices WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_wais4_matrices WHERE visit_id = p_visit_id)),
+      'SSTICS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_sstics WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_sstics WHERE visit_id = p_visit_id)),
+      'CBQ_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_cbq WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_cbq WHERE visit_id = p_visit_id)),
+      'DACOBS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_dacobs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_dacobs WHERE visit_id = p_visit_id))
+    );
+
+    v_statuses := v_statuses || jsonb_build_object(
+      'BILAN_SOCIAL_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_bilan_social WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_bilan_social WHERE visit_id = p_visit_id))
+    );
+
+    v_statuses := v_statuses || jsonb_build_object(
+      'SQOL_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_sqol WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_sqol WHERE visit_id = p_visit_id)),
+      'CTQ_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_ctq WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_ctq WHERE visit_id = p_visit_id)),
+      'MARS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_mars WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_mars WHERE visit_id = p_visit_id)),
+      'BIS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_bis WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_bis WHERE visit_id = p_visit_id)),
+      'EQ5D5L_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_eq5d5l WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_eq5d5l WHERE visit_id = p_visit_id)),
+      'IPAQ_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_ipaq WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_ipaq WHERE visit_id = p_visit_id)),
+      'YBOCS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_ybocs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_ybocs WHERE visit_id = p_visit_id)),
+      'WURS25_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_wurs25 WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_wurs25 WHERE visit_id = p_visit_id)),
+      'STORI_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_stori WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_stori WHERE visit_id = p_visit_id)),
+      'SOGS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_sogs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_sogs WHERE visit_id = p_visit_id)),
+      'PSQI_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_psqi WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_psqi WHERE visit_id = p_visit_id)),
+      'PRESENTEISME_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_presenteisme WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_presenteisme WHERE visit_id = p_visit_id)),
+      'FAGERSTROM_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_fagerstrom WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_fagerstrom WHERE visit_id = p_visit_id))
+    );
+
+    v_statuses := v_statuses || jsonb_build_object(
+      'EPHP_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_ephp WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_ephp WHERE visit_id = p_visit_id))
+    );
+
+    v_statuses := v_statuses || jsonb_build_object(
+      'BRIEF_A_AUTO_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_brief_a_auto WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_brief_a_auto WHERE visit_id = p_visit_id))
     );
 
     WITH visit_data AS (
@@ -1139,95 +1381,23 @@ BEGIN
     ) INTO v_result;
 
   ELSIF v_visit_type = 'annual_evaluation' THEN
-    -- ANNUAL EVALUATION: Nurse + Thymic + Medical + Neuropsy + Soin Suivi modules
-    v_statuses := jsonb_build_object(
-      'TOBACCO', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_tobacco WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_tobacco WHERE visit_id = p_visit_id)),
-      'FAGERSTROM', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_fagerstrom WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_fagerstrom WHERE visit_id = p_visit_id)),
-      'PHYSICAL_PARAMS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_physical_params WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_physical_params WHERE visit_id = p_visit_id)),
-      'BLOOD_PRESSURE', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_blood_pressure WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_blood_pressure WHERE visit_id = p_visit_id)),
-      'ECG', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_ecg WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_ecg WHERE visit_id = p_visit_id)),
-      'SLEEP_APNEA', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_sleep_apnea WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_sleep_apnea WHERE visit_id = p_visit_id)),
-      'BIOLOGICAL_ASSESSMENT', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_biological_assessment WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_biological_assessment WHERE visit_id = p_visit_id)),
-      'MADRS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_madrs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_madrs WHERE visit_id = p_visit_id)),
-      'ALDA', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_alda WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_alda WHERE visit_id = p_visit_id)),
-      'YMRS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_ymrs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_ymrs WHERE visit_id = p_visit_id)),
-      'FAST', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_fast WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_fast WHERE visit_id = p_visit_id)),
-      'CGI', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_cgi WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_cgi WHERE visit_id = p_visit_id)),
-      'EGF', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_egf WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_egf WHERE visit_id = p_visit_id)),
-      'ETAT_PATIENT', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_etat_patient WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_etat_patient WHERE visit_id = p_visit_id)),
-      'DSM5_HUMEUR', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_dsm5_humeur WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_dsm5_humeur WHERE visit_id = p_visit_id)),
-      'DSM5_PSYCHOTIC', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_dsm5_psychotic WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_dsm5_psychotic WHERE visit_id = p_visit_id)),
-      'DSM5_COMORBID', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_dsm5_comorbid WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_dsm5_comorbid WHERE visit_id = p_visit_id)),
-      'DIVA', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_diva WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_diva WHERE visit_id = p_visit_id)),
-      'FAMILY_HISTORY', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_family_history WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_family_history WHERE visit_id = p_visit_id)),
-      'CSSRS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_cssrs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_cssrs WHERE visit_id = p_visit_id)),
-      'ISA_FOLLOWUP', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_isa WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_isa WHERE visit_id = p_visit_id)),
-      'SIS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_sis WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_sis WHERE visit_id = p_visit_id)),
-      'SUICIDE_HISTORY', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_suicide_history WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_suicide_history WHERE visit_id = p_visit_id)),
-      'PERINATALITE', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_perinatalite WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_perinatalite WHERE visit_id = p_visit_id)),
-      'PATHO_NEURO', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_patho_neuro WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_patho_neuro WHERE visit_id = p_visit_id)),
-      'PATHO_CARDIO', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_patho_cardio WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_patho_cardio WHERE visit_id = p_visit_id)),
-      'PATHO_ENDOC', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_patho_endoc WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_patho_endoc WHERE visit_id = p_visit_id)),
-      'PATHO_DERMATO', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_patho_dermato WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_patho_dermato WHERE visit_id = p_visit_id)),
-      'PATHO_URINAIRE', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_patho_urinaire WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_patho_urinaire WHERE visit_id = p_visit_id)),
-      'ANTECEDENTS_GYNECO', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_antecedents_gyneco WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_antecedents_gyneco WHERE visit_id = p_visit_id)),
-      'PATHO_HEPATO_GASTRO', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_patho_hepato_gastro WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_patho_hepato_gastro WHERE visit_id = p_visit_id)),
-      'PATHO_ALLERGIQUE', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_patho_allergique WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_patho_allergique WHERE visit_id = p_visit_id)),
-      'AUTRES_PATHO', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_autres_patho WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_autres_patho WHERE visit_id = p_visit_id))
-    );
+    -- Get pathology type for annual evaluation
+    SELECT pa.type INTO v_pathology_type
+    FROM visits v
+    JOIN patients p ON v.patient_id = p.id
+    LEFT JOIN pathologies pa ON p.pathology_id = pa.id
+    WHERE v.id = p_visit_id;
 
-    -- Add Soin Suivi questionnaires for annual evaluation
-    v_statuses := v_statuses || jsonb_build_object(
-      'SUIVI_RECOMMANDATIONS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_suivi_recommandations WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_suivi_recommandations WHERE visit_id = p_visit_id)),
-      'RECOURS_AUX_SOINS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_recours_aux_soins WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_recours_aux_soins WHERE visit_id = p_visit_id)),
-      'TRAITEMENT_NON_PHARMACOLOGIQUE', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_traitement_non_pharma WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_traitement_non_pharma WHERE visit_id = p_visit_id)),
-      'ARRETS_DE_TRAVAIL', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_arrets_travail WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_arrets_travail WHERE visit_id = p_visit_id)),
-      'SOMATIQUE_ET_CONTRACEPTIF', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_somatique_contraceptif WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_somatique_contraceptif WHERE visit_id = p_visit_id)),
-      'STATUT_PROFESSIONNEL', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_statut_professionnel WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_statut_professionnel WHERE visit_id = p_visit_id)),
-      'SUICIDE_BEHAVIOR_FOLLOWUP', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_suicide_behavior WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_suicide_behavior WHERE visit_id = p_visit_id))
-    );
-
-    -- Add Neuropsychological questionnaires for annual evaluation
-    v_statuses := v_statuses || jsonb_build_object(
-      -- Independent tests
-      'CVLT', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_cvlt WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_cvlt WHERE visit_id = p_visit_id)),
-      'TMT', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_tmt WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_tmt WHERE visit_id = p_visit_id)),
-      'STROOP', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_stroop WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_stroop WHERE visit_id = p_visit_id)),
-      'FLUENCES_VERBALES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_fluences_verbales WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_fluences_verbales WHERE visit_id = p_visit_id)),
-      'MEM3_SPATIAL', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_mem3_spatial WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_mem3_spatial WHERE visit_id = p_visit_id)),
-      -- WAIS-III
-      'WAIS3_CRITERIA', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_wais3_criteria WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_wais3_criteria WHERE visit_id = p_visit_id)),
-      'WAIS3_LEARNING', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_wais3_learning WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_wais3_learning WHERE visit_id = p_visit_id)),
-      'WAIS3_VOCABULAIRE', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_wais3_vocabulaire WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_wais3_vocabulaire WHERE visit_id = p_visit_id)),
-      'WAIS3_MATRICES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_wais3_matrices WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_wais3_matrices WHERE visit_id = p_visit_id)),
-      'WAIS3_CODE_SYMBOLES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_wais3_code_symboles WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_wais3_code_symboles WHERE visit_id = p_visit_id)),
-      'WAIS3_DIGIT_SPAN', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_wais3_digit_span WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_wais3_digit_span WHERE visit_id = p_visit_id)),
-      'WAIS3_CPT2', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_wais3_cpt2 WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_wais3_cpt2 WHERE visit_id = p_visit_id)),
-      -- WAIS-IV
-      'WAIS4_CRITERIA', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_wais4_criteria WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_wais4_criteria WHERE visit_id = p_visit_id)),
-      'WAIS4_LEARNING', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_wais4_learning WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_wais4_learning WHERE visit_id = p_visit_id)),
-      'WAIS4_MATRICES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_wais4_matrices WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_wais4_matrices WHERE visit_id = p_visit_id)),
-      'WAIS_IV_CODE_SYMBOLES_IVT', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_wais4_code WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_wais4_code WHERE visit_id = p_visit_id)),
-      'WAIS4_DIGIT_SPAN', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_wais4_digit_span WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_wais4_digit_span WHERE visit_id = p_visit_id)),
-      'WAIS4_SIMILITUDES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_wais4_similitudes WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_wais4_similitudes WHERE visit_id = p_visit_id)),
-      'COBRA', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_cobra WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_cobra WHERE visit_id = p_visit_id)),
-      'CPT3', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_cpt3 WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_cpt3 WHERE visit_id = p_visit_id)),
-      'TEST_COMMISSIONS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_test_commissions WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_test_commissions WHERE visit_id = p_visit_id)),
-      'SCIP', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_scip WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_scip WHERE visit_id = p_visit_id))
-    );
-
-    -- Add Auto ETAT questionnaires for annual evaluation
-    v_statuses := v_statuses || jsonb_build_object(
-      'EQ5D5L', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_eq5d5l WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_eq5d5l WHERE visit_id = p_visit_id)),
-      'PRISE_M', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_prise_m WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_prise_m WHERE visit_id = p_visit_id)),
-      'STAI_YA', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_stai_ya WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_stai_ya WHERE visit_id = p_visit_id)),
-      'MARS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_mars WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_mars WHERE visit_id = p_visit_id)),
-      'MATHYS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_mathys WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_mathys WHERE visit_id = p_visit_id)),
-      'ASRM', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_asrm WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_asrm WHERE visit_id = p_visit_id)),
-      'QIDS_SR16', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_qids_sr16 WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_qids_sr16 WHERE visit_id = p_visit_id)),
-      'PSQI', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_psqi WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_psqi WHERE visit_id = p_visit_id)),
-      'EPWORTH', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_epworth WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_epworth WHERE visit_id = p_visit_id))
-    );
+    IF v_pathology_type = 'schizophrenia' THEN
+      -- Schizophrenia annual evaluation - track nurse questionnaires
+      v_statuses := jsonb_build_object(
+        'DOSSIER_INFIRMIER_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_dossier_infirmier WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_dossier_infirmier WHERE visit_id = p_visit_id)),
+        'BILAN_BIOLOGIQUE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_bilan_biologique WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_bilan_biologique WHERE visit_id = p_visit_id))
+      );
+    ELSE
+      -- Bipolar annual evaluation - return empty for now (can be extended later)
+      v_statuses := jsonb_build_object();
+    END IF;
 
     WITH visit_data AS (
       SELECT v.*, p.first_name, p.last_name, p.date_of_birth, p.gender, pa.type as pathology_type
@@ -1239,52 +1409,14 @@ BEGIN
     SELECT jsonb_build_object(
       'visit', (SELECT row_to_json(vd.*) FROM visit_data vd),
       'questionnaire_statuses', v_statuses,
-      'tobacco_response', (SELECT row_to_json(t) FROM (SELECT v_tobacco_smoking_status AS smoking_status) t),
-      'dsm5_comorbid_response', (SELECT row_to_json(d) FROM (SELECT v_dsm5_diva_evaluated AS diva_evaluated) d),
-      'wais4_criteria_response', (SELECT row_to_json(w) FROM (SELECT v_wais4_accepted AS accepted_for_neuropsy_evaluation) w),
-      'wais3_criteria_response', (SELECT row_to_json(w) FROM (SELECT v_wais3_accepted AS accepted_for_neuropsy_evaluation) w),
       'completion_status', jsonb_build_object(
-        'total_questionnaires', 0,
+        'total_questionnaires', CASE WHEN v_pathology_type = 'schizophrenia' THEN 2 ELSE 0 END,
         'completed_questionnaires', 0,
         'completion_percentage', 0
       )
     ) INTO v_result;
 
-  ELSIF v_visit_type = 'biannual_followup' THEN
-    -- BIANNUAL FOLLOWUP: Nurse + Medical (subset) + Thymic modules
-    v_statuses := jsonb_build_object(
-      'TOBACCO', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_tobacco WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_tobacco WHERE visit_id = p_visit_id)),
-      'FAGERSTROM', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_fagerstrom WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_fagerstrom WHERE visit_id = p_visit_id)),
-      'PHYSICAL_PARAMS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_physical_params WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_physical_params WHERE visit_id = p_visit_id)),
-      'BLOOD_PRESSURE', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_blood_pressure WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_blood_pressure WHERE visit_id = p_visit_id)),
-      'ECG', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_ecg WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_ecg WHERE visit_id = p_visit_id)),
-      'SLEEP_APNEA', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_sleep_apnea WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_sleep_apnea WHERE visit_id = p_visit_id)),
-      'BIOLOGICAL_ASSESSMENT', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_nurse_biological_assessment WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_nurse_biological_assessment WHERE visit_id = p_visit_id)),
-      'MADRS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_madrs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_madrs WHERE visit_id = p_visit_id)),
-      'YMRS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_ymrs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_ymrs WHERE visit_id = p_visit_id)),
-      'CGI', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_cgi WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_cgi WHERE visit_id = p_visit_id)),
-      'EGF', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_egf WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_egf WHERE visit_id = p_visit_id)),
-      'ALDA', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_alda WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_alda WHERE visit_id = p_visit_id)),
-      'ETAT_PATIENT', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_etat_patient WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_etat_patient WHERE visit_id = p_visit_id)),
-      'FAST', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_fast WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_fast WHERE visit_id = p_visit_id)),
-      'HUMEUR_ACTUELS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_humeur_actuels WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_humeur_actuels WHERE visit_id = p_visit_id)),
-      'HUMEUR_DEPUIS_VISITE', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_humeur_depuis_visite WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_humeur_depuis_visite WHERE visit_id = p_visit_id)),
-      'PSYCHOTIQUES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_psychotiques WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_psychotiques WHERE visit_id = p_visit_id)),
-      'DIAG_PSY_SEM_HUMEUR_ACTUELS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_humeur_actuels WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_humeur_actuels WHERE visit_id = p_visit_id)),
-      'DIAG_PSY_SEM_HUMEUR_DEPUIS_VISITE', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_humeur_depuis_visite WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_humeur_depuis_visite WHERE visit_id = p_visit_id)),
-      'DIAG_PSY_SEM_PSYCHOTIQUES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_psychotiques WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_psychotiques WHERE visit_id = p_visit_id)),
-      'ISA_FOLLOWUP', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_isa WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_isa WHERE visit_id = p_visit_id)),
-      'SUICIDE_BEHAVIOR_FOLLOWUP', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_suicide_behavior WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_suicide_behavior WHERE visit_id = p_visit_id)),
-      'CSSRS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_cssrs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_cssrs WHERE visit_id = p_visit_id)),
-      'SUIVI_RECOMMANDATIONS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_suivi_recommandations WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_suivi_recommandations WHERE visit_id = p_visit_id)),
-      'RECOURS_AUX_SOINS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_recours_aux_soins WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_recours_aux_soins WHERE visit_id = p_visit_id)),
-      'TRAITEMENT_NON_PHARMACOLOGIQUE', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_traitement_non_pharma WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_traitement_non_pharma WHERE visit_id = p_visit_id)),
-      'ARRETS_DE_TRAVAIL', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_arrets_travail WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_arrets_travail WHERE visit_id = p_visit_id)),
-      'SOMATIQUE_ET_CONTRACEPTIF', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_somatique_contraceptif WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_somatique_contraceptif WHERE visit_id = p_visit_id)),
-      'SOMATIQUE_CONTRACEPTIF', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_somatique_contraceptif WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_somatique_contraceptif WHERE visit_id = p_visit_id)),
-      'STATUT_PROFESSIONNEL', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_followup_statut_professionnel WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_followup_statut_professionnel WHERE visit_id = p_visit_id))
-    );
-
+  ELSIF v_visit_type = 'biannual_followup' OR v_visit_type = 'followup' THEN
     WITH visit_data AS (
       SELECT v.*, p.first_name, p.last_name, p.date_of_birth, p.gender, pa.type as pathology_type
       FROM visits v
@@ -1294,40 +1426,15 @@ BEGIN
     )
     SELECT jsonb_build_object(
       'visit', (SELECT row_to_json(vd.*) FROM visit_data vd),
-      'questionnaire_statuses', v_statuses,
-      'tobacco_response', (SELECT row_to_json(t) FROM (SELECT v_tobacco_smoking_status AS smoking_status) t),
+      'questionnaire_statuses', jsonb_build_object(),
       'completion_status', jsonb_build_object(
         'total_questionnaires', 0,
-        'completed_questionnaires', 0,
-        'completion_percentage', 0
-      )
-    ) INTO v_result;
-
-  ELSIF v_visit_type = 'followup' THEN
-    -- FOLLOWUP: Limited subset
-    WITH visit_data AS (
-      SELECT v.*, p.first_name, p.last_name, p.date_of_birth, p.gender, pa.type as pathology_type
-      FROM visits v
-      JOIN patients p ON v.patient_id = p.id
-      LEFT JOIN pathologies pa ON p.pathology_id = pa.id
-      WHERE v.id = p_visit_id
-    )
-    SELECT jsonb_build_object(
-      'visit', (SELECT row_to_json(vd.*) FROM visit_data vd),
-      'questionnaire_statuses', jsonb_build_object(
-        'ASRM', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_asrm WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_asrm WHERE visit_id = p_visit_id)),
-        'QIDS_SR16', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_qids_sr16 WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_qids_sr16 WHERE visit_id = p_visit_id)),
-        'EQ5D5L', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_eq5d5l WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_eq5d5l WHERE visit_id = p_visit_id))
-      ),
-      'completion_status', jsonb_build_object(
-        'total_questionnaires', 3,
         'completed_questionnaires', 0,
         'completion_percentage', 0
       )
     ) INTO v_result;
 
   ELSE
-    -- Unknown visit type
     RETURN jsonb_build_object('error', 'Unknown visit type: ' || v_visit_type);
   END IF;
 
@@ -1339,7 +1446,40 @@ $$;
 ALTER FUNCTION "public"."get_visit_detail_data"("p_visit_id" "uuid") OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."get_visit_detail_data"("p_visit_id" "uuid") IS 'Returns complete visit details including questionnaire completion status. Updated to include INF_BILAN_BIOLOGIQUE_SZ questionnaire for schizophrenia initial evaluation.';
+COMMENT ON FUNCTION "public"."get_visit_detail_data"("p_visit_id" "uuid") IS 'Returns complete visit details including questionnaire completion status. Updated to include schizophrenia nurse module tracking for annual evaluation visits.';
+
+
+
+CREATE OR REPLACE FUNCTION "public"."get_visits_by_type_and_number"("p_visit_type" "public"."visit_type", "p_visit_number" integer, "p_pathology_id" "uuid" DEFAULT NULL::"uuid", "p_center_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("visit_id" "uuid", "patient_id" "uuid", "medical_record_number" "text", "patient_first_name" "text", "patient_last_name" "text", "scheduled_date" timestamp with time zone, "completed_date" timestamp with time zone, "status" character varying)
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    v.id as visit_id,
+    v.patient_id,
+    p.medical_record_number,
+    p.first_name as patient_first_name,
+    p.last_name as patient_last_name,
+    v.scheduled_date,
+    v.completed_date,
+    v.status
+  FROM visits v
+  JOIN patients p ON p.id = v.patient_id
+  WHERE v.visit_type = p_visit_type
+    AND v.visit_number = p_visit_number
+    AND v.status != 'cancelled'
+    AND (p_pathology_id IS NULL OR p.pathology_id = p_pathology_id)
+    AND (p_center_id IS NULL OR p.center_id = p_center_id)
+  ORDER BY v.scheduled_date;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."get_visits_by_type_and_number"("p_visit_type" "public"."visit_type", "p_visit_number" integer, "p_pathology_id" "uuid", "p_center_id" "uuid") OWNER TO "postgres";
+
+
+COMMENT ON FUNCTION "public"."get_visits_by_type_and_number"("p_visit_type" "public"."visit_type", "p_visit_number" integer, "p_pathology_id" "uuid", "p_center_id" "uuid") IS 'Get all visits of a specific type and number for longitudinal research queries';
 
 
 
@@ -1425,6 +1565,164 @@ $$;
 
 
 ALTER FUNCTION "public"."is_manager"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."set_patient_fondacode"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  IF NEW.fondacode IS NULL THEN
+    NEW.fondacode := generate_fondacode(NEW.center_id, NEW.pathology_id);
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."set_patient_fondacode"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."update_schizophrenia_cbq_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."update_schizophrenia_cbq_updated_at"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."update_schizophrenia_commissions_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."update_schizophrenia_commissions_updated_at"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."update_schizophrenia_cvlt_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."update_schizophrenia_cvlt_updated_at"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."update_schizophrenia_dacobs_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."update_schizophrenia_dacobs_updated_at"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."update_schizophrenia_lis_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."update_schizophrenia_lis_updated_at"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."update_schizophrenia_sstics_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."update_schizophrenia_sstics_updated_at"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."update_schizophrenia_tmt_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."update_schizophrenia_tmt_updated_at"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."update_schizophrenia_wais4_criteria_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."update_schizophrenia_wais4_criteria_updated_at"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."update_schizophrenia_wais4_efficience_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."update_schizophrenia_wais4_efficience_updated_at"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."update_schizophrenia_wais4_matrices_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."update_schizophrenia_wais4_matrices_updated_at"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."update_schizophrenia_wais4_similitudes_updated_at"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."update_schizophrenia_wais4_similitudes_updated_at"() OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."update_updated_at_column"() RETURNS "trigger"
@@ -2132,7 +2430,8 @@ CREATE TABLE IF NOT EXISTS "public"."bipolar_diagnostic" (
     "completed_by" "uuid",
     "completed_at" timestamp with time zone,
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "evaluator_name" "text"
 );
 
 
@@ -3838,7 +4137,7 @@ CREATE TABLE IF NOT EXISTS "public"."bipolar_nurse_biological_assessment" (
     "patient_gender" character varying(10),
     "years_of_education" integer,
     "weight_kg" numeric,
-    CONSTRAINT "responses_biological_assessm_vitamin_d_supplementation_mo_check" CHECK ((("vitamin_d_supplementation_mode")::"text" = ANY ((ARRAY['ampoule'::character varying, 'gouttes'::character varying])::"text"[]))),
+    CONSTRAINT "responses_biological_assessm_vitamin_d_supplementation_mo_check" CHECK ((("vitamin_d_supplementation_mode")::"text" = ANY (ARRAY[('ampoule'::character varying)::"text", ('gouttes'::character varying)::"text"]))),
     CONSTRAINT "responses_biological_assessment_acide_urique_check" CHECK ((("acide_urique" >= 100) AND ("acide_urique" <= 500))),
     CONSTRAINT "responses_biological_assessment_alat_check" CHECK ((("alat" >= 5) AND ("alat" <= 500))),
     CONSTRAINT "responses_biological_assessment_albumine_check" CHECK ((("albumine" >= 30) AND ("albumine" <= 55))),
@@ -3846,13 +4145,13 @@ CREATE TABLE IF NOT EXISTS "public"."bipolar_nurse_biological_assessment" (
     CONSTRAINT "responses_biological_assessment_basophiles_check" CHECK ((("basophiles" >= (0)::numeric) AND ("basophiles" <= (5)::numeric))),
     CONSTRAINT "responses_biological_assessment_beta_hcg_check" CHECK ((("beta_hcg" >= 0) AND ("beta_hcg" <= 500000))),
     CONSTRAINT "responses_biological_assessment_bicarbonates_check" CHECK ((("bicarbonates" >= 10) AND ("bicarbonates" <= 40))),
-    CONSTRAINT "responses_biological_assessment_bilirubine_unit_check" CHECK ((("bilirubine_totale_unit")::"text" = ANY ((ARRAY['umol_L'::character varying, 'mmol_L'::character varying, 'mg_L'::character varying])::"text"[]))),
+    CONSTRAINT "responses_biological_assessment_bilirubine_unit_check" CHECK ((("bilirubine_totale_unit")::"text" = ANY (ARRAY[('umol_L'::character varying)::"text", ('mmol_L'::character varying)::"text", ('mg_L'::character varying)::"text"]))),
     CONSTRAINT "responses_biological_assessment_calcemie_check" CHECK ((("calcemie" >= 1.50) AND ("calcemie" <= 2.75))),
-    CONSTRAINT "responses_biological_assessment_ccmh_unit_check" CHECK ((("ccmh_unit")::"text" = ANY ((ARRAY['percent'::character varying, 'g_dL'::character varying, 'g_L'::character varying])::"text"[]))),
+    CONSTRAINT "responses_biological_assessment_ccmh_unit_check" CHECK ((("ccmh_unit")::"text" = ANY (ARRAY[('percent'::character varying)::"text", ('g_dL'::character varying)::"text", ('g_L'::character varying)::"text"]))),
     CONSTRAINT "responses_biological_assessment_chlore_check" CHECK ((("chlore" >= 80) AND ("chlore" <= 130))),
     CONSTRAINT "responses_biological_assessment_cholesterol_total_check" CHECK ((("cholesterol_total" >= (1)::numeric) AND ("cholesterol_total" <= (15)::numeric))),
     CONSTRAINT "responses_biological_assessment_clairance_creatinine_check" CHECK ((("clairance_creatinine" >= (0)::numeric) AND ("clairance_creatinine" <= (10000)::numeric))),
-    CONSTRAINT "responses_biological_assessment_collection_location_check" CHECK ((("collection_location")::"text" = ANY ((ARRAY['sur_site'::character varying, 'hors_site'::character varying])::"text"[]))),
+    CONSTRAINT "responses_biological_assessment_collection_location_check" CHECK ((("collection_location")::"text" = ANY (ARRAY[('sur_site'::character varying)::"text", ('hors_site'::character varying)::"text"]))),
     CONSTRAINT "responses_biological_assessment_creatinine_check" CHECK ((("creatinine" >= (30)::numeric) AND ("creatinine" <= (400)::numeric))),
     CONSTRAINT "responses_biological_assessment_crp_check" CHECK ((("crp" >= (0)::numeric) AND ("crp" <= (50)::numeric))),
     CONSTRAINT "responses_biological_assessment_dosage_bhcg_check" CHECK (("dosage_bhcg" >= (0)::numeric)),
@@ -3861,39 +4160,39 @@ CREATE TABLE IF NOT EXISTS "public"."bipolar_nurse_biological_assessment" (
     CONSTRAINT "responses_biological_assessment_ferritine_check" CHECK ((("ferritine" >= 5) AND ("ferritine" <= 1000))),
     CONSTRAINT "responses_biological_assessment_ggt_check" CHECK ((("ggt" >= 5) AND ("ggt" <= 1500))),
     CONSTRAINT "responses_biological_assessment_glycemie_a_jeun_check" CHECK ((("glycemie_a_jeun" >= (0)::numeric) AND ("glycemie_a_jeun" <= (50)::numeric))),
-    CONSTRAINT "responses_biological_assessment_glycemie_a_jeun_unit_check" CHECK ((("glycemie_a_jeun_unit")::"text" = ANY ((ARRAY['mmol_L'::character varying, 'g_L'::character varying])::"text"[]))),
-    CONSTRAINT "responses_biological_assessment_glycemie_unit_check" CHECK ((("glycemie_unit")::"text" = ANY ((ARRAY['mmol_L'::character varying, 'g_L'::character varying])::"text"[]))),
-    CONSTRAINT "responses_biological_assessment_hdl_unit_check" CHECK ((("hdl_unit")::"text" = ANY ((ARRAY['mmol_L'::character varying, 'g_L'::character varying])::"text"[]))),
+    CONSTRAINT "responses_biological_assessment_glycemie_a_jeun_unit_check" CHECK ((("glycemie_a_jeun_unit")::"text" = ANY (ARRAY[('mmol_L'::character varying)::"text", ('g_L'::character varying)::"text"]))),
+    CONSTRAINT "responses_biological_assessment_glycemie_unit_check" CHECK ((("glycemie_unit")::"text" = ANY (ARRAY[('mmol_L'::character varying)::"text", ('g_L'::character varying)::"text"]))),
+    CONSTRAINT "responses_biological_assessment_hdl_unit_check" CHECK ((("hdl_unit")::"text" = ANY (ARRAY[('mmol_L'::character varying)::"text", ('g_L'::character varying)::"text"]))),
     CONSTRAINT "responses_biological_assessment_hematies_check" CHECK ((("hematies" >= (1)::numeric) AND ("hematies" <= (8)::numeric))),
-    CONSTRAINT "responses_biological_assessment_hematocrite_unit_check" CHECK ((("hematocrite_unit")::"text" = ANY ((ARRAY['percent'::character varying, 'L_L'::character varying])::"text"[]))),
+    CONSTRAINT "responses_biological_assessment_hematocrite_unit_check" CHECK ((("hematocrite_unit")::"text" = ANY (ARRAY[('percent'::character varying)::"text", ('L_L'::character varying)::"text"]))),
     CONSTRAINT "responses_biological_assessment_hemoglobine_glyquee_check" CHECK ((("hemoglobine_glyquee" >= (0)::numeric) AND ("hemoglobine_glyquee" <= (50)::numeric))),
-    CONSTRAINT "responses_biological_assessment_hemoglobine_unit_check" CHECK ((("hemoglobine_unit")::"text" = ANY ((ARRAY['g_dL'::character varying, 'mmol_L'::character varying])::"text"[]))),
-    CONSTRAINT "responses_biological_assessment_ldl_unit_check" CHECK ((("ldl_unit")::"text" = ANY ((ARRAY['mmol_L'::character varying, 'g_L'::character varying])::"text"[]))),
+    CONSTRAINT "responses_biological_assessment_hemoglobine_unit_check" CHECK ((("hemoglobine_unit")::"text" = ANY (ARRAY[('g_dL'::character varying)::"text", ('mmol_L'::character varying)::"text"]))),
+    CONSTRAINT "responses_biological_assessment_ldl_unit_check" CHECK ((("ldl_unit")::"text" = ANY (ARRAY[('mmol_L'::character varying)::"text", ('g_L'::character varying)::"text"]))),
     CONSTRAINT "responses_biological_assessment_leucocytes_check" CHECK ((("leucocytes" >= 0.5) AND ("leucocytes" <= (200)::numeric))),
     CONSTRAINT "responses_biological_assessment_lymphocytes_check" CHECK ((("lymphocytes" >= (0)::numeric) AND ("lymphocytes" <= (20)::numeric))),
     CONSTRAINT "responses_biological_assessment_monocytes_check" CHECK ((("monocytes" >= (0)::numeric) AND ("monocytes" <= (5)::numeric))),
     CONSTRAINT "responses_biological_assessment_neutrophiles_check" CHECK ((("neutrophiles" >= (0)::numeric) AND ("neutrophiles" <= (50)::numeric))),
-    CONSTRAINT "responses_biological_assessment_outdoor_time_check" CHECK ((("outdoor_time")::"text" = ANY ((ARRAY['less_than_1h_per_week'::character varying, 'less_than_1h_per_day_several_hours_per_week'::character varying, 'at_least_1h_per_day'::character varying, 'more_than_4h_per_day'::character varying])::"text"[]))),
+    CONSTRAINT "responses_biological_assessment_outdoor_time_check" CHECK ((("outdoor_time")::"text" = ANY (ARRAY[('less_than_1h_per_week'::character varying)::"text", ('less_than_1h_per_day_several_hours_per_week'::character varying)::"text", ('at_least_1h_per_day'::character varying)::"text", ('more_than_4h_per_day'::character varying)::"text"]))),
     CONSTRAINT "responses_biological_assessment_pal_check" CHECK ((("pal" >= 20) AND ("pal" <= 400))),
     CONSTRAINT "responses_biological_assessment_phosphore_check" CHECK ((("phosphore" >= 0.5) AND ("phosphore" <= 2.0))),
     CONSTRAINT "responses_biological_assessment_plaquettes_check" CHECK ((("plaquettes" >= 10) AND ("plaquettes" <= 1000))),
     CONSTRAINT "responses_biological_assessment_potassium_check" CHECK ((("potassium" >= 2.0) AND ("potassium" <= 7.0))),
     CONSTRAINT "responses_biological_assessment_prolactine_check" CHECK (("prolactine" > (0)::numeric)),
-    CONSTRAINT "responses_biological_assessment_prolactine_unit_check" CHECK ((("prolactine_unit")::"text" = ANY ((ARRAY['mg_L'::character varying, 'uIU_mL'::character varying, 'ng_mL'::character varying, 'ug_L'::character varying])::"text"[]))),
+    CONSTRAINT "responses_biological_assessment_prolactine_unit_check" CHECK ((("prolactine_unit")::"text" = ANY (ARRAY[('mg_L'::character varying)::"text", ('uIU_mL'::character varying)::"text", ('ng_mL'::character varying)::"text", ('ug_L'::character varying)::"text"]))),
     CONSTRAINT "responses_biological_assessment_protidemie_check" CHECK ((("protidemie" >= 50) AND ("protidemie" <= 90))),
-    CONSTRAINT "responses_biological_assessment_skin_phototype_check" CHECK ((("skin_phototype")::"text" = ANY ((ARRAY['I'::character varying, 'II'::character varying, 'III'::character varying, 'IV'::character varying, 'V'::character varying, 'VI'::character varying])::"text"[]))),
+    CONSTRAINT "responses_biological_assessment_skin_phototype_check" CHECK ((("skin_phototype")::"text" = ANY (ARRAY[('I'::character varying)::"text", ('II'::character varying)::"text", ('III'::character varying)::"text", ('IV'::character varying)::"text", ('V'::character varying)::"text", ('VI'::character varying)::"text"]))),
     CONSTRAINT "responses_biological_assessment_sodium_check" CHECK ((("sodium" >= (120)::numeric) AND ("sodium" <= (170)::numeric))),
     CONSTRAINT "responses_biological_assessment_t3_libre_check" CHECK ((("t3_libre" >= (1)::numeric) AND ("t3_libre" <= (30)::numeric))),
     CONSTRAINT "responses_biological_assessment_t4_libre_check" CHECK ((("t4_libre" >= (5)::numeric) AND ("t4_libre" <= (50)::numeric))),
-    CONSTRAINT "responses_biological_assessment_tcmh_unit_check" CHECK ((("tcmh_unit")::"text" = ANY ((ARRAY['pg'::character varying, 'percent'::character varying])::"text"[]))),
-    CONSTRAINT "responses_biological_assessment_teralithe_type_check" CHECK ((("teralithe_type")::"text" = ANY ((ARRAY['250'::character varying, 'LP400'::character varying])::"text"[]))),
+    CONSTRAINT "responses_biological_assessment_tcmh_unit_check" CHECK ((("tcmh_unit")::"text" = ANY (ARRAY[('pg'::character varying)::"text", ('percent'::character varying)::"text"]))),
+    CONSTRAINT "responses_biological_assessment_teralithe_type_check" CHECK ((("teralithe_type")::"text" = ANY (ARRAY[('250'::character varying)::"text", ('LP400'::character varying)::"text"]))),
     CONSTRAINT "responses_biological_assessment_toxo_igg_value_check" CHECK (("toxo_igg_value" > (0)::numeric)),
     CONSTRAINT "responses_biological_assessment_triglycerides_check" CHECK ((("triglycerides" >= 0.2) AND ("triglycerides" <= (20)::numeric))),
-    CONSTRAINT "responses_biological_assessment_tsh_unit_check" CHECK ((("tsh_unit")::"text" = ANY ((ARRAY['pmol_L'::character varying, 'uUI_mL'::character varying, 'mUI_L'::character varying])::"text"[]))),
+    CONSTRAINT "responses_biological_assessment_tsh_unit_check" CHECK ((("tsh_unit")::"text" = ANY (ARRAY[('pmol_L'::character varying)::"text", ('uUI_mL'::character varying)::"text", ('mUI_L'::character varying)::"text"]))),
     CONSTRAINT "responses_biological_assessment_uree_check" CHECK ((("uree" >= (1)::numeric) AND ("uree" <= (20)::numeric))),
     CONSTRAINT "responses_biological_assessment_vgm_check" CHECK ((("vgm" >= (50)::numeric) AND ("vgm" <= (130)::numeric))),
     CONSTRAINT "responses_biological_assessment_vitamin_d_level_check" CHECK ((("vitamin_d_level" >= (0)::numeric) AND ("vitamin_d_level" <= (300)::numeric))),
-    CONSTRAINT "responses_biological_assessment_vitamin_d_product_name_check" CHECK ((("vitamin_d_product_name")::"text" = ANY ((ARRAY['sterogyl'::character varying, 'dedrogyl'::character varying, 'uvedose'::character varying, 'zymaduo'::character varying, 'uvesterol'::character varying, 'zymad'::character varying, 'autre'::character varying])::"text"[])))
+    CONSTRAINT "responses_biological_assessment_vitamin_d_product_name_check" CHECK ((("vitamin_d_product_name")::"text" = ANY (ARRAY[('sterogyl'::character varying)::"text", ('dedrogyl'::character varying)::"text", ('uvedose'::character varying)::"text", ('zymaduo'::character varying)::"text", ('uvesterol'::character varying)::"text", ('zymad'::character varying)::"text", ('autre'::character varying)::"text"])))
 );
 
 
@@ -4069,7 +4368,7 @@ CREATE TABLE IF NOT EXISTS "public"."bipolar_nurse_physical_params" (
     "bmi" numeric,
     CONSTRAINT "responses_physical_params_abdominal_circumference_cm_check" CHECK ((("abdominal_circumference_cm" > 10) AND ("abdominal_circumference_cm" < 200))),
     CONSTRAINT "responses_physical_params_height_cm_check" CHECK ((("height_cm" > 0) AND ("height_cm" < 300))),
-    CONSTRAINT "responses_physical_params_pregnant_check" CHECK ((("pregnant")::"text" = ANY ((ARRAY['Oui'::character varying, 'Non'::character varying])::"text"[]))),
+    CONSTRAINT "responses_physical_params_pregnant_check" CHECK ((("pregnant")::"text" = ANY (ARRAY[('Oui'::character varying)::"text", ('Non'::character varying)::"text"]))),
     CONSTRAINT "responses_physical_params_weight_kg_check" CHECK ((("weight_kg" > (0)::numeric) AND ("weight_kg" < (500)::numeric)))
 );
 
@@ -4106,7 +4405,7 @@ CREATE TABLE IF NOT EXISTS "public"."bipolar_nurse_sleep_apnea" (
     "completed_at" timestamp with time zone DEFAULT "now"(),
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
-    CONSTRAINT "responses_sleep_apnea_diagnosed_sleep_apnea_check" CHECK ((("diagnosed_sleep_apnea")::"text" = ANY ((ARRAY['yes'::character varying, 'no'::character varying, 'unknown'::character varying])::"text"[])))
+    CONSTRAINT "responses_sleep_apnea_diagnosed_sleep_apnea_check" CHECK ((("diagnosed_sleep_apnea")::"text" = ANY (ARRAY[('yes'::character varying)::"text", ('no'::character varying)::"text", ('unknown'::character varying)::"text"])))
 );
 
 
@@ -4144,9 +4443,9 @@ CREATE TABLE IF NOT EXISTS "public"."bipolar_nurse_tobacco" (
     "has_substitution_ex" character varying(10),
     "substitution_methods_ex" "text"[],
     CONSTRAINT "responses_tobacco_pack_years_check" CHECK (("pack_years" > 0)),
-    CONSTRAINT "responses_tobacco_smoking_end_age_check" CHECK ((("smoking_end_age")::"text" = ANY ((ARRAY['unknown'::character varying, '<5'::character varying, '5'::character varying, '6'::character varying, '7'::character varying, '8'::character varying, '9'::character varying, '10'::character varying, '11'::character varying, '12'::character varying, '13'::character varying, '14'::character varying, '15'::character varying, '16'::character varying, '17'::character varying, '18'::character varying, '19'::character varying, '20'::character varying, '21'::character varying, '22'::character varying, '23'::character varying, '24'::character varying, '25'::character varying, '26'::character varying, '27'::character varying, '28'::character varying, '29'::character varying, '30'::character varying, '31'::character varying, '32'::character varying, '33'::character varying, '34'::character varying, '35'::character varying, '36'::character varying, '37'::character varying, '38'::character varying, '39'::character varying, '40'::character varying, '41'::character varying, '42'::character varying, '43'::character varying, '44'::character varying, '45'::character varying, '46'::character varying, '47'::character varying, '48'::character varying, '49'::character varying, '50'::character varying, '51'::character varying, '52'::character varying, '53'::character varying, '54'::character varying, '55'::character varying, '56'::character varying, '57'::character varying, '58'::character varying, '59'::character varying, '60'::character varying, '61'::character varying, '62'::character varying, '63'::character varying, '64'::character varying, '65'::character varying, '66'::character varying, '67'::character varying, '68'::character varying, '69'::character varying, '70'::character varying, '71'::character varying, '72'::character varying, '73'::character varying, '74'::character varying, '75'::character varying, '76'::character varying, '77'::character varying, '78'::character varying, '79'::character varying, '80'::character varying, '81'::character varying, '82'::character varying, '83'::character varying, '84'::character varying, '85'::character varying, '86'::character varying, '87'::character varying, '88'::character varying, '89'::character varying, '>89'::character varying])::"text"[]))),
-    CONSTRAINT "responses_tobacco_smoking_start_age_check" CHECK ((("smoking_start_age")::"text" = ANY ((ARRAY['unknown'::character varying, '<5'::character varying, '5'::character varying, '6'::character varying, '7'::character varying, '8'::character varying, '9'::character varying, '10'::character varying, '11'::character varying, '12'::character varying, '13'::character varying, '14'::character varying, '15'::character varying, '16'::character varying, '17'::character varying, '18'::character varying, '19'::character varying, '20'::character varying, '21'::character varying, '22'::character varying, '23'::character varying, '24'::character varying, '25'::character varying, '26'::character varying, '27'::character varying, '28'::character varying, '29'::character varying, '30'::character varying, '31'::character varying, '32'::character varying, '33'::character varying, '34'::character varying, '35'::character varying, '36'::character varying, '37'::character varying, '38'::character varying, '39'::character varying, '40'::character varying, '41'::character varying, '42'::character varying, '43'::character varying, '44'::character varying, '45'::character varying, '46'::character varying, '47'::character varying, '48'::character varying, '49'::character varying, '50'::character varying, '51'::character varying, '52'::character varying, '53'::character varying, '54'::character varying, '55'::character varying, '56'::character varying, '57'::character varying, '58'::character varying, '59'::character varying, '60'::character varying, '61'::character varying, '62'::character varying, '63'::character varying, '64'::character varying, '65'::character varying, '66'::character varying, '67'::character varying, '68'::character varying, '69'::character varying, '70'::character varying, '71'::character varying, '72'::character varying, '73'::character varying, '74'::character varying, '75'::character varying, '76'::character varying, '77'::character varying, '78'::character varying, '79'::character varying, '80'::character varying, '81'::character varying, '82'::character varying, '83'::character varying, '84'::character varying, '85'::character varying, '86'::character varying, '87'::character varying, '88'::character varying, '89'::character varying, '>89'::character varying])::"text"[]))),
-    CONSTRAINT "responses_tobacco_smoking_status_check" CHECK ((("smoking_status")::"text" = ANY ((ARRAY['non_smoker'::character varying, 'current_smoker'::character varying, 'ex_smoker'::character varying, 'unknown'::character varying])::"text"[])))
+    CONSTRAINT "responses_tobacco_smoking_end_age_check" CHECK ((("smoking_end_age")::"text" = ANY (ARRAY[('unknown'::character varying)::"text", ('<5'::character varying)::"text", ('5'::character varying)::"text", ('6'::character varying)::"text", ('7'::character varying)::"text", ('8'::character varying)::"text", ('9'::character varying)::"text", ('10'::character varying)::"text", ('11'::character varying)::"text", ('12'::character varying)::"text", ('13'::character varying)::"text", ('14'::character varying)::"text", ('15'::character varying)::"text", ('16'::character varying)::"text", ('17'::character varying)::"text", ('18'::character varying)::"text", ('19'::character varying)::"text", ('20'::character varying)::"text", ('21'::character varying)::"text", ('22'::character varying)::"text", ('23'::character varying)::"text", ('24'::character varying)::"text", ('25'::character varying)::"text", ('26'::character varying)::"text", ('27'::character varying)::"text", ('28'::character varying)::"text", ('29'::character varying)::"text", ('30'::character varying)::"text", ('31'::character varying)::"text", ('32'::character varying)::"text", ('33'::character varying)::"text", ('34'::character varying)::"text", ('35'::character varying)::"text", ('36'::character varying)::"text", ('37'::character varying)::"text", ('38'::character varying)::"text", ('39'::character varying)::"text", ('40'::character varying)::"text", ('41'::character varying)::"text", ('42'::character varying)::"text", ('43'::character varying)::"text", ('44'::character varying)::"text", ('45'::character varying)::"text", ('46'::character varying)::"text", ('47'::character varying)::"text", ('48'::character varying)::"text", ('49'::character varying)::"text", ('50'::character varying)::"text", ('51'::character varying)::"text", ('52'::character varying)::"text", ('53'::character varying)::"text", ('54'::character varying)::"text", ('55'::character varying)::"text", ('56'::character varying)::"text", ('57'::character varying)::"text", ('58'::character varying)::"text", ('59'::character varying)::"text", ('60'::character varying)::"text", ('61'::character varying)::"text", ('62'::character varying)::"text", ('63'::character varying)::"text", ('64'::character varying)::"text", ('65'::character varying)::"text", ('66'::character varying)::"text", ('67'::character varying)::"text", ('68'::character varying)::"text", ('69'::character varying)::"text", ('70'::character varying)::"text", ('71'::character varying)::"text", ('72'::character varying)::"text", ('73'::character varying)::"text", ('74'::character varying)::"text", ('75'::character varying)::"text", ('76'::character varying)::"text", ('77'::character varying)::"text", ('78'::character varying)::"text", ('79'::character varying)::"text", ('80'::character varying)::"text", ('81'::character varying)::"text", ('82'::character varying)::"text", ('83'::character varying)::"text", ('84'::character varying)::"text", ('85'::character varying)::"text", ('86'::character varying)::"text", ('87'::character varying)::"text", ('88'::character varying)::"text", ('89'::character varying)::"text", ('>89'::character varying)::"text"]))),
+    CONSTRAINT "responses_tobacco_smoking_start_age_check" CHECK ((("smoking_start_age")::"text" = ANY (ARRAY[('unknown'::character varying)::"text", ('<5'::character varying)::"text", ('5'::character varying)::"text", ('6'::character varying)::"text", ('7'::character varying)::"text", ('8'::character varying)::"text", ('9'::character varying)::"text", ('10'::character varying)::"text", ('11'::character varying)::"text", ('12'::character varying)::"text", ('13'::character varying)::"text", ('14'::character varying)::"text", ('15'::character varying)::"text", ('16'::character varying)::"text", ('17'::character varying)::"text", ('18'::character varying)::"text", ('19'::character varying)::"text", ('20'::character varying)::"text", ('21'::character varying)::"text", ('22'::character varying)::"text", ('23'::character varying)::"text", ('24'::character varying)::"text", ('25'::character varying)::"text", ('26'::character varying)::"text", ('27'::character varying)::"text", ('28'::character varying)::"text", ('29'::character varying)::"text", ('30'::character varying)::"text", ('31'::character varying)::"text", ('32'::character varying)::"text", ('33'::character varying)::"text", ('34'::character varying)::"text", ('35'::character varying)::"text", ('36'::character varying)::"text", ('37'::character varying)::"text", ('38'::character varying)::"text", ('39'::character varying)::"text", ('40'::character varying)::"text", ('41'::character varying)::"text", ('42'::character varying)::"text", ('43'::character varying)::"text", ('44'::character varying)::"text", ('45'::character varying)::"text", ('46'::character varying)::"text", ('47'::character varying)::"text", ('48'::character varying)::"text", ('49'::character varying)::"text", ('50'::character varying)::"text", ('51'::character varying)::"text", ('52'::character varying)::"text", ('53'::character varying)::"text", ('54'::character varying)::"text", ('55'::character varying)::"text", ('56'::character varying)::"text", ('57'::character varying)::"text", ('58'::character varying)::"text", ('59'::character varying)::"text", ('60'::character varying)::"text", ('61'::character varying)::"text", ('62'::character varying)::"text", ('63'::character varying)::"text", ('64'::character varying)::"text", ('65'::character varying)::"text", ('66'::character varying)::"text", ('67'::character varying)::"text", ('68'::character varying)::"text", ('69'::character varying)::"text", ('70'::character varying)::"text", ('71'::character varying)::"text", ('72'::character varying)::"text", ('73'::character varying)::"text", ('74'::character varying)::"text", ('75'::character varying)::"text", ('76'::character varying)::"text", ('77'::character varying)::"text", ('78'::character varying)::"text", ('79'::character varying)::"text", ('80'::character varying)::"text", ('81'::character varying)::"text", ('82'::character varying)::"text", ('83'::character varying)::"text", ('84'::character varying)::"text", ('85'::character varying)::"text", ('86'::character varying)::"text", ('87'::character varying)::"text", ('88'::character varying)::"text", ('89'::character varying)::"text", ('>89'::character varying)::"text"]))),
+    CONSTRAINT "responses_tobacco_smoking_status_check" CHECK ((("smoking_status")::"text" = ANY (ARRAY[('non_smoker'::character varying)::"text", ('current_smoker'::character varying)::"text", ('ex_smoker'::character varying)::"text", ('unknown'::character varying)::"text"])))
 );
 
 
@@ -5852,7 +6151,8 @@ CREATE TABLE IF NOT EXISTS "public"."pathologies" (
     "name" character varying(100) NOT NULL,
     "description" "text",
     "color" character varying(7),
-    "created_at" timestamp with time zone DEFAULT "now"()
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "code" character varying(10) NOT NULL
 );
 
 
@@ -5869,7 +6169,12 @@ CREATE TABLE IF NOT EXISTS "public"."patient_medications" (
     "created_at" timestamp with time zone DEFAULT "now"(),
     "updated_at" timestamp with time zone DEFAULT "now"(),
     "created_by" "uuid",
-    CONSTRAINT "end_date_required_when_not_ongoing" CHECK ((("is_ongoing" = true) OR ("end_date" IS NOT NULL)))
+    "dosage_type" "text",
+    "daily_units" "text",
+    "ampoule_count" "text",
+    "weeks_interval" "text",
+    CONSTRAINT "end_date_required_when_not_ongoing" CHECK ((("is_ongoing" = true) OR ("end_date" IS NOT NULL))),
+    CONSTRAINT "patient_medications_dosage_type_check" CHECK (("dosage_type" = ANY (ARRAY['regular'::"text", 'injectable'::"text"])))
 );
 
 
@@ -5893,6 +6198,22 @@ COMMENT ON COLUMN "public"."patient_medications"."is_ongoing" IS 'Whether the tr
 
 
 COMMENT ON COLUMN "public"."patient_medications"."end_date" IS 'Date when treatment ended (required if is_ongoing = false)';
+
+
+
+COMMENT ON COLUMN "public"."patient_medications"."dosage_type" IS 'Type of dosage: regular (daily) or injectable (periodic)';
+
+
+
+COMMENT ON COLUMN "public"."patient_medications"."daily_units" IS 'For regular meds: number of units per day (e.g., 2, 0.5, Si besoin)';
+
+
+
+COMMENT ON COLUMN "public"."patient_medications"."ampoule_count" IS 'For injectable meds: number of ampoules per administration';
+
+
+
+COMMENT ON COLUMN "public"."patient_medications"."weeks_interval" IS 'For injectable meds: interval between administrations in weeks';
 
 
 
@@ -5920,7 +6241,28 @@ CREATE TABLE IF NOT EXISTS "public"."patients" (
     "assigned_to" "uuid",
     "place_of_birth" character varying(255),
     "years_of_education" integer,
-    CONSTRAINT "patients_gender_check" CHECK ((("gender" IS NULL) OR (("gender")::"text" = ANY ((ARRAY['M'::character varying, 'F'::character varying])::"text"[])))),
+    "maiden_name" "text",
+    "fondacode" character varying(10),
+    "birth_city" "text",
+    "birth_department" "text",
+    "birth_country" "text" DEFAULT 'France'::"text",
+    "marital_name" "text",
+    "hospital_id" "text",
+    "social_security_number" "text",
+    "street_number_and_name" "text",
+    "building_details" "text",
+    "postal_code" "text",
+    "city" "text",
+    "phone_private" "text",
+    "phone_professional" "text",
+    "phone_mobile" "text",
+    "patient_sector" "text",
+    "referred_by" "text",
+    "visit_purpose" "text",
+    "gp_report_consent" "text",
+    "psychiatrist_report_consent" "text",
+    "center_awareness_source" "text",
+    CONSTRAINT "patients_gender_check" CHECK ((("gender" IS NULL) OR (("gender")::"text" = ANY (ARRAY[('M'::character varying)::"text", ('F'::character varying)::"text"])))),
     CONSTRAINT "patients_years_of_education_check" CHECK ((("years_of_education" >= 0) AND ("years_of_education" <= 30)))
 );
 
@@ -5961,6 +6303,78 @@ COMMENT ON COLUMN "public"."patients"."place_of_birth" IS 'Place of birth for th
 
 
 COMMENT ON COLUMN "public"."patients"."years_of_education" IS 'Nombre d''années d''études (depuis les cours préparatoires) - utilisé pour le calcul des scores neuropsychologiques';
+
+
+
+COMMENT ON COLUMN "public"."patients"."birth_city" IS 'Ville de naissance';
+
+
+
+COMMENT ON COLUMN "public"."patients"."birth_department" IS 'Département de naissance';
+
+
+
+COMMENT ON COLUMN "public"."patients"."birth_country" IS 'Pays de naissance';
+
+
+
+COMMENT ON COLUMN "public"."patients"."hospital_id" IS 'Numéro d''identification hospitalier';
+
+
+
+COMMENT ON COLUMN "public"."patients"."social_security_number" IS 'Numéro de Sécurité Sociale';
+
+
+
+COMMENT ON COLUMN "public"."patients"."street_number_and_name" IS 'Numéro et nom de rue';
+
+
+
+COMMENT ON COLUMN "public"."patients"."building_details" IS 'Bâtiment, lieu-dit';
+
+
+
+COMMENT ON COLUMN "public"."patients"."postal_code" IS 'Code postal';
+
+
+
+COMMENT ON COLUMN "public"."patients"."city" IS 'Ville';
+
+
+
+COMMENT ON COLUMN "public"."patients"."phone_private" IS 'Téléphone privé';
+
+
+
+COMMENT ON COLUMN "public"."patients"."phone_professional" IS 'Téléphone professionnel';
+
+
+
+COMMENT ON COLUMN "public"."patients"."phone_mobile" IS 'Téléphone portable';
+
+
+
+COMMENT ON COLUMN "public"."patients"."patient_sector" IS 'Secteur du patient (Secteur du centre, Hors secteur, Monaco)';
+
+
+
+COMMENT ON COLUMN "public"."patients"."referred_by" IS 'Adressé(e) par (Psychiatre libéral, hospitalier, etc.)';
+
+
+
+COMMENT ON COLUMN "public"."patients"."visit_purpose" IS 'Objet de la visite (Avis diagnostic, thérapeutique)';
+
+
+
+COMMENT ON COLUMN "public"."patients"."gp_report_consent" IS 'Accord transmission bilan au médecin généraliste';
+
+
+
+COMMENT ON COLUMN "public"."patients"."psychiatrist_report_consent" IS 'Accord transmission bilan au psychiatre';
+
+
+
+COMMENT ON COLUMN "public"."patients"."center_awareness_source" IS 'Comment avez-vous eu connaissance du centre expert';
 
 
 
@@ -6009,11 +6423,16 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_aims" (
     "completed_by" "uuid",
     "completed_at" timestamp with time zone DEFAULT "now"(),
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "test_done" boolean DEFAULT true
 );
 
 
 ALTER TABLE "public"."schizophrenia_aims" OWNER TO "postgres";
+
+
+COMMENT ON COLUMN "public"."schizophrenia_aims"."test_done" IS 'Flag indicating if the test was administered';
+
 
 
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_antecedents_familiaux_psy" (
@@ -6079,11 +6498,16 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_barnes" (
     "completed_by" "uuid",
     "completed_at" timestamp with time zone DEFAULT "now"(),
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "test_done" boolean DEFAULT true
 );
 
 
 ALTER TABLE "public"."schizophrenia_barnes" OWNER TO "postgres";
+
+
+COMMENT ON COLUMN "public"."schizophrenia_barnes"."test_done" IS 'Flag indicating if the test was administered';
+
 
 
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_bars" (
@@ -6098,11 +6522,21 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_bars" (
     "completed_by" "uuid",
     "completed_at" timestamp with time zone DEFAULT "now"(),
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "test_done" boolean DEFAULT true,
+    "estimation_observance" integer
 );
 
 
 ALTER TABLE "public"."schizophrenia_bars" OWNER TO "postgres";
+
+
+COMMENT ON COLUMN "public"."schizophrenia_bars"."test_done" IS 'Flag indicating if the test was administered';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_bars"."estimation_observance" IS 'Manual estimation of adherence by the patient (0-100)';
+
 
 
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_bilan_biologique" (
@@ -6154,6 +6588,597 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_bilan_biologique" (
 ALTER TABLE "public"."schizophrenia_bilan_biologique" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_bilan_social" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "marital_status" "text",
+    "children_count" integer,
+    "education" "text",
+    "professional_status" "text",
+    "professional_class" "text",
+    "current_work_leave" "text",
+    "past_year_work_leave" "text",
+    "past_year_leave_weeks" integer,
+    "income_types" "text"[],
+    "monthly_income" "text",
+    "housing_type" "text",
+    "protection_measures" "text",
+    "protection_start_year" integer,
+    "justice_safeguard" boolean,
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"()
+);
+
+
+ALTER TABLE "public"."schizophrenia_bilan_social" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_bis" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "questionnaire_done" "text",
+    "q1" "text",
+    "q2" "text",
+    "q3" "text",
+    "q4" "text",
+    "q5" "text",
+    "q6" "text",
+    "q7" "text",
+    "q8" "text",
+    "conscience_symptome_score" numeric(3,1),
+    "conscience_maladie_score" numeric(3,1),
+    "besoin_traitement_score" numeric(3,1),
+    "total_score" numeric(4,1),
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_bis_besoin_traitement_range" CHECK ((("besoin_traitement_score" IS NULL) OR (("besoin_traitement_score" >= (0)::numeric) AND ("besoin_traitement_score" <= (4)::numeric)))),
+    CONSTRAINT "schizophrenia_bis_conscience_maladie_range" CHECK ((("conscience_maladie_score" IS NULL) OR (("conscience_maladie_score" >= (0)::numeric) AND ("conscience_maladie_score" <= (4)::numeric)))),
+    CONSTRAINT "schizophrenia_bis_conscience_symptome_range" CHECK ((("conscience_symptome_score" IS NULL) OR (("conscience_symptome_score" >= (0)::numeric) AND ("conscience_symptome_score" <= (4)::numeric)))),
+    CONSTRAINT "schizophrenia_bis_q1_valid" CHECK ((("q1" IS NULL) OR ("q1" = ANY (ARRAY['D''accord'::"text", 'Pas d''accord'::"text", 'Incertain'::"text"])))),
+    CONSTRAINT "schizophrenia_bis_q2_valid" CHECK ((("q2" IS NULL) OR ("q2" = ANY (ARRAY['D''accord'::"text", 'Pas d''accord'::"text", 'Incertain'::"text"])))),
+    CONSTRAINT "schizophrenia_bis_q3_valid" CHECK ((("q3" IS NULL) OR ("q3" = ANY (ARRAY['D''accord'::"text", 'Pas d''accord'::"text", 'Incertain'::"text"])))),
+    CONSTRAINT "schizophrenia_bis_q4_valid" CHECK ((("q4" IS NULL) OR ("q4" = ANY (ARRAY['D''accord'::"text", 'Pas d''accord'::"text", 'Incertain'::"text"])))),
+    CONSTRAINT "schizophrenia_bis_q5_valid" CHECK ((("q5" IS NULL) OR ("q5" = ANY (ARRAY['D''accord'::"text", 'Pas d''accord'::"text", 'Incertain'::"text"])))),
+    CONSTRAINT "schizophrenia_bis_q6_valid" CHECK ((("q6" IS NULL) OR ("q6" = ANY (ARRAY['D''accord'::"text", 'Pas d''accord'::"text", 'Incertain'::"text"])))),
+    CONSTRAINT "schizophrenia_bis_q7_valid" CHECK ((("q7" IS NULL) OR ("q7" = ANY (ARRAY['D''accord'::"text", 'Pas d''accord'::"text", 'Incertain'::"text"])))),
+    CONSTRAINT "schizophrenia_bis_q8_valid" CHECK ((("q8" IS NULL) OR ("q8" = ANY (ARRAY['D''accord'::"text", 'Pas d''accord'::"text", 'Incertain'::"text"])))),
+    CONSTRAINT "schizophrenia_bis_total_score_range" CHECK ((("total_score" IS NULL) OR (("total_score" >= (0)::numeric) AND ("total_score" <= (12)::numeric))))
+);
+
+
+ALTER TABLE "public"."schizophrenia_bis" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_brief_a_auto" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "q1" integer,
+    "q2" integer,
+    "q3" integer,
+    "q4" integer,
+    "q5" integer,
+    "q6" integer,
+    "q7" integer,
+    "q8" integer,
+    "q9" integer,
+    "q10" integer,
+    "q11" integer,
+    "q12" integer,
+    "q13" integer,
+    "q14" integer,
+    "q15" integer,
+    "q16" integer,
+    "q17" integer,
+    "q18" integer,
+    "q19" integer,
+    "q20" integer,
+    "q21" integer,
+    "q22" integer,
+    "q23" integer,
+    "q24" integer,
+    "q25" integer,
+    "q26" integer,
+    "q27" integer,
+    "q28" integer,
+    "q29" integer,
+    "q30" integer,
+    "q31" integer,
+    "q32" integer,
+    "q33" integer,
+    "q34" integer,
+    "q35" integer,
+    "q36" integer,
+    "q37" integer,
+    "q38" integer,
+    "q39" integer,
+    "q40" integer,
+    "q41" integer,
+    "q42" integer,
+    "q43" integer,
+    "q44" integer,
+    "q45" integer,
+    "q46" integer,
+    "q47" integer,
+    "q48" integer,
+    "q49" integer,
+    "q50" integer,
+    "q51" integer,
+    "q52" integer,
+    "q53" integer,
+    "q54" integer,
+    "q55" integer,
+    "q56" integer,
+    "q57" integer,
+    "q58" integer,
+    "q59" integer,
+    "q60" integer,
+    "q61" integer,
+    "q62" integer,
+    "q63" integer,
+    "q64" integer,
+    "q65" integer,
+    "q66" integer,
+    "q67" integer,
+    "q68" integer,
+    "q69" integer,
+    "q70" integer,
+    "q71" integer,
+    "q72" integer,
+    "q73" integer,
+    "q74" integer,
+    "q75" integer,
+    "brief_a_inhibit" integer,
+    "brief_a_shift" integer,
+    "brief_a_emotional_control" integer,
+    "brief_a_self_monitor" integer,
+    "brief_a_initiate" integer,
+    "brief_a_working_memory" integer,
+    "brief_a_plan_organize" integer,
+    "brief_a_task_monitor" integer,
+    "brief_a_organization_materials" integer,
+    "brief_a_bri" integer,
+    "brief_a_mi" integer,
+    "brief_a_gec" integer,
+    "brief_a_negativity" integer,
+    "brief_a_infrequency" integer,
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_brief_a_auto_q10_check" CHECK ((("q10" >= 1) AND ("q10" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q11_check" CHECK ((("q11" >= 1) AND ("q11" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q12_check" CHECK ((("q12" >= 1) AND ("q12" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q13_check" CHECK ((("q13" >= 1) AND ("q13" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q14_check" CHECK ((("q14" >= 1) AND ("q14" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q15_check" CHECK ((("q15" >= 1) AND ("q15" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q16_check" CHECK ((("q16" >= 1) AND ("q16" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q17_check" CHECK ((("q17" >= 1) AND ("q17" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q18_check" CHECK ((("q18" >= 1) AND ("q18" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q19_check" CHECK ((("q19" >= 1) AND ("q19" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q1_check" CHECK ((("q1" >= 1) AND ("q1" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q20_check" CHECK ((("q20" >= 1) AND ("q20" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q21_check" CHECK ((("q21" >= 1) AND ("q21" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q22_check" CHECK ((("q22" >= 1) AND ("q22" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q23_check" CHECK ((("q23" >= 1) AND ("q23" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q24_check" CHECK ((("q24" >= 1) AND ("q24" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q25_check" CHECK ((("q25" >= 1) AND ("q25" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q26_check" CHECK ((("q26" >= 1) AND ("q26" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q27_check" CHECK ((("q27" >= 1) AND ("q27" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q28_check" CHECK ((("q28" >= 1) AND ("q28" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q29_check" CHECK ((("q29" >= 1) AND ("q29" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q2_check" CHECK ((("q2" >= 1) AND ("q2" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q30_check" CHECK ((("q30" >= 1) AND ("q30" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q31_check" CHECK ((("q31" >= 1) AND ("q31" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q32_check" CHECK ((("q32" >= 1) AND ("q32" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q33_check" CHECK ((("q33" >= 1) AND ("q33" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q34_check" CHECK ((("q34" >= 1) AND ("q34" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q35_check" CHECK ((("q35" >= 1) AND ("q35" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q36_check" CHECK ((("q36" >= 1) AND ("q36" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q37_check" CHECK ((("q37" >= 1) AND ("q37" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q38_check" CHECK ((("q38" >= 1) AND ("q38" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q39_check" CHECK ((("q39" >= 1) AND ("q39" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q3_check" CHECK ((("q3" >= 1) AND ("q3" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q40_check" CHECK ((("q40" >= 1) AND ("q40" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q41_check" CHECK ((("q41" >= 1) AND ("q41" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q42_check" CHECK ((("q42" >= 1) AND ("q42" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q43_check" CHECK ((("q43" >= 1) AND ("q43" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q44_check" CHECK ((("q44" >= 1) AND ("q44" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q45_check" CHECK ((("q45" >= 1) AND ("q45" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q46_check" CHECK ((("q46" >= 1) AND ("q46" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q47_check" CHECK ((("q47" >= 1) AND ("q47" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q48_check" CHECK ((("q48" >= 1) AND ("q48" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q49_check" CHECK ((("q49" >= 1) AND ("q49" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q4_check" CHECK ((("q4" >= 1) AND ("q4" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q50_check" CHECK ((("q50" >= 1) AND ("q50" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q51_check" CHECK ((("q51" >= 1) AND ("q51" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q52_check" CHECK ((("q52" >= 1) AND ("q52" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q53_check" CHECK ((("q53" >= 1) AND ("q53" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q54_check" CHECK ((("q54" >= 1) AND ("q54" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q55_check" CHECK ((("q55" >= 1) AND ("q55" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q56_check" CHECK ((("q56" >= 1) AND ("q56" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q57_check" CHECK ((("q57" >= 1) AND ("q57" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q58_check" CHECK ((("q58" >= 1) AND ("q58" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q59_check" CHECK ((("q59" >= 1) AND ("q59" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q5_check" CHECK ((("q5" >= 1) AND ("q5" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q60_check" CHECK ((("q60" >= 1) AND ("q60" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q61_check" CHECK ((("q61" >= 1) AND ("q61" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q62_check" CHECK ((("q62" >= 1) AND ("q62" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q63_check" CHECK ((("q63" >= 1) AND ("q63" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q64_check" CHECK ((("q64" >= 1) AND ("q64" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q65_check" CHECK ((("q65" >= 1) AND ("q65" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q66_check" CHECK ((("q66" >= 1) AND ("q66" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q67_check" CHECK ((("q67" >= 1) AND ("q67" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q68_check" CHECK ((("q68" >= 1) AND ("q68" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q69_check" CHECK ((("q69" >= 1) AND ("q69" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q6_check" CHECK ((("q6" >= 1) AND ("q6" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q70_check" CHECK ((("q70" >= 1) AND ("q70" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q71_check" CHECK ((("q71" >= 1) AND ("q71" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q72_check" CHECK ((("q72" >= 1) AND ("q72" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q73_check" CHECK ((("q73" >= 1) AND ("q73" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q74_check" CHECK ((("q74" >= 1) AND ("q74" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q75_check" CHECK ((("q75" >= 1) AND ("q75" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q7_check" CHECK ((("q7" >= 1) AND ("q7" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q8_check" CHECK ((("q8" >= 1) AND ("q8" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_auto_q9_check" CHECK ((("q9" >= 1) AND ("q9" <= 3)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_brief_a_auto" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_brief_a_hetero" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "subject_name" "text",
+    "subject_sex" "text",
+    "subject_age" integer,
+    "relationship" "text",
+    "years_known" integer,
+    "brief_a_age_band" "text",
+    "q1" integer,
+    "q2" integer,
+    "q3" integer,
+    "q4" integer,
+    "q5" integer,
+    "q6" integer,
+    "q7" integer,
+    "q8" integer,
+    "q9" integer,
+    "q10" integer,
+    "q11" integer,
+    "q12" integer,
+    "q13" integer,
+    "q14" integer,
+    "q15" integer,
+    "q16" integer,
+    "q17" integer,
+    "q18" integer,
+    "q19" integer,
+    "q20" integer,
+    "q21" integer,
+    "q22" integer,
+    "q23" integer,
+    "q24" integer,
+    "q25" integer,
+    "q26" integer,
+    "q27" integer,
+    "q28" integer,
+    "q29" integer,
+    "q30" integer,
+    "q31" integer,
+    "q32" integer,
+    "q33" integer,
+    "q34" integer,
+    "q35" integer,
+    "q36" integer,
+    "q37" integer,
+    "q38" integer,
+    "q39" integer,
+    "q40" integer,
+    "q41" integer,
+    "q42" integer,
+    "q43" integer,
+    "q44" integer,
+    "q45" integer,
+    "q46" integer,
+    "q47" integer,
+    "q48" integer,
+    "q49" integer,
+    "q50" integer,
+    "q51" integer,
+    "q52" integer,
+    "q53" integer,
+    "q54" integer,
+    "q55" integer,
+    "q56" integer,
+    "q57" integer,
+    "q58" integer,
+    "q59" integer,
+    "q60" integer,
+    "q61" integer,
+    "q62" integer,
+    "q63" integer,
+    "q64" integer,
+    "q65" integer,
+    "q66" integer,
+    "q67" integer,
+    "q68" integer,
+    "q69" integer,
+    "q70" integer,
+    "q71" integer,
+    "q72" integer,
+    "q73" integer,
+    "q74" integer,
+    "q75" integer,
+    "brief_a_inhibit" integer,
+    "brief_a_shift" integer,
+    "brief_a_emotional_control" integer,
+    "brief_a_self_monitor" integer,
+    "brief_a_initiate" integer,
+    "brief_a_working_memory" integer,
+    "brief_a_plan_organize" integer,
+    "brief_a_task_monitor" integer,
+    "brief_a_organization_materials" integer,
+    "brief_a_inhibit_t" integer,
+    "brief_a_inhibit_p" "text",
+    "brief_a_shift_t" integer,
+    "brief_a_shift_p" "text",
+    "brief_a_emotional_control_t" integer,
+    "brief_a_emotional_control_p" "text",
+    "brief_a_self_monitor_t" integer,
+    "brief_a_self_monitor_p" "text",
+    "brief_a_initiate_t" integer,
+    "brief_a_initiate_p" "text",
+    "brief_a_working_memory_t" integer,
+    "brief_a_working_memory_p" "text",
+    "brief_a_plan_organize_t" integer,
+    "brief_a_plan_organize_p" "text",
+    "brief_a_task_monitor_t" integer,
+    "brief_a_task_monitor_p" "text",
+    "brief_a_organization_materials_t" integer,
+    "brief_a_organization_materials_p" "text",
+    "brief_a_bri" integer,
+    "brief_a_mi" integer,
+    "brief_a_gec" integer,
+    "brief_a_bri_t" integer,
+    "brief_a_bri_p" "text",
+    "brief_a_mi_t" integer,
+    "brief_a_mi_p" "text",
+    "brief_a_gec_t" integer,
+    "brief_a_gec_p" "text",
+    "brief_a_negativity" integer,
+    "brief_a_inconsistency" integer,
+    "brief_a_infrequency" integer,
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q10_check" CHECK ((("q10" >= 1) AND ("q10" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q11_check" CHECK ((("q11" >= 1) AND ("q11" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q12_check" CHECK ((("q12" >= 1) AND ("q12" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q13_check" CHECK ((("q13" >= 1) AND ("q13" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q14_check" CHECK ((("q14" >= 1) AND ("q14" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q15_check" CHECK ((("q15" >= 1) AND ("q15" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q16_check" CHECK ((("q16" >= 1) AND ("q16" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q17_check" CHECK ((("q17" >= 1) AND ("q17" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q18_check" CHECK ((("q18" >= 1) AND ("q18" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q19_check" CHECK ((("q19" >= 1) AND ("q19" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q1_check" CHECK ((("q1" >= 1) AND ("q1" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q20_check" CHECK ((("q20" >= 1) AND ("q20" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q21_check" CHECK ((("q21" >= 1) AND ("q21" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q22_check" CHECK ((("q22" >= 1) AND ("q22" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q23_check" CHECK ((("q23" >= 1) AND ("q23" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q24_check" CHECK ((("q24" >= 1) AND ("q24" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q25_check" CHECK ((("q25" >= 1) AND ("q25" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q26_check" CHECK ((("q26" >= 1) AND ("q26" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q27_check" CHECK ((("q27" >= 1) AND ("q27" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q28_check" CHECK ((("q28" >= 1) AND ("q28" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q29_check" CHECK ((("q29" >= 1) AND ("q29" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q2_check" CHECK ((("q2" >= 1) AND ("q2" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q30_check" CHECK ((("q30" >= 1) AND ("q30" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q31_check" CHECK ((("q31" >= 1) AND ("q31" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q32_check" CHECK ((("q32" >= 1) AND ("q32" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q33_check" CHECK ((("q33" >= 1) AND ("q33" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q34_check" CHECK ((("q34" >= 1) AND ("q34" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q35_check" CHECK ((("q35" >= 1) AND ("q35" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q36_check" CHECK ((("q36" >= 1) AND ("q36" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q37_check" CHECK ((("q37" >= 1) AND ("q37" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q38_check" CHECK ((("q38" >= 1) AND ("q38" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q39_check" CHECK ((("q39" >= 1) AND ("q39" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q3_check" CHECK ((("q3" >= 1) AND ("q3" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q40_check" CHECK ((("q40" >= 1) AND ("q40" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q41_check" CHECK ((("q41" >= 1) AND ("q41" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q42_check" CHECK ((("q42" >= 1) AND ("q42" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q43_check" CHECK ((("q43" >= 1) AND ("q43" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q44_check" CHECK ((("q44" >= 1) AND ("q44" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q45_check" CHECK ((("q45" >= 1) AND ("q45" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q46_check" CHECK ((("q46" >= 1) AND ("q46" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q47_check" CHECK ((("q47" >= 1) AND ("q47" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q48_check" CHECK ((("q48" >= 1) AND ("q48" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q49_check" CHECK ((("q49" >= 1) AND ("q49" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q4_check" CHECK ((("q4" >= 1) AND ("q4" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q50_check" CHECK ((("q50" >= 1) AND ("q50" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q51_check" CHECK ((("q51" >= 1) AND ("q51" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q52_check" CHECK ((("q52" >= 1) AND ("q52" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q53_check" CHECK ((("q53" >= 1) AND ("q53" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q54_check" CHECK ((("q54" >= 1) AND ("q54" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q55_check" CHECK ((("q55" >= 1) AND ("q55" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q56_check" CHECK ((("q56" >= 1) AND ("q56" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q57_check" CHECK ((("q57" >= 1) AND ("q57" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q58_check" CHECK ((("q58" >= 1) AND ("q58" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q59_check" CHECK ((("q59" >= 1) AND ("q59" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q5_check" CHECK ((("q5" >= 1) AND ("q5" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q60_check" CHECK ((("q60" >= 1) AND ("q60" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q61_check" CHECK ((("q61" >= 1) AND ("q61" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q62_check" CHECK ((("q62" >= 1) AND ("q62" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q63_check" CHECK ((("q63" >= 1) AND ("q63" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q64_check" CHECK ((("q64" >= 1) AND ("q64" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q65_check" CHECK ((("q65" >= 1) AND ("q65" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q66_check" CHECK ((("q66" >= 1) AND ("q66" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q67_check" CHECK ((("q67" >= 1) AND ("q67" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q68_check" CHECK ((("q68" >= 1) AND ("q68" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q69_check" CHECK ((("q69" >= 1) AND ("q69" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q6_check" CHECK ((("q6" >= 1) AND ("q6" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q70_check" CHECK ((("q70" >= 1) AND ("q70" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q71_check" CHECK ((("q71" >= 1) AND ("q71" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q72_check" CHECK ((("q72" >= 1) AND ("q72" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q73_check" CHECK ((("q73" >= 1) AND ("q73" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q74_check" CHECK ((("q74" >= 1) AND ("q74" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q75_check" CHECK ((("q75" >= 1) AND ("q75" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q7_check" CHECK ((("q7" >= 1) AND ("q7" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q8_check" CHECK ((("q8" >= 1) AND ("q8" <= 3))),
+    CONSTRAINT "schizophrenia_brief_a_hetero_q9_check" CHECK ((("q9" >= 1) AND ("q9" <= 3)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_brief_a_hetero" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_cbq" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "q1" integer,
+    "q2" integer,
+    "q3" integer,
+    "q4" integer,
+    "q5" integer,
+    "q6" integer,
+    "q7" integer,
+    "q8" integer,
+    "q9" integer,
+    "q10" integer,
+    "q11" integer,
+    "q12" integer,
+    "q13" integer,
+    "q14" integer,
+    "q15" integer,
+    "q16" integer,
+    "q17" integer,
+    "q18" integer,
+    "q19" integer,
+    "q20" integer,
+    "q21" integer,
+    "q22" integer,
+    "q23" integer,
+    "q24" integer,
+    "q25" integer,
+    "q26" integer,
+    "q27" integer,
+    "q28" integer,
+    "q29" integer,
+    "q30" integer,
+    "cbq_intentionalisation" integer,
+    "cbq_catastrophisation" integer,
+    "cbq_pensee_dichotomique" integer,
+    "cbq_sauter_conclusions" integer,
+    "cbq_raisonnement_emotionnel" integer,
+    "cbq_evenement_menacant" integer,
+    "cbq_perception_anormale" integer,
+    "cbq_total" integer,
+    "cbq_total_z" numeric(5,2),
+    "cbq_intentionalisation_z" numeric(5,2),
+    "cbq_catastrophisation_z" numeric(5,2),
+    "cbq_pensee_dichotomique_z" numeric(5,2),
+    "cbq_sauter_conclusions_z" numeric(5,2),
+    "cbq_raisonnement_emotionnel_z" numeric(5,2),
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_cbq_cbq_catastrophisation_check" CHECK ((("cbq_catastrophisation" IS NULL) OR (("cbq_catastrophisation" >= 5) AND ("cbq_catastrophisation" <= 15)))),
+    CONSTRAINT "schizophrenia_cbq_cbq_evenement_menacant_check" CHECK ((("cbq_evenement_menacant" IS NULL) OR (("cbq_evenement_menacant" >= 15) AND ("cbq_evenement_menacant" <= 45)))),
+    CONSTRAINT "schizophrenia_cbq_cbq_intentionalisation_check" CHECK ((("cbq_intentionalisation" IS NULL) OR (("cbq_intentionalisation" >= 6) AND ("cbq_intentionalisation" <= 18)))),
+    CONSTRAINT "schizophrenia_cbq_cbq_pensee_dichotomique_check" CHECK ((("cbq_pensee_dichotomique" IS NULL) OR (("cbq_pensee_dichotomique" >= 6) AND ("cbq_pensee_dichotomique" <= 18)))),
+    CONSTRAINT "schizophrenia_cbq_cbq_perception_anormale_check" CHECK ((("cbq_perception_anormale" IS NULL) OR (("cbq_perception_anormale" >= 15) AND ("cbq_perception_anormale" <= 45)))),
+    CONSTRAINT "schizophrenia_cbq_cbq_raisonnement_emotionnel_check" CHECK ((("cbq_raisonnement_emotionnel" IS NULL) OR (("cbq_raisonnement_emotionnel" >= 7) AND ("cbq_raisonnement_emotionnel" <= 21)))),
+    CONSTRAINT "schizophrenia_cbq_cbq_sauter_conclusions_check" CHECK ((("cbq_sauter_conclusions" IS NULL) OR (("cbq_sauter_conclusions" >= 6) AND ("cbq_sauter_conclusions" <= 18)))),
+    CONSTRAINT "schizophrenia_cbq_cbq_total_check" CHECK ((("cbq_total" IS NULL) OR (("cbq_total" >= 30) AND ("cbq_total" <= 90)))),
+    CONSTRAINT "schizophrenia_cbq_q10_check" CHECK ((("q10" IS NULL) OR (("q10" >= 1) AND ("q10" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q11_check" CHECK ((("q11" IS NULL) OR (("q11" >= 1) AND ("q11" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q12_check" CHECK ((("q12" IS NULL) OR (("q12" >= 1) AND ("q12" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q13_check" CHECK ((("q13" IS NULL) OR (("q13" >= 1) AND ("q13" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q14_check" CHECK ((("q14" IS NULL) OR (("q14" >= 1) AND ("q14" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q15_check" CHECK ((("q15" IS NULL) OR (("q15" >= 1) AND ("q15" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q16_check" CHECK ((("q16" IS NULL) OR (("q16" >= 1) AND ("q16" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q17_check" CHECK ((("q17" IS NULL) OR (("q17" >= 1) AND ("q17" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q18_check" CHECK ((("q18" IS NULL) OR (("q18" >= 1) AND ("q18" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q19_check" CHECK ((("q19" IS NULL) OR (("q19" >= 1) AND ("q19" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q1_check" CHECK ((("q1" IS NULL) OR (("q1" >= 1) AND ("q1" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q20_check" CHECK ((("q20" IS NULL) OR (("q20" >= 1) AND ("q20" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q21_check" CHECK ((("q21" IS NULL) OR (("q21" >= 1) AND ("q21" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q22_check" CHECK ((("q22" IS NULL) OR (("q22" >= 1) AND ("q22" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q23_check" CHECK ((("q23" IS NULL) OR (("q23" >= 1) AND ("q23" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q24_check" CHECK ((("q24" IS NULL) OR (("q24" >= 1) AND ("q24" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q25_check" CHECK ((("q25" IS NULL) OR (("q25" >= 1) AND ("q25" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q26_check" CHECK ((("q26" IS NULL) OR (("q26" >= 1) AND ("q26" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q27_check" CHECK ((("q27" IS NULL) OR (("q27" >= 1) AND ("q27" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q28_check" CHECK ((("q28" IS NULL) OR (("q28" >= 1) AND ("q28" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q29_check" CHECK ((("q29" IS NULL) OR (("q29" >= 1) AND ("q29" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q2_check" CHECK ((("q2" IS NULL) OR (("q2" >= 1) AND ("q2" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q30_check" CHECK ((("q30" IS NULL) OR (("q30" >= 1) AND ("q30" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q3_check" CHECK ((("q3" IS NULL) OR (("q3" >= 1) AND ("q3" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q4_check" CHECK ((("q4" IS NULL) OR (("q4" >= 1) AND ("q4" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q5_check" CHECK ((("q5" IS NULL) OR (("q5" >= 1) AND ("q5" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q6_check" CHECK ((("q6" IS NULL) OR (("q6" >= 1) AND ("q6" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q7_check" CHECK ((("q7" IS NULL) OR (("q7" >= 1) AND ("q7" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q8_check" CHECK ((("q8" IS NULL) OR (("q8" >= 1) AND ("q8" <= 3)))),
+    CONSTRAINT "schizophrenia_cbq_q9_check" CHECK ((("q9" IS NULL) OR (("q9" >= 1) AND ("q9" <= 3))))
+);
+
+
+ALTER TABLE "public"."schizophrenia_cbq" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_cbq" IS 'CBQ - Cognitive Biases Questionnaire. Self-report questionnaire assessing 5 types of cognitive biases associated with psychosis.';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cbq"."cbq_intentionalisation" IS 'Intentionalizing bias subscale (items 1,3,11,13,16,21, range 6-18)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cbq"."cbq_catastrophisation" IS 'Catastrophizing bias subscale (items 2,4,12,14,22, range 5-15)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cbq"."cbq_pensee_dichotomique" IS 'Dichotomous thinking bias subscale (items 5,8,18,23,26,28, range 6-18)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cbq"."cbq_sauter_conclusions" IS 'Jumping to conclusions bias subscale (items 6,10,15,20,24,30, range 6-18)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cbq"."cbq_raisonnement_emotionnel" IS 'Emotional reasoning bias subscale (items 7,9,17,19,25,27,29, range 7-21)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cbq"."cbq_evenement_menacant" IS 'Threatening event thematic dimension (items 1-15, range 15-45)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cbq"."cbq_perception_anormale" IS 'Abnormal perception thematic dimension (items 16-30, range 15-45)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cbq"."cbq_total" IS 'Total score (sum of all 30 items, range 30-90)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cbq"."cbq_total_z" IS 'Z-score for total: (total - 36.5) / 2.7. Z > 1.65 indicates clinically significant cognitive biases.';
+
+
+
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_cdss" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "visit_id" "uuid" NOT NULL,
@@ -6173,11 +7198,603 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_cdss" (
     "completed_by" "uuid",
     "completed_at" timestamp with time zone DEFAULT "now"(),
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "questionnaire_done" "text"
 );
 
 
 ALTER TABLE "public"."schizophrenia_cdss" OWNER TO "postgres";
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cdss"."questionnaire_done" IS 'Indicates if the questionnaire was completed (Fait/Non fait)';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_cgi" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "cgi_s" integer,
+    "cgi_i" integer,
+    "therapeutic_effect" integer,
+    "side_effects" integer,
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "therapeutic_index" integer,
+    "therapeutic_index_label" "text",
+    "visit_type" "text",
+    "test_done" boolean DEFAULT true,
+    CONSTRAINT "schizophrenia_cgi_cgi_i_check" CHECK ((("cgi_i" >= 0) AND ("cgi_i" <= 7))),
+    CONSTRAINT "schizophrenia_cgi_cgi_s_check" CHECK ((("cgi_s" >= 0) AND ("cgi_s" <= 7))),
+    CONSTRAINT "schizophrenia_cgi_side_effects_check" CHECK ((("side_effects" >= 0) AND ("side_effects" <= 3))),
+    CONSTRAINT "schizophrenia_cgi_therapeutic_effect_check" CHECK ((("therapeutic_effect" >= 0) AND ("therapeutic_effect" <= 4)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_cgi" OWNER TO "postgres";
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cgi"."test_done" IS 'Flag indicating if the test was administered';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_commissions" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "patient_age" integer,
+    "nsc" integer,
+    "com01" integer,
+    "com02" integer,
+    "com03" integer,
+    "com04" integer,
+    "com05" "text",
+    "com01s1" character varying(20),
+    "com01s2" numeric(5,2),
+    "com02s1" character varying(20),
+    "com02s2" numeric(5,2),
+    "com03s1" character varying(20),
+    "com03s2" numeric(5,2),
+    "com04s1" character varying(20),
+    "com04s2" numeric(5,2),
+    "com04s3" integer,
+    "com04s4" character varying(20),
+    "com04s5" numeric(5,2),
+    "test_done" boolean DEFAULT true,
+    "questionnaire_version" character varying(50),
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_commissions_com01_check" CHECK (("com01" >= 0)),
+    CONSTRAINT "schizophrenia_commissions_com02_check" CHECK (("com02" >= 0)),
+    CONSTRAINT "schizophrenia_commissions_com03_check" CHECK (("com03" >= 0)),
+    CONSTRAINT "schizophrenia_commissions_com04_check" CHECK (("com04" >= 0)),
+    CONSTRAINT "schizophrenia_commissions_nsc_check" CHECK (("nsc" = ANY (ARRAY[0, 1])))
+);
+
+
+ALTER TABLE "public"."schizophrenia_commissions" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_commissions" IS 'Test des Commissions responses for schizophrenia patients - Neuropsy Module Bloc 2. Evaluates planning and executive functions through errand-planning task.';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."nsc" IS 'Education level: 0=lower (<Bac), 1=higher (>=Bac) - used for normative scoring';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com01" IS 'Completion time in minutes';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com02" IS 'Number of unnecessary detours';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com03" IS 'Number of schedule/time violations';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com04" IS 'Number of logical errors';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com05" IS 'Recorded errand sequence (free text)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com01s1" IS 'Time percentile (based on NSC)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com01s2" IS 'Time Z-score (based on age group + NSC)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com02s1" IS 'Detours percentile';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com02s2" IS 'Detours Z-score';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com03s1" IS 'Schedule violations percentile';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com03s2" IS 'Schedule violations Z-score';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com04s1" IS 'Logic errors percentile';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com04s2" IS 'Logic errors Z-score';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com04s3" IS 'Total errors (com02 + com03 + com04)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com04s4" IS 'Total errors percentile';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."com04s5" IS 'Total errors Z-score';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_commissions"."test_done" IS 'Flag indicating test was administered (true = done, false = not done)';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_ctq" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "questionnaire_done" "text",
+    "q1" integer,
+    "q2" integer,
+    "q3" integer,
+    "q4" integer,
+    "q5" integer,
+    "q6" integer,
+    "q7" integer,
+    "q8" integer,
+    "q9" integer,
+    "q10" integer,
+    "q11" integer,
+    "q12" integer,
+    "q13" integer,
+    "q14" integer,
+    "q15" integer,
+    "q16" integer,
+    "q17" integer,
+    "q18" integer,
+    "q19" integer,
+    "q20" integer,
+    "q21" integer,
+    "q22" integer,
+    "q23" integer,
+    "q24" integer,
+    "q25" integer,
+    "q26" integer,
+    "q27" integer,
+    "q28" integer,
+    "emotional_abuse_score" integer,
+    "physical_abuse_score" integer,
+    "sexual_abuse_score" integer,
+    "emotional_neglect_score" integer,
+    "physical_neglect_score" integer,
+    "emotional_abuse_severity" "text",
+    "physical_abuse_severity" "text",
+    "sexual_abuse_severity" "text",
+    "emotional_neglect_severity" "text",
+    "physical_neglect_severity" "text",
+    "denial_score" integer,
+    "minimization_score" integer,
+    "total_score" integer,
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_ctq_denial_score_range" CHECK ((("denial_score" IS NULL) OR (("denial_score" >= 3) AND ("denial_score" <= 15)))),
+    CONSTRAINT "schizophrenia_ctq_emotional_abuse_score_range" CHECK ((("emotional_abuse_score" IS NULL) OR (("emotional_abuse_score" >= 5) AND ("emotional_abuse_score" <= 25)))),
+    CONSTRAINT "schizophrenia_ctq_emotional_abuse_severity_valid" CHECK ((("emotional_abuse_severity" IS NULL) OR ("emotional_abuse_severity" = ANY (ARRAY['no_trauma'::"text", 'low'::"text", 'moderate'::"text", 'severe'::"text"])))),
+    CONSTRAINT "schizophrenia_ctq_emotional_neglect_score_range" CHECK ((("emotional_neglect_score" IS NULL) OR (("emotional_neglect_score" >= 5) AND ("emotional_neglect_score" <= 25)))),
+    CONSTRAINT "schizophrenia_ctq_emotional_neglect_severity_valid" CHECK ((("emotional_neglect_severity" IS NULL) OR ("emotional_neglect_severity" = ANY (ARRAY['no_trauma'::"text", 'low'::"text", 'moderate'::"text", 'severe'::"text"])))),
+    CONSTRAINT "schizophrenia_ctq_minimization_score_range" CHECK ((("minimization_score" IS NULL) OR (("minimization_score" >= 3) AND ("minimization_score" <= 15)))),
+    CONSTRAINT "schizophrenia_ctq_physical_abuse_score_range" CHECK ((("physical_abuse_score" IS NULL) OR (("physical_abuse_score" >= 5) AND ("physical_abuse_score" <= 25)))),
+    CONSTRAINT "schizophrenia_ctq_physical_abuse_severity_valid" CHECK ((("physical_abuse_severity" IS NULL) OR ("physical_abuse_severity" = ANY (ARRAY['no_trauma'::"text", 'low'::"text", 'moderate'::"text", 'severe'::"text"])))),
+    CONSTRAINT "schizophrenia_ctq_physical_neglect_score_range" CHECK ((("physical_neglect_score" IS NULL) OR (("physical_neglect_score" >= 5) AND ("physical_neglect_score" <= 25)))),
+    CONSTRAINT "schizophrenia_ctq_physical_neglect_severity_valid" CHECK ((("physical_neglect_severity" IS NULL) OR ("physical_neglect_severity" = ANY (ARRAY['no_trauma'::"text", 'low'::"text", 'moderate'::"text", 'severe'::"text"])))),
+    CONSTRAINT "schizophrenia_ctq_q10_range" CHECK ((("q10" IS NULL) OR (("q10" >= 1) AND ("q10" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q11_range" CHECK ((("q11" IS NULL) OR (("q11" >= 1) AND ("q11" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q12_range" CHECK ((("q12" IS NULL) OR (("q12" >= 1) AND ("q12" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q13_range" CHECK ((("q13" IS NULL) OR (("q13" >= 1) AND ("q13" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q14_range" CHECK ((("q14" IS NULL) OR (("q14" >= 1) AND ("q14" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q15_range" CHECK ((("q15" IS NULL) OR (("q15" >= 1) AND ("q15" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q16_range" CHECK ((("q16" IS NULL) OR (("q16" >= 1) AND ("q16" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q17_range" CHECK ((("q17" IS NULL) OR (("q17" >= 1) AND ("q17" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q18_range" CHECK ((("q18" IS NULL) OR (("q18" >= 1) AND ("q18" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q19_range" CHECK ((("q19" IS NULL) OR (("q19" >= 1) AND ("q19" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q1_range" CHECK ((("q1" IS NULL) OR (("q1" >= 1) AND ("q1" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q20_range" CHECK ((("q20" IS NULL) OR (("q20" >= 1) AND ("q20" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q21_range" CHECK ((("q21" IS NULL) OR (("q21" >= 1) AND ("q21" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q22_range" CHECK ((("q22" IS NULL) OR (("q22" >= 1) AND ("q22" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q23_range" CHECK ((("q23" IS NULL) OR (("q23" >= 1) AND ("q23" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q24_range" CHECK ((("q24" IS NULL) OR (("q24" >= 1) AND ("q24" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q25_range" CHECK ((("q25" IS NULL) OR (("q25" >= 1) AND ("q25" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q26_range" CHECK ((("q26" IS NULL) OR (("q26" >= 1) AND ("q26" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q27_range" CHECK ((("q27" IS NULL) OR (("q27" >= 1) AND ("q27" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q28_range" CHECK ((("q28" IS NULL) OR (("q28" >= 1) AND ("q28" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q2_range" CHECK ((("q2" IS NULL) OR (("q2" >= 1) AND ("q2" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q3_range" CHECK ((("q3" IS NULL) OR (("q3" >= 1) AND ("q3" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q4_range" CHECK ((("q4" IS NULL) OR (("q4" >= 1) AND ("q4" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q5_range" CHECK ((("q5" IS NULL) OR (("q5" >= 1) AND ("q5" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q6_range" CHECK ((("q6" IS NULL) OR (("q6" >= 1) AND ("q6" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q7_range" CHECK ((("q7" IS NULL) OR (("q7" >= 1) AND ("q7" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q8_range" CHECK ((("q8" IS NULL) OR (("q8" >= 1) AND ("q8" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_q9_range" CHECK ((("q9" IS NULL) OR (("q9" >= 1) AND ("q9" <= 5)))),
+    CONSTRAINT "schizophrenia_ctq_sexual_abuse_score_range" CHECK ((("sexual_abuse_score" IS NULL) OR (("sexual_abuse_score" >= 5) AND ("sexual_abuse_score" <= 25)))),
+    CONSTRAINT "schizophrenia_ctq_sexual_abuse_severity_valid" CHECK ((("sexual_abuse_severity" IS NULL) OR ("sexual_abuse_severity" = ANY (ARRAY['no_trauma'::"text", 'low'::"text", 'moderate'::"text", 'severe'::"text"])))),
+    CONSTRAINT "schizophrenia_ctq_total_score_range" CHECK ((("total_score" IS NULL) OR (("total_score" >= 25) AND ("total_score" <= 125))))
+);
+
+
+ALTER TABLE "public"."schizophrenia_ctq" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_cvlt" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "patient_age" integer,
+    "years_of_education" numeric(4,1),
+    "patient_sex" character varying(1),
+    "trial_1" integer,
+    "trial_2" integer,
+    "trial_3" integer,
+    "trial_4" integer,
+    "trial_5" integer,
+    "total_1_5" integer,
+    "list_b" integer,
+    "sdfr" integer,
+    "sdcr" integer,
+    "ldfr" integer,
+    "ldcr" integer,
+    "semantic_clustering" numeric(5,2),
+    "serial_clustering" numeric(5,2),
+    "perseverations" integer,
+    "intrusions" integer,
+    "recognition_hits" integer,
+    "false_positives" integer,
+    "discriminability" numeric(5,2),
+    "primacy" numeric(5,2),
+    "recency" numeric(5,2),
+    "response_bias" numeric(5,2),
+    "cvlt_delai" integer,
+    "trial_1_std" numeric(5,2),
+    "trial_5_std" character varying(20),
+    "total_1_5_std" numeric(5,2),
+    "list_b_std" numeric(5,2),
+    "sdfr_std" character varying(20),
+    "sdcr_std" character varying(20),
+    "ldfr_std" character varying(20),
+    "ldcr_std" character varying(20),
+    "semantic_std" character varying(20),
+    "serial_std" character varying(20),
+    "persev_std" character varying(20),
+    "intru_std" character varying(20),
+    "recog_std" character varying(20),
+    "false_recog_std" character varying(20),
+    "discrim_std" character varying(20),
+    "primacy_std" numeric(5,2),
+    "recency_std" character varying(20),
+    "bias_std" numeric(5,2),
+    "test_done" boolean DEFAULT true,
+    "questionnaire_version" character varying(50),
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_cvlt_cvlt_delai_check" CHECK (("cvlt_delai" >= 0)),
+    CONSTRAINT "schizophrenia_cvlt_discriminability_check" CHECK ((("discriminability" >= (0)::numeric) AND ("discriminability" <= (100)::numeric))),
+    CONSTRAINT "schizophrenia_cvlt_false_positives_check" CHECK ((("false_positives" >= 0) AND ("false_positives" <= 28))),
+    CONSTRAINT "schizophrenia_cvlt_intrusions_check" CHECK (("intrusions" >= 0)),
+    CONSTRAINT "schizophrenia_cvlt_ldcr_check" CHECK ((("ldcr" >= 0) AND ("ldcr" <= 16))),
+    CONSTRAINT "schizophrenia_cvlt_ldfr_check" CHECK ((("ldfr" >= 0) AND ("ldfr" <= 16))),
+    CONSTRAINT "schizophrenia_cvlt_list_b_check" CHECK ((("list_b" >= 0) AND ("list_b" <= 16))),
+    CONSTRAINT "schizophrenia_cvlt_patient_sex_check" CHECK ((("patient_sex")::"text" = ANY ((ARRAY['M'::character varying, 'F'::character varying])::"text"[]))),
+    CONSTRAINT "schizophrenia_cvlt_perseverations_check" CHECK (("perseverations" >= 0)),
+    CONSTRAINT "schizophrenia_cvlt_primacy_check" CHECK ((("primacy" >= (0)::numeric) AND ("primacy" <= (100)::numeric))),
+    CONSTRAINT "schizophrenia_cvlt_recency_check" CHECK ((("recency" >= (0)::numeric) AND ("recency" <= (100)::numeric))),
+    CONSTRAINT "schizophrenia_cvlt_recognition_hits_check" CHECK ((("recognition_hits" >= 0) AND ("recognition_hits" <= 16))),
+    CONSTRAINT "schizophrenia_cvlt_sdcr_check" CHECK ((("sdcr" >= 0) AND ("sdcr" <= 16))),
+    CONSTRAINT "schizophrenia_cvlt_sdfr_check" CHECK ((("sdfr" >= 0) AND ("sdfr" <= 16))),
+    CONSTRAINT "schizophrenia_cvlt_total_1_5_check" CHECK ((("total_1_5" >= 0) AND ("total_1_5" <= 80))),
+    CONSTRAINT "schizophrenia_cvlt_trial_1_check" CHECK ((("trial_1" >= 0) AND ("trial_1" <= 16))),
+    CONSTRAINT "schizophrenia_cvlt_trial_2_check" CHECK ((("trial_2" >= 0) AND ("trial_2" <= 16))),
+    CONSTRAINT "schizophrenia_cvlt_trial_3_check" CHECK ((("trial_3" >= 0) AND ("trial_3" <= 16))),
+    CONSTRAINT "schizophrenia_cvlt_trial_4_check" CHECK ((("trial_4" >= 0) AND ("trial_4" <= 16))),
+    CONSTRAINT "schizophrenia_cvlt_trial_5_check" CHECK ((("trial_5" >= 0) AND ("trial_5" <= 16)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_cvlt" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_cvlt" IS 'California Verbal Learning Test (CVLT) responses for schizophrenia patients - Neuropsy Module Bloc 2. French adaptation by Deweer et al. (2008).';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."trial_1" IS 'Number of words recalled on Trial 1 of List A (0-16)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."trial_5" IS 'Number of words recalled on Trial 5 of List A (0-16)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."total_1_5" IS 'Sum of Trials 1-5 (0-80)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."list_b" IS 'Number of words recalled from interference list (List B / Mardi)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."sdfr" IS 'Short Delay Free Recall - words recalled immediately after List B';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."sdcr" IS 'Short Delay Cued Recall - words recalled with category cues after List B';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."ldfr" IS 'Long Delay Free Recall - words recalled after 20 minute delay';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."ldcr" IS 'Long Delay Cued Recall - words recalled with category cues after delay';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."semantic_clustering" IS 'Semantic clustering index - measure of category-based recall strategy';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."serial_clustering" IS 'Serial clustering index - measure of order-based recall strategy';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."perseverations" IS 'Total repetition errors across all trials';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."intrusions" IS 'Total intrusion errors (non-list words) across all trials';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."recognition_hits" IS 'Correct identifications in recognition test (0-16)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."false_positives" IS 'False alarms in recognition test (0-28)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."discriminability" IS 'Recognition discriminability index (percentage)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."primacy" IS 'Percentage of primacy region words recalled';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."recency" IS 'Percentage of recency region words recalled';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."response_bias" IS 'Response bias in recognition (tendency to say yes/no)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."cvlt_delai" IS 'Delay in minutes between immediate and delayed recall';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."trial_1_std" IS 'Z-score for Trial 1 (regression-based, all ages)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."trial_5_std" IS 'Standardized score for Trial 5 (percentile for ages <70, Z-score for 70+)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."total_1_5_std" IS 'Z-score for Trials 1-5 total (regression-based, all ages)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_cvlt"."test_done" IS 'Flag indicating test was administered (true = done, false = not done)';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_dacobs" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "q1" integer,
+    "q2" integer,
+    "q3" integer,
+    "q4" integer,
+    "q5" integer,
+    "q6" integer,
+    "q7" integer,
+    "q8" integer,
+    "q9" integer,
+    "q10" integer,
+    "q11" integer,
+    "q12" integer,
+    "q13" integer,
+    "q14" integer,
+    "q15" integer,
+    "q16" integer,
+    "q17" integer,
+    "q18" integer,
+    "q19" integer,
+    "q20" integer,
+    "q21" integer,
+    "q22" integer,
+    "q23" integer,
+    "q24" integer,
+    "q25" integer,
+    "q26" integer,
+    "q27" integer,
+    "q28" integer,
+    "q29" integer,
+    "q30" integer,
+    "q31" integer,
+    "q32" integer,
+    "q33" integer,
+    "q34" integer,
+    "q35" integer,
+    "q36" integer,
+    "q37" integer,
+    "q38" integer,
+    "q39" integer,
+    "q40" integer,
+    "q41" integer,
+    "q42" integer,
+    "dacobs_jtc" integer,
+    "dacobs_bi" integer,
+    "dacobs_at" integer,
+    "dacobs_ea" integer,
+    "dacobs_sc" integer,
+    "dacobs_cp" integer,
+    "dacobs_sb" integer,
+    "dacobs_cognitive_biases" integer,
+    "dacobs_cognitive_limitations" integer,
+    "dacobs_safety_behaviors" integer,
+    "dacobs_total" integer,
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_dacobs_dacobs_at_check" CHECK ((("dacobs_at" IS NULL) OR (("dacobs_at" >= 6) AND ("dacobs_at" <= 42)))),
+    CONSTRAINT "schizophrenia_dacobs_dacobs_bi_check" CHECK ((("dacobs_bi" IS NULL) OR (("dacobs_bi" >= 6) AND ("dacobs_bi" <= 42)))),
+    CONSTRAINT "schizophrenia_dacobs_dacobs_cognitive_biases_check" CHECK ((("dacobs_cognitive_biases" IS NULL) OR (("dacobs_cognitive_biases" >= 24) AND ("dacobs_cognitive_biases" <= 168)))),
+    CONSTRAINT "schizophrenia_dacobs_dacobs_cognitive_limitations_check" CHECK ((("dacobs_cognitive_limitations" IS NULL) OR (("dacobs_cognitive_limitations" >= 12) AND ("dacobs_cognitive_limitations" <= 84)))),
+    CONSTRAINT "schizophrenia_dacobs_dacobs_cp_check" CHECK ((("dacobs_cp" IS NULL) OR (("dacobs_cp" >= 6) AND ("dacobs_cp" <= 42)))),
+    CONSTRAINT "schizophrenia_dacobs_dacobs_ea_check" CHECK ((("dacobs_ea" IS NULL) OR (("dacobs_ea" >= 6) AND ("dacobs_ea" <= 42)))),
+    CONSTRAINT "schizophrenia_dacobs_dacobs_jtc_check" CHECK ((("dacobs_jtc" IS NULL) OR (("dacobs_jtc" >= 6) AND ("dacobs_jtc" <= 42)))),
+    CONSTRAINT "schizophrenia_dacobs_dacobs_safety_behaviors_check" CHECK ((("dacobs_safety_behaviors" IS NULL) OR (("dacobs_safety_behaviors" >= 6) AND ("dacobs_safety_behaviors" <= 42)))),
+    CONSTRAINT "schizophrenia_dacobs_dacobs_sb_check" CHECK ((("dacobs_sb" IS NULL) OR (("dacobs_sb" >= 6) AND ("dacobs_sb" <= 42)))),
+    CONSTRAINT "schizophrenia_dacobs_dacobs_sc_check" CHECK ((("dacobs_sc" IS NULL) OR (("dacobs_sc" >= 6) AND ("dacobs_sc" <= 42)))),
+    CONSTRAINT "schizophrenia_dacobs_dacobs_total_check" CHECK ((("dacobs_total" IS NULL) OR (("dacobs_total" >= 42) AND ("dacobs_total" <= 294)))),
+    CONSTRAINT "schizophrenia_dacobs_q10_check" CHECK ((("q10" IS NULL) OR (("q10" >= 1) AND ("q10" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q11_check" CHECK ((("q11" IS NULL) OR (("q11" >= 1) AND ("q11" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q12_check" CHECK ((("q12" IS NULL) OR (("q12" >= 1) AND ("q12" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q13_check" CHECK ((("q13" IS NULL) OR (("q13" >= 1) AND ("q13" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q14_check" CHECK ((("q14" IS NULL) OR (("q14" >= 1) AND ("q14" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q15_check" CHECK ((("q15" IS NULL) OR (("q15" >= 1) AND ("q15" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q16_check" CHECK ((("q16" IS NULL) OR (("q16" >= 1) AND ("q16" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q17_check" CHECK ((("q17" IS NULL) OR (("q17" >= 1) AND ("q17" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q18_check" CHECK ((("q18" IS NULL) OR (("q18" >= 1) AND ("q18" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q19_check" CHECK ((("q19" IS NULL) OR (("q19" >= 1) AND ("q19" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q1_check" CHECK ((("q1" IS NULL) OR (("q1" >= 1) AND ("q1" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q20_check" CHECK ((("q20" IS NULL) OR (("q20" >= 1) AND ("q20" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q21_check" CHECK ((("q21" IS NULL) OR (("q21" >= 1) AND ("q21" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q22_check" CHECK ((("q22" IS NULL) OR (("q22" >= 1) AND ("q22" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q23_check" CHECK ((("q23" IS NULL) OR (("q23" >= 1) AND ("q23" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q24_check" CHECK ((("q24" IS NULL) OR (("q24" >= 1) AND ("q24" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q25_check" CHECK ((("q25" IS NULL) OR (("q25" >= 1) AND ("q25" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q26_check" CHECK ((("q26" IS NULL) OR (("q26" >= 1) AND ("q26" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q27_check" CHECK ((("q27" IS NULL) OR (("q27" >= 1) AND ("q27" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q28_check" CHECK ((("q28" IS NULL) OR (("q28" >= 1) AND ("q28" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q29_check" CHECK ((("q29" IS NULL) OR (("q29" >= 1) AND ("q29" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q2_check" CHECK ((("q2" IS NULL) OR (("q2" >= 1) AND ("q2" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q30_check" CHECK ((("q30" IS NULL) OR (("q30" >= 1) AND ("q30" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q31_check" CHECK ((("q31" IS NULL) OR (("q31" >= 1) AND ("q31" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q32_check" CHECK ((("q32" IS NULL) OR (("q32" >= 1) AND ("q32" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q33_check" CHECK ((("q33" IS NULL) OR (("q33" >= 1) AND ("q33" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q34_check" CHECK ((("q34" IS NULL) OR (("q34" >= 1) AND ("q34" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q35_check" CHECK ((("q35" IS NULL) OR (("q35" >= 1) AND ("q35" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q36_check" CHECK ((("q36" IS NULL) OR (("q36" >= 1) AND ("q36" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q37_check" CHECK ((("q37" IS NULL) OR (("q37" >= 1) AND ("q37" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q38_check" CHECK ((("q38" IS NULL) OR (("q38" >= 1) AND ("q38" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q39_check" CHECK ((("q39" IS NULL) OR (("q39" >= 1) AND ("q39" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q3_check" CHECK ((("q3" IS NULL) OR (("q3" >= 1) AND ("q3" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q40_check" CHECK ((("q40" IS NULL) OR (("q40" >= 1) AND ("q40" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q41_check" CHECK ((("q41" IS NULL) OR (("q41" >= 1) AND ("q41" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q42_check" CHECK ((("q42" IS NULL) OR (("q42" >= 1) AND ("q42" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q4_check" CHECK ((("q4" IS NULL) OR (("q4" >= 1) AND ("q4" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q5_check" CHECK ((("q5" IS NULL) OR (("q5" >= 1) AND ("q5" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q6_check" CHECK ((("q6" IS NULL) OR (("q6" >= 1) AND ("q6" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q7_check" CHECK ((("q7" IS NULL) OR (("q7" >= 1) AND ("q7" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q8_check" CHECK ((("q8" IS NULL) OR (("q8" >= 1) AND ("q8" <= 7)))),
+    CONSTRAINT "schizophrenia_dacobs_q9_check" CHECK ((("q9" IS NULL) OR (("q9" >= 1) AND ("q9" <= 7))))
+);
+
+
+ALTER TABLE "public"."schizophrenia_dacobs" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_dacobs" IS 'DACOBS - Davos Assessment of Cognitive Biases Scale. Self-report questionnaire assessing cognitive biases, limitations, and safety behaviors.';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_dacobs"."dacobs_jtc" IS 'Jumping to Conclusions subscale (items 3,8,16,18,25,30, range 6-42)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_dacobs"."dacobs_bi" IS 'Belief Inflexibility subscale (items 13,15,26,34,38,41, range 6-42)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_dacobs"."dacobs_at" IS 'Attention to Threat subscale (items 1,2,6,10,20,37, range 6-42)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_dacobs"."dacobs_ea" IS 'External Attribution subscale (items 7,12,17,22,24,29, range 6-42)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_dacobs"."dacobs_sc" IS 'Social Cognition Problems subscale (items 4,9,11,14,19,39, range 6-42)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_dacobs"."dacobs_cp" IS 'Subjective Cognitive Problems subscale (items 5,21,28,32,36,40, range 6-42)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_dacobs"."dacobs_sb" IS 'Safety Behaviors subscale (items 23,27,31,33,35,42, range 6-42)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_dacobs"."dacobs_cognitive_biases" IS 'Cognitive Biases section total (JTC+BI+AT+EA, range 24-168)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_dacobs"."dacobs_cognitive_limitations" IS 'Cognitive Limitations section total (SC+CP, range 12-84)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_dacobs"."dacobs_safety_behaviors" IS 'Safety Behaviors section total (SB, range 6-42)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_dacobs"."dacobs_total" IS 'Total score (sum of all 42 items, range 42-294)';
+
 
 
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_dossier_infirmier" (
@@ -6244,6 +7861,112 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_ecv" (
 
 
 ALTER TABLE "public"."schizophrenia_ecv" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_egf" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "egf_score" integer,
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "test_done" boolean DEFAULT true,
+    CONSTRAINT "schizophrenia_egf_egf_score_check" CHECK ((("egf_score" >= 1) AND ("egf_score" <= 100)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_egf" OWNER TO "postgres";
+
+
+COMMENT ON COLUMN "public"."schizophrenia_egf"."test_done" IS 'Flag indicating if the test was administered';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_ephp" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "questionnaire_done" "text",
+    "a1" integer,
+    "a2" integer,
+    "a3" integer,
+    "a4" integer,
+    "b5" integer,
+    "b6" integer,
+    "b7" integer,
+    "b8" integer,
+    "c9" integer,
+    "c10" integer,
+    "c11" integer,
+    "d12" integer,
+    "d13" integer,
+    "score_cognitiv" integer,
+    "score_motiv" integer,
+    "score_comm" integer,
+    "score_eval" integer,
+    "total_score" integer,
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_ephp_a1_check" CHECK ((("a1" >= 0) AND ("a1" <= 7))),
+    CONSTRAINT "schizophrenia_ephp_a2_check" CHECK ((("a2" >= 0) AND ("a2" <= 7))),
+    CONSTRAINT "schizophrenia_ephp_a3_check" CHECK ((("a3" >= 0) AND ("a3" <= 7))),
+    CONSTRAINT "schizophrenia_ephp_a4_check" CHECK ((("a4" >= 0) AND ("a4" <= 7))),
+    CONSTRAINT "schizophrenia_ephp_b5_check" CHECK ((("b5" >= 0) AND ("b5" <= 7))),
+    CONSTRAINT "schizophrenia_ephp_b6_check" CHECK ((("b6" >= 0) AND ("b6" <= 7))),
+    CONSTRAINT "schizophrenia_ephp_b7_check" CHECK ((("b7" >= 0) AND ("b7" <= 7))),
+    CONSTRAINT "schizophrenia_ephp_b8_check" CHECK ((("b8" >= 0) AND ("b8" <= 7))),
+    CONSTRAINT "schizophrenia_ephp_c10_check" CHECK ((("c10" >= 0) AND ("c10" <= 7))),
+    CONSTRAINT "schizophrenia_ephp_c11_check" CHECK ((("c11" >= 0) AND ("c11" <= 7))),
+    CONSTRAINT "schizophrenia_ephp_c9_check" CHECK ((("c9" >= 0) AND ("c9" <= 7))),
+    CONSTRAINT "schizophrenia_ephp_d12_check" CHECK ((("d12" >= 0) AND ("d12" <= 7))),
+    CONSTRAINT "schizophrenia_ephp_d13_check" CHECK ((("d13" >= 0) AND ("d13" <= 7))),
+    CONSTRAINT "schizophrenia_ephp_questionnaire_done_check" CHECK (("questionnaire_done" = ANY (ARRAY['Fait'::"text", 'Non fait'::"text"]))),
+    CONSTRAINT "schizophrenia_ephp_score_cognitiv_check" CHECK ((("score_cognitiv" >= 0) AND ("score_cognitiv" <= 24))),
+    CONSTRAINT "schizophrenia_ephp_score_comm_check" CHECK ((("score_comm" >= 0) AND ("score_comm" <= 18))),
+    CONSTRAINT "schizophrenia_ephp_score_eval_check" CHECK ((("score_eval" >= 0) AND ("score_eval" <= 12))),
+    CONSTRAINT "schizophrenia_ephp_score_motiv_check" CHECK ((("score_motiv" >= 0) AND ("score_motiv" <= 24))),
+    CONSTRAINT "schizophrenia_ephp_total_score_check" CHECK ((("total_score" >= 0) AND ("total_score" <= 78)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_ephp" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_eq5d5l" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "questionnaire_done" "text",
+    "mobility" integer,
+    "self_care" integer,
+    "usual_activities" integer,
+    "pain_discomfort" integer,
+    "anxiety_depression" integer,
+    "vas_score" integer,
+    "health_state" "text",
+    "index_value" numeric(5,3),
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_eq5d5l_anxiety_depression_range" CHECK ((("anxiety_depression" IS NULL) OR (("anxiety_depression" >= 1) AND ("anxiety_depression" <= 5)))),
+    CONSTRAINT "schizophrenia_eq5d5l_index_value_range" CHECK ((("index_value" IS NULL) OR (("index_value" >= '-0.530'::numeric) AND ("index_value" <= 1.000)))),
+    CONSTRAINT "schizophrenia_eq5d5l_mobility_range" CHECK ((("mobility" IS NULL) OR (("mobility" >= 1) AND ("mobility" <= 5)))),
+    CONSTRAINT "schizophrenia_eq5d5l_pain_discomfort_range" CHECK ((("pain_discomfort" IS NULL) OR (("pain_discomfort" >= 1) AND ("pain_discomfort" <= 5)))),
+    CONSTRAINT "schizophrenia_eq5d5l_self_care_range" CHECK ((("self_care" IS NULL) OR (("self_care" >= 1) AND ("self_care" <= 5)))),
+    CONSTRAINT "schizophrenia_eq5d5l_usual_activities_range" CHECK ((("usual_activities" IS NULL) OR (("usual_activities" >= 1) AND ("usual_activities" <= 5)))),
+    CONSTRAINT "schizophrenia_eq5d5l_vas_score_range" CHECK ((("vas_score" IS NULL) OR (("vas_score" >= 0) AND ("vas_score" <= 100))))
+);
+
+
+ALTER TABLE "public"."schizophrenia_eq5d5l" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_eval_addictologique" (
@@ -6405,6 +8128,96 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_eval_addictologique" (
 ALTER TABLE "public"."schizophrenia_eval_addictologique" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_fagerstrom" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "questionnaire_done" "text",
+    "q1" integer,
+    "q2" integer,
+    "q3" integer,
+    "q4" integer,
+    "q5" integer,
+    "q6" integer,
+    "total_score" integer,
+    "hsi_score" integer,
+    "dependence_level" "text",
+    "treatment_guidance" "text",
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_fagerstrom_hsi_score_check" CHECK ((("hsi_score" >= 0) AND ("hsi_score" <= 6))),
+    CONSTRAINT "schizophrenia_fagerstrom_q1_check" CHECK ((("q1" >= 0) AND ("q1" <= 3))),
+    CONSTRAINT "schizophrenia_fagerstrom_q2_check" CHECK ((("q2" >= 0) AND ("q2" <= 1))),
+    CONSTRAINT "schizophrenia_fagerstrom_q3_check" CHECK ((("q3" >= 0) AND ("q3" <= 1))),
+    CONSTRAINT "schizophrenia_fagerstrom_q4_check" CHECK ((("q4" >= 0) AND ("q4" <= 3))),
+    CONSTRAINT "schizophrenia_fagerstrom_q5_check" CHECK ((("q5" >= 0) AND ("q5" <= 1))),
+    CONSTRAINT "schizophrenia_fagerstrom_q6_check" CHECK ((("q6" >= 0) AND ("q6" <= 1))),
+    CONSTRAINT "schizophrenia_fagerstrom_questionnaire_done_check" CHECK (("questionnaire_done" = ANY (ARRAY['Fait'::"text", 'Non fait'::"text"]))),
+    CONSTRAINT "schizophrenia_fagerstrom_total_score_check" CHECK ((("total_score" >= 0) AND ("total_score" <= 10)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_fagerstrom" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_ipaq" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "questionnaire_done" "text",
+    "vigorous_days" integer,
+    "vigorous_hours" integer,
+    "vigorous_minutes" integer,
+    "moderate_days" integer,
+    "moderate_hours" integer,
+    "moderate_minutes" integer,
+    "walking_days" integer,
+    "walking_hours" integer,
+    "walking_minutes" integer,
+    "walking_pace" "text",
+    "sitting_weekday_hours" integer,
+    "sitting_weekday_minutes" integer,
+    "sitting_weekend_hours" integer,
+    "sitting_weekend_minutes" integer,
+    "vigorous_met_minutes" numeric(10,2),
+    "moderate_met_minutes" numeric(10,2),
+    "walking_met_minutes" numeric(10,2),
+    "total_met_minutes" numeric(10,2),
+    "activity_level" "text",
+    "sitting_weekday_total" integer,
+    "sitting_weekend_total" integer,
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_ipaq_activity_level_check" CHECK (("activity_level" = ANY (ARRAY['low'::"text", 'moderate'::"text", 'high'::"text"]))),
+    CONSTRAINT "schizophrenia_ipaq_moderate_days_check" CHECK ((("moderate_days" >= 0) AND ("moderate_days" <= 7))),
+    CONSTRAINT "schizophrenia_ipaq_moderate_hours_check" CHECK ((("moderate_hours" >= 0) AND ("moderate_hours" <= 24))),
+    CONSTRAINT "schizophrenia_ipaq_moderate_minutes_check" CHECK ((("moderate_minutes" >= 0) AND ("moderate_minutes" <= 59))),
+    CONSTRAINT "schizophrenia_ipaq_sitting_weekday_hours_check" CHECK ((("sitting_weekday_hours" >= 0) AND ("sitting_weekday_hours" <= 24))),
+    CONSTRAINT "schizophrenia_ipaq_sitting_weekday_minutes_check" CHECK ((("sitting_weekday_minutes" >= 0) AND ("sitting_weekday_minutes" <= 59))),
+    CONSTRAINT "schizophrenia_ipaq_sitting_weekend_hours_check" CHECK ((("sitting_weekend_hours" >= 0) AND ("sitting_weekend_hours" <= 24))),
+    CONSTRAINT "schizophrenia_ipaq_sitting_weekend_minutes_check" CHECK ((("sitting_weekend_minutes" >= 0) AND ("sitting_weekend_minutes" <= 59))),
+    CONSTRAINT "schizophrenia_ipaq_vigorous_days_check" CHECK ((("vigorous_days" >= 0) AND ("vigorous_days" <= 7))),
+    CONSTRAINT "schizophrenia_ipaq_vigorous_hours_check" CHECK ((("vigorous_hours" >= 0) AND ("vigorous_hours" <= 24))),
+    CONSTRAINT "schizophrenia_ipaq_vigorous_minutes_check" CHECK ((("vigorous_minutes" >= 0) AND ("vigorous_minutes" <= 59))),
+    CONSTRAINT "schizophrenia_ipaq_walking_days_check" CHECK ((("walking_days" >= 0) AND ("walking_days" <= 7))),
+    CONSTRAINT "schizophrenia_ipaq_walking_hours_check" CHECK ((("walking_hours" >= 0) AND ("walking_hours" <= 24))),
+    CONSTRAINT "schizophrenia_ipaq_walking_minutes_check" CHECK ((("walking_minutes" >= 0) AND ("walking_minutes" <= 59)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_ipaq" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_ipaq" IS 'IPAQ (International Physical Activity Questionnaire) Short Form responses for schizophrenia initial evaluation. Measures physical activity across 4 domains with MET-based scoring.';
+
+
+
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_isa" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "visit_id" "uuid" NOT NULL,
@@ -6449,6 +8262,145 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_isa" (
 
 
 ALTER TABLE "public"."schizophrenia_isa" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_lis" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "lis_a1" integer,
+    "lis_a2" integer,
+    "lis_a3" integer,
+    "lis_a4" integer,
+    "lis_a5" integer,
+    "lis_b1" integer,
+    "lis_b2" integer,
+    "lis_b3" integer,
+    "lis_b4" integer,
+    "lis_b5" integer,
+    "lis_c1" integer,
+    "lis_c2" integer,
+    "lis_c3" integer,
+    "lis_c4" integer,
+    "lis_c5" integer,
+    "lis_d1" integer,
+    "lis_d2" integer,
+    "lis_d3" integer,
+    "lis_d4" integer,
+    "lis_d5" integer,
+    "lis_e1" integer,
+    "lis_e2" integer,
+    "lis_e3" integer,
+    "lis_e4" integer,
+    "lis_e5" integer,
+    "lis_f1" integer,
+    "lis_f2" integer,
+    "lis_f3" integer,
+    "lis_f4" integer,
+    "lis_f5" integer,
+    "lis_score" numeric(6,2),
+    "test_done" boolean DEFAULT true,
+    "questionnaire_version" character varying(50),
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_lis_lis_a1_check" CHECK ((("lis_a1" >= 1) AND ("lis_a1" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_a2_check" CHECK ((("lis_a2" >= 1) AND ("lis_a2" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_a3_check" CHECK ((("lis_a3" >= 1) AND ("lis_a3" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_a4_check" CHECK ((("lis_a4" >= 1) AND ("lis_a4" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_a5_check" CHECK ((("lis_a5" >= 1) AND ("lis_a5" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_b1_check" CHECK ((("lis_b1" >= 1) AND ("lis_b1" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_b2_check" CHECK ((("lis_b2" >= 1) AND ("lis_b2" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_b3_check" CHECK ((("lis_b3" >= 1) AND ("lis_b3" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_b4_check" CHECK ((("lis_b4" >= 1) AND ("lis_b4" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_b5_check" CHECK ((("lis_b5" >= 1) AND ("lis_b5" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_c1_check" CHECK ((("lis_c1" >= 1) AND ("lis_c1" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_c2_check" CHECK ((("lis_c2" >= 1) AND ("lis_c2" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_c3_check" CHECK ((("lis_c3" >= 1) AND ("lis_c3" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_c4_check" CHECK ((("lis_c4" >= 1) AND ("lis_c4" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_c5_check" CHECK ((("lis_c5" >= 1) AND ("lis_c5" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_d1_check" CHECK ((("lis_d1" >= 1) AND ("lis_d1" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_d2_check" CHECK ((("lis_d2" >= 1) AND ("lis_d2" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_d3_check" CHECK ((("lis_d3" >= 1) AND ("lis_d3" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_d4_check" CHECK ((("lis_d4" >= 1) AND ("lis_d4" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_d5_check" CHECK ((("lis_d5" >= 1) AND ("lis_d5" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_e1_check" CHECK ((("lis_e1" >= 1) AND ("lis_e1" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_e2_check" CHECK ((("lis_e2" >= 1) AND ("lis_e2" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_e3_check" CHECK ((("lis_e3" >= 1) AND ("lis_e3" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_e4_check" CHECK ((("lis_e4" >= 1) AND ("lis_e4" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_e5_check" CHECK ((("lis_e5" >= 1) AND ("lis_e5" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_f1_check" CHECK ((("lis_f1" >= 1) AND ("lis_f1" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_f2_check" CHECK ((("lis_f2" >= 1) AND ("lis_f2" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_f3_check" CHECK ((("lis_f3" >= 1) AND ("lis_f3" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_f4_check" CHECK ((("lis_f4" >= 1) AND ("lis_f4" <= 4))),
+    CONSTRAINT "schizophrenia_lis_lis_f5_check" CHECK ((("lis_f5" >= 1) AND ("lis_f5" <= 4)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_lis" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_lis" IS 'LIS (Lecture d''Intentions Sociales) responses for schizophrenia patients - Neuropsy Module Bloc 2. Evaluates social cognition through film scenarios.';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_lis"."lis_a1" IS 'Film A item 1 response (1-4 scale)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_lis"."lis_score" IS 'Total deviation score from normative values (lower = better social cognition)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_lis"."test_done" IS 'Flag indicating test was administered (true = done, false = not done)';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_mars" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "questionnaire_done" "text",
+    "q1" "text",
+    "q2" "text",
+    "q3" "text",
+    "q4" "text",
+    "q5" "text",
+    "q6" "text",
+    "q7" "text",
+    "q8" "text",
+    "q9" "text",
+    "q10" "text",
+    "total_score" integer,
+    "adherence_subscore" integer,
+    "attitude_subscore" integer,
+    "positive_effects_subscore" integer,
+    "negative_effects_subscore" integer,
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_mars_adherence_subscore_range" CHECK ((("adherence_subscore" IS NULL) OR (("adherence_subscore" >= 0) AND ("adherence_subscore" <= 4)))),
+    CONSTRAINT "schizophrenia_mars_attitude_subscore_range" CHECK ((("attitude_subscore" IS NULL) OR (("attitude_subscore" >= 0) AND ("attitude_subscore" <= 2)))),
+    CONSTRAINT "schizophrenia_mars_negative_effects_subscore_range" CHECK ((("negative_effects_subscore" IS NULL) OR (("negative_effects_subscore" >= 0) AND ("negative_effects_subscore" <= 2)))),
+    CONSTRAINT "schizophrenia_mars_positive_effects_subscore_range" CHECK ((("positive_effects_subscore" IS NULL) OR (("positive_effects_subscore" >= 0) AND ("positive_effects_subscore" <= 2)))),
+    CONSTRAINT "schizophrenia_mars_q10_valid" CHECK ((("q10" IS NULL) OR ("q10" = ANY (ARRAY['Oui'::"text", 'Non'::"text"])))),
+    CONSTRAINT "schizophrenia_mars_q1_valid" CHECK ((("q1" IS NULL) OR ("q1" = ANY (ARRAY['Oui'::"text", 'Non'::"text"])))),
+    CONSTRAINT "schizophrenia_mars_q2_valid" CHECK ((("q2" IS NULL) OR ("q2" = ANY (ARRAY['Oui'::"text", 'Non'::"text"])))),
+    CONSTRAINT "schizophrenia_mars_q3_valid" CHECK ((("q3" IS NULL) OR ("q3" = ANY (ARRAY['Oui'::"text", 'Non'::"text"])))),
+    CONSTRAINT "schizophrenia_mars_q4_valid" CHECK ((("q4" IS NULL) OR ("q4" = ANY (ARRAY['Oui'::"text", 'Non'::"text"])))),
+    CONSTRAINT "schizophrenia_mars_q5_valid" CHECK ((("q5" IS NULL) OR ("q5" = ANY (ARRAY['Oui'::"text", 'Non'::"text"])))),
+    CONSTRAINT "schizophrenia_mars_q6_valid" CHECK ((("q6" IS NULL) OR ("q6" = ANY (ARRAY['Oui'::"text", 'Non'::"text"])))),
+    CONSTRAINT "schizophrenia_mars_q7_valid" CHECK ((("q7" IS NULL) OR ("q7" = ANY (ARRAY['Oui'::"text", 'Non'::"text"])))),
+    CONSTRAINT "schizophrenia_mars_q8_valid" CHECK ((("q8" IS NULL) OR ("q8" = ANY (ARRAY['Oui'::"text", 'Non'::"text"])))),
+    CONSTRAINT "schizophrenia_mars_q9_valid" CHECK ((("q9" IS NULL) OR ("q9" = ANY (ARRAY['Oui'::"text", 'Non'::"text"])))),
+    CONSTRAINT "schizophrenia_mars_total_score_range" CHECK ((("total_score" IS NULL) OR (("total_score" >= 0) AND ("total_score" <= 10))))
+);
+
+
+ALTER TABLE "public"."schizophrenia_mars" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_panss" (
@@ -6507,11 +8459,16 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_panss" (
     "completed_by" "uuid",
     "completed_at" timestamp with time zone DEFAULT "now"(),
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "questionnaire_done" "text"
 );
 
 
 ALTER TABLE "public"."schizophrenia_panss" OWNER TO "postgres";
+
+
+COMMENT ON COLUMN "public"."schizophrenia_panss"."questionnaire_done" IS 'Indicates if the questionnaire was completed (Fait/Non fait)';
+
 
 
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_perinatalite" (
@@ -6538,6 +8495,54 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_perinatalite" (
 ALTER TABLE "public"."schizophrenia_perinatalite" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_presenteisme" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "questionnaire_done" "text",
+    "abs_b3" integer,
+    "abs_b4" integer,
+    "abs_b6" integer,
+    "abs_b5a" integer,
+    "abs_b5b" integer,
+    "abs_b5c" integer,
+    "abs_b5d" integer,
+    "abs_b5e" integer,
+    "rad_abs_b9" integer,
+    "rad_abs_b10" integer,
+    "rad_abs_b11" integer,
+    "absenteisme_absolu" integer,
+    "absenteisme_relatif_pct" numeric,
+    "performance_relative" integer,
+    "perte_performance" integer,
+    "productivite_pct" numeric,
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_presenteisme_abs_b3_check" CHECK ((("abs_b3" >= 0) AND ("abs_b3" <= 97))),
+    CONSTRAINT "schizophrenia_presenteisme_abs_b4_check" CHECK ((("abs_b4" >= 0) AND ("abs_b4" <= 97))),
+    CONSTRAINT "schizophrenia_presenteisme_abs_b5a_check" CHECK ((("abs_b5a" >= 0) AND ("abs_b5a" <= 28))),
+    CONSTRAINT "schizophrenia_presenteisme_abs_b5b_check" CHECK ((("abs_b5b" >= 0) AND ("abs_b5b" <= 28))),
+    CONSTRAINT "schizophrenia_presenteisme_abs_b5c_check" CHECK ((("abs_b5c" >= 0) AND ("abs_b5c" <= 28))),
+    CONSTRAINT "schizophrenia_presenteisme_abs_b5d_check" CHECK ((("abs_b5d" >= 0) AND ("abs_b5d" <= 28))),
+    CONSTRAINT "schizophrenia_presenteisme_abs_b5e_check" CHECK ((("abs_b5e" >= 0) AND ("abs_b5e" <= 28))),
+    CONSTRAINT "schizophrenia_presenteisme_abs_b6_check" CHECK (("abs_b6" >= 0)),
+    CONSTRAINT "schizophrenia_presenteisme_questionnaire_done_check" CHECK (("questionnaire_done" = ANY (ARRAY['Fait'::"text", 'Non fait'::"text"]))),
+    CONSTRAINT "schizophrenia_presenteisme_rad_abs_b10_check" CHECK ((("rad_abs_b10" >= 0) AND ("rad_abs_b10" <= 10))),
+    CONSTRAINT "schizophrenia_presenteisme_rad_abs_b11_check" CHECK ((("rad_abs_b11" >= 0) AND ("rad_abs_b11" <= 10))),
+    CONSTRAINT "schizophrenia_presenteisme_rad_abs_b9_check" CHECK ((("rad_abs_b9" >= 0) AND ("rad_abs_b9" <= 10)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_presenteisme" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_presenteisme" IS 'WHO-HPQ (Health and Work Performance Questionnaire) responses for schizophrenia patients. Measures absenteeism and presenteeism over 4 weeks.';
+
+
+
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_psp" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "visit_id" "uuid" NOT NULL,
@@ -6552,11 +8557,98 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_psp" (
     "completed_by" "uuid",
     "completed_at" timestamp with time zone DEFAULT "now"(),
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "test_done" boolean DEFAULT true
 );
 
 
 ALTER TABLE "public"."schizophrenia_psp" OWNER TO "postgres";
+
+
+COMMENT ON COLUMN "public"."schizophrenia_psp"."test_done" IS 'Flag indicating if the test was administered';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_psqi" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "questionnaire_done" "text",
+    "q1_bedtime" "text",
+    "q2_minutes_to_sleep" integer,
+    "q3_waketime" "text",
+    "q4_hours_sleep" "text",
+    "q5a" integer,
+    "q5b" integer,
+    "q5c" integer,
+    "q5d" integer,
+    "q5e" integer,
+    "q5f" integer,
+    "q5g" integer,
+    "q5h" integer,
+    "q5i" integer,
+    "q5j" integer,
+    "q5j_text" "text",
+    "q6" integer,
+    "q7" integer,
+    "q8" integer,
+    "q9" integer,
+    "q10" "text",
+    "q10a" integer,
+    "q10b" integer,
+    "q10c" integer,
+    "q10d" integer,
+    "q10_autre" "text",
+    "c1_subjective_quality" integer,
+    "c2_latency" integer,
+    "c3_duration" integer,
+    "c4_efficiency" integer,
+    "c5_disturbances" integer,
+    "c6_medication" integer,
+    "c7_daytime_dysfunction" integer,
+    "time_in_bed_hours" numeric,
+    "sleep_efficiency_pct" numeric,
+    "total_score" integer,
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_psqi_c1_subjective_quality_check" CHECK ((("c1_subjective_quality" >= 0) AND ("c1_subjective_quality" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_c2_latency_check" CHECK ((("c2_latency" >= 0) AND ("c2_latency" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_c3_duration_check" CHECK ((("c3_duration" >= 0) AND ("c3_duration" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_c4_efficiency_check" CHECK ((("c4_efficiency" >= 0) AND ("c4_efficiency" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_c5_disturbances_check" CHECK ((("c5_disturbances" >= 0) AND ("c5_disturbances" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_c6_medication_check" CHECK ((("c6_medication" >= 0) AND ("c6_medication" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_c7_daytime_dysfunction_check" CHECK ((("c7_daytime_dysfunction" >= 0) AND ("c7_daytime_dysfunction" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q10a_check" CHECK ((("q10a" >= 0) AND ("q10a" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q10b_check" CHECK ((("q10b" >= 0) AND ("q10b" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q10c_check" CHECK ((("q10c" >= 0) AND ("q10c" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q10d_check" CHECK ((("q10d" >= 0) AND ("q10d" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q5a_check" CHECK ((("q5a" >= 0) AND ("q5a" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q5b_check" CHECK ((("q5b" >= 0) AND ("q5b" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q5c_check" CHECK ((("q5c" >= 0) AND ("q5c" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q5d_check" CHECK ((("q5d" >= 0) AND ("q5d" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q5e_check" CHECK ((("q5e" >= 0) AND ("q5e" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q5f_check" CHECK ((("q5f" >= 0) AND ("q5f" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q5g_check" CHECK ((("q5g" >= 0) AND ("q5g" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q5h_check" CHECK ((("q5h" >= 0) AND ("q5h" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q5i_check" CHECK ((("q5i" >= 0) AND ("q5i" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q5j_check" CHECK ((("q5j" >= 0) AND ("q5j" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q6_check" CHECK ((("q6" >= 0) AND ("q6" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q7_check" CHECK ((("q7" >= 0) AND ("q7" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q8_check" CHECK ((("q8" >= 0) AND ("q8" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_q9_check" CHECK ((("q9" >= 0) AND ("q9" <= 3))),
+    CONSTRAINT "schizophrenia_psqi_questionnaire_done_check" CHECK (("questionnaire_done" = ANY (ARRAY['Fait'::"text", 'Non fait'::"text"]))),
+    CONSTRAINT "schizophrenia_psqi_total_score_check" CHECK ((("total_score" >= 0) AND ("total_score" <= 21)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_psqi" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_psqi" IS 'Pittsburgh Sleep Quality Index (PSQI) responses for schizophrenia patients. Global score 0-21, >5 indicates poor sleep quality.';
+
 
 
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_sas" (
@@ -6578,11 +8670,16 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_sas" (
     "completed_by" "uuid",
     "completed_at" timestamp with time zone DEFAULT "now"(),
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "test_done" boolean DEFAULT true
 );
 
 
 ALTER TABLE "public"."schizophrenia_sas" OWNER TO "postgres";
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sas"."test_done" IS 'Flag indicating if the test was administered';
+
 
 
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_screening_diagnostic" (
@@ -6630,6 +8727,365 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_screening_orientation" (
 ALTER TABLE "public"."schizophrenia_screening_orientation" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_sogs" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "questionnaire_done" "text",
+    "rad_sogs1a" "text",
+    "rad_sogs1b" "text",
+    "rad_sogs1c" "text",
+    "rad_sogs1d" "text",
+    "rad_sogs1e" "text",
+    "rad_sogs1f" "text",
+    "rad_sogs1g" "text",
+    "sogs2" "text",
+    "rad_sogs3" "text",
+    "chk_sogs3a" "text",
+    "rad_sogs4" "text",
+    "rad_sogs5" "text",
+    "rad_sogs6" "text",
+    "rad_sogs7" "text",
+    "rad_sogs8" "text",
+    "rad_sogs9" "text",
+    "rad_sogs10" "text",
+    "rad_sogs11" "text",
+    "rad_sogs12" "text",
+    "rad_sogs13" "text",
+    "rad_sogs14" "text",
+    "rad_sogs15" "text",
+    "rad_sogs16" "text",
+    "rad_sogs16a" "text",
+    "rad_sogs16b" "text",
+    "rad_sogs16c" "text",
+    "rad_sogs16d" "text",
+    "rad_sogs16e" "text",
+    "rad_sogs16f" "text",
+    "rad_sogs16g" "text",
+    "rad_sogs16h" "text",
+    "rad_sogs16i" "text",
+    "rad_sogs16j" "text",
+    "rad_sogs16k" "text",
+    "total_score" integer,
+    "gambling_severity" "text",
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_sogs_gambling_severity_check" CHECK (("gambling_severity" = ANY (ARRAY['no_problem'::"text", 'at_risk'::"text", 'pathological'::"text"]))),
+    CONSTRAINT "schizophrenia_sogs_questionnaire_done_check" CHECK (("questionnaire_done" = ANY (ARRAY['Fait'::"text", 'Non fait'::"text"]))),
+    CONSTRAINT "schizophrenia_sogs_total_score_check" CHECK ((("total_score" >= 0) AND ("total_score" <= 20)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_sogs" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_sogs" IS 'SOGS (South Oaks Gambling Screen) responses for schizophrenia pathology. 35 items, 20 scored with 3 different scoring functions. Clinical cutoffs: 0-2 no problem, 3-4 at risk, 5+ pathological.';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_sqol" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "questionnaire_done" "text",
+    "q1" integer,
+    "q2" integer,
+    "q3" integer,
+    "q4" integer,
+    "q5" integer,
+    "q6" integer,
+    "q7" integer,
+    "q8" integer,
+    "q9" integer,
+    "q10" integer,
+    "q11" integer,
+    "q12" integer,
+    "q13" integer,
+    "q14" integer,
+    "q15" integer,
+    "q16" integer,
+    "q17" integer,
+    "q18" integer,
+    "q1_not_concerned" boolean DEFAULT false,
+    "q2_not_concerned" boolean DEFAULT false,
+    "q3_not_concerned" boolean DEFAULT false,
+    "q4_not_concerned" boolean DEFAULT false,
+    "q5_not_concerned" boolean DEFAULT false,
+    "q6_not_concerned" boolean DEFAULT false,
+    "q7_not_concerned" boolean DEFAULT false,
+    "q8_not_concerned" boolean DEFAULT false,
+    "q9_not_concerned" boolean DEFAULT false,
+    "q10_not_concerned" boolean DEFAULT false,
+    "q11_not_concerned" boolean DEFAULT false,
+    "q12_not_concerned" boolean DEFAULT false,
+    "q13_not_concerned" boolean DEFAULT false,
+    "q14_not_concerned" boolean DEFAULT false,
+    "q15_not_concerned" boolean DEFAULT false,
+    "q16_not_concerned" boolean DEFAULT false,
+    "q17_not_concerned" boolean DEFAULT false,
+    "q18_not_concerned" boolean DEFAULT false,
+    "score_vie_sentimentale" numeric(5,2),
+    "score_estime_de_soi" numeric(5,2),
+    "score_relation_famille" numeric(5,2),
+    "score_relation_amis" numeric(5,2),
+    "score_autonomie" numeric(5,2),
+    "score_bien_etre_psychologique" numeric(5,2),
+    "score_bien_etre_physique" numeric(5,2),
+    "score_resilience" numeric(5,2),
+    "total_score" numeric(5,2),
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"()
+);
+
+
+ALTER TABLE "public"."schizophrenia_sqol" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_sstics" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "q1" integer,
+    "q2" integer,
+    "q3" integer,
+    "q4" integer,
+    "q5" integer,
+    "q6" integer,
+    "q7" integer,
+    "q8" integer,
+    "q9" integer,
+    "q10" integer,
+    "q11" integer,
+    "q12" integer,
+    "q13" integer,
+    "q14" integer,
+    "q15" integer,
+    "q16" integer,
+    "q17" integer,
+    "q18" integer,
+    "q19" integer,
+    "q20" integer,
+    "q21" integer,
+    "sstics_memt" integer,
+    "sstics_memexp" integer,
+    "sstics_att" integer,
+    "sstics_fe" integer,
+    "sstics_lang" integer,
+    "sstics_prax" integer,
+    "sstics_score" integer,
+    "sstics_scorez" numeric(5,2),
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_sstics_q10_check" CHECK ((("q10" IS NULL) OR (("q10" >= 0) AND ("q10" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q11_check" CHECK ((("q11" IS NULL) OR (("q11" >= 0) AND ("q11" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q12_check" CHECK ((("q12" IS NULL) OR (("q12" >= 0) AND ("q12" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q13_check" CHECK ((("q13" IS NULL) OR (("q13" >= 0) AND ("q13" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q14_check" CHECK ((("q14" IS NULL) OR (("q14" >= 0) AND ("q14" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q15_check" CHECK ((("q15" IS NULL) OR (("q15" >= 0) AND ("q15" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q16_check" CHECK ((("q16" IS NULL) OR (("q16" >= 0) AND ("q16" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q17_check" CHECK ((("q17" IS NULL) OR (("q17" >= 0) AND ("q17" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q18_check" CHECK ((("q18" IS NULL) OR (("q18" >= 0) AND ("q18" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q19_check" CHECK ((("q19" IS NULL) OR (("q19" >= 0) AND ("q19" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q1_check" CHECK ((("q1" IS NULL) OR (("q1" >= 0) AND ("q1" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q20_check" CHECK ((("q20" IS NULL) OR (("q20" >= 0) AND ("q20" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q21_check" CHECK ((("q21" IS NULL) OR (("q21" >= 0) AND ("q21" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q2_check" CHECK ((("q2" IS NULL) OR (("q2" >= 0) AND ("q2" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q3_check" CHECK ((("q3" IS NULL) OR (("q3" >= 0) AND ("q3" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q4_check" CHECK ((("q4" IS NULL) OR (("q4" >= 0) AND ("q4" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q5_check" CHECK ((("q5" IS NULL) OR (("q5" >= 0) AND ("q5" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q6_check" CHECK ((("q6" IS NULL) OR (("q6" >= 0) AND ("q6" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q7_check" CHECK ((("q7" IS NULL) OR (("q7" >= 0) AND ("q7" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q8_check" CHECK ((("q8" IS NULL) OR (("q8" >= 0) AND ("q8" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_q9_check" CHECK ((("q9" IS NULL) OR (("q9" >= 0) AND ("q9" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_sstics_att_check" CHECK ((("sstics_att" IS NULL) OR (("sstics_att" >= 0) AND ("sstics_att" <= 20)))),
+    CONSTRAINT "schizophrenia_sstics_sstics_fe_check" CHECK ((("sstics_fe" IS NULL) OR (("sstics_fe" >= 0) AND ("sstics_fe" <= 12)))),
+    CONSTRAINT "schizophrenia_sstics_sstics_lang_check" CHECK ((("sstics_lang" IS NULL) OR (("sstics_lang" >= 0) AND ("sstics_lang" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_sstics_memexp_check" CHECK ((("sstics_memexp" IS NULL) OR (("sstics_memexp" >= 0) AND ("sstics_memexp" <= 36)))),
+    CONSTRAINT "schizophrenia_sstics_sstics_memt_check" CHECK ((("sstics_memt" IS NULL) OR (("sstics_memt" >= 0) AND ("sstics_memt" <= 8)))),
+    CONSTRAINT "schizophrenia_sstics_sstics_prax_check" CHECK ((("sstics_prax" IS NULL) OR (("sstics_prax" >= 0) AND ("sstics_prax" <= 4)))),
+    CONSTRAINT "schizophrenia_sstics_sstics_score_check" CHECK ((("sstics_score" IS NULL) OR (("sstics_score" >= 0) AND ("sstics_score" <= 84))))
+);
+
+
+ALTER TABLE "public"."schizophrenia_sstics" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_sstics" IS 'SSTICS - Subjective Scale to Investigate Cognition in Schizophrenia. Self-report questionnaire assessing subjective cognitive complaints across 6 domains.';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sstics"."sstics_memt" IS 'Working Memory domain subscore (items 1-2, range 0-8)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sstics"."sstics_memexp" IS 'Explicit Memory domain subscore (items 3-11, range 0-36)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sstics"."sstics_att" IS 'Attention domain subscore (items 12-16, range 0-20)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sstics"."sstics_fe" IS 'Executive Functions domain subscore (items 17-19, range 0-12)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sstics"."sstics_lang" IS 'Language domain subscore (item 20, range 0-4)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sstics"."sstics_prax" IS 'Praxis domain subscore (item 21, range 0-4)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sstics"."sstics_score" IS 'Total score (sum of all domains, range 0-84)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sstics"."sstics_scorez" IS 'Z-score: (13.1 - total) / 6.2. Negative values indicate more cognitive complaints than reference population.';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_stori" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "questionnaire_done" "text",
+    "q1" integer,
+    "q2" integer,
+    "q3" integer,
+    "q4" integer,
+    "q5" integer,
+    "q6" integer,
+    "q7" integer,
+    "q8" integer,
+    "q9" integer,
+    "q10" integer,
+    "q11" integer,
+    "q12" integer,
+    "q13" integer,
+    "q14" integer,
+    "q15" integer,
+    "q16" integer,
+    "q17" integer,
+    "q18" integer,
+    "q19" integer,
+    "q20" integer,
+    "q21" integer,
+    "q22" integer,
+    "q23" integer,
+    "q24" integer,
+    "q25" integer,
+    "q26" integer,
+    "q27" integer,
+    "q28" integer,
+    "q29" integer,
+    "q30" integer,
+    "q31" integer,
+    "q32" integer,
+    "q33" integer,
+    "q34" integer,
+    "q35" integer,
+    "q36" integer,
+    "q37" integer,
+    "q38" integer,
+    "q39" integer,
+    "q40" integer,
+    "q41" integer,
+    "q42" integer,
+    "q43" integer,
+    "q44" integer,
+    "q45" integer,
+    "q46" integer,
+    "q47" integer,
+    "q48" integer,
+    "q49" integer,
+    "q50" integer,
+    "stori_etap1" integer,
+    "stori_etap2" integer,
+    "stori_etap3" integer,
+    "stori_etap4" integer,
+    "stori_etap5" integer,
+    "dominant_stage" integer,
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_stori_dominant_stage_check" CHECK ((("dominant_stage" IS NULL) OR (("dominant_stage" >= 1) AND ("dominant_stage" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_etap1_check" CHECK ((("stori_etap1" IS NULL) OR (("stori_etap1" >= 0) AND ("stori_etap1" <= 50)))),
+    CONSTRAINT "schizophrenia_stori_etap2_check" CHECK ((("stori_etap2" IS NULL) OR (("stori_etap2" >= 0) AND ("stori_etap2" <= 50)))),
+    CONSTRAINT "schizophrenia_stori_etap3_check" CHECK ((("stori_etap3" IS NULL) OR (("stori_etap3" >= 0) AND ("stori_etap3" <= 50)))),
+    CONSTRAINT "schizophrenia_stori_etap4_check" CHECK ((("stori_etap4" IS NULL) OR (("stori_etap4" >= 0) AND ("stori_etap4" <= 50)))),
+    CONSTRAINT "schizophrenia_stori_etap5_check" CHECK ((("stori_etap5" IS NULL) OR (("stori_etap5" >= 0) AND ("stori_etap5" <= 50)))),
+    CONSTRAINT "schizophrenia_stori_q10_check" CHECK ((("q10" IS NULL) OR (("q10" >= 0) AND ("q10" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q11_check" CHECK ((("q11" IS NULL) OR (("q11" >= 0) AND ("q11" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q12_check" CHECK ((("q12" IS NULL) OR (("q12" >= 0) AND ("q12" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q13_check" CHECK ((("q13" IS NULL) OR (("q13" >= 0) AND ("q13" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q14_check" CHECK ((("q14" IS NULL) OR (("q14" >= 0) AND ("q14" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q15_check" CHECK ((("q15" IS NULL) OR (("q15" >= 0) AND ("q15" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q16_check" CHECK ((("q16" IS NULL) OR (("q16" >= 0) AND ("q16" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q17_check" CHECK ((("q17" IS NULL) OR (("q17" >= 0) AND ("q17" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q18_check" CHECK ((("q18" IS NULL) OR (("q18" >= 0) AND ("q18" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q19_check" CHECK ((("q19" IS NULL) OR (("q19" >= 0) AND ("q19" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q1_check" CHECK ((("q1" IS NULL) OR (("q1" >= 0) AND ("q1" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q20_check" CHECK ((("q20" IS NULL) OR (("q20" >= 0) AND ("q20" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q21_check" CHECK ((("q21" IS NULL) OR (("q21" >= 0) AND ("q21" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q22_check" CHECK ((("q22" IS NULL) OR (("q22" >= 0) AND ("q22" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q23_check" CHECK ((("q23" IS NULL) OR (("q23" >= 0) AND ("q23" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q24_check" CHECK ((("q24" IS NULL) OR (("q24" >= 0) AND ("q24" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q25_check" CHECK ((("q25" IS NULL) OR (("q25" >= 0) AND ("q25" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q26_check" CHECK ((("q26" IS NULL) OR (("q26" >= 0) AND ("q26" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q27_check" CHECK ((("q27" IS NULL) OR (("q27" >= 0) AND ("q27" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q28_check" CHECK ((("q28" IS NULL) OR (("q28" >= 0) AND ("q28" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q29_check" CHECK ((("q29" IS NULL) OR (("q29" >= 0) AND ("q29" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q2_check" CHECK ((("q2" IS NULL) OR (("q2" >= 0) AND ("q2" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q30_check" CHECK ((("q30" IS NULL) OR (("q30" >= 0) AND ("q30" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q31_check" CHECK ((("q31" IS NULL) OR (("q31" >= 0) AND ("q31" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q32_check" CHECK ((("q32" IS NULL) OR (("q32" >= 0) AND ("q32" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q33_check" CHECK ((("q33" IS NULL) OR (("q33" >= 0) AND ("q33" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q34_check" CHECK ((("q34" IS NULL) OR (("q34" >= 0) AND ("q34" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q35_check" CHECK ((("q35" IS NULL) OR (("q35" >= 0) AND ("q35" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q36_check" CHECK ((("q36" IS NULL) OR (("q36" >= 0) AND ("q36" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q37_check" CHECK ((("q37" IS NULL) OR (("q37" >= 0) AND ("q37" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q38_check" CHECK ((("q38" IS NULL) OR (("q38" >= 0) AND ("q38" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q39_check" CHECK ((("q39" IS NULL) OR (("q39" >= 0) AND ("q39" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q3_check" CHECK ((("q3" IS NULL) OR (("q3" >= 0) AND ("q3" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q40_check" CHECK ((("q40" IS NULL) OR (("q40" >= 0) AND ("q40" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q41_check" CHECK ((("q41" IS NULL) OR (("q41" >= 0) AND ("q41" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q42_check" CHECK ((("q42" IS NULL) OR (("q42" >= 0) AND ("q42" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q43_check" CHECK ((("q43" IS NULL) OR (("q43" >= 0) AND ("q43" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q44_check" CHECK ((("q44" IS NULL) OR (("q44" >= 0) AND ("q44" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q45_check" CHECK ((("q45" IS NULL) OR (("q45" >= 0) AND ("q45" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q46_check" CHECK ((("q46" IS NULL) OR (("q46" >= 0) AND ("q46" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q47_check" CHECK ((("q47" IS NULL) OR (("q47" >= 0) AND ("q47" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q48_check" CHECK ((("q48" IS NULL) OR (("q48" >= 0) AND ("q48" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q49_check" CHECK ((("q49" IS NULL) OR (("q49" >= 0) AND ("q49" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q4_check" CHECK ((("q4" IS NULL) OR (("q4" >= 0) AND ("q4" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q50_check" CHECK ((("q50" IS NULL) OR (("q50" >= 0) AND ("q50" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q5_check" CHECK ((("q5" IS NULL) OR (("q5" >= 0) AND ("q5" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q6_check" CHECK ((("q6" IS NULL) OR (("q6" >= 0) AND ("q6" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q7_check" CHECK ((("q7" IS NULL) OR (("q7" >= 0) AND ("q7" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q8_check" CHECK ((("q8" IS NULL) OR (("q8" >= 0) AND ("q8" <= 5)))),
+    CONSTRAINT "schizophrenia_stori_q9_check" CHECK ((("q9" IS NULL) OR (("q9" >= 0) AND ("q9" <= 5))))
+);
+
+
+ALTER TABLE "public"."schizophrenia_stori" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_stori" IS 'STORI (Stages of Recovery Instrument) responses for schizophrenia patients - psychological recovery assessment based on Andresen model. 50 items, 5 recovery stages (Moratoire, Conscience, Préparation, Reconstruction, Croissance).';
+
+
+
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_suicide_history" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "visit_id" "uuid" NOT NULL,
@@ -6672,11 +9128,41 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_sumd" (
     "completed_by" "uuid",
     "completed_at" timestamp with time zone DEFAULT "now"(),
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "updated_at" timestamp with time zone DEFAULT "now"()
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "test_done" boolean DEFAULT true,
+    "score_conscience1" integer,
+    "score_conscience2" integer,
+    "score_conscience3" integer,
+    "awareness_score" numeric,
+    "attribution_score" numeric
 );
 
 
 ALTER TABLE "public"."schizophrenia_sumd" OWNER TO "postgres";
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sumd"."test_done" IS 'Whether the SUMD test was completed';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sumd"."score_conscience1" IS 'Score for Trouble mental (Conscience du trouble)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sumd"."score_conscience2" IS 'Score for Conséquences de ce trouble (Conscience du trouble)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sumd"."score_conscience3" IS 'Score for Effets du traitement (Conscience du trouble)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sumd"."awareness_score" IS 'Average of conscience items (conscience1-9), excluding 0 values';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_sumd"."attribution_score" IS 'Average of attribution items (attribu4-9), excluding 0 values';
+
 
 
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_tea_coffee" (
@@ -6703,6 +9189,140 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_tea_coffee" (
 
 
 ALTER TABLE "public"."schizophrenia_tea_coffee" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_tmt" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "patient_age" integer,
+    "years_of_education" numeric(4,1),
+    "tmta_tps" integer,
+    "tmta_err" integer,
+    "tmta_cor" integer,
+    "tmtb_tps" integer,
+    "tmtb_err" integer,
+    "tmtb_cor" integer,
+    "tmtb_err_persev" integer,
+    "tmta_errtot" integer,
+    "tmtb_errtot" integer,
+    "tmt_b_a_tps" integer,
+    "tmt_b_a_err" integer,
+    "tmta_tps_z" numeric(5,2),
+    "tmta_tps_pc" character varying(20),
+    "tmta_errtot_z" numeric(5,2),
+    "tmta_errtot_pc" character varying(20),
+    "tmtb_tps_z" numeric(5,2),
+    "tmtb_tps_pc" character varying(20),
+    "tmtb_errtot_z" numeric(5,2),
+    "tmtb_errtot_pc" character varying(20),
+    "tmtb_err_persev_z" numeric(5,2),
+    "tmtb_err_persev_pc" character varying(20),
+    "tmt_b_a_tps_z" numeric(5,2),
+    "tmt_b_a_tps_pc" character varying(20),
+    "tmt_b_a_err_z" numeric(5,2),
+    "tmt_b_a_err_pc" character varying(20),
+    "test_done" boolean DEFAULT true,
+    "questionnaire_version" character varying(50),
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_tmt_tmta_cor_check" CHECK (("tmta_cor" >= 0)),
+    CONSTRAINT "schizophrenia_tmt_tmta_err_check" CHECK (("tmta_err" >= 0)),
+    CONSTRAINT "schizophrenia_tmt_tmta_tps_check" CHECK (("tmta_tps" >= 0)),
+    CONSTRAINT "schizophrenia_tmt_tmtb_cor_check" CHECK (("tmtb_cor" >= 0)),
+    CONSTRAINT "schizophrenia_tmt_tmtb_err_check" CHECK (("tmtb_err" >= 0)),
+    CONSTRAINT "schizophrenia_tmt_tmtb_err_persev_check" CHECK (("tmtb_err_persev" >= 0)),
+    CONSTRAINT "schizophrenia_tmt_tmtb_tps_check" CHECK (("tmtb_tps" >= 0))
+);
+
+
+ALTER TABLE "public"."schizophrenia_tmt" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_tmt" IS 'Trail Making Test (TMT) responses for schizophrenia patients - Neuropsy Module Bloc 2. Reference: Reitan (1955).';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmta_tps" IS 'Part A completion time in seconds';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmta_err" IS 'Part A uncorrected errors';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmta_cor" IS 'Part A self-corrected errors';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmtb_tps" IS 'Part B completion time in seconds';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmtb_err" IS 'Part B uncorrected errors';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmtb_cor" IS 'Part B self-corrected errors';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmtb_err_persev" IS 'Part B perseverative errors (continuing same category instead of alternating)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmta_errtot" IS 'Part A total errors (uncorrected + corrected)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmtb_errtot" IS 'Part B total errors (uncorrected + corrected)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmt_b_a_tps" IS 'B-A time difference in seconds (measures isolated executive function)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmt_b_a_err" IS 'B-A error difference (measures isolated executive function)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmta_tps_z" IS 'Z-score for Part A time (positive = better performance)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmta_tps_pc" IS 'Percentile for Part A time';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmtb_tps_z" IS 'Z-score for Part B time (positive = better performance)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmtb_tps_pc" IS 'Percentile for Part B time';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmtb_err_persev_z" IS 'Z-score for Part B perseverative errors';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmtb_err_persev_pc" IS 'Percentile for Part B perseverative errors';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmt_b_a_tps_z" IS 'Z-score for B-A time difference';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."tmt_b_a_tps_pc" IS 'Percentile for B-A time difference';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_tmt"."test_done" IS 'Flag indicating test was administered (true = done, false = not done)';
+
 
 
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_troubles_comorbides" (
@@ -6921,6 +9541,893 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_troubles_psychotiques" (
 ALTER TABLE "public"."schizophrenia_troubles_psychotiques" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_wais4_criteria" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "date_neuropsychologie" "date",
+    "neuro_age" integer,
+    "rad_dernier_eval" character varying(50),
+    "annees_etudes" numeric(4,1),
+    "rad_neuro_lang" integer,
+    "rad_neuro_normo" integer,
+    "rad_neuro_dalt" integer,
+    "rad_neuro_tbaud" integer,
+    "rad_neuro_sismo" integer,
+    "rad_abs_ep_3month" integer,
+    "chk_sismo_choix" "text",
+    "rad_neuro_psychotrope" integer,
+    "accepted_for_neuropsy_evaluation" boolean,
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_wais4_criteria_annees_etudes_check" CHECK ((("annees_etudes" >= (0)::numeric) AND ("annees_etudes" <= (30)::numeric))),
+    CONSTRAINT "schizophrenia_wais4_criteria_neuro_age_check" CHECK ((("neuro_age" >= 16) AND ("neuro_age" <= 90))),
+    CONSTRAINT "schizophrenia_wais4_criteria_rad_abs_ep_3month_check" CHECK (("rad_abs_ep_3month" = ANY (ARRAY[0, 1, 2]))),
+    CONSTRAINT "schizophrenia_wais4_criteria_rad_neuro_dalt_check" CHECK (("rad_neuro_dalt" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_criteria_rad_neuro_lang_check" CHECK (("rad_neuro_lang" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_criteria_rad_neuro_normo_check" CHECK (("rad_neuro_normo" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_criteria_rad_neuro_psychotrope_check" CHECK (("rad_neuro_psychotrope" = ANY (ARRAY[0, 1, 2]))),
+    CONSTRAINT "schizophrenia_wais4_criteria_rad_neuro_sismo_check" CHECK (("rad_neuro_sismo" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_criteria_rad_neuro_tbaud_check" CHECK (("rad_neuro_tbaud" = ANY (ARRAY[0, 1])))
+);
+
+
+ALTER TABLE "public"."schizophrenia_wais4_criteria" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_wais4_criteria" IS 'WAIS-IV Clinical Criteria responses for schizophrenia patients - Neuropsy Module. Pre-evaluation screening for neuropsychological testing eligibility.';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_criteria"."date_neuropsychologie" IS 'Date when the neuropsychological test battery is administered';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_criteria"."neuro_age" IS 'Patient age at the day of evaluation - used for normative scoring';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_criteria"."annees_etudes" IS 'Number of years of formal education - used for normative stratification';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_criteria"."rad_neuro_normo" IS 'Clinical state compatible with cognitive test administration (1=Yes, 0=No)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_criteria"."rad_abs_ep_3month" IS 'Suspicion of learning and acquisition disorder (1=Yes, 0=No, 2=Don''t know)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_criteria"."chk_sismo_choix" IS 'Learning disorder details when rad_abs_ep_3month=1. Stores selected options as comma-separated values (dyslexie, dysphasie, dyspraxie, dysgraphie)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_criteria"."rad_neuro_psychotrope" IS 'Current psychotropic treatment (1=Yes, 0=No, 2=Don''t know)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_criteria"."accepted_for_neuropsy_evaluation" IS 'Final eligibility decision for neuropsychological evaluation';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_wais4_efficience" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "info_std" integer,
+    "wais_simi_std" integer,
+    "wais_mat_std" integer,
+    "compl_im_std" integer,
+    "wais_mc_std" integer,
+    "wais_arith_std" integer,
+    "wais_cod_std" integer,
+    "qi_sum_std" integer,
+    "qi_indice" integer,
+    "qi_rang" "text",
+    "qi_ci95" "text",
+    "qi_interpretation" "text",
+    "icv_sum_std" integer,
+    "icv_indice" integer,
+    "icv_rang" "text",
+    "icv_ci95" "text",
+    "icv_interpretation" "text",
+    "irp_sum_std" integer,
+    "irp_indice" integer,
+    "irp_rang" "text",
+    "irp_ci95" "text",
+    "irp_interpretation" "text",
+    "imt_sum_std" integer,
+    "imt_indice" integer,
+    "imt_rang" "text",
+    "imt_ci95" "text",
+    "imt_interpretation" "text",
+    "ivt_sum_std" integer,
+    "ivt_indice" integer,
+    "ivt_rang" "text",
+    "ivt_ci95" "text",
+    "ivt_interpretation" "text",
+    "barona_test_done" boolean DEFAULT false,
+    "rad_barona_profession" integer,
+    "rad_barona_etude" integer,
+    "barona_qit_attendu" numeric(5,2),
+    "barona_qit_difference" numeric(5,2),
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_wais4_efficience_compl_im_std_check" CHECK ((("compl_im_std" >= 1) AND ("compl_im_std" <= 19))),
+    CONSTRAINT "schizophrenia_wais4_efficience_info_std_check" CHECK ((("info_std" >= 1) AND ("info_std" <= 19))),
+    CONSTRAINT "schizophrenia_wais4_efficience_rad_barona_etude_check" CHECK ((("rad_barona_etude" >= 1) AND ("rad_barona_etude" <= 7))),
+    CONSTRAINT "schizophrenia_wais4_efficience_rad_barona_profession_check" CHECK ((("rad_barona_profession" >= 1) AND ("rad_barona_profession" <= 7))),
+    CONSTRAINT "schizophrenia_wais4_efficience_wais_arith_std_check" CHECK ((("wais_arith_std" >= 1) AND ("wais_arith_std" <= 19))),
+    CONSTRAINT "schizophrenia_wais4_efficience_wais_cod_std_check" CHECK ((("wais_cod_std" >= 1) AND ("wais_cod_std" <= 19))),
+    CONSTRAINT "schizophrenia_wais4_efficience_wais_mat_std_check" CHECK ((("wais_mat_std" >= 1) AND ("wais_mat_std" <= 19))),
+    CONSTRAINT "schizophrenia_wais4_efficience_wais_mc_std_check" CHECK ((("wais_mc_std" >= 1) AND ("wais_mc_std" <= 19))),
+    CONSTRAINT "schizophrenia_wais4_efficience_wais_simi_std_check" CHECK ((("wais_simi_std" >= 1) AND ("wais_simi_std" <= 19)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_wais4_efficience" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_wais4_efficience" IS 'WAIS-IV Efficience Intellectuelle responses for schizophrenia patients - Neuropsy Module. Includes Denney 2015 QI estimation and Barona Index.';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_efficience"."info_std" IS 'Information subtest standard score (1-19)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_efficience"."wais_simi_std" IS 'Similitudes subtest standard score (1-19)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_efficience"."wais_mat_std" IS 'Matrices subtest standard score (1-19)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_efficience"."compl_im_std" IS 'Completement d''images subtest standard score (1-19)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_efficience"."wais_mc_std" IS 'Memoire des chiffres subtest standard score (1-19)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_efficience"."wais_arith_std" IS 'Arithmetique subtest standard score (1-19)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_efficience"."wais_cod_std" IS 'Code subtest standard score (1-19)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_efficience"."qi_indice" IS 'Denney Full Scale IQ index value';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_efficience"."barona_qit_attendu" IS 'Barona expected IQ based on demographic factors';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_efficience"."barona_qit_difference" IS 'Difference between expected (Barona) and observed (Denney) IQ';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_wais4_matrices" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "patient_age" integer,
+    "test_done" boolean DEFAULT false,
+    "rad_wais_mat1" integer,
+    "rad_wais_mat2" integer,
+    "rad_wais_mat3" integer,
+    "rad_wais_mat4" integer,
+    "rad_wais_mat5" integer,
+    "rad_wais_mat6" integer,
+    "rad_wais_mat7" integer,
+    "rad_wais_mat8" integer,
+    "rad_wais_mat9" integer,
+    "rad_wais_mat10" integer,
+    "rad_wais_mat11" integer,
+    "rad_wais_mat12" integer,
+    "rad_wais_mat13" integer,
+    "rad_wais_mat14" integer,
+    "rad_wais_mat15" integer,
+    "rad_wais_mat16" integer,
+    "rad_wais_mat17" integer,
+    "rad_wais_mat18" integer,
+    "rad_wais_mat19" integer,
+    "rad_wais_mat20" integer,
+    "rad_wais_mat21" integer,
+    "rad_wais_mat22" integer,
+    "rad_wais_mat23" integer,
+    "rad_wais_mat24" integer,
+    "rad_wais_mat25" integer,
+    "rad_wais_mat26" integer,
+    "wais_mat_tot" integer,
+    "wais_mat_std" integer,
+    "wais_mat_cr" numeric(5,2),
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat10_check" CHECK ((("rad_wais_mat10" IS NULL) OR (("rad_wais_mat10" >= 0) AND ("rad_wais_mat10" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat11_check" CHECK ((("rad_wais_mat11" IS NULL) OR (("rad_wais_mat11" >= 0) AND ("rad_wais_mat11" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat12_check" CHECK ((("rad_wais_mat12" IS NULL) OR (("rad_wais_mat12" >= 0) AND ("rad_wais_mat12" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat13_check" CHECK ((("rad_wais_mat13" IS NULL) OR (("rad_wais_mat13" >= 0) AND ("rad_wais_mat13" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat14_check" CHECK ((("rad_wais_mat14" IS NULL) OR (("rad_wais_mat14" >= 0) AND ("rad_wais_mat14" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat15_check" CHECK ((("rad_wais_mat15" IS NULL) OR (("rad_wais_mat15" >= 0) AND ("rad_wais_mat15" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat16_check" CHECK ((("rad_wais_mat16" IS NULL) OR (("rad_wais_mat16" >= 0) AND ("rad_wais_mat16" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat17_check" CHECK ((("rad_wais_mat17" IS NULL) OR (("rad_wais_mat17" >= 0) AND ("rad_wais_mat17" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat18_check" CHECK ((("rad_wais_mat18" IS NULL) OR (("rad_wais_mat18" >= 0) AND ("rad_wais_mat18" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat19_check" CHECK ((("rad_wais_mat19" IS NULL) OR (("rad_wais_mat19" >= 0) AND ("rad_wais_mat19" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat1_check" CHECK ((("rad_wais_mat1" IS NULL) OR (("rad_wais_mat1" >= 0) AND ("rad_wais_mat1" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat20_check" CHECK ((("rad_wais_mat20" IS NULL) OR (("rad_wais_mat20" >= 0) AND ("rad_wais_mat20" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat21_check" CHECK ((("rad_wais_mat21" IS NULL) OR (("rad_wais_mat21" >= 0) AND ("rad_wais_mat21" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat22_check" CHECK ((("rad_wais_mat22" IS NULL) OR (("rad_wais_mat22" >= 0) AND ("rad_wais_mat22" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat23_check" CHECK ((("rad_wais_mat23" IS NULL) OR (("rad_wais_mat23" >= 0) AND ("rad_wais_mat23" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat24_check" CHECK ((("rad_wais_mat24" IS NULL) OR (("rad_wais_mat24" >= 0) AND ("rad_wais_mat24" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat25_check" CHECK ((("rad_wais_mat25" IS NULL) OR (("rad_wais_mat25" >= 0) AND ("rad_wais_mat25" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat26_check" CHECK ((("rad_wais_mat26" IS NULL) OR (("rad_wais_mat26" >= 0) AND ("rad_wais_mat26" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat2_check" CHECK ((("rad_wais_mat2" IS NULL) OR (("rad_wais_mat2" >= 0) AND ("rad_wais_mat2" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat3_check" CHECK ((("rad_wais_mat3" IS NULL) OR (("rad_wais_mat3" >= 0) AND ("rad_wais_mat3" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat4_check" CHECK ((("rad_wais_mat4" IS NULL) OR (("rad_wais_mat4" >= 0) AND ("rad_wais_mat4" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat5_check" CHECK ((("rad_wais_mat5" IS NULL) OR (("rad_wais_mat5" >= 0) AND ("rad_wais_mat5" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat6_check" CHECK ((("rad_wais_mat6" IS NULL) OR (("rad_wais_mat6" >= 0) AND ("rad_wais_mat6" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat7_check" CHECK ((("rad_wais_mat7" IS NULL) OR (("rad_wais_mat7" >= 0) AND ("rad_wais_mat7" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat8_check" CHECK ((("rad_wais_mat8" IS NULL) OR (("rad_wais_mat8" >= 0) AND ("rad_wais_mat8" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_rad_wais_mat9_check" CHECK ((("rad_wais_mat9" IS NULL) OR (("rad_wais_mat9" >= 0) AND ("rad_wais_mat9" <= 1)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_wais_mat_std_check" CHECK ((("wais_mat_std" IS NULL) OR (("wais_mat_std" >= 1) AND ("wais_mat_std" <= 19)))),
+    CONSTRAINT "schizophrenia_wais4_matrices_wais_mat_tot_check" CHECK ((("wais_mat_tot" IS NULL) OR (("wais_mat_tot" >= 0) AND ("wais_mat_tot" <= 26))))
+);
+
+
+ALTER TABLE "public"."schizophrenia_wais4_matrices" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_wais4_matrices" IS 'WAIS-IV Matrices subtest responses for schizophrenia patients - assesses perceptual reasoning and fluid intelligence';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_matrices"."patient_age" IS 'Patient age used for age-based normative scoring';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_matrices"."test_done" IS 'Whether the test was administered';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_matrices"."wais_mat_tot" IS 'Total raw score (sum of 26 items, range 0-26)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_matrices"."wais_mat_std" IS 'Age-adjusted standard score (1-19, mean=10, SD=3). NULL if discontinuation rule triggered.';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_matrices"."wais_mat_cr" IS 'Z-score: (standard_score - 10) / 3. NULL if discontinuation rule triggered.';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_wais4_memoire_chiffres" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "patient_age" integer,
+    "test_done" boolean DEFAULT false,
+    "rad_wais_mcod_1a" integer,
+    "rad_wais_mcod_1b" integer,
+    "rad_wais_mcod_2a" integer,
+    "rad_wais_mcod_2b" integer,
+    "rad_wais_mcod_3a" integer,
+    "rad_wais_mcod_3b" integer,
+    "rad_wais_mcod_4a" integer,
+    "rad_wais_mcod_4b" integer,
+    "rad_wais_mcod_5a" integer,
+    "rad_wais_mcod_5b" integer,
+    "rad_wais_mcod_6a" integer,
+    "rad_wais_mcod_6b" integer,
+    "rad_wais_mcod_7a" integer,
+    "rad_wais_mcod_7b" integer,
+    "rad_wais_mcod_8a" integer,
+    "rad_wais_mcod_8b" integer,
+    "rad_wais_mcoi_1a" integer,
+    "rad_wais_mcoi_1b" integer,
+    "rad_wais_mcoi_2a" integer,
+    "rad_wais_mcoi_2b" integer,
+    "rad_wais_mcoi_3a" integer,
+    "rad_wais_mcoi_3b" integer,
+    "rad_wais_mcoi_4a" integer,
+    "rad_wais_mcoi_4b" integer,
+    "rad_wais_mcoi_5a" integer,
+    "rad_wais_mcoi_5b" integer,
+    "rad_wais_mcoi_6a" integer,
+    "rad_wais_mcoi_6b" integer,
+    "rad_wais_mcoi_7a" integer,
+    "rad_wais_mcoi_7b" integer,
+    "rad_wais_mcoi_8a" integer,
+    "rad_wais_mcoi_8b" integer,
+    "rad_wais_mcoc_1a" integer,
+    "rad_wais_mcoc_1b" integer,
+    "rad_wais_mcoc_2a" integer,
+    "rad_wais_mcoc_2b" integer,
+    "rad_wais_mcoc_3a" integer,
+    "rad_wais_mcoc_3b" integer,
+    "rad_wais_mcoc_4a" integer,
+    "rad_wais_mcoc_4b" integer,
+    "rad_wais_mcoc_5a" integer,
+    "rad_wais_mcoc_5b" integer,
+    "rad_wais_mcoc_6a" integer,
+    "rad_wais_mcoc_6b" integer,
+    "rad_wais_mcoc_7a" integer,
+    "rad_wais_mcoc_7b" integer,
+    "rad_wais_mcoc_8a" integer,
+    "rad_wais_mcoc_8b" integer,
+    "wais_mcod_1" integer,
+    "wais_mcod_2" integer,
+    "wais_mcod_3" integer,
+    "wais_mcod_4" integer,
+    "wais_mcod_5" integer,
+    "wais_mcod_6" integer,
+    "wais_mcod_7" integer,
+    "wais_mcod_8" integer,
+    "wais_mcoi_1" integer,
+    "wais_mcoi_2" integer,
+    "wais_mcoi_3" integer,
+    "wais_mcoi_4" integer,
+    "wais_mcoi_5" integer,
+    "wais_mcoi_6" integer,
+    "wais_mcoi_7" integer,
+    "wais_mcoi_8" integer,
+    "wais_mcoc_1" integer,
+    "wais_mcoc_2" integer,
+    "wais_mcoc_3" integer,
+    "wais_mcoc_4" integer,
+    "wais_mcoc_5" integer,
+    "wais_mcoc_6" integer,
+    "wais_mcoc_7" integer,
+    "wais_mcoc_8" integer,
+    "wais_mcod_tot" integer,
+    "wais_mcoi_tot" integer,
+    "wais_mcoc_tot" integer,
+    "wais_mc_end" integer,
+    "wais_mc_env" integer,
+    "wais_mc_cro" integer,
+    "wais_mc_emp" integer,
+    "wais_mc_end_std" numeric(5,2),
+    "wais_mc_env_std" numeric(5,2),
+    "wais_mc_cro_std" numeric(5,2),
+    "wais_mc_tot" integer,
+    "wais_mc_std" integer,
+    "wais_mc_cr" numeric(5,2),
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_1a_check" CHECK (("rad_wais_mcoc_1a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_1b_check" CHECK (("rad_wais_mcoc_1b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_2a_check" CHECK (("rad_wais_mcoc_2a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_2b_check" CHECK (("rad_wais_mcoc_2b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_3a_check" CHECK (("rad_wais_mcoc_3a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_3b_check" CHECK (("rad_wais_mcoc_3b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_4a_check" CHECK (("rad_wais_mcoc_4a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_4b_check" CHECK (("rad_wais_mcoc_4b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_5a_check" CHECK (("rad_wais_mcoc_5a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_5b_check" CHECK (("rad_wais_mcoc_5b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_6a_check" CHECK (("rad_wais_mcoc_6a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_6b_check" CHECK (("rad_wais_mcoc_6b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_7a_check" CHECK (("rad_wais_mcoc_7a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_7b_check" CHECK (("rad_wais_mcoc_7b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_8a_check" CHECK (("rad_wais_mcoc_8a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoc_8b_check" CHECK (("rad_wais_mcoc_8b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_1a_check" CHECK (("rad_wais_mcod_1a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_1b_check" CHECK (("rad_wais_mcod_1b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_2a_check" CHECK (("rad_wais_mcod_2a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_2b_check" CHECK (("rad_wais_mcod_2b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_3a_check" CHECK (("rad_wais_mcod_3a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_3b_check" CHECK (("rad_wais_mcod_3b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_4a_check" CHECK (("rad_wais_mcod_4a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_4b_check" CHECK (("rad_wais_mcod_4b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_5a_check" CHECK (("rad_wais_mcod_5a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_5b_check" CHECK (("rad_wais_mcod_5b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_6a_check" CHECK (("rad_wais_mcod_6a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_6b_check" CHECK (("rad_wais_mcod_6b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_7a_check" CHECK (("rad_wais_mcod_7a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_7b_check" CHECK (("rad_wais_mcod_7b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_8a_check" CHECK (("rad_wais_mcod_8a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcod_8b_check" CHECK (("rad_wais_mcod_8b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_1a_check" CHECK (("rad_wais_mcoi_1a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_1b_check" CHECK (("rad_wais_mcoi_1b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_2a_check" CHECK (("rad_wais_mcoi_2a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_2b_check" CHECK (("rad_wais_mcoi_2b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_3a_check" CHECK (("rad_wais_mcoi_3a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_3b_check" CHECK (("rad_wais_mcoi_3b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_4a_check" CHECK (("rad_wais_mcoi_4a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_4b_check" CHECK (("rad_wais_mcoi_4b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_5a_check" CHECK (("rad_wais_mcoi_5a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_5b_check" CHECK (("rad_wais_mcoi_5b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_6a_check" CHECK (("rad_wais_mcoi_6a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_6b_check" CHECK (("rad_wais_mcoi_6b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_7a_check" CHECK (("rad_wais_mcoi_7a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_7b_check" CHECK (("rad_wais_mcoi_7b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_8a_check" CHECK (("rad_wais_mcoi_8a" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_rad_wais_mcoi_8b_check" CHECK (("rad_wais_mcoi_8b" = ANY (ARRAY[0, 1]))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mc_cro_check" CHECK ((("wais_mc_cro" >= 0) AND ("wais_mc_cro" <= 10))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mc_end_check" CHECK ((("wais_mc_end" >= 0) AND ("wais_mc_end" <= 10))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mc_env_check" CHECK ((("wais_mc_env" >= 0) AND ("wais_mc_env" <= 9))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mc_std_check" CHECK ((("wais_mc_std" >= 1) AND ("wais_mc_std" <= 19))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mc_tot_check" CHECK ((("wais_mc_tot" >= 0) AND ("wais_mc_tot" <= 48))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoc_1_check" CHECK ((("wais_mcoc_1" >= 0) AND ("wais_mcoc_1" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoc_2_check" CHECK ((("wais_mcoc_2" >= 0) AND ("wais_mcoc_2" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoc_3_check" CHECK ((("wais_mcoc_3" >= 0) AND ("wais_mcoc_3" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoc_4_check" CHECK ((("wais_mcoc_4" >= 0) AND ("wais_mcoc_4" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoc_5_check" CHECK ((("wais_mcoc_5" >= 0) AND ("wais_mcoc_5" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoc_6_check" CHECK ((("wais_mcoc_6" >= 0) AND ("wais_mcoc_6" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoc_7_check" CHECK ((("wais_mcoc_7" >= 0) AND ("wais_mcoc_7" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoc_8_check" CHECK ((("wais_mcoc_8" >= 0) AND ("wais_mcoc_8" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoc_tot_check" CHECK ((("wais_mcoc_tot" >= 0) AND ("wais_mcoc_tot" <= 16))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcod_1_check" CHECK ((("wais_mcod_1" >= 0) AND ("wais_mcod_1" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcod_2_check" CHECK ((("wais_mcod_2" >= 0) AND ("wais_mcod_2" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcod_3_check" CHECK ((("wais_mcod_3" >= 0) AND ("wais_mcod_3" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcod_4_check" CHECK ((("wais_mcod_4" >= 0) AND ("wais_mcod_4" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcod_5_check" CHECK ((("wais_mcod_5" >= 0) AND ("wais_mcod_5" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcod_6_check" CHECK ((("wais_mcod_6" >= 0) AND ("wais_mcod_6" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcod_7_check" CHECK ((("wais_mcod_7" >= 0) AND ("wais_mcod_7" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcod_8_check" CHECK ((("wais_mcod_8" >= 0) AND ("wais_mcod_8" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcod_tot_check" CHECK ((("wais_mcod_tot" >= 0) AND ("wais_mcod_tot" <= 16))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoi_1_check" CHECK ((("wais_mcoi_1" >= 0) AND ("wais_mcoi_1" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoi_2_check" CHECK ((("wais_mcoi_2" >= 0) AND ("wais_mcoi_2" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoi_3_check" CHECK ((("wais_mcoi_3" >= 0) AND ("wais_mcoi_3" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoi_4_check" CHECK ((("wais_mcoi_4" >= 0) AND ("wais_mcoi_4" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoi_5_check" CHECK ((("wais_mcoi_5" >= 0) AND ("wais_mcoi_5" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoi_6_check" CHECK ((("wais_mcoi_6" >= 0) AND ("wais_mcoi_6" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoi_7_check" CHECK ((("wais_mcoi_7" >= 0) AND ("wais_mcoi_7" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoi_8_check" CHECK ((("wais_mcoi_8" >= 0) AND ("wais_mcoi_8" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_memoire_chiffres_wais_mcoi_tot_check" CHECK ((("wais_mcoi_tot" >= 0) AND ("wais_mcoi_tot" <= 16)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_wais4_memoire_chiffres" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_wais4_memoire_chiffres" IS 'WAIS-IV Digit Span responses for schizophrenia initial evaluation';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_memoire_chiffres"."patient_age" IS 'Patient age at evaluation (injected from patient profile, used for normative scoring)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_memoire_chiffres"."wais_mcod_tot" IS 'Total Ordre Direct score (0-16)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_memoire_chiffres"."wais_mcoi_tot" IS 'Total Ordre Inverse score (0-16)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_memoire_chiffres"."wais_mcoc_tot" IS 'Total Ordre Croissant score (0-16)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_memoire_chiffres"."wais_mc_end" IS 'Empan endroit (forward span)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_memoire_chiffres"."wais_mc_env" IS 'Empan envers (backward span)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_memoire_chiffres"."wais_mc_cro" IS 'Empan croissant (ascending span)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_memoire_chiffres"."wais_mc_emp" IS 'Empan difference (endroit - envers)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_memoire_chiffres"."wais_mc_end_std" IS 'Forward span Z-score';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_memoire_chiffres"."wais_mc_env_std" IS 'Backward span Z-score';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_memoire_chiffres"."wais_mc_cro_std" IS 'Ascending span Z-score';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_memoire_chiffres"."wais_mc_tot" IS 'Total raw score (0-48)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_memoire_chiffres"."wais_mc_std" IS 'Age-adjusted standard score (1-19)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_memoire_chiffres"."wais_mc_cr" IS 'Standardized value: (standard_score - 10) / 3';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_wais4_similitudes" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "test_done" boolean DEFAULT true,
+    "item_1" integer,
+    "item_2" integer,
+    "item_3" integer,
+    "item_4" integer,
+    "item_5" integer,
+    "item_6" integer,
+    "item_7" integer,
+    "item_8" integer,
+    "item_9" integer,
+    "item_10" integer,
+    "item_11" integer,
+    "item_12" integer,
+    "item_13" integer,
+    "item_14" integer,
+    "item_15" integer,
+    "item_16" integer,
+    "item_17" integer,
+    "item_18" integer,
+    "total_raw_score" integer,
+    "standard_score" integer,
+    "standardized_value" numeric(5,2),
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "patient_age" integer,
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_10_check" CHECK ((("item_10" >= 0) AND ("item_10" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_11_check" CHECK ((("item_11" >= 0) AND ("item_11" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_12_check" CHECK ((("item_12" >= 0) AND ("item_12" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_13_check" CHECK ((("item_13" >= 0) AND ("item_13" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_14_check" CHECK ((("item_14" >= 0) AND ("item_14" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_15_check" CHECK ((("item_15" >= 0) AND ("item_15" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_16_check" CHECK ((("item_16" >= 0) AND ("item_16" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_17_check" CHECK ((("item_17" >= 0) AND ("item_17" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_18_check" CHECK ((("item_18" >= 0) AND ("item_18" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_1_check" CHECK ((("item_1" >= 0) AND ("item_1" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_2_check" CHECK ((("item_2" >= 0) AND ("item_2" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_3_check" CHECK ((("item_3" >= 0) AND ("item_3" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_4_check" CHECK ((("item_4" >= 0) AND ("item_4" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_5_check" CHECK ((("item_5" >= 0) AND ("item_5" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_6_check" CHECK ((("item_6" >= 0) AND ("item_6" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_7_check" CHECK ((("item_7" >= 0) AND ("item_7" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_8_check" CHECK ((("item_8" >= 0) AND ("item_8" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_item_9_check" CHECK ((("item_9" >= 0) AND ("item_9" <= 2))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_standard_score_check" CHECK ((("standard_score" >= 1) AND ("standard_score" <= 19))),
+    CONSTRAINT "schizophrenia_wais4_similitudes_total_raw_score_check" CHECK ((("total_raw_score" >= 0) AND ("total_raw_score" <= 36)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_wais4_similitudes" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_wais4_similitudes" IS 'WAIS-IV Similitudes subtest responses for schizophrenia patients - Neuropsy Module. Verbal comprehension test assessing abstract verbal reasoning through analogical thinking.';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."test_done" IS 'Whether the test was administered';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_1" IS 'Item 1: Framboise-Groseille (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_2" IS 'Item 2: Cheval-Tigre (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_3" IS 'Item 3: Carottes-Épinards (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_4" IS 'Item 4: Jaune-Bleu (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_5" IS 'Item 5: Piano-Tambour (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_6" IS 'Item 6: Poème-Statue (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_7" IS 'Item 7: Bourgeon-Bébé (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_8" IS 'Item 8: Miel-Lait (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_9" IS 'Item 9: Nourriture-Carburant (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_10" IS 'Item 10: Cube-Cylindre (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_11" IS 'Item 11: Nez-Langue (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_12" IS 'Item 12: Soie-Laine (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_13" IS 'Item 13: Éolienne-Barrage (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_14" IS 'Item 14: Éphémère-Permanent (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_15" IS 'Item 15: Inondation-Sécheresse (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_16" IS 'Item 16: Sédentaire-Nomade (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_17" IS 'Item 17: Autoriser-Interdire (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."item_18" IS 'Item 18: Réalité-Rêve (0-2)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."total_raw_score" IS 'Sum of all 18 item scores (0-36)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."standard_score" IS 'Age-adjusted standard score (1-19, mean=10, SD=3)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."standardized_value" IS 'Z-score: (standard_score - 10) / 3';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_wais4_similitudes"."patient_age" IS 'Patient age at evaluation (injected from patient profile, used for normative scoring)';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_wurs25" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "questionnaire_done" "text",
+    "q1" integer,
+    "q2" integer,
+    "q3" integer,
+    "q4" integer,
+    "q5" integer,
+    "q6" integer,
+    "q7" integer,
+    "q8" integer,
+    "q9" integer,
+    "q10" integer,
+    "q11" integer,
+    "q12" integer,
+    "q13" integer,
+    "q14" integer,
+    "q15" integer,
+    "q16" integer,
+    "q17" integer,
+    "q18" integer,
+    "q19" integer,
+    "q20" integer,
+    "q21" integer,
+    "q22" integer,
+    "q23" integer,
+    "q24" integer,
+    "q25" integer,
+    "total_score" integer,
+    "adhd_likely" boolean,
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    CONSTRAINT "schizophrenia_wurs25_q10_check" CHECK ((("q10" IS NULL) OR (("q10" >= 0) AND ("q10" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q11_check" CHECK ((("q11" IS NULL) OR (("q11" >= 0) AND ("q11" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q12_check" CHECK ((("q12" IS NULL) OR (("q12" >= 0) AND ("q12" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q13_check" CHECK ((("q13" IS NULL) OR (("q13" >= 0) AND ("q13" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q14_check" CHECK ((("q14" IS NULL) OR (("q14" >= 0) AND ("q14" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q15_check" CHECK ((("q15" IS NULL) OR (("q15" >= 0) AND ("q15" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q16_check" CHECK ((("q16" IS NULL) OR (("q16" >= 0) AND ("q16" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q17_check" CHECK ((("q17" IS NULL) OR (("q17" >= 0) AND ("q17" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q18_check" CHECK ((("q18" IS NULL) OR (("q18" >= 0) AND ("q18" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q19_check" CHECK ((("q19" IS NULL) OR (("q19" >= 0) AND ("q19" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q1_check" CHECK ((("q1" IS NULL) OR (("q1" >= 0) AND ("q1" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q20_check" CHECK ((("q20" IS NULL) OR (("q20" >= 0) AND ("q20" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q21_check" CHECK ((("q21" IS NULL) OR (("q21" >= 0) AND ("q21" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q22_check" CHECK ((("q22" IS NULL) OR (("q22" >= 0) AND ("q22" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q23_check" CHECK ((("q23" IS NULL) OR (("q23" >= 0) AND ("q23" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q24_check" CHECK ((("q24" IS NULL) OR (("q24" >= 0) AND ("q24" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q25_check" CHECK ((("q25" IS NULL) OR (("q25" >= 0) AND ("q25" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q2_check" CHECK ((("q2" IS NULL) OR (("q2" >= 0) AND ("q2" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q3_check" CHECK ((("q3" IS NULL) OR (("q3" >= 0) AND ("q3" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q4_check" CHECK ((("q4" IS NULL) OR (("q4" >= 0) AND ("q4" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q5_check" CHECK ((("q5" IS NULL) OR (("q5" >= 0) AND ("q5" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q6_check" CHECK ((("q6" IS NULL) OR (("q6" >= 0) AND ("q6" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q7_check" CHECK ((("q7" IS NULL) OR (("q7" >= 0) AND ("q7" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q8_check" CHECK ((("q8" IS NULL) OR (("q8" >= 0) AND ("q8" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_q9_check" CHECK ((("q9" IS NULL) OR (("q9" >= 0) AND ("q9" <= 4)))),
+    CONSTRAINT "schizophrenia_wurs25_total_score_check" CHECK ((("total_score" IS NULL) OR (("total_score" >= 0) AND ("total_score" <= 100))))
+);
+
+
+ALTER TABLE "public"."schizophrenia_wurs25" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."schizophrenia_wurs25" IS 'WURS-25 (Wender Utah Rating Scale) responses for schizophrenia patients - retrospective ADHD assessment. Clinical cutoff ≥46 (96% sensitivity/specificity).';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_ybocs" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "questionnaire_done" "text",
+    "q1" integer,
+    "q2" integer,
+    "q3" integer,
+    "q4" integer,
+    "q5" integer,
+    "q6" integer,
+    "q7" integer,
+    "q8" integer,
+    "q9" integer,
+    "q10" integer,
+    "obsessions_score" integer,
+    "compulsions_score" integer,
+    "total_score" integer,
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "syb1" integer,
+    "syb2" integer,
+    "syb3" integer,
+    "syb4" integer,
+    "syb5" integer,
+    "syb6" integer,
+    "syb7" integer,
+    "syb8" integer,
+    "syb9" integer,
+    "syb10" integer,
+    CONSTRAINT "schizophrenia_ybocs_compulsions_score_range" CHECK ((("compulsions_score" IS NULL) OR (("compulsions_score" >= 0) AND ("compulsions_score" <= 20)))),
+    CONSTRAINT "schizophrenia_ybocs_obsessions_score_range" CHECK ((("obsessions_score" IS NULL) OR (("obsessions_score" >= 0) AND ("obsessions_score" <= 20)))),
+    CONSTRAINT "schizophrenia_ybocs_q10_range" CHECK ((("q10" IS NULL) OR (("q10" >= 0) AND ("q10" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_q1_range" CHECK ((("q1" IS NULL) OR (("q1" >= 0) AND ("q1" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_q2_range" CHECK ((("q2" IS NULL) OR (("q2" >= 0) AND ("q2" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_q3_range" CHECK ((("q3" IS NULL) OR (("q3" >= 0) AND ("q3" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_q4_range" CHECK ((("q4" IS NULL) OR (("q4" >= 0) AND ("q4" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_q5_range" CHECK ((("q5" IS NULL) OR (("q5" >= 0) AND ("q5" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_q6_range" CHECK ((("q6" IS NULL) OR (("q6" >= 0) AND ("q6" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_q7_range" CHECK ((("q7" IS NULL) OR (("q7" >= 0) AND ("q7" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_q8_range" CHECK ((("q8" IS NULL) OR (("q8" >= 0) AND ("q8" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_q9_range" CHECK ((("q9" IS NULL) OR (("q9" >= 0) AND ("q9" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_questionnaire_done_valid" CHECK ((("questionnaire_done" IS NULL) OR ("questionnaire_done" = ANY (ARRAY['Fait'::"text", 'Non fait'::"text"])))),
+    CONSTRAINT "schizophrenia_ybocs_syb10_check" CHECK ((("syb10" IS NULL) OR (("syb10" >= 0) AND ("syb10" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_syb1_check" CHECK ((("syb1" IS NULL) OR (("syb1" >= 0) AND ("syb1" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_syb2_check" CHECK ((("syb2" IS NULL) OR (("syb2" >= 0) AND ("syb2" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_syb3_check" CHECK ((("syb3" IS NULL) OR (("syb3" >= 0) AND ("syb3" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_syb4_check" CHECK ((("syb4" IS NULL) OR (("syb4" >= 0) AND ("syb4" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_syb5_check" CHECK ((("syb5" IS NULL) OR (("syb5" >= 0) AND ("syb5" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_syb6_check" CHECK ((("syb6" IS NULL) OR (("syb6" >= 0) AND ("syb6" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_syb7_check" CHECK ((("syb7" IS NULL) OR (("syb7" >= 0) AND ("syb7" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_syb8_check" CHECK ((("syb8" IS NULL) OR (("syb8" >= 0) AND ("syb8" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_syb9_check" CHECK ((("syb9" IS NULL) OR (("syb9" >= 0) AND ("syb9" <= 4)))),
+    CONSTRAINT "schizophrenia_ybocs_total_score_range" CHECK ((("total_score" IS NULL) OR (("total_score" >= 0) AND ("total_score" <= 40))))
+);
+
+
+ALTER TABLE "public"."schizophrenia_ybocs" OWNER TO "postgres";
+
+
+COMMENT ON COLUMN "public"."schizophrenia_ybocs"."syb1" IS 'Score AUTO-YALE-BROWN: 1. Temps passé aux obsessions (0-4)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_ybocs"."syb2" IS 'Score AUTO-YALE-BROWN: 2. Gêne liée aux obsessions (0-4)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_ybocs"."syb3" IS 'Score AUTO-YALE-BROWN: 3. Angoisse associée aux obsessions (0-4)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_ybocs"."syb4" IS 'Score AUTO-YALE-BROWN: 4. Résistance aux obsessions (0-4)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_ybocs"."syb5" IS 'Score AUTO-YALE-BROWN: 5. Contrôle sur les obsessions (0-4)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_ybocs"."syb6" IS 'Score AUTO-YALE-BROWN: 6. Temps passé aux compulsions (0-4)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_ybocs"."syb7" IS 'Score AUTO-YALE-BROWN: 7. Gêne liée aux compulsions (0-4)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_ybocs"."syb8" IS 'Score AUTO-YALE-BROWN: 8. Anxiété associée aux compulsions (0-4)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_ybocs"."syb9" IS 'Score AUTO-YALE-BROWN: 9. Résistance aux compulsions (0-4)';
+
+
+
+COMMENT ON COLUMN "public"."schizophrenia_ybocs"."syb10" IS 'Score AUTO-YALE-BROWN: 10. Contrôle sur les compulsions (0-4)';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_ymrs" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "q1" integer,
+    "q2" integer,
+    "q3" integer,
+    "q4" integer,
+    "q5" integer,
+    "q6" integer,
+    "q7" integer,
+    "q8" integer,
+    "q9" integer,
+    "q10" integer,
+    "q11" integer,
+    "total_score" integer,
+    "severity" "text",
+    "interpretation" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"(),
+    "test_done" boolean DEFAULT true,
+    CONSTRAINT "schizophrenia_ymrs_q10_check" CHECK ((("q10" >= 0) AND ("q10" <= 4))),
+    CONSTRAINT "schizophrenia_ymrs_q11_check" CHECK ((("q11" >= 0) AND ("q11" <= 4))),
+    CONSTRAINT "schizophrenia_ymrs_q1_check" CHECK ((("q1" >= 0) AND ("q1" <= 4))),
+    CONSTRAINT "schizophrenia_ymrs_q2_check" CHECK ((("q2" >= 0) AND ("q2" <= 4))),
+    CONSTRAINT "schizophrenia_ymrs_q3_check" CHECK ((("q3" >= 0) AND ("q3" <= 4))),
+    CONSTRAINT "schizophrenia_ymrs_q4_check" CHECK ((("q4" >= 0) AND ("q4" <= 4))),
+    CONSTRAINT "schizophrenia_ymrs_q5_check" CHECK ((("q5" >= 0) AND ("q5" <= 8))),
+    CONSTRAINT "schizophrenia_ymrs_q6_check" CHECK ((("q6" >= 0) AND ("q6" <= 8))),
+    CONSTRAINT "schizophrenia_ymrs_q7_check" CHECK ((("q7" >= 0) AND ("q7" <= 4))),
+    CONSTRAINT "schizophrenia_ymrs_q8_check" CHECK ((("q8" >= 0) AND ("q8" <= 8))),
+    CONSTRAINT "schizophrenia_ymrs_q9_check" CHECK ((("q9" >= 0) AND ("q9" <= 8)))
+);
+
+
+ALTER TABLE "public"."schizophrenia_ymrs" OWNER TO "postgres";
+
+
+COMMENT ON COLUMN "public"."schizophrenia_ymrs"."test_done" IS 'Flag indicating if the test was administered';
+
+
+
 CREATE TABLE IF NOT EXISTS "public"."treatment_somatic_contraceptive" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "patient_id" "uuid" NOT NULL,
@@ -6986,6 +10493,17 @@ COMMENT ON COLUMN "public"."user_invitations"."last_name" IS 'Invitee last name 
 
 
 
+CREATE TABLE IF NOT EXISTS "public"."user_pathologies" (
+    "id" "uuid" DEFAULT "extensions"."uuid_generate_v4"() NOT NULL,
+    "user_id" "uuid" NOT NULL,
+    "pathology_id" "uuid" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"()
+);
+
+
+ALTER TABLE "public"."user_pathologies" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "public"."user_permissions" (
     "id" "uuid" DEFAULT "extensions"."uuid_generate_v4"() NOT NULL,
     "user_id" "uuid" NOT NULL,
@@ -7026,7 +10544,7 @@ COMMENT ON COLUMN "public"."user_profiles"."role" IS 'User role in the system hi
 
 
 
-CREATE OR REPLACE VIEW "public"."v_patients_full" WITH ("security_invoker"='true') AS
+CREATE OR REPLACE VIEW "public"."v_patients_full" AS
  SELECT "p"."id",
     "p"."center_id",
     "p"."pathology_id",
@@ -7061,7 +10579,28 @@ CREATE OR REPLACE VIEW "public"."v_patients_full" WITH ("security_invoker"='true
     "up_assigned"."last_name" AS "assigned_to_last_name",
     "up"."email" AS "professional_email",
     "up"."first_name" AS "professional_first_name",
-    "up"."last_name" AS "professional_last_name"
+    "up"."last_name" AS "professional_last_name",
+    "p"."maiden_name",
+    "p"."fondacode",
+    "p"."marital_name",
+    "p"."birth_city",
+    "p"."birth_department",
+    "p"."birth_country",
+    "p"."hospital_id",
+    "p"."social_security_number",
+    "p"."street_number_and_name",
+    "p"."building_details",
+    "p"."postal_code",
+    "p"."city",
+    "p"."phone_private",
+    "p"."phone_professional",
+    "p"."phone_mobile",
+    "p"."patient_sector",
+    "p"."referred_by",
+    "p"."visit_purpose",
+    "p"."gp_report_consent",
+    "p"."psychiatrist_report_consent",
+    "p"."center_awareness_source"
    FROM ((((("public"."patients" "p"
      LEFT JOIN "public"."centers" "c" ON (("p"."center_id" = "c"."id")))
      LEFT JOIN "public"."pathologies" "path" ON (("p"."pathology_id" = "path"."id")))
@@ -7072,6 +10611,26 @@ CREATE OR REPLACE VIEW "public"."v_patients_full" WITH ("security_invoker"='true
 
 
 ALTER VIEW "public"."v_patients_full" OWNER TO "postgres";
+
+
+CREATE OR REPLACE VIEW "public"."v_users_full" AS
+SELECT
+    NULL::"uuid" AS "id",
+    NULL::"public"."user_role" AS "role",
+    NULL::character varying(100) AS "first_name",
+    NULL::character varying(100) AS "last_name",
+    NULL::character varying(255) AS "email",
+    NULL::character varying(20) AS "phone",
+    NULL::character varying(50) AS "username",
+    NULL::boolean AS "active",
+    NULL::timestamp with time zone AS "created_at",
+    NULL::"uuid" AS "center_id",
+    NULL::character varying(255) AS "center_name",
+    NULL::character varying(50) AS "center_code",
+    NULL::"public"."pathology_type"[] AS "center_pathologies";
+
+
+ALTER VIEW "public"."v_users_full" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."visit_templates" (
@@ -7108,7 +10667,8 @@ CREATE TABLE IF NOT EXISTS "public"."visits" (
     "completion_percentage" integer DEFAULT 0,
     "completed_questionnaires" integer DEFAULT 0,
     "total_questionnaires" integer DEFAULT 0,
-    "completion_updated_at" timestamp with time zone
+    "completion_updated_at" timestamp with time zone,
+    "visit_number" integer
 );
 
 
@@ -7132,6 +10692,10 @@ COMMENT ON COLUMN "public"."visits"."total_questionnaires" IS 'Total number of r
 
 
 COMMENT ON COLUMN "public"."visits"."completion_updated_at" IS 'Last time the completion status was calculated';
+
+
+
+COMMENT ON COLUMN "public"."visits"."visit_number" IS 'Sequential number for visits of the same type per patient (e.g., Annual Visit #1, #2, etc.)';
 
 
 
@@ -8038,6 +11602,11 @@ ALTER TABLE ONLY "public"."messages"
 
 
 ALTER TABLE ONLY "public"."pathologies"
+    ADD CONSTRAINT "pathologies_code_key" UNIQUE ("code");
+
+
+
+ALTER TABLE ONLY "public"."pathologies"
     ADD CONSTRAINT "pathologies_pkey" PRIMARY KEY ("id");
 
 
@@ -8049,6 +11618,11 @@ ALTER TABLE ONLY "public"."pathologies"
 
 ALTER TABLE ONLY "public"."patient_medications"
     ADD CONSTRAINT "patient_medications_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."patients"
+    ADD CONSTRAINT "patients_fondacode_key" UNIQUE ("fondacode");
 
 
 
@@ -8207,6 +11781,56 @@ ALTER TABLE ONLY "public"."schizophrenia_bilan_biologique"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_bilan_social"
+    ADD CONSTRAINT "schizophrenia_bilan_social_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_bilan_social"
+    ADD CONSTRAINT "schizophrenia_bilan_social_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_bis"
+    ADD CONSTRAINT "schizophrenia_bis_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_bis"
+    ADD CONSTRAINT "schizophrenia_bis_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_brief_a_auto"
+    ADD CONSTRAINT "schizophrenia_brief_a_auto_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_brief_a_auto"
+    ADD CONSTRAINT "schizophrenia_brief_a_auto_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_brief_a_hetero"
+    ADD CONSTRAINT "schizophrenia_brief_a_hetero_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_brief_a_hetero"
+    ADD CONSTRAINT "schizophrenia_brief_a_hetero_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cbq"
+    ADD CONSTRAINT "schizophrenia_cbq_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cbq"
+    ADD CONSTRAINT "schizophrenia_cbq_visit_id_key" UNIQUE ("visit_id");
+
+
+
 ALTER TABLE ONLY "public"."schizophrenia_cdss"
     ADD CONSTRAINT "schizophrenia_cdss_pkey" PRIMARY KEY ("id");
 
@@ -8214,6 +11838,56 @@ ALTER TABLE ONLY "public"."schizophrenia_cdss"
 
 ALTER TABLE ONLY "public"."schizophrenia_cdss"
     ADD CONSTRAINT "schizophrenia_cdss_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cgi"
+    ADD CONSTRAINT "schizophrenia_cgi_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cgi"
+    ADD CONSTRAINT "schizophrenia_cgi_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_commissions"
+    ADD CONSTRAINT "schizophrenia_commissions_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_commissions"
+    ADD CONSTRAINT "schizophrenia_commissions_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ctq"
+    ADD CONSTRAINT "schizophrenia_ctq_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ctq"
+    ADD CONSTRAINT "schizophrenia_ctq_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cvlt"
+    ADD CONSTRAINT "schizophrenia_cvlt_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cvlt"
+    ADD CONSTRAINT "schizophrenia_cvlt_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_dacobs"
+    ADD CONSTRAINT "schizophrenia_dacobs_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_dacobs"
+    ADD CONSTRAINT "schizophrenia_dacobs_visit_id_key" UNIQUE ("visit_id");
 
 
 
@@ -8237,6 +11911,36 @@ ALTER TABLE ONLY "public"."schizophrenia_ecv"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_egf"
+    ADD CONSTRAINT "schizophrenia_egf_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_egf"
+    ADD CONSTRAINT "schizophrenia_egf_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ephp"
+    ADD CONSTRAINT "schizophrenia_ephp_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ephp"
+    ADD CONSTRAINT "schizophrenia_ephp_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_eq5d5l"
+    ADD CONSTRAINT "schizophrenia_eq5d5l_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_eq5d5l"
+    ADD CONSTRAINT "schizophrenia_eq5d5l_visit_id_key" UNIQUE ("visit_id");
+
+
+
 ALTER TABLE ONLY "public"."schizophrenia_eval_addictologique"
     ADD CONSTRAINT "schizophrenia_eval_addictologique_pkey" PRIMARY KEY ("id");
 
@@ -8247,6 +11951,26 @@ ALTER TABLE ONLY "public"."schizophrenia_eval_addictologique"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_fagerstrom"
+    ADD CONSTRAINT "schizophrenia_fagerstrom_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_fagerstrom"
+    ADD CONSTRAINT "schizophrenia_fagerstrom_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ipaq"
+    ADD CONSTRAINT "schizophrenia_ipaq_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ipaq"
+    ADD CONSTRAINT "schizophrenia_ipaq_visit_id_key" UNIQUE ("visit_id");
+
+
+
 ALTER TABLE ONLY "public"."schizophrenia_isa"
     ADD CONSTRAINT "schizophrenia_isa_pkey" PRIMARY KEY ("id");
 
@@ -8254,6 +11978,26 @@ ALTER TABLE ONLY "public"."schizophrenia_isa"
 
 ALTER TABLE ONLY "public"."schizophrenia_isa"
     ADD CONSTRAINT "schizophrenia_isa_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_lis"
+    ADD CONSTRAINT "schizophrenia_lis_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_lis"
+    ADD CONSTRAINT "schizophrenia_lis_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_mars"
+    ADD CONSTRAINT "schizophrenia_mars_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_mars"
+    ADD CONSTRAINT "schizophrenia_mars_visit_id_key" UNIQUE ("visit_id");
 
 
 
@@ -8277,6 +12021,16 @@ ALTER TABLE ONLY "public"."schizophrenia_perinatalite"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_presenteisme"
+    ADD CONSTRAINT "schizophrenia_presenteisme_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_presenteisme"
+    ADD CONSTRAINT "schizophrenia_presenteisme_visit_id_key" UNIQUE ("visit_id");
+
+
+
 ALTER TABLE ONLY "public"."schizophrenia_psp"
     ADD CONSTRAINT "schizophrenia_psp_pkey" PRIMARY KEY ("id");
 
@@ -8284,6 +12038,16 @@ ALTER TABLE ONLY "public"."schizophrenia_psp"
 
 ALTER TABLE ONLY "public"."schizophrenia_psp"
     ADD CONSTRAINT "schizophrenia_psp_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_psqi"
+    ADD CONSTRAINT "schizophrenia_psqi_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_psqi"
+    ADD CONSTRAINT "schizophrenia_psqi_visit_id_key" UNIQUE ("visit_id");
 
 
 
@@ -8317,6 +12081,46 @@ ALTER TABLE ONLY "public"."schizophrenia_screening_orientation"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_sogs"
+    ADD CONSTRAINT "schizophrenia_sogs_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_sogs"
+    ADD CONSTRAINT "schizophrenia_sogs_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_sqol"
+    ADD CONSTRAINT "schizophrenia_sqol_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_sqol"
+    ADD CONSTRAINT "schizophrenia_sqol_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_sstics"
+    ADD CONSTRAINT "schizophrenia_sstics_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_sstics"
+    ADD CONSTRAINT "schizophrenia_sstics_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_stori"
+    ADD CONSTRAINT "schizophrenia_stori_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_stori"
+    ADD CONSTRAINT "schizophrenia_stori_visit_id_key" UNIQUE ("visit_id");
+
+
+
 ALTER TABLE ONLY "public"."schizophrenia_suicide_history"
     ADD CONSTRAINT "schizophrenia_suicide_history_pkey" PRIMARY KEY ("id");
 
@@ -8347,6 +12151,16 @@ ALTER TABLE ONLY "public"."schizophrenia_tea_coffee"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_tmt"
+    ADD CONSTRAINT "schizophrenia_tmt_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_tmt"
+    ADD CONSTRAINT "schizophrenia_tmt_visit_id_key" UNIQUE ("visit_id");
+
+
+
 ALTER TABLE ONLY "public"."schizophrenia_troubles_comorbides"
     ADD CONSTRAINT "schizophrenia_troubles_comorbides_pkey" PRIMARY KEY ("id");
 
@@ -8367,6 +12181,86 @@ ALTER TABLE ONLY "public"."schizophrenia_troubles_psychotiques"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_wais4_criteria"
+    ADD CONSTRAINT "schizophrenia_wais4_criteria_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_criteria"
+    ADD CONSTRAINT "schizophrenia_wais4_criteria_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_efficience"
+    ADD CONSTRAINT "schizophrenia_wais4_efficience_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_efficience"
+    ADD CONSTRAINT "schizophrenia_wais4_efficience_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_matrices"
+    ADD CONSTRAINT "schizophrenia_wais4_matrices_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_matrices"
+    ADD CONSTRAINT "schizophrenia_wais4_matrices_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_memoire_chiffres"
+    ADD CONSTRAINT "schizophrenia_wais4_memoire_chiffres_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_memoire_chiffres"
+    ADD CONSTRAINT "schizophrenia_wais4_memoire_chiffres_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_similitudes"
+    ADD CONSTRAINT "schizophrenia_wais4_similitudes_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_similitudes"
+    ADD CONSTRAINT "schizophrenia_wais4_similitudes_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wurs25"
+    ADD CONSTRAINT "schizophrenia_wurs25_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wurs25"
+    ADD CONSTRAINT "schizophrenia_wurs25_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ybocs"
+    ADD CONSTRAINT "schizophrenia_ybocs_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ybocs"
+    ADD CONSTRAINT "schizophrenia_ybocs_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ymrs"
+    ADD CONSTRAINT "schizophrenia_ymrs_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ymrs"
+    ADD CONSTRAINT "schizophrenia_ymrs_visit_id_key" UNIQUE ("visit_id");
+
+
+
 ALTER TABLE ONLY "public"."treatment_somatic_contraceptive"
     ADD CONSTRAINT "treatment_somatic_contraceptive_pkey" PRIMARY KEY ("id");
 
@@ -8379,6 +12273,16 @@ ALTER TABLE ONLY "public"."user_invitations"
 
 ALTER TABLE ONLY "public"."user_invitations"
     ADD CONSTRAINT "user_invitations_token_key" UNIQUE ("token");
+
+
+
+ALTER TABLE ONLY "public"."user_pathologies"
+    ADD CONSTRAINT "user_pathologies_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."user_pathologies"
+    ADD CONSTRAINT "user_pathologies_user_id_pathology_id_key" UNIQUE ("user_id", "pathology_id");
 
 
 
@@ -9297,11 +13201,243 @@ CREATE INDEX "idx_responses_tobacco_visit_id" ON "public"."bipolar_nurse_tobacco
 
 
 
+CREATE INDEX "idx_schizo_wais4_mc_patient_id" ON "public"."schizophrenia_wais4_memoire_chiffres" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizo_wais4_mc_visit_id" ON "public"."schizophrenia_wais4_memoire_chiffres" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_cbq_completed_at" ON "public"."schizophrenia_cbq" USING "btree" ("completed_at");
+
+
+
+CREATE INDEX "idx_schizophrenia_cbq_patient_id" ON "public"."schizophrenia_cbq" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_cbq_visit_id" ON "public"."schizophrenia_cbq" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_cgi_patient_id" ON "public"."schizophrenia_cgi" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_cgi_visit_id" ON "public"."schizophrenia_cgi" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_commissions_completed_at" ON "public"."schizophrenia_commissions" USING "btree" ("completed_at");
+
+
+
+CREATE INDEX "idx_schizophrenia_commissions_patient_id" ON "public"."schizophrenia_commissions" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_commissions_visit_id" ON "public"."schizophrenia_commissions" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_cvlt_completed_at" ON "public"."schizophrenia_cvlt" USING "btree" ("completed_at");
+
+
+
+CREATE INDEX "idx_schizophrenia_cvlt_patient_id" ON "public"."schizophrenia_cvlt" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_cvlt_visit_id" ON "public"."schizophrenia_cvlt" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_dacobs_completed_at" ON "public"."schizophrenia_dacobs" USING "btree" ("completed_at");
+
+
+
+CREATE INDEX "idx_schizophrenia_dacobs_patient_id" ON "public"."schizophrenia_dacobs" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_dacobs_visit_id" ON "public"."schizophrenia_dacobs" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_egf_patient_id" ON "public"."schizophrenia_egf" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_egf_visit_id" ON "public"."schizophrenia_egf" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_ephp_patient_id" ON "public"."schizophrenia_ephp" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_ephp_visit_id" ON "public"."schizophrenia_ephp" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_fagerstrom_patient_id" ON "public"."schizophrenia_fagerstrom" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_fagerstrom_visit_id" ON "public"."schizophrenia_fagerstrom" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_ipaq_completed_at" ON "public"."schizophrenia_ipaq" USING "btree" ("completed_at");
+
+
+
+CREATE INDEX "idx_schizophrenia_ipaq_patient_id" ON "public"."schizophrenia_ipaq" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_ipaq_visit_id" ON "public"."schizophrenia_ipaq" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_lis_completed_at" ON "public"."schizophrenia_lis" USING "btree" ("completed_at");
+
+
+
+CREATE INDEX "idx_schizophrenia_lis_patient_id" ON "public"."schizophrenia_lis" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_lis_visit_id" ON "public"."schizophrenia_lis" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_presenteisme_patient_id" ON "public"."schizophrenia_presenteisme" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_presenteisme_visit_id" ON "public"."schizophrenia_presenteisme" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_psqi_patient_id" ON "public"."schizophrenia_psqi" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_psqi_visit_id" ON "public"."schizophrenia_psqi" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_sogs_gambling_severity" ON "public"."schizophrenia_sogs" USING "btree" ("gambling_severity");
+
+
+
+CREATE INDEX "idx_schizophrenia_sogs_patient_id" ON "public"."schizophrenia_sogs" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_sogs_total_score" ON "public"."schizophrenia_sogs" USING "btree" ("total_score");
+
+
+
+CREATE INDEX "idx_schizophrenia_sogs_visit_id" ON "public"."schizophrenia_sogs" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_sstics_completed_at" ON "public"."schizophrenia_sstics" USING "btree" ("completed_at");
+
+
+
+CREATE INDEX "idx_schizophrenia_sstics_patient_id" ON "public"."schizophrenia_sstics" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_sstics_visit_id" ON "public"."schizophrenia_sstics" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_tmt_completed_at" ON "public"."schizophrenia_tmt" USING "btree" ("completed_at");
+
+
+
+CREATE INDEX "idx_schizophrenia_tmt_patient_id" ON "public"."schizophrenia_tmt" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_tmt_visit_id" ON "public"."schizophrenia_tmt" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_wais4_criteria_completed_at" ON "public"."schizophrenia_wais4_criteria" USING "btree" ("completed_at");
+
+
+
+CREATE INDEX "idx_schizophrenia_wais4_criteria_patient_id" ON "public"."schizophrenia_wais4_criteria" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_wais4_criteria_visit_id" ON "public"."schizophrenia_wais4_criteria" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_wais4_efficience_completed_at" ON "public"."schizophrenia_wais4_efficience" USING "btree" ("completed_at");
+
+
+
+CREATE INDEX "idx_schizophrenia_wais4_efficience_patient_id" ON "public"."schizophrenia_wais4_efficience" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_wais4_efficience_visit_id" ON "public"."schizophrenia_wais4_efficience" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_wais4_matrices_completed_at" ON "public"."schizophrenia_wais4_matrices" USING "btree" ("completed_at");
+
+
+
+CREATE INDEX "idx_schizophrenia_wais4_matrices_patient_id" ON "public"."schizophrenia_wais4_matrices" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_wais4_matrices_visit_id" ON "public"."schizophrenia_wais4_matrices" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_wais4_similitudes_completed_at" ON "public"."schizophrenia_wais4_similitudes" USING "btree" ("completed_at");
+
+
+
+CREATE INDEX "idx_schizophrenia_wais4_similitudes_patient_id" ON "public"."schizophrenia_wais4_similitudes" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_wais4_similitudes_visit_id" ON "public"."schizophrenia_wais4_similitudes" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_ymrs_patient_id" ON "public"."schizophrenia_ymrs" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_schizophrenia_ymrs_visit_id" ON "public"."schizophrenia_ymrs" USING "btree" ("visit_id");
+
+
+
 CREATE INDEX "idx_treatment_somatic_contraceptive_created" ON "public"."treatment_somatic_contraceptive" USING "btree" ("created_at");
 
 
 
 CREATE INDEX "idx_treatment_somatic_contraceptive_patient" ON "public"."treatment_somatic_contraceptive" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "idx_user_pathologies_pathology" ON "public"."user_pathologies" USING "btree" ("pathology_id");
+
+
+
+CREATE INDEX "idx_user_pathologies_user" ON "public"."user_pathologies" USING "btree" ("user_id");
 
 
 
@@ -9353,6 +13489,10 @@ CREATE INDEX "idx_visits_patient" ON "public"."visits" USING "btree" ("patient_i
 
 
 
+CREATE INDEX "idx_visits_patient_type_number" ON "public"."visits" USING "btree" ("patient_id", "visit_type", "visit_number");
+
+
+
 CREATE INDEX "idx_visits_scheduled_date" ON "public"."visits" USING "btree" ("scheduled_date");
 
 
@@ -9365,11 +13505,39 @@ CREATE INDEX "idx_visits_template" ON "public"."visits" USING "btree" ("visit_te
 
 
 
+CREATE INDEX "idx_visits_type_number" ON "public"."visits" USING "btree" ("visit_type", "visit_number");
+
+
+
 CREATE UNIQUE INDEX "patients_active_mrn_unique" ON "public"."patients" USING "btree" ("medical_record_number") WHERE ("active" = true);
 
 
 
 COMMENT ON INDEX "public"."patients_active_mrn_unique" IS 'Ensures MRN uniqueness only for active patients, allowing reuse after deletion';
+
+
+
+CREATE INDEX "schizophrenia_brief_a_auto_patient_id_idx" ON "public"."schizophrenia_brief_a_auto" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "schizophrenia_brief_a_auto_visit_id_idx" ON "public"."schizophrenia_brief_a_auto" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "schizophrenia_stori_patient_id_idx" ON "public"."schizophrenia_stori" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "schizophrenia_stori_visit_id_idx" ON "public"."schizophrenia_stori" USING "btree" ("visit_id");
+
+
+
+CREATE INDEX "schizophrenia_wurs25_patient_id_idx" ON "public"."schizophrenia_wurs25" USING "btree" ("patient_id");
+
+
+
+CREATE INDEX "schizophrenia_wurs25_visit_id_idx" ON "public"."schizophrenia_wurs25" USING "btree" ("visit_id");
 
 
 
@@ -9392,6 +13560,46 @@ CREATE OR REPLACE VIEW "public"."v_users_full" WITH ("security_invoker"='true') 
      LEFT JOIN "public"."center_pathologies" "cp" ON (("c"."id" = "cp"."center_id")))
      LEFT JOIN "public"."pathologies" "p" ON (("cp"."pathology_id" = "p"."id")))
   GROUP BY "up"."id", "c"."id", "c"."name", "c"."code";
+
+
+
+CREATE OR REPLACE TRIGGER "set_schizo_wais4_mc_updated_at" BEFORE UPDATE ON "public"."schizophrenia_wais4_memoire_chiffres" FOR EACH ROW EXECUTE FUNCTION "public"."update_updated_at_column"();
+
+
+
+CREATE OR REPLACE TRIGGER "tr_visits_assign_number" BEFORE INSERT ON "public"."visits" FOR EACH ROW EXECUTE FUNCTION "public"."auto_assign_visit_number"();
+
+
+
+CREATE OR REPLACE TRIGGER "trigger_schizophrenia_commissions_updated_at" BEFORE UPDATE ON "public"."schizophrenia_commissions" FOR EACH ROW EXECUTE FUNCTION "public"."update_schizophrenia_commissions_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trigger_schizophrenia_cvlt_updated_at" BEFORE UPDATE ON "public"."schizophrenia_cvlt" FOR EACH ROW EXECUTE FUNCTION "public"."update_schizophrenia_cvlt_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trigger_schizophrenia_lis_updated_at" BEFORE UPDATE ON "public"."schizophrenia_lis" FOR EACH ROW EXECUTE FUNCTION "public"."update_schizophrenia_lis_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trigger_schizophrenia_tmt_updated_at" BEFORE UPDATE ON "public"."schizophrenia_tmt" FOR EACH ROW EXECUTE FUNCTION "public"."update_schizophrenia_tmt_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trigger_schizophrenia_wais4_criteria_updated_at" BEFORE UPDATE ON "public"."schizophrenia_wais4_criteria" FOR EACH ROW EXECUTE FUNCTION "public"."update_schizophrenia_wais4_criteria_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trigger_schizophrenia_wais4_efficience_updated_at" BEFORE UPDATE ON "public"."schizophrenia_wais4_efficience" FOR EACH ROW EXECUTE FUNCTION "public"."update_schizophrenia_wais4_efficience_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trigger_schizophrenia_wais4_similitudes_updated_at" BEFORE UPDATE ON "public"."schizophrenia_wais4_similitudes" FOR EACH ROW EXECUTE FUNCTION "public"."update_schizophrenia_wais4_similitudes_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trigger_set_patient_fondacode" BEFORE INSERT ON "public"."patients" FOR EACH ROW EXECUTE FUNCTION "public"."set_patient_fondacode"();
 
 
 
@@ -9600,6 +13808,42 @@ CREATE OR REPLACE TRIGGER "update_responses_sleep_apnea_updated_at" BEFORE UPDAT
 
 
 CREATE OR REPLACE TRIGGER "update_responses_tobacco_updated_at" BEFORE UPDATE ON "public"."bipolar_nurse_tobacco" FOR EACH ROW EXECUTE FUNCTION "public"."update_updated_at_column"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_schizophrenia_cbq_updated_at" BEFORE UPDATE ON "public"."schizophrenia_cbq" FOR EACH ROW EXECUTE FUNCTION "public"."update_schizophrenia_cbq_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_schizophrenia_dacobs_updated_at" BEFORE UPDATE ON "public"."schizophrenia_dacobs" FOR EACH ROW EXECUTE FUNCTION "public"."update_schizophrenia_dacobs_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_schizophrenia_ephp_updated_at" BEFORE UPDATE ON "public"."schizophrenia_ephp" FOR EACH ROW EXECUTE FUNCTION "public"."update_updated_at_column"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_schizophrenia_fagerstrom_updated_at" BEFORE UPDATE ON "public"."schizophrenia_fagerstrom" FOR EACH ROW EXECUTE FUNCTION "public"."update_updated_at_column"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_schizophrenia_presenteisme_updated_at" BEFORE UPDATE ON "public"."schizophrenia_presenteisme" FOR EACH ROW EXECUTE FUNCTION "public"."update_updated_at_column"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_schizophrenia_psqi_updated_at" BEFORE UPDATE ON "public"."schizophrenia_psqi" FOR EACH ROW EXECUTE FUNCTION "public"."update_updated_at_column"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_schizophrenia_sogs_updated_at" BEFORE UPDATE ON "public"."schizophrenia_sogs" FOR EACH ROW EXECUTE FUNCTION "public"."update_updated_at_column"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_schizophrenia_sstics_updated_at" BEFORE UPDATE ON "public"."schizophrenia_sstics" FOR EACH ROW EXECUTE FUNCTION "public"."update_schizophrenia_sstics_updated_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "update_schizophrenia_wais4_matrices_updated_at" BEFORE UPDATE ON "public"."schizophrenia_wais4_matrices" FOR EACH ROW EXECUTE FUNCTION "public"."update_schizophrenia_wais4_matrices_updated_at"();
 
 
 
@@ -11125,6 +15369,66 @@ ALTER TABLE ONLY "public"."schizophrenia_bilan_biologique"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_bilan_social"
+    ADD CONSTRAINT "schizophrenia_bilan_social_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_bilan_social"
+    ADD CONSTRAINT "schizophrenia_bilan_social_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_bilan_social"
+    ADD CONSTRAINT "schizophrenia_bilan_social_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_bis"
+    ADD CONSTRAINT "schizophrenia_bis_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_bis"
+    ADD CONSTRAINT "schizophrenia_bis_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_bis"
+    ADD CONSTRAINT "schizophrenia_bis_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_brief_a_auto"
+    ADD CONSTRAINT "schizophrenia_brief_a_auto_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_brief_a_auto"
+    ADD CONSTRAINT "schizophrenia_brief_a_auto_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_brief_a_auto"
+    ADD CONSTRAINT "schizophrenia_brief_a_auto_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cbq"
+    ADD CONSTRAINT "schizophrenia_cbq_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cbq"
+    ADD CONSTRAINT "schizophrenia_cbq_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cbq"
+    ADD CONSTRAINT "schizophrenia_cbq_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."schizophrenia_cdss"
     ADD CONSTRAINT "schizophrenia_cdss_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
 
@@ -11137,6 +15441,81 @@ ALTER TABLE ONLY "public"."schizophrenia_cdss"
 
 ALTER TABLE ONLY "public"."schizophrenia_cdss"
     ADD CONSTRAINT "schizophrenia_cdss_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cgi"
+    ADD CONSTRAINT "schizophrenia_cgi_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cgi"
+    ADD CONSTRAINT "schizophrenia_cgi_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cgi"
+    ADD CONSTRAINT "schizophrenia_cgi_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_commissions"
+    ADD CONSTRAINT "schizophrenia_commissions_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_commissions"
+    ADD CONSTRAINT "schizophrenia_commissions_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_commissions"
+    ADD CONSTRAINT "schizophrenia_commissions_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ctq"
+    ADD CONSTRAINT "schizophrenia_ctq_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ctq"
+    ADD CONSTRAINT "schizophrenia_ctq_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ctq"
+    ADD CONSTRAINT "schizophrenia_ctq_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cvlt"
+    ADD CONSTRAINT "schizophrenia_cvlt_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cvlt"
+    ADD CONSTRAINT "schizophrenia_cvlt_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_cvlt"
+    ADD CONSTRAINT "schizophrenia_cvlt_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_dacobs"
+    ADD CONSTRAINT "schizophrenia_dacobs_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_dacobs"
+    ADD CONSTRAINT "schizophrenia_dacobs_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_dacobs"
+    ADD CONSTRAINT "schizophrenia_dacobs_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
 
 
 
@@ -11170,6 +15549,51 @@ ALTER TABLE ONLY "public"."schizophrenia_ecv"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_egf"
+    ADD CONSTRAINT "schizophrenia_egf_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_egf"
+    ADD CONSTRAINT "schizophrenia_egf_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_egf"
+    ADD CONSTRAINT "schizophrenia_egf_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ephp"
+    ADD CONSTRAINT "schizophrenia_ephp_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ephp"
+    ADD CONSTRAINT "schizophrenia_ephp_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ephp"
+    ADD CONSTRAINT "schizophrenia_ephp_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_eq5d5l"
+    ADD CONSTRAINT "schizophrenia_eq5d5l_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_eq5d5l"
+    ADD CONSTRAINT "schizophrenia_eq5d5l_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_eq5d5l"
+    ADD CONSTRAINT "schizophrenia_eq5d5l_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."schizophrenia_eval_addictologique"
     ADD CONSTRAINT "schizophrenia_eval_addictologique_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
 
@@ -11185,6 +15609,36 @@ ALTER TABLE ONLY "public"."schizophrenia_eval_addictologique"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_fagerstrom"
+    ADD CONSTRAINT "schizophrenia_fagerstrom_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_fagerstrom"
+    ADD CONSTRAINT "schizophrenia_fagerstrom_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_fagerstrom"
+    ADD CONSTRAINT "schizophrenia_fagerstrom_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ipaq"
+    ADD CONSTRAINT "schizophrenia_ipaq_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ipaq"
+    ADD CONSTRAINT "schizophrenia_ipaq_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ipaq"
+    ADD CONSTRAINT "schizophrenia_ipaq_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."schizophrenia_isa"
     ADD CONSTRAINT "schizophrenia_isa_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
 
@@ -11197,6 +15651,36 @@ ALTER TABLE ONLY "public"."schizophrenia_isa"
 
 ALTER TABLE ONLY "public"."schizophrenia_isa"
     ADD CONSTRAINT "schizophrenia_isa_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_lis"
+    ADD CONSTRAINT "schizophrenia_lis_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_lis"
+    ADD CONSTRAINT "schizophrenia_lis_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_lis"
+    ADD CONSTRAINT "schizophrenia_lis_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_mars"
+    ADD CONSTRAINT "schizophrenia_mars_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_mars"
+    ADD CONSTRAINT "schizophrenia_mars_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_mars"
+    ADD CONSTRAINT "schizophrenia_mars_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
 
 
 
@@ -11225,6 +15709,21 @@ ALTER TABLE ONLY "public"."schizophrenia_perinatalite"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_presenteisme"
+    ADD CONSTRAINT "schizophrenia_presenteisme_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_presenteisme"
+    ADD CONSTRAINT "schizophrenia_presenteisme_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_presenteisme"
+    ADD CONSTRAINT "schizophrenia_presenteisme_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."schizophrenia_psp"
     ADD CONSTRAINT "schizophrenia_psp_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
 
@@ -11237,6 +15736,21 @@ ALTER TABLE ONLY "public"."schizophrenia_psp"
 
 ALTER TABLE ONLY "public"."schizophrenia_psp"
     ADD CONSTRAINT "schizophrenia_psp_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_psqi"
+    ADD CONSTRAINT "schizophrenia_psqi_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_psqi"
+    ADD CONSTRAINT "schizophrenia_psqi_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_psqi"
+    ADD CONSTRAINT "schizophrenia_psqi_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
 
 
 
@@ -11285,6 +15799,66 @@ ALTER TABLE ONLY "public"."schizophrenia_screening_orientation"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_sogs"
+    ADD CONSTRAINT "schizophrenia_sogs_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_sogs"
+    ADD CONSTRAINT "schizophrenia_sogs_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_sogs"
+    ADD CONSTRAINT "schizophrenia_sogs_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_sqol"
+    ADD CONSTRAINT "schizophrenia_sqol_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_sqol"
+    ADD CONSTRAINT "schizophrenia_sqol_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_sqol"
+    ADD CONSTRAINT "schizophrenia_sqol_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_sstics"
+    ADD CONSTRAINT "schizophrenia_sstics_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_sstics"
+    ADD CONSTRAINT "schizophrenia_sstics_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_sstics"
+    ADD CONSTRAINT "schizophrenia_sstics_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_stori"
+    ADD CONSTRAINT "schizophrenia_stori_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_stori"
+    ADD CONSTRAINT "schizophrenia_stori_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_stori"
+    ADD CONSTRAINT "schizophrenia_stori_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."schizophrenia_suicide_history"
     ADD CONSTRAINT "schizophrenia_suicide_history_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
 
@@ -11325,6 +15899,21 @@ ALTER TABLE ONLY "public"."schizophrenia_tea_coffee"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_tmt"
+    ADD CONSTRAINT "schizophrenia_tmt_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_tmt"
+    ADD CONSTRAINT "schizophrenia_tmt_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_tmt"
+    ADD CONSTRAINT "schizophrenia_tmt_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."schizophrenia_troubles_comorbides"
     ADD CONSTRAINT "schizophrenia_troubles_comorbides_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
 
@@ -11355,6 +15944,126 @@ ALTER TABLE ONLY "public"."schizophrenia_troubles_psychotiques"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_wais4_criteria"
+    ADD CONSTRAINT "schizophrenia_wais4_criteria_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_criteria"
+    ADD CONSTRAINT "schizophrenia_wais4_criteria_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_criteria"
+    ADD CONSTRAINT "schizophrenia_wais4_criteria_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_efficience"
+    ADD CONSTRAINT "schizophrenia_wais4_efficience_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_efficience"
+    ADD CONSTRAINT "schizophrenia_wais4_efficience_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_efficience"
+    ADD CONSTRAINT "schizophrenia_wais4_efficience_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_matrices"
+    ADD CONSTRAINT "schizophrenia_wais4_matrices_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_matrices"
+    ADD CONSTRAINT "schizophrenia_wais4_matrices_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_matrices"
+    ADD CONSTRAINT "schizophrenia_wais4_matrices_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_memoire_chiffres"
+    ADD CONSTRAINT "schizophrenia_wais4_memoire_chiffres_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_memoire_chiffres"
+    ADD CONSTRAINT "schizophrenia_wais4_memoire_chiffres_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_memoire_chiffres"
+    ADD CONSTRAINT "schizophrenia_wais4_memoire_chiffres_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_similitudes"
+    ADD CONSTRAINT "schizophrenia_wais4_similitudes_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_similitudes"
+    ADD CONSTRAINT "schizophrenia_wais4_similitudes_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wais4_similitudes"
+    ADD CONSTRAINT "schizophrenia_wais4_similitudes_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wurs25"
+    ADD CONSTRAINT "schizophrenia_wurs25_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wurs25"
+    ADD CONSTRAINT "schizophrenia_wurs25_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_wurs25"
+    ADD CONSTRAINT "schizophrenia_wurs25_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ybocs"
+    ADD CONSTRAINT "schizophrenia_ybocs_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ybocs"
+    ADD CONSTRAINT "schizophrenia_ybocs_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ybocs"
+    ADD CONSTRAINT "schizophrenia_ybocs_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ymrs"
+    ADD CONSTRAINT "schizophrenia_ymrs_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ymrs"
+    ADD CONSTRAINT "schizophrenia_ymrs_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_ymrs"
+    ADD CONSTRAINT "schizophrenia_ymrs_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."treatment_somatic_contraceptive"
     ADD CONSTRAINT "treatment_somatic_contraceptive_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "public"."user_profiles"("id");
 
@@ -11382,6 +16091,16 @@ ALTER TABLE ONLY "public"."user_invitations"
 
 ALTER TABLE ONLY "public"."user_invitations"
     ADD CONSTRAINT "user_invitations_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."user_pathologies"
+    ADD CONSTRAINT "user_pathologies_pathology_id_fkey" FOREIGN KEY ("pathology_id") REFERENCES "public"."pathologies"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."user_pathologies"
+    ADD CONSTRAINT "user_pathologies_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user_profiles"("id") ON DELETE CASCADE;
 
 
 
@@ -11563,6 +16282,18 @@ CREATE POLICY "Healthcare professionals can view sleep apnea" ON "public"."bipol
 CREATE POLICY "Healthcare professionals can view tobacco responses" ON "public"."bipolar_nurse_tobacco" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'administrator'::"public"."user_role", 'manager'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Patients can insert own SOGS responses" ON "public"."schizophrenia_sogs" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients can update own SOGS responses" ON "public"."schizophrenia_sogs" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients can view own SOGS responses" ON "public"."schizophrenia_sogs" FOR SELECT USING (("auth"."uid"() = "patient_id"));
 
 
 
@@ -11762,6 +16493,14 @@ CREATE POLICY "Patients delete own somatic contraceptive" ON "public"."treatment
 
 
 
+CREATE POLICY "Patients insert own IPAQ responses" ON "public"."schizophrenia_ipaq" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own PSQI responses" ON "public"."schizophrenia_psqi" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
 CREATE POLICY "Patients insert own bipolar_asrm" ON "public"."bipolar_asrm" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
 
 
@@ -11774,6 +16513,26 @@ CREATE POLICY "Patients insert own bipolar_qids_sr16" ON "public"."bipolar_qids_
 
 
 
+CREATE POLICY "Patients insert own cbq responses" ON "public"."schizophrenia_cbq" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own dacobs responses" ON "public"."schizophrenia_dacobs" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own ephp responses" ON "public"."schizophrenia_ephp" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own fagerstrom responses" ON "public"."schizophrenia_fagerstrom" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own matrices responses" ON "public"."schizophrenia_wais4_matrices" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
 CREATE POLICY "Patients insert own medications" ON "public"."patient_medications" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
 
 
@@ -11782,11 +16541,95 @@ CREATE POLICY "Patients insert own non_pharmacologic" ON "public"."bipolar_non_p
 
 
 
+CREATE POLICY "Patients insert own presenteisme responses" ON "public"."schizophrenia_presenteisme" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
 CREATE POLICY "Patients insert own psychotropes_lifetime" ON "public"."bipolar_psychotropes_lifetime" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
 
 
 
+CREATE POLICY "Patients insert own responses" ON "public"."schizophrenia_wais4_memoire_chiffres" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_bis" ON "public"."schizophrenia_bis" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_brief_a_auto" ON "public"."schizophrenia_brief_a_auto" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_commissions responses" ON "public"."schizophrenia_commissions" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_ctq" ON "public"."schizophrenia_ctq" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_cvlt responses" ON "public"."schizophrenia_cvlt" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_eq5d5l" ON "public"."schizophrenia_eq5d5l" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_lis responses" ON "public"."schizophrenia_lis" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_mars" ON "public"."schizophrenia_mars" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_sqol" ON "public"."schizophrenia_sqol" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_tmt responses" ON "public"."schizophrenia_tmt" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_wais4_criteria responses" ON "public"."schizophrenia_wais4_criteria" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_wais4_efficience responses" ON "public"."schizophrenia_wais4_efficience" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_wais4_similitudes responses" ON "public"."schizophrenia_wais4_similitudes" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_ybocs" ON "public"."schizophrenia_ybocs" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
 CREATE POLICY "Patients insert own somatic contraceptive" ON "public"."treatment_somatic_contraceptive" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own sstics responses" ON "public"."schizophrenia_sstics" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own stori responses" ON "public"."schizophrenia_stori" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own wurs25 responses" ON "public"."schizophrenia_wurs25" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own IPAQ responses" ON "public"."schizophrenia_ipaq" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own PSQI responses" ON "public"."schizophrenia_psqi" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
 
 
 
@@ -11802,6 +16645,26 @@ CREATE POLICY "Patients update own bipolar_qids_sr16" ON "public"."bipolar_qids_
 
 
 
+CREATE POLICY "Patients update own cbq responses" ON "public"."schizophrenia_cbq" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own dacobs responses" ON "public"."schizophrenia_dacobs" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own ephp responses" ON "public"."schizophrenia_ephp" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own fagerstrom responses" ON "public"."schizophrenia_fagerstrom" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own matrices responses" ON "public"."schizophrenia_wais4_matrices" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
 CREATE POLICY "Patients update own medications" ON "public"."patient_medications" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
 
 
@@ -11810,11 +16673,95 @@ CREATE POLICY "Patients update own non_pharmacologic" ON "public"."bipolar_non_p
 
 
 
+CREATE POLICY "Patients update own presenteisme responses" ON "public"."schizophrenia_presenteisme" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
 CREATE POLICY "Patients update own psychotropes_lifetime" ON "public"."bipolar_psychotropes_lifetime" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
 
 
 
+CREATE POLICY "Patients update own responses" ON "public"."schizophrenia_wais4_memoire_chiffres" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_bis" ON "public"."schizophrenia_bis" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_brief_a_auto" ON "public"."schizophrenia_brief_a_auto" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_commissions responses" ON "public"."schizophrenia_commissions" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_ctq" ON "public"."schizophrenia_ctq" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_cvlt responses" ON "public"."schizophrenia_cvlt" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_eq5d5l" ON "public"."schizophrenia_eq5d5l" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_lis responses" ON "public"."schizophrenia_lis" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_mars" ON "public"."schizophrenia_mars" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_sqol" ON "public"."schizophrenia_sqol" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_tmt responses" ON "public"."schizophrenia_tmt" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_wais4_criteria responses" ON "public"."schizophrenia_wais4_criteria" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_wais4_efficience responses" ON "public"."schizophrenia_wais4_efficience" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_wais4_similitudes responses" ON "public"."schizophrenia_wais4_similitudes" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_ybocs" ON "public"."schizophrenia_ybocs" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
 CREATE POLICY "Patients update own somatic contraceptive" ON "public"."treatment_somatic_contraceptive" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own sstics responses" ON "public"."schizophrenia_sstics" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own stori responses" ON "public"."schizophrenia_stori" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own wurs25 responses" ON "public"."schizophrenia_wurs25" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own IPAQ responses" ON "public"."schizophrenia_ipaq" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own PSQI responses" ON "public"."schizophrenia_psqi" FOR SELECT USING (("auth"."uid"() = "patient_id"));
 
 
 
@@ -11926,6 +16873,26 @@ CREATE POLICY "Patients view own bipolar_ymrs" ON "public"."bipolar_ymrs" FOR SE
 
 
 
+CREATE POLICY "Patients view own cbq responses" ON "public"."schizophrenia_cbq" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own dacobs responses" ON "public"."schizophrenia_dacobs" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own ephp responses" ON "public"."schizophrenia_ephp" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own fagerstrom responses" ON "public"."schizophrenia_fagerstrom" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own matrices responses" ON "public"."schizophrenia_wais4_matrices" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
 CREATE POLICY "Patients view own medications" ON "public"."patient_medications" FOR SELECT USING (("auth"."uid"() = "patient_id"));
 
 
@@ -11934,7 +16901,15 @@ CREATE POLICY "Patients view own non_pharmacologic" ON "public"."bipolar_non_pha
 
 
 
+CREATE POLICY "Patients view own presenteisme responses" ON "public"."schizophrenia_presenteisme" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
 CREATE POLICY "Patients view own psychotropes_lifetime" ON "public"."bipolar_psychotropes_lifetime" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own responses" ON "public"."schizophrenia_wais4_memoire_chiffres" FOR SELECT USING (("auth"."uid"() = "patient_id"));
 
 
 
@@ -11958,7 +16933,35 @@ CREATE POLICY "Patients view own schizophrenia_bilan_biologique" ON "public"."sc
 
 
 
+CREATE POLICY "Patients view own schizophrenia_bilan_social" ON "public"."schizophrenia_bilan_social" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own schizophrenia_bis" ON "public"."schizophrenia_bis" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own schizophrenia_brief_a_auto" ON "public"."schizophrenia_brief_a_auto" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
 CREATE POLICY "Patients view own schizophrenia_cdss" ON "public"."schizophrenia_cdss" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own schizophrenia_cgi" ON "public"."schizophrenia_cgi" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own schizophrenia_commissions responses" ON "public"."schizophrenia_commissions" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own schizophrenia_ctq" ON "public"."schizophrenia_ctq" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own schizophrenia_cvlt responses" ON "public"."schizophrenia_cvlt" FOR SELECT USING (("auth"."uid"() = "patient_id"));
 
 
 
@@ -11970,11 +16973,27 @@ CREATE POLICY "Patients view own schizophrenia_ecv" ON "public"."schizophrenia_e
 
 
 
+CREATE POLICY "Patients view own schizophrenia_egf" ON "public"."schizophrenia_egf" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own schizophrenia_eq5d5l" ON "public"."schizophrenia_eq5d5l" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
 CREATE POLICY "Patients view own schizophrenia_eval_addictologique" ON "public"."schizophrenia_eval_addictologique" FOR SELECT USING (("auth"."uid"() = "patient_id"));
 
 
 
 CREATE POLICY "Patients view own schizophrenia_isa" ON "public"."schizophrenia_isa" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own schizophrenia_lis responses" ON "public"."schizophrenia_lis" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own schizophrenia_mars" ON "public"."schizophrenia_mars" FOR SELECT USING (("auth"."uid"() = "patient_id"));
 
 
 
@@ -12002,6 +17021,10 @@ CREATE POLICY "Patients view own schizophrenia_screening_orientation" ON "public
 
 
 
+CREATE POLICY "Patients view own schizophrenia_sqol" ON "public"."schizophrenia_sqol" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
 CREATE POLICY "Patients view own schizophrenia_suicide_history" ON "public"."schizophrenia_suicide_history" FOR SELECT USING (("auth"."uid"() = "patient_id"));
 
 
@@ -12014,6 +17037,10 @@ CREATE POLICY "Patients view own schizophrenia_tea_coffee" ON "public"."schizoph
 
 
 
+CREATE POLICY "Patients view own schizophrenia_tmt responses" ON "public"."schizophrenia_tmt" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
 CREATE POLICY "Patients view own schizophrenia_troubles_comorbides" ON "public"."schizophrenia_troubles_comorbides" FOR SELECT USING (("auth"."uid"() = "patient_id"));
 
 
@@ -12022,7 +17049,45 @@ CREATE POLICY "Patients view own schizophrenia_troubles_psychotiques" ON "public
 
 
 
+CREATE POLICY "Patients view own schizophrenia_wais4_criteria responses" ON "public"."schizophrenia_wais4_criteria" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own schizophrenia_wais4_efficience responses" ON "public"."schizophrenia_wais4_efficience" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own schizophrenia_wais4_similitudes responses" ON "public"."schizophrenia_wais4_similitudes" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own schizophrenia_ybocs" ON "public"."schizophrenia_ybocs" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own schizophrenia_ymrs" ON "public"."schizophrenia_ymrs" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
 CREATE POLICY "Patients view own somatic contraceptive" ON "public"."treatment_somatic_contraceptive" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own sstics responses" ON "public"."schizophrenia_sstics" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own stori responses" ON "public"."schizophrenia_stori" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own wurs25 responses" ON "public"."schizophrenia_wurs25" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Professionals can insert SOGS responses" ON "public"."schizophrenia_sogs" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
 
 
@@ -12272,6 +17337,12 @@ CREATE POLICY "Professionals can insert bipolar_wais4_similitudes" ON "public"."
 
 
 
+CREATE POLICY "Professionals can update SOGS responses" ON "public"."schizophrenia_sogs" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals can update bipolar_antecedents_gyneco" ON "public"."bipolar_antecedents_gyneco" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'administrator'::"public"."user_role", 'manager'::"public"."user_role"]))))));
@@ -12515,6 +17586,12 @@ CREATE POLICY "Professionals can update bipolar_wais4_matrices" ON "public"."bip
 CREATE POLICY "Professionals can update bipolar_wais4_similitudes" ON "public"."bipolar_wais4_similitudes" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'administrator'::"public"."user_role", 'manager'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals can view all SOGS responses" ON "public"."schizophrenia_sogs" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
 
 
@@ -12776,6 +17853,18 @@ CREATE POLICY "Professionals delete somatic contraceptive" ON "public"."treatmen
 
 
 
+CREATE POLICY "Professionals insert IPAQ responses" ON "public"."schizophrenia_ipaq" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert PSQI responses" ON "public"."schizophrenia_psqi" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals insert bipolar_aim" ON "public"."bipolar_aim" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
@@ -12950,7 +18039,49 @@ CREATE POLICY "Professionals insert bipolar_ymrs" ON "public"."bipolar_ymrs" FOR
 
 
 
+CREATE POLICY "Professionals insert cbq responses" ON "public"."schizophrenia_cbq" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert dacobs responses" ON "public"."schizophrenia_dacobs" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert ephp responses" ON "public"."schizophrenia_ephp" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert fagerstrom responses" ON "public"."schizophrenia_fagerstrom" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert matrices responses" ON "public"."schizophrenia_wais4_matrices" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals insert medications" ON "public"."patient_medications" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert presenteisme responses" ON "public"."schizophrenia_presenteisme" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert responses" ON "public"."schizophrenia_wais4_memoire_chiffres" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -12986,7 +18117,49 @@ CREATE POLICY "Professionals insert schizophrenia_bilan_biologique" ON "public".
 
 
 
+CREATE POLICY "Professionals insert schizophrenia_bilan_social" ON "public"."schizophrenia_bilan_social" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert schizophrenia_bis" ON "public"."schizophrenia_bis" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert schizophrenia_brief_a_auto" ON "public"."schizophrenia_brief_a_auto" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals insert schizophrenia_cdss" ON "public"."schizophrenia_cdss" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert schizophrenia_cgi" ON "public"."schizophrenia_cgi" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert schizophrenia_commissions responses" ON "public"."schizophrenia_commissions" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert schizophrenia_ctq" ON "public"."schizophrenia_ctq" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert schizophrenia_cvlt responses" ON "public"."schizophrenia_cvlt" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -13004,6 +18177,18 @@ CREATE POLICY "Professionals insert schizophrenia_ecv" ON "public"."schizophreni
 
 
 
+CREATE POLICY "Professionals insert schizophrenia_egf" ON "public"."schizophrenia_egf" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert schizophrenia_eq5d5l" ON "public"."schizophrenia_eq5d5l" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals insert schizophrenia_eval_addictologique" ON "public"."schizophrenia_eval_addictologique" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
@@ -13011,6 +18196,18 @@ CREATE POLICY "Professionals insert schizophrenia_eval_addictologique" ON "publi
 
 
 CREATE POLICY "Professionals insert schizophrenia_isa" ON "public"."schizophrenia_isa" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert schizophrenia_lis responses" ON "public"."schizophrenia_lis" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert schizophrenia_mars" ON "public"."schizophrenia_mars" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -13052,6 +18249,12 @@ CREATE POLICY "Professionals insert schizophrenia_screening_orientation" ON "pub
 
 
 
+CREATE POLICY "Professionals insert schizophrenia_sqol" ON "public"."schizophrenia_sqol" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals insert schizophrenia_suicide_history" ON "public"."schizophrenia_suicide_history" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
@@ -13070,6 +18273,12 @@ CREATE POLICY "Professionals insert schizophrenia_tea_coffee" ON "public"."schiz
 
 
 
+CREATE POLICY "Professionals insert schizophrenia_tmt responses" ON "public"."schizophrenia_tmt" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals insert schizophrenia_troubles_comorbides" ON "public"."schizophrenia_troubles_comorbides" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
@@ -13082,7 +18291,67 @@ CREATE POLICY "Professionals insert schizophrenia_troubles_psychotiques" ON "pub
 
 
 
+CREATE POLICY "Professionals insert schizophrenia_wais4_criteria responses" ON "public"."schizophrenia_wais4_criteria" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert schizophrenia_wais4_efficience responses" ON "public"."schizophrenia_wais4_efficience" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert schizophrenia_wais4_similitudes responses" ON "public"."schizophrenia_wais4_similitudes" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert schizophrenia_ybocs" ON "public"."schizophrenia_ybocs" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert schizophrenia_ymrs" ON "public"."schizophrenia_ymrs" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals insert somatic contraceptive" ON "public"."treatment_somatic_contraceptive" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert sstics responses" ON "public"."schizophrenia_sstics" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert stori responses" ON "public"."schizophrenia_stori" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals insert wurs25 responses" ON "public"."schizophrenia_wurs25" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update IPAQ responses" ON "public"."schizophrenia_ipaq" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update PSQI responses" ON "public"."schizophrenia_psqi" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -13262,7 +18531,49 @@ CREATE POLICY "Professionals update bipolar_ymrs" ON "public"."bipolar_ymrs" FOR
 
 
 
+CREATE POLICY "Professionals update cbq responses" ON "public"."schizophrenia_cbq" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update dacobs responses" ON "public"."schizophrenia_dacobs" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update ephp responses" ON "public"."schizophrenia_ephp" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update fagerstrom responses" ON "public"."schizophrenia_fagerstrom" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update matrices responses" ON "public"."schizophrenia_wais4_matrices" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals update medications" ON "public"."patient_medications" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update presenteisme responses" ON "public"."schizophrenia_presenteisme" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update responses" ON "public"."schizophrenia_wais4_memoire_chiffres" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -13298,7 +18609,49 @@ CREATE POLICY "Professionals update schizophrenia_bilan_biologique" ON "public".
 
 
 
+CREATE POLICY "Professionals update schizophrenia_bilan_social" ON "public"."schizophrenia_bilan_social" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update schizophrenia_bis" ON "public"."schizophrenia_bis" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update schizophrenia_brief_a_auto" ON "public"."schizophrenia_brief_a_auto" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals update schizophrenia_cdss" ON "public"."schizophrenia_cdss" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update schizophrenia_cgi" ON "public"."schizophrenia_cgi" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update schizophrenia_commissions responses" ON "public"."schizophrenia_commissions" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update schizophrenia_ctq" ON "public"."schizophrenia_ctq" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update schizophrenia_cvlt responses" ON "public"."schizophrenia_cvlt" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -13316,6 +18669,18 @@ CREATE POLICY "Professionals update schizophrenia_ecv" ON "public"."schizophreni
 
 
 
+CREATE POLICY "Professionals update schizophrenia_egf" ON "public"."schizophrenia_egf" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update schizophrenia_eq5d5l" ON "public"."schizophrenia_eq5d5l" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals update schizophrenia_eval_addictologique" ON "public"."schizophrenia_eval_addictologique" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
@@ -13323,6 +18688,18 @@ CREATE POLICY "Professionals update schizophrenia_eval_addictologique" ON "publi
 
 
 CREATE POLICY "Professionals update schizophrenia_isa" ON "public"."schizophrenia_isa" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update schizophrenia_lis responses" ON "public"."schizophrenia_lis" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update schizophrenia_mars" ON "public"."schizophrenia_mars" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -13364,6 +18741,12 @@ CREATE POLICY "Professionals update schizophrenia_screening_orientation" ON "pub
 
 
 
+CREATE POLICY "Professionals update schizophrenia_sqol" ON "public"."schizophrenia_sqol" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals update schizophrenia_suicide_history" ON "public"."schizophrenia_suicide_history" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
@@ -13382,6 +18765,12 @@ CREATE POLICY "Professionals update schizophrenia_tea_coffee" ON "public"."schiz
 
 
 
+CREATE POLICY "Professionals update schizophrenia_tmt responses" ON "public"."schizophrenia_tmt" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals update schizophrenia_troubles_comorbides" ON "public"."schizophrenia_troubles_comorbides" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
@@ -13394,7 +18783,67 @@ CREATE POLICY "Professionals update schizophrenia_troubles_psychotiques" ON "pub
 
 
 
+CREATE POLICY "Professionals update schizophrenia_wais4_criteria responses" ON "public"."schizophrenia_wais4_criteria" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update schizophrenia_wais4_efficience responses" ON "public"."schizophrenia_wais4_efficience" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update schizophrenia_wais4_similitudes responses" ON "public"."schizophrenia_wais4_similitudes" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update schizophrenia_ybocs" ON "public"."schizophrenia_ybocs" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update schizophrenia_ymrs" ON "public"."schizophrenia_ymrs" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals update somatic contraceptive" ON "public"."treatment_somatic_contraceptive" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update sstics responses" ON "public"."schizophrenia_sstics" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update stori responses" ON "public"."schizophrenia_stori" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update wurs25 responses" ON "public"."schizophrenia_wurs25" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all IPAQ responses" ON "public"."schizophrenia_ipaq" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all PSQI responses" ON "public"."schizophrenia_psqi" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -13574,13 +19023,133 @@ CREATE POLICY "Professionals view all bipolar_ymrs" ON "public"."bipolar_ymrs" F
 
 
 
+CREATE POLICY "Professionals view all cbq responses" ON "public"."schizophrenia_cbq" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all dacobs responses" ON "public"."schizophrenia_dacobs" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all ephp responses" ON "public"."schizophrenia_ephp" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all fagerstrom responses" ON "public"."schizophrenia_fagerstrom" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all matrices responses" ON "public"."schizophrenia_wais4_matrices" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals view all medications" ON "public"."patient_medications" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
 
 
+CREATE POLICY "Professionals view all presenteisme responses" ON "public"."schizophrenia_presenteisme" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all responses" ON "public"."schizophrenia_wais4_memoire_chiffres" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all schizophrenia_cgi" ON "public"."schizophrenia_cgi" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all schizophrenia_commissions responses" ON "public"."schizophrenia_commissions" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all schizophrenia_cvlt responses" ON "public"."schizophrenia_cvlt" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all schizophrenia_egf" ON "public"."schizophrenia_egf" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all schizophrenia_lis responses" ON "public"."schizophrenia_lis" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all schizophrenia_tmt responses" ON "public"."schizophrenia_tmt" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all schizophrenia_wais4_criteria responses" ON "public"."schizophrenia_wais4_criteria" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all schizophrenia_wais4_efficience responses" ON "public"."schizophrenia_wais4_efficience" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all schizophrenia_wais4_similitudes response" ON "public"."schizophrenia_wais4_similitudes" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all schizophrenia_ymrs" ON "public"."schizophrenia_ymrs" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals view all somatic contraceptive" ON "public"."treatment_somatic_contraceptive" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all sstics responses" ON "public"."schizophrenia_sstics" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all stori responses" ON "public"."schizophrenia_stori" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view all wurs25 responses" ON "public"."schizophrenia_wurs25" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -13616,7 +19185,31 @@ CREATE POLICY "Professionals view schizophrenia_bilan_biologique" ON "public"."s
 
 
 
+CREATE POLICY "Professionals view schizophrenia_bilan_social" ON "public"."schizophrenia_bilan_social" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view schizophrenia_bis" ON "public"."schizophrenia_bis" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view schizophrenia_brief_a_auto" ON "public"."schizophrenia_brief_a_auto" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals view schizophrenia_cdss" ON "public"."schizophrenia_cdss" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view schizophrenia_ctq" ON "public"."schizophrenia_ctq" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -13634,6 +19227,12 @@ CREATE POLICY "Professionals view schizophrenia_ecv" ON "public"."schizophrenia_
 
 
 
+CREATE POLICY "Professionals view schizophrenia_eq5d5l" ON "public"."schizophrenia_eq5d5l" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals view schizophrenia_eval_addictologique" ON "public"."schizophrenia_eval_addictologique" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
@@ -13641,6 +19240,12 @@ CREATE POLICY "Professionals view schizophrenia_eval_addictologique" ON "public"
 
 
 CREATE POLICY "Professionals view schizophrenia_isa" ON "public"."schizophrenia_isa" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view schizophrenia_mars" ON "public"."schizophrenia_mars" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -13682,6 +19287,12 @@ CREATE POLICY "Professionals view schizophrenia_screening_orientation" ON "publi
 
 
 
+CREATE POLICY "Professionals view schizophrenia_sqol" ON "public"."schizophrenia_sqol" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals view schizophrenia_suicide_history" ON "public"."schizophrenia_suicide_history" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
@@ -13707,6 +19318,12 @@ CREATE POLICY "Professionals view schizophrenia_troubles_comorbides" ON "public"
 
 
 CREATE POLICY "Professionals view schizophrenia_troubles_psychotiques" ON "public"."schizophrenia_troubles_psychotiques" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view schizophrenia_ybocs" ON "public"."schizophrenia_ybocs" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -14458,7 +20075,34 @@ ALTER TABLE "public"."schizophrenia_bars" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."schizophrenia_bilan_biologique" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "public"."schizophrenia_bilan_social" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_bis" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_brief_a_auto" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_cbq" ENABLE ROW LEVEL SECURITY;
+
+
 ALTER TABLE "public"."schizophrenia_cdss" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_cgi" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_commissions" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_ctq" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_cvlt" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_dacobs" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."schizophrenia_dossier_infirmier" ENABLE ROW LEVEL SECURITY;
@@ -14467,10 +20111,31 @@ ALTER TABLE "public"."schizophrenia_dossier_infirmier" ENABLE ROW LEVEL SECURITY
 ALTER TABLE "public"."schizophrenia_ecv" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "public"."schizophrenia_egf" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_ephp" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_eq5d5l" ENABLE ROW LEVEL SECURITY;
+
+
 ALTER TABLE "public"."schizophrenia_eval_addictologique" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "public"."schizophrenia_fagerstrom" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_ipaq" ENABLE ROW LEVEL SECURITY;
+
+
 ALTER TABLE "public"."schizophrenia_isa" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_lis" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_mars" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."schizophrenia_panss" ENABLE ROW LEVEL SECURITY;
@@ -14479,7 +20144,13 @@ ALTER TABLE "public"."schizophrenia_panss" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."schizophrenia_perinatalite" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "public"."schizophrenia_presenteisme" ENABLE ROW LEVEL SECURITY;
+
+
 ALTER TABLE "public"."schizophrenia_psp" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_psqi" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."schizophrenia_sas" ENABLE ROW LEVEL SECURITY;
@@ -14491,6 +20162,18 @@ ALTER TABLE "public"."schizophrenia_screening_diagnostic" ENABLE ROW LEVEL SECUR
 ALTER TABLE "public"."schizophrenia_screening_orientation" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "public"."schizophrenia_sogs" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_sqol" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_sstics" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_stori" ENABLE ROW LEVEL SECURITY;
+
+
 ALTER TABLE "public"."schizophrenia_suicide_history" ENABLE ROW LEVEL SECURITY;
 
 
@@ -14500,10 +20183,37 @@ ALTER TABLE "public"."schizophrenia_sumd" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."schizophrenia_tea_coffee" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "public"."schizophrenia_tmt" ENABLE ROW LEVEL SECURITY;
+
+
 ALTER TABLE "public"."schizophrenia_troubles_comorbides" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."schizophrenia_troubles_psychotiques" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_wais4_criteria" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_wais4_efficience" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_wais4_matrices" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_wais4_memoire_chiffres" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_wais4_similitudes" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_wurs25" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_ybocs" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_ymrs" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."treatment_somatic_contraceptive" ENABLE ROW LEVEL SECURITY;
@@ -14537,6 +20247,17 @@ CREATE POLICY "user_invitations_professional_insert" ON "public"."user_invitatio
 CREATE POLICY "user_invitations_view_own" ON "public"."user_invitations" FOR SELECT TO "authenticated" USING ((("invited_by" = "auth"."uid"()) OR (("email")::"text" = (( SELECT "user_profiles"."email"
    FROM "public"."user_profiles"
   WHERE ("user_profiles"."id" = "auth"."uid"())))::"text")));
+
+
+
+ALTER TABLE "public"."user_pathologies" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "user_pathologies_all_authenticated" ON "public"."user_pathologies" TO "authenticated" USING (true) WITH CHECK (true);
+
+
+
+CREATE POLICY "user_pathologies_select" ON "public"."user_pathologies" FOR SELECT TO "authenticated" USING (true);
 
 
 
@@ -14607,6 +20328,9 @@ CREATE POLICY "visits_center_isolation" ON "public"."visits" TO "authenticated" 
 
 
 ALTER PUBLICATION "supabase_realtime" OWNER TO "postgres";
+
+
+
 
 
 GRANT USAGE ON SCHEMA "public" TO "postgres";
@@ -14766,6 +20490,42 @@ GRANT USAGE ON SCHEMA "public" TO "service_role";
 
 
 
+
+
+
+
+
+
+GRANT ALL ON FUNCTION "public"."auto_assign_visit_number"() TO "anon";
+GRANT ALL ON FUNCTION "public"."auto_assign_visit_number"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."auto_assign_visit_number"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."generate_fondacode"("p_center_id" "uuid", "p_pathology_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."generate_fondacode"("p_center_id" "uuid", "p_pathology_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."generate_fondacode"("p_center_id" "uuid", "p_pathology_id" "uuid") TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."generate_fondacode_suffix"() TO "anon";
+GRANT ALL ON FUNCTION "public"."generate_fondacode_suffix"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."generate_fondacode_suffix"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."get_longitudinal_comparison"("p_visit_type" "public"."visit_type", "p_questionnaire_table" "text", "p_score_column" "text", "p_visit_numbers" integer[], "p_pathology_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."get_longitudinal_comparison"("p_visit_type" "public"."visit_type", "p_questionnaire_table" "text", "p_score_column" "text", "p_visit_numbers" integer[], "p_pathology_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_longitudinal_comparison"("p_visit_type" "public"."visit_type", "p_questionnaire_table" "text", "p_score_column" "text", "p_visit_numbers" integer[], "p_pathology_id" "uuid") TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."get_next_visit_number"("p_patient_id" "uuid", "p_visit_type" "public"."visit_type") TO "anon";
+GRANT ALL ON FUNCTION "public"."get_next_visit_number"("p_patient_id" "uuid", "p_visit_type" "public"."visit_type") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_next_visit_number"("p_patient_id" "uuid", "p_visit_type" "public"."visit_type") TO "service_role";
+
+
+
 GRANT ALL ON FUNCTION "public"."get_patient_profile_data"("p_patient_id" "uuid", "p_center_id" "uuid", "p_from_date" timestamp with time zone) TO "anon";
 GRANT ALL ON FUNCTION "public"."get_patient_profile_data"("p_patient_id" "uuid", "p_center_id" "uuid", "p_from_date" timestamp with time zone) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_patient_profile_data"("p_patient_id" "uuid", "p_center_id" "uuid", "p_from_date" timestamp with time zone) TO "service_role";
@@ -14775,6 +20535,12 @@ GRANT ALL ON FUNCTION "public"."get_patient_profile_data"("p_patient_id" "uuid",
 GRANT ALL ON FUNCTION "public"."get_professional_dashboard_data"("p_professional_id" "uuid", "p_center_id" "uuid", "p_pathology_type" "public"."pathology_type") TO "anon";
 GRANT ALL ON FUNCTION "public"."get_professional_dashboard_data"("p_professional_id" "uuid", "p_center_id" "uuid", "p_pathology_type" "public"."pathology_type") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_professional_dashboard_data"("p_professional_id" "uuid", "p_center_id" "uuid", "p_pathology_type" "public"."pathology_type") TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."get_questionnaire_data_by_visit_number"("p_visit_type" "public"."visit_type", "p_visit_number" integer, "p_questionnaire_table" "text", "p_pathology_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."get_questionnaire_data_by_visit_number"("p_visit_type" "public"."visit_type", "p_visit_number" integer, "p_questionnaire_table" "text", "p_pathology_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_questionnaire_data_by_visit_number"("p_visit_type" "public"."visit_type", "p_visit_number" integer, "p_questionnaire_table" "text", "p_pathology_id" "uuid") TO "service_role";
 
 
 
@@ -14796,6 +20562,12 @@ GRANT ALL ON FUNCTION "public"."get_visit_detail_data"("p_visit_id" "uuid") TO "
 
 
 
+GRANT ALL ON FUNCTION "public"."get_visits_by_type_and_number"("p_visit_type" "public"."visit_type", "p_visit_number" integer, "p_pathology_id" "uuid", "p_center_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."get_visits_by_type_and_number"("p_visit_type" "public"."visit_type", "p_visit_number" integer, "p_pathology_id" "uuid", "p_center_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_visits_by_type_and_number"("p_visit_type" "public"."visit_type", "p_visit_number" integer, "p_pathology_id" "uuid", "p_center_id" "uuid") TO "service_role";
+
+
+
 GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "anon";
 GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "service_role";
@@ -14811,6 +20583,78 @@ GRANT ALL ON FUNCTION "public"."is_admin"() TO "service_role";
 GRANT ALL ON FUNCTION "public"."is_manager"() TO "anon";
 GRANT ALL ON FUNCTION "public"."is_manager"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."is_manager"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."set_patient_fondacode"() TO "anon";
+GRANT ALL ON FUNCTION "public"."set_patient_fondacode"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."set_patient_fondacode"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_cbq_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_cbq_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_cbq_updated_at"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_commissions_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_commissions_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_commissions_updated_at"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_cvlt_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_cvlt_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_cvlt_updated_at"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_dacobs_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_dacobs_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_dacobs_updated_at"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_lis_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_lis_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_lis_updated_at"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_sstics_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_sstics_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_sstics_updated_at"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_tmt_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_tmt_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_tmt_updated_at"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_wais4_criteria_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_wais4_criteria_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_wais4_criteria_updated_at"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_wais4_efficience_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_wais4_efficience_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_wais4_efficience_updated_at"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_wais4_matrices_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_wais4_matrices_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_wais4_matrices_updated_at"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_wais4_similitudes_updated_at"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_wais4_similitudes_updated_at"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_schizophrenia_wais4_similitudes_updated_at"() TO "service_role";
 
 
 
@@ -15471,9 +21315,69 @@ GRANT ALL ON TABLE "public"."schizophrenia_bilan_biologique" TO "service_role";
 
 
 
+GRANT ALL ON TABLE "public"."schizophrenia_bilan_social" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_bilan_social" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_bilan_social" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_bis" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_bis" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_bis" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_brief_a_auto" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_brief_a_auto" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_brief_a_auto" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_brief_a_hetero" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_brief_a_hetero" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_brief_a_hetero" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_cbq" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_cbq" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_cbq" TO "service_role";
+
+
+
 GRANT ALL ON TABLE "public"."schizophrenia_cdss" TO "anon";
 GRANT ALL ON TABLE "public"."schizophrenia_cdss" TO "authenticated";
 GRANT ALL ON TABLE "public"."schizophrenia_cdss" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_cgi" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_cgi" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_cgi" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_commissions" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_commissions" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_commissions" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_ctq" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_ctq" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_ctq" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_cvlt" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_cvlt" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_cvlt" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_dacobs" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_dacobs" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_dacobs" TO "service_role";
 
 
 
@@ -15489,15 +21393,57 @@ GRANT ALL ON TABLE "public"."schizophrenia_ecv" TO "service_role";
 
 
 
+GRANT ALL ON TABLE "public"."schizophrenia_egf" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_egf" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_egf" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_ephp" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_ephp" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_ephp" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_eq5d5l" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_eq5d5l" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_eq5d5l" TO "service_role";
+
+
+
 GRANT ALL ON TABLE "public"."schizophrenia_eval_addictologique" TO "anon";
 GRANT ALL ON TABLE "public"."schizophrenia_eval_addictologique" TO "authenticated";
 GRANT ALL ON TABLE "public"."schizophrenia_eval_addictologique" TO "service_role";
 
 
 
+GRANT ALL ON TABLE "public"."schizophrenia_fagerstrom" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_fagerstrom" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_fagerstrom" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_ipaq" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_ipaq" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_ipaq" TO "service_role";
+
+
+
 GRANT ALL ON TABLE "public"."schizophrenia_isa" TO "anon";
 GRANT ALL ON TABLE "public"."schizophrenia_isa" TO "authenticated";
 GRANT ALL ON TABLE "public"."schizophrenia_isa" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_lis" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_lis" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_lis" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_mars" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_mars" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_mars" TO "service_role";
 
 
 
@@ -15513,9 +21459,21 @@ GRANT ALL ON TABLE "public"."schizophrenia_perinatalite" TO "service_role";
 
 
 
+GRANT ALL ON TABLE "public"."schizophrenia_presenteisme" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_presenteisme" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_presenteisme" TO "service_role";
+
+
+
 GRANT ALL ON TABLE "public"."schizophrenia_psp" TO "anon";
 GRANT ALL ON TABLE "public"."schizophrenia_psp" TO "authenticated";
 GRANT ALL ON TABLE "public"."schizophrenia_psp" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_psqi" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_psqi" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_psqi" TO "service_role";
 
 
 
@@ -15537,6 +21495,30 @@ GRANT ALL ON TABLE "public"."schizophrenia_screening_orientation" TO "service_ro
 
 
 
+GRANT ALL ON TABLE "public"."schizophrenia_sogs" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_sogs" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_sogs" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_sqol" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_sqol" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_sqol" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_sstics" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_sstics" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_sstics" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_stori" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_stori" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_stori" TO "service_role";
+
+
+
 GRANT ALL ON TABLE "public"."schizophrenia_suicide_history" TO "anon";
 GRANT ALL ON TABLE "public"."schizophrenia_suicide_history" TO "authenticated";
 GRANT ALL ON TABLE "public"."schizophrenia_suicide_history" TO "service_role";
@@ -15555,6 +21537,12 @@ GRANT ALL ON TABLE "public"."schizophrenia_tea_coffee" TO "service_role";
 
 
 
+GRANT ALL ON TABLE "public"."schizophrenia_tmt" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_tmt" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_tmt" TO "service_role";
+
+
+
 GRANT ALL ON TABLE "public"."schizophrenia_troubles_comorbides" TO "anon";
 GRANT ALL ON TABLE "public"."schizophrenia_troubles_comorbides" TO "authenticated";
 GRANT ALL ON TABLE "public"."schizophrenia_troubles_comorbides" TO "service_role";
@@ -15567,6 +21555,54 @@ GRANT ALL ON TABLE "public"."schizophrenia_troubles_psychotiques" TO "service_ro
 
 
 
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_criteria" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_criteria" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_criteria" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_efficience" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_efficience" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_efficience" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_matrices" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_matrices" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_matrices" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_memoire_chiffres" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_memoire_chiffres" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_memoire_chiffres" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_similitudes" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_similitudes" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_wais4_similitudes" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_wurs25" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_wurs25" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_wurs25" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_ybocs" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_ybocs" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_ybocs" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_ymrs" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_ymrs" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_ymrs" TO "service_role";
+
+
+
 GRANT ALL ON TABLE "public"."treatment_somatic_contraceptive" TO "anon";
 GRANT ALL ON TABLE "public"."treatment_somatic_contraceptive" TO "authenticated";
 GRANT ALL ON TABLE "public"."treatment_somatic_contraceptive" TO "service_role";
@@ -15576,6 +21612,12 @@ GRANT ALL ON TABLE "public"."treatment_somatic_contraceptive" TO "service_role";
 GRANT ALL ON TABLE "public"."user_invitations" TO "anon";
 GRANT ALL ON TABLE "public"."user_invitations" TO "authenticated";
 GRANT ALL ON TABLE "public"."user_invitations" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."user_pathologies" TO "anon";
+GRANT ALL ON TABLE "public"."user_pathologies" TO "authenticated";
+GRANT ALL ON TABLE "public"."user_pathologies" TO "service_role";
 
 
 

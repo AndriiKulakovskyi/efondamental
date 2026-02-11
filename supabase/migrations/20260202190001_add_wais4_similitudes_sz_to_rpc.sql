@@ -1,9 +1,0 @@
--- Migration: Add WAIS4_SIMILITUDES_SZ to get_visit_detail_data RPC function
--- This migration was applied via MCP and adds the WAIS4_SIMILITUDES_SZ questionnaire
--- tracking to the schizophrenia neuropsy module section of the RPC function.
---
--- Note: This migration restores the correct RPC function structure from migration
--- 20260202180000 and adds the new WAIS4_SIMILITUDES_SZ entry.
---
--- The full RPC function content was applied via MCP apply_migration tool.
--- See migration name: fix_rpc_wais4_similitudes_sz
