@@ -1,55 +1,62 @@
 /**
  * Patient Demographics Utilities
- * 
+ *
  * Centralized functions for calculating patient age and managing demographic data
  * used in questionnaire scoring.
  */
 
 /**
  * Calculate the precise age in years at a specific date.
- * 
+ *
  * @param dateOfBirth - Patient's date of birth (ISO string or Date)
  * @param targetDate - The date at which to calculate age (e.g., visit date)
  * @returns Age in complete years
  */
 export function calculateAgeAtDate(
   dateOfBirth: string | Date,
-  targetDate: string | Date
+  targetDate: string | Date,
 ): number {
-  const birthDate = typeof dateOfBirth === 'string' ? new Date(dateOfBirth) : dateOfBirth;
-  const refDate = typeof targetDate === 'string' ? new Date(targetDate) : targetDate;
-  
+  const birthDate =
+    typeof dateOfBirth === "string" ? new Date(dateOfBirth) : dateOfBirth;
+  const refDate =
+    typeof targetDate === "string" ? new Date(targetDate) : targetDate;
+
   let age = refDate.getFullYear() - birthDate.getFullYear();
   const monthDiff = refDate.getMonth() - birthDate.getMonth();
-  
+
   // Adjust age if birthday hasn't occurred yet in the target year
-  if (monthDiff < 0 || (monthDiff === 0 && refDate.getDate() < birthDate.getDate())) {
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && refDate.getDate() < birthDate.getDate())
+  ) {
     age--;
   }
-  
+
   return age;
 }
 
 /**
  * Normalize gender value to a consistent format.
  * Handles various input formats (M/F, male/female, homme/femme).
- * 
+ *
  * @param gender - Raw gender value from patient record
  * @returns Normalized gender code ('M' | 'F') or null if not recognized
  */
-export function normalizeGender(gender: string | null | undefined): 'M' | 'F' | null {
+export function normalizeGender(
+  gender: string | null | undefined,
+): "M" | "F" | null {
   if (!gender) return null;
-  
+
   const normalized = gender.toLowerCase().trim();
-  
-  if (normalized === 'male' || normalized === 'm' || normalized === 'homme') {
-    return 'M';
+
+  if (normalized === "male" || normalized === "m" || normalized === "homme") {
+    return "M";
   }
-  
-  if (normalized === 'female' || normalized === 'f' || normalized === 'femme') {
-    return 'F';
+
+  if (normalized === "female" || normalized === "f" || normalized === "femme") {
+    return "F";
   }
-  
+
   return null;
 }
 
@@ -60,9 +67,9 @@ export interface PatientDemographicsForVisit {
   /** Patient's age in years at the time of the visit */
   patient_age: number;
   /** Normalized gender code ('M' or 'F') */
-  patient_gender: 'M' | 'F' | null;
+  patient_gender: "M" | "F" | null;
   /** Gender code specifically for questionnaires using patient_sex field */
-  patient_sex: 'M' | 'F' | null;
+  patient_sex: "M" | "F" | null;
 }
 
 /**
@@ -71,49 +78,52 @@ export interface PatientDemographicsForVisit {
  */
 export const QUESTIONNAIRES_REQUIRING_DEMOGRAPHICS: string[] = [
   // WAIS-IV questionnaires (all require age for standardized scoring)
-  'WAIS4_CRITERIA',
-  'WAIS4_LEARNING',
-  'WAIS4_MATRICES',
-  'WAIS4_CODE',
-  'WAIS_IV_CODE_SYMBOLES_IVT', // Full version with Code, Symboles & IVT
-  'WAIS4_DIGIT_SPAN',
-  'WAIS4_SIMILITUDES',
-  
+  "WAIS4_CRITERIA",
+  "WAIS4_LEARNING",
+  "WAIS4_MATRICES",
+  "WAIS4_CODE",
+  "WAIS_IV_CODE_SYMBOLES_IVT", // Full version with Code, Symboles & IVT
+  "WAIS4_DIGIT_SPAN",
+  "WAIS4_SIMILITUDES",
+
   // WAIS-III questionnaires (all require age for standardized scoring)
-  'WAIS3_CRITERIA',
-  'WAIS3_LEARNING',
-  'WAIS3_VOCABULAIRE',
-  'WAIS3_MATRICES',
-  'WAIS3_CODE_SYMBOLES',
-  'WAIS3_DIGIT_SPAN',
-  'WAIS3_CPT2',
-  
+  "WAIS3_CRITERIA",
+  "WAIS3_LEARNING",
+  "WAIS3_VOCABULAIRE",
+  "WAIS3_MATRICES",
+  "WAIS3_CODE_SYMBOLES",
+  "WAIS3_DIGIT_SPAN",
+  "WAIS3_CPT2",
+
   // Schizophrenia WAIS-IV questionnaires (use neuro_age for scoring)
-  'WAIS4_CRITERIA_SZ',
-  'WAIS4_SIMILITUDES_SZ',  // Uses patient_age for age-based norm tables
-  'WAIS4_MEMOIRE_CHIFFRES_SZ',  // Uses patient_age for age-based norm tables and span Z-scores
-  
+  "WAIS4_CRITERIA_SZ",
+  "WAIS4_SIMILITUDES_SZ", // Uses patient_age for age-based norm tables
+  "WAIS4_MEMOIRE_CHIFFRES_SZ", // Uses patient_age for age-based norm tables and span Z-scores
+
   // Cognitive assessments (require age/sex/education for scoring)
-  'CVLT',
-  'CVLT_SZ',  // Schizophrenia CVLT
-  'TMT',
-  'TMT_SZ',   // Schizophrenia TMT
-  'COMMISSIONS_SZ',  // Schizophrenia Commissions (requires age, NSC is form field)
-  'STROOP',
-  'FLUENCES_VERBALES',
-  'TEST_COMMISSIONS',
-  'SCIP',
-  'COBRA',
-  'CPT3',
-  'MEM3_SPATIAL',
-  
+  "CVLT",
+  "CVLT_SZ", // Schizophrenia CVLT
+  "TMT",
+  "TMT_SZ", // Schizophrenia TMT
+  "COMMISSIONS_SZ", // Schizophrenia Commissions (requires age, NSC is form field)
+  "STROOP",
+  "FLUENCES_VERBALES",
+  "TEST_COMMISSIONS",
+  "SCIP",
+  "COBRA",
+  "CPT3",
+  "MEM3_SPATIAL",
+
   // Infirmier questionnaires
-  'BIOLOGICAL_ASSESSMENT',
-  'PHYSICAL_PARAMS',
-  'SLEEP_APNEA',
-  
+  "BIOLOGICAL_ASSESSMENT",
+  "PHYSICAL_PARAMS",
+  "SLEEP_APNEA",
+
   // Patient questionnaires requiring gender
-  'PRISE_M',
+  "PRISE_M",
+
+  // Schizophrenia hetero questionnaire requiring age band norms
+  "BRIEF_A_SZ",
 ];
 
 /**
@@ -121,8 +131,8 @@ export const QUESTIONNAIRES_REQUIRING_DEMOGRAPHICS: string[] = [
  * These need special handling to inject the age into the 'age' field.
  */
 export const QUESTIONNAIRES_USING_AGE_FIELD: string[] = [
-  'WAIS4_CRITERIA',
-  'WAIS3_CRITERIA',
+  "WAIS4_CRITERIA",
+  "WAIS3_CRITERIA",
 ];
 
 /**
@@ -130,8 +140,8 @@ export const QUESTIONNAIRES_USING_AGE_FIELD: string[] = [
  * CVLT specifically uses patient_sex with 'F'/'M' codes for regression-based Z-scores.
  */
 export const QUESTIONNAIRES_USING_PATIENT_SEX: string[] = [
-  'CVLT',
-  'CVLT_SZ',  // Schizophrenia CVLT
+  "CVLT",
+  "CVLT_SZ", // Schizophrenia CVLT
 ];
 
 /**
@@ -139,11 +149,11 @@ export const QUESTIONNAIRES_USING_PATIENT_SEX: string[] = [
  * These questionnaires need education level from patient profile for scoring.
  */
 export const QUESTIONNAIRES_USING_EDUCATION: string[] = [
-  'CVLT',
-  'CVLT_SZ',  // Schizophrenia CVLT
-  'TMT',
-  'TMT_SZ',   // Schizophrenia TMT
-  'FLUENCES_VERBALES',
+  "CVLT",
+  "CVLT_SZ", // Schizophrenia CVLT
+  "TMT",
+  "TMT_SZ", // Schizophrenia TMT
+  "FLUENCES_VERBALES",
 ];
 
 /**
@@ -152,7 +162,7 @@ export const QUESTIONNAIRES_USING_EDUCATION: string[] = [
  * Used by schizophrenia WAIS-IV questionnaires.
  */
 export const QUESTIONNAIRES_USING_NEURO_AGE_FIELD: string[] = [
-  'WAIS4_CRITERIA_SZ',
+  "WAIS4_CRITERIA_SZ",
 ];
 
 /**
@@ -161,12 +171,12 @@ export const QUESTIONNAIRES_USING_NEURO_AGE_FIELD: string[] = [
  * Used by schizophrenia neuropsy questionnaires.
  */
 export const QUESTIONNAIRES_USING_ANNEES_ETUDES_FIELD: string[] = [
-  'WAIS4_CRITERIA_SZ',
+  "WAIS4_CRITERIA_SZ",
 ];
 
 /**
  * Check if a questionnaire uses years_of_education field.
- * 
+ *
  * @param questionnaireCode - The questionnaire code to check
  * @returns True if the questionnaire uses years_of_education
  */
@@ -176,27 +186,31 @@ export function questionnaireUsesEducation(questionnaireCode: string): boolean {
 
 /**
  * Check if a questionnaire requires patient demographics.
- * 
+ *
  * @param questionnaireCode - The questionnaire code to check
  * @returns True if the questionnaire requires demographics
  */
-export function questionnaireRequiresDemographics(questionnaireCode: string): boolean {
+export function questionnaireRequiresDemographics(
+  questionnaireCode: string,
+): boolean {
   return QUESTIONNAIRES_REQUIRING_DEMOGRAPHICS.includes(questionnaireCode);
 }
 
 /**
  * Check if a questionnaire uses patient_sex field (vs patient_gender).
- * 
+ *
  * @param questionnaireCode - The questionnaire code to check
  * @returns True if the questionnaire uses patient_sex
  */
-export function questionnaireUsesPatientSex(questionnaireCode: string): boolean {
+export function questionnaireUsesPatientSex(
+  questionnaireCode: string,
+): boolean {
   return QUESTIONNAIRES_USING_PATIENT_SEX.includes(questionnaireCode);
 }
 
 /**
  * Check if a questionnaire uses 'age' field instead of 'patient_age'.
- * 
+ *
  * @param questionnaireCode - The questionnaire code to check
  * @returns True if the questionnaire uses the 'age' field
  */
@@ -206,21 +220,24 @@ export function questionnaireUsesAgeField(questionnaireCode: string): boolean {
 
 /**
  * Check if a questionnaire uses 'neuro_age' field instead of 'patient_age'.
- * 
+ *
  * @param questionnaireCode - The questionnaire code to check
  * @returns True if the questionnaire uses the 'neuro_age' field
  */
-export function questionnaireUsesNeuroAgeField(questionnaireCode: string): boolean {
+export function questionnaireUsesNeuroAgeField(
+  questionnaireCode: string,
+): boolean {
   return QUESTIONNAIRES_USING_NEURO_AGE_FIELD.includes(questionnaireCode);
 }
 
 /**
  * Check if a questionnaire uses 'annees_etudes' field instead of 'years_of_education'.
- * 
+ *
  * @param questionnaireCode - The questionnaire code to check
  * @returns True if the questionnaire uses the 'annees_etudes' field
  */
-export function questionnaireUsesAnneesEtudesField(questionnaireCode: string): boolean {
+export function questionnaireUsesAnneesEtudesField(
+  questionnaireCode: string,
+): boolean {
   return QUESTIONNAIRES_USING_ANNEES_ETUDES_FIELD.includes(questionnaireCode);
 }
-

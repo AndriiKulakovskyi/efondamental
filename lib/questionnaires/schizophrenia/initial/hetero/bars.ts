@@ -15,7 +15,8 @@ export interface SchizophreniaBarsResponse {
   q1?: number | null; // Prescribed doses per day
   q2?: number | null; // Days without treatment
   q3?: number | null; // Days with reduced dose
-  adherence_percentage?: number | null;
+  estimation_observance?: number | null;
+  adherence_score?: number | null;
   completed_by?: string | null;
   completed_at?: string | null;
   created_at?: string;
@@ -24,41 +25,67 @@ export interface SchizophreniaBarsResponse {
 
 export type SchizophreniaBarsResponseInsert = Omit<
   SchizophreniaBarsResponse,
-  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'adherence_percentage'
+  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'adherence_score'
 >;
 
 // ============================================================================
 // Questions
 // ============================================================================
 
+const SHOW_WHEN_TEST_DONE = { '==': [{ 'var': 'test_done' }, 'oui'] };
+
 export const BARS_QUESTIONS: Question[] = [
+  {
+    id: 'test_done',
+    text: 'Passation du questionnaire fait',
+    type: 'single_choice',
+    required: true,
+    options: [
+      { code: 'oui', label: 'Oui', score: 0 },
+      { code: 'non', label: 'Non', score: 1 }
+    ]
+  },
   {
     id: 'bars_instructions',
     text: 'Instructions',
     help: 'Administrer les trois questions au patient concernant sa prise de traitement au cours du mois dernier (30 derniers jours).',
     type: 'instruction',
-    required: false
+    required: false,
+    display_if: SHOW_WHEN_TEST_DONE
   },
   {
     id: 'q1',
     text: '1. Nombre de doses prescrites par jour',
     help: 'Quel est le nombre de doses prescrites par jour (connaissance qu\'en a le patient)',
     type: 'number',
-    required: false
+    required: false,
+    display_if: SHOW_WHEN_TEST_DONE
   },
   {
     id: 'q2',
     text: '2. Jours sans traitement',
     help: 'Nombre de jours le mois dernier pendant lesquels il n\'a pas pris le traitement prescrit',
     type: 'number',
-    required: false
+    required: false,
+    display_if: SHOW_WHEN_TEST_DONE
   },
   {
     id: 'q3',
     text: '3. Jours avec dose reduite',
     help: 'Nombre de jours le mois dernier pendant lesquels le patient a pris moins que la dose de traitement prescrite',
     type: 'number',
-    required: false
+    required: false,
+    display_if: SHOW_WHEN_TEST_DONE
+  },
+  {
+    id: 'estimation_observance',
+    text: 'A partir de ces questions, estimation de l\'observance (de traitement pris par le patient le mois dernier)',
+    help: 'Saisir une valeur entre 0 et 100',
+    type: 'number',
+    required: false,
+    min: 0,
+    max: 100,
+    display_if: SHOW_WHEN_TEST_DONE
   }
 ];
 

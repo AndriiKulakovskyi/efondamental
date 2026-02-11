@@ -2744,13 +2744,13 @@ export function QuestionnaireRenderer({
       return renderSection(question, questionnaire.questions, sectionNumber);
     }
 
-    // Handle instruction type (bold text with horizontal separator)
+    // Handle instruction type (using markdown parser for bold/newlines)
     if (question.type === 'instruction') {
       return (
         <div key={question.id} className="my-6">
-          <p className="text-base font-bold text-slate-800 mb-3">
-            {question.text}
-          </p>
+          <div className="text-base text-slate-800">
+            <MarkdownContent content={question.text} />
+          </div>
           <hr className="border-t-2 border-slate-300" />
         </div>
       );
