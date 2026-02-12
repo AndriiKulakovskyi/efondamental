@@ -755,7 +755,7 @@ export const TROUBLES_PSYCHOTIQUES_QUESTIONS: Question[] = [
   {
     id: "chk_tbpsychoan_modpec_nonmed_tcc",
     text: "Approche TCC",
-    type: "multi_choice",
+    type: "multiple_choice",
     required: false,
     options: START_END_OPTIONS,
     display_if: { "==": [{ var: "rad_tbpsychoan_modpec_nonmed" }, "Oui"] },
@@ -764,7 +764,7 @@ export const TROUBLES_PSYCHOTIQUES_QUESTIONS: Question[] = [
   {
     id: "chk_tbpsychoan_modpec_nonmed_remed",
     text: "Remediation des fonctions cognitives",
-    type: "multi_choice",
+    type: "multiple_choice",
     required: false,
     options: START_END_OPTIONS,
     display_if: { "==": [{ var: "rad_tbpsychoan_modpec_nonmed" }, "Oui"] },
@@ -773,7 +773,7 @@ export const TROUBLES_PSYCHOTIQUES_QUESTIONS: Question[] = [
   {
     id: "chk_tbpsychoan_modpec_nonmed_psychody",
     text: "Approche psychodynamique",
-    type: "multi_choice",
+    type: "multiple_choice",
     required: false,
     options: START_END_OPTIONS,
     display_if: { "==": [{ var: "rad_tbpsychoan_modpec_nonmed" }, "Oui"] },
@@ -782,7 +782,7 @@ export const TROUBLES_PSYCHOTIQUES_QUESTIONS: Question[] = [
   {
     id: "chk_tbpsychoan_modpec_nonmed_fam",
     text: "Approche familiale",
-    type: "multi_choice",
+    type: "multiple_choice",
     required: false,
     options: START_END_OPTIONS,
     display_if: { "==": [{ var: "rad_tbpsychoan_modpec_nonmed" }, "Oui"] },
@@ -807,7 +807,7 @@ export const TROUBLES_PSYCHOTIQUES_QUESTIONS: Question[] = [
   {
     id: "chk_aide_prise_tt",
     text: "Aide a la prise de traitement",
-    type: "multi_choice",
+    type: "multiple_choice",
     required: false,
     options: AIDE_PRISE_TRAITEMENT_OPTIONS,
   },
