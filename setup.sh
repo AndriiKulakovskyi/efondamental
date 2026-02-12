@@ -144,19 +144,127 @@ if npx supabase status &> /dev/null; then
     
     echo "   📊 $MIGRATION_COUNT migration(s) détectée(s)"
     echo ""
-    echo "   ℹ️  Avec Supabase local, les migrations sont gérées par la CLI"
-    echo "   📋 Pour appliquer/réappliquer les migrations:"
-    echo "      npx supabase db reset  # Reset complet avec seed"
+    echo "   ℹ️  Choisissez une option:"
     echo ""
-    
-    read -p "   Voulez-vous reset la base de données locale ? (y/N) " -n 1 -r
+    echo "   1) Appliquer uniquement les nouvelles migrations (CONSERVE vos données)"
+    echo "   2) Reset complet de la base de données (SUPPRIME toutes les données)"
+    echo "   3) Annuler"
+    echo ""
+    read -p "   Votre choix (1/2/3): " -n 1 -r
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo
+    
+    if [[ $REPLY == "1" ]]; then
+        echo "   🔄 Application des nouvelles migrations uniquement..."
         echo ""
-        echo "   🔄 Reset de la base de données locale..."
-        npx supabase db reset
+        
+        # Avec Supabase LOCAL, la seule façon propre d'appliquer les migrations
+        # est de les exécuter manuellement via psql en respectant l'ordre
+        
+        DB_PORT="54322"
+        DB_URL="postgresql://postgres:postgres@127.0.0.1:${DB_PORT}/postgres"
+        
+        echo "   📍 Connexion à la base locale: 127.0.0.1:$DB_PORT"
+        
+        # Vérifier la connexion
+        if ! psql "$DB_URL" -c "SELECT 1" > /dev/null 2>&1; then
+            echo "   ❌ Impossible de se connecter à la base de données locale"
+            echo "   ℹ️  Vérifiez que Supabase local est démarré: npx supabase status"
+            exit 1
+        fi
+        
+        echo "   ✅ Connexion établie"
         echo ""
-        echo "   ✅ Base de données réinitialisée avec toutes les migrations et le seed"
+        
+        # Lister les migrations et les appliquer dans l'ordre
+        APPLIED=0
+        SKIPPED=0
+        TOTAL=0
+        
+        echo "   🔍 Scan des migrations..."
+        
+        # Utiliser find au lieu de glob pour éviter les problèmes de buffering
+        while IFS= read -r migration_file; do
+            ((TOTAL++))
+            migration_name=$(basename "$migration_file")
+            
+            # Skip le fichier d'init complet
+            if [[ "$migration_name" == "000_complete_init.sql" ]]; then
+                continue
+            fi
+            
+            # Extraire le timestamp de la migration (format: YYYYMMDDHHMMSS)
+            migration_version="${migration_name%.sql}"
+            
+            echo "   → $migration_name"
+            
+            # Vérifier si déjà appliquée
+            ALREADY_APPLIED=$(psql "$DB_URL" -tAc "SELECT COUNT(*) FROM supabase_migrations.schema_migrations WHERE version = '$migration_version';" 2>/dev/null || echo "0")
+            
+            if [[ "$ALREADY_APPLIED" -gt 0 ]]; then
+                echo "      ⏭️  Déjà appliquée"
+                ((SKIPPED++))
+            else
+                echo "      🔄 Application en cours..."
+                
+                # Appliquer la migration
+                if psql "$DB_URL" -f "$migration_file" > /tmp/migration_output.log 2>&1; then
+                    # Enregistrer dans la table de tracking
+                    psql "$DB_URL" -c "INSERT INTO supabase_migrations.schema_migrations (version, name, statements) VALUES ('$migration_version', '$migration_name', ARRAY[]::text[]);" > /dev/null 2>&1
+                    
+                    echo "      ✅ Appliquée avec succès"
+                    ((APPLIED++))
+                else
+                    echo "      ❌ ERREUR lors de l'application"
+                    echo ""
+                    echo "      Détails de l'erreur:"
+                    head -10 /tmp/migration_output.log | sed 's/^/         /'
+                    echo ""
+                    
+                    read -p "      Continuer malgré l'erreur ? (y/N) " -n 1 -r
+                    echo
+                    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                        echo "   ❌ Arrêt de l'application des migrations"
+                        exit 1
+                    fi
+                fi
+            fi
+        done < <(find supabase/migrations -name "*.sql" -type f | sort)
+        
+        echo ""
+        echo "   📊 Résumé:"
+        echo "      📁 Total traité: $TOTAL"
+        echo "      ✅ Appliquées: $APPLIED"
+        echo "      ⏭️  Déjà présentes: $SKIPPED"
+        
+        if [ $APPLIED -eq 0 ] && [ $SKIPPED -eq 0 ]; then
+            echo ""
+            echo "   ⚠️  Aucune migration n'a été traitée"
+            echo "   ℹ️  Vérifiez que les fichiers de migration existent dans supabase/migrations/"
+        elif [ $APPLIED -eq 0 ]; then
+            echo ""
+            echo "   ℹ️  Toutes les migrations sont déjà appliquées"
+        fi
+        
+        echo ""
+        echo "   ℹ️  Vos données de test ont été conservées"
+    elif [[ $REPLY == "2" ]]; then
+        echo "   ⚠️  ATTENTION: Cette opération va SUPPRIMER toutes vos données de test !"
+        echo ""
+        read -p "   Confirmer le reset complet ? (tapez 'RESET' en majuscules): " -r
+        echo
+        
+        if [[ $REPLY == "RESET" ]]; then
+            echo ""
+            echo "   🔄 Reset complet de la base de données locale..."
+            npx supabase db reset
+            echo ""
+            echo "   ✅ Base de données réinitialisée avec toutes les migrations et le seed"
+        else
+            echo "   ❌ Reset annulé"
+        fi
+    else
+        echo "   ℹ️  Opération annulée - aucune modification apportée"
     fi
     
     MIGRATION_SUCCESS=$MIGRATION_COUNT
