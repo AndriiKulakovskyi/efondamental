@@ -256,6 +256,7 @@ function questionnaireCodeToSchizophreniaKey(code: string): string | null {
     // Medical evaluation
     'TROUBLES_PSYCHOTIQUES': 'TROUBLES_PSYCHOTIQUES',
     'TROUBLES_COMORBIDES_SZ': 'TROUBLES_COMORBIDES_SZ',
+    'ISA': 'ISA_SZ',  // Map ISA to ISA_SZ for schizophrenia
     'ISA_SZ': 'ISA_SZ',
     'SUICIDE_HISTORY_SZ': 'SUICIDE_HISTORY_SZ',
     'ANTECEDENTS_FAMILIAUX_PSY_SZ': 'ANTECEDENTS_FAMILIAUX_PSY_SZ',
@@ -586,10 +587,10 @@ export async function submitProfessionalQuestionnaireAction(
         // Filter out fields that are injected for form computation but may not be DB columns
         const { patient_gender, male_gender, patient_age, weight_kg, years_of_education, ...filteredResponses } = responses;
         
+        // Note: Most schizophrenia tables don't have completed_by column - it's omitted from insert
         const result = await saveSchizophreniaInitialResponse(schizophreniaKey, {
           visit_id: visitId,
           patient_id: patientId,
-          completed_by: completedBy,
           ...filteredResponses
         });
         
