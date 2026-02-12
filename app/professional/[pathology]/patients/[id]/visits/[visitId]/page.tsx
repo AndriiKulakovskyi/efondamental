@@ -141,6 +141,7 @@ import {
   EGF_SZ_DEFINITION,
   ECV_DEFINITION,
   TROUBLES_PSYCHOTIQUES_DEFINITION,
+  ISA_SZ_DEFINITION,
   SUICIDE_HISTORY_SZ_DEFINITION,
   ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
   SZ_PERINATALITE_DEFINITION,
@@ -475,11 +476,11 @@ export default async function VisitDetailPage({
               name: 'Suicide',
               questionnaires: [
                 {
-                  ...ISA_DEFINITION,
-                  id: ISA_DEFINITION.code,
+                  ...ISA_SZ_DEFINITION,
+                  id: ISA_SZ_DEFINITION.code,
                   target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['ISA']?.completed || false,
-                  completedAt: questionnaireStatuses['ISA']?.completed_at,
+                  completed: questionnaireStatuses['ISA_SZ']?.completed || false,
+                  completedAt: questionnaireStatuses['ISA_SZ']?.completed_at,
                 },
                 {
                   ...SUICIDE_HISTORY_SZ_DEFINITION,

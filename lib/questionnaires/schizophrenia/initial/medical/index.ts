@@ -42,3 +42,10 @@ export {
   type SchizophreniaEcvResponse,
   type SchizophreniaEcvResponseInsert
 } from './ecv';
+
+export {
+  ISA_SZ_QUESTIONS,
+  ISA_SZ_DEFINITION,
+  type SchizophreniaIsaResponse,
+  type SchizophreniaIsaResponseInsert
+} from './isa';
