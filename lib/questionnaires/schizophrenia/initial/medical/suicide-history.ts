@@ -36,20 +36,20 @@ export type SchizophreniaSuicideHistoryResponseInsert = Omit<
 export const SUICIDE_HISTORY_SZ_QUESTIONS: Question[] = [
   {
     id: 'q1_first_attempt_date',
-    text: 'Date de la premiere tentative de suicide',
+    text: 'Date de la première tentative de suicide',
     type: 'date',
     required: false
   },
   {
     id: 'q2_attempt_count',
-    text: 'Combien de fois avez-vous tente de vous suicider ?',
+    text: 'Combien de fois avez-vous tenté de vous suicider ?',
     type: 'number',
     required: false,
     min: 0
   },
   {
     id: 'q3_attempt_count_12m',
-    text: 'Combien de fois avez-vous tente de vous suicider au cours des 12 derniers mois ?',
+    text: 'Combien de fois avez-vous tenté de vous suicider au cours des 12 derniers mois ?',
     type: 'number',
     required: false,
     min: 0
@@ -76,7 +76,7 @@ export const SUICIDE_HISTORY_SZ_QUESTIONS: Question[] = [
   },
   {
     id: 'q5_serious_attempts',
-    text: '2. Existe-t-il des tentatives de suicide graves (passage en reanimation) non violentes (medicamenteuses, phlebotomie) ?',
+    text: '2. Existe-t-il des tentatives de suicide graves (passage en réanimation) non violentes (médicamenteuses, phlébotomie) ?',
     type: 'single_choice',
     required: false,
     options: [
