@@ -2,6 +2,7 @@
 // Handles all questionnaire data operations for schizophrenia initial visits
 
 import { createClient } from "@/lib/supabase/server";
+import { computeSapsScores } from "@/lib/questionnaires/schizophrenia/initial/hetero/saps";
 import { calculateCvltScores, CvltRawData } from "@/lib/services/cvlt-scoring";
 import { BRIEF_NORMS_HETERO } from "@/lib/constants/brief-a/hetero";
 import { AgeBand, NormPoint } from "@/lib/constants/brief-a/types";
@@ -40,6 +41,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   CDSS: "schizophrenia_cdss",
   BARS: "schizophrenia_bars",
   SUMD: "schizophrenia_sumd",
+  SAPS: "schizophrenia_saps",
   AIMS: "schizophrenia_aims",
   BARNES: "schizophrenia_barnes",
   SAS: "schizophrenia_sas",
@@ -47,6 +49,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   YMRS_SZ: "schizophrenia_ymrs",
   CGI_SZ: "schizophrenia_cgi",
   EGF_SZ: "schizophrenia_egf",
+
 
   // Medical evaluation module
   TROUBLES_PSYCHOTIQUES: "schizophrenia_troubles_psychotiques",
@@ -155,6 +158,8 @@ export async function saveSchizophreniaInitialResponse<
       return (await saveBarsResponse(response)) as any as T;
     case "SUMD":
       return (await saveSumdResponse(response)) as any as T;
+    case "SAPS":
+      return (await saveSapsResponse(response)) as any as T;
     case "AIMS":
       return (await saveAimsResponse(response)) as any as T;
     case "BARNES":
@@ -307,6 +312,11 @@ export async function getBarsResponse(visitId: string) {
 export async function getSumdResponse(visitId: string) {
   return getSchizophreniaInitialResponse("SUMD", visitId);
 }
+
+export async function getSapsResponse(visitId: string) {
+  return getSchizophreniaInitialResponse("SAPS", visitId);
+}
+
 
 export async function getAimsResponse(visitId: string) {
   return getSchizophreniaInitialResponse("AIMS", visitId);
@@ -739,7 +749,7 @@ export async function saveSumdResponse(response: any): Promise<any> {
   };
 
   // Compute awareness score (average of conscience items, excluding 0 values)
-  const conscienceItems = [
+  const conscienceRawItems = [
     dataWithAttribution.conscience1,
     dataWithAttribution.conscience2,
     dataWithAttribution.conscience3,
@@ -749,28 +759,43 @@ export async function saveSumdResponse(response: any): Promise<any> {
     dataWithAttribution.conscience7,
     dataWithAttribution.conscience8,
     dataWithAttribution.conscience9,
-  ].filter((v): v is number => v !== null && v !== undefined && v > 0);
+  ];
 
-  const awareness_score =
-    conscienceItems.length > 0
-      ? conscienceItems.reduce((sum, v) => sum + v, 0) / conscienceItems.length
-      : null;
+  const allConscienceAnswered = conscienceRawItems.every(
+    (v) => v !== null && v !== undefined,
+  );
+
+  let awareness_score: number | null = null;
+  if (allConscienceAnswered) {
+    const validItems = (conscienceRawItems as number[]).filter((v) => v > 0);
+    awareness_score =
+      validItems.length > 0
+        ? validItems.reduce((sum, v) => sum + v, 0) / validItems.length
+        : null;
+  }
 
   // Compute attribution score (average of attribution items, excluding 0 values)
-  const attributionItems = [
+  const attributionRawItems = [
     attribu4,
     attribu5,
     attribu6,
     attribu7,
     attribu8,
     attribu9,
-  ].filter((v): v is number => v !== null && v !== undefined && v > 0);
+  ];
 
-  const attribution_score =
-    attributionItems.length > 0
-      ? attributionItems.reduce((sum, v) => sum + v, 0) /
-        attributionItems.length
-      : null;
+  const allAttributionAnswered = attributionRawItems.every(
+    (v) => v !== null && v !== undefined,
+  );
+
+  let attribution_score: number | null = null;
+  if (allAttributionAnswered) {
+    const validItems = (attributionRawItems as number[]).filter((v) => v > 0);
+    attribution_score =
+      validItems.length > 0
+        ? validItems.reduce((sum, v) => sum + v, 0) / validItems.length
+        : null;
+  }
 
   // Store individual conscience scores for items 1-3 (matching v3 behavior)
   const score_conscience1 = dataWithAttribution.conscience1 ?? null;
@@ -806,6 +831,59 @@ export async function saveSumdResponse(response: any): Promise<any> {
 }
 
 /**
+ * Save SAPS response with scoring calculation
+ */
+export async function saveSapsResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    section_hallucinations,
+    section_delusions,
+    section_bizarre_behavior,
+    section_thought_disorder,
+    ...responseData
+  } = response;
+
+  // Use centralized scoring function
+  const scores = computeSapsScores(responseData);
+  const {
+    hallucinations_subscore,
+    delusions_subscore,
+    bizarre_behavior_subscore,
+    thought_disorder_subscore,
+    subscores_sum,
+    global_evaluations_score,
+    total_score
+  } = scores;
+
+  const { data, error } = await supabase
+    .from("schizophrenia_saps")
+    .upsert(
+      {
+        ...responseData,
+        hallucinations_subscore,
+        delusions_subscore,
+        bizarre_behavior_subscore,
+        thought_disorder_subscore,
+        subscores_sum,
+        global_evaluations_score,
+        total_score,
+        test_done: response.test_done === 1,
+        completed_by: user.data.user?.id,
+      },
+      { onConflict: "visit_id" },
+    )
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+
+/**
  * Save AIMS response with movement score calculation
  */
 export async function saveAimsResponse(response: any): Promise<any> {
@@ -831,14 +909,14 @@ export async function saveAimsResponse(response: any): Promise<any> {
     responseData.q6,
     responseData.q7,
   ];
-  const answeredItems = movementItems.filter(
+  const allAnswered = movementItems.every(
     (item) => item !== null && item !== undefined,
   );
 
   let movement_score: number | null = null;
   let interpretation: string | null = null;
 
-  if (answeredItems.length > 0) {
+  if (allAnswered) {
     const computedScore = movementItems.reduce(
       (sum, item) => sum + (item ?? 0),
       0,
@@ -911,11 +989,16 @@ export async function saveBarnesResponse(response: any): Promise<any> {
   let global_score: number | null = null;
   let interpretation: string | null = null;
 
-  if (q1 !== null || q2 !== null || q3 !== null) {
+  const componentItems = [q1, q2, q3];
+  const allComponentAnswered = componentItems.every(
+    (item) => item !== null && item !== undefined,
+  );
+
+  if (allComponentAnswered) {
     objective_subjective_score = (q1 ?? 0) + (q2 ?? 0) + (q3 ?? 0);
   }
 
-  if (q4 !== null) {
+  if (q4 !== null && q4 !== undefined) {
     global_score = q4;
 
     switch (q4) {
@@ -1424,7 +1507,11 @@ function calculateSqolSubscale(
     if (notConcerned === true) continue; // Skip excluded items
 
     const value = responses[qId];
-    if (value !== null && value !== undefined && typeof value === "number") {
+    if (value === null || value === undefined) {
+      return null; // Strict rule: return null if any contributing item is missing
+    }
+
+    if (typeof value === "number") {
       sum += value;
       validCount++;
     }

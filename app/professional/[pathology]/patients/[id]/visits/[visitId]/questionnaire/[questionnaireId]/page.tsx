@@ -133,6 +133,7 @@ import {
   YMRS_SZ_DEFINITION,
   CGI_SZ_DEFINITION,
   EGF_SZ_DEFINITION,
+  SAPS_DEFINITION,
   ECV_DEFINITION,
   TROUBLES_PSYCHOTIQUES_DEFINITION,
   ISA_SZ_DEFINITION,
@@ -293,6 +294,7 @@ import {
   getAimsResponse,
   getBarnesResponse,
   getSasResponse,
+  getSapsResponse,
   getPspResponse,
   getEcvResponse,
   getTroublesPsychotiquesResponse,
@@ -710,6 +712,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === YMRS_SZ_DEFINITION.code) questionnaire = YMRS_SZ_DEFINITION;
   else if (code === CGI_SZ_DEFINITION.code) questionnaire = CGI_SZ_DEFINITION;
   else if (code === EGF_SZ_DEFINITION.code) questionnaire = EGF_SZ_DEFINITION;
+  else if (code === SAPS_DEFINITION.code) questionnaire = SAPS_DEFINITION;
   // Schizophrenia medical evaluation
   else if (code === ECV_DEFINITION.code) questionnaire = ECV_DEFINITION;
   else if (code === TROUBLES_PSYCHOTIQUES_DEFINITION.code)
@@ -1019,6 +1022,8 @@ export default async function ProfessionalQuestionnairePage({
     existingResponse = await getBarnesResponse(visitId);
   else if (code === SAS_DEFINITION.code)
     existingResponse = await getSasResponse(visitId);
+  else if (code === SAPS_DEFINITION.code)
+    existingResponse = await getSapsResponse(visitId);
   else if (code === PSP_DEFINITION.code)
     existingResponse = await getPspResponse(visitId);
   else if (code === BRIEF_A_SZ_DEFINITION.code)

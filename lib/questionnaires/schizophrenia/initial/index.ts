@@ -12,9 +12,9 @@
 // Physical parameters, blood pressure, ECG, and biological assessment
 export * as nurse from './nurse';
 
-// Hetero module (8 questionnaires)
+// Hetero module (9 questionnaires)
 // Clinical rating scales for hetero-evaluation (clinician-administered)
-// PANSS, CDSS, BARS, SUMD, AIMS, Barnes, SAS, PSP
+// PANSS, CDSS, BARS, SUMD, SAPS, AIMS, Barnes, SAS, PSP
 export * as hetero from './hetero';
 
 // Medical module (6 questionnaires)

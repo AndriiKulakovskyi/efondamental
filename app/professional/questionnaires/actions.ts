@@ -240,7 +240,10 @@ async function shouldUseSchizophreniaTables(
 
   // Check if the visit is a schizophrenia initial evaluation
   const visit = await getVisitById(visitId);
-  if (!visit || visit.visit_type !== "initial_evaluation") {
+  if (
+    !visit ||
+    !["initial_evaluation", "annual_evaluation"].includes(visit.visit_type)
+  ) {
     return false;
   }
 
@@ -263,6 +266,7 @@ function questionnaireCodeToSchizophreniaKey(code: string): string | null {
     BARNES: "BARNES",
     SAS: "SAS",
     PSP: "PSP",
+    SAPS: "SAPS",
     YMRS_SZ: "YMRS_SZ",
     CGI_SZ: "CGI_SZ",
     EGF_SZ: "EGF_SZ",

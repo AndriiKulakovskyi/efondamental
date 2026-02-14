@@ -284,15 +284,22 @@ import {
 } from './bipolar-followup.service';
 import {
   getScreeningSzDiagnosticResponse,
-  getScreeningSzOrientationResponse,
-  getPanssResponse,
-  getCdssResponse
+  getScreeningSzOrientationResponse
 } from './questionnaire-schizophrenia.service';
 import {
   getSchizophreniaInitialCompletionStatus as checkSchizophreniaInitialCompletion,
   SCHIZOPHRENIA_INITIAL_TABLES,
   getDossierInfirmierSzResponse,
-  getBilanBiologiqueSzResponse
+  getBilanBiologiqueSzResponse,
+  getSapsResponse,
+  getPanssResponse,
+  getCdssResponse,
+  getBarsResponse,
+  getSumdResponse,
+  getAimsResponse,
+  getBarnesResponse,
+  getSasResponse,
+  getPspResponse
 } from './schizophrenia-initial.service';
 import { getPatientById } from './patient.service';
 
@@ -1605,17 +1612,44 @@ export async function getVisitCompletionStatus(visitId: string) {
     const pathologyType = patient?.pathology_type;
     
     if (pathologyType === 'schizophrenia') {
-      // Schizophrenia annual evaluation: 2 nurse questionnaires
-      total = 2;
-      totalModules = 1;
+      // Schizophrenia annual evaluation: 2 nurse questionnaires + 12 hetero-questionnaires = 14 total
+      total = 14;
+      totalModules = 2; // Nurse, Hetero
       
-      const [dossierInfirmier, bilanBiologique] = await Promise.all([
+      const [
+        dossierInfirmier, bilanBiologique,
+        panss, cdss, ymrs, cgi, egf, bars, sumd, saps, aims, barnes, sas, psp
+      ] = await Promise.all([
         getDossierInfirmierSzResponse(visitId),
-        getBilanBiologiqueSzResponse(visitId)
+        getBilanBiologiqueSzResponse(visitId),
+        getPanssResponse(visitId),
+        getCdssResponse(visitId),
+        getYmrsResponse(visitId),
+        getCgiResponse(visitId),
+        getEgfResponse(visitId),
+        getBarsResponse(visitId),
+        getSumdResponse(visitId),
+        getSapsResponse(visitId),
+        getAimsResponse(visitId),
+        getBarnesResponse(visitId),
+        getSasResponse(visitId),
+        getPspResponse(visitId)
       ]);
       
       if (dossierInfirmier) completed++;
       if (bilanBiologique) completed++;
+      if (panss) completed++;
+      if (cdss) completed++;
+      if (ymrs) completed++;
+      if (cgi) completed++;
+      if (egf) completed++;
+      if (bars) completed++;
+      if (sumd) completed++;
+      if (saps) completed++;
+      if (aims) completed++;
+      if (barnes) completed++;
+      if (sas) completed++;
+      if (psp) completed++;
     } else {
       // Bipolar annual evaluation: 7 infirmier + 7 thymic + 19 medical + 9 auto etat + 6 soin_suivi = 48 total
       total = 48;
