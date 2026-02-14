@@ -567,31 +567,39 @@ export const PANSS_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 
 export function computePanssScores(response: Partial<SchizophreniaPanssResponse>): {
-  positive_score: number;
-  negative_score: number;
-  general_score: number;
-  total_score: number;
+  positive_score: number | null;
+  negative_score: number | null;
+  general_score: number | null;
+  total_score: number | null;
 } {
-  const positive = [response.p1, response.p2, response.p3, response.p4, response.p5, response.p6, response.p7]
-    .filter((v): v is number => v !== null && v !== undefined)
-    .reduce((sum, v) => sum + v, 0);
+  const sumIfComplete = (values: (number | null | undefined)[]): number | null => {
+    if (values.some((v) => v === null || v === undefined)) return null;
+    return values.reduce<number>((sum, v) => sum + (v as number), 0);
+  };
+
+  const positive = sumIfComplete([
+    response.p1, response.p2, response.p3, response.p4, response.p5, response.p6, response.p7
+  ]);
   
-  const negative = [response.n1, response.n2, response.n3, response.n4, response.n5, response.n6, response.n7]
-    .filter((v): v is number => v !== null && v !== undefined)
-    .reduce((sum, v) => sum + v, 0);
+  const negative = sumIfComplete([
+    response.n1, response.n2, response.n3, response.n4, response.n5, response.n6, response.n7
+  ]);
   
-  const general = [
+  const general = sumIfComplete([
     response.g1, response.g2, response.g3, response.g4, response.g5, response.g6,
     response.g7, response.g8, response.g9, response.g10, response.g11, response.g12,
     response.g13, response.g14, response.g15, response.g16
-  ].filter((v): v is number => v !== null && v !== undefined)
-    .reduce((sum, v) => sum + v, 0);
+  ]);
   
+  const total = (positive !== null && negative !== null && general !== null) 
+    ? (positive + negative + general) 
+    : null;
+
   return {
     positive_score: positive,
     negative_score: negative,
     general_score: general,
-    total_score: positive + negative + general
+    total_score: total
   };
 }
 

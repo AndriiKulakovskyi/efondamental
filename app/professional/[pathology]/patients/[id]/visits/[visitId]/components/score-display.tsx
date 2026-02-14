@@ -96,6 +96,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return isPositive ? "warning" : "info";
     }
 
+    if (code === "SAPS") {
+      if (data.total_score >= 60) return "error";
+      if (data.total_score >= 30) return "warning";
+      return "info";
+    }
+
     if (code === "CTQ" || code === "CTQ_SZ") {
       // CTQ: Check if any subscale is severe
       const hasSevere = [
@@ -1089,6 +1095,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {code === "WAIS_IV_CODE_SYMBOLES_IVT" &&
                 "Résultats WAIS-IV Code, Symboles & IVT"}
               {code === "PANSS" && "Résultats PANSS"}
+              {code === "SAPS" && "Résultats SAPS"}
               {code === "CDSS" && "Résultats CDSS - Échelle de Calgary"}
               {code === "ISA_FOLLOWUP" &&
                 "Résultats ISA - Intentionnalité Suicidaire Actuelle (Suivi)"}
@@ -1201,6 +1208,8 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 ? (data.total_score !== undefined ? data.total_score : "-")
                 : code === "CDSS"
                 ? (data.total_score !== undefined ? data.total_score : "-")
+                : code === "SAPS"
+                ? (data.total_score !== undefined ? data.total_score : "-")
                 : code === "BARS"
                 ? (data.adherence_score !== undefined ? data.adherence_score : "-")
                 : code === "SUMD"
@@ -1285,6 +1294,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {code === "WAIS_IV_CODE_SYMBOLES_IVT" && (data.wais_ivt !== undefined && data.wais_ivt !== null ? "/150" : "/19")}
               {code === "PANSS" && "/210"}
               {code === "CDSS" && "/27"}
+              {code === "SAPS" && "/170"}
               {code === "ISA_FOLLOWUP" && "/5"}
               {code === "BARS" && "%"}
               {code === "SUMD" && ""}
@@ -6205,6 +6215,104 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <span className="font-bold text-lg">
                 {data.total_score ?? "-"}/27
               </span>
+            </div>
+          </div>
+        )}
+
+        {/* SAPS Details */}
+        {code === "SAPS" && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Core SAPS Scores */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">
+                Scores et sous-scores SAPS
+              </h5>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-600">
+                    Sous-score Hallucinations (items 1-6):
+                  </span>
+                  <span className="font-semibold">
+                    {data.hallucinations_subscore ?? "-"}/30
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-600">
+                    Sous-score Idées délirantes (items 8-19):
+                  </span>
+                  <span className="font-semibold">
+                    {data.delusions_subscore ?? "-"}/60
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-600">
+                    Sous-score Comportement bizarre (items 21-24):
+                  </span>
+                  <span className="font-semibold">
+                    {data.bizarre_behavior_subscore ?? "-"}/20
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-600">
+                    Sous-score Trouble pensée (items 26-33):
+                  </span>
+                  <span className="font-semibold">
+                    {data.thought_disorder_subscore ?? "-"}/40
+                  </span>
+                </div>
+                
+                <div className="flex justify-between items-center pt-2 border-t">
+                  <span className="text-gray-600 font-medium">
+                    Somme des sous-scores:
+                  </span>
+                  <span className="font-bold">
+                    {data.subscores_sum ?? "-"}/150
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 font-medium">
+                    Somme des évaluations globales (items 7, 20, 25, 34):
+                  </span>
+                  <span className="font-bold">
+                    {data.global_evaluations_score ?? "-"}/20
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center pt-2 border-t">
+                  <span className="text-gray-600 font-bold">
+                    Score total (somme de tous les items):
+                  </span>
+                  <span className="font-bold text-lg text-blue-700">
+                    {data.total_score ?? "-"}/170
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Global Items Details */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2 text-xs text-blue-800">
+                Evaluations globales
+              </h5>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500 italic">Hallucinations (q7):</span>
+                  <span className="font-medium">{data.q7 ?? "-"}/5</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500 italic">Idées délirantes (q20):</span>
+                  <span className="font-medium">{data.q20 ?? "-"}/5</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500 italic">Comportement bizarre (q25):</span>
+                  <span className="font-medium">{data.q25 ?? "-"}/5</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500 italic">Trouble pensée (q34):</span>
+                  <span className="font-medium">{data.q34 ?? "-"}/5</span>
+                </div>
+              </div>
             </div>
           </div>
         )}

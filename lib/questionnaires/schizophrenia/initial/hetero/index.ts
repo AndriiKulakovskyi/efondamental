@@ -42,6 +42,15 @@ export {
   type SchizophreniaSumdResponseInsert
 } from './sumd';
 
+// SAPS (Scale for the Assessment of Positive Symptoms)
+export {
+  SAPS_QUESTIONS,
+  SAPS_DEFINITION,
+  computeSapsScores,
+  type SchizophreniaSapsResponse,
+  type SchizophreniaSapsResponseInsert
+} from './saps';
+
 // AIMS (Abnormal Involuntary Movement Scale)
 export {
   AIMS_QUESTIONS,

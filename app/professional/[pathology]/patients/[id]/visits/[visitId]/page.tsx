@@ -135,6 +135,7 @@ import {
   BARNES_DEFINITION,
   SAS_DEFINITION,
   PSP_DEFINITION,
+  SAPS_DEFINITION,
   BRIEF_A_SZ_DEFINITION,
   YMRS_SZ_DEFINITION,
   CGI_SZ_DEFINITION,
@@ -399,6 +400,13 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['SUMD']?.completed || false,
               completedAt: questionnaireStatuses['SUMD']?.completed_at,
+            },
+            {
+              ...SAPS_DEFINITION,
+              id: SAPS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SAPS']?.completed || false,
+              completedAt: questionnaireStatuses['SAPS']?.completed_at,
             },
             {
               ...AIMS_DEFINITION,
@@ -1955,6 +1963,97 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['BILAN_BIOLOGIQUE_SZ']?.completed || false,
               completedAt: questionnaireStatuses['BILAN_BIOLOGIQUE_SZ']?.completed_at,
+            }
+          ]
+        },
+        {
+          id: 'mod_hetero',
+          name: 'Hétéro-questionnaires',
+          description: 'Échelles cliniques d\'hétéro-évaluation',
+          questionnaires: [
+            {
+              ...PANSS_DEFINITION,
+              id: PANSS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['PANSS']?.completed || false,
+              completedAt: questionnaireStatuses['PANSS']?.completed_at,
+            },
+            {
+              ...CDSS_DEFINITION,
+              id: CDSS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['CDSS']?.completed || false,
+              completedAt: questionnaireStatuses['CDSS']?.completed_at,
+            },
+            {
+              ...YMRS_SZ_DEFINITION,
+              id: YMRS_SZ_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['YMRS_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['YMRS_SZ']?.completed_at,
+            },
+            {
+              ...CGI_SZ_DEFINITION,
+              id: CGI_SZ_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['CGI_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['CGI_SZ']?.completed_at,
+            },
+            {
+              ...EGF_SZ_DEFINITION,
+              id: EGF_SZ_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['EGF_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['EGF_SZ']?.completed_at,
+            },
+            {
+              ...BARS_DEFINITION,
+              id: BARS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['BARS']?.completed || false,
+              completedAt: questionnaireStatuses['BARS']?.completed_at,
+            },
+            {
+              ...SUMD_DEFINITION,
+              id: SUMD_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SUMD']?.completed || false,
+              completedAt: questionnaireStatuses['SUMD']?.completed_at,
+            },
+            {
+              ...SAPS_DEFINITION,
+              id: SAPS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SAPS']?.completed || false,
+              completedAt: questionnaireStatuses['SAPS']?.completed_at,
+            },
+            {
+              ...AIMS_DEFINITION,
+              id: AIMS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['AIMS']?.completed || false,
+              completedAt: questionnaireStatuses['AIMS']?.completed_at,
+            },
+            {
+              ...BARNES_DEFINITION,
+              id: BARNES_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['BARNES']?.completed || false,
+              completedAt: questionnaireStatuses['BARNES']?.completed_at,
+            },
+            {
+              ...SAS_DEFINITION,
+              id: SAS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SAS']?.completed || false,
+              completedAt: questionnaireStatuses['SAS']?.completed_at,
+            },
+            {
+              ...PSP_DEFINITION,
+              id: PSP_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['PSP']?.completed || false,
+              completedAt: questionnaireStatuses['PSP']?.completed_at,
             }
           ]
         }
