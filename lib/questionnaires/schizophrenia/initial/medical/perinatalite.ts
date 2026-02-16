@@ -40,7 +40,7 @@ export type SchizophreniaPerinataliteResponseInsert = Omit<
 export const SZ_PERINATALITE_QUESTIONS: Question[] = [
   {
     id: 'q1_mother_age',
-    text: 'Age de la mere a la naissance (en annees)',
+    text: 'Age de la mère à la naissance (en années)',
     type: 'number',
     required: false,
     min: 10,
@@ -48,7 +48,7 @@ export const SZ_PERINATALITE_QUESTIONS: Question[] = [
   },
   {
     id: 'q2_father_age',
-    text: 'Age du pere a la naissance (en annees)',
+    text: 'Age du père à la naissance (en années)',
     type: 'number',
     required: false,
     min: 10,
@@ -60,15 +60,15 @@ export const SZ_PERINATALITE_QUESTIONS: Question[] = [
     type: 'single_choice',
     required: false,
     options: [
-      { code: 'premature', label: 'Prematurite', score: 0 },
-      { code: 'term', label: 'Ne a terme', score: 0 },
-      { code: 'post_mature', label: 'Post-maturite', score: 0 },
+      { code: 'premature', label: 'Prématurité', score: 0 },
+      { code: 'term', label: 'Né à terme', score: 0 },
+      { code: 'post_mature', label: 'Post-maturité', score: 0 },
       { code: 'unknown', label: 'Ne sais pas', score: 0 }
     ]
   },
   {
     id: 'q4_gestational_age',
-    text: 'L\'age gestationnel (en semaines d\'amenorrhee et revolues)',
+    text: 'L\'age gestationnel (en semaines d\'amenorrhée et révolues)',
     type: 'number',
     required: false,
     min: 22,
@@ -81,7 +81,7 @@ export const SZ_PERINATALITE_QUESTIONS: Question[] = [
     required: false,
     options: [
       { code: 'vaginal', label: 'Voie basse', score: 0 },
-      { code: 'cesarean', label: 'Cesarienne', score: 0 },
+      { code: 'cesarean', label: 'Césarienne', score: 0 },
       { code: 'unknown', label: 'Ne sais pas', score: 0 }
     ]
   },
@@ -106,7 +106,7 @@ export const SZ_PERINATALITE_QUESTIONS: Question[] = [
   },
   {
     id: 'q8_birth_environment',
-    text: 'Etes-vous ne dans un milieu',
+    text: 'Êtes-vous né dans un milieu',
     type: 'single_choice',
     required: false,
     options: [
@@ -117,7 +117,7 @@ export const SZ_PERINATALITE_QUESTIONS: Question[] = [
   },
   {
     id: 'q9_obstetric_complications',
-    text: 'Y a-t-il eu des complications obstetricales a votre naissance',
+    text: 'Y a-t-il eu des complications obstétricales à votre naissance',
     type: 'single_choice',
     required: false,
     options: [
@@ -128,7 +128,7 @@ export const SZ_PERINATALITE_QUESTIONS: Question[] = [
   },
   {
     id: 'q10_maternal_viral_infection',
-    text: 'Votre mere a-t-elle eu une infection virale pendant sa grossesse',
+    text: 'Votre mère a-t-elle eu une infection virale pendant sa grossesse',
     type: 'single_choice',
     required: false,
     options: [
@@ -139,19 +139,19 @@ export const SZ_PERINATALITE_QUESTIONS: Question[] = [
   },
   {
     id: 'q11_maternal_pregnancy_events',
-    text: 'Votre mere a-t-elle vecu un ou plusieurs de ces evenements au cours de sa grossesse ?',
+    text: 'Votre mère a-t-elle vécu un ou plusieurs de ces événements au cours de sa grossesse ?',
     type: 'multiple_choice',
     required: false,
     options: [
-      { code: 'deces_proche', label: 'Deces d\'un proche', score: 1 },
+      { code: 'deces_proche', label: 'Décès d\'un proche', score: 1 },
       { code: 'perte_travail', label: 'Perte du travail', score: 1 },
       { code: 'perte_travail_conjoint', label: 'Perte de travail du conjoint', score: 1 },
-      { code: 'separation_divorce', label: 'Separation/divorce', score: 1 },
-      { code: 'probleme_couple', label: 'Probleme de couple', score: 1 },
-      { code: 'difficultes_enfants', label: 'Difficultes avec ses enfants', score: 1 },
-      { code: 'probleme_argent', label: 'Probleme d\'argent', score: 1 },
-      { code: 'probleme_grossesse', label: 'Probleme lie a la grossesse', score: 1 },
-      { code: 'demenagement', label: 'Demenagement', score: 1 },
+      { code: 'separation_divorce', label: 'Séparation/divorce', score: 1 },
+      { code: 'probleme_couple', label: 'Problème de couple', score: 1 },
+      { code: 'difficultes_enfants', label: 'Difficultés avec ses enfants', score: 1 },
+      { code: 'probleme_argent', label: 'Problème d\'argent', score: 1 },
+      { code: 'probleme_grossesse', label: 'Problème lié à la grossesse', score: 1 },
+      { code: 'demenagement', label: 'Déménagement', score: 1 },
       { code: 'aucun', label: 'Aucun', score: 0 }
     ]
   }
