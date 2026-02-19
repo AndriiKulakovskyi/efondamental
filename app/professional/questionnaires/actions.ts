@@ -285,6 +285,7 @@ function questionnaireCodeToSchizophreniaKey(code: string): string | null {
     CVLT_SZ: "CVLT_SZ",
     TMT_SZ: "TMT_SZ",
     STROOP_SZ: "STROOP_SZ",
+    FLUENCES_VERBALES_SZ: "FLUENCES_VERBALES_SZ",
   };
 
   const mappedKey = mapping[code];
@@ -653,6 +654,7 @@ export async function submitProfessionalQuestionnaireAction(
           "CVLT_SZ",
           "TMT_SZ",
           "STROOP_SZ",
+          "FLUENCES_VERBALES_SZ",
         ];
         if (szNeuropsyTables.includes(schizophreniaKey)) {
           if (patient_age !== undefined) {

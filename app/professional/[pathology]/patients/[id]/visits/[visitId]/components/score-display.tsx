@@ -290,9 +290,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return "warning";
     }
 
-    if (code === "FLUENCES_VERBALES") {
-      // Fluences Verbales: Z-scores > 0 are above average
-      // Use the more impaired of the two tests for overall severity
+    if (code === "FLUENCES_VERBALES" || code === "FLUENCES_VERBALES_SZ") {
       const pZScore = data.fv_p_tot_correct_z ?? 0;
       const animZScore = data.fv_anim_tot_correct_z ?? 0;
       const worstZScore = Math.min(pZScore, animZScore);
@@ -934,7 +932,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
     }
   }
 
-  if (code === "FLUENCES_VERBALES" && !interpretation) {
+  if ((code === "FLUENCES_VERBALES" || code === "FLUENCES_VERBALES_SZ") && !interpretation) {
     const pZScore = data.fv_p_tot_correct_z ?? 0;
     const animZScore = data.fv_anim_tot_correct_z ?? 0;
 
@@ -1098,7 +1096,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 "Résultats LIS (Lecture d'Intentions Sociales)"}
               {code === "WAIS4_EFFICIENCE_SZ" &&
                 "Résultats Efficience Intellectuelle - WAIS-IV"}
-              {code === "FLUENCES_VERBALES" &&
+              {(code === "FLUENCES_VERBALES" || code === "FLUENCES_VERBALES_SZ") &&
                 "Résultats Fluences Verbales (Cardebat et al., 1990)"}
               {code === "WAIS4_CODE" && "Résultats WAIS-IV Code"}
               {code === "WAIS_IV_CODE_SYMBOLES_IVT" &&
@@ -1267,6 +1265,8 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 ? (data.total_score !== undefined ? data.total_score : "-")
                 : code === "EPHP_SZ"
                 ? (data.total_score !== undefined ? data.total_score : "-")
+                : (code === "FLUENCES_VERBALES" || code === "FLUENCES_VERBALES_SZ")
+                ? (data.fv_p_tot_correct !== undefined && data.fv_p_tot_correct !== null ? data.fv_p_tot_correct : "-")
                 : (data.total_score !== undefined ? data.total_score : "-")}
               {code === "ASRM" && "/20"}
               {code === "QIDS_SR16" && "/27"}
@@ -1299,6 +1299,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {(code === "CVLT" || code === "CVLT_SZ") && "/80"}
               {code === "TMT_SZ" && " (Partie A)"}
               {code === "STROOP_SZ" && " (Interférence)"}
+              {(code === "FLUENCES_VERBALES" || code === "FLUENCES_VERBALES_SZ") && " (Lettre P)"}
               {code === "COMMISSIONS_SZ" && " (Temps)"}
               {code === "LIS_SZ" && " (Score déviation)"}
               {code === "WAIS4_EFFICIENCE_SZ" && " (QI - Indice)"}
@@ -5959,7 +5960,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
         )}
 
         {/* Fluences Verbales Details */}
-        {code === "FLUENCES_VERBALES" && (
+        {(code === "FLUENCES_VERBALES" || code === "FLUENCES_VERBALES_SZ") && (
           <div className="text-sm space-y-3 mt-2 pt-2 border-t">
             {/* Phonemic Fluency (Letter P) */}
             <div>

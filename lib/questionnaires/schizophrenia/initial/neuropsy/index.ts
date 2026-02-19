@@ -21,6 +21,8 @@ export { LIS_SZ_DEFINITION, LIS_SZ_QUESTIONS } from './bloc2';
 export type { SchizophreniaLisResponse, SchizophreniaLisResponseInsert } from './bloc2';
 export { STROOP_SZ_DEFINITION, STROOP_SZ_QUESTIONS } from './bloc2';
 export type { SchizophreniaStroopResponse, SchizophreniaStroopResponseInsert } from './bloc2';
+export { FLUENCES_VERBALES_SZ_DEFINITION, FLUENCES_VERBALES_SZ_QUESTIONS } from './bloc2';
+export type { SchizophreniaFluencesVerbalesResponse, SchizophreniaFluencesVerbalesResponseInsert } from './bloc2';
 
 // WAIS-IV
 export { WAIS4_CRITERIA_SZ_DEFINITION, WAIS4_CRITERIA_SZ_QUESTIONS } from './wais4';

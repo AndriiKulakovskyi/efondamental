@@ -37,3 +37,10 @@ export {
   type SchizophreniaStroopResponse,
   type SchizophreniaStroopResponseInsert
 } from './stroop';
+
+export {
+  FLUENCES_VERBALES_SZ_QUESTIONS,
+  FLUENCES_VERBALES_SZ_DEFINITION,
+  type SchizophreniaFluencesVerbalesResponse,
+  type SchizophreniaFluencesVerbalesResponseInsert
+} from './fluences-verbales';

@@ -109,6 +109,7 @@ export const QUESTIONNAIRES_REQUIRING_DEMOGRAPHICS: string[] = [
   "STROOP",
   "STROOP_SZ",
   "FLUENCES_VERBALES",
+  "FLUENCES_VERBALES_SZ",
   "TEST_COMMISSIONS",
   "SCIP",
   "COBRA",
@@ -156,6 +157,7 @@ export const QUESTIONNAIRES_USING_EDUCATION: string[] = [
   "TMT_SZ", // Schizophrenia TMT
   "STROOP_SZ", // Schizophrenia Stroop
   "FLUENCES_VERBALES",
+  "FLUENCES_VERBALES_SZ",
 ];
 
 /**

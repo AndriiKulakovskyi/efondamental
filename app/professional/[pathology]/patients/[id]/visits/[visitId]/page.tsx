@@ -170,6 +170,7 @@ import {
   COMMISSIONS_SZ_DEFINITION,
   LIS_SZ_DEFINITION,
   STROOP_SZ_DEFINITION,
+  FLUENCES_VERBALES_SZ_DEFINITION,
   WAIS4_CRITERIA_SZ_DEFINITION,
   WAIS4_EFFICIENCE_SZ_DEFINITION,
   WAIS4_SIMILITUDES_SZ_DEFINITION,
@@ -625,6 +626,16 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['STROOP_SZ']?.completed || false,
               completedAt: questionnaireStatuses['STROOP_SZ']?.completed_at,
+            },
+            {
+              id: FLUENCES_VERBALES_SZ_DEFINITION.code,
+              code: FLUENCES_VERBALES_SZ_DEFINITION.code,
+              title: FLUENCES_VERBALES_SZ_DEFINITION.title,
+              description: FLUENCES_VERBALES_SZ_DEFINITION.description,
+              questions: FLUENCES_VERBALES_SZ_DEFINITION.questions,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['FLUENCES_VERBALES_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['FLUENCES_VERBALES_SZ']?.completed_at,
             }
           ],
           sections: [

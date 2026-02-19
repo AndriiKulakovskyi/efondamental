@@ -41,7 +41,7 @@ const QUESTIONNAIRES_WITH_SCORING = new Set([
   'WAIS4_MATRICES', 'WAIS4_MATRICES_SZ', 'WAIS4_SIMILITUDES', 'WAIS4_SIMILITUDES_SZ', 'WAIS4_MEMOIRE_CHIFFRES_SZ', 'SSTICS_SZ', 'CBQ_SZ', 'DACOBS_SZ', 'BRIEF_A_SZ', 'BRIEF_A_AUTO_SZ',
   'WAIS4_CRITERIA', 'WAIS4_LEARNING',   'CVLT', 'CVLT_SZ', 'TMT_SZ', 'STROOP_SZ', 'COMMISSIONS_SZ',
   'LIS_SZ', 'WAIS4_EFFICIENCE_SZ', 'WAIS4_CODE', 'WAIS_IV_CODE_SYMBOLES_IVT',
-  'WAIS4_DIGIT_SPAN', 'FLUENCES_VERBALES',
+  'WAIS4_DIGIT_SPAN', 'FLUENCES_VERBALES', 'FLUENCES_VERBALES_SZ',
   'WAIS3_VOCABULAIRE', 'WAIS3_VOCABULAIRE_FR',
   'WAIS3_MATRICES', 'WAIS3_MATRICES_FR',
   'SOCIAL',
@@ -312,14 +312,17 @@ export function QuestionnairePageClient({
       // Also add explicit fallbacks to ensure they always show scores
       // Normalize code to uppercase for consistent comparison
       const code = questionnaire.code?.toUpperCase() || '';
+      console.log('[Scoring] code:', code, 'inSet:', QUESTIONNAIRES_WITH_SCORING.has(code));
       const hasScoring = QUESTIONNAIRES_WITH_SCORING.has(code) || 
-                         code === 'WAIS4_MEMOIRE_CHIFFRES_SZ' ||  // Explicit fallback
-                         code === 'WAIS4_SIMILITUDES_SZ' ||       // Explicit fallback
-                         code === 'WAIS4_MATRICES_SZ' ||          // Explicit fallback
-                         code === 'SSTICS_SZ' ||                  // Explicit fallback
-                         code === 'CBQ_SZ' ||                     // Explicit fallback
-                         code === 'DACOBS_SZ' ||                  // Explicit fallback
-                         code === 'BRIEF_A_SZ';                   // Explicit fallback
+                         code === 'WAIS4_MEMOIRE_CHIFFRES_SZ' ||
+                         code === 'WAIS4_SIMILITUDES_SZ' ||
+                         code === 'WAIS4_MATRICES_SZ' ||
+                         code === 'SSTICS_SZ' ||
+                         code === 'CBQ_SZ' ||
+                         code === 'DACOBS_SZ' ||
+                         code === 'BRIEF_A_SZ' ||
+                         code === 'FLUENCES_VERBALES_SZ' ||
+                         code === 'STROOP_SZ';
 
       if (!hasScoring) {
         // No score page for this questionnaire - redirect back to visit

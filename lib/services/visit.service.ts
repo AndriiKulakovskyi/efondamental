@@ -261,6 +261,7 @@ import {
   COMMISSIONS_SZ_DEFINITION,
   LIS_SZ_DEFINITION,
   STROOP_SZ_DEFINITION,
+  FLUENCES_VERBALES_SZ_DEFINITION,
   WAIS4_CRITERIA_SZ_DEFINITION,
   WAIS4_EFFICIENCE_SZ_DEFINITION,
   WAIS4_SIMILITUDES_SZ_DEFINITION,
@@ -763,6 +764,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               title: STROOP_SZ_DEFINITION.title,
               description: STROOP_SZ_DEFINITION.description,
               questions: STROOP_SZ_DEFINITION.questions
+            },
+            {
+              id: FLUENCES_VERBALES_SZ_DEFINITION.id,
+              code: FLUENCES_VERBALES_SZ_DEFINITION.code,
+              title: FLUENCES_VERBALES_SZ_DEFINITION.title,
+              description: FLUENCES_VERBALES_SZ_DEFINITION.description,
+              questions: FLUENCES_VERBALES_SZ_DEFINITION.questions
             }
           ],
           sections: [

@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { computeSapsScores } from "@/lib/questionnaires/schizophrenia/initial/hetero/saps";
 import { calculateCvltScores, CvltRawData } from "@/lib/services/cvlt-scoring";
 import { calculateStroopScores } from "@/lib/services/stroop-scoring";
+import { calculateFluencesVerbalesScores } from "@/lib/services/fluences-verbales-scoring";
 import { BRIEF_NORMS_HETERO } from "@/lib/constants/brief-a/hetero";
 import { AgeBand, NormPoint } from "@/lib/constants/brief-a/types";
 
@@ -90,6 +91,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   COMMISSIONS_SZ: "schizophrenia_commissions",
   LIS_SZ: "schizophrenia_lis",
   STROOP_SZ: "schizophrenia_stroop",
+  FLUENCES_VERBALES_SZ: "schizophrenia_fluences_verbales",
 
   // Neuropsy module - WAIS-IV (Neuropsychological assessments)
   WAIS4_CRITERIA_SZ: "schizophrenia_wais4_criteria",
@@ -210,6 +212,8 @@ export async function saveSchizophreniaInitialResponse<
       return (await saveEphpSzResponse(response)) as any as T;
     case "STROOP_SZ":
       return (await saveStroopSzResponse(response)) as any as T;
+    case "FLUENCES_VERBALES_SZ":
+      return (await saveFluencesVerbalesSzResponse(response)) as any as T;
   }
 
   const supabase = await createClient();
@@ -4724,6 +4728,96 @@ export async function saveStroopSzResponse(response: any): Promise<any> {
 
   if (error) {
     console.error("Error saving schizophrenia_stroop:", error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// Fluences Verbales Functions (Neuropsy - Bloc 2)
+// ============================================================================
+
+export async function getFluencesVerbalesSzResponse(visitId: string): Promise<any | null> {
+  return getSchizophreniaInitialResponse("FLUENCES_VERBALES_SZ", visitId);
+}
+
+export async function saveFluencesVerbalesSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  let computedScores: any = {};
+
+  console.log('[FluencesVerbalesSZ] Scoring input check:', {
+    patient_age: response.patient_age,
+    years_of_education: response.years_of_education,
+    fv_p_tot_correct: response.fv_p_tot_correct,
+    fv_anim_tot_correct: response.fv_anim_tot_correct,
+    allPresent: response.patient_age != null && response.years_of_education != null && response.fv_p_tot_correct != null && response.fv_anim_tot_correct != null,
+  });
+
+  if (
+    response.patient_age != null &&
+    response.years_of_education != null &&
+    response.fv_p_tot_correct != null &&
+    response.fv_anim_tot_correct != null
+  ) {
+    computedScores = calculateFluencesVerbalesScores({
+      patient_age: response.patient_age,
+      years_of_education: response.years_of_education,
+      fv_p_tot_correct: response.fv_p_tot_correct,
+      fv_p_deriv: response.fv_p_deriv,
+      fv_p_intrus: response.fv_p_intrus,
+      fv_p_propres: response.fv_p_propres,
+      fv_anim_tot_correct: response.fv_anim_tot_correct,
+      fv_anim_deriv: response.fv_anim_deriv,
+      fv_anim_intrus: response.fv_anim_intrus,
+      fv_anim_propres: response.fv_anim_propres,
+    });
+    console.log('[FluencesVerbalesSZ] Computed scores:', computedScores);
+  }
+
+  const { data, error } = await supabase
+    .from("schizophrenia_fluences_verbales")
+    .upsert(
+      {
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        patient_age: response.patient_age,
+        years_of_education: response.years_of_education,
+        // Lettre P (Phonemic)
+        fv_p_tot_correct: response.fv_p_tot_correct,
+        fv_p_persev: response.fv_p_persev,
+        fv_p_deriv: response.fv_p_deriv,
+        fv_p_intrus: response.fv_p_intrus,
+        fv_p_propres: response.fv_p_propres,
+        fv_p_cluster_tot: response.fv_p_cluster_tot,
+        fv_p_cluster_taille: response.fv_p_cluster_taille,
+        fv_p_switch_tot: response.fv_p_switch_tot,
+        // Categorie Animaux (Semantic)
+        fv_anim_tot_correct: response.fv_anim_tot_correct,
+        fv_anim_persev: response.fv_anim_persev,
+        fv_anim_deriv: response.fv_anim_deriv,
+        fv_anim_intrus: response.fv_anim_intrus,
+        fv_anim_propres: response.fv_anim_propres,
+        fv_anim_cluster_tot: response.fv_anim_cluster_tot,
+        fv_anim_cluster_taille: response.fv_anim_cluster_taille,
+        fv_anim_switch_tot: response.fv_anim_switch_tot,
+        // Computed scores
+        fv_p_tot_rupregle: computedScores.fv_p_tot_rupregle ?? null,
+        fv_p_tot_correct_z: computedScores.fv_p_tot_correct_z ?? null,
+        fv_p_tot_correct_pc: computedScores.fv_p_tot_correct_pc ?? null,
+        fv_anim_tot_rupregle: computedScores.fv_anim_tot_rupregle ?? null,
+        fv_anim_tot_correct_z: computedScores.fv_anim_tot_correct_z ?? null,
+        fv_anim_tot_correct_pc: computedScores.fv_anim_tot_correct_pc ?? null,
+        completed_by: user.data.user?.id,
+      },
+      { onConflict: "visit_id" },
+    )
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error saving schizophrenia_fluences_verbales:", error);
     throw error;
   }
   return data;

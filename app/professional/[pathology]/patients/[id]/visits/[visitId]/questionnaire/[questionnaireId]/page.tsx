@@ -164,6 +164,7 @@ import {
   COMMISSIONS_SZ_DEFINITION,
   LIS_SZ_DEFINITION,
   STROOP_SZ_DEFINITION,
+  FLUENCES_VERBALES_SZ_DEFINITION,
   WAIS4_CRITERIA_SZ_DEFINITION,
   WAIS4_EFFICIENCE_SZ_DEFINITION,
   WAIS4_SIMILITUDES_SZ_DEFINITION,
@@ -327,6 +328,7 @@ import {
   getCommissionsSzResponse,
   getLisSzResponse,
   getStroopSzResponse,
+  getFluencesVerbalesSzResponse,
   getWais4CriteriaSzResponse,
   getWais4EfficienceSzResponse,
   getWais4SimilitudesSzResponse,
@@ -767,6 +769,7 @@ export default async function ProfessionalQuestionnairePage({
     questionnaire = COMMISSIONS_SZ_DEFINITION;
   else if (code === LIS_SZ_DEFINITION.code) questionnaire = LIS_SZ_DEFINITION;
   else if (code === STROOP_SZ_DEFINITION.code) questionnaire = STROOP_SZ_DEFINITION;
+  else if (code === FLUENCES_VERBALES_SZ_DEFINITION.code) questionnaire = FLUENCES_VERBALES_SZ_DEFINITION;
   else if (code === WAIS4_CRITERIA_SZ_DEFINITION.code)
     questionnaire = WAIS4_CRITERIA_SZ_DEFINITION;
   else if (code === WAIS4_EFFICIENCE_SZ_DEFINITION.code)
@@ -1105,6 +1108,8 @@ export default async function ProfessionalQuestionnairePage({
     existingResponse = await getLisSzResponse(visitId);
   else if (code === STROOP_SZ_DEFINITION.code)
     existingResponse = await getStroopSzResponse(visitId);
+  else if (code === FLUENCES_VERBALES_SZ_DEFINITION.code)
+    existingResponse = await getFluencesVerbalesSzResponse(visitId);
   else if (code === WAIS4_CRITERIA_SZ_DEFINITION.code)
     existingResponse = await getWais4CriteriaSzResponse(visitId);
   else if (code === WAIS4_EFFICIENCE_SZ_DEFINITION.code)
@@ -1410,6 +1415,15 @@ export default async function ProfessionalQuestionnairePage({
     );
   }
 
+  if (code === "FLUENCES_VERBALES_SZ" && existingResponse) {
+    delete initialResponses.fv_p_tot_rupregle;
+    delete initialResponses.fv_p_tot_correct_z;
+    delete initialResponses.fv_p_tot_correct_pc;
+    delete initialResponses.fv_anim_tot_rupregle;
+    delete initialResponses.fv_anim_tot_correct_z;
+    delete initialResponses.fv_anim_tot_correct_pc;
+  }
+
   // Inject patient demographics (age at visit date, gender) for questionnaires that require them
   const requiresDemographics = questionnaireRequiresDemographics(code);
   console.log(
@@ -1705,7 +1719,7 @@ export default async function ProfessionalQuestionnairePage({
 
   // Filter out score fields from Fluences Verbales questionnaire
   // Readonly score fields should only appear on the score page, not in the input form
-  if (code === "FLUENCES_VERBALES") {
+  if (code === "FLUENCES_VERBALES" || code === "FLUENCES_VERBALES_SZ") {
     const scoreFieldIds = [
       "fv_p_tot_rupregle",
       "fv_p_tot_correct_z",
@@ -1717,23 +1731,22 @@ export default async function ProfessionalQuestionnairePage({
     filteredQuestionnaire = {
       ...serializableQuestionnaire,
       questions: serializableQuestionnaire.questions.filter((q: any) => {
-        // Remove readonly score fields
         if (q.readonly && scoreFieldIds.includes(q.id)) {
           return false;
         }
-        // Keep all other questions
         return true;
       }),
     };
-    console.log(
-      "[Fluences Verbales Debug] Filtered out score fields. Original questions:",
-      serializableQuestionnaire.questions.length,
-      "Filtered:",
-      filteredQuestionnaire.questions.length,
-    );
   }
 
   // Debug logging for questionnaire being passed to client
+  if (code === "FLUENCES_VERBALES_SZ") {
+    console.log("[Page.tsx FLUENCES_VERBALES_SZ] Passing to client:", {
+      questionnaireCode: filteredQuestionnaire.code,
+      hasExistingResponse: !!existingResponse,
+      filteredQuestionnaireKeys: Object.keys(filteredQuestionnaire),
+    });
+  }
   if (code === "WAIS4_MEMOIRE_CHIFFRES_SZ") {
     console.log("[Page.tsx] Passing to client:", {
       questionnaireCode: filteredQuestionnaire.code,
