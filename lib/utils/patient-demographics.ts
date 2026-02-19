@@ -107,6 +107,7 @@ export const QUESTIONNAIRES_REQUIRING_DEMOGRAPHICS: string[] = [
   "TMT_SZ", // Schizophrenia TMT
   "COMMISSIONS_SZ", // Schizophrenia Commissions (requires age, NSC is form field)
   "STROOP",
+  "STROOP_SZ",
   "FLUENCES_VERBALES",
   "TEST_COMMISSIONS",
   "SCIP",
@@ -153,6 +154,7 @@ export const QUESTIONNAIRES_USING_EDUCATION: string[] = [
   "CVLT_SZ", // Schizophrenia CVLT
   "TMT",
   "TMT_SZ", // Schizophrenia TMT
+  "STROOP_SZ", // Schizophrenia Stroop
   "FLUENCES_VERBALES",
 ];
 
