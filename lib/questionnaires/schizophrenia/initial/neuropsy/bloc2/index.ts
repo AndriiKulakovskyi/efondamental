@@ -30,3 +30,10 @@ export {
   type SchizophreniaLisResponse,
   type SchizophreniaLisResponseInsert
 } from './lis';
+
+export {
+  STROOP_SZ_QUESTIONS,
+  STROOP_SZ_DEFINITION,
+  type SchizophreniaStroopResponse,
+  type SchizophreniaStroopResponseInsert
+} from './stroop';

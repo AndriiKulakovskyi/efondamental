@@ -260,6 +260,7 @@ import {
   TMT_SZ_DEFINITION,
   COMMISSIONS_SZ_DEFINITION,
   LIS_SZ_DEFINITION,
+  STROOP_SZ_DEFINITION,
   WAIS4_CRITERIA_SZ_DEFINITION,
   WAIS4_EFFICIENCE_SZ_DEFINITION,
   WAIS4_SIMILITUDES_SZ_DEFINITION,
@@ -755,6 +756,15 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           id: 'mod_neuropsy_sz',
           name: 'Evaluation Neuropsychologique',
           description: 'Évaluation neuropsychologique',
+          questionnaires: [
+            {
+              id: STROOP_SZ_DEFINITION.id,
+              code: STROOP_SZ_DEFINITION.code,
+              title: STROOP_SZ_DEFINITION.title,
+              description: STROOP_SZ_DEFINITION.description,
+              questions: STROOP_SZ_DEFINITION.questions
+            }
+          ],
           sections: [
             {
               id: 'bloc2',

@@ -4,6 +4,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { computeSapsScores } from "@/lib/questionnaires/schizophrenia/initial/hetero/saps";
 import { calculateCvltScores, CvltRawData } from "@/lib/services/cvlt-scoring";
+import { calculateStroopScores } from "@/lib/services/stroop-scoring";
 import { BRIEF_NORMS_HETERO } from "@/lib/constants/brief-a/hetero";
 import { AgeBand, NormPoint } from "@/lib/constants/brief-a/types";
 
@@ -88,6 +89,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   TMT_SZ: "schizophrenia_tmt",
   COMMISSIONS_SZ: "schizophrenia_commissions",
   LIS_SZ: "schizophrenia_lis",
+  STROOP_SZ: "schizophrenia_stroop",
 
   // Neuropsy module - WAIS-IV (Neuropsychological assessments)
   WAIS4_CRITERIA_SZ: "schizophrenia_wais4_criteria",
@@ -206,6 +208,8 @@ export async function saveSchizophreniaInitialResponse<
       return (await saveBriefAAutoSzResponse(response)) as any as T;
     case "EPHP_SZ":
       return (await saveEphpSzResponse(response)) as any as T;
+    case "STROOP_SZ":
+      return (await saveStroopSzResponse(response)) as any as T;
   }
 
   const supabase = await createClient();
@@ -4611,6 +4615,115 @@ export async function saveLisSzResponse(response: any): Promise<any> {
 
   if (error) {
     console.error("Error saving schizophrenia_lis:", error);
+    throw error;
+  }
+  return data;
+}
+
+// ============================================================================
+// Neuropsy Module - Bloc 2: Stroop Test (STROOP_SZ)
+// ============================================================================
+
+/**
+ * Get Stroop response for a visit
+ */
+export async function getStroopSzResponse(visitId: string): Promise<any | null> {
+  return getSchizophreniaInitialResponse("STROOP_SZ", visitId);
+}
+
+/**
+ * Save Stroop response with computed scores (age corrections, T-scores, Z-scores, interference)
+ * Uses the shared Stroop scoring service (Golden 1978)
+ */
+export async function saveStroopSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  const testDone = response.test_done === "oui" || response.test_done === true;
+
+  if (!testDone) {
+    const { data, error } = await supabase
+      .from("schizophrenia_stroop")
+      .upsert(
+        {
+          visit_id: response.visit_id,
+          patient_id: response.patient_id,
+          test_done: false,
+          completed_by: user.data.user?.id,
+        },
+        { onConflict: "visit_id" },
+      )
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error saving schizophrenia_stroop:", error);
+      throw error;
+    }
+    return data;
+  }
+
+  let computedScores: any = {};
+
+  if (
+    response.patient_age != null &&
+    response.stroop_w_tot != null &&
+    response.stroop_c_tot != null &&
+    response.stroop_cw_tot != null
+  ) {
+    computedScores = calculateStroopScores({
+      patient_age: response.patient_age,
+      stroop_w_tot: response.stroop_w_tot,
+      stroop_c_tot: response.stroop_c_tot,
+      stroop_cw_tot: response.stroop_cw_tot,
+    });
+  }
+
+  const { data, error } = await supabase
+    .from("schizophrenia_stroop")
+    .upsert(
+      {
+        visit_id: response.visit_id,
+        patient_id: response.patient_id,
+        patient_age: response.patient_age,
+        years_of_education: response.years_of_education,
+        patient_gender: response.patient_gender,
+        // Planche A - Mots
+        stroop_w_tot: response.stroop_w_tot,
+        stroop_w_cor: response.stroop_w_cor,
+        stroop_w_err: response.stroop_w_err,
+        // Planche B - Couleurs
+        stroop_c_tot: response.stroop_c_tot,
+        stroop_c_cor: response.stroop_c_cor,
+        stroop_c_err: response.stroop_c_err,
+        // Planche C - Mots/Couleurs
+        stroop_cw_tot: response.stroop_cw_tot,
+        stroop_cw_cor: response.stroop_cw_cor,
+        stroop_cw_err: response.stroop_cw_err,
+        // Computed scores
+        stroop_w_tot_c: computedScores.stroop_w_tot_c ?? null,
+        stroop_c_tot_c: computedScores.stroop_c_tot_c ?? null,
+        stroop_cw_tot_c: computedScores.stroop_cw_tot_c ?? null,
+        stroop_interf: computedScores.stroop_interf ?? null,
+        stroop_w_note_t: computedScores.stroop_w_note_t ?? null,
+        stroop_c_note_t: computedScores.stroop_c_note_t ?? null,
+        stroop_cw_note_t: computedScores.stroop_cw_note_t ?? null,
+        stroop_interf_note_t: computedScores.stroop_interf_note_t ?? null,
+        stroop_w_note_t_corrigee: computedScores.stroop_w_note_t_corrigee ?? null,
+        stroop_c_note_t_corrigee: computedScores.stroop_c_note_t_corrigee ?? null,
+        stroop_cw_note_t_corrigee: computedScores.stroop_cw_note_t_corrigee ?? null,
+        stroop_interf_note_tz: computedScores.stroop_interf_note_tz ?? null,
+        // Status and metadata
+        test_done: true,
+        completed_by: user.data.user?.id,
+      },
+      { onConflict: "visit_id" },
+    )
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error saving schizophrenia_stroop:", error);
     throw error;
   }
   return data;

@@ -19,6 +19,8 @@ export { COMMISSIONS_SZ_DEFINITION, COMMISSIONS_SZ_QUESTIONS } from './bloc2';
 export type { SchizophreniaCommissionsResponse, SchizophreniaCommissionsResponseInsert } from './bloc2';
 export { LIS_SZ_DEFINITION, LIS_SZ_QUESTIONS } from './bloc2';
 export type { SchizophreniaLisResponse, SchizophreniaLisResponseInsert } from './bloc2';
+export { STROOP_SZ_DEFINITION, STROOP_SZ_QUESTIONS } from './bloc2';
+export type { SchizophreniaStroopResponse, SchizophreniaStroopResponseInsert } from './bloc2';
 
 // WAIS-IV
 export { WAIS4_CRITERIA_SZ_DEFINITION, WAIS4_CRITERIA_SZ_QUESTIONS } from './wais4';

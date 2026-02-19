@@ -444,6 +444,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return "error"; // Difficulties with social cognition
     }
 
+    if (code === "STROOP_SZ") {
+      const score = data.stroop_interf_note_tz;
+      if (score === null || score === undefined) return "info";
+      if (score >= 0) return "success";
+      if (score >= -1) return "info";
+      return "warning";
+    }
+
     if (code === "WAIS4_EFFICIENCE_SZ") {
       // WAIS-IV Efficience Intellectuelle: Use QI index as main score
       // Index scoring: 50-150 scale, mean=100, SD=15
@@ -1084,6 +1092,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {code === "WAIS3_MATRICES" && "Score WAIS-III Matrices"}
               {(code === "CVLT" || code === "CVLT_SZ") && "Résultats CVLT"}
               {code === "TMT_SZ" && "Résultats TMT (Trail Making Test)"}
+              {code === "STROOP_SZ" && "Résultats Test de Stroop (Golden 1978)"}
               {code === "COMMISSIONS_SZ" && "Résultats Test des Commissions"}
               {code === "LIS_SZ" &&
                 "Résultats LIS (Lecture d'Intentions Sociales)"}
@@ -1194,6 +1203,8 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 ? (data.total_1_5 !== undefined ? data.total_1_5 : "-")
                 : code === "TMT_SZ"
                 ? (data.tmta_tps !== undefined ? `${data.tmta_tps}s` : "-")
+                : code === "STROOP_SZ"
+                ? (data.stroop_interf !== undefined && data.stroop_interf !== null ? data.stroop_interf : "-")
                 : code === "COMMISSIONS_SZ"
                 ? (data.com01 !== undefined ? `${data.com01} min` : "-")
                 : code === "LIS_SZ"
@@ -1287,6 +1298,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {(code === "WAIS4_SIMILITUDES" || code === "WAIS4_SIMILITUDES_SZ") && "/19"}
               {(code === "CVLT" || code === "CVLT_SZ") && "/80"}
               {code === "TMT_SZ" && " (Partie A)"}
+              {code === "STROOP_SZ" && " (Interférence)"}
               {code === "COMMISSIONS_SZ" && " (Temps)"}
               {code === "LIS_SZ" && " (Score déviation)"}
               {code === "WAIS4_EFFICIENCE_SZ" && " (QI - Indice)"}
@@ -4942,6 +4954,123 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   <span className="font-medium">
                     {data.tmt_b_a_err_z ?? "-"} / {data.tmt_b_a_err_pc ?? "-"}
                   </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Stroop SZ Details */}
+        {code === "STROOP_SZ" && (
+          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+            {/* Demographics */}
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Age:</span>
+                <span className="font-medium">
+                  {data.patient_age ?? "-"} ans
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Education:</span>
+                <span className="font-medium">
+                  {data.years_of_education ?? "-"} ans
+                </span>
+              </div>
+            </div>
+
+            {/* Words (Planche A) */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">
+                Planche A - Mots (Lecture)
+              </h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Score brut:</span>
+                  <span className="font-medium">{data.stroop_w_tot ?? "-"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Score corrigé:</span>
+                  <span className="font-medium">{data.stroop_w_tot_c ?? "-"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Note T:</span>
+                  <span className="font-medium">{data.stroop_w_note_t ?? "-"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score:</span>
+                  <span className="font-medium">{data.stroop_w_note_t_corrigee ?? "-"}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Colors (Planche B) */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">
+                Planche B - Couleurs (Dénomination)
+              </h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Score brut:</span>
+                  <span className="font-medium">{data.stroop_c_tot ?? "-"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Score corrigé:</span>
+                  <span className="font-medium">{data.stroop_c_tot_c ?? "-"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Note T:</span>
+                  <span className="font-medium">{data.stroop_c_note_t ?? "-"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score:</span>
+                  <span className="font-medium">{data.stroop_c_note_t_corrigee ?? "-"}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Color-Words (Planche C) */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">
+                Planche C - Interférence (Mots/Couleurs)
+              </h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Score brut:</span>
+                  <span className="font-medium">{data.stroop_cw_tot ?? "-"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Score corrigé:</span>
+                  <span className="font-medium">{data.stroop_cw_tot_c ?? "-"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Note T:</span>
+                  <span className="font-medium">{data.stroop_cw_note_t ?? "-"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score:</span>
+                  <span className="font-medium">{data.stroop_cw_note_t_corrigee ?? "-"}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Interference */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2">
+                Score d&apos;Interférence
+              </h5>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Interférence:</span>
+                  <span className="font-medium">{data.stroop_interf ?? "-"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Note T:</span>
+                  <span className="font-medium">{data.stroop_interf_note_t ?? "-"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Z-Score:</span>
+                  <span className="font-medium">{data.stroop_interf_note_tz ?? "-"}</span>
                 </div>
               </div>
             </div>

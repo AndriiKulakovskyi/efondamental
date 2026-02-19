@@ -284,6 +284,7 @@ function questionnaireCodeToSchizophreniaKey(code: string): string | null {
     // Neuropsy module
     CVLT_SZ: "CVLT_SZ",
     TMT_SZ: "TMT_SZ",
+    STROOP_SZ: "STROOP_SZ",
   };
 
   const mappedKey = mapping[code];
@@ -646,6 +647,22 @@ export async function submitProfessionalQuestionnaireAction(
           years_of_education,
           ...filteredResponses
         } = responses;
+
+        // Neuropsy tables need patient_age and years_of_education for scoring
+        const szNeuropsyTables = [
+          "CVLT_SZ",
+          "TMT_SZ",
+          "STROOP_SZ",
+        ];
+        if (szNeuropsyTables.includes(schizophreniaKey)) {
+          if (patient_age !== undefined) {
+            (filteredResponses as any).patient_age = patient_age;
+          }
+          if (years_of_education !== undefined) {
+            (filteredResponses as any).years_of_education =
+              years_of_education;
+          }
+        }
 
         const result = await saveSchizophreniaInitialResponse(
           schizophreniaKey,

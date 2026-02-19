@@ -1,0 +1,28 @@
+{
+  "plugins": {
+    "supabase": {
+      "enabled": true
+    },
+    "continual-learning": {
+      "enabled": true
+    },
+    "cursor-team-kit": {
+      "enabled": true
+    },
+    "context7-plugin": {
+      "enabled": true
+    },
+    "parallel": {
+      "enabled": true
+    },
+    "compound-engineering": {
+      "enabled": true
+    },
+    "linear": {
+      "enabled": true
+    },
+    "superpowers": {
+      "enabled": true
+    }
+  }
+}

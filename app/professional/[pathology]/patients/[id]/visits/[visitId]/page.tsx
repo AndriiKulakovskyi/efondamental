@@ -169,6 +169,7 @@ import {
   TMT_SZ_DEFINITION,
   COMMISSIONS_SZ_DEFINITION,
   LIS_SZ_DEFINITION,
+  STROOP_SZ_DEFINITION,
   WAIS4_CRITERIA_SZ_DEFINITION,
   WAIS4_EFFICIENCE_SZ_DEFINITION,
   WAIS4_SIMILITUDES_SZ_DEFINITION,
@@ -614,6 +615,18 @@ export default async function VisitDetailPage({
           id: 'mod_neuropsy_sz',
           name: 'Evaluation Neuropsychologique',
           description: 'Évaluation neuropsychologique',
+          questionnaires: [
+            {
+              id: STROOP_SZ_DEFINITION.code,
+              code: STROOP_SZ_DEFINITION.code,
+              title: STROOP_SZ_DEFINITION.title,
+              description: STROOP_SZ_DEFINITION.description,
+              questions: STROOP_SZ_DEFINITION.questions,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['STROOP_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['STROOP_SZ']?.completed_at,
+            }
+          ],
           sections: [
             {
               id: 'bloc2',
