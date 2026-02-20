@@ -171,7 +171,7 @@ export function getPatientInvitationEmailHtml(params: {
           <tr>
             <td style="padding: 24px 40px; text-align: center;">
               <p style="margin: 0 0 8px 0; font-size: 12px; color: #94a3b8;">
-                2025 Fondation FondaMental - Reseau de Centres Experts
+                2026 Fondation FondaMental - Reseau de Centres Experts
               </p>
               <p style="margin: 0; font-size: 12px; color: #94a3b8;">
                 Vous recevez cet email car vous etes inscrit dans un parcours de soin eFondaMental.
