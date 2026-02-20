@@ -269,7 +269,8 @@ import {
   WAIS4_MATRICES_SZ_DEFINITION,
   SSTICS_SZ_DEFINITION,
   CBQ_SZ_DEFINITION,
-  DACOBS_SZ_DEFINITION
+  DACOBS_SZ_DEFINITION,
+  TAP_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -771,6 +772,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               title: FLUENCES_VERBALES_SZ_DEFINITION.title,
               description: FLUENCES_VERBALES_SZ_DEFINITION.description,
               questions: FLUENCES_VERBALES_SZ_DEFINITION.questions
+            },
+            {
+              id: TAP_SZ_DEFINITION.id,
+              code: TAP_SZ_DEFINITION.code,
+              title: TAP_SZ_DEFINITION.title,
+              description: TAP_SZ_DEFINITION.description,
+              questions: []
             }
           ],
           sections: [

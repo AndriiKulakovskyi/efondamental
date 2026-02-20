@@ -92,6 +92,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   LIS_SZ: "schizophrenia_lis",
   STROOP_SZ: "schizophrenia_stroop",
   FLUENCES_VERBALES_SZ: "schizophrenia_fluences_verbales",
+  TAP_SZ: "schizophrenia_tap",
 
   // Neuropsy module - WAIS-IV (Neuropsychological assessments)
   WAIS4_CRITERIA_SZ: "schizophrenia_wais4_criteria",
@@ -6594,4 +6595,12 @@ export async function saveEgfSzResponse(response: any): Promise<any> {
     throw error;
   }
   return data;
+}
+
+// ============================================================================
+// TAP Functions (Neuropsy - TEA/TAP)
+// ============================================================================
+
+export async function getTapSzResponse(visitId: string): Promise<any | null> {
+  return getSchizophreniaInitialResponse("TAP_SZ", visitId);
 }

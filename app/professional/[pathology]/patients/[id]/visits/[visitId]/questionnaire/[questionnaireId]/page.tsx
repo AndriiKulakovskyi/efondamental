@@ -173,6 +173,7 @@ import {
   SSTICS_SZ_DEFINITION,
   CBQ_SZ_DEFINITION,
   DACOBS_SZ_DEFINITION,
+  TAP_SZ_DEFINITION,
 } from "@/lib/questionnaires/schizophrenia";
 import {
   getAsrmResponse,
@@ -340,10 +341,12 @@ import {
   getBriefASzResponse,
   getSchizophreniaInitialResponse,
   getIsaSzResponse,
+  getTapSzResponse,
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
 import { QuestionnairePageClient } from "./page-client";
+import { TapQuestionnaireForm } from "@/components/clinical/tap-questionnaire-form";
 import {
   calculateAgeAtDate,
   normalizeGender,
@@ -785,6 +788,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === CBQ_SZ_DEFINITION.code) questionnaire = CBQ_SZ_DEFINITION;
   else if (code === DACOBS_SZ_DEFINITION.code)
     questionnaire = DACOBS_SZ_DEFINITION;
+  else if (code === TAP_SZ_DEFINITION.code)
+    questionnaire = TAP_SZ_DEFINITION as any;
 
   if (!questionnaire) {
     notFound();
@@ -1126,6 +1131,8 @@ export default async function ProfessionalQuestionnairePage({
     existingResponse = await getCbqSzResponse(visitId);
   else if (code === DACOBS_SZ_DEFINITION.code)
     existingResponse = await getDacobsSzResponse(visitId);
+  else if (code === TAP_SZ_DEFINITION.code)
+    existingResponse = await getTapSzResponse(visitId);
 
   // Debug logging for PSQI_SZ
   if (code === "PSQI_SZ") {
@@ -1758,6 +1765,34 @@ export default async function ProfessionalQuestionnairePage({
           }
         : null,
     });
+  }
+
+  // TAP_SZ uses a custom renderer (file upload + editable tables)
+  if (code === "TAP_SZ") {
+    const [tapPatient, tapContext] = await Promise.all([
+      getPatientById(patientId),
+      getUserContext(),
+    ]);
+
+    let patientAge: number | null = null;
+    if (tapPatient?.date_of_birth) {
+      patientAge = calculateAgeAtDate(tapPatient.date_of_birth, new Date().toISOString());
+    }
+
+    const doctorName = tapContext?.profile
+      ? [tapContext.profile.first_name, tapContext.profile.last_name].filter(Boolean).join(' ')
+      : null;
+
+    return (
+      <TapQuestionnaireForm
+        visitId={visitId}
+        patientId={patientId}
+        pathology={pathology}
+        existingData={existingResponse}
+        patientAge={patientAge}
+        doctorName={doctorName}
+      />
+    );
   }
 
   return (

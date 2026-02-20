@@ -45,3 +45,16 @@ export type { SchizophreniaCbqResponse, SchizophreniaCbqResponseInsert, CbqScore
 // DACOBS - Davos Assessment of Cognitive Biases Scale (root level)
 export { DACOBS_SZ_DEFINITION, DACOBS_SZ_QUESTIONS, computeDacobsScores, interpretDacobsScore, DACOBS_SUBSCALES, DACOBS_SECTIONS, DACOBS_LIKERT_OPTIONS } from './dacobs';
 export type { SchizophreniaDacobsResponse, SchizophreniaDacobsResponseInsert, DacobsScoreResult } from './dacobs';
+
+// TAP - Test of Attentional Performance (Attention soutenue + Flexibilité)
+export * as tap from './tap';
+export { TAP_SZ_DEFINITION } from './tap';
+export type { TapQuestionnaireDefinition } from './tap';
+export type {
+  SchizophreniaTapResponse,
+  SchizophreniaTapResponseInsert,
+  AttentionSoutenueRow,
+  FlexibiliteRow,
+  FlexibiliteGlobalIndices,
+  TapTestMetadata,
+} from './tap';

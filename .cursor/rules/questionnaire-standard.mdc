@@ -312,7 +312,7 @@ export async function getMadrsResponse(visitId: string): Promise<BipolarMadrsRes
   const supabase = await createClient();
   
   const { data, error } = await supabase
-    .from('responses_madrs')
+    .from('bipolar_madrs')
     .select('*')
     .eq('visit_id', visitId)
     .single();
@@ -340,7 +340,7 @@ export async function saveMadrsResponse(
   const interpretation = interpretMadrs(totalScore);
   
   const { data, error } = await supabase
-    .from('responses_madrs')
+    .from('bipolar_madrs')
     .upsert({
       ...response,
       total_score: totalScore,
@@ -358,11 +358,11 @@ export async function saveMadrsResponse(
 ### 5.4 Generic Service Pattern (for many questionnaires)
 
 ```typescript
-// Table mapping constant
+// Table mapping constant — uses pathology prefix, NOT responses_ prefix
 export const BIPOLAR_INITIAL_TABLES: Record<string, string> = {
-  'MADRS': 'responses_madrs',
-  'YMRS': 'responses_ymrs',
-  'CGI': 'responses_cgi',
+  'MADRS': 'bipolar_madrs',
+  'YMRS': 'bipolar_ymrs',
+  'CGI': 'bipolar_cgi',
   // ...
 };
 
@@ -417,16 +417,31 @@ export async function saveBipolarInitialResponse<T>(
 
 ### 6.1 Table Naming
 
-Tables MUST be named: `responses_<questionnaire_code>` in lowercase.
+**CRITICAL**: Tables MUST be named with a **pathology prefix**, NOT the legacy `responses_` prefix.
 
-Examples: `responses_madrs`, `responses_ymrs`, `responses_dsm5_humeur`
+The naming pattern is: `<pathology>_<questionnaire_code>` in lowercase.
+
+| Pathology | Prefix | Examples |
+|-----------|--------|----------|
+| Bipolar | `bipolar_` | `bipolar_madrs`, `bipolar_ymrs`, `bipolar_asrm` |
+| Bipolar Nurse | `bipolar_nurse_` | `bipolar_nurse_tobacco`, `bipolar_nurse_ecg` |
+| Bipolar Followup | `bipolar_followup_` | `bipolar_followup_humeur_actuels` |
+| Schizophrenia | `schizophrenia_` | `schizophrenia_panss`, `schizophrenia_cdss` |
+
+**NEVER use `responses_` prefix** — this is a deprecated legacy convention that no longer matches the database.
+
+When writing or modifying RPC functions (especially `get_visit_detail_data`), always verify table names against:
+1. The `BIPOLAR_INITIAL_TABLES` map in `lib/services/bipolar-initial.service.ts`
+2. The `SCHIZOPHRENIA_INITIAL_TABLES` map in `lib/services/schizophrenia-initial.service.ts`
+3. The service `.from('table_name')` calls in the relevant service files
+4. The authoritative `supabase/schema.sql` RPC function definition
 
 ### 6.2 Required Columns
 
 Every response table MUST include:
 
 ```sql
-CREATE TABLE responses_<name> (
+CREATE TABLE <pathology>_<name> (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   visit_id UUID REFERENCES visits(id) ON DELETE CASCADE NOT NULL UNIQUE,
   patient_id UUID REFERENCES patients(id) ON DELETE CASCADE NOT NULL,
@@ -458,32 +473,32 @@ visit_id UUID REFERENCES visits(id) ON DELETE CASCADE NOT NULL UNIQUE
 Every table MUST have RLS enabled with these policies:
 
 ```sql
-ALTER TABLE responses_<name> ENABLE ROW LEVEL SECURITY;
+ALTER TABLE <pathology>_<name> ENABLE ROW LEVEL SECURITY;
 
 -- Patient policies
-CREATE POLICY "Patients view own responses" ON responses_<name>
+CREATE POLICY "Patients view own responses" ON <pathology>_<name>
   FOR SELECT USING (auth.uid() = patient_id);
 
-CREATE POLICY "Patients insert own responses" ON responses_<name>
+CREATE POLICY "Patients insert own responses" ON <pathology>_<name>
   FOR INSERT WITH CHECK (auth.uid() = patient_id);
 
-CREATE POLICY "Patients update own responses" ON responses_<name>
+CREATE POLICY "Patients update own responses" ON <pathology>_<name>
   FOR UPDATE USING (auth.uid() = patient_id);
 
 -- Professional policies
-CREATE POLICY "Professionals view all responses" ON responses_<name>
+CREATE POLICY "Professionals view all responses" ON <pathology>_<name>
   FOR SELECT USING (
     EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() 
             AND role IN ('healthcare_professional', 'manager', 'administrator'))
   );
 
-CREATE POLICY "Professionals insert responses" ON responses_<name>
+CREATE POLICY "Professionals insert responses" ON <pathology>_<name>
   FOR INSERT WITH CHECK (
     EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() 
             AND role IN ('healthcare_professional', 'manager', 'administrator'))
   );
 
-CREATE POLICY "Professionals update responses" ON responses_<name>
+CREATE POLICY "Professionals update responses" ON <pathology>_<name>
   FOR UPDATE USING (
     EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() 
             AND role IN ('healthcare_professional', 'manager', 'administrator'))
@@ -504,11 +519,20 @@ total_score INTEGER GENERATED ALWAYS AS (q1 + q2 + q3 + q4 + q5) STORED
 
 ### 7.1 Visit Detail Data
 
-The `get_visit_detail_data(p_visit_id UUID)` function must include the questionnaire in its completion tracking:
+The `get_visit_detail_data(p_visit_id UUID)` function must include the questionnaire in its completion tracking.
+
+**CRITICAL**: When modifying this RPC function:
+1. **NEVER flatten** the visit-type branching structure (screening / initial_evaluation / annual_evaluation / biannual_followup)
+2. **ALWAYS use pathology-prefixed table names** (e.g., `bipolar_madrs`, NOT `responses_madrs`)
+3. **ALWAYS cross-reference** table names against the authoritative `supabase/schema.sql` before writing SQL
+4. **ALWAYS base your changes** on the existing RPC function in `schema.sql` — add your new lines to the correct visit-type branch, don't rewrite the whole function
 
 ```sql
--- Add to the appropriate visit type section
-'<questionnaire_code>', (SELECT id FROM responses_<table> WHERE visit_id = p_visit_id),
+-- Add to the appropriate visit type section in the ELSIF branch
+'<QUESTIONNAIRE_CODE>', jsonb_build_object(
+  'completed', EXISTS (SELECT 1 FROM <pathology>_<table> WHERE visit_id = p_visit_id),
+  'completed_at', (SELECT completed_at FROM <pathology>_<table> WHERE visit_id = p_visit_id)
+),
 ```
 
 ### 7.2 Dashboard Progress
@@ -589,8 +613,8 @@ Before considering a questionnaire complete, verify:
 display_if: { field: 'smoking_status', operator: 'equals', value: 'current_smoker' }
 
 // In RPC function
-CASE WHEN (SELECT smoking_status FROM responses_tobacco WHERE visit_id = p_visit_id) = 'current_smoker'
-     THEN (SELECT id FROM responses_fagerstrom WHERE visit_id = p_visit_id)
+CASE WHEN (SELECT smoking_status FROM bipolar_nurse_tobacco WHERE visit_id = p_visit_id) = 'current_smoker'
+     THEN (SELECT id FROM bipolar_nurse_fagerstrom WHERE visit_id = p_visit_id)
      ELSE 'not_applicable'
 END
 ```
@@ -600,7 +624,7 @@ END
 Some questionnaires are patient-level (not visit-specific):
 
 ```sql
-CREATE TABLE responses_non_pharmacologic (
+CREATE TABLE bipolar_followup_traitement_non_pharma (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   patient_id UUID REFERENCES patients(id) ON DELETE CASCADE NOT NULL UNIQUE,
   -- No visit_id column
@@ -613,8 +637,8 @@ CREATE TABLE responses_non_pharmacologic (
 When the same questionnaire is used across multiple visit types, use a single table:
 
 ```typescript
-// Same table for initial, biannual, annual
-'MADRS': 'responses_madrs'  // Shared across all visits
+// Same table for initial, biannual, annual — always pathology-prefixed
+'MADRS': 'bipolar_madrs'  // Shared across all visits
 ```
 
 Each visit creates a new row; longitudinal queries use `patient_id` with `ORDER BY created_at`.

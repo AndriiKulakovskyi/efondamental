@@ -1294,6 +1294,7 @@ BEGIN
       'CDSS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_cdss WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_cdss WHERE visit_id = p_visit_id)),
       'BARS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_bars WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_bars WHERE visit_id = p_visit_id)),
       'SUMD', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_sumd WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_sumd WHERE visit_id = p_visit_id)),
+      'SAPS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_saps WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_saps WHERE visit_id = p_visit_id)),
       'AIMS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_aims WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_aims WHERE visit_id = p_visit_id)),
       'BARNES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_barnes WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_barnes WHERE visit_id = p_visit_id)),
       'SAS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_sas WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_sas WHERE visit_id = p_visit_id)),
@@ -1304,30 +1305,38 @@ BEGIN
       'EGF_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_egf WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_egf WHERE visit_id = p_visit_id))
     );
 
+    -- Schizophrenia medical module
     v_statuses := v_statuses || jsonb_build_object(
       'TROUBLES_PSYCHOTIQUES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_psychotiques WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_psychotiques WHERE visit_id = p_visit_id)),
       'TROUBLES_COMORBIDES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_comorbides WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_comorbides WHERE visit_id = p_visit_id)),
       'TEA_COFFEE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_tea_coffee WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_tea_coffee WHERE visit_id = p_visit_id)),
       'EVAL_ADDICTOLOGIQUE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id)),
+      'ISA_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_isa WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_isa WHERE visit_id = p_visit_id)),
       'SUICIDE_HISTORY_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_suicide_history WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_suicide_history WHERE visit_id = p_visit_id)),
       'ANTECEDENTS_FAMILIAUX_PSY_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_antecedents_familiaux_psy WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_antecedents_familiaux_psy WHERE visit_id = p_visit_id)),
       'PERINATALITE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_perinatalite WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_perinatalite WHERE visit_id = p_visit_id)),
       'ECV', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_ecv WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_ecv WHERE visit_id = p_visit_id))
     );
 
-    -- Schizophrenia neuropsychological module (Bloc 2 + WAIS-IV + CBQ + DACOBS)
+    -- Schizophrenia neuropsychological module (Bloc 2 + WAIS-IV + CBQ + DACOBS + TAP)
     v_statuses := v_statuses || jsonb_build_object(
       'CVLT_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_cvlt WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_cvlt WHERE visit_id = p_visit_id)),
       'TMT_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_tmt WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_tmt WHERE visit_id = p_visit_id)),
       'COMMISSIONS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_commissions WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_commissions WHERE visit_id = p_visit_id)),
       'LIS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_lis WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_lis WHERE visit_id = p_visit_id)),
+      'STROOP_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_stroop WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_stroop WHERE visit_id = p_visit_id)),
+      'FLUENCES_VERBALES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_fluences_verbales WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_fluences_verbales WHERE visit_id = p_visit_id)),
+      'TAP_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_tap WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_tap WHERE visit_id = p_visit_id)),
       'WAIS4_CRITERIA_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_wais4_criteria WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_wais4_criteria WHERE visit_id = p_visit_id)),
       'WAIS4_EFFICIENCE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_wais4_efficience WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_wais4_efficience WHERE visit_id = p_visit_id)),
       'WAIS4_SIMILITUDES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_wais4_similitudes WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_wais4_similitudes WHERE visit_id = p_visit_id)),
       'WAIS4_MEMOIRE_CHIFFRES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_wais4_memoire_chiffres WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_wais4_memoire_chiffres WHERE visit_id = p_visit_id)),
       'WAIS4_MATRICES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_wais4_matrices WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_wais4_matrices WHERE visit_id = p_visit_id)),
       'SSTICS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_sstics WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_sstics WHERE visit_id = p_visit_id)),
-      'CBQ_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_cbq WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_cbq WHERE visit_id = p_visit_id)),
+      'CBQ_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_cbq WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_cbq WHERE visit_id = p_visit_id))
+    );
+
+    v_statuses := v_statuses || jsonb_build_object(
       'DACOBS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_dacobs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_dacobs WHERE visit_id = p_visit_id))
     );
 

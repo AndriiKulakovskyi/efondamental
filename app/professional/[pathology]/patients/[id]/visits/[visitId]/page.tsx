@@ -178,7 +178,8 @@ import {
   WAIS4_MATRICES_SZ_DEFINITION,
   SSTICS_SZ_DEFINITION,
   CBQ_SZ_DEFINITION,
-  DACOBS_SZ_DEFINITION
+  DACOBS_SZ_DEFINITION,
+  TAP_SZ_DEFINITION
 } from "@/lib/questionnaires/schizophrenia";
 import { VISIT_TYPE_NAMES, VisitType } from "@/lib/types/enums";
 
@@ -636,6 +637,16 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['FLUENCES_VERBALES_SZ']?.completed || false,
               completedAt: questionnaireStatuses['FLUENCES_VERBALES_SZ']?.completed_at,
+            },
+            {
+              id: TAP_SZ_DEFINITION.code,
+              code: TAP_SZ_DEFINITION.code,
+              title: TAP_SZ_DEFINITION.title,
+              description: TAP_SZ_DEFINITION.description,
+              questions: [],
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['TAP_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['TAP_SZ']?.completed_at,
             }
           ],
           sections: [
