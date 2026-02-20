@@ -137,6 +137,7 @@ import {
   PSP_DEFINITION,
   SAPS_DEFINITION,
   SANS_DEFINITION,
+  UKU_DEFINITION,
   BRIEF_A_SZ_DEFINITION,
   YMRS_SZ_DEFINITION,
   CGI_SZ_DEFINITION,
@@ -417,6 +418,13 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['SANS']?.completed || false,
               completedAt: questionnaireStatuses['SANS']?.completed_at,
+            },
+            {
+              ...UKU_DEFINITION,
+              id: UKU_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['UKU']?.completed || false,
+              completedAt: questionnaireStatuses['UKU']?.completed_at,
             },
             {
               ...AIMS_DEFINITION,
@@ -2065,6 +2073,13 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['SANS']?.completed || false,
               completedAt: questionnaireStatuses['SANS']?.completed_at,
+            },
+            {
+              ...UKU_DEFINITION,
+              id: UKU_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['UKU']?.completed || false,
+              completedAt: questionnaireStatuses['UKU']?.completed_at,
             },
             {
               ...AIMS_DEFINITION,

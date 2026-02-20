@@ -135,6 +135,7 @@ import {
   EGF_SZ_DEFINITION,
   SAPS_DEFINITION,
   SANS_DEFINITION,
+  UKU_DEFINITION,
   ECV_DEFINITION,
   TROUBLES_PSYCHOTIQUES_DEFINITION,
   ISA_SZ_DEFINITION,
@@ -299,6 +300,7 @@ import {
   getSasResponse,
   getSapsResponse,
   getSansResponse,
+  getUkuResponse,
   getPspResponse,
   getEcvResponse,
   getTroublesPsychotiquesResponse,
@@ -720,6 +722,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === EGF_SZ_DEFINITION.code) questionnaire = EGF_SZ_DEFINITION;
   else if (code === SAPS_DEFINITION.code) questionnaire = SAPS_DEFINITION;
   else if (code === SANS_DEFINITION.code) questionnaire = SANS_DEFINITION;
+  else if (code === UKU_DEFINITION.code) questionnaire = UKU_DEFINITION;
   // Schizophrenia medical evaluation
   else if (code === ECV_DEFINITION.code) questionnaire = ECV_DEFINITION;
   else if (code === TROUBLES_PSYCHOTIQUES_DEFINITION.code)
@@ -1035,6 +1038,8 @@ export default async function ProfessionalQuestionnairePage({
     existingResponse = await getSapsResponse(visitId);
   else if (code === SANS_DEFINITION.code)
     existingResponse = await getSansResponse(visitId);
+  else if (code === UKU_DEFINITION.code)
+    existingResponse = await getUkuResponse(visitId);
   else if (code === PSP_DEFINITION.code)
     existingResponse = await getPspResponse(visitId);
   else if (code === BRIEF_A_SZ_DEFINITION.code)
@@ -1668,6 +1673,17 @@ export default async function ProfessionalQuestionnairePage({
       initialResponses = {
         ...initialResponses,
         screening_diag_nommed: `Dr. ${patient.assigned_to_first_name} ${patient.assigned_to_last_name}`,
+      };
+    }
+  }
+
+  // Inject patient gender for UKU (needed for sex-specific questions)
+  if (code === UKU_DEFINITION.code) {
+    const patient = await getPatientById(patientId);
+    if (patient && patient.gender) {
+      initialResponses = {
+        ...initialResponses,
+        patient_gender: patient.gender === 'M' ? 'm' : patient.gender === 'F' ? 'f' : patient.gender.toLowerCase(),
       };
     }
   }

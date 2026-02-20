@@ -33,7 +33,8 @@ export {
   CGI_SZ_DEFINITION,
   EGF_SZ_DEFINITION,
   SAPS_DEFINITION,
-  SANS_DEFINITION
+  SANS_DEFINITION,
+  UKU_DEFINITION
 } from './initial/hetero';
 
 export {

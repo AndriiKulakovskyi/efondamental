@@ -4,6 +4,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { computeSapsScores } from "@/lib/questionnaires/schizophrenia/initial/hetero/saps";
 import { computeSansScores } from "@/lib/questionnaires/schizophrenia/initial/hetero/sans";
+import { computeUkuScores } from "@/lib/questionnaires/schizophrenia/initial/hetero/uku";
 import { calculateCvltScores, CvltRawData } from "@/lib/services/cvlt-scoring";
 import { calculateStroopScores } from "@/lib/services/stroop-scoring";
 import { calculateFluencesVerbalesScores } from "@/lib/services/fluences-verbales-scoring";
@@ -46,6 +47,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   SUMD: "schizophrenia_sumd",
   SAPS: "schizophrenia_saps",
   SANS: "schizophrenia_sans",
+  UKU: "schizophrenia_uku",
   AIMS: "schizophrenia_aims",
   BARNES: "schizophrenia_barnes",
   SAS: "schizophrenia_sas",
@@ -168,6 +170,8 @@ export async function saveSchizophreniaInitialResponse<
       return (await saveSapsResponse(response)) as any as T;
     case "SANS":
       return (await saveSansResponse(response)) as any as T;
+    case "UKU":
+      return (await saveUkuResponse(response)) as any as T;
     case "AIMS":
       return (await saveAimsResponse(response)) as any as T;
     case "BARNES":
@@ -331,6 +335,10 @@ export async function getSapsResponse(visitId: string) {
 
 export async function getSansResponse(visitId: string) {
   return getSchizophreniaInitialResponse("SANS", visitId);
+}
+
+export async function getUkuResponse(visitId: string) {
+  return getSchizophreniaInitialResponse("UKU", visitId);
 }
 
 
@@ -941,6 +949,52 @@ export async function saveSansResponse(response: any): Promise<any> {
         attention_subscore,
         subscores_sum,
         global_evaluations_score,
+        total_score,
+        test_done: response.test_done === 1,
+        completed_by: user.data.user?.id,
+      },
+      { onConflict: "visit_id" },
+    )
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+
+/**
+ * Save UKU response with scoring calculation
+ */
+export async function saveUkuResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    section_psychic,
+    section_autonomic,
+    section_other,
+    ...responseData
+  } = response;
+
+  // Use centralized scoring function
+  const scores = computeUkuScores(responseData);
+  const {
+    psychic_subscore,
+    autonomic_subscore,
+    other_subscore,
+    total_score
+  } = scores;
+
+  const { data, error } = await supabase
+    .from("schizophrenia_uku")
+    .upsert(
+      {
+        ...responseData,
+        psychic_subscore,
+        autonomic_subscore,
+        other_subscore,
         total_score,
         test_done: response.test_done === 1,
         completed_by: user.data.user?.id,

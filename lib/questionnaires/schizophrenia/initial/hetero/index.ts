@@ -60,6 +60,15 @@ export {
   type SchizophreniaSansResponseInsert
 } from './sans';
 
+// UKU (Udvalg for Kliniske Undersøgelser Side Effect Rating Scale)
+export {
+  UKU_QUESTIONS,
+  UKU_DEFINITION,
+  computeUkuScores,
+  type SchizophreniaUkuResponse,
+  type SchizophreniaUkuResponseInsert
+} from './uku';
+
 // AIMS (Abnormal Involuntary Movement Scale)
 export {
   AIMS_QUESTIONS,
