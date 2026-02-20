@@ -134,6 +134,7 @@ import {
   CGI_SZ_DEFINITION,
   EGF_SZ_DEFINITION,
   SAPS_DEFINITION,
+  SANS_DEFINITION,
   ECV_DEFINITION,
   TROUBLES_PSYCHOTIQUES_DEFINITION,
   ISA_SZ_DEFINITION,
@@ -297,6 +298,7 @@ import {
   getBarnesResponse,
   getSasResponse,
   getSapsResponse,
+  getSansResponse,
   getPspResponse,
   getEcvResponse,
   getTroublesPsychotiquesResponse,
@@ -717,6 +719,7 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === CGI_SZ_DEFINITION.code) questionnaire = CGI_SZ_DEFINITION;
   else if (code === EGF_SZ_DEFINITION.code) questionnaire = EGF_SZ_DEFINITION;
   else if (code === SAPS_DEFINITION.code) questionnaire = SAPS_DEFINITION;
+  else if (code === SANS_DEFINITION.code) questionnaire = SANS_DEFINITION;
   // Schizophrenia medical evaluation
   else if (code === ECV_DEFINITION.code) questionnaire = ECV_DEFINITION;
   else if (code === TROUBLES_PSYCHOTIQUES_DEFINITION.code)
@@ -1030,6 +1033,8 @@ export default async function ProfessionalQuestionnairePage({
     existingResponse = await getSasResponse(visitId);
   else if (code === SAPS_DEFINITION.code)
     existingResponse = await getSapsResponse(visitId);
+  else if (code === SANS_DEFINITION.code)
+    existingResponse = await getSansResponse(visitId);
   else if (code === PSP_DEFINITION.code)
     existingResponse = await getPspResponse(visitId);
   else if (code === BRIEF_A_SZ_DEFINITION.code)
@@ -1753,9 +1758,9 @@ export default async function ProfessionalQuestionnairePage({
       hasExistingResponse: !!existingResponse,
       existingResponseHasScores: existingResponse
         ? {
-            wais_mc_std: existingResponse.wais_mc_std,
-            wais_mc_tot: existingResponse.wais_mc_tot,
-          }
+          wais_mc_std: existingResponse.wais_mc_std,
+          wais_mc_tot: existingResponse.wais_mc_tot,
+        }
         : null,
     });
   }

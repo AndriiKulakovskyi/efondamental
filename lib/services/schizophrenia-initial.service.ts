@@ -3,6 +3,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { computeSapsScores } from "@/lib/questionnaires/schizophrenia/initial/hetero/saps";
+import { computeSansScores } from "@/lib/questionnaires/schizophrenia/initial/hetero/sans";
 import { calculateCvltScores, CvltRawData } from "@/lib/services/cvlt-scoring";
 import { calculateStroopScores } from "@/lib/services/stroop-scoring";
 import { calculateFluencesVerbalesScores } from "@/lib/services/fluences-verbales-scoring";
@@ -44,6 +45,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   BARS: "schizophrenia_bars",
   SUMD: "schizophrenia_sumd",
   SAPS: "schizophrenia_saps",
+  SANS: "schizophrenia_sans",
   AIMS: "schizophrenia_aims",
   BARNES: "schizophrenia_barnes",
   SAS: "schizophrenia_sas",
@@ -164,6 +166,8 @@ export async function saveSchizophreniaInitialResponse<
       return (await saveSumdResponse(response)) as any as T;
     case "SAPS":
       return (await saveSapsResponse(response)) as any as T;
+    case "SANS":
+      return (await saveSansResponse(response)) as any as T;
     case "AIMS":
       return (await saveAimsResponse(response)) as any as T;
     case "BARNES":
@@ -323,6 +327,10 @@ export async function getSumdResponse(visitId: string) {
 
 export async function getSapsResponse(visitId: string) {
   return getSchizophreniaInitialResponse("SAPS", visitId);
+}
+
+export async function getSansResponse(visitId: string) {
+  return getSchizophreniaInitialResponse("SANS", visitId);
 }
 
 
@@ -875,6 +883,62 @@ export async function saveSapsResponse(response: any): Promise<any> {
         delusions_subscore,
         bizarre_behavior_subscore,
         thought_disorder_subscore,
+        subscores_sum,
+        global_evaluations_score,
+        total_score,
+        test_done: response.test_done === 1,
+        completed_by: user.data.user?.id,
+      },
+      { onConflict: "visit_id" },
+    )
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+
+/**
+ * Save SANS response with scoring calculation
+ */
+export async function saveSansResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Remove section fields that shouldn't be saved to DB
+  const {
+    section_affective_flattening,
+    section_alogia,
+    section_avolition,
+    section_anhedonia,
+    section_attention,
+    ...responseData
+  } = response;
+
+  // Use centralized scoring function
+  const scores = computeSansScores(responseData);
+  const {
+    affective_flattening_subscore,
+    alogia_subscore,
+    avolition_subscore,
+    anhedonia_subscore,
+    attention_subscore,
+    subscores_sum,
+    global_evaluations_score,
+    total_score
+  } = scores;
+
+  const { data, error } = await supabase
+    .from("schizophrenia_sans")
+    .upsert(
+      {
+        ...responseData,
+        affective_flattening_subscore,
+        alogia_subscore,
+        avolition_subscore,
+        anhedonia_subscore,
+        attention_subscore,
         subscores_sum,
         global_evaluations_score,
         total_score,
@@ -4128,10 +4192,10 @@ export async function saveCvltSzResponse(response: any): Promise<any> {
   const total_1_5 =
     response.total_1_5 ??
     (response.trial_1 ?? 0) +
-      (response.trial_2 ?? 0) +
-      (response.trial_3 ?? 0) +
-      (response.trial_4 ?? 0) +
-      (response.trial_5 ?? 0);
+    (response.trial_2 ?? 0) +
+    (response.trial_3 ?? 0) +
+    (response.trial_4 ?? 0) +
+    (response.trial_5 ?? 0);
 
   // Prepare raw data for scoring (only if we have required demographics)
   let computedScores: any = {};

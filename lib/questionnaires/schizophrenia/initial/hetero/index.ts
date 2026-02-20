@@ -51,6 +51,15 @@ export {
   type SchizophreniaSapsResponseInsert
 } from './saps';
 
+// SANS (Scale for the Assessment of Negative Symptoms)
+export {
+  SANS_QUESTIONS,
+  SANS_DEFINITION,
+  computeSansScores,
+  type SchizophreniaSansResponse,
+  type SchizophreniaSansResponseInsert
+} from './sans';
+
 // AIMS (Abnormal Involuntary Movement Scale)
 export {
   AIMS_QUESTIONS,

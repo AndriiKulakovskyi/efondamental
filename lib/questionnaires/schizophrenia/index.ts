@@ -32,7 +32,8 @@ export {
   YMRS_SZ_DEFINITION,
   CGI_SZ_DEFINITION,
   EGF_SZ_DEFINITION,
-  SAPS_DEFINITION
+  SAPS_DEFINITION,
+  SANS_DEFINITION
 } from './initial/hetero';
 
 export {

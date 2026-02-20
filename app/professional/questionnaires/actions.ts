@@ -188,6 +188,8 @@ import {
   saveYmrsSzResponse,
   saveCgiSzResponse,
   saveEgfSzResponse,
+  saveSapsResponse as saveSchizophreniaSapsResponse,
+  saveSansResponse as saveSchizophreniaSansResponse,
 } from "@/lib/services/schizophrenia-initial.service";
 import {
   getVisitCompletionStatus,
@@ -267,6 +269,7 @@ function questionnaireCodeToSchizophreniaKey(code: string): string | null {
     SAS: "SAS",
     PSP: "PSP",
     SAPS: "SAPS",
+    SANS: "SANS",
     YMRS_SZ: "YMRS_SZ",
     CGI_SZ: "CGI_SZ",
     EGF_SZ: "EGF_SZ",
@@ -648,6 +651,30 @@ export async function submitProfessionalQuestionnaireAction(
           years_of_education,
           ...filteredResponses
         } = responses;
+
+        // SAPS: use specialized save function that computes subscores and total score
+        if (schizophreniaKey === "SAPS") {
+          const result = await saveSchizophreniaSapsResponse({
+            visit_id: visitId,
+            patient_id: patientId,
+            completed_by: completedBy,
+            ...filteredResponses,
+          });
+          revalidatePath("/professional");
+          return { success: true, data: result };
+        }
+
+        // SANS: use specialized save function that computes subscores and total score
+        if (schizophreniaKey === "SANS") {
+          const result = await saveSchizophreniaSansResponse({
+            visit_id: visitId,
+            patient_id: patientId,
+            completed_by: completedBy,
+            ...filteredResponses,
+          });
+          revalidatePath("/professional");
+          return { success: true, data: result };
+        }
 
         // Neuropsy tables need patient_age and years_of_education for scoring
         const szNeuropsyTables = [
