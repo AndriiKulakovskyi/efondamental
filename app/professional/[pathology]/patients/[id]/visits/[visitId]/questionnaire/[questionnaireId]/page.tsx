@@ -1690,7 +1690,7 @@ export default async function ProfessionalQuestionnairePage({
     if (patient && patient.gender) {
       initialResponses = {
         ...initialResponses,
-        patient_gender: patient.gender === 'M' ? 'm' : patient.gender === 'F' ? 'f' : patient.gender.toLowerCase(),
+        patient_gender: patient.gender === 'M' ? 'm' : 'f',
       };
     }
   }
