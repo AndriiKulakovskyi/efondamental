@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Loader2, User, Phone, Mail, MapPin, Users } from "lucide-react";
 
 interface EmergencyContact {
@@ -295,13 +296,13 @@ export function EditPatientModal({ patient, isOpen, onClose }: EditPatientModalP
 
               <div className="space-y-2">
                 <Label htmlFor="dateOfBirth">Date de naissance *</Label>
-                <Input
+                <DatePicker
                   id="dateOfBirth"
-                  type="date"
                   value={dateOfBirth}
                   max={getMaxDateOfBirth()}
-                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  onChange={setDateOfBirth}
                   required
+                  placeholder="Sélectionner la date"
                 />
               </div>
 

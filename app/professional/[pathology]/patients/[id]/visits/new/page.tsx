@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DateTimePicker } from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -173,21 +174,15 @@ export default function NewVisitPage() {
                   <Label htmlFor="scheduledDate" className="block text-sm font-semibold text-slate-700 mb-2">
                     Date planifiée <span className="text-brand">*</span>
                   </Label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <CalendarIcon className="w-5 h-5 text-slate-400" />
-                    </div>
-                    <Input
-                      id="scheduledDate"
-                      type="datetime-local"
-                      value={formData.scheduledDate}
-                      onChange={(e) =>
-                        setFormData({ ...formData, scheduledDate: e.target.value })
-                      }
-                      required
-                      className="bg-slate-50 border-slate-200 rounded-xl pl-10 pr-4 py-3 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand shadow-sm"
-                    />
-                  </div>
+                  <DateTimePicker
+                    id="scheduledDate"
+                    value={formData.scheduledDate}
+                    onChange={(val) =>
+                      setFormData({ ...formData, scheduledDate: val })
+                    }
+                    required
+                    className="bg-slate-50 border-slate-200 rounded-xl h-auto px-4 py-3 transition hover:bg-white hover:border-slate-300 shadow-sm"
+                  />
                 </div>
               </div>
             </div>

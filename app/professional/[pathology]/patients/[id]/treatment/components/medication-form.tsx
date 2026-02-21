@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -265,11 +266,10 @@ export function MedicationForm({ patientId, onMedicationAdded }: MedicationFormP
           <Label htmlFor="start_date" className="block text-sm font-semibold text-slate-700 mb-2">
             Date de début du traitement <span className="text-orange-600">*</span>
           </Label>
-          <Input
+          <DatePicker
             id="start_date"
-            type="date"
             value={formData.start_date}
-            onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+            onChange={(val) => setFormData({ ...formData, start_date: val })}
             required
             className="bg-slate-50 border-slate-200 rounded-xl"
           />
@@ -311,11 +311,10 @@ export function MedicationForm({ patientId, onMedicationAdded }: MedicationFormP
           <Label htmlFor="end_date" className="block text-sm font-semibold text-slate-700 mb-2">
             Date de fin du traitement <span className="text-orange-600">*</span>
           </Label>
-          <Input
+          <DatePicker
             id="end_date"
-            type="date"
             value={formData.end_date}
-            onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+            onChange={(val) => setFormData({ ...formData, end_date: val })}
             required={!formData.is_ongoing}
             className="bg-slate-50 border-slate-200 rounded-xl"
           />

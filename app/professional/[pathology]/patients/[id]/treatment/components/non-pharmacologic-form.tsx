@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Loader2, Save } from "lucide-react";
 import { NonPharmacologicResponse } from "@/lib/types/database.types";
 
@@ -271,10 +272,9 @@ export function NonPharmacologicForm({
                       <Label className="block text-sm text-slate-600 mb-1">
                         Date de debut
                       </Label>
-                      <Input
-                        type="date"
+                      <DatePicker
                         value={tState.start_date}
-                        onChange={(e) => updateTreatment(t.id, "start_date", e.target.value)}
+                        onChange={(val) => updateTreatment(t.id, "start_date", val)}
                         className="bg-slate-50 border-slate-200 rounded-lg text-sm"
                       />
                     </div>
@@ -282,10 +282,9 @@ export function NonPharmacologicForm({
                       <Label className="block text-sm text-slate-600 mb-1">
                         Date de fin
                       </Label>
-                      <Input
-                        type="date"
+                      <DatePicker
                         value={tState.end_date}
-                        onChange={(e) => updateTreatment(t.id, "end_date", e.target.value)}
+                        onChange={(val) => updateTreatment(t.id, "end_date", val)}
                         className="bg-slate-50 border-slate-200 rounded-lg text-sm"
                       />
                     </div>

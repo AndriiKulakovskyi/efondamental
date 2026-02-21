@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertBanner } from "@/components/ui/alert-banner";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Loader2 } from "lucide-react";
 
 interface Doctor {
@@ -165,13 +166,13 @@ export function PatientForm({ pathology, doctors, currentUserId }: PatientFormPr
               <label className="block text-sm font-semibold text-slate-700 mb-2">
                 Date de naissance <span className="text-brand">*</span>
               </label>
-              <input
-                type="date"
+              <DatePicker
                 value={formData.dateOfBirth}
                 max={getMaxDateOfBirth()}
-                onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                onChange={(val) => setFormData({ ...formData, dateOfBirth: val })}
                 className={inputClassName}
                 required
+                placeholder="Sélectionner la date de naissance"
               />
               <p className="text-[10px] text-slate-400 mt-1.5 ml-1">Le patient doit avoir au moins 15 ans</p>
             </div>

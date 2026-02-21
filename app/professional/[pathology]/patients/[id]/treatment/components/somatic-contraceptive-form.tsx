@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { SomaticContraceptiveEntry } from "@/lib/types/database.types";
 
@@ -131,10 +132,9 @@ export function SomaticContraceptiveForm({
             <Label className="block text-sm font-semibold text-slate-700 mb-2">
               Date de debut
             </Label>
-            <Input
-              type="date"
+            <DatePicker
               value={formData.start_date}
-              onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+              onChange={(val) => setFormData({ ...formData, start_date: val })}
               className="bg-slate-50 border-slate-200 rounded-xl"
             />
           </div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -126,10 +127,9 @@ export function PsychotropesLifetimeForm({
         <Label className="block text-sm font-semibold text-slate-700 mb-2">
           Date de recueil des informations
         </Label>
-        <Input
-          type="date"
+        <DatePicker
           value={collectionDate}
-          onChange={(e) => setCollectionDate(e.target.value)}
+          onChange={setCollectionDate}
           className="bg-slate-50 border-slate-200 rounded-xl"
         />
       </div>
@@ -179,10 +179,9 @@ export function PsychotropesLifetimeForm({
                     <Label className="block text-sm text-slate-600 mb-1">
                       Date de debut
                     </Label>
-                    <Input
-                      type="date"
+                    <DatePicker
                       value={catState.start_date}
-                      onChange={(e) => updateCategory(cat.id, "start_date", e.target.value)}
+                      onChange={(val) => updateCategory(cat.id, "start_date", val)}
                       className="bg-slate-50 border-slate-200 rounded-lg text-sm"
                     />
                   </div>

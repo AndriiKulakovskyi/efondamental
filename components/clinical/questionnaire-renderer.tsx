@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -3067,15 +3068,13 @@ export function QuestionnaireRenderer({
         )}
 
         {question.type === "date" && (
-          <Input
+          <DatePicker
             id={question.id}
-            name={question.id}
-            type="date"
             value={value || ""}
-            onChange={(e) => handleResponseChange(question.id, e.target.value)}
+            onChange={(val) => handleResponseChange(question.id, val)}
             disabled={readonly}
             required={isRequired}
-            className="bg-slate-50 border-slate-200 rounded-xl px-4 py-3.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand"
+            className="bg-slate-50 border-slate-200 rounded-xl h-auto px-4 py-3.5 transition hover:bg-white hover:border-slate-300"
           />
         )}
       </div>

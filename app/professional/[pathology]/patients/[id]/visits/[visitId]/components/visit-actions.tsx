@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DateTimePicker } from "@/components/ui/date-picker";
 import { AlertBanner } from "@/components/ui/alert-banner";
 import { 
   Play, 
@@ -240,11 +241,10 @@ export default function VisitActions({
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="reschedule-date">Nouvelle date et heure</Label>
-              <Input
+              <DateTimePicker
                 id="reschedule-date"
-                type="datetime-local"
                 value={rescheduleDate}
-                onChange={(e) => setRescheduleDate(e.target.value)}
+                onChange={setRescheduleDate}
               />
             </div>
             {error && <AlertBanner type="error" message={error} />}
