@@ -51,6 +51,24 @@ export {
   type SchizophreniaSapsResponseInsert
 } from './saps';
 
+// SANS (Scale for the Assessment of Negative Symptoms)
+export {
+  SANS_QUESTIONS,
+  SANS_DEFINITION,
+  computeSansScores,
+  type SchizophreniaSansResponse,
+  type SchizophreniaSansResponseInsert
+} from './sans';
+
+// UKU (Udvalg for Kliniske Undersøgelser Side Effect Rating Scale)
+export {
+  UKU_QUESTIONS,
+  UKU_DEFINITION,
+  computeUkuScores,
+  type SchizophreniaUkuResponse,
+  type SchizophreniaUkuResponseInsert
+} from './uku';
+
 // AIMS (Abnormal Involuntary Movement Scale)
 export {
   AIMS_QUESTIONS,

@@ -13,11 +13,11 @@ import { ExpandableModuleCard } from "./components/expandable-module-card";
 import { VisitQuickStats } from "./components/visit-quick-stats";
 import { CircularProgress } from "./components/circular-progress";
 import { cn } from "@/lib/utils";
-import { 
-  ASRM_DEFINITION, 
-  QIDS_DEFINITION, 
-  MDQ_DEFINITION, 
-  DIAGNOSTIC_DEFINITION, 
+import {
+  ASRM_DEFINITION,
+  QIDS_DEFINITION,
+  MDQ_DEFINITION,
+  DIAGNOSTIC_DEFINITION,
   ORIENTATION_DEFINITION,
   // TRAITS (to be migrated)
   ASRS_DEFINITION,
@@ -136,6 +136,8 @@ import {
   SAS_DEFINITION,
   PSP_DEFINITION,
   SAPS_DEFINITION,
+  SANS_DEFINITION,
+  UKU_DEFINITION,
   BRIEF_A_SZ_DEFINITION,
   YMRS_SZ_DEFINITION,
   CGI_SZ_DEFINITION,
@@ -208,27 +210,27 @@ export default async function VisitDetailPage({
 
   // Fetch tobacco response to determine if Fagerstrom should be shown
   const tobaccoResponse = await getTobaccoResponse(visitId);
-  
+
   // Determine Fagerstrom visibility based on tobacco smoking_status
   // Show Fagerstrom only if patient is current_smoker or ex_smoker
   const tobaccoAnswered = !!tobaccoResponse;
   const smokingStatus = tobaccoResponse?.smoking_status;
   // Fagerstrom is only required for current smokers (Fumeur actuel), not ex-smokers
   const isFagerstromRequired = smokingStatus === 'current_smoker';
-  
+
   // Fetch DSM5 Comorbidities response to determine if DIVA should be shown
   const dsm5ComorbidResponse = await getDsm5ComorbidResponse(visitId);
-  
+
   // Determine DIVA visibility based on diva_evaluated
   // Show DIVA only if professional answered "Oui" to diva_evaluated question
   const dsm5ComorbidAnswered = !!dsm5ComorbidResponse;
   const divaEvaluated = dsm5ComorbidResponse?.diva_evaluated;
   const isDivaRequired = divaEvaluated === 'oui';
-  
+
   // Fetch WAIS criteria responses to determine neuropsychological questionnaire visibility
   const wais4CriteriaResponse = await getWais4CriteriaResponse(visitId);
   const wais3CriteriaResponse = await getWais3CriteriaResponse(visitId);
-  
+
   // Determine neuropsychological questionnaire visibility based on acceptance
   const wais4CriteriaAnswered = !!wais4CriteriaResponse;
   const wais3CriteriaAnswered = !!wais3CriteriaResponse;
@@ -236,7 +238,7 @@ export default async function VisitDetailPage({
   // Use type assertion to handle the type mismatch
   const wais4Accepted = !!(wais4CriteriaResponse?.accepted_for_neuropsy_evaluation);
   const wais3Accepted = !!(wais3CriteriaResponse?.accepted_for_neuropsy_evaluation);
-  
+
   // NOTE: We will calculate actual completion status from constructed modules AFTER building them
   // This ensures accuracy by using the same logic as individual module cards
   // The RPC data is still used for questionnaire statuses, but progress is calculated from modules
@@ -410,6 +412,20 @@ export default async function VisitDetailPage({
               target_role: 'healthcare_professional',
               completed: questionnaireStatuses['SAPS']?.completed || false,
               completedAt: questionnaireStatuses['SAPS']?.completed_at,
+            },
+            {
+              ...SANS_DEFINITION,
+              id: SANS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SANS']?.completed || false,
+              completedAt: questionnaireStatuses['SANS']?.completed_at,
+            },
+            {
+              ...UKU_DEFINITION,
+              id: UKU_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['UKU']?.completed || false,
+              completedAt: questionnaireStatuses['UKU']?.completed_at,
             },
             {
               ...AIMS_DEFINITION,
@@ -965,739 +981,739 @@ export default async function VisitDetailPage({
         }
       ];
     } else {
-    // Bipolar and other pathologies - full initial evaluation
-    // Build nurse module questionnaires with conditional Fagerstrom
-    const nurseQuestionnaires: any[] = [
-      {
-        ...TOBACCO_DEFINITION,
-        id: TOBACCO_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: questionnaireStatuses['TOBACCO']?.completed || false,
-        completedAt: questionnaireStatuses['TOBACCO']?.completed_at,
-      },
-    ];
-    
-    // Add Fagerstrom with conditional display properties (ALWAYS visible)
-    // - If tobacco not answered: show as locked (waiting for tobacco)
-    // - If tobacco answered with smoker/ex-smoker: show enabled
-    // - If tobacco answered with non-smoker/unknown: show as locked/grayed (not applicable)
-    if (!tobaccoAnswered) {
-      // Tobacco not yet completed - show Fagerstrom as conditional/locked
-      nurseQuestionnaires.push({
-        ...FAGERSTROM_DEFINITION,
-        id: FAGERSTROM_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: false,
-        completedAt: null,
-        isConditional: true,
-        conditionMet: false,
-        conditionMessage: 'Complétez d\'abord l\'évaluation du tabagisme',
-      });
-    } else if (isFagerstromRequired) {
-      // Tobacco answered with smoker/ex-smoker - show Fagerstrom enabled
-      nurseQuestionnaires.push({
-        ...FAGERSTROM_DEFINITION,
-        id: FAGERSTROM_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: questionnaireStatuses['FAGERSTROM']?.completed || false,
-        completedAt: questionnaireStatuses['FAGERSTROM']?.completed_at,
-        isConditional: true,
-        conditionMet: true,
-      });
-    } else {
-      // Tobacco answered with non_smoker or unknown - show Fagerstrom as locked/grayed (not applicable)
-      nurseQuestionnaires.push({
-        ...FAGERSTROM_DEFINITION,
-        id: FAGERSTROM_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: false,
-        completedAt: null,
-        isConditional: true,
-        conditionMet: false,
-        conditionMessage: 'Non applicable - le patient n\'est pas fumeur',
-      });
-    }
-    
-    // Add remaining nurse questionnaires
-    nurseQuestionnaires.push(
-      {
-        ...PHYSICAL_PARAMS_DEFINITION,
-        id: PHYSICAL_PARAMS_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: questionnaireStatuses['PHYSICAL_PARAMS']?.completed || false,
-        completedAt: questionnaireStatuses['PHYSICAL_PARAMS']?.completed_at,
-      },
-      {
-        ...BLOOD_PRESSURE_DEFINITION,
-        id: BLOOD_PRESSURE_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: questionnaireStatuses['BLOOD_PRESSURE']?.completed || false,
-        completedAt: questionnaireStatuses['BLOOD_PRESSURE']?.completed_at,
-      },
-      {
-        ...ECG_DEFINITION,
-        id: ECG_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: questionnaireStatuses['ECG']?.completed || false,
-        completedAt: questionnaireStatuses['ECG']?.completed_at,
-      },
-      {
-        ...SLEEP_APNEA_DEFINITION,
-        id: SLEEP_APNEA_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: questionnaireStatuses['SLEEP_APNEA']?.completed || false,
-        completedAt: questionnaireStatuses['SLEEP_APNEA']?.completed_at,
-      },
-      {
-        ...BIOLOGICAL_ASSESSMENT_DEFINITION,
-        id: BIOLOGICAL_ASSESSMENT_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: questionnaireStatuses['BIOLOGICAL_ASSESSMENT']?.completed || false,
-        completedAt: questionnaireStatuses['BIOLOGICAL_ASSESSMENT']?.completed_at,
+      // Bipolar and other pathologies - full initial evaluation
+      // Build nurse module questionnaires with conditional Fagerstrom
+      const nurseQuestionnaires: any[] = [
+        {
+          ...TOBACCO_DEFINITION,
+          id: TOBACCO_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['TOBACCO']?.completed || false,
+          completedAt: questionnaireStatuses['TOBACCO']?.completed_at,
+        },
+      ];
+
+      // Add Fagerstrom with conditional display properties (ALWAYS visible)
+      // - If tobacco not answered: show as locked (waiting for tobacco)
+      // - If tobacco answered with smoker/ex-smoker: show enabled
+      // - If tobacco answered with non-smoker/unknown: show as locked/grayed (not applicable)
+      if (!tobaccoAnswered) {
+        // Tobacco not yet completed - show Fagerstrom as conditional/locked
+        nurseQuestionnaires.push({
+          ...FAGERSTROM_DEFINITION,
+          id: FAGERSTROM_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: false,
+          completedAt: null,
+          isConditional: true,
+          conditionMet: false,
+          conditionMessage: 'Complétez d\'abord l\'évaluation du tabagisme',
+        });
+      } else if (isFagerstromRequired) {
+        // Tobacco answered with smoker/ex-smoker - show Fagerstrom enabled
+        nurseQuestionnaires.push({
+          ...FAGERSTROM_DEFINITION,
+          id: FAGERSTROM_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['FAGERSTROM']?.completed || false,
+          completedAt: questionnaireStatuses['FAGERSTROM']?.completed_at,
+          isConditional: true,
+          conditionMet: true,
+        });
+      } else {
+        // Tobacco answered with non_smoker or unknown - show Fagerstrom as locked/grayed (not applicable)
+        nurseQuestionnaires.push({
+          ...FAGERSTROM_DEFINITION,
+          id: FAGERSTROM_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: false,
+          completedAt: null,
+          isConditional: true,
+          conditionMet: false,
+          conditionMessage: 'Non applicable - le patient n\'est pas fumeur',
+        });
       }
-    );
 
-    modulesWithQuestionnaires = [
-      {
-        id: 'mod_nurse',
-        name: 'Infirmier',
-        description: 'Évaluation par l\'infirmier',
-        questionnaires: nurseQuestionnaires
-      },
-      {
-        id: 'mod_thymic_eval',
-        name: 'Evaluation état thymique et fonctionnement',
-        description: 'Évaluation de l\'état thymique et du fonctionnement',
-        questionnaires: [
-          {
-            ...MADRS_DEFINITION,
-            id: MADRS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['MADRS']?.completed || false,
-            completedAt: questionnaireStatuses['MADRS']?.completed_at,
-          },
-          {
-            ...YMRS_DEFINITION,
-            id: YMRS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['YMRS']?.completed || false,
-            completedAt: questionnaireStatuses['YMRS']?.completed_at,
-          },
-          {
-            ...CGI_DEFINITION,
-            id: CGI_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['CGI']?.completed || false,
-            completedAt: questionnaireStatuses['CGI']?.completed_at,
-          },
-          {
-            ...EGF_DEFINITION,
-            id: EGF_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['EGF']?.completed || false,
-            completedAt: questionnaireStatuses['EGF']?.completed_at,
-          },
-          {
-            ...ALDA_DEFINITION,
-            id: ALDA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ALDA']?.completed || false,
-            completedAt: questionnaireStatuses['ALDA']?.completed_at,
-          },
-          {
-            ...ETAT_PATIENT_DEFINITION,
-            id: ETAT_PATIENT_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ETAT_PATIENT']?.completed || false,
-            completedAt: questionnaireStatuses['ETAT_PATIENT']?.completed_at,
-          },
-          {
-            ...FAST_DEFINITION,
-            id: FAST_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['FAST']?.completed || false,
-            completedAt: questionnaireStatuses['FAST']?.completed_at,
-          }
-        ]
-      },
-      // Build medical evaluation module with sections
-      (() => {
-        // Build DSM5 section questionnaires with conditional DIVA
-        const dsm5Questionnaires: any[] = [
-          {
-            ...DSM5_HUMEUR_DEFINITION,
-            id: DSM5_HUMEUR_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['DSM5_HUMEUR']?.completed || false,
-            completedAt: questionnaireStatuses['DSM5_HUMEUR']?.completed_at,
-          },
-          {
-            ...DSM5_PSYCHOTIC_DEFINITION,
-            id: DSM5_PSYCHOTIC_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['DSM5_PSYCHOTIC']?.completed || false,
-            completedAt: questionnaireStatuses['DSM5_PSYCHOTIC']?.completed_at,
-          },
-          {
-            ...DSM5_COMORBID_DEFINITION,
-            id: DSM5_COMORBID_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['DSM5_COMORBID']?.completed || false,
-            completedAt: questionnaireStatuses['DSM5_COMORBID']?.completed_at,
-          },
-        ];
-        
-        // Add DIVA with conditional display properties (ALWAYS visible)
-        // - If DSM5 Comorbidities not answered: show as locked (waiting for DSM5)
-        // - If DSM5 answered with "Oui" to diva_evaluated: show DIVA enabled
-        // - If DSM5 answered with "Non" or "Ne sais pas": show as locked/grayed (not applicable)
-        if (!dsm5ComorbidAnswered) {
-          // DSM5 not yet completed - show DIVA as conditional/locked
-          dsm5Questionnaires.push({
-            ...DIVA_DEFINITION,
-            id: DIVA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: false,
-            completedAt: null,
-            isConditional: true,
-            conditionMet: false,
-            conditionMessage: 'Complétez d\'abord l\'évaluation DSM5 - Troubles comorbides (Section 5)',
-          });
-        } else if (isDivaRequired) {
-          // DSM5 answered with "Oui" - show DIVA enabled
-          dsm5Questionnaires.push({
-            ...DIVA_DEFINITION,
-            id: DIVA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['DIVA']?.completed || false,
-            completedAt: questionnaireStatuses['DIVA']?.completed_at,
-            isConditional: true,
-            conditionMet: true,
-          });
-        } else {
-          // DSM5 answered with "Non" or "Ne sais pas" - show DIVA as locked/grayed (not applicable)
-          dsm5Questionnaires.push({
-            ...DIVA_DEFINITION,
-            id: DIVA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: false,
-            completedAt: null,
-            isConditional: true,
-            conditionMet: false,
-            conditionMessage: 'Non applicable - le patient n\'a pas été évalué avec la DIVA',
-          });
+      // Add remaining nurse questionnaires
+      nurseQuestionnaires.push(
+        {
+          ...PHYSICAL_PARAMS_DEFINITION,
+          id: PHYSICAL_PARAMS_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['PHYSICAL_PARAMS']?.completed || false,
+          completedAt: questionnaireStatuses['PHYSICAL_PARAMS']?.completed_at,
+        },
+        {
+          ...BLOOD_PRESSURE_DEFINITION,
+          id: BLOOD_PRESSURE_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['BLOOD_PRESSURE']?.completed || false,
+          completedAt: questionnaireStatuses['BLOOD_PRESSURE']?.completed_at,
+        },
+        {
+          ...ECG_DEFINITION,
+          id: ECG_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['ECG']?.completed || false,
+          completedAt: questionnaireStatuses['ECG']?.completed_at,
+        },
+        {
+          ...SLEEP_APNEA_DEFINITION,
+          id: SLEEP_APNEA_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['SLEEP_APNEA']?.completed || false,
+          completedAt: questionnaireStatuses['SLEEP_APNEA']?.completed_at,
+        },
+        {
+          ...BIOLOGICAL_ASSESSMENT_DEFINITION,
+          id: BIOLOGICAL_ASSESSMENT_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['BIOLOGICAL_ASSESSMENT']?.completed || false,
+          completedAt: questionnaireStatuses['BIOLOGICAL_ASSESSMENT']?.completed_at,
         }
+      );
 
-        // Build Suicide section questionnaires
-        const suicideQuestionnaires = [
-          {
-            ...CSSRS_DEFINITION,
-            id: CSSRS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['CSSRS']?.completed || false,
-            completedAt: questionnaireStatuses['CSSRS']?.completed_at,
-          },
-          {
-            ...ISA_DEFINITION,
-            id: ISA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ISA']?.completed || false,
-            completedAt: questionnaireStatuses['ISA']?.completed_at,
-          },
-          {
-            ...SIS_DEFINITION,
-            id: SIS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['SIS']?.completed || false,
-            completedAt: questionnaireStatuses['SIS']?.completed_at,
-          },
-          {
-            ...SUICIDE_HISTORY_DEFINITION,
-            id: SUICIDE_HISTORY_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['SUICIDE_HISTORY']?.completed || false,
-            completedAt: questionnaireStatuses['SUICIDE_HISTORY']?.completed_at,
-          }
-        ];
-        
-        return {
-          id: 'mod_medical_eval',
-          name: 'Evaluation Médicale',
-          description: 'Évaluation médicale complète',
+      modulesWithQuestionnaires = [
+        {
+          id: 'mod_nurse',
+          name: 'Infirmier',
+          description: 'Évaluation par l\'infirmier',
+          questionnaires: nurseQuestionnaires
+        },
+        {
+          id: 'mod_thymic_eval',
+          name: 'Evaluation état thymique et fonctionnement',
+          description: 'Évaluation de l\'état thymique et du fonctionnement',
           questionnaires: [
             {
-              ...FAMILY_HISTORY_DEFINITION,
-              id: FAMILY_HISTORY_DEFINITION.code,
+              ...MADRS_DEFINITION,
+              id: MADRS_DEFINITION.code,
               target_role: 'healthcare_professional',
-              completed: questionnaireStatuses['FAMILY_HISTORY']?.completed || false,
-              completedAt: questionnaireStatuses['FAMILY_HISTORY']?.completed_at,
-            }
-          ],
-          sections: [
-            {
-              id: 'dsm5',
-              name: 'DSM5',
-              questionnaires: dsm5Questionnaires
+              completed: questionnaireStatuses['MADRS']?.completed || false,
+              completedAt: questionnaireStatuses['MADRS']?.completed_at,
             },
             {
-              id: 'suicide',
-              name: 'Suicide',
-              questionnaires: suicideQuestionnaires
+              ...YMRS_DEFINITION,
+              id: YMRS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['YMRS']?.completed || false,
+              completedAt: questionnaireStatuses['YMRS']?.completed_at,
             },
             {
-              id: 'histoire_somatique',
-              name: 'Histoire somatique',
-              questionnaires: [
-                {
-                  ...PERINATALITE_DEFINITION,
-                  id: PERINATALITE_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['PERINATALITE']?.completed || false,
-                  completedAt: questionnaireStatuses['PERINATALITE']?.completed_at,
-                },
-                {
-                  ...PATHO_NEURO_DEFINITION,
-                  id: PATHO_NEURO_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['PATHO_NEURO']?.completed || false,
-                  completedAt: questionnaireStatuses['PATHO_NEURO']?.completed_at,
-                },
-                {
-                  ...PATHO_CARDIO_DEFINITION,
-                  id: PATHO_CARDIO_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['PATHO_CARDIO']?.completed || false,
-                  completedAt: questionnaireStatuses['PATHO_CARDIO']?.completed_at,
-                },
-                {
-                  ...PATHO_ENDOC_DEFINITION,
-                  id: PATHO_ENDOC_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['PATHO_ENDOC']?.completed || false,
-                  completedAt: questionnaireStatuses['PATHO_ENDOC']?.completed_at,
-                },
-                {
-                  ...PATHO_DERMATO_DEFINITION,
-                  id: PATHO_DERMATO_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['PATHO_DERMATO']?.completed || false,
-                  completedAt: questionnaireStatuses['PATHO_DERMATO']?.completed_at,
-                },
-                {
-                  ...PATHO_URINAIRE_DEFINITION,
-                  id: PATHO_URINAIRE_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['PATHO_URINAIRE']?.completed || false,
-                  completedAt: questionnaireStatuses['PATHO_URINAIRE']?.completed_at,
-                },
-                {
-                  ...ANTECEDENTS_GYNECO_DEFINITION,
-                  id: ANTECEDENTS_GYNECO_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['ANTECEDENTS_GYNECO']?.completed || false,
-                  completedAt: questionnaireStatuses['ANTECEDENTS_GYNECO']?.completed_at,
-                },
-                {
-                  ...PATHO_HEPATO_GASTRO_DEFINITION,
-                  id: PATHO_HEPATO_GASTRO_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['PATHO_HEPATO_GASTRO']?.completed || false,
-                  completedAt: questionnaireStatuses['PATHO_HEPATO_GASTRO']?.completed_at,
-                },
-                {
-                  ...PATHO_ALLERGIQUE_DEFINITION,
-                  id: PATHO_ALLERGIQUE_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['PATHO_ALLERGIQUE']?.completed || false,
-                  completedAt: questionnaireStatuses['PATHO_ALLERGIQUE']?.completed_at,
-                },
-                {
-                  ...AUTRES_PATHO_DEFINITION,
-                  id: AUTRES_PATHO_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['AUTRES_PATHO']?.completed || false,
-                  completedAt: questionnaireStatuses['AUTRES_PATHO']?.completed_at,
-                }
-              ]
+              ...CGI_DEFINITION,
+              id: CGI_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['CGI']?.completed || false,
+              completedAt: questionnaireStatuses['CGI']?.completed_at,
+            },
+            {
+              ...EGF_DEFINITION,
+              id: EGF_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['EGF']?.completed || false,
+              completedAt: questionnaireStatuses['EGF']?.completed_at,
+            },
+            {
+              ...ALDA_DEFINITION,
+              id: ALDA_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['ALDA']?.completed || false,
+              completedAt: questionnaireStatuses['ALDA']?.completed_at,
+            },
+            {
+              ...ETAT_PATIENT_DEFINITION,
+              id: ETAT_PATIENT_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['ETAT_PATIENT']?.completed || false,
+              completedAt: questionnaireStatuses['ETAT_PATIENT']?.completed_at,
+            },
+            {
+              ...FAST_DEFINITION,
+              id: FAST_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['FAST']?.completed || false,
+              completedAt: questionnaireStatuses['FAST']?.completed_at,
             }
           ]
-        };
-      })(),
-      {
-        id: 'mod_neuropsy',
-        name: 'Evaluation Neuropsychologique',
-        description: 'Évaluation neuropsychologique (Tests indépendants, WAIS-III, WAIS-IV)',
-        questionnaires: (() => {
-          const independentTests = [
-            { def: CVLT_DEFINITION, code: 'CVLT' },
-            { def: TMT_DEFINITION, code: 'TMT' },
-            { def: STROOP_DEFINITION, code: 'STROOP' },
-            { def: FLUENCES_VERBALES_DEFINITION, code: 'FLUENCES_VERBALES' },
-            { def: MEM3_SPATIAL_DEFINITION, code: 'MEM3_SPATIAL' }
+        },
+        // Build medical evaluation module with sections
+        (() => {
+          // Build DSM5 section questionnaires with conditional DIVA
+          const dsm5Questionnaires: any[] = [
+            {
+              ...DSM5_HUMEUR_DEFINITION,
+              id: DSM5_HUMEUR_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['DSM5_HUMEUR']?.completed || false,
+              completedAt: questionnaireStatuses['DSM5_HUMEUR']?.completed_at,
+            },
+            {
+              ...DSM5_PSYCHOTIC_DEFINITION,
+              id: DSM5_PSYCHOTIC_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['DSM5_PSYCHOTIC']?.completed || false,
+              completedAt: questionnaireStatuses['DSM5_PSYCHOTIC']?.completed_at,
+            },
+            {
+              ...DSM5_COMORBID_DEFINITION,
+              id: DSM5_COMORBID_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['DSM5_COMORBID']?.completed || false,
+              completedAt: questionnaireStatuses['DSM5_COMORBID']?.completed_at,
+            },
           ];
-          
-          return independentTests.map(({ def, code }) => {
-            const isAnswered = wais3CriteriaAnswered || wais4CriteriaAnswered;
-            const isAccepted = wais3Accepted || wais4Accepted;
-            
-            if (!isAnswered) {
-              return {
-                ...def,
-                id: def.code,
-                target_role: 'healthcare_professional',
-                completed: false,
-                completedAt: null,
-                isConditional: true,
-                conditionMet: false,
-                conditionMessage: 'Complétez d\'abord les Critères cliniques (WAIS-III ou WAIS-IV)',
-              };
-            } else if (isAccepted) {
-              return {
-                ...def,
-                id: def.code,
-                target_role: 'healthcare_professional',
-                completed: questionnaireStatuses[code]?.completed || false,
-                completedAt: questionnaireStatuses[code]?.completed_at,
-                isConditional: true,
-                conditionMet: true,
-              };
-            } else {
-              return {
-                ...def,
-                id: def.code,
-                target_role: 'healthcare_professional',
-                completed: false,
-                completedAt: null,
-                isConditional: true,
-                conditionMet: false,
-                conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
-              };
+
+          // Add DIVA with conditional display properties (ALWAYS visible)
+          // - If DSM5 Comorbidities not answered: show as locked (waiting for DSM5)
+          // - If DSM5 answered with "Oui" to diva_evaluated: show DIVA enabled
+          // - If DSM5 answered with "Non" or "Ne sais pas": show as locked/grayed (not applicable)
+          if (!dsm5ComorbidAnswered) {
+            // DSM5 not yet completed - show DIVA as conditional/locked
+            dsm5Questionnaires.push({
+              ...DIVA_DEFINITION,
+              id: DIVA_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: false,
+              completedAt: null,
+              isConditional: true,
+              conditionMet: false,
+              conditionMessage: 'Complétez d\'abord l\'évaluation DSM5 - Troubles comorbides (Section 5)',
+            });
+          } else if (isDivaRequired) {
+            // DSM5 answered with "Oui" - show DIVA enabled
+            dsm5Questionnaires.push({
+              ...DIVA_DEFINITION,
+              id: DIVA_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['DIVA']?.completed || false,
+              completedAt: questionnaireStatuses['DIVA']?.completed_at,
+              isConditional: true,
+              conditionMet: true,
+            });
+          } else {
+            // DSM5 answered with "Non" or "Ne sais pas" - show DIVA as locked/grayed (not applicable)
+            dsm5Questionnaires.push({
+              ...DIVA_DEFINITION,
+              id: DIVA_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: false,
+              completedAt: null,
+              isConditional: true,
+              conditionMet: false,
+              conditionMessage: 'Non applicable - le patient n\'a pas été évalué avec la DIVA',
+            });
+          }
+
+          // Build Suicide section questionnaires
+          const suicideQuestionnaires = [
+            {
+              ...CSSRS_DEFINITION,
+              id: CSSRS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['CSSRS']?.completed || false,
+              completedAt: questionnaireStatuses['CSSRS']?.completed_at,
+            },
+            {
+              ...ISA_DEFINITION,
+              id: ISA_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['ISA']?.completed || false,
+              completedAt: questionnaireStatuses['ISA']?.completed_at,
+            },
+            {
+              ...SIS_DEFINITION,
+              id: SIS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SIS']?.completed || false,
+              completedAt: questionnaireStatuses['SIS']?.completed_at,
+            },
+            {
+              ...SUICIDE_HISTORY_DEFINITION,
+              id: SUICIDE_HISTORY_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SUICIDE_HISTORY']?.completed || false,
+              completedAt: questionnaireStatuses['SUICIDE_HISTORY']?.completed_at,
             }
-          });
+          ];
+
+          return {
+            id: 'mod_medical_eval',
+            name: 'Evaluation Médicale',
+            description: 'Évaluation médicale complète',
+            questionnaires: [
+              {
+                ...FAMILY_HISTORY_DEFINITION,
+                id: FAMILY_HISTORY_DEFINITION.code,
+                target_role: 'healthcare_professional',
+                completed: questionnaireStatuses['FAMILY_HISTORY']?.completed || false,
+                completedAt: questionnaireStatuses['FAMILY_HISTORY']?.completed_at,
+              }
+            ],
+            sections: [
+              {
+                id: 'dsm5',
+                name: 'DSM5',
+                questionnaires: dsm5Questionnaires
+              },
+              {
+                id: 'suicide',
+                name: 'Suicide',
+                questionnaires: suicideQuestionnaires
+              },
+              {
+                id: 'histoire_somatique',
+                name: 'Histoire somatique',
+                questionnaires: [
+                  {
+                    ...PERINATALITE_DEFINITION,
+                    id: PERINATALITE_DEFINITION.code,
+                    target_role: 'healthcare_professional',
+                    completed: questionnaireStatuses['PERINATALITE']?.completed || false,
+                    completedAt: questionnaireStatuses['PERINATALITE']?.completed_at,
+                  },
+                  {
+                    ...PATHO_NEURO_DEFINITION,
+                    id: PATHO_NEURO_DEFINITION.code,
+                    target_role: 'healthcare_professional',
+                    completed: questionnaireStatuses['PATHO_NEURO']?.completed || false,
+                    completedAt: questionnaireStatuses['PATHO_NEURO']?.completed_at,
+                  },
+                  {
+                    ...PATHO_CARDIO_DEFINITION,
+                    id: PATHO_CARDIO_DEFINITION.code,
+                    target_role: 'healthcare_professional',
+                    completed: questionnaireStatuses['PATHO_CARDIO']?.completed || false,
+                    completedAt: questionnaireStatuses['PATHO_CARDIO']?.completed_at,
+                  },
+                  {
+                    ...PATHO_ENDOC_DEFINITION,
+                    id: PATHO_ENDOC_DEFINITION.code,
+                    target_role: 'healthcare_professional',
+                    completed: questionnaireStatuses['PATHO_ENDOC']?.completed || false,
+                    completedAt: questionnaireStatuses['PATHO_ENDOC']?.completed_at,
+                  },
+                  {
+                    ...PATHO_DERMATO_DEFINITION,
+                    id: PATHO_DERMATO_DEFINITION.code,
+                    target_role: 'healthcare_professional',
+                    completed: questionnaireStatuses['PATHO_DERMATO']?.completed || false,
+                    completedAt: questionnaireStatuses['PATHO_DERMATO']?.completed_at,
+                  },
+                  {
+                    ...PATHO_URINAIRE_DEFINITION,
+                    id: PATHO_URINAIRE_DEFINITION.code,
+                    target_role: 'healthcare_professional',
+                    completed: questionnaireStatuses['PATHO_URINAIRE']?.completed || false,
+                    completedAt: questionnaireStatuses['PATHO_URINAIRE']?.completed_at,
+                  },
+                  {
+                    ...ANTECEDENTS_GYNECO_DEFINITION,
+                    id: ANTECEDENTS_GYNECO_DEFINITION.code,
+                    target_role: 'healthcare_professional',
+                    completed: questionnaireStatuses['ANTECEDENTS_GYNECO']?.completed || false,
+                    completedAt: questionnaireStatuses['ANTECEDENTS_GYNECO']?.completed_at,
+                  },
+                  {
+                    ...PATHO_HEPATO_GASTRO_DEFINITION,
+                    id: PATHO_HEPATO_GASTRO_DEFINITION.code,
+                    target_role: 'healthcare_professional',
+                    completed: questionnaireStatuses['PATHO_HEPATO_GASTRO']?.completed || false,
+                    completedAt: questionnaireStatuses['PATHO_HEPATO_GASTRO']?.completed_at,
+                  },
+                  {
+                    ...PATHO_ALLERGIQUE_DEFINITION,
+                    id: PATHO_ALLERGIQUE_DEFINITION.code,
+                    target_role: 'healthcare_professional',
+                    completed: questionnaireStatuses['PATHO_ALLERGIQUE']?.completed || false,
+                    completedAt: questionnaireStatuses['PATHO_ALLERGIQUE']?.completed_at,
+                  },
+                  {
+                    ...AUTRES_PATHO_DEFINITION,
+                    id: AUTRES_PATHO_DEFINITION.code,
+                    target_role: 'healthcare_professional',
+                    completed: questionnaireStatuses['AUTRES_PATHO']?.completed || false,
+                    completedAt: questionnaireStatuses['AUTRES_PATHO']?.completed_at,
+                  }
+                ]
+              }
+            ]
+          };
         })(),
-        sections: [
-          {
-            id: 'wais3',
-            name: 'WAIS-III',
-            questionnaires: (() => {
-              const wais3Questionnaires: any[] = [
-                // Criteria questionnaire - always enabled
-                {
-                  ...WAIS3_CRITERIA_DEFINITION,
-                  id: WAIS3_CRITERIA_DEFINITION.code,
+        {
+          id: 'mod_neuropsy',
+          name: 'Evaluation Neuropsychologique',
+          description: 'Évaluation neuropsychologique (Tests indépendants, WAIS-III, WAIS-IV)',
+          questionnaires: (() => {
+            const independentTests = [
+              { def: CVLT_DEFINITION, code: 'CVLT' },
+              { def: TMT_DEFINITION, code: 'TMT' },
+              { def: STROOP_DEFINITION, code: 'STROOP' },
+              { def: FLUENCES_VERBALES_DEFINITION, code: 'FLUENCES_VERBALES' },
+              { def: MEM3_SPATIAL_DEFINITION, code: 'MEM3_SPATIAL' }
+            ];
+
+            return independentTests.map(({ def, code }) => {
+              const isAnswered = wais3CriteriaAnswered || wais4CriteriaAnswered;
+              const isAccepted = wais3Accepted || wais4Accepted;
+
+              if (!isAnswered) {
+                return {
+                  ...def,
+                  id: def.code,
                   target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['WAIS3_CRITERIA']?.completed || false,
-                  completedAt: questionnaireStatuses['WAIS3_CRITERIA']?.completed_at,
-                }
-              ];
-              
-              // Helper function to add conditional questionnaire
-              const addConditionalQuestionnaire = (definition: any, code: string) => {
-                if (!wais3CriteriaAnswered) {
-                  // Criteria not yet completed - show as conditional/locked
-                  wais3Questionnaires.push({
-                    ...definition,
-                    id: definition.code,
+                  completed: false,
+                  completedAt: null,
+                  isConditional: true,
+                  conditionMet: false,
+                  conditionMessage: 'Complétez d\'abord les Critères cliniques (WAIS-III ou WAIS-IV)',
+                };
+              } else if (isAccepted) {
+                return {
+                  ...def,
+                  id: def.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses[code]?.completed || false,
+                  completedAt: questionnaireStatuses[code]?.completed_at,
+                  isConditional: true,
+                  conditionMet: true,
+                };
+              } else {
+                return {
+                  ...def,
+                  id: def.code,
+                  target_role: 'healthcare_professional',
+                  completed: false,
+                  completedAt: null,
+                  isConditional: true,
+                  conditionMet: false,
+                  conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
+                };
+              }
+            });
+          })(),
+          sections: [
+            {
+              id: 'wais3',
+              name: 'WAIS-III',
+              questionnaires: (() => {
+                const wais3Questionnaires: any[] = [
+                  // Criteria questionnaire - always enabled
+                  {
+                    ...WAIS3_CRITERIA_DEFINITION,
+                    id: WAIS3_CRITERIA_DEFINITION.code,
                     target_role: 'healthcare_professional',
-                    completed: false,
-                    completedAt: null,
-                    isConditional: true,
-                    conditionMet: false,
-                    conditionMessage: 'Complétez d\'abord les Critères cliniques',
-                  });
-                } else if (wais3Accepted) {
-                  // Patient accepted - show enabled
-                  wais3Questionnaires.push({
-                    ...definition,
-                    id: definition.code,
+                    completed: questionnaireStatuses['WAIS3_CRITERIA']?.completed || false,
+                    completedAt: questionnaireStatuses['WAIS3_CRITERIA']?.completed_at,
+                  }
+                ];
+
+                // Helper function to add conditional questionnaire
+                const addConditionalQuestionnaire = (definition: any, code: string) => {
+                  if (!wais3CriteriaAnswered) {
+                    // Criteria not yet completed - show as conditional/locked
+                    wais3Questionnaires.push({
+                      ...definition,
+                      id: definition.code,
+                      target_role: 'healthcare_professional',
+                      completed: false,
+                      completedAt: null,
+                      isConditional: true,
+                      conditionMet: false,
+                      conditionMessage: 'Complétez d\'abord les Critères cliniques',
+                    });
+                  } else if (wais3Accepted) {
+                    // Patient accepted - show enabled
+                    wais3Questionnaires.push({
+                      ...definition,
+                      id: definition.code,
+                      target_role: 'healthcare_professional',
+                      completed: questionnaireStatuses[code]?.completed || false,
+                      completedAt: questionnaireStatuses[code]?.completed_at,
+                      isConditional: true,
+                      conditionMet: true,
+                    });
+                  } else {
+                    // Patient not accepted - show as locked/not applicable
+                    wais3Questionnaires.push({
+                      ...definition,
+                      id: definition.code,
+                      target_role: 'healthcare_professional',
+                      completed: false,
+                      completedAt: null,
+                      isConditional: true,
+                      conditionMet: false,
+                      conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
+                    });
+                  }
+                };
+
+                // Add conditional questionnaires (WAIS-III specific tests)
+                addConditionalQuestionnaire(WAIS3_LEARNING_DEFINITION, 'WAIS3_LEARNING');
+                addConditionalQuestionnaire(WAIS3_VOCABULAIRE_DEFINITION, 'WAIS3_VOCABULAIRE');
+                addConditionalQuestionnaire(WAIS3_MATRICES_DEFINITION, 'WAIS3_MATRICES');
+                addConditionalQuestionnaire(WAIS3_CODE_SYMBOLES_DEFINITION, 'WAIS3_CODE_SYMBOLES');
+                addConditionalQuestionnaire(WAIS3_DIGIT_SPAN_DEFINITION, 'WAIS3_DIGIT_SPAN');
+                addConditionalQuestionnaire(WAIS3_CPT2_DEFINITION, 'WAIS3_CPT2');
+
+                return wais3Questionnaires;
+              })()
+            },
+            {
+              id: 'wais4',
+              name: 'WAIS-IV',
+              questionnaires: (() => {
+                const wais4Questionnaires: any[] = [
+                  // Criteria questionnaire - always enabled
+                  {
+                    ...WAIS4_CRITERIA_DEFINITION,
+                    id: WAIS4_CRITERIA_DEFINITION.code,
                     target_role: 'healthcare_professional',
-                    completed: questionnaireStatuses[code]?.completed || false,
-                    completedAt: questionnaireStatuses[code]?.completed_at,
-                    isConditional: true,
-                    conditionMet: true,
-                  });
-                } else {
-                  // Patient not accepted - show as locked/not applicable
-                  wais3Questionnaires.push({
-                    ...definition,
-                    id: definition.code,
+                    completed: questionnaireStatuses['WAIS4_CRITERIA']?.completed || false,
+                    completedAt: questionnaireStatuses['WAIS4_CRITERIA']?.completed_at,
+                  },
+                  {
+                    ...COBRA_DEFINITION,
+                    id: COBRA_DEFINITION.code,
                     target_role: 'healthcare_professional',
-                    completed: false,
-                    completedAt: null,
-                    isConditional: true,
-                    conditionMet: false,
-                    conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
-                  });
-                }
-              };
-              
-              // Add conditional questionnaires (WAIS-III specific tests)
-              addConditionalQuestionnaire(WAIS3_LEARNING_DEFINITION, 'WAIS3_LEARNING');
-              addConditionalQuestionnaire(WAIS3_VOCABULAIRE_DEFINITION, 'WAIS3_VOCABULAIRE');
-              addConditionalQuestionnaire(WAIS3_MATRICES_DEFINITION, 'WAIS3_MATRICES');
-              addConditionalQuestionnaire(WAIS3_CODE_SYMBOLES_DEFINITION, 'WAIS3_CODE_SYMBOLES');
-              addConditionalQuestionnaire(WAIS3_DIGIT_SPAN_DEFINITION, 'WAIS3_DIGIT_SPAN');
-              addConditionalQuestionnaire(WAIS3_CPT2_DEFINITION, 'WAIS3_CPT2');
-              
-              return wais3Questionnaires;
-            })()
-          },
-          {
-            id: 'wais4',
-            name: 'WAIS-IV',
-            questionnaires: (() => {
-              const wais4Questionnaires: any[] = [
-                // Criteria questionnaire - always enabled
-                {
-                  ...WAIS4_CRITERIA_DEFINITION,
-                  id: WAIS4_CRITERIA_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['WAIS4_CRITERIA']?.completed || false,
-                  completedAt: questionnaireStatuses['WAIS4_CRITERIA']?.completed_at,
-                },
-                {
-                  ...COBRA_DEFINITION,
-                  id: COBRA_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['COBRA']?.completed || false,
-                  completedAt: questionnaireStatuses['COBRA']?.completed_at,
-                },
-                {
-                  ...CPT3_DEFINITION,
-                  id: CPT3_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['CPT3']?.completed || false,
-                  completedAt: questionnaireStatuses['CPT3']?.completed_at,
-                },
-                {
-                  ...TEST_COMMISSIONS_DEFINITION,
-                  id: TEST_COMMISSIONS_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['TEST_COMMISSIONS']?.completed || false,
-                  completedAt: questionnaireStatuses['TEST_COMMISSIONS']?.completed_at,
-                },
-                {
-                  ...SCIP_DEFINITION,
-                  id: SCIP_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['SCIP']?.completed || false,
-                  completedAt: questionnaireStatuses['SCIP']?.completed_at,
-                },
-                {
-                  ...WAIS4_SIMILITUDES_DEFINITION,
-                  id: WAIS4_SIMILITUDES_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['WAIS4_SIMILITUDES']?.completed || false,
-                  completedAt: questionnaireStatuses['WAIS4_SIMILITUDES']?.completed_at,
-                }
-              ];
-              
-              // Helper function to add conditional questionnaire
-              const addConditionalQuestionnaire = (definition: any, code: string) => {
-                if (!wais4CriteriaAnswered) {
-                  // Criteria not yet completed - show as conditional/locked
-                  wais4Questionnaires.push({
-                    ...definition,
-                    id: definition.code,
+                    completed: questionnaireStatuses['COBRA']?.completed || false,
+                    completedAt: questionnaireStatuses['COBRA']?.completed_at,
+                  },
+                  {
+                    ...CPT3_DEFINITION,
+                    id: CPT3_DEFINITION.code,
                     target_role: 'healthcare_professional',
-                    completed: false,
-                    completedAt: null,
-                    isConditional: true,
-                    conditionMet: false,
-                    conditionMessage: 'Complétez d\'abord les Critères cliniques',
-                  });
-                } else if (wais4Accepted) {
-                  // Patient accepted - show enabled
-                  wais4Questionnaires.push({
-                    ...definition,
-                    id: definition.code,
+                    completed: questionnaireStatuses['CPT3']?.completed || false,
+                    completedAt: questionnaireStatuses['CPT3']?.completed_at,
+                  },
+                  {
+                    ...TEST_COMMISSIONS_DEFINITION,
+                    id: TEST_COMMISSIONS_DEFINITION.code,
                     target_role: 'healthcare_professional',
-                    completed: questionnaireStatuses[code]?.completed || false,
-                    completedAt: questionnaireStatuses[code]?.completed_at,
-                    isConditional: true,
-                    conditionMet: true,
-                  });
-                } else {
-                  // Patient not accepted - show as locked/not applicable
-                  wais4Questionnaires.push({
-                    ...definition,
-                    id: definition.code,
+                    completed: questionnaireStatuses['TEST_COMMISSIONS']?.completed || false,
+                    completedAt: questionnaireStatuses['TEST_COMMISSIONS']?.completed_at,
+                  },
+                  {
+                    ...SCIP_DEFINITION,
+                    id: SCIP_DEFINITION.code,
                     target_role: 'healthcare_professional',
-                    completed: false,
-                    completedAt: null,
-                    isConditional: true,
-                    conditionMet: false,
-                    conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
-                  });
-                }
-              };
-              
-              // Add conditional questionnaires (WAIS-IV specific tests only)
-              addConditionalQuestionnaire(WAIS4_LEARNING_DEFINITION, 'WAIS4_LEARNING');
-              addConditionalQuestionnaire(WAIS4_MATRICES_DEFINITION, 'WAIS4_MATRICES');
-              addConditionalQuestionnaire(WAIS4_CODE_DEFINITION, 'WAIS_IV_CODE_SYMBOLES_IVT');
-              addConditionalQuestionnaire(WAIS4_DIGIT_SPAN_DEFINITION, 'WAIS4_DIGIT_SPAN');
-              
-              return wais4Questionnaires;
-            })()
-          }
-        ]
-      },
-      {
-        id: 'mod_auto_etat',
-        name: 'Autoquestionnaires - ETAT',
-        description: 'Questionnaires sur l\'état actuel du patient',
-        questionnaires: [
-          {
-            ...EQ5D5L_DEFINITION,
-            id: EQ5D5L_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['EQ5D5L']?.completed || false,
-            completedAt: questionnaireStatuses['EQ5D5L']?.completed_at,
-          },
-          {
-            ...PRISE_M_DEFINITION,
-            id: PRISE_M_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['PRISE_M']?.completed || false,
-            completedAt: questionnaireStatuses['PRISE_M']?.completed_at,
-          },
-          {
-            ...STAI_YA_DEFINITION,
-            id: STAI_YA_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['STAI_YA']?.completed || false,
-            completedAt: questionnaireStatuses['STAI_YA']?.completed_at,
-          },
-          {
-            ...MARS_DEFINITION,
-            id: MARS_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['MARS']?.completed || false,
-            completedAt: questionnaireStatuses['MARS']?.completed_at,
-          },
-          {
-            ...MATHYS_DEFINITION,
-            id: MATHYS_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['MATHYS']?.completed || false,
-            completedAt: questionnaireStatuses['MATHYS']?.completed_at,
-          },
-          {
-            ...ASRM_DEFINITION,
-            id: ASRM_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['ASRM']?.completed || false,
-            completedAt: questionnaireStatuses['ASRM']?.completed_at,
-          },
-          {
-            ...QIDS_DEFINITION,
-            id: QIDS_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['QIDS_SR16']?.completed || false,
-            completedAt: questionnaireStatuses['QIDS_SR16']?.completed_at,
-          },
-          {
-            ...PSQI_DEFINITION,
-            id: PSQI_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['PSQI']?.completed || false,
-            completedAt: questionnaireStatuses['PSQI']?.completed_at,
-          },
-          {
-            ...EPWORTH_DEFINITION,
-            id: EPWORTH_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['EPWORTH']?.completed || false,
-            completedAt: questionnaireStatuses['EPWORTH']?.completed_at,
-          }
-        ]
-      },
-      {
-        id: 'mod_social',
-        name: 'Social',
-        description: 'Évaluation sociale',
-        questionnaires: [
-          {
-            ...SOCIAL_DEFINITION,
-            id: SOCIAL_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['SOCIAL']?.completed || false,
-            completedAt: questionnaireStatuses['SOCIAL']?.completed_at,
-          }
-        ]
-      },
-      {
-        id: 'mod_auto_traits',
-        name: 'Autoquestionnaires - TRAITS',
-        description: 'Questionnaires sur les traits du patient',
-        questionnaires: [
-          {
-            ...ASRS_DEFINITION,
-            id: ASRS_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['ASRS']?.completed || false,
-            completedAt: questionnaireStatuses['ASRS']?.completed_at,
-          },
-          {
-            ...CTQ_DEFINITION,
-            id: CTQ_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['CTQ']?.completed || false,
-            completedAt: questionnaireStatuses['CTQ']?.completed_at,
-          },
-          {
-            ...BIS10_DEFINITION,
-            id: BIS10_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['BIS10']?.completed || false,
-            completedAt: questionnaireStatuses['BIS10']?.completed_at,
-          },
-          {
-            ...ALS18_DEFINITION,
-            id: ALS18_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['ALS18']?.completed || false,
-            completedAt: questionnaireStatuses['ALS18']?.completed_at,
-          },
-          {
-            ...AIM_DEFINITION,
-            id: AIM_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['AIM']?.completed || false,
-            completedAt: questionnaireStatuses['AIM']?.completed_at,
-          },
-          {
-            ...WURS25_DEFINITION,
-            id: WURS25_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['WURS25']?.completed || false,
-            completedAt: questionnaireStatuses['WURS25']?.completed_at,
-          },
-          {
-            ...AQ12_DEFINITION,
-            id: AQ12_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['AQ12']?.completed || false,
-            completedAt: questionnaireStatuses['AQ12']?.completed_at,
-          },
-          {
-            ...CSM_DEFINITION,
-            id: CSM_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['CSM']?.completed || false,
-            completedAt: questionnaireStatuses['CSM']?.completed_at,
-          },
-          {
-            ...CTI_DEFINITION,
-            id: CTI_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['CTI']?.completed || false,
-            completedAt: questionnaireStatuses['CTI']?.completed_at,
-          }
-        ]
-      }
-    ];
+                    completed: questionnaireStatuses['SCIP']?.completed || false,
+                    completedAt: questionnaireStatuses['SCIP']?.completed_at,
+                  },
+                  {
+                    ...WAIS4_SIMILITUDES_DEFINITION,
+                    id: WAIS4_SIMILITUDES_DEFINITION.code,
+                    target_role: 'healthcare_professional',
+                    completed: questionnaireStatuses['WAIS4_SIMILITUDES']?.completed || false,
+                    completedAt: questionnaireStatuses['WAIS4_SIMILITUDES']?.completed_at,
+                  }
+                ];
+
+                // Helper function to add conditional questionnaire
+                const addConditionalQuestionnaire = (definition: any, code: string) => {
+                  if (!wais4CriteriaAnswered) {
+                    // Criteria not yet completed - show as conditional/locked
+                    wais4Questionnaires.push({
+                      ...definition,
+                      id: definition.code,
+                      target_role: 'healthcare_professional',
+                      completed: false,
+                      completedAt: null,
+                      isConditional: true,
+                      conditionMet: false,
+                      conditionMessage: 'Complétez d\'abord les Critères cliniques',
+                    });
+                  } else if (wais4Accepted) {
+                    // Patient accepted - show enabled
+                    wais4Questionnaires.push({
+                      ...definition,
+                      id: definition.code,
+                      target_role: 'healthcare_professional',
+                      completed: questionnaireStatuses[code]?.completed || false,
+                      completedAt: questionnaireStatuses[code]?.completed_at,
+                      isConditional: true,
+                      conditionMet: true,
+                    });
+                  } else {
+                    // Patient not accepted - show as locked/not applicable
+                    wais4Questionnaires.push({
+                      ...definition,
+                      id: definition.code,
+                      target_role: 'healthcare_professional',
+                      completed: false,
+                      completedAt: null,
+                      isConditional: true,
+                      conditionMet: false,
+                      conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
+                    });
+                  }
+                };
+
+                // Add conditional questionnaires (WAIS-IV specific tests only)
+                addConditionalQuestionnaire(WAIS4_LEARNING_DEFINITION, 'WAIS4_LEARNING');
+                addConditionalQuestionnaire(WAIS4_MATRICES_DEFINITION, 'WAIS4_MATRICES');
+                addConditionalQuestionnaire(WAIS4_CODE_DEFINITION, 'WAIS_IV_CODE_SYMBOLES_IVT');
+                addConditionalQuestionnaire(WAIS4_DIGIT_SPAN_DEFINITION, 'WAIS4_DIGIT_SPAN');
+
+                return wais4Questionnaires;
+              })()
+            }
+          ]
+        },
+        {
+          id: 'mod_auto_etat',
+          name: 'Autoquestionnaires - ETAT',
+          description: 'Questionnaires sur l\'état actuel du patient',
+          questionnaires: [
+            {
+              ...EQ5D5L_DEFINITION,
+              id: EQ5D5L_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['EQ5D5L']?.completed || false,
+              completedAt: questionnaireStatuses['EQ5D5L']?.completed_at,
+            },
+            {
+              ...PRISE_M_DEFINITION,
+              id: PRISE_M_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['PRISE_M']?.completed || false,
+              completedAt: questionnaireStatuses['PRISE_M']?.completed_at,
+            },
+            {
+              ...STAI_YA_DEFINITION,
+              id: STAI_YA_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['STAI_YA']?.completed || false,
+              completedAt: questionnaireStatuses['STAI_YA']?.completed_at,
+            },
+            {
+              ...MARS_DEFINITION,
+              id: MARS_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['MARS']?.completed || false,
+              completedAt: questionnaireStatuses['MARS']?.completed_at,
+            },
+            {
+              ...MATHYS_DEFINITION,
+              id: MATHYS_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['MATHYS']?.completed || false,
+              completedAt: questionnaireStatuses['MATHYS']?.completed_at,
+            },
+            {
+              ...ASRM_DEFINITION,
+              id: ASRM_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['ASRM']?.completed || false,
+              completedAt: questionnaireStatuses['ASRM']?.completed_at,
+            },
+            {
+              ...QIDS_DEFINITION,
+              id: QIDS_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['QIDS_SR16']?.completed || false,
+              completedAt: questionnaireStatuses['QIDS_SR16']?.completed_at,
+            },
+            {
+              ...PSQI_DEFINITION,
+              id: PSQI_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['PSQI']?.completed || false,
+              completedAt: questionnaireStatuses['PSQI']?.completed_at,
+            },
+            {
+              ...EPWORTH_DEFINITION,
+              id: EPWORTH_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['EPWORTH']?.completed || false,
+              completedAt: questionnaireStatuses['EPWORTH']?.completed_at,
+            }
+          ]
+        },
+        {
+          id: 'mod_social',
+          name: 'Social',
+          description: 'Évaluation sociale',
+          questionnaires: [
+            {
+              ...SOCIAL_DEFINITION,
+              id: SOCIAL_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SOCIAL']?.completed || false,
+              completedAt: questionnaireStatuses['SOCIAL']?.completed_at,
+            }
+          ]
+        },
+        {
+          id: 'mod_auto_traits',
+          name: 'Autoquestionnaires - TRAITS',
+          description: 'Questionnaires sur les traits du patient',
+          questionnaires: [
+            {
+              ...ASRS_DEFINITION,
+              id: ASRS_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['ASRS']?.completed || false,
+              completedAt: questionnaireStatuses['ASRS']?.completed_at,
+            },
+            {
+              ...CTQ_DEFINITION,
+              id: CTQ_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['CTQ']?.completed || false,
+              completedAt: questionnaireStatuses['CTQ']?.completed_at,
+            },
+            {
+              ...BIS10_DEFINITION,
+              id: BIS10_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['BIS10']?.completed || false,
+              completedAt: questionnaireStatuses['BIS10']?.completed_at,
+            },
+            {
+              ...ALS18_DEFINITION,
+              id: ALS18_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['ALS18']?.completed || false,
+              completedAt: questionnaireStatuses['ALS18']?.completed_at,
+            },
+            {
+              ...AIM_DEFINITION,
+              id: AIM_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['AIM']?.completed || false,
+              completedAt: questionnaireStatuses['AIM']?.completed_at,
+            },
+            {
+              ...WURS25_DEFINITION,
+              id: WURS25_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['WURS25']?.completed || false,
+              completedAt: questionnaireStatuses['WURS25']?.completed_at,
+            },
+            {
+              ...AQ12_DEFINITION,
+              id: AQ12_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['AQ12']?.completed || false,
+              completedAt: questionnaireStatuses['AQ12']?.completed_at,
+            },
+            {
+              ...CSM_DEFINITION,
+              id: CSM_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['CSM']?.completed || false,
+              completedAt: questionnaireStatuses['CSM']?.completed_at,
+            },
+            {
+              ...CTI_DEFINITION,
+              id: CTI_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['CTI']?.completed || false,
+              completedAt: questionnaireStatuses['CTI']?.completed_at,
+            }
+          ]
+        }
+      ];
     }
   } else if (visit.visit_type === 'biannual_followup') {
     // Build nurse module questionnaires with conditional Fagerstrom for biannual follow-up
@@ -1710,7 +1726,7 @@ export default async function VisitDetailPage({
         completedAt: questionnaireStatuses['TOBACCO']?.completed_at,
       },
     ];
-    
+
     // Add Fagerstrom with conditional display properties (ALWAYS visible)
     if (!tobaccoAnswered) {
       biannualNurseQuestionnaires.push({
@@ -1745,7 +1761,7 @@ export default async function VisitDetailPage({
         conditionMessage: 'Non applicable - le patient n\'est pas fumeur',
       });
     }
-    
+
     // Add remaining nurse questionnaires for biannual
     biannualNurseQuestionnaires.push(
       {
@@ -1975,7 +1991,7 @@ export default async function VisitDetailPage({
     // =====================================================================
     // ANNUAL EVALUATION - Full evaluation
     // =====================================================================
-    
+
     // Check if this is a schizophrenia annual evaluation
     if (pathology === 'schizophrenia') {
       // Schizophrenia annual evaluation - uses same nurse module as initial visit
@@ -2063,6 +2079,20 @@ export default async function VisitDetailPage({
               completedAt: questionnaireStatuses['SAPS']?.completed_at,
             },
             {
+              ...SANS_DEFINITION,
+              id: SANS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SANS']?.completed || false,
+              completedAt: questionnaireStatuses['SANS']?.completed_at,
+            },
+            {
+              ...UKU_DEFINITION,
+              id: UKU_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['UKU']?.completed || false,
+              completedAt: questionnaireStatuses['UKU']?.completed_at,
+            },
+            {
               ...AIMS_DEFINITION,
               id: AIMS_DEFINITION.code,
               target_role: 'healthcare_professional',
@@ -2097,7 +2127,7 @@ export default async function VisitDetailPage({
       // =====================================================================
       // BIPOLAR ANNUAL EVALUATION - Full evaluation with 4 modules
       // =====================================================================
-      
+
       // Build nurse module questionnaires with conditional Fagerstrom
       const annualNurseQuestionnaires: any[] = [
         {
@@ -2108,695 +2138,695 @@ export default async function VisitDetailPage({
           completedAt: questionnaireStatuses['TOBACCO']?.completed_at,
         },
       ];
-    
-    // Add Fagerstrom with conditional display properties
-    if (!tobaccoAnswered) {
-      annualNurseQuestionnaires.push({
-        ...FAGERSTROM_DEFINITION,
-        id: FAGERSTROM_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: false,
-        completedAt: null,
-        isConditional: true,
-        conditionMet: false,
-        conditionMessage: 'Complétez d\'abord l\'évaluation du tabagisme',
-      });
-    } else if (isFagerstromRequired) {
-      annualNurseQuestionnaires.push({
-        ...FAGERSTROM_DEFINITION,
-        id: FAGERSTROM_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: questionnaireStatuses['FAGERSTROM']?.completed || false,
-        completedAt: questionnaireStatuses['FAGERSTROM']?.completed_at,
-        isConditional: true,
-        conditionMet: true,
-      });
-    } else {
-      annualNurseQuestionnaires.push({
-        ...FAGERSTROM_DEFINITION,
-        id: FAGERSTROM_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: false,
-        completedAt: null,
-        isConditional: true,
-        conditionMet: false,
-        conditionMessage: 'Non applicable - le patient n\'est pas fumeur',
-      });
-    }
-    
-    // Add remaining nurse questionnaires for annual
-    annualNurseQuestionnaires.push(
-      {
-        ...PHYSICAL_PARAMS_DEFINITION,
-        id: PHYSICAL_PARAMS_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: questionnaireStatuses['PHYSICAL_PARAMS']?.completed || false,
-        completedAt: questionnaireStatuses['PHYSICAL_PARAMS']?.completed_at,
-      },
-      {
-        ...BLOOD_PRESSURE_DEFINITION,
-        id: BLOOD_PRESSURE_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: questionnaireStatuses['BLOOD_PRESSURE']?.completed || false,
-        completedAt: questionnaireStatuses['BLOOD_PRESSURE']?.completed_at,
-      },
-      {
-        ...ECG_DEFINITION,
-        id: ECG_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: questionnaireStatuses['ECG']?.completed || false,
-        completedAt: questionnaireStatuses['ECG']?.completed_at,
-      },
-      {
-        ...SLEEP_APNEA_DEFINITION,
-        id: SLEEP_APNEA_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: questionnaireStatuses['SLEEP_APNEA']?.completed || false,
-        completedAt: questionnaireStatuses['SLEEP_APNEA']?.completed_at,
-      },
-      {
-        ...BIOLOGICAL_ASSESSMENT_DEFINITION,
-        id: BIOLOGICAL_ASSESSMENT_DEFINITION.code,
-        target_role: 'healthcare_professional',
-        completed: questionnaireStatuses['BIOLOGICAL_ASSESSMENT']?.completed || false,
-        completedAt: questionnaireStatuses['BIOLOGICAL_ASSESSMENT']?.completed_at,
+
+      // Add Fagerstrom with conditional display properties
+      if (!tobaccoAnswered) {
+        annualNurseQuestionnaires.push({
+          ...FAGERSTROM_DEFINITION,
+          id: FAGERSTROM_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: false,
+          completedAt: null,
+          isConditional: true,
+          conditionMet: false,
+          conditionMessage: 'Complétez d\'abord l\'évaluation du tabagisme',
+        });
+      } else if (isFagerstromRequired) {
+        annualNurseQuestionnaires.push({
+          ...FAGERSTROM_DEFINITION,
+          id: FAGERSTROM_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['FAGERSTROM']?.completed || false,
+          completedAt: questionnaireStatuses['FAGERSTROM']?.completed_at,
+          isConditional: true,
+          conditionMet: true,
+        });
+      } else {
+        annualNurseQuestionnaires.push({
+          ...FAGERSTROM_DEFINITION,
+          id: FAGERSTROM_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: false,
+          completedAt: null,
+          isConditional: true,
+          conditionMet: false,
+          conditionMessage: 'Non applicable - le patient n\'est pas fumeur',
+        });
       }
-    );
 
-    // Build annual visit modules
-    modulesWithQuestionnaires = [
-      {
-        id: 'mod_nurse',
-        name: 'Infirmier',
-        description: 'Évaluation par l\'infirmier',
-        questionnaires: annualNurseQuestionnaires
-      },
-      {
-        id: 'mod_thymic_eval',
-        name: 'Evaluation état thymique et fonctionnement',
-        description: 'Évaluation de l\'état thymique et du fonctionnement',
-        questionnaires: [
-          {
-            ...MADRS_DEFINITION,
-            id: MADRS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['MADRS']?.completed || false,
-            completedAt: questionnaireStatuses['MADRS']?.completed_at,
-          },
-          {
-            ...ALDA_DEFINITION,
-            id: ALDA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ALDA']?.completed || false,
-            completedAt: questionnaireStatuses['ALDA']?.completed_at,
-          },
-          {
-            ...YMRS_DEFINITION,
-            id: YMRS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['YMRS']?.completed || false,
-            completedAt: questionnaireStatuses['YMRS']?.completed_at,
-          },
-          {
-            ...FAST_DEFINITION,
-            id: FAST_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['FAST']?.completed || false,
-            completedAt: questionnaireStatuses['FAST']?.completed_at,
-          },
-          {
-            ...CGI_DEFINITION,
-            id: CGI_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['CGI']?.completed || false,
-            completedAt: questionnaireStatuses['CGI']?.completed_at,
-          },
-          {
-            ...EGF_DEFINITION,
-            id: EGF_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['EGF']?.completed || false,
-            completedAt: questionnaireStatuses['EGF']?.completed_at,
-          },
-          {
-            ...ETAT_PATIENT_DEFINITION,
-            id: ETAT_PATIENT_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ETAT_PATIENT']?.completed || false,
-            completedAt: questionnaireStatuses['ETAT_PATIENT']?.completed_at,
-          }
-        ]
-      },
-      // Full Medical evaluation module (same as initial_evaluation)
-      (() => {
-        // Build DSM5 section questionnaires with conditional DIVA
-        const dsm5Questionnaires: any[] = [
-          {
-            ...DSM5_HUMEUR_DEFINITION,
-            id: DSM5_HUMEUR_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['DSM5_HUMEUR']?.completed || false,
-            completedAt: questionnaireStatuses['DSM5_HUMEUR']?.completed_at,
-          },
-          {
-            ...DSM5_PSYCHOTIC_DEFINITION,
-            id: DSM5_PSYCHOTIC_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['DSM5_PSYCHOTIC']?.completed || false,
-            completedAt: questionnaireStatuses['DSM5_PSYCHOTIC']?.completed_at,
-          },
-          {
-            ...DSM5_COMORBID_DEFINITION,
-            id: DSM5_COMORBID_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['DSM5_COMORBID']?.completed || false,
-            completedAt: questionnaireStatuses['DSM5_COMORBID']?.completed_at,
-          },
-        ];
-        
-        // Add DIVA with conditional display properties
-        if (!dsm5ComorbidAnswered) {
-          dsm5Questionnaires.push({
-            ...DIVA_DEFINITION,
-            id: DIVA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: false,
-            completedAt: null,
-            isConditional: true,
-            conditionMet: false,
-            conditionMessage: 'Complétez d\'abord l\'évaluation DSM5 - Troubles comorbides (Section 5)',
-          });
-        } else if (isDivaRequired) {
-          dsm5Questionnaires.push({
-            ...DIVA_DEFINITION,
-            id: DIVA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['DIVA']?.completed || false,
-            completedAt: questionnaireStatuses['DIVA']?.completed_at,
-            isConditional: true,
-            conditionMet: true,
-          });
-        } else {
-          dsm5Questionnaires.push({
-            ...DIVA_DEFINITION,
-            id: DIVA_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: false,
-            completedAt: null,
-            isConditional: true,
-            conditionMet: false,
-            conditionMessage: 'Non applicable - le patient n\'a pas été évalué avec la DIVA',
-          });
+      // Add remaining nurse questionnaires for annual
+      annualNurseQuestionnaires.push(
+        {
+          ...PHYSICAL_PARAMS_DEFINITION,
+          id: PHYSICAL_PARAMS_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['PHYSICAL_PARAMS']?.completed || false,
+          completedAt: questionnaireStatuses['PHYSICAL_PARAMS']?.completed_at,
+        },
+        {
+          ...BLOOD_PRESSURE_DEFINITION,
+          id: BLOOD_PRESSURE_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['BLOOD_PRESSURE']?.completed || false,
+          completedAt: questionnaireStatuses['BLOOD_PRESSURE']?.completed_at,
+        },
+        {
+          ...ECG_DEFINITION,
+          id: ECG_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['ECG']?.completed || false,
+          completedAt: questionnaireStatuses['ECG']?.completed_at,
+        },
+        {
+          ...SLEEP_APNEA_DEFINITION,
+          id: SLEEP_APNEA_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['SLEEP_APNEA']?.completed || false,
+          completedAt: questionnaireStatuses['SLEEP_APNEA']?.completed_at,
+        },
+        {
+          ...BIOLOGICAL_ASSESSMENT_DEFINITION,
+          id: BIOLOGICAL_ASSESSMENT_DEFINITION.code,
+          target_role: 'healthcare_professional',
+          completed: questionnaireStatuses['BIOLOGICAL_ASSESSMENT']?.completed || false,
+          completedAt: questionnaireStatuses['BIOLOGICAL_ASSESSMENT']?.completed_at,
         }
-        
-        // Build Antécédents section questionnaires
-        const antecedentsQuestionnaires = [
-          {
-            ...FAMILY_HISTORY_DEFINITION,
-            id: FAMILY_HISTORY_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['FAMILY_HISTORY']?.completed || false,
-            completedAt: questionnaireStatuses['FAMILY_HISTORY']?.completed_at,
-          }
-        ];
+      );
 
-        // Build Suicide section questionnaires
-        const suicideQuestionnaires = [
-          {
-            ...CSSRS_DEFINITION,
-            id: CSSRS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['CSSRS']?.completed || false,
-            completedAt: questionnaireStatuses['CSSRS']?.completed_at,
-          },
-          {
-            ...ISA_FOLLOWUP_DEFINITION,
-            id: ISA_FOLLOWUP_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ISA_FOLLOWUP']?.completed || false,
-            completedAt: questionnaireStatuses['ISA_FOLLOWUP']?.completed_at,
-          },
-          {
-            ...SIS_DEFINITION,
-            id: SIS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['SIS']?.completed || false,
-            completedAt: questionnaireStatuses['SIS']?.completed_at,
-          },
-          {
-            ...SUICIDE_HISTORY_DEFINITION,
-            id: SUICIDE_HISTORY_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['SUICIDE_HISTORY']?.completed || false,
-            completedAt: questionnaireStatuses['SUICIDE_HISTORY']?.completed_at,
-          }
-        ];
-
-        // Build Histoire somatique section questionnaires
-        const histoireSomatiqueQuestionnaires = [
-          {
-            ...PERINATALITE_DEFINITION,
-            id: PERINATALITE_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['PERINATALITE']?.completed || false,
-            completedAt: questionnaireStatuses['PERINATALITE']?.completed_at,
-          },
-          {
-            ...PATHO_NEURO_DEFINITION,
-            id: PATHO_NEURO_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['PATHO_NEURO']?.completed || false,
-            completedAt: questionnaireStatuses['PATHO_NEURO']?.completed_at,
-          },
-          {
-            ...PATHO_CARDIO_DEFINITION,
-            id: PATHO_CARDIO_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['PATHO_CARDIO']?.completed || false,
-            completedAt: questionnaireStatuses['PATHO_CARDIO']?.completed_at,
-          },
-          {
-            ...PATHO_ENDOC_DEFINITION,
-            id: PATHO_ENDOC_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['PATHO_ENDOC']?.completed || false,
-            completedAt: questionnaireStatuses['PATHO_ENDOC']?.completed_at,
-          },
-          {
-            ...PATHO_DERMATO_DEFINITION,
-            id: PATHO_DERMATO_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['PATHO_DERMATO']?.completed || false,
-            completedAt: questionnaireStatuses['PATHO_DERMATO']?.completed_at,
-          },
-          {
-            ...PATHO_URINAIRE_DEFINITION,
-            id: PATHO_URINAIRE_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['PATHO_URINAIRE']?.completed || false,
-            completedAt: questionnaireStatuses['PATHO_URINAIRE']?.completed_at,
-          },
-          {
-            ...ANTECEDENTS_GYNECO_DEFINITION,
-            id: ANTECEDENTS_GYNECO_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ANTECEDENTS_GYNECO']?.completed || false,
-            completedAt: questionnaireStatuses['ANTECEDENTS_GYNECO']?.completed_at,
-          },
-          {
-            ...PATHO_HEPATO_GASTRO_DEFINITION,
-            id: PATHO_HEPATO_GASTRO_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['PATHO_HEPATO_GASTRO']?.completed || false,
-            completedAt: questionnaireStatuses['PATHO_HEPATO_GASTRO']?.completed_at,
-          },
-          {
-            ...PATHO_ALLERGIQUE_DEFINITION,
-            id: PATHO_ALLERGIQUE_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['PATHO_ALLERGIQUE']?.completed || false,
-            completedAt: questionnaireStatuses['PATHO_ALLERGIQUE']?.completed_at,
-          },
-          {
-            ...AUTRES_PATHO_DEFINITION,
-            id: AUTRES_PATHO_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['AUTRES_PATHO']?.completed || false,
-            completedAt: questionnaireStatuses['AUTRES_PATHO']?.completed_at,
-          }
-        ];
-
-        // Build Soin, suivi et arrêt de travail section questionnaires
-        const soinSuiviQuestionnaires = [
-          {
-            ...SUIVI_RECOMMANDATIONS_DEFINITION,
-            id: SUIVI_RECOMMANDATIONS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['SUIVI_RECOMMANDATIONS']?.completed || false,
-            completedAt: questionnaireStatuses['SUIVI_RECOMMANDATIONS']?.completed_at,
-          },
-          {
-            ...RECOURS_AUX_SOINS_DEFINITION,
-            id: RECOURS_AUX_SOINS_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['RECOURS_AUX_SOINS']?.completed || false,
-            completedAt: questionnaireStatuses['RECOURS_AUX_SOINS']?.completed_at,
-          },
-          {
-            ...TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION,
-            id: TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['TRAITEMENT_NON_PHARMACOLOGIQUE']?.completed || false,
-            completedAt: questionnaireStatuses['TRAITEMENT_NON_PHARMACOLOGIQUE']?.completed_at,
-          },
-          {
-            ...ARRETS_DE_TRAVAIL_DEFINITION,
-            id: ARRETS_DE_TRAVAIL_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['ARRETS_DE_TRAVAIL']?.completed || false,
-            completedAt: questionnaireStatuses['ARRETS_DE_TRAVAIL']?.completed_at,
-          },
-          {
-            ...SOMATIQUE_CONTRACEPTIF_DEFINITION,
-            id: SOMATIQUE_CONTRACEPTIF_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['SOMATIQUE_ET_CONTRACEPTIF']?.completed || false,
-            completedAt: questionnaireStatuses['SOMATIQUE_ET_CONTRACEPTIF']?.completed_at,
-          },
-          {
-            ...STATUT_PROFESSIONNEL_DEFINITION,
-            id: STATUT_PROFESSIONNEL_DEFINITION.code,
-            target_role: 'healthcare_professional',
-            completed: questionnaireStatuses['STATUT_PROFESSIONNEL']?.completed || false,
-            completedAt: questionnaireStatuses['STATUT_PROFESSIONNEL']?.completed_at,
-          }
-        ];
-        
-        return {
-          id: 'mod_medical_eval',
-          name: 'Evaluation Médicale',
-          description: 'Évaluation médicale complète',
-          sections: [
+      // Build annual visit modules
+      modulesWithQuestionnaires = [
+        {
+          id: 'mod_nurse',
+          name: 'Infirmier',
+          description: 'Évaluation par l\'infirmier',
+          questionnaires: annualNurseQuestionnaires
+        },
+        {
+          id: 'mod_thymic_eval',
+          name: 'Evaluation état thymique et fonctionnement',
+          description: 'Évaluation de l\'état thymique et du fonctionnement',
+          questionnaires: [
             {
-              id: 'dsm5',
-              name: 'DSM5',
-              questionnaires: dsm5Questionnaires
+              ...MADRS_DEFINITION,
+              id: MADRS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['MADRS']?.completed || false,
+              completedAt: questionnaireStatuses['MADRS']?.completed_at,
             },
             {
-              id: 'antecedents',
-              name: 'Antécédents',
-              questionnaires: antecedentsQuestionnaires
+              ...ALDA_DEFINITION,
+              id: ALDA_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['ALDA']?.completed || false,
+              completedAt: questionnaireStatuses['ALDA']?.completed_at,
             },
             {
-              id: 'suicide',
-              name: 'Suicide',
-              questionnaires: suicideQuestionnaires
+              ...YMRS_DEFINITION,
+              id: YMRS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['YMRS']?.completed || false,
+              completedAt: questionnaireStatuses['YMRS']?.completed_at,
             },
             {
-              id: 'histoire_somatique',
-              name: 'Histoire somatique',
-              questionnaires: histoireSomatiqueQuestionnaires
+              ...FAST_DEFINITION,
+              id: FAST_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['FAST']?.completed || false,
+              completedAt: questionnaireStatuses['FAST']?.completed_at,
             },
             {
-              id: 'soin_suivi',
-              name: 'Soin, suivi et arrêt de travail',
-              questionnaires: soinSuiviQuestionnaires
+              ...CGI_DEFINITION,
+              id: CGI_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['CGI']?.completed || false,
+              completedAt: questionnaireStatuses['CGI']?.completed_at,
+            },
+            {
+              ...EGF_DEFINITION,
+              id: EGF_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['EGF']?.completed || false,
+              completedAt: questionnaireStatuses['EGF']?.completed_at,
+            },
+            {
+              ...ETAT_PATIENT_DEFINITION,
+              id: ETAT_PATIENT_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['ETAT_PATIENT']?.completed || false,
+              completedAt: questionnaireStatuses['ETAT_PATIENT']?.completed_at,
             }
           ]
-        };
-      })(),
-      // Neuropsychological evaluation module (same structure as initial_evaluation)
-      {
-        id: 'mod_neuropsy',
-        name: 'Evaluation Neuropsychologique',
-        description: 'Évaluation neuropsychologique (Tests indépendants, WAIS-III, WAIS-IV)',
-        questionnaires: (() => {
-          const independentTests = [
-            { def: CVLT_DEFINITION, code: 'CVLT' },
-            { def: TMT_DEFINITION, code: 'TMT' },
-            { def: STROOP_DEFINITION, code: 'STROOP' },
-            { def: FLUENCES_VERBALES_DEFINITION, code: 'FLUENCES_VERBALES' },
-            { def: MEM3_SPATIAL_DEFINITION, code: 'MEM3_SPATIAL' }
+        },
+        // Full Medical evaluation module (same as initial_evaluation)
+        (() => {
+          // Build DSM5 section questionnaires with conditional DIVA
+          const dsm5Questionnaires: any[] = [
+            {
+              ...DSM5_HUMEUR_DEFINITION,
+              id: DSM5_HUMEUR_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['DSM5_HUMEUR']?.completed || false,
+              completedAt: questionnaireStatuses['DSM5_HUMEUR']?.completed_at,
+            },
+            {
+              ...DSM5_PSYCHOTIC_DEFINITION,
+              id: DSM5_PSYCHOTIC_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['DSM5_PSYCHOTIC']?.completed || false,
+              completedAt: questionnaireStatuses['DSM5_PSYCHOTIC']?.completed_at,
+            },
+            {
+              ...DSM5_COMORBID_DEFINITION,
+              id: DSM5_COMORBID_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['DSM5_COMORBID']?.completed || false,
+              completedAt: questionnaireStatuses['DSM5_COMORBID']?.completed_at,
+            },
           ];
-          
-          return independentTests.map(({ def, code }) => {
-            const isAnswered = wais3CriteriaAnswered || wais4CriteriaAnswered;
-            const isAccepted = wais3Accepted || wais4Accepted;
-            
-            if (!isAnswered) {
-              return {
-                ...def,
-                id: def.code,
-                target_role: 'healthcare_professional',
-                completed: false,
-                completedAt: null,
-                isConditional: true,
-                conditionMet: false,
-                conditionMessage: 'Complétez d\'abord les Critères cliniques (WAIS-III ou WAIS-IV)',
-              };
-            } else if (isAccepted) {
-              return {
-                ...def,
-                id: def.code,
-                target_role: 'healthcare_professional',
-                completed: questionnaireStatuses[code]?.completed || false,
-                completedAt: questionnaireStatuses[code]?.completed_at,
-                isConditional: true,
-                conditionMet: true,
-              };
-            } else {
-              return {
-                ...def,
-                id: def.code,
-                target_role: 'healthcare_professional',
-                completed: false,
-                completedAt: null,
-                isConditional: true,
-                conditionMet: false,
-                conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
-              };
+
+          // Add DIVA with conditional display properties
+          if (!dsm5ComorbidAnswered) {
+            dsm5Questionnaires.push({
+              ...DIVA_DEFINITION,
+              id: DIVA_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: false,
+              completedAt: null,
+              isConditional: true,
+              conditionMet: false,
+              conditionMessage: 'Complétez d\'abord l\'évaluation DSM5 - Troubles comorbides (Section 5)',
+            });
+          } else if (isDivaRequired) {
+            dsm5Questionnaires.push({
+              ...DIVA_DEFINITION,
+              id: DIVA_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['DIVA']?.completed || false,
+              completedAt: questionnaireStatuses['DIVA']?.completed_at,
+              isConditional: true,
+              conditionMet: true,
+            });
+          } else {
+            dsm5Questionnaires.push({
+              ...DIVA_DEFINITION,
+              id: DIVA_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: false,
+              completedAt: null,
+              isConditional: true,
+              conditionMet: false,
+              conditionMessage: 'Non applicable - le patient n\'a pas été évalué avec la DIVA',
+            });
+          }
+
+          // Build Antécédents section questionnaires
+          const antecedentsQuestionnaires = [
+            {
+              ...FAMILY_HISTORY_DEFINITION,
+              id: FAMILY_HISTORY_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['FAMILY_HISTORY']?.completed || false,
+              completedAt: questionnaireStatuses['FAMILY_HISTORY']?.completed_at,
             }
-          });
+          ];
+
+          // Build Suicide section questionnaires
+          const suicideQuestionnaires = [
+            {
+              ...CSSRS_DEFINITION,
+              id: CSSRS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['CSSRS']?.completed || false,
+              completedAt: questionnaireStatuses['CSSRS']?.completed_at,
+            },
+            {
+              ...ISA_FOLLOWUP_DEFINITION,
+              id: ISA_FOLLOWUP_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['ISA_FOLLOWUP']?.completed || false,
+              completedAt: questionnaireStatuses['ISA_FOLLOWUP']?.completed_at,
+            },
+            {
+              ...SIS_DEFINITION,
+              id: SIS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SIS']?.completed || false,
+              completedAt: questionnaireStatuses['SIS']?.completed_at,
+            },
+            {
+              ...SUICIDE_HISTORY_DEFINITION,
+              id: SUICIDE_HISTORY_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SUICIDE_HISTORY']?.completed || false,
+              completedAt: questionnaireStatuses['SUICIDE_HISTORY']?.completed_at,
+            }
+          ];
+
+          // Build Histoire somatique section questionnaires
+          const histoireSomatiqueQuestionnaires = [
+            {
+              ...PERINATALITE_DEFINITION,
+              id: PERINATALITE_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['PERINATALITE']?.completed || false,
+              completedAt: questionnaireStatuses['PERINATALITE']?.completed_at,
+            },
+            {
+              ...PATHO_NEURO_DEFINITION,
+              id: PATHO_NEURO_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['PATHO_NEURO']?.completed || false,
+              completedAt: questionnaireStatuses['PATHO_NEURO']?.completed_at,
+            },
+            {
+              ...PATHO_CARDIO_DEFINITION,
+              id: PATHO_CARDIO_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['PATHO_CARDIO']?.completed || false,
+              completedAt: questionnaireStatuses['PATHO_CARDIO']?.completed_at,
+            },
+            {
+              ...PATHO_ENDOC_DEFINITION,
+              id: PATHO_ENDOC_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['PATHO_ENDOC']?.completed || false,
+              completedAt: questionnaireStatuses['PATHO_ENDOC']?.completed_at,
+            },
+            {
+              ...PATHO_DERMATO_DEFINITION,
+              id: PATHO_DERMATO_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['PATHO_DERMATO']?.completed || false,
+              completedAt: questionnaireStatuses['PATHO_DERMATO']?.completed_at,
+            },
+            {
+              ...PATHO_URINAIRE_DEFINITION,
+              id: PATHO_URINAIRE_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['PATHO_URINAIRE']?.completed || false,
+              completedAt: questionnaireStatuses['PATHO_URINAIRE']?.completed_at,
+            },
+            {
+              ...ANTECEDENTS_GYNECO_DEFINITION,
+              id: ANTECEDENTS_GYNECO_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['ANTECEDENTS_GYNECO']?.completed || false,
+              completedAt: questionnaireStatuses['ANTECEDENTS_GYNECO']?.completed_at,
+            },
+            {
+              ...PATHO_HEPATO_GASTRO_DEFINITION,
+              id: PATHO_HEPATO_GASTRO_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['PATHO_HEPATO_GASTRO']?.completed || false,
+              completedAt: questionnaireStatuses['PATHO_HEPATO_GASTRO']?.completed_at,
+            },
+            {
+              ...PATHO_ALLERGIQUE_DEFINITION,
+              id: PATHO_ALLERGIQUE_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['PATHO_ALLERGIQUE']?.completed || false,
+              completedAt: questionnaireStatuses['PATHO_ALLERGIQUE']?.completed_at,
+            },
+            {
+              ...AUTRES_PATHO_DEFINITION,
+              id: AUTRES_PATHO_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['AUTRES_PATHO']?.completed || false,
+              completedAt: questionnaireStatuses['AUTRES_PATHO']?.completed_at,
+            }
+          ];
+
+          // Build Soin, suivi et arrêt de travail section questionnaires
+          const soinSuiviQuestionnaires = [
+            {
+              ...SUIVI_RECOMMANDATIONS_DEFINITION,
+              id: SUIVI_RECOMMANDATIONS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SUIVI_RECOMMANDATIONS']?.completed || false,
+              completedAt: questionnaireStatuses['SUIVI_RECOMMANDATIONS']?.completed_at,
+            },
+            {
+              ...RECOURS_AUX_SOINS_DEFINITION,
+              id: RECOURS_AUX_SOINS_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['RECOURS_AUX_SOINS']?.completed || false,
+              completedAt: questionnaireStatuses['RECOURS_AUX_SOINS']?.completed_at,
+            },
+            {
+              ...TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION,
+              id: TRAITEMENT_NON_PHARMACOLOGIQUE_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['TRAITEMENT_NON_PHARMACOLOGIQUE']?.completed || false,
+              completedAt: questionnaireStatuses['TRAITEMENT_NON_PHARMACOLOGIQUE']?.completed_at,
+            },
+            {
+              ...ARRETS_DE_TRAVAIL_DEFINITION,
+              id: ARRETS_DE_TRAVAIL_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['ARRETS_DE_TRAVAIL']?.completed || false,
+              completedAt: questionnaireStatuses['ARRETS_DE_TRAVAIL']?.completed_at,
+            },
+            {
+              ...SOMATIQUE_CONTRACEPTIF_DEFINITION,
+              id: SOMATIQUE_CONTRACEPTIF_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['SOMATIQUE_ET_CONTRACEPTIF']?.completed || false,
+              completedAt: questionnaireStatuses['SOMATIQUE_ET_CONTRACEPTIF']?.completed_at,
+            },
+            {
+              ...STATUT_PROFESSIONNEL_DEFINITION,
+              id: STATUT_PROFESSIONNEL_DEFINITION.code,
+              target_role: 'healthcare_professional',
+              completed: questionnaireStatuses['STATUT_PROFESSIONNEL']?.completed || false,
+              completedAt: questionnaireStatuses['STATUT_PROFESSIONNEL']?.completed_at,
+            }
+          ];
+
+          return {
+            id: 'mod_medical_eval',
+            name: 'Evaluation Médicale',
+            description: 'Évaluation médicale complète',
+            sections: [
+              {
+                id: 'dsm5',
+                name: 'DSM5',
+                questionnaires: dsm5Questionnaires
+              },
+              {
+                id: 'antecedents',
+                name: 'Antécédents',
+                questionnaires: antecedentsQuestionnaires
+              },
+              {
+                id: 'suicide',
+                name: 'Suicide',
+                questionnaires: suicideQuestionnaires
+              },
+              {
+                id: 'histoire_somatique',
+                name: 'Histoire somatique',
+                questionnaires: histoireSomatiqueQuestionnaires
+              },
+              {
+                id: 'soin_suivi',
+                name: 'Soin, suivi et arrêt de travail',
+                questionnaires: soinSuiviQuestionnaires
+              }
+            ]
+          };
         })(),
-        sections: [
-          {
-            id: 'wais3',
-            name: 'WAIS-III',
-            questionnaires: (() => {
-              const wais3Questionnaires: any[] = [
-                // Criteria questionnaire - always enabled
-                {
-                  ...WAIS3_CRITERIA_DEFINITION,
-                  id: WAIS3_CRITERIA_DEFINITION.code,
+        // Neuropsychological evaluation module (same structure as initial_evaluation)
+        {
+          id: 'mod_neuropsy',
+          name: 'Evaluation Neuropsychologique',
+          description: 'Évaluation neuropsychologique (Tests indépendants, WAIS-III, WAIS-IV)',
+          questionnaires: (() => {
+            const independentTests = [
+              { def: CVLT_DEFINITION, code: 'CVLT' },
+              { def: TMT_DEFINITION, code: 'TMT' },
+              { def: STROOP_DEFINITION, code: 'STROOP' },
+              { def: FLUENCES_VERBALES_DEFINITION, code: 'FLUENCES_VERBALES' },
+              { def: MEM3_SPATIAL_DEFINITION, code: 'MEM3_SPATIAL' }
+            ];
+
+            return independentTests.map(({ def, code }) => {
+              const isAnswered = wais3CriteriaAnswered || wais4CriteriaAnswered;
+              const isAccepted = wais3Accepted || wais4Accepted;
+
+              if (!isAnswered) {
+                return {
+                  ...def,
+                  id: def.code,
                   target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['WAIS3_CRITERIA']?.completed || false,
-                  completedAt: questionnaireStatuses['WAIS3_CRITERIA']?.completed_at,
-                }
-              ];
-              
-              // Helper function to add conditional questionnaire
-              const addConditionalQuestionnaire = (definition: any, code: string) => {
-                if (!wais3CriteriaAnswered) {
-                  // Criteria not yet completed - show as conditional/locked
-                  wais3Questionnaires.push({
-                    ...definition,
-                    id: definition.code,
+                  completed: false,
+                  completedAt: null,
+                  isConditional: true,
+                  conditionMet: false,
+                  conditionMessage: 'Complétez d\'abord les Critères cliniques (WAIS-III ou WAIS-IV)',
+                };
+              } else if (isAccepted) {
+                return {
+                  ...def,
+                  id: def.code,
+                  target_role: 'healthcare_professional',
+                  completed: questionnaireStatuses[code]?.completed || false,
+                  completedAt: questionnaireStatuses[code]?.completed_at,
+                  isConditional: true,
+                  conditionMet: true,
+                };
+              } else {
+                return {
+                  ...def,
+                  id: def.code,
+                  target_role: 'healthcare_professional',
+                  completed: false,
+                  completedAt: null,
+                  isConditional: true,
+                  conditionMet: false,
+                  conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
+                };
+              }
+            });
+          })(),
+          sections: [
+            {
+              id: 'wais3',
+              name: 'WAIS-III',
+              questionnaires: (() => {
+                const wais3Questionnaires: any[] = [
+                  // Criteria questionnaire - always enabled
+                  {
+                    ...WAIS3_CRITERIA_DEFINITION,
+                    id: WAIS3_CRITERIA_DEFINITION.code,
                     target_role: 'healthcare_professional',
-                    completed: false,
-                    completedAt: null,
-                    isConditional: true,
-                    conditionMet: false,
-                    conditionMessage: 'Complétez d\'abord les Critères cliniques',
-                  });
-                } else if (wais3Accepted) {
-                  // Patient accepted - show enabled
-                  wais3Questionnaires.push({
-                    ...definition,
-                    id: definition.code,
+                    completed: questionnaireStatuses['WAIS3_CRITERIA']?.completed || false,
+                    completedAt: questionnaireStatuses['WAIS3_CRITERIA']?.completed_at,
+                  }
+                ];
+
+                // Helper function to add conditional questionnaire
+                const addConditionalQuestionnaire = (definition: any, code: string) => {
+                  if (!wais3CriteriaAnswered) {
+                    // Criteria not yet completed - show as conditional/locked
+                    wais3Questionnaires.push({
+                      ...definition,
+                      id: definition.code,
+                      target_role: 'healthcare_professional',
+                      completed: false,
+                      completedAt: null,
+                      isConditional: true,
+                      conditionMet: false,
+                      conditionMessage: 'Complétez d\'abord les Critères cliniques',
+                    });
+                  } else if (wais3Accepted) {
+                    // Patient accepted - show enabled
+                    wais3Questionnaires.push({
+                      ...definition,
+                      id: definition.code,
+                      target_role: 'healthcare_professional',
+                      completed: questionnaireStatuses[code]?.completed || false,
+                      completedAt: questionnaireStatuses[code]?.completed_at,
+                      isConditional: true,
+                      conditionMet: true,
+                    });
+                  } else {
+                    // Patient not accepted - show as locked/not applicable
+                    wais3Questionnaires.push({
+                      ...definition,
+                      id: definition.code,
+                      target_role: 'healthcare_professional',
+                      completed: false,
+                      completedAt: null,
+                      isConditional: true,
+                      conditionMet: false,
+                      conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
+                    });
+                  }
+                };
+
+                // Add conditional questionnaires (WAIS-III specific tests)
+                addConditionalQuestionnaire(WAIS3_LEARNING_DEFINITION, 'WAIS3_LEARNING');
+                addConditionalQuestionnaire(WAIS3_VOCABULAIRE_DEFINITION, 'WAIS3_VOCABULAIRE');
+                addConditionalQuestionnaire(WAIS3_MATRICES_DEFINITION, 'WAIS3_MATRICES');
+                addConditionalQuestionnaire(WAIS3_CODE_SYMBOLES_DEFINITION, 'WAIS3_CODE_SYMBOLES');
+                addConditionalQuestionnaire(WAIS3_DIGIT_SPAN_DEFINITION, 'WAIS3_DIGIT_SPAN');
+                addConditionalQuestionnaire(WAIS3_CPT2_DEFINITION, 'WAIS3_CPT2');
+
+                return wais3Questionnaires;
+              })()
+            },
+            {
+              id: 'wais4',
+              name: 'WAIS-IV',
+              questionnaires: (() => {
+                const wais4Questionnaires: any[] = [
+                  // Criteria questionnaire - always enabled
+                  {
+                    ...WAIS4_CRITERIA_DEFINITION,
+                    id: WAIS4_CRITERIA_DEFINITION.code,
                     target_role: 'healthcare_professional',
-                    completed: questionnaireStatuses[code]?.completed || false,
-                    completedAt: questionnaireStatuses[code]?.completed_at,
-                    isConditional: true,
-                    conditionMet: true,
-                  });
-                } else {
-                  // Patient not accepted - show as locked/not applicable
-                  wais3Questionnaires.push({
-                    ...definition,
-                    id: definition.code,
+                    completed: questionnaireStatuses['WAIS4_CRITERIA']?.completed || false,
+                    completedAt: questionnaireStatuses['WAIS4_CRITERIA']?.completed_at,
+                  },
+                  {
+                    ...COBRA_DEFINITION,
+                    id: COBRA_DEFINITION.code,
                     target_role: 'healthcare_professional',
-                    completed: false,
-                    completedAt: null,
-                    isConditional: true,
-                    conditionMet: false,
-                    conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
-                  });
-                }
-              };
-              
-              // Add conditional questionnaires (WAIS-III specific tests)
-              addConditionalQuestionnaire(WAIS3_LEARNING_DEFINITION, 'WAIS3_LEARNING');
-              addConditionalQuestionnaire(WAIS3_VOCABULAIRE_DEFINITION, 'WAIS3_VOCABULAIRE');
-              addConditionalQuestionnaire(WAIS3_MATRICES_DEFINITION, 'WAIS3_MATRICES');
-              addConditionalQuestionnaire(WAIS3_CODE_SYMBOLES_DEFINITION, 'WAIS3_CODE_SYMBOLES');
-              addConditionalQuestionnaire(WAIS3_DIGIT_SPAN_DEFINITION, 'WAIS3_DIGIT_SPAN');
-              addConditionalQuestionnaire(WAIS3_CPT2_DEFINITION, 'WAIS3_CPT2');
-              
-              return wais3Questionnaires;
-            })()
-          },
-          {
-            id: 'wais4',
-            name: 'WAIS-IV',
-            questionnaires: (() => {
-              const wais4Questionnaires: any[] = [
-                // Criteria questionnaire - always enabled
-                {
-                  ...WAIS4_CRITERIA_DEFINITION,
-                  id: WAIS4_CRITERIA_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['WAIS4_CRITERIA']?.completed || false,
-                  completedAt: questionnaireStatuses['WAIS4_CRITERIA']?.completed_at,
-                },
-                {
-                  ...COBRA_DEFINITION,
-                  id: COBRA_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['COBRA']?.completed || false,
-                  completedAt: questionnaireStatuses['COBRA']?.completed_at,
-                },
-                {
-                  ...CPT3_DEFINITION,
-                  id: CPT3_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['CPT3']?.completed || false,
-                  completedAt: questionnaireStatuses['CPT3']?.completed_at,
-                },
-                {
-                  ...TEST_COMMISSIONS_DEFINITION,
-                  id: TEST_COMMISSIONS_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['TEST_COMMISSIONS']?.completed || false,
-                  completedAt: questionnaireStatuses['TEST_COMMISSIONS']?.completed_at,
-                },
-                {
-                  ...SCIP_DEFINITION,
-                  id: SCIP_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['SCIP']?.completed || false,
-                  completedAt: questionnaireStatuses['SCIP']?.completed_at,
-                },
-                {
-                  ...WAIS4_SIMILITUDES_DEFINITION,
-                  id: WAIS4_SIMILITUDES_DEFINITION.code,
-                  target_role: 'healthcare_professional',
-                  completed: questionnaireStatuses['WAIS4_SIMILITUDES']?.completed || false,
-                  completedAt: questionnaireStatuses['WAIS4_SIMILITUDES']?.completed_at,
-                }
-              ];
-              
-              // Helper function to add conditional questionnaire
-              const addConditionalQuestionnaire = (definition: any, code: string) => {
-                if (!wais4CriteriaAnswered) {
-                  // Criteria not yet completed - show as conditional/locked
-                  wais4Questionnaires.push({
-                    ...definition,
-                    id: definition.code,
+                    completed: questionnaireStatuses['COBRA']?.completed || false,
+                    completedAt: questionnaireStatuses['COBRA']?.completed_at,
+                  },
+                  {
+                    ...CPT3_DEFINITION,
+                    id: CPT3_DEFINITION.code,
                     target_role: 'healthcare_professional',
-                    completed: false,
-                    completedAt: null,
-                    isConditional: true,
-                    conditionMet: false,
-                    conditionMessage: 'Complétez d\'abord les Critères cliniques',
-                  });
-                } else if (wais4Accepted) {
-                  // Patient accepted - show enabled
-                  wais4Questionnaires.push({
-                    ...definition,
-                    id: definition.code,
+                    completed: questionnaireStatuses['CPT3']?.completed || false,
+                    completedAt: questionnaireStatuses['CPT3']?.completed_at,
+                  },
+                  {
+                    ...TEST_COMMISSIONS_DEFINITION,
+                    id: TEST_COMMISSIONS_DEFINITION.code,
                     target_role: 'healthcare_professional',
-                    completed: questionnaireStatuses[code]?.completed || false,
-                    completedAt: questionnaireStatuses[code]?.completed_at,
-                    isConditional: true,
-                    conditionMet: true,
-                  });
-                } else {
-                  // Patient not accepted - show as locked/not applicable
-                  wais4Questionnaires.push({
-                    ...definition,
-                    id: definition.code,
+                    completed: questionnaireStatuses['TEST_COMMISSIONS']?.completed || false,
+                    completedAt: questionnaireStatuses['TEST_COMMISSIONS']?.completed_at,
+                  },
+                  {
+                    ...SCIP_DEFINITION,
+                    id: SCIP_DEFINITION.code,
                     target_role: 'healthcare_professional',
-                    completed: false,
-                    completedAt: null,
-                    isConditional: true,
-                    conditionMet: false,
-                    conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
-                  });
-                }
-              };
-              
-              // Add conditional questionnaires (WAIS-IV specific tests only)
-              addConditionalQuestionnaire(WAIS4_LEARNING_DEFINITION, 'WAIS4_LEARNING');
-              addConditionalQuestionnaire(WAIS4_MATRICES_DEFINITION, 'WAIS4_MATRICES');
-              addConditionalQuestionnaire(WAIS4_CODE_DEFINITION, 'WAIS_IV_CODE_SYMBOLES_IVT');
-              addConditionalQuestionnaire(WAIS4_DIGIT_SPAN_DEFINITION, 'WAIS4_DIGIT_SPAN');
-              
-              return wais4Questionnaires;
-            })()
-          }
-        ]
-      },
-      {
-        id: 'mod_auto_etat',
-        name: 'Autoquestionnaires - ETAT',
-        description: 'Questionnaires sur l\'état actuel du patient',
-        questionnaires: [
-          {
-            ...EQ5D5L_DEFINITION,
-            id: EQ5D5L_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['EQ5D5L']?.completed || false,
-            completedAt: questionnaireStatuses['EQ5D5L']?.completed_at,
-          },
-          {
-            ...PRISE_M_DEFINITION,
-            id: PRISE_M_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['PRISE_M']?.completed || false,
-            completedAt: questionnaireStatuses['PRISE_M']?.completed_at,
-          },
-          {
-            ...STAI_YA_DEFINITION,
-            id: STAI_YA_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['STAI_YA']?.completed || false,
-            completedAt: questionnaireStatuses['STAI_YA']?.completed_at,
-          },
-          {
-            ...MARS_DEFINITION,
-            id: MARS_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['MARS']?.completed || false,
-            completedAt: questionnaireStatuses['MARS']?.completed_at,
-          },
-          {
-            ...MATHYS_DEFINITION,
-            id: MATHYS_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['MATHYS']?.completed || false,
-            completedAt: questionnaireStatuses['MATHYS']?.completed_at,
-          },
-          {
-            ...ASRM_DEFINITION,
-            id: ASRM_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['ASRM']?.completed || false,
-            completedAt: questionnaireStatuses['ASRM']?.completed_at,
-          },
-          {
-            ...QIDS_DEFINITION,
-            id: QIDS_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['QIDS_SR16']?.completed || false,
-            completedAt: questionnaireStatuses['QIDS_SR16']?.completed_at,
-          },
-          {
-            ...PSQI_DEFINITION,
-            id: PSQI_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['PSQI']?.completed || false,
-            completedAt: questionnaireStatuses['PSQI']?.completed_at,
-          },
-          {
-            ...EPWORTH_DEFINITION,
-            id: EPWORTH_DEFINITION.code,
-            target_role: 'patient',
-            completed: questionnaireStatuses['EPWORTH']?.completed || false,
-            completedAt: questionnaireStatuses['EPWORTH']?.completed_at,
-          }
-        ]
-      }
-    ];
+                    completed: questionnaireStatuses['SCIP']?.completed || false,
+                    completedAt: questionnaireStatuses['SCIP']?.completed_at,
+                  },
+                  {
+                    ...WAIS4_SIMILITUDES_DEFINITION,
+                    id: WAIS4_SIMILITUDES_DEFINITION.code,
+                    target_role: 'healthcare_professional',
+                    completed: questionnaireStatuses['WAIS4_SIMILITUDES']?.completed || false,
+                    completedAt: questionnaireStatuses['WAIS4_SIMILITUDES']?.completed_at,
+                  }
+                ];
+
+                // Helper function to add conditional questionnaire
+                const addConditionalQuestionnaire = (definition: any, code: string) => {
+                  if (!wais4CriteriaAnswered) {
+                    // Criteria not yet completed - show as conditional/locked
+                    wais4Questionnaires.push({
+                      ...definition,
+                      id: definition.code,
+                      target_role: 'healthcare_professional',
+                      completed: false,
+                      completedAt: null,
+                      isConditional: true,
+                      conditionMet: false,
+                      conditionMessage: 'Complétez d\'abord les Critères cliniques',
+                    });
+                  } else if (wais4Accepted) {
+                    // Patient accepted - show enabled
+                    wais4Questionnaires.push({
+                      ...definition,
+                      id: definition.code,
+                      target_role: 'healthcare_professional',
+                      completed: questionnaireStatuses[code]?.completed || false,
+                      completedAt: questionnaireStatuses[code]?.completed_at,
+                      isConditional: true,
+                      conditionMet: true,
+                    });
+                  } else {
+                    // Patient not accepted - show as locked/not applicable
+                    wais4Questionnaires.push({
+                      ...definition,
+                      id: definition.code,
+                      target_role: 'healthcare_professional',
+                      completed: false,
+                      completedAt: null,
+                      isConditional: true,
+                      conditionMet: false,
+                      conditionMessage: 'Patient non accepté pour l\'évaluation neuropsychologique',
+                    });
+                  }
+                };
+
+                // Add conditional questionnaires (WAIS-IV specific tests only)
+                addConditionalQuestionnaire(WAIS4_LEARNING_DEFINITION, 'WAIS4_LEARNING');
+                addConditionalQuestionnaire(WAIS4_MATRICES_DEFINITION, 'WAIS4_MATRICES');
+                addConditionalQuestionnaire(WAIS4_CODE_DEFINITION, 'WAIS_IV_CODE_SYMBOLES_IVT');
+                addConditionalQuestionnaire(WAIS4_DIGIT_SPAN_DEFINITION, 'WAIS4_DIGIT_SPAN');
+
+                return wais4Questionnaires;
+              })()
+            }
+          ]
+        },
+        {
+          id: 'mod_auto_etat',
+          name: 'Autoquestionnaires - ETAT',
+          description: 'Questionnaires sur l\'état actuel du patient',
+          questionnaires: [
+            {
+              ...EQ5D5L_DEFINITION,
+              id: EQ5D5L_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['EQ5D5L']?.completed || false,
+              completedAt: questionnaireStatuses['EQ5D5L']?.completed_at,
+            },
+            {
+              ...PRISE_M_DEFINITION,
+              id: PRISE_M_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['PRISE_M']?.completed || false,
+              completedAt: questionnaireStatuses['PRISE_M']?.completed_at,
+            },
+            {
+              ...STAI_YA_DEFINITION,
+              id: STAI_YA_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['STAI_YA']?.completed || false,
+              completedAt: questionnaireStatuses['STAI_YA']?.completed_at,
+            },
+            {
+              ...MARS_DEFINITION,
+              id: MARS_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['MARS']?.completed || false,
+              completedAt: questionnaireStatuses['MARS']?.completed_at,
+            },
+            {
+              ...MATHYS_DEFINITION,
+              id: MATHYS_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['MATHYS']?.completed || false,
+              completedAt: questionnaireStatuses['MATHYS']?.completed_at,
+            },
+            {
+              ...ASRM_DEFINITION,
+              id: ASRM_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['ASRM']?.completed || false,
+              completedAt: questionnaireStatuses['ASRM']?.completed_at,
+            },
+            {
+              ...QIDS_DEFINITION,
+              id: QIDS_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['QIDS_SR16']?.completed || false,
+              completedAt: questionnaireStatuses['QIDS_SR16']?.completed_at,
+            },
+            {
+              ...PSQI_DEFINITION,
+              id: PSQI_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['PSQI']?.completed || false,
+              completedAt: questionnaireStatuses['PSQI']?.completed_at,
+            },
+            {
+              ...EPWORTH_DEFINITION,
+              id: EPWORTH_DEFINITION.code,
+              target_role: 'patient',
+              completed: questionnaireStatuses['EPWORTH']?.completed || false,
+              completedAt: questionnaireStatuses['EPWORTH']?.completed_at,
+            }
+          ]
+        }
+      ];
     }
   }
 
@@ -2811,13 +2841,13 @@ export default async function VisitDetailPage({
     // Helper function to count a questionnaire
     const countQuestionnaire = (q: any) => {
       if (!q) return;
-      
+
       // Skip conditional questionnaires where condition is not met
       // These are not required/visible, so don't count them
       if (q.isConditional && q.conditionMet !== true) {
         return;
       }
-      
+
       totalQuestionnaires++;
       if (q.completed) {
         completedQuestionnaires++;
@@ -2830,7 +2860,7 @@ export default async function VisitDetailPage({
       for (const q of questionnaires) {
         countQuestionnaire(q);
       }
-      
+
       // Count questionnaires inside sections (e.g., mod_medical_eval, mod_neuropsy)
       const sections = (module as any).sections || [];
       for (const section of sections) {
@@ -2841,8 +2871,8 @@ export default async function VisitDetailPage({
       }
     }
 
-    const completionPercentage = totalQuestionnaires > 0 
-      ? Math.round((completedQuestionnaires / totalQuestionnaires) * 100) 
+    const completionPercentage = totalQuestionnaires > 0
+      ? Math.round((completedQuestionnaires / totalQuestionnaires) * 100)
       : 0;
 
     return {
@@ -2867,7 +2897,7 @@ export default async function VisitDetailPage({
           <div className="flex items-start gap-6 flex-1">
             {/* Circular Progress */}
             <CircularProgress percentage={completionStatus.completionPercentage} />
-            
+
             {/* Visit Info */}
             <div className="flex-1">
               <h2 className="text-3xl font-bold text-slate-900 mb-2">
@@ -2906,7 +2936,7 @@ export default async function VisitDetailPage({
           </div>
 
           {/* Actions */}
-          <VisitActions 
+          <VisitActions
             visitId={visitId}
             patientId={patientId}
             pathology={pathology}
@@ -2932,19 +2962,19 @@ export default async function VisitDetailPage({
         </h3>
 
         <div className="relative space-y-6 pl-2">
-        {(Array.isArray(modulesWithQuestionnaires) ? modulesWithQuestionnaires : [])
-          .filter((m): m is NonNullable<typeof m> => m != null && typeof m === 'object' && 'id' in m)
-          .map((module, index) => (
-            <ExpandableModuleCard
-              key={module.id}
-              module={module}
-              index={index}
-              pathology={pathology}
-              patientId={patientId}
-              visitId={visitId}
-              totalModules={(Array.isArray(modulesWithQuestionnaires) ? modulesWithQuestionnaires : []).length}
-            />
-          ))}
+          {(Array.isArray(modulesWithQuestionnaires) ? modulesWithQuestionnaires : [])
+            .filter((m): m is NonNullable<typeof m> => m != null && typeof m === 'object' && 'id' in m)
+            .map((module, index) => (
+              <ExpandableModuleCard
+                key={module.id}
+                module={module}
+                index={index}
+                pathology={pathology}
+                patientId={patientId}
+                visitId={visitId}
+                totalModules={(Array.isArray(modulesWithQuestionnaires) ? modulesWithQuestionnaires : []).length}
+              />
+            ))}
         </div>
       </div>
 

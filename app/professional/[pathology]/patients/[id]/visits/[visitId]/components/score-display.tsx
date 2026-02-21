@@ -102,6 +102,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return "info";
     }
 
+    if (code === "SANS") {
+      if (data.total_score >= 60) return "error";
+      if (data.total_score >= 30) return "warning";
+      return "info";
+    }
+
     if (code === "CTQ" || code === "CTQ_SZ") {
       // CTQ: Check if any subscale is severe
       const hasSevere = [
@@ -1011,20 +1017,20 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       data.q1_score !== undefined
         ? data.q1_score
         : [
-            "q1_1",
-            "q1_2",
-            "q1_3",
-            "q1_4",
-            "q1_5",
-            "q1_6",
-            "q1_7",
-            "q1_8",
-            "q1_9",
-            "q1_10",
-            "q1_11",
-            "q1_12",
-            "q1_13",
-          ].reduce((acc, key) => acc + (data[key] || 0), 0);
+          "q1_1",
+          "q1_2",
+          "q1_3",
+          "q1_4",
+          "q1_5",
+          "q1_6",
+          "q1_7",
+          "q1_8",
+          "q1_9",
+          "q1_10",
+          "q1_11",
+          "q1_12",
+          "q1_13",
+        ].reduce((acc, key) => acc + (data[key] || 0), 0);
 
     const impactLabels = [
       "Pas de problème",
@@ -1103,6 +1109,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 "Résultats WAIS-IV Code, Symboles & IVT"}
               {code === "PANSS" && "Résultats PANSS"}
               {code === "SAPS" && "Résultats SAPS"}
+              {code === "SANS" && "Résultats SANS"}
               {code === "CDSS" && "Résultats CDSS - Échelle de Calgary"}
               {code === "ISA_FOLLOWUP" &&
                 "Résultats ISA - Intentionnalité Suicidaire Actuelle (Suivi)"}
@@ -1144,130 +1151,132 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {code === "MDQ"
                 ? (data.interpretation?.includes("Positif") ? "POSITIF" : "NÉGATIF")
                 : code === "ASRS"
-                ? (data.screening_positive ? "POSITIF" : "NÉGATIF")
-                : (code === "CTQ" || code === "CTQ_SZ")
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "BIS10"
-                ? (data.overall_impulsivity !== undefined && data.overall_impulsivity !== null ? parseFloat(data.overall_impulsivity).toFixed(2) : "-")
-                : code === "WURS25"
-                ? (data.adhd_likely ? "POSITIF" : "NÉGATIF")
-                : code === "WURS25_SZ"
-                ? (data.adhd_likely ? "POSITIF" : "NÉGATIF")
-                : code === "STORI_SZ"
-                ? (data.dominant_stage ? `Étape ${data.dominant_stage}` : "-")
-                : code === "CSM"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "CTI"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "ALS18"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "AIM"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "AQ12"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "ALDA"
-                ? (data.alda_score !== undefined ? data.alda_score : "-")
-                : (code === "CGI" || code === "CGI_SZ")
-                ? (data.therapeutic_index !== undefined && data.therapeutic_index !== null ? data.therapeutic_index : (data.cgi_s !== undefined ? data.cgi_s : "-"))
-                : code === "MADRS"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : (code === "YMRS" || code === "YMRS_SZ")
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "EGF_SZ"
-                ? (data.egf_score !== undefined ? data.egf_score : "-")
-                : code === "WAIS4_MATRICES"
-                ? (data.standardized_score !== undefined ? data.standardized_score : "-")
-                : code === "WAIS4_MATRICES_SZ"
-                ? (data.wais_mat_std !== undefined ? data.wais_mat_std : "-")
-                : code === "SSTICS_SZ"
-                ? (data.sstics_scorez !== undefined && data.sstics_scorez !== null ? data.sstics_scorez.toFixed(2) : "-")
-                : code === "CBQ_SZ"
-                ? (data.cbq_total_z !== undefined && data.cbq_total_z !== null ? Number(data.cbq_total_z).toFixed(2) : "-")
-                : code === "DACOBS_SZ"
-                ? (data.dacobs_total !== undefined && data.dacobs_total !== null ? data.dacobs_total : "-")
-                : code === "BRIEF_A_SZ"
-                ? (data.brief_a_gec !== undefined && data.brief_a_gec !== null ? data.brief_a_gec : "-")
-                : code === "BRIEF_A_AUTO_SZ"
-                ? (data.brief_a_gec !== undefined && data.brief_a_gec !== null ? data.brief_a_gec : "-")
-                : (code === "WAIS4_DIGIT_SPAN" || code === "WAIS4_MEMOIRE_CHIFFRES_SZ")
-                ? (data.wais_mc_std !== undefined ? data.wais_mc_std : "-")
-                : (code === "WAIS4_SIMILITUDES" || code === "WAIS4_SIMILITUDES_SZ")
-                ? (data.standard_score !== undefined ? data.standard_score : "-")
-                : code === "WAIS3_VOCABULAIRE"
-                ? (data.standard_score !== undefined ? data.standard_score : "-")
-                : code === "WAIS3_MATRICES"
-                ? (data.standard_score !== undefined ? data.standard_score : "-")
-                : (code === "CVLT" || code === "CVLT_SZ")
-                ? (data.total_1_5 !== undefined ? data.total_1_5 : "-")
-                : code === "TMT_SZ"
-                ? (data.tmta_tps !== undefined ? `${data.tmta_tps}s` : "-")
-                : code === "STROOP_SZ"
-                ? (data.stroop_interf !== undefined && data.stroop_interf !== null ? data.stroop_interf : "-")
-                : code === "COMMISSIONS_SZ"
-                ? (data.com01 !== undefined ? `${data.com01} min` : "-")
-                : code === "LIS_SZ"
-                ? (data.lis_score !== undefined && data.lis_score !== null ? data.lis_score.toFixed(2) : "-")
-                : code === "WAIS4_EFFICIENCE_SZ"
-                ? (data.qi_indice !== undefined && data.qi_indice !== null ? data.qi_indice : "-")
-                : code === "WAIS4_CODE"
-                ? (data.wais_cod_std !== undefined ? data.wais_cod_std : "-")
-                : code === "WAIS_IV_CODE_SYMBOLES_IVT"
-                ? (data.wais_ivt !== undefined && data.wais_ivt !== null ? data.wais_ivt : (data.wais_cod_std !== undefined ? data.wais_cod_std : "-"))
-                : code === "PANSS"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "CDSS"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "SAPS"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "BARS"
-                ? (data.adherence_score !== undefined ? data.adherence_score : "-")
-                : code === "SUMD"
-                ? "Voir details"
-                : code === "AIMS"
-                ? (data.movement_score !== undefined ? data.movement_score : "-")
-                : code === "BARNES"
-                ? (data.global_score !== undefined ? data.global_score : "-")
-                : code === "SAS"
-                ? (data.mean_score !== undefined && data.mean_score !== null ? data.mean_score.toFixed(2) : "-")
-                : code === "PSP"
-                ? (data.final_score !== undefined && data.final_score !== null ? data.final_score : "-")
-                : (code === "EQ5D5L" || code === "EQ5D5L_SZ")
-                ? (data.profile_string || data.health_state || "-")
-                : code === "PRISE_M"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "STAI_YA"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : (code === "MARS" || code === "MARS_SZ")
-                ? (data.total_score !== undefined ? `${data.total_score}/10` : "-")
-                : code === "BIS_SZ"
-                ? (data.total_score !== undefined ? `${parseFloat(data.total_score).toFixed(1)}/12` : "-")
-                : code === "YBOCS_SZ"
-                ? (data.total_score !== undefined ? `${data.total_score}/40` : "-")
-                : code === "SOGS_SZ"
-                ? (data.total_score !== undefined ? `${data.total_score}/20` : "-")
-                : code === "PSQI_SZ"
-                ? (data.total_score !== undefined ? `${data.total_score}/21` : "-")
-                : code === "PRESENTEISME_SZ"
-                ? (data.productivite_pct !== undefined ? `${data.productivite_pct.toFixed(0)}%` : "-")
-                : code === "IPAQ_SZ"
-                ? (data.total_met_minutes !== undefined ? `${Math.round(data.total_met_minutes)} MET-min/sem` : "-")
-                : code === "MATHYS"
-                ? (data.total_score !== undefined ? `${parseFloat(data.total_score).toFixed(1)}/200` : "-")
-                : code === "QIDS_SR16"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "PSQI"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "EPWORTH"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "FAGERSTROM"
-                ? (data.total_score ?? data.totalScore ?? "-")
-                : code === "FAGERSTROM_SZ"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : code === "EPHP_SZ"
-                ? (data.total_score !== undefined ? data.total_score : "-")
-                : (code === "FLUENCES_VERBALES" || code === "FLUENCES_VERBALES_SZ")
-                ? (data.fv_p_tot_correct !== undefined && data.fv_p_tot_correct !== null ? data.fv_p_tot_correct : "-")
-                : (data.total_score !== undefined ? data.total_score : "-")}
+                  ? (data.screening_positive ? "POSITIF" : "NÉGATIF")
+                  : (code === "CTQ" || code === "CTQ_SZ")
+                    ? (data.total_score !== undefined ? data.total_score : "-")
+                    : code === "BIS10"
+                      ? (data.overall_impulsivity !== undefined && data.overall_impulsivity !== null ? parseFloat(data.overall_impulsivity).toFixed(2) : "-")
+                      : code === "WURS25"
+                        ? (data.adhd_likely ? "POSITIF" : "NÉGATIF")
+                        : code === "WURS25_SZ"
+                          ? (data.adhd_likely ? "POSITIF" : "NÉGATIF")
+                          : code === "STORI_SZ"
+                            ? (data.dominant_stage ? `Étape ${data.dominant_stage}` : "-")
+                            : code === "CSM"
+                              ? (data.total_score !== undefined ? data.total_score : "-")
+                              : code === "CTI"
+                                ? (data.total_score !== undefined ? data.total_score : "-")
+                                : code === "ALS18"
+                                  ? (data.total_score !== undefined ? data.total_score : "-")
+                                  : code === "AIM"
+                                    ? (data.total_score !== undefined ? data.total_score : "-")
+                                    : code === "AQ12"
+                                      ? (data.total_score !== undefined ? data.total_score : "-")
+                                      : code === "ALDA"
+                                        ? (data.alda_score !== undefined ? data.alda_score : "-")
+                                        : (code === "CGI" || code === "CGI_SZ")
+                                          ? (data.therapeutic_index !== undefined && data.therapeutic_index !== null ? data.therapeutic_index : (data.cgi_s !== undefined ? data.cgi_s : "-"))
+                                          : code === "MADRS"
+                                            ? (data.total_score !== undefined ? data.total_score : "-")
+                                            : (code === "YMRS" || code === "YMRS_SZ")
+                                              ? (data.total_score !== undefined ? data.total_score : "-")
+                                              : code === "EGF_SZ"
+                                                ? (data.egf_score !== undefined ? data.egf_score : "-")
+                                                : code === "WAIS4_MATRICES"
+                                                  ? (data.standardized_score !== undefined ? data.standardized_score : "-")
+                                                  : code === "WAIS4_MATRICES_SZ"
+                                                    ? (data.wais_mat_std !== undefined ? data.wais_mat_std : "-")
+                                                    : code === "SSTICS_SZ"
+                                                      ? (data.sstics_scorez !== undefined && data.sstics_scorez !== null ? data.sstics_scorez.toFixed(2) : "-")
+                                                      : code === "CBQ_SZ"
+                                                        ? (data.cbq_total_z !== undefined && data.cbq_total_z !== null ? Number(data.cbq_total_z).toFixed(2) : "-")
+                                                        : code === "DACOBS_SZ"
+                                                          ? (data.dacobs_total !== undefined && data.dacobs_total !== null ? data.dacobs_total : "-")
+                                                          : code === "BRIEF_A_SZ"
+                                                            ? (data.brief_a_gec !== undefined && data.brief_a_gec !== null ? data.brief_a_gec : "-")
+                                                            : code === "BRIEF_A_AUTO_SZ"
+                                                              ? (data.brief_a_gec !== undefined && data.brief_a_gec !== null ? data.brief_a_gec : "-")
+                                                              : (code === "WAIS4_DIGIT_SPAN" || code === "WAIS4_MEMOIRE_CHIFFRES_SZ")
+                                                                ? (data.wais_mc_std !== undefined ? data.wais_mc_std : "-")
+                                                                : (code === "WAIS4_SIMILITUDES" || code === "WAIS4_SIMILITUDES_SZ")
+                                                                  ? (data.standard_score !== undefined ? data.standard_score : "-")
+                                                                  : code === "WAIS3_VOCABULAIRE"
+                                                                    ? (data.standard_score !== undefined ? data.standard_score : "-")
+                                                                    : code === "WAIS3_MATRICES"
+                                                                      ? (data.standard_score !== undefined ? data.standard_score : "-")
+                                                                      : (code === "CVLT" || code === "CVLT_SZ")
+                                                                        ? (data.total_1_5 !== undefined ? data.total_1_5 : "-")
+                                                                        : code === "TMT_SZ"
+                                                                          ? (data.tmta_tps !== undefined ? `${data.tmta_tps}s` : "-")
+                                                                          : code === "STROOP_SZ"
+                                                                            ? (data.stroop_interf !== undefined && data.stroop_interf !== null ? data.stroop_interf : "-")
+                                                                            : code === "COMMISSIONS_SZ"
+                                                                              ? (data.com01 !== undefined ? `${data.com01} min` : "-")
+                                                                              : code === "LIS_SZ"
+                                                                                ? (data.lis_score !== undefined && data.lis_score !== null ? data.lis_score.toFixed(2) : "-")
+                                                                                : code === "WAIS4_EFFICIENCE_SZ"
+                                                                                  ? (data.qi_indice !== undefined && data.qi_indice !== null ? data.qi_indice : "-")
+                                                                                  : code === "WAIS4_CODE"
+                                                                                    ? (data.wais_cod_std !== undefined ? data.wais_cod_std : "-")
+                                                                                    : code === "WAIS_IV_CODE_SYMBOLES_IVT"
+                                                                                      ? (data.wais_ivt !== undefined && data.wais_ivt !== null ? data.wais_ivt : (data.wais_cod_std !== undefined ? data.wais_cod_std : "-"))
+                                                                                      : code === "PANSS"
+                                                                                        ? (data.total_score !== undefined ? data.total_score : "-")
+                                                                                        : code === "CDSS"
+                                                                                          ? (data.total_score !== undefined ? data.total_score : "-")
+                                                                                          : code === "SAPS"
+                                                                                            ? (data.total_score !== undefined ? data.total_score : "-")
+                                                                                            : code === "SANS"
+                                                                                              ? (data.total_score !== undefined ? data.total_score : "-")
+                                                                                              : code === "BARS"
+                                                                                                ? (data.adherence_score !== undefined ? data.adherence_score : "-")
+                                                                                                : code === "SUMD"
+                                                                                                  ? "Voir details"
+                                                                                                  : code === "AIMS"
+                                                                                                    ? (data.movement_score !== undefined ? data.movement_score : "-")
+                                                                                                    : code === "BARNES"
+                                                                                                      ? (data.global_score !== undefined ? data.global_score : "-")
+                                                                                                      : code === "SAS"
+                                                                                                        ? (data.mean_score !== undefined && data.mean_score !== null ? data.mean_score.toFixed(2) : "-")
+                                                                                                        : code === "PSP"
+                                                                                                          ? (data.final_score !== undefined && data.final_score !== null ? data.final_score : "-")
+                                                                                                          : (code === "EQ5D5L" || code === "EQ5D5L_SZ")
+                                                                                                            ? (data.profile_string || data.health_state || "-")
+                                                                                                            : code === "PRISE_M"
+                                                                                                              ? (data.total_score !== undefined ? data.total_score : "-")
+                                                                                                              : code === "STAI_YA"
+                                                                                                                ? (data.total_score !== undefined ? data.total_score : "-")
+                                                                                                                : (code === "MARS" || code === "MARS_SZ")
+                                                                                                                  ? (data.total_score !== undefined ? `${data.total_score}/10` : "-")
+                                                                                                                  : code === "BIS_SZ"
+                                                                                                                    ? (data.total_score !== undefined ? `${parseFloat(data.total_score).toFixed(1)}/12` : "-")
+                                                                                                                    : code === "YBOCS_SZ"
+                                                                                                                      ? (data.total_score !== undefined ? `${data.total_score}/40` : "-")
+                                                                                                                      : code === "SOGS_SZ"
+                                                                                                                        ? (data.total_score !== undefined ? `${data.total_score}/20` : "-")
+                                                                                                                        : code === "PSQI_SZ"
+                                                                                                                          ? (data.total_score !== undefined ? `${data.total_score}/21` : "-")
+                                                                                                                          : code === "PRESENTEISME_SZ"
+                                                                                                                            ? (data.productivite_pct !== undefined ? `${data.productivite_pct.toFixed(0)}%` : "-")
+                                                                                                                            : code === "IPAQ_SZ"
+                                                                                                                              ? (data.total_met_minutes !== undefined ? `${Math.round(data.total_met_minutes)} MET-min/sem` : "-")
+                                                                                                                              : code === "MATHYS"
+                                                                                                                                ? (data.total_score !== undefined ? `${parseFloat(data.total_score).toFixed(1)}/200` : "-")
+                                                                                                                                : code === "QIDS_SR16"
+                                                                                                                                  ? (data.total_score !== undefined ? data.total_score : "-")
+                                                                                                                                  : code === "PSQI"
+                                                                                                                                    ? (data.total_score !== undefined ? data.total_score : "-")
+                                                                                                                                    : code === "EPWORTH"
+                                                                                                                                      ? (data.total_score !== undefined ? data.total_score : "-")
+                                                                                                                                      : code === "FAGERSTROM"
+                                                                                                                                        ? (data.total_score ?? data.totalScore ?? "-")
+                                                                                                                                        : code === "FAGERSTROM_SZ"
+                                                                                                                                          ? (data.total_score !== undefined ? data.total_score : "-")
+                                                                                                                                          : code === "EPHP_SZ"
+                                                                                                                                            ? (data.total_score !== undefined ? data.total_score : "-")
+                                                                                                                                            : (code === "FLUENCES_VERBALES" || code === "FLUENCES_VERBALES_SZ")
+                                                                                                                                              ? (data.fv_p_tot_correct !== undefined && data.fv_p_tot_correct !== null ? data.fv_p_tot_correct : "-")
+                                                                                                                                              : (data.total_score !== undefined ? data.total_score : "-")}
               {code === "ASRM" && "/20"}
               {code === "QIDS_SR16" && "/27"}
               {code === "PSQI" && "/21"}
@@ -1308,6 +1317,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {code === "PANSS" && "/210"}
               {code === "CDSS" && "/27"}
               {code === "SAPS" && "/170"}
+              {code === "SANS" && "/124"}
               {code === "ISA_FOLLOWUP" && "/5"}
               {code === "BARS" && "%"}
               {code === "SUMD" && ""}
@@ -1336,13 +1346,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
 
             {/* Score Interpretation */}
             <div
-              className={`p-3 rounded-lg ${
-                data.alda_score !== null && data.alda_score >= 7
-                  ? "bg-green-50 border border-green-200"
-                  : data.alda_score !== null && data.alda_score >= 4
-                    ? "bg-blue-50 border border-blue-200"
-                    : "bg-amber-50 border border-amber-200"
-              }`}
+              className={`p-3 rounded-lg ${data.alda_score !== null && data.alda_score >= 7
+                ? "bg-green-50 border border-green-200"
+                : data.alda_score !== null && data.alda_score >= 4
+                  ? "bg-blue-50 border border-blue-200"
+                  : "bg-amber-50 border border-amber-200"
+                }`}
             >
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
@@ -1795,7 +1804,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <span className="text-gray-600">Impulsivité cognitive:</span>
                 <span className="font-semibold">
                   {data.cognitive_impulsivity_mean !== undefined &&
-                  data.cognitive_impulsivity_mean !== null
+                    data.cognitive_impulsivity_mean !== null
                     ? parseFloat(data.cognitive_impulsivity_mean).toFixed(2)
                     : "-"}
                   /4.0
@@ -1805,7 +1814,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <span className="text-gray-600">Impulsivité motrice:</span>
                 <span className="font-semibold">
                   {data.behavioral_impulsivity_mean !== undefined &&
-                  data.behavioral_impulsivity_mean !== null
+                    data.behavioral_impulsivity_mean !== null
                     ? parseFloat(data.behavioral_impulsivity_mean).toFixed(2)
                     : "-"}
                   /4.0
@@ -1818,7 +1827,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               </span>
               <span className="font-bold text-lg">
                 {data.overall_impulsivity !== undefined &&
-                data.overall_impulsivity !== null
+                  data.overall_impulsivity !== null
                   ? parseFloat(data.overall_impulsivity).toFixed(2)
                   : "-"}
                 /4.0
@@ -1905,11 +1914,10 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg ${
-                  data.adhd_likely
-                    ? "bg-amber-50 border border-amber-200 text-amber-800"
-                    : "bg-blue-50 border border-blue-200 text-blue-800"
-                }`}
+                className={`p-3 rounded-lg ${data.adhd_likely
+                  ? "bg-amber-50 border border-amber-200 text-amber-800"
+                  : "bg-blue-50 border border-blue-200 text-blue-800"
+                  }`}
               >
                 <p className="text-xs">{data.interpretation}</p>
               </div>
@@ -1978,19 +1986,18 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             <div className="flex justify-between items-center">
               <span className="text-gray-600 font-medium">Stade dominant:</span>
               <span
-                className={`font-bold text-lg ${
-                  data.dominant_stage === 1
-                    ? "text-red-600"
-                    : data.dominant_stage === 2
-                      ? "text-orange-600"
-                      : data.dominant_stage === 3
-                        ? "text-yellow-600"
-                        : data.dominant_stage === 4
-                          ? "text-lime-600"
-                          : data.dominant_stage === 5
-                            ? "text-green-600"
-                            : "text-gray-600"
-                }`}
+                className={`font-bold text-lg ${data.dominant_stage === 1
+                  ? "text-red-600"
+                  : data.dominant_stage === 2
+                    ? "text-orange-600"
+                    : data.dominant_stage === 3
+                      ? "text-yellow-600"
+                      : data.dominant_stage === 4
+                        ? "text-lime-600"
+                        : data.dominant_stage === 5
+                          ? "text-green-600"
+                          : "text-gray-600"
+                  }`}
               >
                 {data.dominant_stage === 1 && "Moratoire"}
                 {data.dominant_stage === 2 && "Conscience"}
@@ -2109,19 +2116,18 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg ${
-                  data.dominant_stage === 1
-                    ? "bg-red-50 border border-red-200 text-red-800"
-                    : data.dominant_stage === 2
-                      ? "bg-orange-50 border border-orange-200 text-orange-800"
-                      : data.dominant_stage === 3
-                        ? "bg-yellow-50 border border-yellow-200 text-yellow-800"
-                        : data.dominant_stage === 4
-                          ? "bg-lime-50 border border-lime-200 text-lime-800"
-                          : data.dominant_stage === 5
-                            ? "bg-green-50 border border-green-200 text-green-800"
-                            : "bg-gray-50 border border-gray-200 text-gray-800"
-                }`}
+                className={`p-3 rounded-lg ${data.dominant_stage === 1
+                  ? "bg-red-50 border border-red-200 text-red-800"
+                  : data.dominant_stage === 2
+                    ? "bg-orange-50 border border-orange-200 text-orange-800"
+                    : data.dominant_stage === 3
+                      ? "bg-yellow-50 border border-yellow-200 text-yellow-800"
+                      : data.dominant_stage === 4
+                        ? "bg-lime-50 border border-lime-200 text-lime-800"
+                        : data.dominant_stage === 5
+                          ? "bg-green-50 border border-green-200 text-green-800"
+                          : "bg-gray-50 border border-gray-200 text-gray-800"
+                  }`}
               >
                 <p className="text-xs whitespace-pre-line">
                   {data.interpretation}
@@ -2195,15 +2201,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Score total:</span>
               <span
-                className={`font-semibold ${
-                  data.total_score !== null && data.total_score !== undefined
-                    ? data.total_score <= 2
-                      ? "text-green-600"
-                      : data.total_score <= 4
-                        ? "text-orange-600"
-                        : "text-red-600"
-                    : ""
-                }`}
+                className={`font-semibold ${data.total_score !== null && data.total_score !== undefined
+                  ? data.total_score <= 2
+                    ? "text-green-600"
+                    : data.total_score <= 4
+                      ? "text-orange-600"
+                      : "text-red-600"
+                  : ""
+                  }`}
               >
                 {data.total_score ?? "-"}/20
               </span>
@@ -2211,15 +2216,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             <div className="flex justify-between items-center">
               <span className="text-gray-600">Classification:</span>
               <span
-                className={`font-semibold ${
-                  data.gambling_severity === "no_problem"
-                    ? "text-green-600"
-                    : data.gambling_severity === "at_risk"
-                      ? "text-orange-600"
-                      : data.gambling_severity === "pathological"
-                        ? "text-red-600"
-                        : ""
-                }`}
+                className={`font-semibold ${data.gambling_severity === "no_problem"
+                  ? "text-green-600"
+                  : data.gambling_severity === "at_risk"
+                    ? "text-orange-600"
+                    : data.gambling_severity === "pathological"
+                      ? "text-red-600"
+                      : ""
+                  }`}
               >
                 {data.gambling_severity === "no_problem" &&
                   "Pas de problème de jeu"}
@@ -2258,15 +2262,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg ${
-                  data.gambling_severity === "no_problem"
-                    ? "bg-green-50 border border-green-200 text-green-800"
-                    : data.gambling_severity === "at_risk"
-                      ? "bg-orange-50 border border-orange-200 text-orange-800"
-                      : data.gambling_severity === "pathological"
-                        ? "bg-red-50 border border-red-200 text-red-800"
-                        : "bg-gray-50 border border-gray-200 text-gray-800"
-                }`}
+                className={`p-3 rounded-lg ${data.gambling_severity === "no_problem"
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : data.gambling_severity === "at_risk"
+                    ? "bg-orange-50 border border-orange-200 text-orange-800"
+                    : data.gambling_severity === "pathological"
+                      ? "bg-red-50 border border-red-200 text-red-800"
+                      : "bg-gray-50 border border-gray-200 text-gray-800"
+                  }`}
               >
                 <p className="text-xs whitespace-pre-line">
                   {data.interpretation}
@@ -2302,15 +2305,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   Score sur la qualité du sommeil:
                 </span>
                 <span
-                  className={`font-semibold ${
-                    data.c1_subjective_quality === 0
-                      ? "text-green-600"
-                      : data.c1_subjective_quality === 1
-                        ? "text-yellow-600"
-                        : data.c1_subjective_quality === 2
-                          ? "text-orange-600"
-                          : "text-red-600"
-                  }`}
+                  className={`font-semibold ${data.c1_subjective_quality === 0
+                    ? "text-green-600"
+                    : data.c1_subjective_quality === 1
+                      ? "text-yellow-600"
+                      : data.c1_subjective_quality === 2
+                        ? "text-orange-600"
+                        : "text-red-600"
+                    }`}
                 >
                   {data.c1_subjective_quality ?? "-"}/3
                 </span>
@@ -2322,15 +2324,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   Score latence avant sommeil:
                 </span>
                 <span
-                  className={`font-semibold ${
-                    data.c2_latency === 0
-                      ? "text-green-600"
-                      : data.c2_latency === 1
-                        ? "text-yellow-600"
-                        : data.c2_latency === 2
-                          ? "text-orange-600"
-                          : "text-red-600"
-                  }`}
+                  className={`font-semibold ${data.c2_latency === 0
+                    ? "text-green-600"
+                    : data.c2_latency === 1
+                      ? "text-yellow-600"
+                      : data.c2_latency === 2
+                        ? "text-orange-600"
+                        : "text-red-600"
+                    }`}
                 >
                   {data.c2_latency ?? "-"}/3
                 </span>
@@ -2340,15 +2341,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <div className="flex justify-between items-center py-1 border-b border-gray-100">
                 <span className="text-gray-600">Score durée de sommeil:</span>
                 <span
-                  className={`font-semibold ${
-                    data.c3_duration === 0
-                      ? "text-green-600"
-                      : data.c3_duration === 1
-                        ? "text-yellow-600"
-                        : data.c3_duration === 2
-                          ? "text-orange-600"
-                          : "text-red-600"
-                  }`}
+                  className={`font-semibold ${data.c3_duration === 0
+                    ? "text-green-600"
+                    : data.c3_duration === 1
+                      ? "text-yellow-600"
+                      : data.c3_duration === 2
+                        ? "text-orange-600"
+                        : "text-red-600"
+                    }`}
                 >
                   {data.c3_duration ?? "-"}/3
                 </span>
@@ -2358,15 +2358,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <div className="flex justify-between items-center py-1 border-b border-gray-100">
                 <span className="text-gray-600">Score efficience sommeil:</span>
                 <span
-                  className={`font-semibold ${
-                    data.c4_efficiency === 0
-                      ? "text-green-600"
-                      : data.c4_efficiency === 1
-                        ? "text-yellow-600"
-                        : data.c4_efficiency === 2
-                          ? "text-orange-600"
-                          : "text-red-600"
-                  }`}
+                  className={`font-semibold ${data.c4_efficiency === 0
+                    ? "text-green-600"
+                    : data.c4_efficiency === 1
+                      ? "text-yellow-600"
+                      : data.c4_efficiency === 2
+                        ? "text-orange-600"
+                        : "text-red-600"
+                    }`}
                 >
                   {data.c4_efficiency ?? "-"}/3
                 </span>
@@ -2378,15 +2377,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   Score du trouble du sommeil:
                 </span>
                 <span
-                  className={`font-semibold ${
-                    data.c5_disturbances === 0
-                      ? "text-green-600"
-                      : data.c5_disturbances === 1
-                        ? "text-yellow-600"
-                        : data.c5_disturbances === 2
-                          ? "text-orange-600"
-                          : "text-red-600"
-                  }`}
+                  className={`font-semibold ${data.c5_disturbances === 0
+                    ? "text-green-600"
+                    : data.c5_disturbances === 1
+                      ? "text-yellow-600"
+                      : data.c5_disturbances === 2
+                        ? "text-orange-600"
+                        : "text-red-600"
+                    }`}
                 >
                   {data.c5_disturbances ?? "-"}/3
                 </span>
@@ -2396,15 +2394,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <div className="flex justify-between items-center py-1 border-b border-gray-100">
                 <span className="text-gray-600">Score médication:</span>
                 <span
-                  className={`font-semibold ${
-                    data.c6_medication === 0
-                      ? "text-green-600"
-                      : data.c6_medication === 1
-                        ? "text-yellow-600"
-                        : data.c6_medication === 2
-                          ? "text-orange-600"
-                          : "text-red-600"
-                  }`}
+                  className={`font-semibold ${data.c6_medication === 0
+                    ? "text-green-600"
+                    : data.c6_medication === 1
+                      ? "text-yellow-600"
+                      : data.c6_medication === 2
+                        ? "text-orange-600"
+                        : "text-red-600"
+                    }`}
                 >
                   {data.c6_medication ?? "-"}/3
                 </span>
@@ -2416,15 +2413,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   Score de dysfonctionnement dû au sommeil:
                 </span>
                 <span
-                  className={`font-semibold ${
-                    data.c7_daytime_dysfunction === 0
-                      ? "text-green-600"
-                      : data.c7_daytime_dysfunction === 1
-                        ? "text-yellow-600"
-                        : data.c7_daytime_dysfunction === 2
-                          ? "text-orange-600"
-                          : "text-red-600"
-                  }`}
+                  className={`font-semibold ${data.c7_daytime_dysfunction === 0
+                    ? "text-green-600"
+                    : data.c7_daytime_dysfunction === 1
+                      ? "text-yellow-600"
+                      : data.c7_daytime_dysfunction === 2
+                        ? "text-orange-600"
+                        : "text-red-600"
+                    }`}
                 >
                   {data.c7_daytime_dysfunction ?? "-"}/3
                 </span>
@@ -2436,15 +2432,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   Score total:
                 </span>
                 <span
-                  className={`font-bold text-lg ${
-                    data.total_score !== null && data.total_score !== undefined
-                      ? data.total_score <= 5
-                        ? "text-green-600"
-                        : data.total_score <= 10
-                          ? "text-orange-600"
-                          : "text-red-600"
-                      : ""
-                  }`}
+                  className={`font-bold text-lg ${data.total_score !== null && data.total_score !== undefined
+                    ? data.total_score <= 5
+                      ? "text-green-600"
+                      : data.total_score <= 10
+                        ? "text-orange-600"
+                        : "text-red-600"
+                    : ""
+                    }`}
                 >
                   {data.total_score ?? "-"}/21
                 </span>
@@ -2481,13 +2476,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg ${
-                  data.total_score <= 5
-                    ? "bg-green-50 border border-green-200 text-green-800"
-                    : data.total_score <= 10
-                      ? "bg-orange-50 border border-orange-200 text-orange-800"
-                      : "bg-red-50 border border-red-200 text-red-800"
-                }`}
+                className={`p-3 rounded-lg ${data.total_score <= 5
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : data.total_score <= 10
+                    ? "bg-orange-50 border border-orange-200 text-orange-800"
+                    : "bg-red-50 border border-red-200 text-red-800"
+                  }`}
               >
                 <p className="text-xs whitespace-pre-line">
                   {data.interpretation}
@@ -2522,16 +2516,15 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 Productivité globale:
               </span>
               <span
-                className={`font-bold text-lg ${
-                  data.productivite_pct !== null &&
+                className={`font-bold text-lg ${data.productivite_pct !== null &&
                   data.productivite_pct !== undefined
-                    ? data.productivite_pct >= 80
-                      ? "text-green-600"
-                      : data.productivite_pct >= 60
-                        ? "text-orange-600"
-                        : "text-red-600"
-                    : ""
-                }`}
+                  ? data.productivite_pct >= 80
+                    ? "text-green-600"
+                    : data.productivite_pct >= 60
+                      ? "text-orange-600"
+                      : "text-red-600"
+                  : ""
+                  }`}
               >
                 {data.productivite_pct !== undefined
                   ? `${data.productivite_pct.toFixed(0)}%`
@@ -2551,15 +2544,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   Jours d&apos;absence (santé):
                 </span>
                 <span
-                  className={`font-semibold ${
-                    data.absenteisme_absolu === 0
-                      ? "text-green-600"
-                      : data.absenteisme_absolu <= 2
-                        ? "text-yellow-600"
-                        : data.absenteisme_absolu <= 5
-                          ? "text-orange-600"
-                          : "text-red-600"
-                  }`}
+                  className={`font-semibold ${data.absenteisme_absolu === 0
+                    ? "text-green-600"
+                    : data.absenteisme_absolu <= 2
+                      ? "text-yellow-600"
+                      : data.absenteisme_absolu <= 5
+                        ? "text-orange-600"
+                        : "text-red-600"
+                    }`}
                 >
                   {data.absenteisme_absolu ?? "-"} jour(s)
                 </span>
@@ -2571,15 +2563,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   Heures non travaillées (%):
                 </span>
                 <span
-                  className={`font-semibold ${
-                    data.absenteisme_relatif_pct <= 0
-                      ? "text-green-600"
-                      : data.absenteisme_relatif_pct <= 10
-                        ? "text-yellow-600"
-                        : data.absenteisme_relatif_pct <= 25
-                          ? "text-orange-600"
-                          : "text-red-600"
-                  }`}
+                  className={`font-semibold ${data.absenteisme_relatif_pct <= 0
+                    ? "text-green-600"
+                    : data.absenteisme_relatif_pct <= 10
+                      ? "text-yellow-600"
+                      : data.absenteisme_relatif_pct <= 25
+                        ? "text-orange-600"
+                        : "text-red-600"
+                    }`}
                 >
                   {data.absenteisme_relatif_pct !== undefined
                     ? `${data.absenteisme_relatif_pct.toFixed(1)}%`
@@ -2598,15 +2589,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <div className="flex justify-between items-center py-1 border-b border-gray-100">
                 <span className="text-gray-600">Performance vs collègues:</span>
                 <span
-                  className={`font-semibold ${
-                    data.performance_relative > 0
-                      ? "text-green-600"
-                      : data.performance_relative === 0
-                        ? "text-gray-600"
-                        : data.performance_relative >= -2
-                          ? "text-orange-600"
-                          : "text-red-600"
-                  }`}
+                  className={`font-semibold ${data.performance_relative > 0
+                    ? "text-green-600"
+                    : data.performance_relative === 0
+                      ? "text-gray-600"
+                      : data.performance_relative >= -2
+                        ? "text-orange-600"
+                        : "text-red-600"
+                    }`}
                 >
                   {data.performance_relative !== undefined
                     ? data.performance_relative > 0
@@ -2623,15 +2613,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   Perte de performance récente:
                 </span>
                 <span
-                  className={`font-semibold ${
-                    data.perte_performance <= 0
-                      ? "text-green-600"
-                      : data.perte_performance <= 1
-                        ? "text-yellow-600"
-                        : data.perte_performance <= 3
-                          ? "text-orange-600"
-                          : "text-red-600"
-                  }`}
+                  className={`font-semibold ${data.perte_performance <= 0
+                    ? "text-green-600"
+                    : data.perte_performance <= 1
+                      ? "text-yellow-600"
+                      : data.perte_performance <= 3
+                        ? "text-orange-600"
+                        : "text-red-600"
+                    }`}
                 >
                   {data.perte_performance !== undefined
                     ? data.perte_performance > 0
@@ -2674,13 +2663,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg ${
-                  data.productivite_pct >= 80
-                    ? "bg-green-50 border border-green-200 text-green-800"
-                    : data.productivite_pct >= 60
-                      ? "bg-orange-50 border border-orange-200 text-orange-800"
-                      : "bg-red-50 border border-red-200 text-red-800"
-                }`}
+                className={`p-3 rounded-lg ${data.productivite_pct >= 80
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : data.productivite_pct >= 60
+                    ? "bg-orange-50 border border-orange-200 text-orange-800"
+                    : "bg-red-50 border border-red-200 text-red-800"
+                  }`}
               >
                 <p className="text-xs whitespace-pre-line">
                   {data.interpretation}
@@ -2803,13 +2791,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
           <div className="text-sm space-y-4 mt-2 pt-2 border-t">
             {/* Score Interpretation */}
             <div
-              className={`p-3 rounded-lg ${
-                data.total_score !== null && data.total_score >= 26
-                  ? "bg-red-50 border border-red-200"
-                  : data.total_score !== null && data.total_score >= 14
-                    ? "bg-amber-50 border border-amber-200"
-                    : "bg-green-50 border border-green-200"
-              }`}
+              className={`p-3 rounded-lg ${data.total_score !== null && data.total_score >= 26
+                ? "bg-red-50 border border-red-200"
+                : data.total_score !== null && data.total_score >= 14
+                  ? "bg-amber-50 border border-amber-200"
+                  : "bg-green-50 border border-green-200"
+                }`}
             >
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -2892,13 +2879,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
           <div className="text-sm space-y-4 mt-2 pt-2 border-t">
             {/* Score Interpretation */}
             <div
-              className={`p-3 rounded-lg ${
-                data.total_score !== null && data.total_score >= 81
-                  ? "bg-amber-50 border border-amber-200"
-                  : data.total_score !== null && data.total_score >= 51
-                    ? "bg-green-50 border border-green-200"
-                    : "bg-blue-50 border border-blue-200"
-              }`}
+              className={`p-3 rounded-lg ${data.total_score !== null && data.total_score >= 81
+                ? "bg-amber-50 border border-amber-200"
+                : data.total_score !== null && data.total_score >= 51
+                  ? "bg-green-50 border border-green-200"
+                  : "bg-blue-50 border border-blue-200"
+                }`}
             >
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -2961,13 +2947,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
           <div className="text-sm space-y-4 mt-2 pt-2 border-t">
             {/* Score Interpretation */}
             <div
-              className={`p-3 rounded-lg ${
-                data.total_score !== null && data.total_score > 45
-                  ? "bg-red-50 border border-red-200"
-                  : data.total_score !== null && data.total_score >= 31
-                    ? "bg-amber-50 border border-amber-200"
-                    : "bg-green-50 border border-green-200"
-              }`}
+              className={`p-3 rounded-lg ${data.total_score !== null && data.total_score > 45
+                ? "bg-red-50 border border-red-200"
+                : data.total_score !== null && data.total_score >= 31
+                  ? "bg-amber-50 border border-amber-200"
+                  : "bg-green-50 border border-green-200"
+                }`}
             >
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -3068,15 +3053,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
 
             {/* Score Interpretation */}
             <div
-              className={`p-3 rounded-lg ${
-                data.total_score !== null && data.total_score > 34
-                  ? "bg-red-50 border border-red-200"
-                  : data.total_score !== null && data.total_score > 19
-                    ? "bg-amber-50 border border-amber-200"
-                    : data.total_score !== null && data.total_score > 6
-                      ? "bg-blue-50 border border-blue-200"
-                      : "bg-green-50 border border-green-200"
-              }`}
+              className={`p-3 rounded-lg ${data.total_score !== null && data.total_score > 34
+                ? "bg-red-50 border border-red-200"
+                : data.total_score !== null && data.total_score > 19
+                  ? "bg-amber-50 border border-amber-200"
+                  : data.total_score !== null && data.total_score > 6
+                    ? "bg-blue-50 border border-blue-200"
+                    : "bg-green-50 border border-green-200"
+                }`}
             >
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -3190,15 +3174,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
 
             {/* Score Interpretation with detailed clinical info */}
             <div
-              className={`p-3 rounded-lg ${
-                data.total_score !== null && data.total_score >= 26
-                  ? "bg-red-50 border border-red-200"
-                  : data.total_score !== null && data.total_score >= 20
-                    ? "bg-amber-50 border border-amber-200"
-                    : data.total_score !== null && data.total_score >= 13
-                      ? "bg-blue-50 border border-blue-200"
-                      : "bg-green-50 border border-green-200"
-              }`}
+              className={`p-3 rounded-lg ${data.total_score !== null && data.total_score >= 26
+                ? "bg-red-50 border border-red-200"
+                : data.total_score !== null && data.total_score >= 20
+                  ? "bg-amber-50 border border-amber-200"
+                  : data.total_score !== null && data.total_score >= 13
+                    ? "bg-blue-50 border border-blue-200"
+                    : "bg-green-50 border border-green-200"
+                }`}
             >
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
@@ -3410,15 +3393,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   </span>
                   <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden max-w-md">
                     <div
-                      className={`h-full ${
-                        data.egf_score >= 71
-                          ? "bg-teal-500"
-                          : data.egf_score >= 51
-                            ? "bg-blue-500"
-                            : data.egf_score >= 41
-                              ? "bg-amber-500"
-                              : "bg-red-500"
-                      }`}
+                      className={`h-full ${data.egf_score >= 71
+                        ? "bg-teal-500"
+                        : data.egf_score >= 51
+                          ? "bg-blue-500"
+                          : data.egf_score >= 41
+                            ? "bg-amber-500"
+                            : "bg-red-500"
+                        }`}
                       style={{ width: `${data.egf_score || 0}%` }}
                     />
                   </div>
@@ -3428,15 +3410,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     Score EGF
                   </span>
                   <span
-                    className={`text-3xl font-black ${
-                      data.egf_score >= 71
-                        ? "text-teal-600"
-                        : data.egf_score >= 51
-                          ? "text-blue-600"
-                          : data.egf_score >= 41
-                            ? "text-amber-600"
-                            : "text-red-600"
-                    }`}
+                    className={`text-3xl font-black ${data.egf_score >= 71
+                      ? "text-teal-600"
+                      : data.egf_score >= 51
+                        ? "text-blue-600"
+                        : data.egf_score >= 41
+                          ? "text-amber-600"
+                          : "text-red-600"
+                      }`}
                   >
                     {data.egf_score ?? "-"}
                   </span>
@@ -3485,7 +3466,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               </span>
               <span className="font-bold text-lg">
                 {data.percentile_rank !== null &&
-                data.percentile_rank !== undefined
+                  data.percentile_rank !== undefined
                   ? data.percentile_rank
                   : "-"}
               </span>
@@ -3514,7 +3495,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <span className="text-gray-600">Valeur Standardisée:</span>
               <span className="font-semibold">
                 {data.standardized_value !== null &&
-                data.standardized_value !== undefined
+                  data.standardized_value !== undefined
                   ? data.standardized_value.toFixed(2)
                   : "-"}
               </span>
@@ -3631,7 +3612,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   <span className="text-gray-600">Z-score:</span>
                   <span className="font-semibold">
                     {data.sstics_scorez !== null &&
-                    data.sstics_scorez !== undefined
+                      data.sstics_scorez !== undefined
                       ? Number(data.sstics_scorez).toFixed(2)
                       : "-"}
                   </span>
@@ -3708,7 +3689,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     >
                       Z:{" "}
                       {data.cbq_intentionalisation_z !== null &&
-                      data.cbq_intentionalisation_z !== undefined
+                        data.cbq_intentionalisation_z !== undefined
                         ? Number(data.cbq_intentionalisation_z).toFixed(2)
                         : "-"}
                       {data.cbq_intentionalisation_z > 1.65 && " ⚠"}
@@ -3734,7 +3715,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     >
                       Z:{" "}
                       {data.cbq_catastrophisation_z !== null &&
-                      data.cbq_catastrophisation_z !== undefined
+                        data.cbq_catastrophisation_z !== undefined
                         ? Number(data.cbq_catastrophisation_z).toFixed(2)
                         : "-"}
                       {data.cbq_catastrophisation_z > 1.65 && " ⚠"}
@@ -3760,7 +3741,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     >
                       Z:{" "}
                       {data.cbq_pensee_dichotomique_z !== null &&
-                      data.cbq_pensee_dichotomique_z !== undefined
+                        data.cbq_pensee_dichotomique_z !== undefined
                         ? Number(data.cbq_pensee_dichotomique_z).toFixed(2)
                         : "-"}
                       {data.cbq_pensee_dichotomique_z > 1.65 && " ⚠"}
@@ -3786,7 +3767,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     >
                       Z:{" "}
                       {data.cbq_sauter_conclusions_z !== null &&
-                      data.cbq_sauter_conclusions_z !== undefined
+                        data.cbq_sauter_conclusions_z !== undefined
                         ? Number(data.cbq_sauter_conclusions_z).toFixed(2)
                         : "-"}
                       {data.cbq_sauter_conclusions_z > 1.65 && " ⚠"}
@@ -3812,7 +3793,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     >
                       Z:{" "}
                       {data.cbq_raisonnement_emotionnel_z !== null &&
-                      data.cbq_raisonnement_emotionnel_z !== undefined
+                        data.cbq_raisonnement_emotionnel_z !== undefined
                         ? Number(data.cbq_raisonnement_emotionnel_z).toFixed(2)
                         : "-"}
                       {data.cbq_raisonnement_emotionnel_z > 1.65 && " ⚠"}
@@ -3860,22 +3841,22 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               data.cbq_pensee_dichotomique_z > 1.65 ||
               data.cbq_sauter_conclusions_z > 1.65 ||
               data.cbq_raisonnement_emotionnel_z > 1.65) && (
-              <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded text-red-800 text-xs">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <strong>
-                      Biais cognitifs cliniquement significatifs détectés
-                    </strong>
-                    <p className="mt-1">
-                      Un ou plusieurs scores Z dépassent le seuil clinique de
-                      +1.65 (marqués par ⚠), indiquant des biais cognitifs
-                      significativement plus élevés que la population contrôle.
-                    </p>
+                <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded text-red-800 text-xs">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <strong>
+                        Biais cognitifs cliniquement significatifs détectés
+                      </strong>
+                      <p className="mt-1">
+                        Un ou plusieurs scores Z dépassent le seuil clinique de
+                        +1.65 (marqués par ⚠), indiquant des biais cognitifs
+                        significativement plus élevés que la population contrôle.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* Scoring explanation */}
             <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded text-blue-800 text-xs">
@@ -4378,20 +4359,20 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {((data.brief_a_negativity ?? 0) >= 6 ||
               (data.brief_a_inconsistency ?? 0) >= 8 ||
               (data.brief_a_infrequency ?? 0) >= 3) && (
-              <div className="mt-2 p-3 bg-orange-50 border border-orange-200 rounded text-orange-800 text-xs">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <strong>Attention: Échelles de validité élevées</strong>
-                    <p className="mt-1">
-                      Une ou plusieurs échelles de validité dépassent le seuil
-                      critique. Les résultats doivent être interprétés avec
-                      prudence.
-                    </p>
+                <div className="mt-2 p-3 bg-orange-50 border border-orange-200 rounded text-orange-800 text-xs">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <strong>Attention: Échelles de validité élevées</strong>
+                      <p className="mt-1">
+                        Une ou plusieurs échelles de validité dépassent le seuil
+                        critique. Les résultats doivent être interprétés avec
+                        prudence.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* Scoring explanation */}
             <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded text-blue-800 text-xs">
@@ -4557,22 +4538,22 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             </div>
 
             {/* Validity warning */}
-            {((data.brief_a_negativity ?? 0) >= 6 || 
+            {((data.brief_a_negativity ?? 0) >= 6 ||
               (data.brief_a_infrequency ?? 0) >= 3) && (
-              <div className="mt-2 p-3 bg-orange-50 border border-orange-200 rounded text-orange-800 text-xs">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <strong>Attention: Échelles de validité élevées</strong>
-                    <p className="mt-1">
-                      Une ou plusieurs échelles de validité dépassent le seuil critique. 
-                      Les résultats doivent être interprétés avec prudence.
-                    </p>
+                <div className="mt-2 p-3 bg-orange-50 border border-orange-200 rounded text-orange-800 text-xs">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <strong>Attention: Échelles de validité élevées</strong>
+                      <p className="mt-1">
+                        Une ou plusieurs échelles de validité dépassent le seuil critique.
+                        Les résultats doivent être interprétés avec prudence.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-            
+              )}
+
             {/* Scoring explanation */}
             <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded text-blue-800 text-xs">
               <div className="font-semibold mb-1">Interprétation des scores (Auto-évaluation)</div>
@@ -4608,7 +4589,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <span className="text-gray-600">Valeur Standardisée:</span>
               <span className="font-semibold">
                 {data.standardized_value !== null &&
-                data.standardized_value !== undefined
+                  data.standardized_value !== undefined
                   ? data.standardized_value.toFixed(2)
                   : "-"}
               </span>
@@ -4643,7 +4624,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <span className="text-gray-600">Valeur Standardisée:</span>
               <span className="font-semibold">
                 {data.standardized_value !== null &&
-                data.standardized_value !== undefined
+                  data.standardized_value !== undefined
                   ? data.standardized_value.toFixed(2)
                   : "-"}
               </span>
@@ -4684,7 +4665,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               </span>
               <span className="font-semibold">
                 {data.standardized_score !== null &&
-                data.standardized_score !== undefined
+                  data.standardized_score !== undefined
                   ? ((data.standardized_score - 10) / 3).toFixed(2)
                   : "-"}
               </span>
@@ -4693,7 +4674,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <span className="text-gray-600">Rang percentile:</span>
               <span className="font-semibold">
                 {data.percentile_rank !== null &&
-                data.percentile_rank !== undefined
+                  data.percentile_rank !== undefined
                   ? data.percentile_rank.toFixed(2)
                   : "-"}
               </span>
@@ -4801,40 +4782,40 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               data.serial_std ||
               data.persev_std ||
               data.intru_std) && (
-              <div className="pt-2 border-t">
-                <h5 className="font-semibold text-gray-700 mb-2">
-                  Strategie et Erreurs
-                </h5>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  {data.semantic_std && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Semantique (std):</span>
-                      <span className="font-medium">{data.semantic_std}</span>
-                    </div>
-                  )}
-                  {data.serial_std && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Seriel (std):</span>
-                      <span className="font-medium">{data.serial_std}</span>
-                    </div>
-                  )}
-                  {data.persev_std && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">
-                        Perseverations (std):
-                      </span>
-                      <span className="font-medium">{data.persev_std}</span>
-                    </div>
-                  )}
-                  {data.intru_std && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Intrusions (std):</span>
-                      <span className="font-medium">{data.intru_std}</span>
-                    </div>
-                  )}
+                <div className="pt-2 border-t">
+                  <h5 className="font-semibold text-gray-700 mb-2">
+                    Strategie et Erreurs
+                  </h5>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    {data.semantic_std && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Semantique (std):</span>
+                        <span className="font-medium">{data.semantic_std}</span>
+                      </div>
+                    )}
+                    {data.serial_std && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Seriel (std):</span>
+                        <span className="font-medium">{data.serial_std}</span>
+                      </div>
+                    )}
+                    {data.persev_std && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">
+                          Perseverations (std):
+                        </span>
+                        <span className="font-medium">{data.persev_std}</span>
+                      </div>
+                    )}
+                    {data.intru_std && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Intrusions (std):</span>
+                        <span className="font-medium">{data.intru_std}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         )}
 
@@ -5199,15 +5180,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
           <div className="text-sm space-y-3 mt-2 pt-2 border-t">
             {/* Score Interpretation */}
             <div
-              className={`p-3 rounded-lg ${
-                data.lis_score !== null && data.lis_score <= 10
-                  ? "bg-green-50 border border-green-200"
-                  : data.lis_score !== null && data.lis_score <= 20
-                    ? "bg-blue-50 border border-blue-200"
-                    : data.lis_score !== null && data.lis_score <= 30
-                      ? "bg-amber-50 border border-amber-200"
-                      : "bg-red-50 border border-red-200"
-              }`}
+              className={`p-3 rounded-lg ${data.lis_score !== null && data.lis_score <= 10
+                ? "bg-green-50 border border-green-200"
+                : data.lis_score !== null && data.lis_score <= 20
+                  ? "bg-blue-50 border border-blue-200"
+                  : data.lis_score !== null && data.lis_score <= 30
+                    ? "bg-amber-50 border border-amber-200"
+                    : "bg-red-50 border border-red-200"
+                }`}
             >
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -5382,15 +5362,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
           <div className="text-sm space-y-3 mt-2 pt-2 border-t">
             {/* QI Interpretation */}
             <div
-              className={`p-3 rounded-lg ${
-                data.qi_indice !== null && data.qi_indice >= 110
-                  ? "bg-green-50 border border-green-200"
-                  : data.qi_indice !== null && data.qi_indice >= 90
-                    ? "bg-blue-50 border border-blue-200"
-                    : data.qi_indice !== null && data.qi_indice >= 80
-                      ? "bg-amber-50 border border-amber-200"
-                      : "bg-red-50 border border-red-200"
-              }`}
+              className={`p-3 rounded-lg ${data.qi_indice !== null && data.qi_indice >= 110
+                ? "bg-green-50 border border-green-200"
+                : data.qi_indice !== null && data.qi_indice >= 90
+                  ? "bg-blue-50 border border-blue-200"
+                  : data.qi_indice !== null && data.qi_indice >= 80
+                    ? "bg-amber-50 border border-amber-200"
+                    : "bg-red-50 border border-red-200"
+                }`}
             >
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -5541,33 +5520,31 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   </div>
 
                   <div
-                    className={`p-2 rounded ${
-                      data.barona_qit_difference != null &&
+                    className={`p-2 rounded ${data.barona_qit_difference != null &&
                       Math.abs(Number(data.barona_qit_difference)) >= 19
-                        ? "bg-red-50"
-                        : data.barona_qit_difference != null &&
-                            Math.abs(Number(data.barona_qit_difference)) >= 16
-                          ? "bg-amber-50"
-                          : "bg-gray-50"
-                    }`}
+                      ? "bg-red-50"
+                      : data.barona_qit_difference != null &&
+                        Math.abs(Number(data.barona_qit_difference)) >= 16
+                        ? "bg-amber-50"
+                        : "bg-gray-50"
+                      }`}
                   >
                     <div className="flex justify-between items-center text-xs">
                       <span className="font-medium text-gray-700">
                         Différence (QI attendu - QI observé)
                       </span>
                       <span
-                        className={`font-semibold ${
-                          data.barona_qit_difference != null &&
+                        className={`font-semibold ${data.barona_qit_difference != null &&
                           Number(data.barona_qit_difference) > 0
-                            ? "text-red-600"
-                            : "text-gray-900"
-                        }`}
+                          ? "text-red-600"
+                          : "text-gray-900"
+                          }`}
                       >
                         {data.barona_qit_difference != null
                           ? (Number(data.barona_qit_difference) > 0
-                              ? "+"
-                              : "") +
-                            Number(data.barona_qit_difference).toFixed(1)
+                            ? "+"
+                            : "") +
+                          Number(data.barona_qit_difference).toFixed(1)
                           : "-"}
                       </span>
                     </div>
@@ -5762,7 +5739,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                       <span className="text-gray-500">Z-Score:</span>
                       <span className="font-medium">
                         {data.wais_symb_cr !== null &&
-                        data.wais_symb_cr !== undefined
+                          data.wais_symb_cr !== undefined
                           ? data.wais_symb_cr
                           : "-"}
                       </span>
@@ -5821,143 +5798,143 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
         {/* WAIS-IV Digit Span Details */}
         {(code === "WAIS4_DIGIT_SPAN" ||
           code === "WAIS4_MEMOIRE_CHIFFRES_SZ") && (
-          <div className="text-sm space-y-3 mt-2 pt-2 border-t">
-            {/* Section Totals */}
-            <div>
-              <h5 className="font-semibold text-gray-700 mb-2">
-                Scores par section
-              </h5>
-              <div className="grid grid-cols-3 gap-2 text-xs">
-                <div className="flex flex-col items-center p-2 bg-blue-50 rounded">
-                  <span className="text-gray-600 text-xs mb-1">
-                    Ordre Direct
-                  </span>
-                  <span className="font-bold text-lg">
-                    {data.wais_mcod_tot ?? "-"}
-                  </span>
-                </div>
-                <div className="flex flex-col items-center p-2 bg-blue-50 rounded">
-                  <span className="text-gray-600 text-xs mb-1">
-                    Ordre Inverse
-                  </span>
-                  <span className="font-bold text-lg">
-                    {data.wais_mcoi_tot ?? "-"}
-                  </span>
-                </div>
-                <div className="flex flex-col items-center p-2 bg-blue-50 rounded">
-                  <span className="text-gray-600 text-xs mb-1">
-                    Ordre Croissant
-                  </span>
-                  <span className="font-bold text-lg">
-                    {data.wais_mcoc_tot ?? "-"}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Empan Values */}
-            <div className="pt-2 border-t">
-              <h5 className="font-semibold text-gray-700 mb-2">
-                Empan (longueur maximale)
-              </h5>
-              <div className="grid grid-cols-3 gap-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Direct:</span>
-                  <span className="font-medium">{data.wais_mc_end ?? "-"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Inverse:</span>
-                  <span className="font-medium">{data.wais_mc_env ?? "-"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Croissant:</span>
-                  <span className="font-medium">{data.wais_mc_cro ?? "-"}</span>
+            <div className="text-sm space-y-3 mt-2 pt-2 border-t">
+              {/* Section Totals */}
+              <div>
+                <h5 className="font-semibold text-gray-700 mb-2">
+                  Scores par section
+                </h5>
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="flex flex-col items-center p-2 bg-blue-50 rounded">
+                    <span className="text-gray-600 text-xs mb-1">
+                      Ordre Direct
+                    </span>
+                    <span className="font-bold text-lg">
+                      {data.wais_mcod_tot ?? "-"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-center p-2 bg-blue-50 rounded">
+                    <span className="text-gray-600 text-xs mb-1">
+                      Ordre Inverse
+                    </span>
+                    <span className="font-bold text-lg">
+                      {data.wais_mcoi_tot ?? "-"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-center p-2 bg-blue-50 rounded">
+                    <span className="text-gray-600 text-xs mb-1">
+                      Ordre Croissant
+                    </span>
+                    <span className="font-bold text-lg">
+                      {data.wais_mcoc_tot ?? "-"}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Empan Z-Scores */}
-            <div className="pt-2 border-t">
-              <h5 className="font-semibold text-gray-700 mb-2">
-                Z-Scores Empan (normes par âge)
-              </h5>
-              <div className="grid grid-cols-3 gap-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Direct:</span>
-                  <span className="font-medium">
-                    {data.wais_mc_end_std !== null &&
-                    data.wais_mc_end_std !== undefined
-                      ? Number(data.wais_mc_end_std).toFixed(2)
-                      : "-"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Inverse:</span>
-                  <span className="font-medium">
-                    {data.wais_mc_env_std !== null &&
-                    data.wais_mc_env_std !== undefined
-                      ? Number(data.wais_mc_env_std).toFixed(2)
-                      : "-"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Croissant:</span>
-                  <span className="font-medium">
-                    {data.wais_mc_cro_std !== null &&
-                    data.wais_mc_cro_std !== undefined
-                      ? Number(data.wais_mc_cro_std).toFixed(2)
-                      : "-"}
-                  </span>
+              {/* Empan Values */}
+              <div className="pt-2 border-t">
+                <h5 className="font-semibold text-gray-700 mb-2">
+                  Empan (longueur maximale)
+                </h5>
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Direct:</span>
+                    <span className="font-medium">{data.wais_mc_end ?? "-"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Inverse:</span>
+                    <span className="font-medium">{data.wais_mc_env ?? "-"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Croissant:</span>
+                    <span className="font-medium">{data.wais_mc_cro ?? "-"}</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Global Scores */}
-            <div className="pt-2 border-t">
-              <h5 className="font-semibold text-gray-700 mb-2">
-                Scores globaux
-              </h5>
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              {/* Empan Z-Scores */}
+              <div className="pt-2 border-t">
+                <h5 className="font-semibold text-gray-700 mb-2">
+                  Z-Scores Empan (normes par âge)
+                </h5>
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Direct:</span>
+                    <span className="font-medium">
+                      {data.wais_mc_end_std !== null &&
+                        data.wais_mc_end_std !== undefined
+                        ? Number(data.wais_mc_end_std).toFixed(2)
+                        : "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Inverse:</span>
+                    <span className="font-medium">
+                      {data.wais_mc_env_std !== null &&
+                        data.wais_mc_env_std !== undefined
+                        ? Number(data.wais_mc_env_std).toFixed(2)
+                        : "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Croissant:</span>
+                    <span className="font-medium">
+                      {data.wais_mc_cro_std !== null &&
+                        data.wais_mc_cro_std !== undefined
+                        ? Number(data.wais_mc_cro_std).toFixed(2)
+                        : "-"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Global Scores */}
+              <div className="pt-2 border-t">
+                <h5 className="font-semibold text-gray-700 mb-2">
+                  Scores globaux
+                </h5>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Note Brute Totale:</span>
+                    <span className="font-semibold">
+                      {data.wais_mc_tot ?? "-"}/48
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Note Standard:</span>
+                    <span className="font-semibold">
+                      {data.wais_mc_std ?? "-"}/19
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Empan Difference (D-I):</span>
+                    <span className="font-medium">{data.wais_mc_emp ?? "-"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 font-medium">
+                      Valeur CR (Z-Score):
+                    </span>
+                    <span className="font-bold">
+                      {data.wais_mc_cr !== null && data.wais_mc_cr !== undefined
+                        ? Number(data.wais_mc_cr).toFixed(2)
+                        : "-"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Demographics */}
+              <div className="pt-2 border-t">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Note Brute Totale:</span>
+                  <span className="text-gray-600">Age du patient:</span>
                   <span className="font-semibold">
-                    {data.wais_mc_tot ?? "-"}/48
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Note Standard:</span>
-                  <span className="font-semibold">
-                    {data.wais_mc_std ?? "-"}/19
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Empan Difference (D-I):</span>
-                  <span className="font-medium">{data.wais_mc_emp ?? "-"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">
-                    Valeur CR (Z-Score):
-                  </span>
-                  <span className="font-bold">
-                    {data.wais_mc_cr !== null && data.wais_mc_cr !== undefined
-                      ? Number(data.wais_mc_cr).toFixed(2)
-                      : "-"}
+                    {data.patient_age ?? "-"} ans
                   </span>
                 </div>
               </div>
             </div>
-
-            {/* Demographics */}
-            <div className="pt-2 border-t">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Age du patient:</span>
-                <span className="font-semibold">
-                  {data.patient_age ?? "-"} ans
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
+          )}
 
         {/* Fluences Verbales Details */}
         {(code === "FLUENCES_VERBALES" || code === "FLUENCES_VERBALES_SZ") && (
@@ -5984,7 +5961,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   <span className="text-gray-600">Z-Score:</span>
                   <span className="font-bold">
                     {data.fv_p_tot_correct_z !== null &&
-                    data.fv_p_tot_correct_z !== undefined
+                      data.fv_p_tot_correct_z !== undefined
                       ? Number(data.fv_p_tot_correct_z).toFixed(2)
                       : "-"}
                   </span>
@@ -6046,7 +6023,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   <span className="text-gray-600">Z-Score:</span>
                   <span className="font-bold">
                     {data.fv_anim_tot_correct_z !== null &&
-                    data.fv_anim_tot_correct_z !== undefined
+                      data.fv_anim_tot_correct_z !== undefined
                       ? Number(data.fv_anim_tot_correct_z).toFixed(2)
                       : "-"}
                   </span>
@@ -6274,11 +6251,10 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
           <div className="text-sm space-y-4 mt-2 pt-2 border-t">
             {/* Clinical Interpretation */}
             <div
-              className={`p-3 rounded-lg ${
-                data.has_depressive_syndrome
-                  ? "bg-amber-50 border border-amber-200"
-                  : "bg-green-50 border border-green-200"
-              }`}
+              className={`p-3 rounded-lg ${data.has_depressive_syndrome
+                ? "bg-amber-50 border border-amber-200"
+                : "bg-green-50 border border-green-200"
+                }`}
             >
               <div className="flex justify-between items-center">
                 <span className="font-medium">
@@ -6390,7 +6366,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     {data.thought_disorder_subscore ?? "-"}/40
                   </span>
                 </div>
-                
+
                 <div className="flex justify-between items-center pt-2 border-t">
                   <span className="text-gray-600 font-medium">
                     Somme des sous-scores:
@@ -6447,22 +6423,131 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
           </div>
         )}
 
+        {/* SANS Details */}
+        {code === "SANS" && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            {/* Core SANS Scores */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">
+                Scores et sous-scores SANS
+              </h5>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-600">
+                    Sous-score Pauvreté affective (items 1-7):
+                  </span>
+                  <span className="font-semibold">
+                    {data.affective_flattening_subscore ?? "-"}/34
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-600">
+                    Sous-score Alogie (items 9-12):
+                  </span>
+                  <span className="font-semibold">
+                    {data.alogia_subscore ?? "-"}/20
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-600">
+                    Sous-score Avolition-Apathie (items 14-16):
+                  </span>
+                  <span className="font-semibold">
+                    {data.avolition_subscore ?? "-"}/15
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-600">
+                    Sous-score Anhédonie-Retrait social (items 18-21):
+                  </span>
+                  <span className="font-semibold">
+                    {data.anhedonia_subscore ?? "-"}/20
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-600">
+                    Sous-score Attention (items 23-24):
+                  </span>
+                  <span className="font-semibold">
+                    {data.attention_subscore ?? "-"}/10
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center pt-2 border-t">
+                  <span className="text-gray-600 font-medium">
+                    Somme des sous-scores:
+                  </span>
+                  <span className="font-bold">
+                    {data.subscores_sum ?? "-"}/99
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 font-medium">
+                    Somme des évaluations globales (items 8, 13, 17, 22, 25):
+                  </span>
+                  <span className="font-bold">
+                    {data.global_evaluations_score ?? "-"}/25
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center pt-2 border-t">
+                  <span className="text-gray-600 font-bold">
+                    Score total (somme de tous les items):
+                  </span>
+                  <span className="font-bold text-lg text-blue-700">
+                    {data.total_score ?? "-"}/124
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Global Items Details */}
+            <div className="pt-2 border-t">
+              <h5 className="font-semibold text-gray-700 mb-2 text-xs text-blue-800">
+                Evaluations globales
+              </h5>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-500 italic">Pauvreté affective (q8):</span>
+                  <span className="font-medium">{data.q8 ?? "-"}/5</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500 italic">Alogie (q13):</span>
+                  <span className="font-medium">{data.q13 ?? "-"}/5</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500 italic">Avolition-Apathie (q17):</span>
+                  <span className="font-medium">{data.q17 ?? "-"}/5</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500 italic">Anhédonie (q22):</span>
+                  <span className="font-medium">{data.q22 ?? "-"}/5</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500 italic">Attention (q25):</span>
+                  <span className="font-medium">{data.q25 ?? "-"}/5</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ISA FOLLOWUP Details */}
         {code === "ISA_FOLLOWUP" && (
           <div className="text-sm space-y-4 mt-2 pt-2 border-t">
             {/* Risk Level */}
             <div
-              className={`p-3 rounded-lg ${
-                data.total_score >= 5
+              className={`p-3 rounded-lg ${data.total_score >= 5
+                ? "bg-red-50 border border-red-200"
+                : data.total_score >= 3
                   ? "bg-red-50 border border-red-200"
-                  : data.total_score >= 3
-                    ? "bg-red-50 border border-red-200"
-                    : data.total_score >= 2
-                      ? "bg-amber-50 border border-amber-200"
-                      : data.total_score >= 1
-                        ? "bg-blue-50 border border-blue-200"
-                        : "bg-green-50 border border-green-200"
-              }`}
+                  : data.total_score >= 2
+                    ? "bg-amber-50 border border-amber-200"
+                    : data.total_score >= 1
+                      ? "bg-blue-50 border border-blue-200"
+                      : "bg-green-50 border border-green-200"
+                }`}
             >
               <div className="text-center">
                 <span className="font-medium">
@@ -6603,18 +6688,17 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
           <div className="text-sm space-y-4 mt-2 pt-2 border-t">
             {/* Clinical Interpretation */}
             <div
-              className={`p-3 rounded-lg ${
-                data.adherence_score !== undefined &&
+              className={`p-3 rounded-lg ${data.adherence_score !== undefined &&
                 data.adherence_score !== null
-                  ? data.adherence_score >= 91
-                    ? "bg-green-50 border border-green-200"
-                    : data.adherence_score >= 76
-                      ? "bg-blue-50 border border-blue-200"
-                      : data.adherence_score >= 51
-                        ? "bg-amber-50 border border-amber-200"
-                        : "bg-red-50 border border-red-200"
-                  : "bg-gray-50 border border-gray-200"
-              }`}
+                ? data.adherence_score >= 91
+                  ? "bg-green-50 border border-green-200"
+                  : data.adherence_score >= 76
+                    ? "bg-blue-50 border border-blue-200"
+                    : data.adherence_score >= 51
+                      ? "bg-amber-50 border border-amber-200"
+                      : "bg-red-50 border border-red-200"
+                : "bg-gray-50 border border-gray-200"
+                }`}
             >
               <div className="text-center">
                 <span className="font-medium">
@@ -7074,15 +7158,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg text-center font-medium ${
-                  data.movement_score !== null && data.movement_score >= 14
-                    ? "bg-red-50 border border-red-200 text-red-800"
-                    : data.movement_score !== null && data.movement_score >= 7
-                      ? "bg-amber-50 border border-amber-200 text-amber-800"
-                      : data.movement_score !== null && data.movement_score > 0
-                        ? "bg-blue-50 border border-blue-200 text-blue-800"
-                        : "bg-green-50 border border-green-200 text-green-800"
-                }`}
+                className={`p-3 rounded-lg text-center font-medium ${data.movement_score !== null && data.movement_score >= 14
+                  ? "bg-red-50 border border-red-200 text-red-800"
+                  : data.movement_score !== null && data.movement_score >= 7
+                    ? "bg-amber-50 border border-amber-200 text-amber-800"
+                    : data.movement_score !== null && data.movement_score > 0
+                      ? "bg-blue-50 border border-blue-200 text-blue-800"
+                      : "bg-green-50 border border-green-200 text-green-800"
+                  }`}
               >
                 {data.interpretation}
               </div>
@@ -7274,15 +7357,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg text-center font-medium ${
-                  data.global_score !== null && data.global_score >= 4
-                    ? "bg-red-50 border border-red-200 text-red-800"
-                    : data.global_score !== null && data.global_score >= 3
-                      ? "bg-amber-50 border border-amber-200 text-amber-800"
-                      : data.global_score !== null && data.global_score >= 1
-                        ? "bg-blue-50 border border-blue-200 text-blue-800"
-                        : "bg-green-50 border border-green-200 text-green-800"
-                }`}
+                className={`p-3 rounded-lg text-center font-medium ${data.global_score !== null && data.global_score >= 4
+                  ? "bg-red-50 border border-red-200 text-red-800"
+                  : data.global_score !== null && data.global_score >= 3
+                    ? "bg-amber-50 border border-amber-200 text-amber-800"
+                    : data.global_score !== null && data.global_score >= 1
+                      ? "bg-blue-50 border border-blue-200 text-blue-800"
+                      : "bg-green-50 border border-green-200 text-green-800"
+                  }`}
               >
                 {data.interpretation}
               </div>
@@ -7296,13 +7378,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <div className="flex justify-between">
                 <span className="text-gray-600">Manifestations motrices:</span>
                 <span
-                  className={`font-medium ${
-                    data.q1 !== null && data.q1 >= 2
-                      ? "text-amber-600"
-                      : data.q1 === 0
-                        ? "text-green-600"
-                        : ""
-                  }`}
+                  className={`font-medium ${data.q1 !== null && data.q1 >= 2
+                    ? "text-amber-600"
+                    : data.q1 === 0
+                      ? "text-green-600"
+                      : ""
+                    }`}
                 >
                   {data.q1 === 0
                     ? "Normal"
@@ -7328,13 +7409,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     Conscience de l'agitation:
                   </span>
                   <span
-                    className={`font-medium ${
-                      data.q2 !== null && data.q2 >= 2
-                        ? "text-amber-600"
-                        : data.q2 === 0
-                          ? "text-green-600"
-                          : ""
-                    }`}
+                    className={`font-medium ${data.q2 !== null && data.q2 >= 2
+                      ? "text-amber-600"
+                      : data.q2 === 0
+                        ? "text-green-600"
+                        : ""
+                      }`}
                   >
                     {data.q2 === 0
                       ? "Absence"
@@ -7350,13 +7430,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Detresse:</span>
                   <span
-                    className={`font-medium ${
-                      data.q3 !== null && data.q3 >= 2
-                        ? "text-amber-600"
-                        : data.q3 === 0
-                          ? "text-green-600"
-                          : ""
-                    }`}
+                    className={`font-medium ${data.q3 !== null && data.q3 >= 2
+                      ? "text-amber-600"
+                      : data.q3 === 0
+                        ? "text-green-600"
+                        : ""
+                      }`}
                   >
                     {data.q3 === 0
                       ? "Pas de detresse"
@@ -7412,17 +7491,16 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg text-center font-medium ${
-                  data.mean_score !== null && data.mean_score > 2.0
-                    ? "bg-red-50 border border-red-200 text-red-800"
-                    : data.mean_score !== null && data.mean_score > 1.0
-                      ? "bg-amber-50 border border-amber-200 text-amber-800"
-                      : data.mean_score !== null && data.mean_score > 0.3
+                className={`p-3 rounded-lg text-center font-medium ${data.mean_score !== null && data.mean_score > 2.0
+                  ? "bg-red-50 border border-red-200 text-red-800"
+                  : data.mean_score !== null && data.mean_score > 1.0
+                    ? "bg-amber-50 border border-amber-200 text-amber-800"
+                    : data.mean_score !== null && data.mean_score > 0.3
+                      ? "bg-blue-50 border border-blue-200 text-blue-800"
+                      : data.mean_score !== null && data.mean_score > 0
                         ? "bg-blue-50 border border-blue-200 text-blue-800"
-                        : data.mean_score !== null && data.mean_score > 0
-                          ? "bg-blue-50 border border-blue-200 text-blue-800"
-                          : "bg-green-50 border border-green-200 text-green-800"
-                }`}
+                        : "bg-green-50 border border-green-200 text-green-800"
+                  }`}
               >
                 {data.interpretation}
               </div>
@@ -7523,17 +7601,16 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 Score moyen (somme / 10):
               </span>
               <span
-                className={`font-bold text-lg ${
-                  data.mean_score > 2.0
-                    ? "text-red-600"
-                    : data.mean_score > 1.0
-                      ? "text-amber-600"
-                      : data.mean_score > 0.3
+                className={`font-bold text-lg ${data.mean_score > 2.0
+                  ? "text-red-600"
+                  : data.mean_score > 1.0
+                    ? "text-amber-600"
+                    : data.mean_score > 0.3
+                      ? "text-blue-600"
+                      : data.mean_score > 0
                         ? "text-blue-600"
-                        : data.mean_score > 0
-                          ? "text-blue-600"
-                          : "text-green-600"
-                }`}
+                        : "text-green-600"
+                  }`}
               >
                 {data.mean_score !== undefined && data.mean_score !== null
                   ? data.mean_score.toFixed(2)
@@ -7561,15 +7638,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg text-center font-medium ${
-                  data.final_score !== null && data.final_score >= 71
-                    ? "bg-green-50 border border-green-200 text-green-800"
-                    : data.final_score !== null && data.final_score >= 51
-                      ? "bg-blue-50 border border-blue-200 text-blue-800"
-                      : data.final_score !== null && data.final_score >= 31
-                        ? "bg-amber-50 border border-amber-200 text-amber-800"
-                        : "bg-red-50 border border-red-200 text-red-800"
-                }`}
+                className={`p-3 rounded-lg text-center font-medium ${data.final_score !== null && data.final_score >= 71
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : data.final_score !== null && data.final_score >= 51
+                    ? "bg-blue-50 border border-blue-200 text-blue-800"
+                    : data.final_score !== null && data.final_score >= 31
+                      ? "bg-amber-50 border border-amber-200 text-amber-800"
+                      : "bg-red-50 border border-red-200 text-red-800"
+                  }`}
               >
                 {data.interpretation}
               </div>
@@ -7586,16 +7662,15 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     (a) Activites socialement utiles:
                   </span>
                   <span
-                    className={`font-medium ${
-                      data.domain_a === "Severe" ||
+                    className={`font-medium ${data.domain_a === "Severe" ||
                       data.domain_a === "Tres_severe"
-                        ? "text-red-600"
-                        : data.domain_a === "Marque"
-                          ? "text-amber-600"
-                          : data.domain_a === "Absent"
-                            ? "text-green-600"
-                            : ""
-                    }`}
+                      ? "text-red-600"
+                      : data.domain_a === "Marque"
+                        ? "text-amber-600"
+                        : data.domain_a === "Absent"
+                          ? "text-green-600"
+                          : ""
+                      }`}
                   >
                     {data.domain_a?.replace("_", " ") || "-"}
                   </span>
@@ -7605,16 +7680,15 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     (b) Relations personnelles et sociales:
                   </span>
                   <span
-                    className={`font-medium ${
-                      data.domain_b === "Severe" ||
+                    className={`font-medium ${data.domain_b === "Severe" ||
                       data.domain_b === "Tres_severe"
-                        ? "text-red-600"
-                        : data.domain_b === "Marque"
-                          ? "text-amber-600"
-                          : data.domain_b === "Absent"
-                            ? "text-green-600"
-                            : ""
-                    }`}
+                      ? "text-red-600"
+                      : data.domain_b === "Marque"
+                        ? "text-amber-600"
+                        : data.domain_b === "Absent"
+                          ? "text-green-600"
+                          : ""
+                      }`}
                   >
                     {data.domain_b?.replace("_", " ") || "-"}
                   </span>
@@ -7622,16 +7696,15 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="flex justify-between">
                   <span className="text-gray-600">(c) Souci de soi:</span>
                   <span
-                    className={`font-medium ${
-                      data.domain_c === "Severe" ||
+                    className={`font-medium ${data.domain_c === "Severe" ||
                       data.domain_c === "Tres_severe"
-                        ? "text-red-600"
-                        : data.domain_c === "Marque"
-                          ? "text-amber-600"
-                          : data.domain_c === "Absent"
-                            ? "text-green-600"
-                            : ""
-                    }`}
+                      ? "text-red-600"
+                      : data.domain_c === "Marque"
+                        ? "text-amber-600"
+                        : data.domain_c === "Absent"
+                          ? "text-green-600"
+                          : ""
+                      }`}
                   >
                     {data.domain_c?.replace("_", " ") || "-"}
                   </span>
@@ -7641,16 +7714,15 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     (d) Comportements perturbateurs:
                   </span>
                   <span
-                    className={`font-medium ${
-                      data.domain_d === "Severe" ||
+                    className={`font-medium ${data.domain_d === "Severe" ||
                       data.domain_d === "Tres_severe"
-                        ? "text-red-600"
-                        : data.domain_d === "Marque"
-                          ? "text-amber-600"
-                          : data.domain_d === "Absent"
-                            ? "text-green-600"
-                            : ""
-                    }`}
+                      ? "text-red-600"
+                      : data.domain_d === "Marque"
+                        ? "text-amber-600"
+                        : data.domain_d === "Absent"
+                          ? "text-green-600"
+                          : ""
+                      }`}
                   >
                     {data.domain_d?.replace("_", " ") || "-"}
                   </span>
@@ -7692,15 +7764,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     Score final:
                   </span>
                   <span
-                    className={`font-bold text-lg ${
-                      data.final_score >= 71
-                        ? "text-green-600"
-                        : data.final_score >= 51
-                          ? "text-blue-600"
-                          : data.final_score >= 31
-                            ? "text-amber-600"
-                            : "text-red-600"
-                    }`}
+                    className={`font-bold text-lg ${data.final_score >= 71
+                      ? "text-green-600"
+                      : data.final_score >= 51
+                        ? "text-blue-600"
+                        : data.final_score >= 31
+                          ? "text-amber-600"
+                          : "text-red-600"
+                      }`}
                   >
                     {data.final_score ?? "-"}/100
                   </span>
@@ -7726,13 +7797,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
           <div className="text-sm space-y-4 mt-2 pt-2 border-t">
             {/* Health State Profile */}
             <div
-              className={`p-3 rounded-lg ${
-                data.vas_score !== null && data.vas_score >= 80
-                  ? "bg-green-50 border border-green-200"
-                  : data.vas_score !== null && data.vas_score >= 50
-                    ? "bg-blue-50 border border-blue-200"
-                    : "bg-amber-50 border border-amber-200"
-              }`}
+              className={`p-3 rounded-lg ${data.vas_score !== null && data.vas_score >= 80
+                ? "bg-green-50 border border-green-200"
+                : data.vas_score !== null && data.vas_score >= 50
+                  ? "bg-blue-50 border border-blue-200"
+                  : "bg-amber-50 border border-amber-200"
+                }`}
             >
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -7758,15 +7828,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Mobilité:</span>
                   <span
-                    className={`font-medium ${
-                      data.mobility === 1
-                        ? "text-green-600"
-                        : data.mobility === 2
-                          ? "text-blue-600"
-                          : data.mobility === 3
-                            ? "text-amber-600"
-                            : "text-red-600"
-                    }`}
+                    className={`font-medium ${data.mobility === 1
+                      ? "text-green-600"
+                      : data.mobility === 2
+                        ? "text-blue-600"
+                        : data.mobility === 3
+                          ? "text-amber-600"
+                          : "text-red-600"
+                      }`}
                   >
                     {data.mobility === 1
                       ? "Aucun problème"
@@ -7784,15 +7853,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Autonomie:</span>
                   <span
-                    className={`font-medium ${
-                      data.self_care === 1
-                        ? "text-green-600"
-                        : data.self_care === 2
-                          ? "text-blue-600"
-                          : data.self_care === 3
-                            ? "text-amber-600"
-                            : "text-red-600"
-                    }`}
+                    className={`font-medium ${data.self_care === 1
+                      ? "text-green-600"
+                      : data.self_care === 2
+                        ? "text-blue-600"
+                        : data.self_care === 3
+                          ? "text-amber-600"
+                          : "text-red-600"
+                      }`}
                   >
                     {data.self_care === 1
                       ? "Aucun problème"
@@ -7810,15 +7878,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Activités courantes:</span>
                   <span
-                    className={`font-medium ${
-                      data.usual_activities === 1
-                        ? "text-green-600"
-                        : data.usual_activities === 2
-                          ? "text-blue-600"
-                          : data.usual_activities === 3
-                            ? "text-amber-600"
-                            : "text-red-600"
-                    }`}
+                    className={`font-medium ${data.usual_activities === 1
+                      ? "text-green-600"
+                      : data.usual_activities === 2
+                        ? "text-blue-600"
+                        : data.usual_activities === 3
+                          ? "text-amber-600"
+                          : "text-red-600"
+                      }`}
                   >
                     {data.usual_activities === 1
                       ? "Aucun problème"
@@ -7836,15 +7903,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Douleur/Gêne:</span>
                   <span
-                    className={`font-medium ${
-                      data.pain_discomfort === 1
-                        ? "text-green-600"
-                        : data.pain_discomfort === 2
-                          ? "text-blue-600"
-                          : data.pain_discomfort === 3
-                            ? "text-amber-600"
-                            : "text-red-600"
-                    }`}
+                    className={`font-medium ${data.pain_discomfort === 1
+                      ? "text-green-600"
+                      : data.pain_discomfort === 2
+                        ? "text-blue-600"
+                        : data.pain_discomfort === 3
+                          ? "text-amber-600"
+                          : "text-red-600"
+                      }`}
                   >
                     {data.pain_discomfort === 1
                       ? "Aucune"
@@ -7862,15 +7928,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Anxiété/Dépression:</span>
                   <span
-                    className={`font-medium ${
-                      data.anxiety_depression === 1
-                        ? "text-green-600"
-                        : data.anxiety_depression === 2
-                          ? "text-blue-600"
-                          : data.anxiety_depression === 3
-                            ? "text-amber-600"
-                            : "text-red-600"
-                    }`}
+                    className={`font-medium ${data.anxiety_depression === 1
+                      ? "text-green-600"
+                      : data.anxiety_depression === 2
+                        ? "text-blue-600"
+                        : data.anxiety_depression === 3
+                          ? "text-amber-600"
+                          : "text-red-600"
+                      }`}
                   >
                     {data.anxiety_depression === 1
                       ? "Aucune"
@@ -7894,13 +7959,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Score VAS:</span>
                   <span
-                    className={`font-bold text-lg ${
-                      data.vas_score >= 80
-                        ? "text-green-600"
-                        : data.vas_score >= 50
-                          ? "text-blue-600"
-                          : "text-amber-600"
-                    }`}
+                    className={`font-bold text-lg ${data.vas_score >= 80
+                      ? "text-green-600"
+                      : data.vas_score >= 50
+                        ? "text-blue-600"
+                        : "text-amber-600"
+                      }`}
                   >
                     {data.vas_score ?? "-"}/100
                   </span>
@@ -7937,22 +8001,20 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
           <div className="text-sm space-y-4 mt-4 pt-4 border-t-2 border-gray-200">
             {/* Activity Level Badge */}
             <div
-              className={`p-4 rounded-lg text-center ${
-                data.activity_level === "high"
-                  ? "bg-green-50 border-2 border-green-300"
-                  : data.activity_level === "moderate"
-                    ? "bg-blue-50 border-2 border-blue-300"
-                    : "bg-amber-50 border-2 border-amber-300"
-              }`}
+              className={`p-4 rounded-lg text-center ${data.activity_level === "high"
+                ? "bg-green-50 border-2 border-green-300"
+                : data.activity_level === "moderate"
+                  ? "bg-blue-50 border-2 border-blue-300"
+                  : "bg-amber-50 border-2 border-amber-300"
+                }`}
             >
               <div
-                className={`text-2xl font-bold ${
-                  data.activity_level === "high"
-                    ? "text-green-700"
-                    : data.activity_level === "moderate"
-                      ? "text-blue-700"
-                      : "text-amber-700"
-                }`}
+                className={`text-2xl font-bold ${data.activity_level === "high"
+                  ? "text-green-700"
+                  : data.activity_level === "moderate"
+                    ? "text-blue-700"
+                    : "text-amber-700"
+                  }`}
               >
                 {data.activity_level === "high"
                   ? "NIVEAU ÉLEVÉ"
@@ -8062,13 +8124,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg mt-2 ${
-                  data.activity_level === "high"
-                    ? "bg-green-50 border border-green-200 text-green-800"
-                    : data.activity_level === "moderate"
-                      ? "bg-blue-50 border border-blue-200 text-blue-800"
-                      : "bg-amber-50 border border-amber-200 text-amber-800"
-                }`}
+                className={`p-3 rounded-lg mt-2 ${data.activity_level === "high"
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : data.activity_level === "moderate"
+                    ? "bg-blue-50 border border-blue-200 text-blue-800"
+                    : "bg-amber-50 border border-amber-200 text-amber-800"
+                  }`}
               >
                 <p className="text-sm">{data.interpretation}</p>
               </div>
@@ -8102,15 +8163,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg ${
-                  data.total_score === 0
-                    ? "bg-green-50 border border-green-200 text-green-800"
-                    : data.total_score <= 10
-                      ? "bg-blue-50 border border-blue-200 text-blue-800"
-                      : data.total_score <= 20
-                        ? "bg-amber-50 border border-amber-200 text-amber-800"
-                        : "bg-red-50 border border-red-200 text-red-800"
-                }`}
+                className={`p-3 rounded-lg ${data.total_score === 0
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : data.total_score <= 10
+                    ? "bg-blue-50 border border-blue-200 text-blue-800"
+                    : data.total_score <= 20
+                      ? "bg-amber-50 border border-amber-200 text-amber-800"
+                      : "bg-red-50 border border-red-200 text-red-800"
+                  }`}
               >
                 <p className="font-medium">{data.interpretation}</p>
               </div>
@@ -8153,11 +8213,10 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     Prend actuellement un traitement:
                   </span>
                   <span
-                    className={`font-medium ${
-                      data.taking_medication === "oui"
-                        ? "text-blue-600"
-                        : "text-gray-600"
-                    }`}
+                    className={`font-medium ${data.taking_medication === "oui"
+                      ? "text-blue-600"
+                      : "text-gray-600"
+                      }`}
                   >
                     {data.taking_medication === "oui"
                       ? "Oui"
@@ -8196,15 +8255,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg ${
-                  data.total_score <= 35
-                    ? "bg-green-50 border border-green-200 text-green-800"
-                    : data.total_score <= 45
-                      ? "bg-blue-50 border border-blue-200 text-blue-800"
-                      : data.total_score <= 55
-                        ? "bg-amber-50 border border-amber-200 text-amber-800"
-                        : "bg-red-50 border border-red-200 text-red-800"
-                }`}
+                className={`p-3 rounded-lg ${data.total_score <= 35
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : data.total_score <= 45
+                    ? "bg-blue-50 border border-blue-200 text-blue-800"
+                    : data.total_score <= 55
+                      ? "bg-amber-50 border border-amber-200 text-amber-800"
+                      : "bg-red-50 border border-red-200 text-red-800"
+                  }`}
               >
                 <p className="font-medium">{data.interpretation}</p>
               </div>
@@ -8236,18 +8294,17 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Niveau d'anxiété:</span>
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      data.anxiety_level === "low" ||
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${data.anxiety_level === "low" ||
                       data.anxiety_level === "légère"
-                        ? "bg-green-100 text-green-800"
-                        : data.anxiety_level === "moderate" ||
-                            data.anxiety_level === "modérée"
-                          ? "bg-blue-100 text-blue-800"
-                          : data.anxiety_level === "moderate-high" ||
-                              data.anxiety_level === "moyenne-haute"
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-red-100 text-red-800"
-                    }`}
+                      ? "bg-green-100 text-green-800"
+                      : data.anxiety_level === "moderate" ||
+                        data.anxiety_level === "modérée"
+                        ? "bg-blue-100 text-blue-800"
+                        : data.anxiety_level === "moderate-high" ||
+                          data.anxiety_level === "moyenne-haute"
+                          ? "bg-amber-100 text-amber-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
                   >
                     {data.anxiety_level === "low"
                       ? "Légère"
@@ -8298,15 +8355,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg ${
-                  data.total_score >= 8
-                    ? "bg-green-50 border border-green-200 text-green-800"
-                    : data.total_score >= 6
-                      ? "bg-blue-50 border border-blue-200 text-blue-800"
-                      : data.total_score >= 4
-                        ? "bg-amber-50 border border-amber-200 text-amber-800"
-                        : "bg-red-50 border border-red-200 text-red-800"
-                }`}
+                className={`p-3 rounded-lg ${data.total_score >= 8
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : data.total_score >= 6
+                    ? "bg-blue-50 border border-blue-200 text-blue-800"
+                    : data.total_score >= 4
+                      ? "bg-amber-50 border border-amber-200 text-amber-800"
+                      : "bg-red-50 border border-red-200 text-red-800"
+                  }`}
               >
                 <p className="font-medium">{data.interpretation}</p>
               </div>
@@ -8349,15 +8405,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div
-                      className={`h-3 rounded-full transition-all ${
-                        data.adherence_percentage >= 80
-                          ? "bg-green-500"
-                          : data.adherence_percentage >= 60
-                            ? "bg-blue-500"
-                            : data.adherence_percentage >= 40
-                              ? "bg-amber-500"
-                              : "bg-red-500"
-                      }`}
+                      className={`h-3 rounded-full transition-all ${data.adherence_percentage >= 80
+                        ? "bg-green-500"
+                        : data.adherence_percentage >= 60
+                          ? "bg-blue-500"
+                          : data.adherence_percentage >= 40
+                            ? "bg-amber-500"
+                            : "bg-red-500"
+                        }`}
                       style={{
                         width: `${Math.min(100, data.adherence_percentage)}%`,
                       }}
@@ -8374,11 +8429,10 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     Prend actuellement un traitement:
                   </span>
                   <span
-                    className={`font-medium ${
-                      data.taking_medication === "oui"
-                        ? "text-blue-600"
-                        : "text-gray-600"
-                    }`}
+                    className={`font-medium ${data.taking_medication === "oui"
+                      ? "text-blue-600"
+                      : "text-gray-600"
+                      }`}
                   >
                     {data.taking_medication === "oui"
                       ? "Oui"
@@ -8442,7 +8496,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
                   <div className="text-2xl font-bold text-blue-700">
                     {data.conscience_symptome_score !== null &&
-                    data.conscience_symptome_score !== undefined
+                      data.conscience_symptome_score !== undefined
                       ? parseFloat(data.conscience_symptome_score).toFixed(0)
                       : "-"}
                   </div>
@@ -8455,7 +8509,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
                   <div className="text-2xl font-bold text-purple-700">
                     {data.conscience_maladie_score !== null &&
-                    data.conscience_maladie_score !== undefined
+                      data.conscience_maladie_score !== undefined
                       ? parseFloat(data.conscience_maladie_score).toFixed(0)
                       : "-"}
                   </div>
@@ -8468,7 +8522,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
                   <div className="text-2xl font-bold text-green-700">
                     {data.besoin_traitement_score !== null &&
-                    data.besoin_traitement_score !== undefined
+                      data.besoin_traitement_score !== undefined
                       ? parseFloat(data.besoin_traitement_score).toFixed(1)
                       : "-"}
                   </div>
@@ -8483,15 +8537,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg ${
-                  data.total_score >= 10
-                    ? "bg-green-50 border border-green-200 text-green-800"
-                    : data.total_score >= 7
-                      ? "bg-blue-50 border border-blue-200 text-blue-800"
-                      : data.total_score >= 4
-                        ? "bg-amber-50 border border-amber-200 text-amber-800"
-                        : "bg-red-50 border border-red-200 text-red-800"
-                }`}
+                className={`p-3 rounded-lg ${data.total_score >= 10
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : data.total_score >= 7
+                    ? "bg-blue-50 border border-blue-200 text-blue-800"
+                    : data.total_score >= 4
+                      ? "bg-amber-50 border border-amber-200 text-amber-800"
+                      : "bg-red-50 border border-red-200 text-red-800"
+                  }`}
               >
                 <p className="font-medium">{data.interpretation}</p>
               </div>
@@ -8540,7 +8593,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
                   <div className="text-2xl font-bold text-blue-700">
                     {data.obsessions_score !== null &&
-                    data.obsessions_score !== undefined
+                      data.obsessions_score !== undefined
                       ? data.obsessions_score
                       : "-"}
                   </div>
@@ -8553,7 +8606,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="text-center p-3 bg-purple-50 rounded-lg border border-purple-200">
                   <div className="text-2xl font-bold text-purple-700">
                     {data.compulsions_score !== null &&
-                    data.compulsions_score !== undefined
+                      data.compulsions_score !== undefined
                       ? data.compulsions_score
                       : "-"}
                   </div>
@@ -8568,15 +8621,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg ${
-                  data.total_score <= 7
-                    ? "bg-green-50 border border-green-200 text-green-800"
-                    : data.total_score <= 15
-                      ? "bg-blue-50 border border-blue-200 text-blue-800"
-                      : data.total_score <= 23
-                        ? "bg-amber-50 border border-amber-200 text-amber-800"
-                        : "bg-red-50 border border-red-200 text-red-800"
-                }`}
+                className={`p-3 rounded-lg ${data.total_score <= 7
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : data.total_score <= 15
+                    ? "bg-blue-50 border border-blue-200 text-blue-800"
+                    : data.total_score <= 23
+                      ? "bg-amber-50 border border-amber-200 text-amber-800"
+                      : "bg-red-50 border border-red-200 text-red-800"
+                  }`}
               >
                 <p className="font-medium">{data.interpretation}</p>
               </div>
@@ -8585,17 +8637,16 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Severity Badge */}
             <div className="flex justify-center">
               <span
-                className={`px-4 py-2 rounded-full text-sm font-medium ${
-                  data.total_score <= 7
-                    ? "bg-green-100 text-green-800"
-                    : data.total_score <= 15
-                      ? "bg-blue-100 text-blue-800"
-                      : data.total_score <= 23
-                        ? "bg-amber-100 text-amber-800"
-                        : data.total_score <= 31
-                          ? "bg-red-100 text-red-800"
-                          : "bg-red-200 text-red-900"
-                }`}
+                className={`px-4 py-2 rounded-full text-sm font-medium ${data.total_score <= 7
+                  ? "bg-green-100 text-green-800"
+                  : data.total_score <= 15
+                    ? "bg-blue-100 text-blue-800"
+                    : data.total_score <= 23
+                      ? "bg-amber-100 text-amber-800"
+                      : data.total_score <= 31
+                        ? "bg-red-100 text-red-800"
+                        : "bg-red-200 text-red-900"
+                  }`}
               >
                 {data.total_score <= 7
                   ? "Sous-clinique"
@@ -8670,13 +8721,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg ${
-                  data.total_score < 60 || data.total_score > 140
-                    ? "bg-red-50 border border-red-200 text-red-800"
-                    : data.total_score < 80 || data.total_score > 120
-                      ? "bg-amber-50 border border-amber-200 text-amber-800"
-                      : "bg-green-50 border border-green-200 text-green-800"
-                }`}
+                className={`p-3 rounded-lg ${data.total_score < 60 || data.total_score > 140
+                  ? "bg-red-50 border border-red-200 text-red-800"
+                  : data.total_score < 80 || data.total_score > 120
+                    ? "bg-amber-50 border border-amber-200 text-amber-800"
+                    : "bg-green-50 border border-green-200 text-green-800"
+                  }`}
               >
                 <p className="font-medium">{data.interpretation}</p>
               </div>
@@ -8691,7 +8741,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="text-center p-3 bg-purple-50 rounded-lg">
                   <div className="text-xl font-bold text-purple-700">
                     {data.subscore_emotion !== null &&
-                    data.subscore_emotion !== undefined
+                      data.subscore_emotion !== undefined
                       ? parseFloat(data.subscore_emotion).toFixed(1)
                       : "-"}
                   </div>
@@ -8701,7 +8751,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="text-center p-3 bg-blue-50 rounded-lg">
                   <div className="text-xl font-bold text-blue-700">
                     {data.subscore_motivation !== null &&
-                    data.subscore_motivation !== undefined
+                      data.subscore_motivation !== undefined
                       ? parseFloat(data.subscore_motivation).toFixed(1)
                       : "-"}
                   </div>
@@ -8711,7 +8761,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="text-center p-3 bg-green-50 rounded-lg">
                   <div className="text-xl font-bold text-green-700">
                     {data.subscore_perception !== null &&
-                    data.subscore_perception !== undefined
+                      data.subscore_perception !== undefined
                       ? parseFloat(data.subscore_perception).toFixed(1)
                       : "-"}
                   </div>
@@ -8721,7 +8771,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="text-center p-3 bg-amber-50 rounded-lg">
                   <div className="text-xl font-bold text-amber-700">
                     {data.subscore_interaction !== null &&
-                    data.subscore_interaction !== undefined
+                      data.subscore_interaction !== undefined
                       ? parseFloat(data.subscore_interaction).toFixed(1)
                       : "-"}
                   </div>
@@ -8731,7 +8781,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="text-center p-3 bg-indigo-50 rounded-lg">
                   <div className="text-xl font-bold text-indigo-700">
                     {data.subscore_cognition !== null &&
-                    data.subscore_cognition !== undefined
+                      data.subscore_cognition !== undefined
                       ? parseFloat(data.subscore_cognition).toFixed(1)
                       : "-"}
                   </div>
@@ -8750,7 +8800,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="text-center p-2 bg-gray-50 rounded">
                   <div className="text-lg font-bold text-gray-900">
                     {data.cognitive_speed !== null &&
-                    data.cognitive_speed !== undefined
+                      data.cognitive_speed !== undefined
                       ? parseFloat(data.cognitive_speed).toFixed(2)
                       : "-"}
                   </div>
@@ -8761,7 +8811,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="text-center p-2 bg-gray-50 rounded">
                   <div className="text-lg font-bold text-gray-900">
                     {data.emotional_hyperreactivity !== null &&
-                    data.emotional_hyperreactivity !== undefined
+                      data.emotional_hyperreactivity !== undefined
                       ? parseFloat(data.emotional_hyperreactivity).toFixed(2)
                       : "-"}
                   </div>
@@ -8772,7 +8822,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="text-center p-2 bg-gray-50 rounded">
                   <div className="text-lg font-bold text-gray-900">
                     {data.emotional_hyporeactivity !== null &&
-                    data.emotional_hyporeactivity !== undefined
+                      data.emotional_hyporeactivity !== undefined
                       ? parseFloat(data.emotional_hyporeactivity).toFixed(2)
                       : "-"}
                   </div>
@@ -8791,7 +8841,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="text-center p-2 bg-gray-50 rounded">
                   <div className="text-lg font-bold text-gray-900">
                     {data.motor_activity !== null &&
-                    data.motor_activity !== undefined
+                      data.motor_activity !== undefined
                       ? parseFloat(data.motor_activity).toFixed(2)
                       : "-"}
                   </div>
@@ -8834,15 +8884,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg ${
-                  data.total_score <= 5
-                    ? "bg-green-50 border border-green-200 text-green-800"
-                    : data.total_score <= 10
-                      ? "bg-blue-50 border border-blue-200 text-blue-800"
-                      : data.total_score <= 15
-                        ? "bg-amber-50 border border-amber-200 text-amber-800"
-                        : "bg-red-50 border border-red-200 text-red-800"
-                }`}
+                className={`p-3 rounded-lg ${data.total_score <= 5
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : data.total_score <= 10
+                    ? "bg-blue-50 border border-blue-200 text-blue-800"
+                    : data.total_score <= 15
+                      ? "bg-amber-50 border border-amber-200 text-amber-800"
+                      : "bg-red-50 border border-red-200 text-red-800"
+                  }`}
               >
                 <p className="font-medium">{data.interpretation}</p>
               </div>
@@ -8853,17 +8902,16 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Niveau de sévérité:</span>
                 <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    data.total_score <= 5
-                      ? "bg-green-100 text-green-800"
-                      : data.total_score <= 10
-                        ? "bg-blue-100 text-blue-800"
-                        : data.total_score <= 15
-                          ? "bg-amber-100 text-amber-800"
-                          : data.total_score <= 20
-                            ? "bg-red-100 text-red-800"
-                            : "bg-red-200 text-red-900"
-                  }`}
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${data.total_score <= 5
+                    ? "bg-green-100 text-green-800"
+                    : data.total_score <= 10
+                      ? "bg-blue-100 text-blue-800"
+                      : data.total_score <= 15
+                        ? "bg-amber-100 text-amber-800"
+                        : data.total_score <= 20
+                          ? "bg-red-100 text-red-800"
+                          : "bg-red-200 text-red-900"
+                    }`}
                 >
                   {data.total_score <= 5
                     ? "Absence"
@@ -8930,15 +8978,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg ${
-                  data.total_score <= 5
-                    ? "bg-green-50 border border-green-200 text-green-800"
-                    : data.total_score <= 10
-                      ? "bg-blue-50 border border-blue-200 text-blue-800"
-                      : data.total_score <= 15
-                        ? "bg-amber-50 border border-amber-200 text-amber-800"
-                        : "bg-red-50 border border-red-200 text-red-800"
-                }`}
+                className={`p-3 rounded-lg ${data.total_score <= 5
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : data.total_score <= 10
+                    ? "bg-blue-50 border border-blue-200 text-blue-800"
+                    : data.total_score <= 15
+                      ? "bg-amber-50 border border-amber-200 text-amber-800"
+                      : "bg-red-50 border border-red-200 text-red-800"
+                  }`}
               >
                 <p className="font-medium">{data.interpretation}</p>
               </div>
@@ -9012,15 +9059,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     <div className="flex items-center gap-2">
                       <div className="flex-1 bg-gray-200 rounded-full h-2">
                         <div
-                          className={`h-2 rounded-full ${
-                            data.sleep_efficiency_pct >= 85
-                              ? "bg-green-500"
-                              : data.sleep_efficiency_pct >= 75
-                                ? "bg-blue-500"
-                                : data.sleep_efficiency_pct >= 65
-                                  ? "bg-amber-500"
-                                  : "bg-red-500"
-                          }`}
+                          className={`h-2 rounded-full ${data.sleep_efficiency_pct >= 85
+                            ? "bg-green-500"
+                            : data.sleep_efficiency_pct >= 75
+                              ? "bg-blue-500"
+                              : data.sleep_efficiency_pct >= 65
+                                ? "bg-amber-500"
+                                : "bg-red-500"
+                            }`}
                           style={{
                             width: `${Math.min(data.sleep_efficiency_pct, 100)}%`,
                           }}
@@ -9047,15 +9093,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Qualité du sommeil:</span>
                 <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    data.total_score <= 5
-                      ? "bg-green-100 text-green-800"
-                      : data.total_score <= 10
-                        ? "bg-blue-100 text-blue-800"
-                        : data.total_score <= 15
-                          ? "bg-amber-100 text-amber-800"
-                          : "bg-red-100 text-red-800"
-                  }`}
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${data.total_score <= 5
+                    ? "bg-green-100 text-green-800"
+                    : data.total_score <= 10
+                      ? "bg-blue-100 text-blue-800"
+                      : data.total_score <= 15
+                        ? "bg-amber-100 text-amber-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
                 >
                   {data.total_score <= 5
                     ? "Bonne"
@@ -9101,17 +9146,16 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Interpretation */}
             {data.interpretation && (
               <div
-                className={`p-3 rounded-lg ${
-                  data.total_score <= 5
-                    ? "bg-green-50 border border-green-200 text-green-800"
-                    : data.total_score <= 10
-                      ? "bg-blue-50 border border-blue-200 text-blue-800"
-                      : data.total_score <= 12
-                        ? "bg-amber-50 border border-amber-200 text-amber-800"
-                        : data.total_score <= 15
-                          ? "bg-orange-50 border border-orange-200 text-orange-800"
-                          : "bg-red-50 border border-red-200 text-red-800"
-                }`}
+                className={`p-3 rounded-lg ${data.total_score <= 5
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : data.total_score <= 10
+                    ? "bg-blue-50 border border-blue-200 text-blue-800"
+                    : data.total_score <= 12
+                      ? "bg-amber-50 border border-amber-200 text-amber-800"
+                      : data.total_score <= 15
+                        ? "bg-orange-50 border border-orange-200 text-orange-800"
+                        : "bg-red-50 border border-red-200 text-red-800"
+                  }`}
               >
                 <p className="font-medium">{data.interpretation}</p>
               </div>
@@ -9122,17 +9166,16 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Niveau de somnolence:</span>
                 <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    data.total_score <= 5
-                      ? "bg-green-100 text-green-800"
-                      : data.total_score <= 10
-                        ? "bg-blue-100 text-blue-800"
-                        : data.total_score <= 12
-                          ? "bg-amber-100 text-amber-800"
-                          : data.total_score <= 15
-                            ? "bg-orange-100 text-orange-800"
-                            : "bg-red-100 text-red-800"
-                  }`}
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${data.total_score <= 5
+                    ? "bg-green-100 text-green-800"
+                    : data.total_score <= 10
+                      ? "bg-blue-100 text-blue-800"
+                      : data.total_score <= 12
+                        ? "bg-amber-100 text-amber-800"
+                        : data.total_score <= 15
+                          ? "bg-orange-100 text-orange-800"
+                          : "bg-red-100 text-red-800"
+                    }`}
                 >
                   {data.severity ||
                     (data.total_score <= 5
@@ -9241,34 +9284,33 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {(interpretation ||
               data.total_score !== undefined ||
               data.totalScore !== undefined) && (
-              <div
-                className={`p-4 rounded-lg border-2 ${
-                  severity === "success"
+                <div
+                  className={`p-4 rounded-lg border-2 ${severity === "success"
                     ? "bg-green-50 border-green-200 text-green-900"
                     : severity === "info"
                       ? "bg-blue-50 border-blue-200 text-blue-900"
                       : severity === "warning"
                         ? "bg-orange-50 border-orange-200 text-orange-900"
                         : "bg-red-50 border-red-200 text-red-900"
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="mt-0.5">{getAlertIcon()}</div>
-                  <div className="space-y-2">
-                    <p className="font-bold text-base leading-tight">
-                      Interprétation clinique
-                    </p>
-                    <p className="text-sm leading-relaxed font-medium">
-                      {interpretation ||
-                        interpretFagerstromScore(
-                          data.total_score ?? data.totalScore,
-                          data,
-                        )}
-                    </p>
+                    }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5">{getAlertIcon()}</div>
+                    <div className="space-y-2">
+                      <p className="font-bold text-base leading-tight">
+                        Interprétation clinique
+                      </p>
+                      <p className="text-sm leading-relaxed font-medium">
+                        {interpretation ||
+                          interpretFagerstromScore(
+                            data.total_score ?? data.totalScore,
+                            data,
+                          )}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* Clinical Highlights (only if enough data) */}
             {data.q1 !== undefined && (
@@ -9318,15 +9360,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   Score Total FTND
                 </p>
                 <p
-                  className={`text-2xl font-bold ${
-                    (data.total_score ?? 0) <= 2
-                      ? "text-green-600"
-                      : (data.total_score ?? 0) <= 4
-                        ? "text-blue-600"
-                        : (data.total_score ?? 0) === 5
-                          ? "text-orange-600"
-                          : "text-red-600"
-                  }`}
+                  className={`text-2xl font-bold ${(data.total_score ?? 0) <= 2
+                    ? "text-green-600"
+                    : (data.total_score ?? 0) <= 4
+                      ? "text-blue-600"
+                      : (data.total_score ?? 0) === 5
+                        ? "text-orange-600"
+                        : "text-red-600"
+                    }`}
                 >
                   {data.total_score !== undefined
                     ? `${data.total_score}/10`
@@ -9339,15 +9380,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   Score HSI (Indice de sévérité)
                 </p>
                 <p
-                  className={`text-2xl font-bold ${
-                    (data.hsi_score ?? 0) <= 2
-                      ? "text-green-600"
-                      : (data.hsi_score ?? 0) <= 3
-                        ? "text-blue-600"
-                        : (data.hsi_score ?? 0) <= 4
-                          ? "text-orange-600"
-                          : "text-red-600"
-                  }`}
+                  className={`text-2xl font-bold ${(data.hsi_score ?? 0) <= 2
+                    ? "text-green-600"
+                    : (data.hsi_score ?? 0) <= 3
+                      ? "text-blue-600"
+                      : (data.hsi_score ?? 0) <= 4
+                        ? "text-orange-600"
+                        : "text-red-600"
+                    }`}
                 >
                   {data.hsi_score !== undefined ? `${data.hsi_score}/6` : "-"}
                 </p>
@@ -9361,29 +9401,27 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Dependence Level */}
               <div
-                className={`p-3 rounded-lg border-2 ${
-                  data.dependence_level === "aucune_tres_faible"
-                    ? "bg-green-50 border-green-200"
-                    : data.dependence_level === "faible"
-                      ? "bg-blue-50 border-blue-200"
-                      : data.dependence_level === "moyenne"
-                        ? "bg-orange-50 border-orange-200"
-                        : "bg-red-50 border-red-200"
-                }`}
+                className={`p-3 rounded-lg border-2 ${data.dependence_level === "aucune_tres_faible"
+                  ? "bg-green-50 border-green-200"
+                  : data.dependence_level === "faible"
+                    ? "bg-blue-50 border-blue-200"
+                    : data.dependence_level === "moyenne"
+                      ? "bg-orange-50 border-orange-200"
+                      : "bg-red-50 border-red-200"
+                  }`}
               >
                 <p className="text-xs font-semibold uppercase tracking-wider mb-1 opacity-70">
                   Niveau de dépendance
                 </p>
                 <p
-                  className={`text-sm font-bold ${
-                    data.dependence_level === "aucune_tres_faible"
-                      ? "text-green-700"
-                      : data.dependence_level === "faible"
-                        ? "text-blue-700"
-                        : data.dependence_level === "moyenne"
-                          ? "text-orange-700"
-                          : "text-red-700"
-                  }`}
+                  className={`text-sm font-bold ${data.dependence_level === "aucune_tres_faible"
+                    ? "text-green-700"
+                    : data.dependence_level === "faible"
+                      ? "text-blue-700"
+                      : data.dependence_level === "moyenne"
+                        ? "text-orange-700"
+                        : "text-red-700"
+                    }`}
                 >
                   {data.dependence_level === "aucune_tres_faible"
                     ? "Pas de dépendance ou très faible"
@@ -9398,29 +9436,27 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               </div>
               {/* Treatment Guidance */}
               <div
-                className={`p-3 rounded-lg border-2 ${
-                  data.dependence_level === "aucune_tres_faible"
-                    ? "bg-green-50 border-green-200"
-                    : data.dependence_level === "faible"
-                      ? "bg-blue-50 border-blue-200"
-                      : data.dependence_level === "moyenne"
-                        ? "bg-orange-50 border-orange-200"
-                        : "bg-red-50 border-red-200"
-                }`}
+                className={`p-3 rounded-lg border-2 ${data.dependence_level === "aucune_tres_faible"
+                  ? "bg-green-50 border-green-200"
+                  : data.dependence_level === "faible"
+                    ? "bg-blue-50 border-blue-200"
+                    : data.dependence_level === "moyenne"
+                      ? "bg-orange-50 border-orange-200"
+                      : "bg-red-50 border-red-200"
+                  }`}
               >
                 <p className="text-xs font-semibold uppercase tracking-wider mb-1 opacity-70">
                   Traitement suggéré
                 </p>
                 <p
-                  className={`text-sm font-bold ${
-                    data.dependence_level === "aucune_tres_faible"
-                      ? "text-green-700"
-                      : data.dependence_level === "faible"
-                        ? "text-blue-700"
-                        : data.dependence_level === "moyenne"
-                          ? "text-orange-700"
-                          : "text-red-700"
-                  }`}
+                  className={`text-sm font-bold ${data.dependence_level === "aucune_tres_faible"
+                    ? "text-green-700"
+                    : data.dependence_level === "faible"
+                      ? "text-blue-700"
+                      : data.dependence_level === "moyenne"
+                        ? "text-orange-700"
+                        : "text-red-700"
+                    }`}
                 >
                   {data.treatment_guidance || "-"}
                 </p>
@@ -9435,13 +9471,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     Première cigarette
                   </p>
                   <p
-                    className={`text-sm font-medium ${
-                      data.q1 >= 2
-                        ? "text-red-600"
-                        : data.q1 === 1
-                          ? "text-orange-600"
-                          : "text-green-600"
-                    }`}
+                    className={`text-sm font-medium ${data.q1 >= 2
+                      ? "text-red-600"
+                      : data.q1 === 1
+                        ? "text-orange-600"
+                        : "text-green-600"
+                      }`}
                   >
                     {data.q1 === 3
                       ? "Dans les 5 minutes (très précoce)"
@@ -9457,13 +9492,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     Consommation quotidienne
                   </p>
                   <p
-                    className={`text-sm font-medium ${
-                      data.q4 >= 2
-                        ? "text-red-600"
-                        : data.q4 === 1
-                          ? "text-orange-600"
-                          : "text-green-600"
-                    }`}
+                    className={`text-sm font-medium ${data.q4 >= 2
+                      ? "text-red-600"
+                      : data.q4 === 1
+                        ? "text-orange-600"
+                        : "text-green-600"
+                      }`}
                   >
                     {data.q4 === 0
                       ? "≤ 10 cigarettes/jour"
@@ -9482,15 +9516,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Clinical Interpretation */}
             {interpretation && (
               <div
-                className={`p-4 rounded-lg border-2 ${
-                  severity === "success"
-                    ? "bg-green-50 border-green-200 text-green-900"
-                    : severity === "info"
-                      ? "bg-blue-50 border-blue-200 text-blue-900"
-                      : severity === "warning"
-                        ? "bg-orange-50 border-orange-200 text-orange-900"
-                        : "bg-red-50 border-red-200 text-red-900"
-                }`}
+                className={`p-4 rounded-lg border-2 ${severity === "success"
+                  ? "bg-green-50 border-green-200 text-green-900"
+                  : severity === "info"
+                    ? "bg-blue-50 border-blue-200 text-blue-900"
+                    : severity === "warning"
+                      ? "bg-orange-50 border-orange-200 text-orange-900"
+                      : "bg-red-50 border-red-200 text-red-900"
+                  }`}
               >
                 <div className="flex items-start gap-3">
                   <div className="mt-0.5">{getAlertIcon()}</div>
@@ -9543,17 +9576,16 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
           <div className="text-sm space-y-4 mt-2 pt-2 border-t">
             {/* Global Score Summary */}
             <div
-              className={`p-4 rounded-lg border-2 ${
-                data.total_score !== null && data.total_score !== undefined
-                  ? (data.total_score / 78) * 100 >= 75
-                    ? "bg-green-50 border-green-200"
-                    : (data.total_score / 78) * 100 >= 50
-                      ? "bg-blue-50 border-blue-200"
-                      : (data.total_score / 78) * 100 >= 25
-                        ? "bg-amber-50 border-amber-200"
-                        : "bg-red-50 border-red-200"
-                  : "bg-gray-50 border-gray-200"
-              }`}
+              className={`p-4 rounded-lg border-2 ${data.total_score !== null && data.total_score !== undefined
+                ? (data.total_score / 78) * 100 >= 75
+                  ? "bg-green-50 border-green-200"
+                  : (data.total_score / 78) * 100 >= 50
+                    ? "bg-blue-50 border-blue-200"
+                    : (data.total_score / 78) * 100 >= 25
+                      ? "bg-amber-50 border-amber-200"
+                      : "bg-red-50 border-red-200"
+                : "bg-gray-50 border-gray-200"
+                }`}
             >
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -9583,28 +9615,26 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                       Capacités cognitives
                     </span>
                     <span
-                      className={`font-semibold ${
-                        data.score_cognitiv !== null &&
+                      className={`font-semibold ${data.score_cognitiv !== null &&
                         data.score_cognitiv !== undefined
-                          ? (data.score_cognitiv / 24) * 100 >= 50
-                            ? "text-green-600"
-                            : "text-orange-600"
-                          : "text-gray-400"
-                      }`}
+                        ? (data.score_cognitiv / 24) * 100 >= 50
+                          ? "text-green-600"
+                          : "text-orange-600"
+                        : "text-gray-400"
+                        }`}
                     >
                       {data.score_cognitiv !== null &&
-                      data.score_cognitiv !== undefined
+                        data.score_cognitiv !== undefined
                         ? `${data.score_cognitiv}/24`
                         : "-"}
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className={`h-2 rounded-full transition-all ${
-                        ((data.score_cognitiv ?? 0) / 24) * 100 >= 50
-                          ? "bg-green-500"
-                          : "bg-orange-500"
-                      }`}
+                      className={`h-2 rounded-full transition-all ${((data.score_cognitiv ?? 0) / 24) * 100 >= 50
+                        ? "bg-green-500"
+                        : "bg-orange-500"
+                        }`}
                       style={{
                         width: `${Math.min(((data.score_cognitiv ?? 0) / 24) * 100, 100)}%`,
                       }}
@@ -9622,28 +9652,26 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                       Motivations
                     </span>
                     <span
-                      className={`font-semibold ${
-                        data.score_motiv !== null &&
+                      className={`font-semibold ${data.score_motiv !== null &&
                         data.score_motiv !== undefined
-                          ? (data.score_motiv / 24) * 100 >= 50
-                            ? "text-green-600"
-                            : "text-orange-600"
-                          : "text-gray-400"
-                      }`}
+                        ? (data.score_motiv / 24) * 100 >= 50
+                          ? "text-green-600"
+                          : "text-orange-600"
+                        : "text-gray-400"
+                        }`}
                     >
                       {data.score_motiv !== null &&
-                      data.score_motiv !== undefined
+                        data.score_motiv !== undefined
                         ? `${data.score_motiv}/24`
                         : "-"}
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className={`h-2 rounded-full transition-all ${
-                        ((data.score_motiv ?? 0) / 24) * 100 >= 50
-                          ? "bg-green-500"
-                          : "bg-orange-500"
-                      }`}
+                      className={`h-2 rounded-full transition-all ${((data.score_motiv ?? 0) / 24) * 100 >= 50
+                        ? "bg-green-500"
+                        : "bg-orange-500"
+                        }`}
                       style={{
                         width: `${Math.min(((data.score_motiv ?? 0) / 24) * 100, 100)}%`,
                       }}
@@ -9661,14 +9689,13 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                       Capacités de communication et de compréhension des autres
                     </span>
                     <span
-                      className={`font-semibold ${
-                        data.score_comm !== null &&
+                      className={`font-semibold ${data.score_comm !== null &&
                         data.score_comm !== undefined
-                          ? (data.score_comm / 18) * 100 >= 50
-                            ? "text-green-600"
-                            : "text-orange-600"
-                          : "text-gray-400"
-                      }`}
+                        ? (data.score_comm / 18) * 100 >= 50
+                          ? "text-green-600"
+                          : "text-orange-600"
+                        : "text-gray-400"
+                        }`}
                     >
                       {data.score_comm !== null && data.score_comm !== undefined
                         ? `${data.score_comm}/18`
@@ -9677,11 +9704,10 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className={`h-2 rounded-full transition-all ${
-                        ((data.score_comm ?? 0) / 18) * 100 >= 50
-                          ? "bg-green-500"
-                          : "bg-orange-500"
-                      }`}
+                      className={`h-2 rounded-full transition-all ${((data.score_comm ?? 0) / 18) * 100 >= 50
+                        ? "bg-green-500"
+                        : "bg-orange-500"
+                        }`}
                       style={{
                         width: `${Math.min(((data.score_comm ?? 0) / 18) * 100, 100)}%`,
                       }}
@@ -9700,14 +9726,13 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                       compte de ses limites
                     </span>
                     <span
-                      className={`font-semibold ${
-                        data.score_eval !== null &&
+                      className={`font-semibold ${data.score_eval !== null &&
                         data.score_eval !== undefined
-                          ? (data.score_eval / 12) * 100 >= 50
-                            ? "text-green-600"
-                            : "text-orange-600"
-                          : "text-gray-400"
-                      }`}
+                        ? (data.score_eval / 12) * 100 >= 50
+                          ? "text-green-600"
+                          : "text-orange-600"
+                        : "text-gray-400"
+                        }`}
                     >
                       {data.score_eval !== null && data.score_eval !== undefined
                         ? `${data.score_eval}/12`
@@ -9716,11 +9741,10 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className={`h-2 rounded-full transition-all ${
-                        ((data.score_eval ?? 0) / 12) * 100 >= 50
-                          ? "bg-green-500"
-                          : "bg-orange-500"
-                      }`}
+                      className={`h-2 rounded-full transition-all ${((data.score_eval ?? 0) / 12) * 100 >= 50
+                        ? "bg-green-500"
+                        : "bg-orange-500"
+                        }`}
                       style={{
                         width: `${Math.min(((data.score_eval ?? 0) / 12) * 100, 100)}%`,
                       }}
@@ -9736,15 +9760,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
             {/* Clinical Interpretation */}
             {interpretation && (
               <div
-                className={`p-4 rounded-lg border-2 ${
-                  severity === "success"
-                    ? "bg-green-50 border-green-200 text-green-900"
-                    : severity === "info"
-                      ? "bg-blue-50 border-blue-200 text-blue-900"
-                      : severity === "warning"
-                        ? "bg-orange-50 border-orange-200 text-orange-900"
-                        : "bg-red-50 border-red-200 text-red-900"
-                }`}
+                className={`p-4 rounded-lg border-2 ${severity === "success"
+                  ? "bg-green-50 border-green-200 text-green-900"
+                  : severity === "info"
+                    ? "bg-blue-50 border-blue-200 text-blue-900"
+                    : severity === "warning"
+                      ? "bg-orange-50 border-orange-200 text-orange-900"
+                      : "bg-red-50 border-red-200 text-red-900"
+                  }`}
               >
                 <div className="flex items-start gap-3">
                   <div className="mt-0.5">{getAlertIcon()}</div>
@@ -9813,7 +9836,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   className={`font-semibold ${data.autonomy_score === null ? "text-orange-600" : ""}`}
                 >
                   {data.autonomy_score !== null &&
-                  data.autonomy_score !== undefined
+                    data.autonomy_score !== undefined
                     ? `${data.autonomy_score}/12`
                     : "Questionnaire incomplet"}
                 </span>
@@ -9824,7 +9847,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   className={`font-semibold ${data.occupational_score === null ? "text-orange-600" : ""}`}
                 >
                   {data.occupational_score !== null &&
-                  data.occupational_score !== undefined
+                    data.occupational_score !== undefined
                     ? `${data.occupational_score}/15`
                     : "Questionnaire incomplet"}
                 </span>
@@ -9835,7 +9858,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   className={`font-semibold ${data.cognitive_score === null ? "text-orange-600" : ""}`}
                 >
                   {data.cognitive_score !== null &&
-                  data.cognitive_score !== undefined
+                    data.cognitive_score !== undefined
                     ? `${data.cognitive_score}/15`
                     : "Questionnaire incomplet"}
                 </span>
@@ -9846,7 +9869,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   className={`font-semibold ${data.financial_score === null ? "text-orange-600" : ""}`}
                 >
                   {data.financial_score !== null &&
-                  data.financial_score !== undefined
+                    data.financial_score !== undefined
                     ? `${data.financial_score}/6`
                     : "Questionnaire incomplet"}
                 </span>
@@ -9857,7 +9880,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   className={`font-semibold ${data.interpersonal_score === null ? "text-orange-600" : ""}`}
                 >
                   {data.interpersonal_score !== null &&
-                  data.interpersonal_score !== undefined
+                    data.interpersonal_score !== undefined
                     ? `${data.interpersonal_score}/18`
                     : "Questionnaire incomplet"}
                 </span>
@@ -9868,7 +9891,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   className={`font-semibold ${data.leisure_score === null ? "text-orange-600" : ""}`}
                 >
                   {data.leisure_score !== null &&
-                  data.leisure_score !== undefined
+                    data.leisure_score !== undefined
                     ? `${data.leisure_score}/6`
                     : "Questionnaire incomplet"}
                 </span>
@@ -9891,15 +9914,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
           <div className="text-sm space-y-4 mt-2 pt-2 border-t">
             {/* Global Score Summary */}
             <div
-              className={`p-3 rounded-lg ${
-                data.total_score !== null && data.total_score >= 75
-                  ? "bg-green-50 border border-green-200"
-                  : data.total_score !== null && data.total_score >= 50
-                    ? "bg-blue-50 border border-blue-200"
-                    : data.total_score !== null && data.total_score >= 25
-                      ? "bg-amber-50 border border-amber-200"
-                      : "bg-red-50 border border-red-200"
-              }`}
+              className={`p-3 rounded-lg ${data.total_score !== null && data.total_score >= 75
+                ? "bg-green-50 border border-green-200"
+                : data.total_score !== null && data.total_score >= 50
+                  ? "bg-blue-50 border border-blue-200"
+                  : data.total_score !== null && data.total_score >= 25
+                    ? "bg-amber-50 border border-amber-200"
+                    : "bg-red-50 border border-red-200"
+                }`}
             >
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -9933,7 +9955,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     className={`font-semibold ${data.score_vie_sentimentale === null ? "text-orange-600" : ""}`}
                   >
                     {data.score_vie_sentimentale !== null &&
-                    data.score_vie_sentimentale !== undefined
+                      data.score_vie_sentimentale !== undefined
                       ? `${data.score_vie_sentimentale}%`
                       : "Pas concerné(e)"}
                   </span>
@@ -9944,7 +9966,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     className={`font-semibold ${data.score_estime_de_soi === null ? "text-orange-600" : ""}`}
                   >
                     {data.score_estime_de_soi !== null &&
-                    data.score_estime_de_soi !== undefined
+                      data.score_estime_de_soi !== undefined
                       ? `${data.score_estime_de_soi}%`
                       : "Pas concerné(e)"}
                   </span>
@@ -9957,7 +9979,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     className={`font-semibold ${data.score_relation_famille === null ? "text-orange-600" : ""}`}
                   >
                     {data.score_relation_famille !== null &&
-                    data.score_relation_famille !== undefined
+                      data.score_relation_famille !== undefined
                       ? `${data.score_relation_famille}%`
                       : "Pas concerné(e)"}
                   </span>
@@ -9970,7 +9992,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     className={`font-semibold ${data.score_relation_amis === null ? "text-orange-600" : ""}`}
                   >
                     {data.score_relation_amis !== null &&
-                    data.score_relation_amis !== undefined
+                      data.score_relation_amis !== undefined
                       ? `${data.score_relation_amis}%`
                       : "Pas concerné(e)"}
                   </span>
@@ -9981,7 +10003,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     className={`font-semibold ${data.score_autonomie === null ? "text-orange-600" : ""}`}
                   >
                     {data.score_autonomie !== null &&
-                    data.score_autonomie !== undefined
+                      data.score_autonomie !== undefined
                       ? `${data.score_autonomie}%`
                       : "Pas concerné(e)"}
                   </span>
@@ -9994,7 +10016,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     className={`font-semibold ${data.score_bien_etre_psychologique === null ? "text-orange-600" : ""}`}
                   >
                     {data.score_bien_etre_psychologique !== null &&
-                    data.score_bien_etre_psychologique !== undefined
+                      data.score_bien_etre_psychologique !== undefined
                       ? `${data.score_bien_etre_psychologique}%`
                       : "Pas concerné(e)"}
                   </span>
@@ -10007,7 +10029,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     className={`font-semibold ${data.score_bien_etre_physique === null ? "text-orange-600" : ""}`}
                   >
                     {data.score_bien_etre_physique !== null &&
-                    data.score_bien_etre_physique !== undefined
+                      data.score_bien_etre_physique !== undefined
                       ? `${data.score_bien_etre_physique}%`
                       : "Pas concerné(e)"}
                   </span>
@@ -10020,7 +10042,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     className={`font-semibold ${data.score_resilience === null ? "text-orange-600" : ""}`}
                   >
                     {data.score_resilience !== null &&
-                    data.score_resilience !== undefined
+                      data.score_resilience !== undefined
                       ? `${data.score_resilience}%`
                       : "Pas concerné(e)"}
                   </span>
@@ -10034,17 +10056,16 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 Index global S-QoL:
               </span>
               <span
-                className={`font-bold text-lg ${
-                  data.total_score !== null && data.total_score >= 75
-                    ? "text-green-600"
-                    : data.total_score !== null && data.total_score >= 50
-                      ? "text-blue-600"
-                      : data.total_score !== null && data.total_score >= 25
-                        ? "text-amber-600"
-                        : data.total_score !== null
-                          ? "text-red-600"
-                          : "text-orange-600"
-                }`}
+                className={`font-bold text-lg ${data.total_score !== null && data.total_score >= 75
+                  ? "text-green-600"
+                  : data.total_score !== null && data.total_score >= 50
+                    ? "text-blue-600"
+                    : data.total_score !== null && data.total_score >= 25
+                      ? "text-amber-600"
+                      : data.total_score !== null
+                        ? "text-red-600"
+                        : "text-orange-600"
+                  }`}
               >
                 {data.total_score !== null && data.total_score !== undefined
                   ? `${data.total_score}%`

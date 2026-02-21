@@ -39,14 +39,14 @@ const QUESTIONNAIRES_WITH_SCORING = new Set([
   'ASRS', 'CTQ', 'BIS10', 'ALS18', 'AIM', 'WURS25', 'AQ12', 'CSM', 'CTI',
   'MADRS', 'YMRS', 'CGI', 'EGF', 'ALDA', 'ETAT_PATIENT', 'FAST',
   'WAIS4_MATRICES', 'WAIS4_MATRICES_SZ', 'WAIS4_SIMILITUDES', 'WAIS4_SIMILITUDES_SZ', 'WAIS4_MEMOIRE_CHIFFRES_SZ', 'SSTICS_SZ', 'CBQ_SZ', 'DACOBS_SZ', 'BRIEF_A_SZ', 'BRIEF_A_AUTO_SZ',
-  'WAIS4_CRITERIA', 'WAIS4_LEARNING',   'CVLT', 'CVLT_SZ', 'TMT_SZ', 'STROOP_SZ', 'COMMISSIONS_SZ',
+  'WAIS4_CRITERIA', 'WAIS4_LEARNING', 'CVLT', 'CVLT_SZ', 'TMT_SZ', 'STROOP_SZ', 'COMMISSIONS_SZ',
   'LIS_SZ', 'WAIS4_EFFICIENCE_SZ', 'WAIS4_CODE', 'WAIS_IV_CODE_SYMBOLES_IVT',
   'WAIS4_DIGIT_SPAN', 'FLUENCES_VERBALES', 'FLUENCES_VERBALES_SZ',
   'WAIS3_VOCABULAIRE', 'WAIS3_VOCABULAIRE_FR',
   'WAIS3_MATRICES', 'WAIS3_MATRICES_FR',
   'SOCIAL',
   'TOBACCO', 'FAGERSTROM', 'PHYSICAL_PARAMS', 'BLOOD_PRESSURE', 'SLEEP_APNEA',
-  'PANSS', 'CDSS', 'SAPS', 'BARS', 'SUMD', 'AIMS', 'BARNES', 'SAS', 'PSP',
+  'PANSS', 'CDSS', 'SAPS', 'SANS', 'UKU', 'BARS', 'SUMD', 'AIMS', 'BARNES', 'SAS', 'PSP',
   'ISA_FOLLOWUP',
   'SQOL_SZ', 'CTQ_SZ', 'MARS_SZ', 'BIS_SZ', 'EQ5D5L_SZ', 'IPAQ_SZ', 'YBOCS_SZ',
   'WURS25_SZ', 'STORI_SZ', 'SOGS_SZ', 'PSQI_SZ', 'PRESENTEISME_SZ', 'FAGERSTROM_SZ',
@@ -66,14 +66,14 @@ export function QuestionnairePageClient({
 }: QuestionnairePageClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   // Check if we should show the score page based on URL param (persists across revalidation)
   const showScoreFromUrl = searchParams.get('submitted') === 'true';
-  
+
   const [error, setError] = useState<string | null>(null);
   const [submittedData, setSubmittedData] = useState<any>(existingData);
   const [justSubmitted, setJustSubmitted] = useState(showScoreFromUrl);
-  
+
   // Sync submittedData with existingData when URL has ?submitted=true
   // This handles the case where the page reloads after submission and existingData
   // now contains the saved response from the server
@@ -82,10 +82,10 @@ export function QuestionnairePageClient({
       setSubmittedData(existingData);
     }
   }, [showScoreFromUrl, existingData, submittedData]);
-  
+
   // Stabilize initialResponses to prevent unnecessary re-initialization of the renderer
   const stableInitialResponses = useMemo(() => initialResponses, [initialResponses]);
-  
+
   // Track current responses for live score calculation
   // This is updated via callback from QuestionnaireRenderer
   const [currentResponses, setCurrentResponses] = useState<Record<string, any>>(stableInitialResponses);
@@ -116,18 +116,18 @@ export function QuestionnairePageClient({
           itemCount++;
         }
       }
-      
+
       const patientAge = currentResponses.patient_age;
-      
+
       // Calculate standardized score if we have age
       let standardizedScore: number | null = null;
       let percentileRank: number | null = null;
-      
+
       if (patientAge && typeof patientAge === 'number' && patientAge >= 16) {
         standardizedScore = calculateStandardizedScore(rawScore, patientAge);
         percentileRank = calculatePercentileRank(standardizedScore);
       }
-      
+
       return {
         type: 'WAIS4_MATRICES',
         rawScore,
@@ -157,10 +157,10 @@ export function QuestionnairePageClient({
       ) {
         const te = Number(therapeuticEffect);
         const se = Number(sideEffects);
-        
+
         if (te >= 1 && te <= 4 && se >= 0 && se <= 3) {
           therapeuticIndex = se + (4 * (te - 1)) + 1;
-          
+
           if (therapeuticIndex <= 4) {
             label = 'Très bon rapport bénéfice/risque';
             color = 'text-green-700';
@@ -209,11 +209,11 @@ export function QuestionnairePageClient({
       ) {
         const te = Number(therapeuticEffect);
         const se = Number(sideEffects);
-        
+
         if (te >= 1 && te <= 4 && se >= 0 && se <= 3) {
           // Formula: 4 * (Effet - 1) + SideEffects + 1
           therapeuticIndex = (4 * (te - 1)) + se + 1;
-          
+
           if (therapeuticIndex <= 4) {
             label = 'Très bon rapport bénéfice/risque';
             color = 'text-green-700';
@@ -313,16 +313,16 @@ export function QuestionnairePageClient({
       // Normalize code to uppercase for consistent comparison
       const code = questionnaire.code?.toUpperCase() || '';
       console.log('[Scoring] code:', code, 'inSet:', QUESTIONNAIRES_WITH_SCORING.has(code));
-      const hasScoring = QUESTIONNAIRES_WITH_SCORING.has(code) || 
-                         code === 'WAIS4_MEMOIRE_CHIFFRES_SZ' ||
-                         code === 'WAIS4_SIMILITUDES_SZ' ||
-                         code === 'WAIS4_MATRICES_SZ' ||
-                         code === 'SSTICS_SZ' ||
-                         code === 'CBQ_SZ' ||
-                         code === 'DACOBS_SZ' ||
-                         code === 'BRIEF_A_SZ' ||
-                         code === 'FLUENCES_VERBALES_SZ' ||
-                         code === 'STROOP_SZ';
+      const hasScoring = QUESTIONNAIRES_WITH_SCORING.has(code) ||
+        code === 'WAIS4_MEMOIRE_CHIFFRES_SZ' ||
+        code === 'WAIS4_SIMILITUDES_SZ' ||
+        code === 'WAIS4_MATRICES_SZ' ||
+        code === 'SSTICS_SZ' ||
+        code === 'CBQ_SZ' ||
+        code === 'DACOBS_SZ' ||
+        code === 'BRIEF_A_SZ' ||
+        code === 'FLUENCES_VERBALES_SZ' ||
+        code === 'STROOP_SZ';
 
       if (!hasScoring) {
         // No score page for this questionnaire - redirect back to visit
@@ -334,7 +334,7 @@ export function QuestionnairePageClient({
       // Use URL param to persist state across Next.js revalidation
       setSubmittedData(result.data);
       setJustSubmitted(true);
-      
+
       // Navigate to same page with ?submitted=true to persist state across revalidation
       // Use setTimeout to ensure state updates are committed before navigation
       const currentPath = window.location.pathname;
@@ -356,7 +356,7 @@ export function QuestionnairePageClient({
   // The showScoreFromUrl check ensures score page persists even after Next.js revalidates
   // Use existingData as fallback when showScoreFromUrl is true (handles page reload after submission)
   const scoreData = submittedData || (showScoreFromUrl ? existingData : null);
-  
+
   if ((justSubmitted || showScoreFromUrl) && scoreData) {
     return (
       <div className="min-h-screen bg-[#FDFBFA]">
@@ -380,11 +380,11 @@ export function QuestionnairePageClient({
               </div>
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
-              <ScoreDisplay 
-                code={questionnaire.code} 
-                data={scoreData} 
+              <ScoreDisplay
+                code={questionnaire.code}
+                data={scoreData}
               />
-              
+
               <div className="flex justify-end pt-4 border-t">
                 <Button onClick={handleReturn}>
                   Retour a la visite
@@ -414,7 +414,7 @@ export function QuestionnairePageClient({
         progress={progress}
         onBack={handleReturn}
       />
-      
+
       <div className="max-w-4xl mx-auto px-8 py-10 pb-32">
         {questionnaire.description && (
           <p className="text-slate-500 mb-8 max-w-2xl">
@@ -430,13 +430,13 @@ export function QuestionnairePageClient({
             </p>
           </div>
         )}
-        
+
         {error && (
           <div className="mb-6">
             <AlertBanner type="error" message={error} />
           </div>
         )}
-        
+
         <QuestionnaireRenderer
           questionnaire={questionnaire}
           initialResponses={stableInitialResponses}
@@ -444,7 +444,7 @@ export function QuestionnairePageClient({
           onResponseChange={handleResponsesChange}
         />
       </div>
-      
+
       {/* Live Score Display */}
       {liveScores && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg z-50">
@@ -461,10 +461,10 @@ export function QuestionnairePageClient({
                     </div>
                     <div className="text-xs text-slate-400">{liveScores.itemCount}/26 items</div>
                   </div>
-                  
+
                   {/* Separator */}
                   <div className="h-12 w-px bg-slate-200"></div>
-                  
+
                   {/* Standardized Score */}
                   <div className="text-center">
                     <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Note Standard</div>
@@ -477,10 +477,10 @@ export function QuestionnairePageClient({
                       <div className="text-sm text-slate-400">Entrez l'age</div>
                     )}
                   </div>
-                  
+
                   {/* Separator */}
                   <div className="h-12 w-px bg-slate-200"></div>
-                  
+
                   {/* Percentile */}
                   <div className="text-center">
                     <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Rang Percentile</div>
@@ -493,7 +493,7 @@ export function QuestionnairePageClient({
                     )}
                   </div>
                 </div>
-                
+
                 {/* Interpretation */}
                 {liveScores.standardizedScore !== null && liveScores.standardizedScore !== undefined && (
                   <div className={`px-4 py-2 rounded-lg ${getScoreInterpretation(liveScores.standardizedScore)?.bg}`}>
@@ -515,7 +515,7 @@ export function QuestionnairePageClient({
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Interpretation Label */}
                 {liveScores.label && (
                   <div className={`px-4 py-2 rounded-lg ${liveScores.bg}`}>
@@ -537,7 +537,7 @@ export function QuestionnairePageClient({
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Interpretation Label */}
                 {liveScores.label && (
                   <div className={`px-4 py-2 rounded-lg ${liveScores.bg}`}>
@@ -559,7 +559,7 @@ export function QuestionnairePageClient({
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Interpretation Label */}
                 {liveScores.label && (
                   <div className={`px-4 py-2 rounded-lg ${liveScores.bg}`}>
