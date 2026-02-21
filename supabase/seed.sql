@@ -65,9 +65,7 @@ INSERT INTO public.visit_templates (id, pathology_id, visit_type, name, descript
 VALUES
   ('b2000001-0000-0000-0000-000000000001', '22222222-2222-2222-2222-222222222222', 'screening', 'Depistage Schizophrenie', 'Initial screening visit for schizophrenia', 1, true),
   ('b2000001-0000-0000-0000-000000000002', '22222222-2222-2222-2222-222222222222', 'initial_evaluation', 'Evaluation Initiale Schizophrenie', 'Comprehensive initial evaluation', 2, true),
-  ('b2000001-0000-0000-0000-000000000003', '22222222-2222-2222-2222-222222222222', 'biannual_followup', 'Suivi Semestriel Schizophrenie', '6-month follow-up visit', 3, true),
-  ('b2000001-0000-0000-0000-000000000004', '22222222-2222-2222-2222-222222222222', 'annual_evaluation', 'Evaluation Annuelle Schizophrenie', 'Annual comprehensive evaluation', 4, true),
-  ('b2000001-0000-0000-0000-000000000005', '22222222-2222-2222-2222-222222222222', 'off_schedule', 'Visite Hors Programme Schizophrenie', 'Unscheduled visit', 5, true)
+  ('b2000001-0000-0000-0000-000000000004', '22222222-2222-2222-2222-222222222222', 'annual_evaluation', 'Evaluation Annuelle Schizophrenie', 'Annual comprehensive evaluation', 3, true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Asperger/ASD visit templates
