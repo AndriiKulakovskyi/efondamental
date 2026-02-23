@@ -52,6 +52,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   BARNES: "schizophrenia_barnes",
   SAS: "schizophrenia_sas",
   PSP: "schizophrenia_psp",
+  BRIEF_A_SZ: "schizophrenia_brief_a_hetero",
   YMRS_SZ: "schizophrenia_ymrs",
   CGI_SZ: "schizophrenia_cgi",
   EGF_SZ: "schizophrenia_egf",
@@ -103,6 +104,12 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   WAIS4_EFFICIENCE_SZ: "schizophrenia_wais4_efficience",
   WAIS4_SIMILITUDES_SZ: "schizophrenia_wais4_similitudes",
   WAIS4_MEMOIRE_CHIFFRES_SZ: "schizophrenia_wais4_memoire_chiffres",
+  WAIS4_MATRICES_SZ: "schizophrenia_wais4_matrices",
+  SSTICS_SZ: "schizophrenia_sstics",
+
+  // Neuropsy module - CBQ & DACOBS
+  CBQ_SZ: "schizophrenia_cbq",
+  DACOBS_SZ: "schizophrenia_dacobs",
 };
 
 // ============================================================================
