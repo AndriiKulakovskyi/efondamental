@@ -166,6 +166,7 @@ import {
   PRESENTEISME_SZ_DEFINITION,
   FAGERSTROM_SZ_DEFINITION,
   BRIEF_A_AUTO_SZ_DEFINITION,
+  ONAPS_SZ_DEFINITION,
   EPHP_SZ_DEFINITION,
   SZ_CVLT_DEFINITION,
   TMT_SZ_DEFINITION,
@@ -959,6 +960,16 @@ export default async function VisitDetailPage({
               target_role: 'patient',
               completed: questionnaireStatuses['BRIEF_A_AUTO_SZ']?.completed || false,
               completedAt: questionnaireStatuses['BRIEF_A_AUTO_SZ']?.completed_at,
+            },
+            {
+              id: ONAPS_SZ_DEFINITION.code,
+              code: ONAPS_SZ_DEFINITION.code,
+              title: ONAPS_SZ_DEFINITION.title,
+              description: ONAPS_SZ_DEFINITION.description,
+              questions: ONAPS_SZ_DEFINITION.questions,
+              target_role: 'patient',
+              completed: questionnaireStatuses['ONAPS_SZ']?.completed || false,
+              completedAt: questionnaireStatuses['ONAPS_SZ']?.completed_at,
             }
           ]
         },

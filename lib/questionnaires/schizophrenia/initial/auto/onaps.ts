@@ -280,38 +280,24 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'single_choice',
         required: true,
         options: [
-            { code: 0, label: '0 jour', score: 0 },
-            { code: 1, label: '1 jour', score: 1 },
-            { code: 2, label: '2 jours', score: 2 },
-            { code: 3, label: '3 jours', score: 3 },
-            { code: 4, label: '4 jours', score: 4 },
-            { code: 5, label: '5 jours', score: 5 },
-            { code: 6, label: '6 jours', score: 6 },
-            { code: 7, label: '7 jours', score: 7 }
+            { code: 0, label: '0', score: 0 },
+            { code: 1, label: '1', score: 1 },
+            { code: 2, label: '2', score: 2 },
+            { code: 3, label: '3', score: 3 },
+            { code: 4, label: '4', score: 4 },
+            { code: 5, label: '5', score: 5 },
+            { code: 6, label: '6', score: 6 },
+            { code: 7, label: '7', score: 7 }
         ],
         display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
     {
-        id: 'work_vigorous_hours',
-        text: '2a) Lorsque vous effectuez ces tâches de forte intensité au travail, combien de temps par jour en moyenne y consacrez-vous ? (heures)',
-        type: 'number',
+        id: 'work_vigorous_time',
+        text: '2) Lorsque vous effectuez ces tâches de forte intensité au travail, combien de temps par jour en moyenne y consacrez-vous ?',
+        type: 'text',
         required: false,
-        min: 0,
-        max: 24,
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'work_vigorous_days' }, 0] }
-            ]
-        }
-    },
-    {
-        id: 'work_vigorous_minutes',
-        text: '2b) (minutes)',
-        type: 'number',
-        required: false,
-        min: 0,
-        max: 59,
+        help: 'Format HH:MM (ex: 01:30 pour 1h30)',
+        metadata: { placeholder: 'HH:MM' },
         display_if: {
             'and': [
                 { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
@@ -325,24 +311,24 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'single_choice',
         required: true,
         options: [
-            { code: 0, label: '0 jour', score: 0 },
-            { code: 1, label: '1 jour', score: 1 },
-            { code: 2, label: '2 jours', score: 2 },
-            { code: 3, label: '3 jours', score: 3 },
-            { code: 4, label: '4 jours', score: 4 },
-            { code: 5, label: '5 jours', score: 5 },
-            { code: 6, label: '6 jours', score: 6 },
-            { code: 7, label: '7 jours', score: 7 }
+            { code: 0, label: '0', score: 0 },
+            { code: 1, label: '1', score: 1 },
+            { code: 2, label: '2', score: 2 },
+            { code: 3, label: '3', score: 3 },
+            { code: 4, label: '4', score: 4 },
+            { code: 5, label: '5', score: 5 },
+            { code: 6, label: '6', score: 6 },
+            { code: 7, label: '7', score: 7 }
         ],
         display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
     {
-        id: 'work_moderate_hours',
-        text: '4a) Lorsque vous effectuez ces tâches d\'intensité modérée au travail, combien de temps en moyenne par jour y consacrez-vous ? (heures)',
-        type: 'number',
+        id: 'work_moderate_time',
+        text: '4) Lorsque vous effectuez ces tâches d\'intensité modérée au travail, combien de temps en moyenne par jour y consacrez-vous ?',
+        type: 'text',
         required: false,
-        min: 0,
-        max: 24,
+        help: 'Format HH:MM (ex: 01:30 pour 1h30)',
+        metadata: { placeholder: 'HH:MM' },
         display_if: {
             'and': [
                 { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
@@ -351,35 +337,12 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         }
     },
     {
-        id: 'work_moderate_minutes',
-        text: '4b) (minutes)',
-        type: 'number',
+        id: 'work_sitting_time',
+        text: '5) Habituellement, combien de temps par jour en moyenne passez-vous assis pour votre travail ? (Mettre 0 si vous ne travaillez pas, ne pas compter les temps de repas)',
+        type: 'text',
         required: false,
-        min: 0,
-        max: 59,
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'work_moderate_days' }, 0] }
-            ]
-        }
-    },
-    {
-        id: 'work_sitting_hours',
-        text: '5a) Habituellement, combien de temps par jour en moyenne passez-vous assis pour votre travail ? (Mettre 0 si vous ne travaillez pas, ne pas compter les temps de repas) - (heures)',
-        type: 'number',
-        required: false,
-        min: 0,
-        max: 24,
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
-    },
-    {
-        id: 'work_sitting_minutes',
-        text: '5b) (minutes)',
-        type: 'number',
-        required: false,
-        min: 0,
-        max: 59,
+        help: 'Format HH:MM (ex: 02:00 pour 2h00)',
+        metadata: { placeholder: 'HH:MM' },
         display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
 
@@ -387,7 +350,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
     {
         id: 'section_transport',
         text: 'Partie B : Déplacements à but utilitaire',
-        description: 'Les questions suivantes concernent la façon habituelle de vous déplacer d\'un endroit à un autre, par exemple aller au travail, faire des courses, aller au marché, aller chez un ami...',
+        help: 'Les questions suivantes concernent la façon habituelle de vous déplacer d\'un endroit à un autre, par exemple aller au travail, faire des courses, aller au marché, aller chez un ami...',
         type: 'section',
         required: false,
         display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
@@ -398,38 +361,24 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'single_choice',
         required: true,
         options: [
-            { code: 0, label: '0 jour', score: 0 },
-            { code: 1, label: '1 jour', score: 1 },
-            { code: 2, label: '2 jours', score: 2 },
-            { code: 3, label: '3 jours', score: 3 },
-            { code: 4, label: '4 jours', score: 4 },
-            { code: 5, label: '5 jours', score: 5 },
-            { code: 6, label: '6 jours', score: 6 },
-            { code: 7, label: '7 jours', score: 7 }
+            { code: 0, label: '0', score: 0 },
+            { code: 1, label: '1', score: 1 },
+            { code: 2, label: '2', score: 2 },
+            { code: 3, label: '3', score: 3 },
+            { code: 4, label: '4', score: 4 },
+            { code: 5, label: '5', score: 5 },
+            { code: 6, label: '6', score: 6 },
+            { code: 7, label: '7', score: 7 }
         ],
         display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
     {
-        id: 'transport_walking_hours',
-        text: '7a) Lors d\'une journée durant laquelle vous effectuez des trajets à pied, combien de temps en moyenne y consacrez-vous ? (heures)',
-        type: 'number',
+        id: 'transport_walking_time',
+        text: '7) Lors d\'une journée durant laquelle vous effectuez des trajets à pied, combien de temps en moyenne y consacrez-vous ?',
+        type: 'text',
         required: false,
-        min: 0,
-        max: 24,
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'transport_walking_days' }, 0] }
-            ]
-        }
-    },
-    {
-        id: 'transport_walking_minutes',
-        text: '7b) (minutes)',
-        type: 'number',
-        required: false,
-        min: 0,
-        max: 59,
+        help: 'Format HH:MM (ex: 00:45 pour 45min)',
+        metadata: { placeholder: 'HH:MM' },
         display_if: {
             'and': [
                 { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
@@ -443,38 +392,24 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'single_choice',
         required: true,
         options: [
-            { code: 0, label: '0 jour', score: 0 },
-            { code: 1, label: '1 jour', score: 1 },
-            { code: 2, label: '2 jours', score: 2 },
-            { code: 3, label: '3 jours', score: 3 },
-            { code: 4, label: '4 jours', score: 4 },
-            { code: 5, label: '5 jours', score: 5 },
-            { code: 6, label: '6 jours', score: 6 },
-            { code: 7, label: '7 jours', score: 7 }
+            { code: 0, label: '0', score: 0 },
+            { code: 1, label: '1', score: 1 },
+            { code: 2, label: '2', score: 2 },
+            { code: 3, label: '3', score: 3 },
+            { code: 4, label: '4', score: 4 },
+            { code: 5, label: '5', score: 5 },
+            { code: 6, label: '6', score: 6 },
+            { code: 7, label: '7', score: 7 }
         ],
         display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
     {
-        id: 'transport_bicycle_hours',
-        text: '9a) Lors d\'une journée durant laquelle vous effectuez des trajets à vélo ou VAE, combien de temps en moyenne y consacrez-vous ? (heures)',
-        type: 'number',
+        id: 'transport_bicycle_time',
+        text: '9) Lors d\'une journée durant laquelle vous effectuez des trajets à vélo ou VAE, combien de temps en moyenne y consacrez-vous ?',
+        type: 'text',
         required: false,
-        min: 0,
-        max: 24,
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'transport_bicycle_days' }, 0] }
-            ]
-        }
-    },
-    {
-        id: 'transport_bicycle_minutes',
-        text: '9b) (minutes)',
-        type: 'number',
-        required: false,
-        min: 0,
-        max: 59,
+        help: 'Format HH:MM (ex: 00:30 pour 30min)',
+        metadata: { placeholder: 'HH:MM' },
         display_if: {
             'and': [
                 { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
@@ -488,41 +423,27 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'single_choice',
         required: true,
         options: [
-            { code: 0, label: '0 jour', score: 0 },
-            { code: 1, label: '1 jour', score: 1 },
-            { code: 2, label: '2 jours', score: 2 },
-            { code: 3, label: '3 jours', score: 3 },
-            { code: 4, label: '4 jours', score: 4 },
-            { code: 5, label: '5 jours', score: 5 },
-            { code: 6, label: '6 jours', score: 6 },
-            { code: 7, label: '7 jours', score: 7 },
-            { code: 8, label: '8 jours', score: 8 },
-            { code: 9, label: '9 jours', score: 9 },
-            { code: 10, label: '10 jours', score: 10 }
+            { code: 0, label: '0', score: 0 },
+            { code: 1, label: '1', score: 1 },
+            { code: 2, label: '2', score: 2 },
+            { code: 3, label: '3', score: 3 },
+            { code: 4, label: '4', score: 4 },
+            { code: 5, label: '5', score: 5 },
+            { code: 6, label: '6', score: 6 },
+            { code: 7, label: '7', score: 7 },
+            { code: 8, label: '8', score: 8 },
+            { code: 9, label: '9', score: 9 },
+            { code: 10, label: '10', score: 10 }
         ],
         display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
     {
-        id: 'transport_motorized_hours',
-        text: '11a) Lors d\'une journée durant laquelle vous effectuez des trajets motorisés, combien de temps en moyenne durent l\'ensemble de ces trajets ? (heures)',
-        type: 'number',
+        id: 'transport_motorized_time',
+        text: '11) Lors d\'une journée durant laquelle vous effectuez des trajets motorisés, combien de temps en moyenne durent l\'ensemble de ces trajets ?',
+        type: 'text',
         required: false,
-        min: 0,
-        max: 24,
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'transport_motorized_days' }, 0] }
-            ]
-        }
-    },
-    {
-        id: 'transport_motorized_minutes',
-        text: '11b) (minutes)',
-        type: 'number',
-        required: false,
-        min: 0,
-        max: 59,
+        help: 'Format HH:MM (ex: 01:00 pour 1h)',
+        metadata: { placeholder: 'HH:MM' },
         display_if: {
             'and': [
                 { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
@@ -535,7 +456,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
     {
         id: 'section_leisure',
         text: 'Partie C : Activités de loisirs ou au domicile',
-        description: 'Les questions suivantes excluent les activités liées au travail et aux déplacements que vous avez déjà mentionnées.',
+        help: 'Les questions suivantes excluent les activités liées au travail et aux déplacements que vous avez déjà mentionnées.',
         type: 'section',
         required: false,
         display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
@@ -546,38 +467,24 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'single_choice',
         required: true,
         options: [
-            { code: 0, label: '0 jour', score: 0 },
-            { code: 1, label: '1 jour', score: 1 },
-            { code: 2, label: '2 jours', score: 2 },
-            { code: 3, label: '3 jours', score: 3 },
-            { code: 4, label: '4 jours', score: 4 },
-            { code: 5, label: '5 jours', score: 5 },
-            { code: 6, label: '6 jours', score: 6 },
-            { code: 7, label: '7 jours', score: 7 }
+            { code: 0, label: '0', score: 0 },
+            { code: 1, label: '1', score: 1 },
+            { code: 2, label: '2', score: 2 },
+            { code: 3, label: '3', score: 3 },
+            { code: 4, label: '4', score: 4 },
+            { code: 5, label: '5', score: 5 },
+            { code: 6, label: '6', score: 6 },
+            { code: 7, label: '7', score: 7 }
         ],
         display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
     {
-        id: 'leisure_vigorous_hours',
-        text: '13a) Lors d\'une journée durant laquelle vous pratiquez des activités sportives ou des activités de loisirs de forte intensité, combien de temps en moyenne y consacrez-vous ? (heures)',
-        type: 'number',
+        id: 'leisure_vigorous_time',
+        text: '13) Lors d\'une journée durant laquelle vous pratiquez des activités sportives ou des activités de loisirs de forte intensité, combien de temps en moyenne y consacrez-vous ?',
+        type: 'text',
         required: false,
-        min: 0,
-        max: 24,
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'leisure_vigorous_days' }, 0] }
-            ]
-        }
-    },
-    {
-        id: 'leisure_vigorous_minutes',
-        text: '13b) (minutes)',
-        type: 'number',
-        required: false,
-        min: 0,
-        max: 59,
+        help: 'Format HH:MM (ex: 01:30 pour 1h30)',
+        metadata: { placeholder: 'HH:MM' },
         display_if: {
             'and': [
                 { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
@@ -591,38 +498,24 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'single_choice',
         required: true,
         options: [
-            { code: 0, label: '0 jour', score: 0 },
-            { code: 1, label: '1 jour', score: 1 },
-            { code: 2, label: '2 jours', score: 2 },
-            { code: 3, label: '3 jours', score: 3 },
-            { code: 4, label: '4 jours', score: 4 },
-            { code: 5, label: '5 jours', score: 5 },
-            { code: 6, label: '6 jours', score: 6 },
-            { code: 7, label: '7 jours', score: 7 }
+            { code: 0, label: '0', score: 0 },
+            { code: 1, label: '1', score: 1 },
+            { code: 2, label: '2', score: 2 },
+            { code: 3, label: '3', score: 3 },
+            { code: 4, label: '4', score: 4 },
+            { code: 5, label: '5', score: 5 },
+            { code: 6, label: '6', score: 6 },
+            { code: 7, label: '7', score: 7 }
         ],
         display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
     {
-        id: 'leisure_moderate_hours',
-        text: '15a) Lors d\'une journée durant laquelle vous pratiquez des activités sportives ou des activités de loisirs d\'intensité modérée, combien de temps en moyenne y consacrez-vous ? (heures)',
-        type: 'number',
+        id: 'leisure_moderate_time',
+        text: '15) Lors d\'une journée durant laquelle vous pratiquez des activités sportives ou des activités de loisirs d\'intensité modérée, combien de temps en moyenne y consacrez-vous ?',
+        type: 'text',
         required: false,
-        min: 0,
-        max: 24,
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'leisure_moderate_days' }, 0] }
-            ]
-        }
-    },
-    {
-        id: 'leisure_moderate_minutes',
-        text: '15b) (minutes)',
-        type: 'number',
-        required: false,
-        min: 0,
-        max: 59,
+        help: 'Format HH:MM (ex: 00:45 pour 45min)',
+        metadata: { placeholder: 'HH:MM' },
         display_if: {
             'and': [
                 { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
@@ -636,38 +529,24 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'single_choice',
         required: true,
         options: [
-            { code: 0, label: '0 jour', score: 0 },
-            { code: 1, label: '1 jour', score: 1 },
-            { code: 2, label: '2 jours', score: 2 },
-            { code: 3, label: '3 jours', score: 3 },
-            { code: 4, label: '4 jours', score: 4 },
-            { code: 5, label: '5 jours', score: 5 },
-            { code: 6, label: '6 jours', score: 6 },
-            { code: 7, label: '7 jours', score: 7 }
+            { code: 0, label: '0', score: 0 },
+            { code: 1, label: '1', score: 1 },
+            { code: 2, label: '2', score: 2 },
+            { code: 3, label: '3', score: 3 },
+            { code: 4, label: '4', score: 4 },
+            { code: 5, label: '5', score: 5 },
+            { code: 6, label: '6', score: 6 },
+            { code: 7, label: '7', score: 7 }
         ],
         display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
     {
-        id: 'leisure_screen_hours',
-        text: '17a) Lors d\'une journée durant laquelle vous passez du temps devant l\'écran, combien de temps en moyenne y passez-vous, chez vous ou lors de vos loisirs (heures)',
-        type: 'number',
+        id: 'leisure_screen_time',
+        text: '17) Lors d\'une journée durant laquelle vous passez du temps devant l\'écran, combien de temps en moyenne y passez-vous, chez vous ou lors de vos loisirs ?',
+        type: 'text',
         required: false,
-        min: 0,
-        max: 24,
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'leisure_screen_days' }, 0] }
-            ]
-        }
-    },
-    {
-        id: 'leisure_screen_minutes',
-        text: '17b) (minutes)',
-        type: 'number',
-        required: false,
-        min: 0,
-        max: 59,
+        help: 'Format HH:MM (ex: 03:00 pour 3h)',
+        metadata: { placeholder: 'HH:MM' },
         display_if: {
             'and': [
                 { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
@@ -681,38 +560,24 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'single_choice',
         required: true,
         options: [
-            { code: 0, label: '0 jour', score: 0 },
-            { code: 1, label: '1 jour', score: 1 },
-            { code: 2, label: '2 jours', score: 2 },
-            { code: 3, label: '3 jours', score: 3 },
-            { code: 4, label: '4 jours', score: 4 },
-            { code: 5, label: '5 jours', score: 5 },
-            { code: 6, label: '6 jours', score: 6 },
-            { code: 7, label: '7 jours', score: 7 }
+            { code: 0, label: '0', score: 0 },
+            { code: 1, label: '1', score: 1 },
+            { code: 2, label: '2', score: 2 },
+            { code: 3, label: '3', score: 3 },
+            { code: 4, label: '4', score: 4 },
+            { code: 5, label: '5', score: 5 },
+            { code: 6, label: '6', score: 6 },
+            { code: 7, label: '7', score: 7 }
         ],
         display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
     {
-        id: 'leisure_other_hours',
-        text: '19a) Lors d\'une journée durant laquelle vous passez du temps autre que devant l\'écran, combien de temps en moyenne y passez-vous, chez vous ou lors de vos loisirs ? (heures)',
-        type: 'number',
+        id: 'leisure_other_time',
+        text: '19) Lors d\'une journée durant laquelle vous passez du temps autre que devant l\'écran, combien de temps en moyenne y passez-vous, chez vous ou lors de vos loisirs ?',
+        type: 'text',
         required: false,
-        min: 0,
-        max: 24,
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'leisure_other_days' }, 0] }
-            ]
-        }
-    },
-    {
-        id: 'leisure_other_minutes',
-        text: '19b) (minutes)',
-        type: 'number',
-        required: false,
-        min: 0,
-        max: 59,
+        help: 'Format HH:MM (ex: 02:00 pour 2h)',
+        metadata: { placeholder: 'HH:MM' },
         display_if: {
             'and': [
                 { '==': [{ var: 'questionnaire_done' }, 'Fait'] },

@@ -47,6 +47,26 @@ import {
   CTI_DEFINITION,
   QuestionnaireDefinition
 } from '../constants/questionnaires';
+import {
+  getSchizophreniaInitialResponse
+} from './schizophrenia-initial.service';
+import {
+  SQOL_SZ_DEFINITION,
+  CTQ_SZ_DEFINITION,
+  MARS_SZ_DEFINITION,
+  BIS_SZ_DEFINITION,
+  EQ5D5L_SZ_DEFINITION,
+  IPAQ_SZ_DEFINITION,
+  ONAPS_SZ_DEFINITION,
+  YBOCS_SZ_DEFINITION,
+  WURS25_SZ_DEFINITION,
+  STORI_SZ_DEFINITION,
+  SOGS_SZ_DEFINITION,
+  PSQI_SZ_DEFINITION,
+  PRESENTEISME_SZ_DEFINITION,
+  FAGERSTROM_SZ_DEFINITION,
+  BRIEF_A_AUTO_SZ_DEFINITION
+} from '../questionnaires/schizophrenia';
 
 // ============================================================================
 // TYPES
@@ -70,7 +90,7 @@ export interface PatientQuestionnaire {
   isCompleted: boolean;
   completedByRole: CompletedByRole;
   isLockedByProfessional: boolean;
-  category: 'etat' | 'traits' | 'screening';
+  category: 'etat' | 'traits' | 'screening' | 'autoquestionnaire';
 }
 
 export interface PatientVisitWithQuestionnaires {
@@ -118,6 +138,24 @@ const INITIAL_EVAL_TRAITS_QUESTIONNAIRES = [
   { definition: CTI_DEFINITION, estimatedTime: 10, category: 'traits' as const }
 ];
 
+const SZ_INITIAL_EVAL_AUTO_QUESTIONNAIRES = [
+  { definition: SQOL_SZ_DEFINITION, estimatedTime: 15, category: 'autoquestionnaire' as const },
+  { definition: CTQ_SZ_DEFINITION, estimatedTime: 15, category: 'autoquestionnaire' as const },
+  { definition: MARS_SZ_DEFINITION, estimatedTime: 5, category: 'autoquestionnaire' as const },
+  { definition: BIS_SZ_DEFINITION, estimatedTime: 5, category: 'autoquestionnaire' as const },
+  { definition: EQ5D5L_SZ_DEFINITION, estimatedTime: 5, category: 'autoquestionnaire' as const },
+  { definition: IPAQ_SZ_DEFINITION, estimatedTime: 10, category: 'autoquestionnaire' as const },
+  { definition: YBOCS_SZ_DEFINITION, estimatedTime: 10, category: 'autoquestionnaire' as const },
+  { definition: WURS25_SZ_DEFINITION, estimatedTime: 15, category: 'autoquestionnaire' as const },
+  { definition: STORI_SZ_DEFINITION, estimatedTime: 10, category: 'autoquestionnaire' as const },
+  { definition: SOGS_SZ_DEFINITION, estimatedTime: 10, category: 'autoquestionnaire' as const },
+  { definition: PSQI_SZ_DEFINITION, estimatedTime: 10, category: 'autoquestionnaire' as const },
+  { definition: PRESENTEISME_SZ_DEFINITION, estimatedTime: 5, category: 'autoquestionnaire' as const },
+  { definition: FAGERSTROM_SZ_DEFINITION, estimatedTime: 5, category: 'autoquestionnaire' as const },
+  { definition: BRIEF_A_AUTO_SZ_DEFINITION, estimatedTime: 10, category: 'autoquestionnaire' as const },
+  { definition: ONAPS_SZ_DEFINITION, estimatedTime: 15, category: 'autoquestionnaire' as const }
+];
+
 // ============================================================================
 // QUESTIONNAIRE COMPLETION CHECKING
 // ============================================================================
@@ -146,7 +184,22 @@ const QUESTIONNAIRE_GETTERS: Record<string, QuestionnaireGetter> = {
   'WURS25': getWurs25Response,
   'AQ12': getAq12Response,
   'CSM': getCsmResponse,
-  'CTI': getCtiResponse
+  'CTI': getCtiResponse,
+  // Schizophrenia auto-questionnaires
+  'SQOL_SZ': (visitId: string) => getSchizophreniaInitialResponse('SQOL_SZ', visitId),
+  'MARS_SZ': (visitId: string) => getSchizophreniaInitialResponse('MARS_SZ', visitId),
+  'BIS_SZ': (visitId: string) => getSchizophreniaInitialResponse('BIS_SZ', visitId),
+  'EQ5D5L_SZ': (visitId: string) => getSchizophreniaInitialResponse('EQ5D5L_SZ', visitId),
+  'IPAQ_SZ': (visitId: string) => getSchizophreniaInitialResponse('IPAQ_SZ', visitId),
+  'ONAPS_SZ': (visitId: string) => getSchizophreniaInitialResponse('ONAPS_SZ', visitId),
+  'YBOCS_SZ': (visitId: string) => getSchizophreniaInitialResponse('YBOCS_SZ', visitId),
+  'WURS25_SZ': (visitId: string) => getSchizophreniaInitialResponse('WURS25_SZ', visitId),
+  'STORI_SZ': (visitId: string) => getSchizophreniaInitialResponse('STORI_SZ', visitId),
+  'SOGS_SZ': (visitId: string) => getSchizophreniaInitialResponse('SOGS_SZ', visitId),
+  'PSQI_SZ': (visitId: string) => getSchizophreniaInitialResponse('PSQI_SZ', visitId),
+  'PRESENTEISME_SZ': (visitId: string) => getSchizophreniaInitialResponse('PRESENTEISME_SZ', visitId),
+  'FAGERSTROM_SZ': (visitId: string) => getSchizophreniaInitialResponse('FAGERSTROM_SZ', visitId),
+  'BRIEF_A_AUTO_SZ': (visitId: string) => getSchizophreniaInitialResponse('BRIEF_A_AUTO_SZ', visitId)
 };
 
 // Professional roles that lock questionnaires for patients
@@ -158,9 +211,14 @@ const PROFESSIONAL_ROLES = ['healthcare_professional', 'manager', 'administrator
 async function checkQuestionnaireCompletionWithRole(
   visitId: string,
   code: string,
-  patientUserId: string
+  patientUserId: string,
+  pathologyType?: string
 ): Promise<QuestionnaireCompletionInfo> {
-  const getter = QUESTIONNAIRE_GETTERS[code];
+  // For schizophrenia patients, CTQ code should use the schizophrenia table
+  let getter = QUESTIONNAIRE_GETTERS[code];
+  if (code === 'CTQ' && pathologyType === 'schizophrenia') {
+    getter = (vId: string) => getSchizophreniaInitialResponse('CTQ', vId);
+  }
   if (!getter) {
     console.warn(`[Patient Visit Service] No getter found for questionnaire code: ${code}`);
     return {
@@ -249,12 +307,16 @@ async function checkQuestionnaireCompletionWithRole(
  * Get auto-questionnaires for a specific visit type
  */
 export function getVisitAutoQuestionnaires(
-  visitType: string
-): Array<{ definition: QuestionnaireDefinition; estimatedTime: number; category: 'etat' | 'traits' | 'screening' }> {
+  visitType: string,
+  pathologyType?: string
+): Array<{ definition: QuestionnaireDefinition; estimatedTime: number; category: 'etat' | 'traits' | 'screening' | 'autoquestionnaire' }> {
   switch (visitType) {
     case 'screening':
       return SCREENING_AUTO_QUESTIONNAIRES;
     case 'initial_evaluation':
+      if (pathologyType === 'schizophrenia') {
+        return SZ_INITIAL_EVAL_AUTO_QUESTIONNAIRES;
+      }
       return [
         ...INITIAL_EVAL_ETAT_QUESTIONNAIRES,
         ...INITIAL_EVAL_TRAITS_QUESTIONNAIRES
@@ -270,9 +332,10 @@ export function getVisitAutoQuestionnaires(
 export async function getQuestionnaireCompletionForVisit(
   visitId: string,
   visitType: string,
-  patientUserId: string
+  patientUserId: string,
+  pathologyType?: string
 ): Promise<Map<string, QuestionnaireCompletionInfo>> {
-  const questionnaires = getVisitAutoQuestionnaires(visitType);
+  const questionnaires = getVisitAutoQuestionnaires(visitType, pathologyType);
   const completionMap = new Map<string, QuestionnaireCompletionInfo>();
   
   console.log(`[Patient Visit Service] Checking completion for visit ${visitId} (type: ${visitType}), ${questionnaires.length} questionnaires`);
@@ -280,7 +343,7 @@ export async function getQuestionnaireCompletionForVisit(
   const completionChecks = await Promise.all(
     questionnaires.map(async (q) => ({
       code: q.definition.code,
-      info: await checkQuestionnaireCompletionWithRole(visitId, q.definition.code, patientUserId)
+      info: await checkQuestionnaireCompletionWithRole(visitId, q.definition.code, patientUserId, pathologyType)
     }))
   );
   
@@ -300,14 +363,15 @@ export async function getPatientVisitsWithQuestionnaires(
 ): Promise<PatientVisitWithQuestionnaires[]> {
   const supabase = await createClient();
   
-  // Get the patient's user_id for role checking
+  // Get the patient's user_id and pathology for role checking and questionnaire selection
   const { data: patient } = await supabase
     .from('patients')
-    .select('user_id')
+    .select('user_id, pathology_type')
     .eq('id', patientId)
     .single();
   
   const patientUserId = patient?.user_id || '';
+  const patientPathologyType = patient?.pathology_type || '';
   
   // Fetch all active visits (scheduled, in_progress, or completed)
   // Patients should be able to see and review all their visits
@@ -336,11 +400,12 @@ export async function getPatientVisitsWithQuestionnaires(
   // Process each visit to include questionnaire details
   const visitsWithQuestionnaires = await Promise.all(
     visits.map(async (visit) => {
-      const autoQuestionnaires = getVisitAutoQuestionnaires(visit.visit_type);
+      const autoQuestionnaires = getVisitAutoQuestionnaires(visit.visit_type, patientPathologyType);
       const completionMap = await getQuestionnaireCompletionForVisit(
         visit.id,
         visit.visit_type,
-        patientUserId
+        patientUserId,
+        patientPathologyType
       );
       
       const questionnaires: PatientQuestionnaire[] = autoQuestionnaires.map((q) => {

@@ -274,7 +274,7 @@ function VisitQuestionnaireCard({
       {/* Questionnaires List */}
       <div className="p-5 space-y-3">
         {/* Group by category */}
-        {["screening", "etat", "traits"].map((category) => {
+        {["screening", "etat", "traits", "autoquestionnaire"].map((category) => {
           const categoryQuestionnaires = visitData.questionnaires.filter(
             (q) => q.category === category
           );
@@ -284,6 +284,7 @@ function VisitQuestionnaireCard({
             screening: "Questionnaires de Depistage",
             etat: "Questionnaires ETAT (Etat Actuel)",
             traits: "Questionnaires TRAITS",
+            autoquestionnaire: "Autoquestionnaires",
           };
 
           return (
