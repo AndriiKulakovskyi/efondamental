@@ -2,11 +2,11 @@
 // Re-exports all medical questionnaires for schizophrenia initial evaluation
 
 export {
-  TROUBLES_PSYCHOTIQUES_QUESTIONS,
-  TROUBLES_PSYCHOTIQUES_DEFINITION,
-  type SchizophreniaTroublesPsychotiquesResponse,
-  type SchizophreniaTroublesPsychotiquesResponseInsert
-} from './troubles-psychotiques';
+  TROUBLES_PSYCHOTIQUES_INITIAL_QUESTIONS,
+  TROUBLES_PSYCHOTIQUES_INITIAL_DEFINITION,
+  type SchizophreniaTroublesPsychotiquesInitialResponse,
+  type SchizophreniaTroublesPsychotiquesInitialResponseInsert
+} from './troubles-psychotiques-initial';
 
 export {
   TROUBLES_COMORBIDES_SZ_QUESTIONS,

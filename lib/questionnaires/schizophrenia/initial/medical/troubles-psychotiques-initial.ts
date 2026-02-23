@@ -1,6 +1,7 @@
-// eFondaMental Platform - Troubles Psychotiques Assessment
+// eFondaMental Platform - Troubles Psychotiques Initial Assessment
 // Comprehensive psychotic disorders evaluation including disorder classification,
 // symptoms inventory, episode history, hospitalizations, and treatment
+// Used for initial evaluation visits only
 
 import { Question, QuestionOption } from "@/lib/types/database.types";
 
@@ -8,7 +9,7 @@ import { Question, QuestionOption } from "@/lib/types/database.types";
 // Types
 // ============================================================================
 
-export interface SchizophreniaTroublesPsychotiquesResponse {
+export interface SchizophreniaTroublesPsychotiquesInitialResponse {
   id: string;
   visit_id: string;
   patient_id: string;
@@ -19,8 +20,8 @@ export interface SchizophreniaTroublesPsychotiquesResponse {
   updated_at?: string;
 }
 
-export type SchizophreniaTroublesPsychotiquesResponseInsert = Omit<
-  SchizophreniaTroublesPsychotiquesResponse,
+export type SchizophreniaTroublesPsychotiquesInitialResponseInsert = Omit<
+  SchizophreniaTroublesPsychotiquesInitialResponse,
   "id" | "created_at" | "updated_at" | "completed_at"
 >;
 
@@ -179,7 +180,7 @@ const AIDE_PRISE_TRAITEMENT_OPTIONS: QuestionOption[] = [
 // Questions
 // ============================================================================
 
-export const TROUBLES_PSYCHOTIQUES_QUESTIONS: Question[] = [
+export const TROUBLES_PSYCHOTIQUES_INITIAL_QUESTIONS: Question[] = [
   // Classification section
   {
     id: "section_classification",
@@ -849,15 +850,15 @@ export interface QuestionnaireDefinition {
   };
 }
 
-export const TROUBLES_PSYCHOTIQUES_DEFINITION: QuestionnaireDefinition = {
-  id: "troubles_psychotiques",
-  code: "TROUBLES_PSYCHOTIQUES",
-  title: "Troubles psychotiques",
+export const TROUBLES_PSYCHOTIQUES_INITIAL_DEFINITION: QuestionnaireDefinition = {
+  id: "troubles_psychotiques_initial",
+  code: "TROUBLES_PSYCHOTIQUES_INITIAL",
+  title: "Troubles psychotiques (initial)",
   description:
     "Evaluation complete des troubles psychotiques incluant la classification des troubles, les caracteristiques vie entiere, l'inventaire des symptomes (positifs et negatifs), l'historique des episodes, les hospitalisations, le mode evolutif et le suivi annuel.",
   instructions:
     "Ce questionnaire doit etre administre par un clinicien forme. Evaluer systematiquement chaque section. Periode de reference: Vie entiere et 12 derniers mois.",
-  questions: TROUBLES_PSYCHOTIQUES_QUESTIONS,
+  questions: TROUBLES_PSYCHOTIQUES_INITIAL_QUESTIONS,
   metadata: {
     singleColumn: false,
     pathologies: ["schizophrenia"],

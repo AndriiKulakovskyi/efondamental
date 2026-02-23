@@ -146,7 +146,8 @@ import {
   UKU_DEFINITION,
   ECV_DEFINITION,
   ISA_SZ_DEFINITION,
-  TROUBLES_PSYCHOTIQUES_DEFINITION,
+  TROUBLES_PSYCHOTIQUES_INITIAL_DEFINITION,
+  TROUBLES_PSYCHOTIQUES_ANNUEL_DEFINITION,
   SUICIDE_HISTORY_SZ_DEFINITION,
   TEA_COFFEE_SZ_DEFINITION,
   ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
@@ -756,7 +757,7 @@ function schizophreniaModules(isAnnual: boolean = false): VirtualModule[] {
           id: 'dsm5',
           name: 'DSM5',
           questionnaires: [
-            q(TROUBLES_PSYCHOTIQUES_DEFINITION, 'healthcare_professional'),
+            q(isAnnual ? TROUBLES_PSYCHOTIQUES_ANNUEL_DEFINITION : TROUBLES_PSYCHOTIQUES_INITIAL_DEFINITION, 'healthcare_professional'),
             q(TROUBLES_COMORBIDES_SZ_DEFINITION, 'healthcare_professional'),
           ],
         },

@@ -137,7 +137,8 @@ import {
   SANS_DEFINITION,
   UKU_DEFINITION,
   ECV_DEFINITION,
-  TROUBLES_PSYCHOTIQUES_DEFINITION,
+  TROUBLES_PSYCHOTIQUES_INITIAL_DEFINITION,
+  TROUBLES_PSYCHOTIQUES_ANNUEL_DEFINITION,
   ISA_SZ_DEFINITION,
   SUICIDE_HISTORY_SZ_DEFINITION,
   ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
@@ -304,7 +305,8 @@ import {
   getUkuResponse,
   getPspResponse,
   getEcvResponse,
-  getTroublesPsychotiquesResponse,
+  getTroublesPsychotiquesInitialResponse,
+  getTroublesPsychotiquesAnnuelResponse,
   getTroublesComorbidesSzResponse,
   getSuicideHistorySzResponse,
   getAntecedentsFamiliauxPsySzResponse,
@@ -728,8 +730,10 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === UKU_DEFINITION.code) questionnaire = UKU_DEFINITION;
   // Schizophrenia medical evaluation
   else if (code === ECV_DEFINITION.code) questionnaire = ECV_DEFINITION;
-  else if (code === TROUBLES_PSYCHOTIQUES_DEFINITION.code)
-    questionnaire = TROUBLES_PSYCHOTIQUES_DEFINITION;
+  else if (code === TROUBLES_PSYCHOTIQUES_INITIAL_DEFINITION.code)
+    questionnaire = TROUBLES_PSYCHOTIQUES_INITIAL_DEFINITION;
+  else if (code === TROUBLES_PSYCHOTIQUES_ANNUEL_DEFINITION.code)
+    questionnaire = TROUBLES_PSYCHOTIQUES_ANNUEL_DEFINITION;
   else if (code === TROUBLES_COMORBIDES_SZ_DEFINITION.code)
     questionnaire = TROUBLES_COMORBIDES_SZ_DEFINITION;
   else if (code === ISA_SZ_DEFINITION.code)
@@ -1061,8 +1065,10 @@ export default async function ProfessionalQuestionnairePage({
   // Schizophrenia medical evaluation
   else if (code === ECV_DEFINITION.code)
     existingResponse = await getEcvResponse(visitId);
-  else if (code === TROUBLES_PSYCHOTIQUES_DEFINITION.code)
-    existingResponse = await getTroublesPsychotiquesResponse(visitId);
+  else if (code === TROUBLES_PSYCHOTIQUES_INITIAL_DEFINITION.code)
+    existingResponse = await getTroublesPsychotiquesInitialResponse(visitId);
+  else if (code === TROUBLES_PSYCHOTIQUES_ANNUEL_DEFINITION.code)
+    existingResponse = await getTroublesPsychotiquesAnnuelResponse(visitId);
   else if (code === TROUBLES_COMORBIDES_SZ_DEFINITION.code)
     existingResponse = await getTroublesComorbidesSzResponse(visitId);
   else if (code === ISA_SZ_DEFINITION.code)

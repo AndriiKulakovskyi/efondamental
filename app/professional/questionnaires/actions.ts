@@ -274,7 +274,8 @@ function questionnaireCodeToSchizophreniaKey(code: string): string | null {
     CGI_SZ: "CGI_SZ",
     EGF_SZ: "EGF_SZ",
     // Medical evaluation
-    TROUBLES_PSYCHOTIQUES: "TROUBLES_PSYCHOTIQUES",
+    TROUBLES_PSYCHOTIQUES_INITIAL: "TROUBLES_PSYCHOTIQUES_INITIAL",
+    TROUBLES_PSYCHOTIQUES_ANNUEL: "TROUBLES_PSYCHOTIQUES_ANNUEL",
     TROUBLES_COMORBIDES_SZ: "TROUBLES_COMORBIDES_SZ",
     ISA: "ISA_SZ", // Map ISA to ISA_SZ for schizophrenia
     ISA_SZ: "ISA_SZ",

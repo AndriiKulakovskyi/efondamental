@@ -8,6 +8,9 @@ export * from './screening';
 // Initial evaluation questionnaires (22 questionnaires across 6 modules)
 export * as initial from './initial';
 
+// Annual evaluation questionnaires
+export * from './annual';
+
 // Re-export commonly used definitions for convenience
 export {
   SZ_DIAGNOSTIC_DEFINITION,
@@ -38,7 +41,7 @@ export {
 } from './initial/hetero';
 
 export {
-  TROUBLES_PSYCHOTIQUES_DEFINITION,
+  TROUBLES_PSYCHOTIQUES_INITIAL_DEFINITION,
   TROUBLES_COMORBIDES_SZ_DEFINITION,
   ISA_SZ_DEFINITION,
   SUICIDE_HISTORY_SZ_DEFINITION,
