@@ -692,7 +692,26 @@ function bipolarAutoEtatModule(): VirtualModule {
   };
 }
 
-function schizophreniaModules(): VirtualModule[] {
+function schizophreniaModules(isAnnual: boolean = false): VirtualModule[] {
+  const autoQuestionnaires = [
+    q(CBQ_SZ_DEFINITION, 'patient'),
+    q(DACOBS_SZ_DEFINITION, 'patient'),
+    q(SQOL_SZ_DEFINITION, 'patient'),
+    ...(!isAnnual ? [q(CTQ_SZ_DEFINITION, 'patient')] : []),
+    q(MARS_SZ_DEFINITION, 'patient'),
+    q(BIS_SZ_DEFINITION, 'patient'),
+    q(EQ5D5L_SZ_DEFINITION, 'patient'),
+    q(IPAQ_SZ_DEFINITION, 'patient'),
+    q(YBOCS_SZ_DEFINITION, 'patient'),
+    ...(!isAnnual ? [q(WURS25_SZ_DEFINITION, 'patient')] : []),
+    q(STORI_SZ_DEFINITION, 'patient'),
+    q(SOGS_SZ_DEFINITION, 'patient'),
+    q(PSQI_SZ_DEFINITION, 'patient'),
+    q(PRESENTEISME_SZ_DEFINITION, 'patient'),
+    q(FAGERSTROM_SZ_DEFINITION, 'patient'),
+    q(BRIEF_A_AUTO_SZ_DEFINITION, 'patient'),
+  ];
+
   return [
     {
       id: 'mod_nurse',
@@ -816,36 +835,19 @@ function schizophreniaModules(): VirtualModule[] {
         },
       ],
     },
-    {
+    ...(!isAnnual ? [{
       id: 'mod_social_sz',
       name: 'Social',
       description: 'Évaluation sociale',
       questionnaires: [
         q(BILAN_SOCIAL_SZ_DEFINITION, 'healthcare_professional'),
       ],
-    },
+    }] : []),
     {
       id: 'mod_auto_sz',
       name: 'Autoquestionnaires',
       description: 'Questionnaires remplis par le patient',
-      questionnaires: [
-        q(CBQ_SZ_DEFINITION, 'patient'),
-        q(DACOBS_SZ_DEFINITION, 'patient'),
-        q(SQOL_SZ_DEFINITION, 'patient'),
-        q(CTQ_SZ_DEFINITION, 'patient'),
-        q(MARS_SZ_DEFINITION, 'patient'),
-        q(BIS_SZ_DEFINITION, 'patient'),
-        q(EQ5D5L_SZ_DEFINITION, 'patient'),
-        q(IPAQ_SZ_DEFINITION, 'patient'),
-        q(YBOCS_SZ_DEFINITION, 'patient'),
-        q(WURS25_SZ_DEFINITION, 'patient'),
-        q(STORI_SZ_DEFINITION, 'patient'),
-        q(SOGS_SZ_DEFINITION, 'patient'),
-        q(PSQI_SZ_DEFINITION, 'patient'),
-        q(PRESENTEISME_SZ_DEFINITION, 'patient'),
-        q(FAGERSTROM_SZ_DEFINITION, 'patient'),
-        q(BRIEF_A_AUTO_SZ_DEFINITION, 'patient'),
-      ],
+      questionnaires: autoQuestionnaires,
     },
     {
       id: 'mod_auto_entourage_sz',
@@ -1032,7 +1034,7 @@ export function getVisitModules(visitType: string, pathologyType: string): Virtu
   // ─── ANNUAL EVALUATION ───────────────────────────────────────────────
   if (visitType === 'annual_evaluation') {
     if (pathologyType === 'schizophrenia') {
-      return schizophreniaModules();
+      return schizophreniaModules(true);
     }
     return [
       bipolarNurseModule(),
