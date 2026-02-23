@@ -170,6 +170,7 @@ import {
   PRESENTEISME_SZ_DEFINITION,
   FAGERSTROM_SZ_DEFINITION,
   BRIEF_A_AUTO_SZ_DEFINITION,
+  ONAPS_SZ_DEFINITION,
   EPHP_SZ_DEFINITION,
   SZ_CVLT_DEFINITION,
   TMT_SZ_DEFINITION,
@@ -712,6 +713,7 @@ function schizophreniaModules(isAnnual: boolean = false): VirtualModule[] {
     q(PRESENTEISME_SZ_DEFINITION, 'patient'),
     q(FAGERSTROM_SZ_DEFINITION, 'patient'),
     q(BRIEF_A_AUTO_SZ_DEFINITION, 'patient'),
+    q(ONAPS_SZ_DEFINITION, 'patient'),
   ];
 
   return [

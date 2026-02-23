@@ -8,6 +8,7 @@ import { computeUkuScores } from "@/lib/questionnaires/schizophrenia/initial/het
 import { calculateCvltScores, CvltRawData } from "@/lib/services/cvlt-scoring";
 import { calculateStroopScores } from "@/lib/services/stroop-scoring";
 import { calculateFluencesVerbalesScores } from "@/lib/services/fluences-verbales-scoring";
+import { computeOnapsScores } from "@/lib/questionnaires/schizophrenia/initial/auto/onaps";
 import { BRIEF_NORMS_HETERO } from "@/lib/constants/brief-a/hetero";
 import { AgeBand, NormPoint } from "@/lib/constants/brief-a/types";
 
@@ -81,6 +82,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   BIS_SZ: "schizophrenia_bis",
   EQ5D5L_SZ: "schizophrenia_eq5d5l",
   IPAQ_SZ: "schizophrenia_ipaq",
+  ONAPS_SZ: "schizophrenia_onaps",
   YBOCS_SZ: "schizophrenia_ybocs",
   WURS25_SZ: "schizophrenia_wurs25",
   STORI_SZ: "schizophrenia_stori",
@@ -210,6 +212,8 @@ export async function saveSchizophreniaInitialResponse<
       return (await saveEq5d5lSzResponse(response)) as any as T;
     case "IPAQ_SZ":
       return (await saveIpaqSzResponse(response)) as any as T;
+    case "ONAPS_SZ":
+      return (await saveOnapsSzResponse(response)) as any as T;
     case "YBOCS_SZ":
       return (await saveYbocsResponse(response)) as any as T;
     case "WURS25_SZ":
@@ -457,6 +461,24 @@ export async function saveBilanSocialSzResponse(response: any): Promise<any> {
 // Auto module (patient self-administered)
 export async function getSqolResponse(visitId: string) {
   return getSchizophreniaInitialResponse("SQOL_SZ", visitId);
+}
+
+export async function getOnapsSzResponse(visitId: string) {
+  const data = await getSchizophreniaInitialResponse("ONAPS_SZ", visitId);
+  if (!data) return data;
+  // Convert DB hours/minutes into HH:MM _time fields for the form
+  const d = data as any;
+  d.work_vigorous_time = formatHHMM(d.work_vigorous_hours, d.work_vigorous_minutes);
+  d.work_moderate_time = formatHHMM(d.work_moderate_hours, d.work_moderate_minutes);
+  d.work_sitting_time = formatHHMM(d.work_sitting_hours, d.work_sitting_minutes);
+  d.transport_walking_time = formatHHMM(d.transport_walking_hours, d.transport_walking_minutes);
+  d.transport_bicycle_time = formatHHMM(d.transport_bicycle_hours, d.transport_bicycle_minutes);
+  d.transport_motorized_time = formatHHMM(d.transport_motorized_hours, d.transport_motorized_minutes);
+  d.leisure_vigorous_time = formatHHMM(d.leisure_vigorous_hours, d.leisure_vigorous_minutes);
+  d.leisure_moderate_time = formatHHMM(d.leisure_moderate_hours, d.leisure_moderate_minutes);
+  d.leisure_screen_time = formatHHMM(d.leisure_screen_hours, d.leisure_screen_minutes);
+  d.leisure_other_time = formatHHMM(d.leisure_other_hours, d.leisure_other_minutes);
+  return d;
 }
 
 export async function getCtqResponse(visitId: string) {
@@ -2541,6 +2563,133 @@ function interpretIpaqScore(
   interpretation += `Temps assis: ${Math.round(sittingWeekday)} min/jour (semaine), ${Math.round(sittingWeekend)} min/jour (week-end).`;
 
   return interpretation;
+}
+
+// ============================================================================
+// ONAPS Helper: Parse "HH:MM" string into { hours, minutes }
+// ============================================================================
+
+function parseHHMM(value: string | null | undefined): { hours: number; minutes: number } {
+  if (!value || typeof value !== "string") return { hours: 0, minutes: 0 };
+  const match = value.match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return { hours: 0, minutes: 0 };
+  return { hours: parseInt(match[1], 10), minutes: parseInt(match[2], 10) };
+}
+
+function formatHHMM(hours: number | null, minutes: number | null): string | null {
+  if (hours == null && minutes == null) return null;
+  const h = String(hours || 0).padStart(2, "0");
+  const m = String(minutes || 0).padStart(2, "0");
+  return `${h}:${m}`;
+}
+
+/**
+ * Save ONAPS response with HH:MM parsing and score computation
+ */
+export async function saveOnapsSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  if (response.questionnaire_done === "Non fait") {
+    const { data, error } = await supabase
+      .from("schizophrenia_onaps")
+      .upsert(
+        {
+          visit_id: response.visit_id,
+          patient_id: response.patient_id,
+          questionnaire_done: response.questionnaire_done,
+          completed_by: user.data.user?.id,
+        },
+        { onConflict: "visit_id" },
+      )
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error saving schizophrenia_onaps (not done):", error);
+      throw error;
+    }
+    return data;
+  }
+
+  // Remove section/instruction fields that shouldn't be saved to DB
+  const {
+    instruction_consigne,
+    section_work,
+    section_transport,
+    section_leisure,
+    section_scores,
+    // Remove _time fields (we'll parse them into _hours/_minutes)
+    work_vigorous_time,
+    work_moderate_time,
+    work_sitting_time,
+    transport_walking_time,
+    transport_bicycle_time,
+    transport_motorized_time,
+    leisure_vigorous_time,
+    leisure_moderate_time,
+    leisure_screen_time,
+    leisure_other_time,
+    ...responseData
+  } = response;
+
+  // Parse HH:MM strings into separate hours/minutes
+  const wv = parseHHMM(work_vigorous_time);
+  const wm = parseHHMM(work_moderate_time);
+  const ws = parseHHMM(work_sitting_time);
+  const tw = parseHHMM(transport_walking_time);
+  const tb = parseHHMM(transport_bicycle_time);
+  const tm = parseHHMM(transport_motorized_time);
+  const lv = parseHHMM(leisure_vigorous_time);
+  const lm = parseHHMM(leisure_moderate_time);
+  const ls = parseHHMM(leisure_screen_time);
+  const lo = parseHHMM(leisure_other_time);
+
+  const parsedData = {
+    ...responseData,
+    work_vigorous_hours: wv.hours,
+    work_vigorous_minutes: wv.minutes,
+    work_moderate_hours: wm.hours,
+    work_moderate_minutes: wm.minutes,
+    work_sitting_hours: ws.hours,
+    work_sitting_minutes: ws.minutes,
+    transport_walking_hours: tw.hours,
+    transport_walking_minutes: tw.minutes,
+    transport_bicycle_hours: tb.hours,
+    transport_bicycle_minutes: tb.minutes,
+    transport_motorized_hours: tm.hours,
+    transport_motorized_minutes: tm.minutes,
+    leisure_vigorous_hours: lv.hours,
+    leisure_vigorous_minutes: lv.minutes,
+    leisure_moderate_hours: lm.hours,
+    leisure_moderate_minutes: lm.minutes,
+    leisure_screen_hours: ls.hours,
+    leisure_screen_minutes: ls.minutes,
+    leisure_other_hours: lo.hours,
+    leisure_other_minutes: lo.minutes,
+  };
+
+  // Compute scores
+  const scores = computeOnapsScores(parsedData);
+
+  const { data, error } = await supabase
+    .from("schizophrenia_onaps")
+    .upsert(
+      {
+        ...parsedData,
+        ...scores,
+        completed_by: user.data.user?.id,
+      },
+      { onConflict: "visit_id" },
+    )
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error saving schizophrenia_onaps:", error);
+    throw error;
+  }
+  return data;
 }
 
 /**
