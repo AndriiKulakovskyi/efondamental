@@ -42,6 +42,7 @@ import { calculateWais4CodeSymbolesScores } from "@/lib/services/wais4-code-scor
 import { calculateDigitSpanScores } from "@/lib/services/wais4-digit-span-scoring";
 import { Loader2, ChevronDown, Info } from "lucide-react";
 import { calculateCvltScores } from "@/lib/services/cvlt-scoring";
+import { computeOnapsScores } from "@/lib/questionnaires/schizophrenia/initial/auto/onaps";
 
 interface QuestionnaireRendererProps {
   questionnaire: QuestionnaireDefinition;
@@ -2494,6 +2495,159 @@ export function QuestionnaireRenderer({
     responses.rad_tb_hum_nbepdep,
     responses.rad_tb_hum_nbepmanan,
     responses.rad_tb_hum_nbephypoman
+  ]);
+
+  // Auto-calculate ONAPS scores only when ALL required items for each score are answered
+  useEffect(() => {
+    if (questionnaire?.code !== 'ONAPS_SZ') return;
+
+    const parseHHMM = (val: any): { hours: number; minutes: number } | null => {
+      if (!val || typeof val !== 'string') return null;
+      const match = val.match(/^(\d{1,2}):(\d{2})$/);
+      if (!match) return null;
+      return { hours: parseInt(match[1], 10), minutes: parseInt(match[2], 10) };
+    };
+
+    // Check if a (days, time) pair is complete:
+    // - days must be answered (not null/undefined/empty)
+    // - if days > 0, time must also be filled in (valid HH:MM)
+    // - if days == 0, time is not needed (contribution is 0)
+    const isPairComplete = (daysVal: any, timeVal: any): boolean => {
+      if (daysVal == null || daysVal === '') return false;
+      const days = Number(daysVal);
+      if (isNaN(days)) return false;
+      if (days > 0 && !parseHHMM(timeVal)) return false;
+      return true;
+    };
+
+    // Check if a standalone time field is filled
+    const isTimeComplete = (timeVal: any): boolean => {
+      return parseHHMM(timeVal) !== null;
+    };
+
+    setResponses((prev) => {
+      const updated = { ...prev };
+      let hasChanges = false;
+
+      const safeHHMM = (val: any) => parseHHMM(val) || { hours: 0, minutes: 0 };
+
+      // --- VPA dependencies: work_vigorous + leisure_vigorous ---
+      const vpaComplete = isPairComplete(prev.work_vigorous_days, prev.work_vigorous_time)
+        && isPairComplete(prev.leisure_vigorous_days, prev.leisure_vigorous_time);
+
+      // --- MPA dependencies: work_moderate + transport_walking + transport_bicycle + leisure_moderate ---
+      const mpaComplete = isPairComplete(prev.work_moderate_days, prev.work_moderate_time)
+        && isPairComplete(prev.transport_walking_days, prev.transport_walking_time)
+        && isPairComplete(prev.transport_bicycle_days, prev.transport_bicycle_time)
+        && isPairComplete(prev.leisure_moderate_days, prev.leisure_moderate_time);
+
+      // --- SB dependencies: work_sitting + transport_motorized + leisure_screen + leisure_other ---
+      const sbComplete = isTimeComplete(prev.work_sitting_time)
+        && isPairComplete(prev.transport_motorized_days, prev.transport_motorized_time)
+        && isPairComplete(prev.leisure_screen_days, prev.leisure_screen_time)
+        && isPairComplete(prev.leisure_other_days, prev.leisure_other_time);
+
+      // Compute full scores (always safe, defaults to 0 for missing)
+      const scores = computeOnapsScores({
+        work_vigorous_days: prev.work_vigorous_days != null ? Number(prev.work_vigorous_days) : null,
+        work_vigorous_hours: safeHHMM(prev.work_vigorous_time).hours,
+        work_vigorous_minutes: safeHHMM(prev.work_vigorous_time).minutes,
+        work_moderate_days: prev.work_moderate_days != null ? Number(prev.work_moderate_days) : null,
+        work_moderate_hours: safeHHMM(prev.work_moderate_time).hours,
+        work_moderate_minutes: safeHHMM(prev.work_moderate_time).minutes,
+        work_sitting_hours: safeHHMM(prev.work_sitting_time).hours,
+        work_sitting_minutes: safeHHMM(prev.work_sitting_time).minutes,
+        transport_walking_days: prev.transport_walking_days != null ? Number(prev.transport_walking_days) : null,
+        transport_walking_hours: safeHHMM(prev.transport_walking_time).hours,
+        transport_walking_minutes: safeHHMM(prev.transport_walking_time).minutes,
+        transport_bicycle_days: prev.transport_bicycle_days != null ? Number(prev.transport_bicycle_days) : null,
+        transport_bicycle_hours: safeHHMM(prev.transport_bicycle_time).hours,
+        transport_bicycle_minutes: safeHHMM(prev.transport_bicycle_time).minutes,
+        transport_motorized_days: prev.transport_motorized_days != null ? Number(prev.transport_motorized_days) : null,
+        transport_motorized_hours: safeHHMM(prev.transport_motorized_time).hours,
+        transport_motorized_minutes: safeHHMM(prev.transport_motorized_time).minutes,
+        leisure_vigorous_days: prev.leisure_vigorous_days != null ? Number(prev.leisure_vigorous_days) : null,
+        leisure_vigorous_hours: safeHHMM(prev.leisure_vigorous_time).hours,
+        leisure_vigorous_minutes: safeHHMM(prev.leisure_vigorous_time).minutes,
+        leisure_moderate_days: prev.leisure_moderate_days != null ? Number(prev.leisure_moderate_days) : null,
+        leisure_moderate_hours: safeHHMM(prev.leisure_moderate_time).hours,
+        leisure_moderate_minutes: safeHHMM(prev.leisure_moderate_time).minutes,
+        leisure_screen_days: prev.leisure_screen_days != null ? Number(prev.leisure_screen_days) : null,
+        leisure_screen_hours: safeHHMM(prev.leisure_screen_time).hours,
+        leisure_screen_minutes: safeHHMM(prev.leisure_screen_time).minutes,
+        leisure_other_days: prev.leisure_other_days != null ? Number(prev.leisure_other_days) : null,
+        leisure_other_hours: safeHHMM(prev.leisure_other_time).hours,
+        leisure_other_minutes: safeHHMM(prev.leisure_other_time).minutes,
+      });
+
+      // Helper: set field to value or clear it
+      const setField = (key: string, value: any) => {
+        if (updated[key] !== value) {
+          updated[key] = value;
+          hasChanges = true;
+        }
+      };
+      const clearField = (key: string) => {
+        if (updated[key] !== undefined && updated[key] !== '' && updated[key] !== null) {
+          updated[key] = '';
+          hasChanges = true;
+        }
+      };
+
+      // VPA / VPAMET
+      if (vpaComplete) {
+        setField('vpa_duration', scores.vpa_duration);
+        setField('vpamet', scores.vpamet);
+      } else {
+        clearField('vpa_duration');
+        clearField('vpamet');
+      }
+
+      // MPA / MPAMET
+      if (mpaComplete) {
+        setField('mpa_duration', scores.mpa_duration);
+        setField('mpamet', scores.mpamet);
+      } else {
+        clearField('mpa_duration');
+        clearField('mpamet');
+      }
+
+      // MVPA / APtot (need both VPA and MPA complete)
+      if (vpaComplete && mpaComplete) {
+        setField('mvpa_duration', scores.mvpa_duration);
+        setField('mvpa_interpretation', scores.mvpa_interpretation);
+        setField('aptot', scores.aptot);
+        setField('aptot_interpretation', scores.aptot_interpretation);
+      } else {
+        clearField('mvpa_duration');
+        clearField('mvpa_interpretation');
+        clearField('aptot');
+        clearField('aptot_interpretation');
+      }
+
+      // SB
+      if (sbComplete) {
+        setField('sb_duration', scores.sb_duration);
+        setField('sedentarity_interpretation', scores.sedentarity_interpretation);
+      } else {
+        clearField('sb_duration');
+        clearField('sedentarity_interpretation');
+      }
+
+      return hasChanges ? updated : prev;
+    });
+  }, [
+    questionnaire.code,
+    responses.work_vigorous_days, responses.work_vigorous_time,
+    responses.work_moderate_days, responses.work_moderate_time,
+    responses.work_sitting_time,
+    responses.transport_walking_days, responses.transport_walking_time,
+    responses.transport_bicycle_days, responses.transport_bicycle_time,
+    responses.transport_motorized_days, responses.transport_motorized_time,
+    responses.leisure_vigorous_days, responses.leisure_vigorous_time,
+    responses.leisure_moderate_days, responses.leisure_moderate_time,
+    responses.leisure_screen_days, responses.leisure_screen_time,
+    responses.leisure_other_days, responses.leisure_other_time,
   ]);
 
   const handleResponseChange = (questionId: string, value: any) => {

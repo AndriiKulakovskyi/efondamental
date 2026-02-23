@@ -201,24 +201,28 @@ export function computeOnapsScores(responses: {
 
 
     // === Sitting Behavior (Sédentarité) ===
-    // Total sitting per day = work sitting per day + motorized transport per day + leisure screen per day + leisure other sitting per day
-    // Since we assume the user reported typical per-day duration when these occur
+    // SB = A7 + [(B18 x B19) + (C24 x C25) + (C27 x C28)] / 7
+    // A7 = work_sitting (already per day), rest are weekly totals divided by 7
     const workSittingMin = minutesPerDay(responses.work_sitting_hours, responses.work_sitting_minutes);
 
     const motorizedMin = minutesPerDay(responses.transport_motorized_hours, responses.transport_motorized_minutes);
-    // (Note: motorized_days max is 10 in UI, but we calculate per day average or consider it as average day)
+    const motorizedDays = responses.transport_motorized_days || 0;
 
     const leisureScreenMin = minutesPerDay(responses.leisure_screen_hours, responses.leisure_screen_minutes);
-    const leisureOtherMin = minutesPerDay(responses.leisure_other_hours, responses.leisure_other_minutes);
+    const leisureScreenDays = responses.leisure_screen_days || 0;
 
-    // To get a simple average min/jour of sedentary time (SB duration), one standard way is adding the usual times:
-    // Usually sitting measures the typical day:
-    let sb_duration = workSittingMin + motorizedMin + leisureScreenMin + leisureOtherMin;
+    const leisureOtherMin = minutesPerDay(responses.leisure_other_hours, responses.leisure_other_minutes);
+    const leisureOtherDays = responses.leisure_other_days || 0;
+
+    const sb_duration = Math.round(
+        workSittingMin +
+        ((motorizedDays * motorizedMin) + (leisureScreenDays * leisureScreenMin) + (leisureOtherDays * leisureOtherMin)) / 7
+    );
 
     // Interpretations
     const mvpa_interpretation = mvpa_duration < 150 ? 'INACTIF' : 'ACTIF';
-    const aptot_interpretation = aptot < 600 ? 'INACTIF' : 'ACTIF';
-    const sedentarity_interpretation = mvpa_duration < 180 ? 'Sédentarité faible' : 'Sédentarité normale/élevée';
+    const aptot_interpretation = aptot > 1500 ? 'Très actif' : aptot >= 600 ? 'Actif' : 'Inactif';
+    const sedentarity_interpretation = sb_duration < 180 ? 'Sédentarité faible' : sb_duration <= 420 ? 'Sédentarité modérée' : 'Sédentarité élevée';
 
     return {
         vpa_duration,
@@ -262,7 +266,8 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         id: 'instruction_consigne',
         text: 'Ce questionnaire, inspiré de l’ONAPS a été conçu pour évaluer votre activité physique au quotidien lors des 7 derniers jours.\n\nLes activités physiques de forte intensité sont des activités nécessitant un effort physique important et causant une augmentation conséquente de la respiration ou du rythme cardiaque.\n\nLes activités physiques d\'intensité modérée sont des activités qui demandent un effort physique modéré et causant une petite augmentation de la respiration ou du rythme cardiaque.\n\nEn répondant aux questions suivantes, pensez uniquement aux exercices physiques que vous avez réalisé pendant au moins 10 minutes consécutives.',
         type: 'instruction',
-        required: false
+        required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
 
     // ========== PARTIE A : ACTIVITÉS AU TRAVAIL ==========
@@ -270,13 +275,15 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         id: 'section_work',
         text: 'Partie A : activités au travail',
         type: 'section',
-        required: false
+        required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
     {
         id: 'work_vigorous_days',
         text: '1) Habituellement, combien de jours par semaine effectuez-vous des tâches de forte intensité physique dans le cadre de votre travail ? (Mettre 0 si pas d\'activité de forte intensité)',
         type: 'single_choice',
         required: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         options: [
             { code: 0, label: '0', score: 0 },
             { code: 1, label: '1', score: 1 },
@@ -293,6 +300,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '2) Lorsque vous effectuez ces tâches de forte intensité au travail, combien de temps par jour en moyenne y consacrez-vous ?',
         type: 'text',
         required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: 'Format HH:MM (ex: 01:30 pour 1h30)',
         metadata: { placeholder: 'HH:MM' }
     },
@@ -301,6 +309,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '3) Habituellement, combien de jours par semaine effectuez-vous des tâches d\'intensité modérée dans le cadre de votre travail ? (Mettre 0 si pas d\'activité modérée)',
         type: 'single_choice',
         required: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         options: [
             { code: 0, label: '0', score: 0 },
             { code: 1, label: '1', score: 1 },
@@ -317,6 +326,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '4) Lorsque vous effectuez ces tâches d\'intensité modérée au travail, combien de temps en moyenne par jour y consacrez-vous ?',
         type: 'text',
         required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: 'Format HH:MM (ex: 01:30 pour 1h30)',
         metadata: { placeholder: 'HH:MM' }
     },
@@ -325,6 +335,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '5) Habituellement, combien de temps par jour en moyenne passez-vous assis pour votre travail ? (Mettre 0 si vous ne travaillez pas, ne pas compter les temps de repas)',
         type: 'text',
         required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: 'Format HH:MM (ex: 02:00 pour 2h00)',
         metadata: { placeholder: 'HH:MM' }
     },
@@ -335,13 +346,15 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: 'Partie B : Déplacements à but utilitaire',
         help: 'Les questions suivantes concernent la façon habituelle de vous déplacer d\'un endroit à un autre, par exemple aller au travail, faire des courses, aller au marché, aller chez un ami...',
         type: 'section',
-        required: false
+        required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
     {
         id: 'transport_walking_days',
         text: '6) Habituellement combien de jours par semaine en moyenne effectuez-vous des trajets à pied de plus de 10 minutes ? (mettre 0 si pas de trajets effectués à pied)',
         type: 'single_choice',
         required: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         options: [
             { code: 0, label: '0', score: 0 },
             { code: 1, label: '1', score: 1 },
@@ -358,6 +371,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '7) Lors d\'une journée durant laquelle vous effectuez des trajets à pied, combien de temps en moyenne y consacrez-vous ?',
         type: 'text',
         required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: 'Format HH:MM (ex: 00:45 pour 45min)',
         metadata: { placeholder: 'HH:MM' }
     },
@@ -366,6 +380,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '8) Habituellement combien de jours par semaine en moyenne effectuez-vous des trajets à vélo ou vélo à assistance électrique (VAE) ? (mettre 0 si pas de trajets)',
         type: 'single_choice',
         required: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         options: [
             { code: 0, label: '0', score: 0 },
             { code: 1, label: '1', score: 1 },
@@ -382,6 +397,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '9) Lors d\'une journée durant laquelle vous effectuez des trajets à vélo ou VAE, combien de temps en moyenne y consacrez-vous ?',
         type: 'text',
         required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: 'Format HH:MM (ex: 00:30 pour 30min)',
         metadata: { placeholder: 'HH:MM' }
     },
@@ -390,6 +406,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '10) Habituellement, combien de jours par semaine effectuez-vous des trajets avec des moyens de transport motorisés',
         type: 'single_choice',
         required: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         options: [
             { code: 0, label: '0', score: 0 },
             { code: 1, label: '1', score: 1 },
@@ -409,6 +426,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '11) Lors d\'une journée durant laquelle vous effectuez des trajets motorisés, combien de temps en moyenne durent l\'ensemble de ces trajets ?',
         type: 'text',
         required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: 'Format HH:MM (ex: 01:00 pour 1h)',
         metadata: { placeholder: 'HH:MM' }
     },
@@ -419,13 +437,15 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: 'Partie C : Activités de loisirs ou au domicile',
         help: 'Les questions suivantes excluent les activités liées au travail et aux déplacements que vous avez déjà mentionnées.',
         type: 'section',
-        required: false
+        required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
     {
         id: 'leisure_vigorous_days',
         text: '12) Habituellement, combien de jours par semaine pratiquez-vous des activités sportives ou des activités de loisirs de forte intensité',
         type: 'single_choice',
         required: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         options: [
             { code: 0, label: '0', score: 0 },
             { code: 1, label: '1', score: 1 },
@@ -442,6 +462,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '13) Lors d\'une journée durant laquelle vous pratiquez des activités sportives ou des activités de loisirs de forte intensité, combien de temps en moyenne y consacrez-vous ?',
         type: 'text',
         required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: 'Format HH:MM (ex: 01:30 pour 1h30)',
         metadata: { placeholder: 'HH:MM' }
     },
@@ -450,6 +471,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '14) Habituellement, combien de jours par semaine pratiquez-vous des activités sportives ou des activités de loisirs d\'intensité modérée ?',
         type: 'single_choice',
         required: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         options: [
             { code: 0, label: '0', score: 0 },
             { code: 1, label: '1', score: 1 },
@@ -466,6 +488,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '15) Lors d\'une journée durant laquelle vous pratiquez des activités sportives ou des activités de loisirs d\'intensité modérée, combien de temps en moyenne y consacrez-vous ?',
         type: 'text',
         required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: 'Format HH:MM (ex: 00:45 pour 45min)',
         metadata: { placeholder: 'HH:MM' }
     },
@@ -474,6 +497,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '16) Habituellement, lors de combien de jours par semaine passez-vous du temps devant un écran, chez vous ou lors de vos loisirs',
         type: 'single_choice',
         required: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         options: [
             { code: 0, label: '0', score: 0 },
             { code: 1, label: '1', score: 1 },
@@ -490,6 +514,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '17) Lors d\'une journée durant laquelle vous passez du temps devant l\'écran, combien de temps en moyenne y passez-vous, chez vous ou lors de vos loisirs ?',
         type: 'text',
         required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: 'Format HH:MM (ex: 03:00 pour 3h)',
         metadata: { placeholder: 'HH:MM' }
     },
@@ -498,6 +523,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '18) Habituellement, lors de combien de jours par semaine passez-vous du temps autre que devant un écran, chez vous ou lors de vos loisirs ?',
         type: 'single_choice',
         required: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         options: [
             { code: 0, label: '0', score: 0 },
             { code: 1, label: '1', score: 1 },
@@ -514,6 +540,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: '19) Lors d\'une journée durant laquelle vous passez du temps autre que devant l\'écran, combien de temps en moyenne y passez-vous, chez vous ou lors de vos loisirs ?',
         type: 'text',
         required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: 'Format HH:MM (ex: 02:00 pour 2h)',
         metadata: { placeholder: 'HH:MM' }
     },
@@ -523,13 +550,16 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         id: 'section_scores',
         text: 'Résultats',
         type: 'section',
-        required: false
+        required: false,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
     },
     {
         id: 'vpa_duration',
         text: 'Durée hebdomadaire d\'activité physique de forte intensité (VPA) :',
         type: 'number',
         required: false,
+        readonly: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: 'En minutes par semaine',
         metadata: { placeholder: 'min/semaine' }
     },
@@ -538,6 +568,8 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: 'Durée hebdomadaire d\'activité physique d\'intensité modérée (MPA) :',
         type: 'number',
         required: false,
+        readonly: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: 'En minutes par semaine',
         metadata: { placeholder: 'min/semaine' }
     },
@@ -546,6 +578,8 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: 'Durée hebdomadaire d\'activité physique d\'intensité modérée et de forte intensité (MVPA) :',
         type: 'number',
         required: false,
+        readonly: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: '(MVPA) < 150 min/semaine => INACTIF',
         metadata: { placeholder: 'min/semaine' }
     },
@@ -554,6 +588,8 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: 'Activité physique de forte intensité (VPAMET) :',
         type: 'number',
         required: false,
+        readonly: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         metadata: { placeholder: 'METs.min/semaine' }
     },
     {
@@ -561,6 +597,8 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: 'Activité physique d\'intensité modérée (MPAMET) :',
         type: 'number',
         required: false,
+        readonly: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         metadata: { placeholder: 'METs.min/semaine' }
     },
     {
@@ -568,6 +606,8 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: 'Activité totale en METs.min/semaine (APtot) :',
         type: 'number',
         required: false,
+        readonly: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: 'Inférieur à 600 METs.min par semaine => Inactif',
         metadata: { placeholder: 'METs.min/semaine' }
     },
@@ -576,8 +616,37 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: 'Comportement sédentaire (SB) :',
         type: 'number',
         required: false,
+        readonly: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
         help: 'Si activité faible inférieur à 180 min/j => Sédentarité faible',
         metadata: { placeholder: 'min/jour' }
+    },
+    {
+        id: 'mvpa_interpretation',
+        text: 'Interprétation MVPA :',
+        type: 'text',
+        required: false,
+        readonly: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
+        help: 'MVPA < 150 min/semaine => INACTIF, >= 150 => ACTIF'
+    },
+    {
+        id: 'aptot_interpretation',
+        text: 'Interprétation APtot :',
+        type: 'text',
+        required: false,
+        readonly: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
+        help: '> 1500 METs => Très actif, 600-1500 => Actif, < 600 => Inactif'
+    },
+    {
+        id: 'sedentarity_interpretation',
+        text: 'Interprétation Sédentarité :',
+        type: 'text',
+        required: false,
+        readonly: true,
+        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
+        help: '< 180 min/j => Faible, 180-420 => Modérée, > 420 => Élevée'
     }
 ];
 
