@@ -43,6 +43,8 @@ export function DatePicker({
   id,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
+  // Control the visible month to ensure we don't open on a fully disabled month
+  const [month, setMonth] = React.useState<Date | undefined>(undefined);
 
   const selectedDate = React.useMemo(() => {
     if (!value) return undefined;
@@ -78,6 +80,24 @@ export function DatePicker({
     return matchers.length > 0 ? matchers : undefined;
   }, [minDate, maxDate]);
 
+  // Wide navigation range for year/month dropdowns
+  const fromBoundaryDate = minDate ?? new Date(1900, 0, 1);
+  const toBoundaryDate = maxDate ?? undefined;
+  const fromYear = fromBoundaryDate.getFullYear();
+  const toYear = toBoundaryDate?.getFullYear() ?? new Date().getFullYear();
+
+  // Initialize/adjust visible month when constraints or selection change
+  React.useEffect(() => {
+    const today = new Date();
+    let initial = selectedDate ?? today;
+    if (maxDate && initial > maxDate) initial = maxDate;
+    if (minDate && initial < minDate) initial = minDate;
+    // Only set if unset or now out of bounds
+    if (!month || (maxDate && month > maxDate) || (minDate && month < minDate)) {
+      setMonth(initial);
+    }
+  }, [selectedDate, minDate, maxDate]);
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -104,7 +124,13 @@ export function DatePicker({
           selected={selectedDate}
           onSelect={handleSelect}
           disabled={disabledMatcher}
-          defaultMonth={selectedDate}
+          month={month}
+          onMonthChange={setMonth}
+          fromDate={fromBoundaryDate}
+          toDate={toBoundaryDate}
+          captionLayout="dropdown"
+          fromYear={fromYear}
+          toYear={toYear}
           locale={fr}
           required={required}
         />
@@ -192,6 +218,9 @@ export function DateTimePicker({
           selected={selectedDate}
           onSelect={handleDateSelect}
           defaultMonth={selectedDate}
+          captionLayout="dropdown"
+          fromYear={1900}
+          toYear={new Date().getFullYear()}
           locale={fr}
           required={required}
         />
