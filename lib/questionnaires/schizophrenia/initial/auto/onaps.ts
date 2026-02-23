@@ -262,8 +262,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         id: 'instruction_consigne',
         text: 'Ce questionnaire, inspiré de l’ONAPS a été conçu pour évaluer votre activité physique au quotidien lors des 7 derniers jours.\n\nLes activités physiques de forte intensité sont des activités nécessitant un effort physique important et causant une augmentation conséquente de la respiration ou du rythme cardiaque.\n\nLes activités physiques d\'intensité modérée sont des activités qui demandent un effort physique modéré et causant une petite augmentation de la respiration ou du rythme cardiaque.\n\nEn répondant aux questions suivantes, pensez uniquement aux exercices physiques que vous avez réalisé pendant au moins 10 minutes consécutives.',
         type: 'instruction',
-        required: false,
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
+        required: false
     },
 
     // ========== PARTIE A : ACTIVITÉS AU TRAVAIL ==========
@@ -271,8 +270,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         id: 'section_work',
         text: 'Partie A : activités au travail',
         type: 'section',
-        required: false,
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
+        required: false
     },
     {
         id: 'work_vigorous_days',
@@ -288,8 +286,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
             { code: 5, label: '5', score: 5 },
             { code: 6, label: '6', score: 6 },
             { code: 7, label: '7', score: 7 }
-        ],
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
+        ]
     },
     {
         id: 'work_vigorous_time',
@@ -297,13 +294,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'text',
         required: false,
         help: 'Format HH:MM (ex: 01:30 pour 1h30)',
-        metadata: { placeholder: 'HH:MM' },
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'work_vigorous_days' }, 0] }
-            ]
-        }
+        metadata: { placeholder: 'HH:MM' }
     },
     {
         id: 'work_moderate_days',
@@ -319,8 +310,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
             { code: 5, label: '5', score: 5 },
             { code: 6, label: '6', score: 6 },
             { code: 7, label: '7', score: 7 }
-        ],
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
+        ]
     },
     {
         id: 'work_moderate_time',
@@ -328,13 +318,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'text',
         required: false,
         help: 'Format HH:MM (ex: 01:30 pour 1h30)',
-        metadata: { placeholder: 'HH:MM' },
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'work_moderate_days' }, 0] }
-            ]
-        }
+        metadata: { placeholder: 'HH:MM' }
     },
     {
         id: 'work_sitting_time',
@@ -342,8 +326,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'text',
         required: false,
         help: 'Format HH:MM (ex: 02:00 pour 2h00)',
-        metadata: { placeholder: 'HH:MM' },
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
+        metadata: { placeholder: 'HH:MM' }
     },
 
     // ========== PARTIE B : DÉPLACEMENTS À BUT UTILITAIRE ==========
@@ -352,8 +335,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: 'Partie B : Déplacements à but utilitaire',
         help: 'Les questions suivantes concernent la façon habituelle de vous déplacer d\'un endroit à un autre, par exemple aller au travail, faire des courses, aller au marché, aller chez un ami...',
         type: 'section',
-        required: false,
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
+        required: false
     },
     {
         id: 'transport_walking_days',
@@ -369,8 +351,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
             { code: 5, label: '5', score: 5 },
             { code: 6, label: '6', score: 6 },
             { code: 7, label: '7', score: 7 }
-        ],
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
+        ]
     },
     {
         id: 'transport_walking_time',
@@ -378,13 +359,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'text',
         required: false,
         help: 'Format HH:MM (ex: 00:45 pour 45min)',
-        metadata: { placeholder: 'HH:MM' },
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'transport_walking_days' }, 0] }
-            ]
-        }
+        metadata: { placeholder: 'HH:MM' }
     },
     {
         id: 'transport_bicycle_days',
@@ -400,8 +375,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
             { code: 5, label: '5', score: 5 },
             { code: 6, label: '6', score: 6 },
             { code: 7, label: '7', score: 7 }
-        ],
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
+        ]
     },
     {
         id: 'transport_bicycle_time',
@@ -409,13 +383,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'text',
         required: false,
         help: 'Format HH:MM (ex: 00:30 pour 30min)',
-        metadata: { placeholder: 'HH:MM' },
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'transport_bicycle_days' }, 0] }
-            ]
-        }
+        metadata: { placeholder: 'HH:MM' }
     },
     {
         id: 'transport_motorized_days',
@@ -434,8 +402,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
             { code: 8, label: '8', score: 8 },
             { code: 9, label: '9', score: 9 },
             { code: 10, label: '10', score: 10 }
-        ],
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
+        ]
     },
     {
         id: 'transport_motorized_time',
@@ -443,13 +410,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'text',
         required: false,
         help: 'Format HH:MM (ex: 01:00 pour 1h)',
-        metadata: { placeholder: 'HH:MM' },
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'transport_motorized_days' }, 0] }
-            ]
-        }
+        metadata: { placeholder: 'HH:MM' }
     },
 
     // ========== PARTIE C : ACTIVITÉS DE LOISIRS OU AU DOMICILE ==========
@@ -458,8 +419,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         text: 'Partie C : Activités de loisirs ou au domicile',
         help: 'Les questions suivantes excluent les activités liées au travail et aux déplacements que vous avez déjà mentionnées.',
         type: 'section',
-        required: false,
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
+        required: false
     },
     {
         id: 'leisure_vigorous_days',
@@ -475,8 +435,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
             { code: 5, label: '5', score: 5 },
             { code: 6, label: '6', score: 6 },
             { code: 7, label: '7', score: 7 }
-        ],
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
+        ]
     },
     {
         id: 'leisure_vigorous_time',
@@ -484,13 +443,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'text',
         required: false,
         help: 'Format HH:MM (ex: 01:30 pour 1h30)',
-        metadata: { placeholder: 'HH:MM' },
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'leisure_vigorous_days' }, 0] }
-            ]
-        }
+        metadata: { placeholder: 'HH:MM' }
     },
     {
         id: 'leisure_moderate_days',
@@ -506,8 +459,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
             { code: 5, label: '5', score: 5 },
             { code: 6, label: '6', score: 6 },
             { code: 7, label: '7', score: 7 }
-        ],
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
+        ]
     },
     {
         id: 'leisure_moderate_time',
@@ -515,13 +467,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'text',
         required: false,
         help: 'Format HH:MM (ex: 00:45 pour 45min)',
-        metadata: { placeholder: 'HH:MM' },
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'leisure_moderate_days' }, 0] }
-            ]
-        }
+        metadata: { placeholder: 'HH:MM' }
     },
     {
         id: 'leisure_screen_days',
@@ -537,8 +483,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
             { code: 5, label: '5', score: 5 },
             { code: 6, label: '6', score: 6 },
             { code: 7, label: '7', score: 7 }
-        ],
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
+        ]
     },
     {
         id: 'leisure_screen_time',
@@ -546,13 +491,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'text',
         required: false,
         help: 'Format HH:MM (ex: 03:00 pour 3h)',
-        metadata: { placeholder: 'HH:MM' },
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'leisure_screen_days' }, 0] }
-            ]
-        }
+        metadata: { placeholder: 'HH:MM' }
     },
     {
         id: 'leisure_other_days',
@@ -568,8 +507,7 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
             { code: 5, label: '5', score: 5 },
             { code: 6, label: '6', score: 6 },
             { code: 7, label: '7', score: 7 }
-        ],
-        display_if: { '==': [{ var: 'questionnaire_done' }, 'Fait'] }
+        ]
     },
     {
         id: 'leisure_other_time',
@@ -577,13 +515,69 @@ export const ONAPS_SZ_QUESTIONS: Question[] = [
         type: 'text',
         required: false,
         help: 'Format HH:MM (ex: 02:00 pour 2h)',
-        metadata: { placeholder: 'HH:MM' },
-        display_if: {
-            'and': [
-                { '==': [{ var: 'questionnaire_done' }, 'Fait'] },
-                { '>': [{ var: 'leisure_other_days' }, 0] }
-            ]
-        }
+        metadata: { placeholder: 'HH:MM' }
+    },
+
+    // ========== RÉSULTATS / SCORES ==========
+    {
+        id: 'section_scores',
+        text: 'Résultats',
+        type: 'section',
+        required: false
+    },
+    {
+        id: 'vpa_duration',
+        text: 'Durée hebdomadaire d\'activité physique de forte intensité (VPA) :',
+        type: 'number',
+        required: false,
+        help: 'En minutes par semaine',
+        metadata: { placeholder: 'min/semaine' }
+    },
+    {
+        id: 'mpa_duration',
+        text: 'Durée hebdomadaire d\'activité physique d\'intensité modérée (MPA) :',
+        type: 'number',
+        required: false,
+        help: 'En minutes par semaine',
+        metadata: { placeholder: 'min/semaine' }
+    },
+    {
+        id: 'mvpa_duration',
+        text: 'Durée hebdomadaire d\'activité physique d\'intensité modérée et de forte intensité (MVPA) :',
+        type: 'number',
+        required: false,
+        help: '(MVPA) < 150 min/semaine => INACTIF',
+        metadata: { placeholder: 'min/semaine' }
+    },
+    {
+        id: 'vpamet',
+        text: 'Activité physique de forte intensité (VPAMET) :',
+        type: 'number',
+        required: false,
+        metadata: { placeholder: 'METs.min/semaine' }
+    },
+    {
+        id: 'mpamet',
+        text: 'Activité physique d\'intensité modérée (MPAMET) :',
+        type: 'number',
+        required: false,
+        metadata: { placeholder: 'METs.min/semaine' }
+    },
+    {
+        id: 'aptot',
+        text: 'Activité totale en METs.min/semaine (APtot) :',
+        type: 'number',
+        required: false,
+        help: 'Inférieur à 600 METs.min par semaine => Inactif',
+        metadata: { placeholder: 'METs.min/semaine' }
+    },
+    {
+        id: 'sb_duration',
+        text: 'Comportement sédentaire (SB) :',
+        type: 'number',
+        required: false,
+        help: 'Si activité faible inférieur à 180 min/j => Sédentarité faible',
+        metadata: { placeholder: 'min/jour' }
     }
 ];
 

@@ -8,7 +8,7 @@ import { computeUkuScores } from "@/lib/questionnaires/schizophrenia/initial/het
 import { calculateCvltScores, CvltRawData } from "@/lib/services/cvlt-scoring";
 import { calculateStroopScores } from "@/lib/services/stroop-scoring";
 import { calculateFluencesVerbalesScores } from "@/lib/services/fluences-verbales-scoring";
-import { computeOnapsScores, interpretOnapsScore } from "@/lib/questionnaires/schizophrenia/initial/auto/onaps";
+import { computeOnapsScores } from "@/lib/questionnaires/schizophrenia/initial/auto/onaps";
 import { BRIEF_NORMS_HETERO } from "@/lib/constants/brief-a/hetero";
 import { AgeBand, NormPoint } from "@/lib/constants/brief-a/types";
 
@@ -2601,6 +2601,7 @@ export async function saveOnapsSzResponse(response: any): Promise<any> {
     section_work,
     section_transport,
     section_leisure,
+    section_scores,
     // Remove _time fields (we'll parse them into _hours/_minutes)
     work_vigorous_time,
     work_moderate_time,
@@ -2653,7 +2654,6 @@ export async function saveOnapsSzResponse(response: any): Promise<any> {
 
   // Compute scores
   const scores = computeOnapsScores(parsedData);
-  const interpretation = interpretOnapsScore(scores);
 
   const { data, error } = await supabase
     .from("schizophrenia_onaps")
@@ -2661,7 +2661,6 @@ export async function saveOnapsSzResponse(response: any): Promise<any> {
       {
         ...parsedData,
         ...scores,
-        interpretation,
         completed_by: user.data.user?.id,
       },
       { onConflict: "visit_id" },
