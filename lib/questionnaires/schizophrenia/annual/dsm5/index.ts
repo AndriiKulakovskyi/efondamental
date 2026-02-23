@@ -4,3 +4,10 @@ export {
   type SchizophreniaTroublesPsychotiquesAnnuelResponse,
   type SchizophreniaTroublesPsychotiquesAnnuelResponseInsert
 } from './troubles-psychotiques-annuel';
+
+export {
+  COMPORTEMENTS_VIOLENTS_SZ_QUESTIONS,
+  COMPORTEMENTS_VIOLENTS_SZ_DEFINITION,
+  type SchizophreniaComportementsViolentsResponse,
+  type SchizophreniaComportementsViolentsResponseInsert
+} from './comportements-violents';

@@ -61,6 +61,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   // Medical evaluation module
   TROUBLES_PSYCHOTIQUES_INITIAL: "schizophrenia_troubles_psychotiques_initial",
   TROUBLES_PSYCHOTIQUES_ANNUEL: "schizophrenia_troubles_psychotiques_annuel",
+  COMPORTEMENTS_VIOLENTS_SZ: "schizophrenia_comportements_violents",
   TROUBLES_COMORBIDES_SZ: "schizophrenia_troubles_comorbides",
   ISA_SZ: "schizophrenia_isa",
   SUICIDE_HISTORY_SZ: "schizophrenia_suicide_history",
@@ -374,6 +375,10 @@ export async function getTroublesPsychotiquesInitialResponse(visitId: string) {
 
 export async function getTroublesPsychotiquesAnnuelResponse(visitId: string) {
   return getSchizophreniaInitialResponse("TROUBLES_PSYCHOTIQUES_ANNUEL", visitId);
+}
+
+export async function getComportementsViolentsSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse("COMPORTEMENTS_VIOLENTS_SZ", visitId);
 }
 
 export async function getTroublesComorbidesSzResponse(visitId: string) {

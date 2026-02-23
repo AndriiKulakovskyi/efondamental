@@ -139,6 +139,7 @@ import {
   ECV_DEFINITION,
   TROUBLES_PSYCHOTIQUES_INITIAL_DEFINITION,
   TROUBLES_PSYCHOTIQUES_ANNUEL_DEFINITION,
+  COMPORTEMENTS_VIOLENTS_SZ_DEFINITION,
   ISA_SZ_DEFINITION,
   SUICIDE_HISTORY_SZ_DEFINITION,
   ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
@@ -307,6 +308,7 @@ import {
   getEcvResponse,
   getTroublesPsychotiquesInitialResponse,
   getTroublesPsychotiquesAnnuelResponse,
+  getComportementsViolentsSzResponse,
   getTroublesComorbidesSzResponse,
   getSuicideHistorySzResponse,
   getAntecedentsFamiliauxPsySzResponse,
@@ -734,6 +736,8 @@ export default async function ProfessionalQuestionnairePage({
     questionnaire = TROUBLES_PSYCHOTIQUES_INITIAL_DEFINITION;
   else if (code === TROUBLES_PSYCHOTIQUES_ANNUEL_DEFINITION.code)
     questionnaire = TROUBLES_PSYCHOTIQUES_ANNUEL_DEFINITION;
+  else if (code === COMPORTEMENTS_VIOLENTS_SZ_DEFINITION.code)
+    questionnaire = COMPORTEMENTS_VIOLENTS_SZ_DEFINITION;
   else if (code === TROUBLES_COMORBIDES_SZ_DEFINITION.code)
     questionnaire = TROUBLES_COMORBIDES_SZ_DEFINITION;
   else if (code === ISA_SZ_DEFINITION.code)
@@ -1069,6 +1073,8 @@ export default async function ProfessionalQuestionnairePage({
     existingResponse = await getTroublesPsychotiquesInitialResponse(visitId);
   else if (code === TROUBLES_PSYCHOTIQUES_ANNUEL_DEFINITION.code)
     existingResponse = await getTroublesPsychotiquesAnnuelResponse(visitId);
+  else if (code === COMPORTEMENTS_VIOLENTS_SZ_DEFINITION.code)
+    existingResponse = await getComportementsViolentsSzResponse(visitId);
   else if (code === TROUBLES_COMORBIDES_SZ_DEFINITION.code)
     existingResponse = await getTroublesComorbidesSzResponse(visitId);
   else if (code === ISA_SZ_DEFINITION.code)
