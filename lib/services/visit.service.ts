@@ -784,13 +784,13 @@ function schizophreniaModules(isAnnual: boolean = false): VirtualModule[] {
             q(AUTRES_PATHO_DEFINITION, 'healthcare_professional'),
           ],
         },
-        {
+        ...(!isAnnual ? [{
           id: 'antecedents_familiaux',
           name: 'Antécédents familiaux',
           questionnaires: [
             q(ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION, 'healthcare_professional'),
           ],
-        },
+        }] : []),
         {
           id: 'addictologie',
           name: 'Addictologie',

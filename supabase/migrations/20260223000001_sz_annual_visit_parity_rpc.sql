@@ -276,7 +276,7 @@ BEGIN
     WHERE v.id = p_visit_id;
 
     IF v_pathology_type = 'schizophrenia' THEN
-      -- Schizophrenia annual evaluation - same as initial except: no Social module, no CTQ/WURS25
+      -- Schizophrenia annual evaluation - same as initial except: no Social, no CTQ/WURS25, no Antecedents familiaux
       -- Nurse module
       v_statuses := jsonb_build_object(
         'DOSSIER_INFIRMIER_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_dossier_infirmier WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_dossier_infirmier WHERE visit_id = p_visit_id)),
@@ -300,7 +300,7 @@ BEGIN
         'EGF_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_egf WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_egf WHERE visit_id = p_visit_id))
       );
 
-      -- Medical module
+      -- Medical module (ANTECEDENTS_FAMILIAUX_PSY_SZ omitted: immutable baseline)
       v_statuses := v_statuses || jsonb_build_object(
         'TROUBLES_PSYCHOTIQUES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_psychotiques WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_psychotiques WHERE visit_id = p_visit_id)),
         'TROUBLES_COMORBIDES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_comorbides WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_comorbides WHERE visit_id = p_visit_id)),
@@ -308,7 +308,6 @@ BEGIN
         'EVAL_ADDICTOLOGIQUE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id)),
         'ISA_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_isa WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_isa WHERE visit_id = p_visit_id)),
         'SUICIDE_HISTORY_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_suicide_history WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_suicide_history WHERE visit_id = p_visit_id)),
-        'ANTECEDENTS_FAMILIAUX_PSY_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_antecedents_familiaux_psy WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_antecedents_familiaux_psy WHERE visit_id = p_visit_id)),
         'PERINATALITE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_perinatalite WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_perinatalite WHERE visit_id = p_visit_id)),
         'ECV', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_ecv WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_ecv WHERE visit_id = p_visit_id))
       );
@@ -406,4 +405,4 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION "public"."get_visit_detail_data"("p_visit_id" "uuid") IS 'Returns complete visit details including questionnaire completion status. Schizophrenia annual evaluation matches initial except: no Social module, no CTQ/WURS25.';
+COMMENT ON FUNCTION "public"."get_visit_detail_data"("p_visit_id" "uuid") IS 'Returns complete visit details including questionnaire completion status. Schizophrenia annual evaluation matches initial except: no Social, no CTQ/WURS25, no Antecedents familiaux.';
