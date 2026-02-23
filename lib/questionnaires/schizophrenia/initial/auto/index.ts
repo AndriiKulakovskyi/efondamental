@@ -161,3 +161,13 @@ export {
   type SchizophreniaBriefAAutoResponseInsert,
   type BriefAAutoScoreResult,
 } from './brief-a-auto';
+
+export {
+  ONAPS_SZ_QUESTIONS,
+  ONAPS_SZ_DEFINITION,
+  computeOnapsScores,
+  interpretOnapsScore,
+  type SchizophreniaOnapsResponse,
+  type SchizophreniaOnapsResponseInsert,
+  type OnapsSzScoreResult,
+} from './onaps';

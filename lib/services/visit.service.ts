@@ -270,7 +270,8 @@ import {
   SSTICS_SZ_DEFINITION,
   CBQ_SZ_DEFINITION,
   DACOBS_SZ_DEFINITION,
-  TAP_SZ_DEFINITION
+  TAP_SZ_DEFINITION,
+  ONAPS_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
 import {
   getHumeurActuelsResponse,
@@ -382,7 +383,7 @@ export async function createVisit(visit: VisitInsert): Promise<Visit> {
   // Check for duplicate unique visit types
   const visitType = visit.visit_type as VisitType;
   const isDuplicate = await checkDuplicateVisit(supabase, visit.patient_id, visitType);
-  
+
   if (isDuplicate) {
     const visitTypeName = visitType === VisitType.SCREENING ? 'screening' : 'initial evaluation';
     throw new DuplicateVisitError(visitTypeName);
@@ -395,7 +396,7 @@ export async function createVisit(visit: VisitInsert): Promise<Visit> {
       .select('assigned_to')
       .eq('id', visit.patient_id)
       .single();
-    
+
     if (patient?.assigned_to) {
       visit.conducted_by = patient.assigned_to;
     }
@@ -562,7 +563,7 @@ export async function getUpcomingVisitsByPatient(
     .eq('patient_id', patientId)
     .eq('status', VisitStatus.SCHEDULED)
     .gte('scheduled_date', new Date().toISOString())
-    .order('scheduled_date', { ascending: true});
+    .order('scheduled_date', { ascending: true });
 
   if (error) {
     throw new Error(`Failed to fetch upcoming visits: ${error.message}`);
@@ -658,7 +659,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
     // Get patient to determine pathology-specific modules
     const patient = await getPatientById(visit.patient_id);
     const pathologyType = patient?.pathology_type;
-    
+
     // Schizophrenia screening - only medical questionnaires (no autoquestionnaires)
     if (pathologyType === 'schizophrenia') {
       return [
@@ -670,7 +671,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         }
       ];
     }
-    
+
     // Default (bipolar and others) screening
     return [
       {
@@ -692,7 +693,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
     // Get patient to determine pathology-specific modules
     const patient = await getPatientById(visit.patient_id);
     const pathologyType = patient?.pathology_type;
-    
+
     // Schizophrenia initial evaluation - uses Dossier Infirmier questionnaire in nurse module
     // and PANSS in hetero-questionnaires module
     if (pathologyType === 'schizophrenia') {
@@ -708,14 +709,14 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
           name: 'Hetero-questionnaires',
           description: 'Questionnaires d\'evaluation clinique',
           questionnaires: [
-            PANSS_DEFINITION, 
-            CDSS_DEFINITION, 
-            BARS_DEFINITION, 
-            SUMD_DEFINITION, 
-            AIMS_DEFINITION, 
-            BARNES_DEFINITION, 
-            SAS_DEFINITION, 
-            PSP_DEFINITION, 
+            PANSS_DEFINITION,
+            CDSS_DEFINITION,
+            BARS_DEFINITION,
+            SUMD_DEFINITION,
+            AIMS_DEFINITION,
+            BARNES_DEFINITION,
+            SAS_DEFINITION,
+            PSP_DEFINITION,
             BRIEF_A_SZ_DEFINITION,
             YMRS_SZ_DEFINITION,
             CGI_SZ_DEFINITION,
@@ -989,6 +990,13 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
               title: BRIEF_A_AUTO_SZ_DEFINITION.title,
               description: BRIEF_A_AUTO_SZ_DEFINITION.description,
               questions: BRIEF_A_AUTO_SZ_DEFINITION.questions,
+            },
+            {
+              id: ONAPS_SZ_DEFINITION.id,
+              code: ONAPS_SZ_DEFINITION.code,
+              title: ONAPS_SZ_DEFINITION.title,
+              description: ONAPS_SZ_DEFINITION.description,
+              questions: ONAPS_SZ_DEFINITION.questions,
             }
           ]
         },
@@ -1189,7 +1197,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
     // Get patient to determine pathology-specific modules
     const patient = await getPatientById(visit.patient_id);
     const pathologyType = patient?.pathology_type;
-    
+
     // Schizophrenia annual evaluation - uses same nurse module as initial visit
     if (pathologyType === 'schizophrenia') {
       return [
@@ -1201,7 +1209,7 @@ export async function getVisitModules(visitId: string): Promise<VirtualModule[]>
         }
       ];
     }
-    
+
     // Bipolar annual evaluation modules
     return [
       {
@@ -1346,17 +1354,17 @@ export async function getVisitCompletionStatus(visitId: string) {
     // Get patient to determine pathology-specific completion tracking
     const patient = await getPatientById(visit.patient_id);
     const pathologyType = patient?.pathology_type;
-    
+
     if (pathologyType === 'schizophrenia') {
       // Schizophrenia screening: 2 questionnaires (Diagnostic, Orientation)
       total = 2;
       totalModules = 1;
-      
+
       const [szDiag, szOrient] = await Promise.all([
         getScreeningSzDiagnosticResponse(visitId),
         getScreeningSzOrientationResponse(visitId)
       ]);
-      
+
       if (szDiag) completed++;
       if (szOrient) completed++;
     } else {
@@ -1383,7 +1391,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     // Get patient to determine pathology-specific completion tracking
     const patient = await getPatientById(visit.patient_id);
     const pathologyType = patient?.pathology_type;
-    
+
     // For bipolar initial evaluation, use bipolar_* tables
     if (pathologyType === 'bipolar') {
       // Use the bipolar-initial.service to check completion status against bipolar_* tables
@@ -1403,7 +1411,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       total = 55;
       totalModules = 7;
 
-    const [
+      const [
         eq5d5l, priseM, staiYa, mars, mathys, asrm, qids, psqi, epworth,
         asrs, ctq, bis10, als18, aim, wurs25, aq12, csm, cti,
         madrs, ymrs, cgi, egf, alda, etatPatient, fast, social,
@@ -1411,144 +1419,144 @@ export async function getVisitCompletionStatus(visitId: string) {
         dsm5Humeur, dsm5Psychotic, dsm5Comorbid, diva, familyHistory, cssrs, isa, sis, suicideHistory, perinatalite, pathoNeuro, pathoCardio, pathoEndoc, pathoDermato, pathoUrinaire, antecedentsGyneco, pathoHepatoGastro, pathoAllergique, autresPatho,
         wais4Criteria, wais4Learning, wais4Matrices, wais4DigitSpan
       ] = await Promise.all([
-      // ETAT questionnaires
-      getEq5d5lResponse(visitId),
-      getPriseMResponse(visitId),
-      getStaiYaResponse(visitId),
-      getMarsResponse(visitId),
-      getMathysResponse(visitId),
-      getAsrmResponse(visitId), // Reused
-      getQidsResponse(visitId), // Reused
-      getPsqiResponse(visitId),
-      getEpworthResponse(visitId),
-      // TRAITS questionnaires
-      getAsrsResponse(visitId),
-      getCtqResponse(visitId),
-      getBis10Response(visitId),
-      getAls18Response(visitId),
-      getAimResponse(visitId),
-      getWurs25Response(visitId),
-      getAq12Response(visitId),
-      getCsmResponse(visitId),
-      getCtiResponse(visitId),
-      // HETERO questionnaires
-      getMadrsResponse(visitId),
-      getYmrsResponse(visitId),
-      getCgiResponse(visitId),
-      getEgfResponse(visitId),
-      getAldaResponse(visitId),
-      getEtatPatientResponse(visitId),
-      getFastResponse(visitId),
-      // SOCIAL questionnaire
-      getSocialResponse(visitId),
-      // INFIRMIER questionnaires
-      getTobaccoResponse(visitId),
-      getFagerstromResponse(visitId),
-      getPhysicalParamsResponse(visitId),
-      getBloodPressureResponse(visitId),
-      getSleepApneaResponse(visitId),
-      getBiologicalAssessmentResponse(visitId),
-      // DSM5 questionnaires
-      getDsm5HumeurResponse(visitId),
-      getDsm5PsychoticResponse(visitId),
-      getDsm5ComorbidResponse(visitId),
-      // DIVA questionnaire
-      getDivaResponse(visitId),
-      // Family History
-      getFamilyHistoryResponse(visitId),
-      // C-SSRS
-      getCssrsResponse(visitId),
-      // ISA
-      getIsaResponse(visitId),
-      // SIS
-      getSisResponse(visitId),
-      // Suicide History
-      getSuicideHistoryResponse(visitId),
-      // Perinatalite
-      getPerinataliteResponse(visitId),
-      // Pathologies Neurologiques
-      getPathoNeuroResponse(visitId),
-      // Pathologies Cardio-vasculaires
-      getPathoCardioResponse(visitId),
-      // Pathologies Endocriniennes et Métaboliques
-      getPathoEndocResponse(visitId),
-      // Pathologies Dermatologiques
-      getPathoDermatoResponse(visitId),
-      // Pathologies des voies urinaires
-      getPathoUrinaireResponse(visitId),
-      // Antécédents gynécologiques
-      getAntecedentsGynecoResponse(visitId),
-      // Pathologies hépato-gastro-entérologiques
-      getPathoHepatoGastroResponse(visitId),
-      // Pathologies allergiques et inflammatoires
-      getPathoAllergiqueResponse(visitId),
-      // Autres pathologies
-      getAutresPathoResponse(visitId),
-      // WAIS-4 Criteria
-      getWais4CriteriaResponse(visitId),
-      // WAIS-4 Learning
-      getWais4LearningResponse(visitId),
-      // WAIS-4 Matrices
-      getWais4MatricesResponse(visitId),
-      // WAIS-4 Digit Span
-      getWais4DigitSpanResponse(visitId)
-    ]);
+        // ETAT questionnaires
+        getEq5d5lResponse(visitId),
+        getPriseMResponse(visitId),
+        getStaiYaResponse(visitId),
+        getMarsResponse(visitId),
+        getMathysResponse(visitId),
+        getAsrmResponse(visitId), // Reused
+        getQidsResponse(visitId), // Reused
+        getPsqiResponse(visitId),
+        getEpworthResponse(visitId),
+        // TRAITS questionnaires
+        getAsrsResponse(visitId),
+        getCtqResponse(visitId),
+        getBis10Response(visitId),
+        getAls18Response(visitId),
+        getAimResponse(visitId),
+        getWurs25Response(visitId),
+        getAq12Response(visitId),
+        getCsmResponse(visitId),
+        getCtiResponse(visitId),
+        // HETERO questionnaires
+        getMadrsResponse(visitId),
+        getYmrsResponse(visitId),
+        getCgiResponse(visitId),
+        getEgfResponse(visitId),
+        getAldaResponse(visitId),
+        getEtatPatientResponse(visitId),
+        getFastResponse(visitId),
+        // SOCIAL questionnaire
+        getSocialResponse(visitId),
+        // INFIRMIER questionnaires
+        getTobaccoResponse(visitId),
+        getFagerstromResponse(visitId),
+        getPhysicalParamsResponse(visitId),
+        getBloodPressureResponse(visitId),
+        getSleepApneaResponse(visitId),
+        getBiologicalAssessmentResponse(visitId),
+        // DSM5 questionnaires
+        getDsm5HumeurResponse(visitId),
+        getDsm5PsychoticResponse(visitId),
+        getDsm5ComorbidResponse(visitId),
+        // DIVA questionnaire
+        getDivaResponse(visitId),
+        // Family History
+        getFamilyHistoryResponse(visitId),
+        // C-SSRS
+        getCssrsResponse(visitId),
+        // ISA
+        getIsaResponse(visitId),
+        // SIS
+        getSisResponse(visitId),
+        // Suicide History
+        getSuicideHistoryResponse(visitId),
+        // Perinatalite
+        getPerinataliteResponse(visitId),
+        // Pathologies Neurologiques
+        getPathoNeuroResponse(visitId),
+        // Pathologies Cardio-vasculaires
+        getPathoCardioResponse(visitId),
+        // Pathologies Endocriniennes et Métaboliques
+        getPathoEndocResponse(visitId),
+        // Pathologies Dermatologiques
+        getPathoDermatoResponse(visitId),
+        // Pathologies des voies urinaires
+        getPathoUrinaireResponse(visitId),
+        // Antécédents gynécologiques
+        getAntecedentsGynecoResponse(visitId),
+        // Pathologies hépato-gastro-entérologiques
+        getPathoHepatoGastroResponse(visitId),
+        // Pathologies allergiques et inflammatoires
+        getPathoAllergiqueResponse(visitId),
+        // Autres pathologies
+        getAutresPathoResponse(visitId),
+        // WAIS-4 Criteria
+        getWais4CriteriaResponse(visitId),
+        // WAIS-4 Learning
+        getWais4LearningResponse(visitId),
+        // WAIS-4 Matrices
+        getWais4MatricesResponse(visitId),
+        // WAIS-4 Digit Span
+        getWais4DigitSpanResponse(visitId)
+      ]);
 
-    if (eq5d5l) completed++;
-    if (priseM) completed++;
-    if (staiYa) completed++;
-    if (mars) completed++;
-    if (mathys) completed++;
-    if (asrm) completed++;
-    if (qids) completed++;
-    if (psqi) completed++;
-    if (epworth) completed++;
-    if (asrs) completed++;
-    if (ctq) completed++;
-    if (bis10) completed++;
-    if (als18) completed++;
-    if (aim) completed++;
-    if (wurs25) completed++;
-    if (aq12) completed++;
-    if (csm) completed++;
-    if (cti) completed++;
-    if (madrs) completed++;
-    if (ymrs) completed++;
-    if (cgi) completed++;
-    if (egf) completed++;
-    if (alda) completed++;
-    if (etatPatient) completed++;
-    if (fast) completed++;
-    if (social) completed++;
-    if (tobacco) completed++;
-    if (fagerstrom) completed++;
-    if (physicalParams) completed++;
-    if (bloodPressure) completed++;
-    if (sleepApnea) completed++;
-    if (biologicalAssessment) completed++;
-    if (dsm5Humeur) completed++;
-    if (dsm5Psychotic) completed++;
-    if (dsm5Comorbid) completed++;
-    if (diva) completed++;
-    if (familyHistory) completed++;
-    if (cssrs) completed++;
-    if (isa) completed++;
-    if (sis) completed++;
-    if (suicideHistory) completed++;
-    if (perinatalite) completed++;
-    if (pathoNeuro) completed++;
-    if (pathoCardio) completed++;
-    if (pathoEndoc) completed++;
-    if (pathoDermato) completed++;
-    if (pathoUrinaire) completed++;
-    if (antecedentsGyneco) completed++;
-    if (pathoHepatoGastro) completed++;
-    if (pathoAllergique) completed++;
-    if (autresPatho) completed++;
-    if (wais4Criteria) completed++;
-    if (wais4Learning) completed++;
-    if (wais4Matrices) completed++;
-    if (wais4DigitSpan) completed++;
+      if (eq5d5l) completed++;
+      if (priseM) completed++;
+      if (staiYa) completed++;
+      if (mars) completed++;
+      if (mathys) completed++;
+      if (asrm) completed++;
+      if (qids) completed++;
+      if (psqi) completed++;
+      if (epworth) completed++;
+      if (asrs) completed++;
+      if (ctq) completed++;
+      if (bis10) completed++;
+      if (als18) completed++;
+      if (aim) completed++;
+      if (wurs25) completed++;
+      if (aq12) completed++;
+      if (csm) completed++;
+      if (cti) completed++;
+      if (madrs) completed++;
+      if (ymrs) completed++;
+      if (cgi) completed++;
+      if (egf) completed++;
+      if (alda) completed++;
+      if (etatPatient) completed++;
+      if (fast) completed++;
+      if (social) completed++;
+      if (tobacco) completed++;
+      if (fagerstrom) completed++;
+      if (physicalParams) completed++;
+      if (bloodPressure) completed++;
+      if (sleepApnea) completed++;
+      if (biologicalAssessment) completed++;
+      if (dsm5Humeur) completed++;
+      if (dsm5Psychotic) completed++;
+      if (dsm5Comorbid) completed++;
+      if (diva) completed++;
+      if (familyHistory) completed++;
+      if (cssrs) completed++;
+      if (isa) completed++;
+      if (sis) completed++;
+      if (suicideHistory) completed++;
+      if (perinatalite) completed++;
+      if (pathoNeuro) completed++;
+      if (pathoCardio) completed++;
+      if (pathoEndoc) completed++;
+      if (pathoDermato) completed++;
+      if (pathoUrinaire) completed++;
+      if (antecedentsGyneco) completed++;
+      if (pathoHepatoGastro) completed++;
+      if (pathoAllergique) completed++;
+      if (autresPatho) completed++;
+      if (wais4Criteria) completed++;
+      if (wais4Learning) completed++;
+      if (wais4Matrices) completed++;
+      if (wais4DigitSpan) completed++;
     }
   } else if (visit.visit_type === 'biannual_followup') {
     // Biannual follow-up: 6 infirmier + 7 thymic + 12 medical (6 original + 6 soin_suivi) = 25 total
@@ -1615,7 +1623,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (alda) completed++;
     if (etatPatient) completed++;
     if (fast) completed++;
-    
+
     // Count medical evaluation - DSM5
     if (humeurActuels) completed++;
     if (humeurDepuisVisite) completed++;
@@ -1624,7 +1632,7 @@ export async function getVisitCompletionStatus(visitId: string) {
     if (cssrs) completed++;
     if (isaFollowup) completed++;
     if (suicideBehaviorFollowup) completed++;
-    
+
     // Count soin, suivi et arret de travail (6 separate tables now)
     if (suiviRecommandations) completed++;
     if (recoursAuxSoins) completed++;
@@ -1636,12 +1644,12 @@ export async function getVisitCompletionStatus(visitId: string) {
     // Get patient to determine pathology-specific completion tracking
     const patient = await getPatientById(visit.patient_id);
     const pathologyType = patient?.pathology_type;
-    
+
     if (pathologyType === 'schizophrenia') {
       // Schizophrenia annual evaluation: 2 nurse questionnaires + 12 hetero-questionnaires = 14 total
       total = 14;
       totalModules = 2; // Nurse, Hetero
-      
+
       const [
         dossierInfirmier, bilanBiologique,
         panss, cdss, ymrs, cgi, egf, bars, sumd, saps, aims, barnes, sas, psp
@@ -1661,7 +1669,7 @@ export async function getVisitCompletionStatus(visitId: string) {
         getSasResponse(visitId),
         getPspResponse(visitId)
       ]);
-      
+
       if (dossierInfirmier) completed++;
       if (bilanBiologique) completed++;
       if (panss) completed++;
@@ -1766,7 +1774,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       if (cgi) completed++;
       if (egf) completed++;
       if (etatPatient) completed++;
-      
+
       // Count medical evaluation
       if (dsm5Humeur) completed++;
       if (dsm5Psychotic) completed++;
@@ -1787,7 +1795,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       if (pathoHepatoGastro) completed++;
       if (pathoAllergique) completed++;
       if (autresPatho) completed++;
-      
+
       // Count auto-questionnaires ETAT
       if (eq5d5l) completed++;
       if (priseM) completed++;
@@ -1798,7 +1806,7 @@ export async function getVisitCompletionStatus(visitId: string) {
       if (qids) completed++;
       if (psqi) completed++;
       if (epworth) completed++;
-      
+
       // Count soin, suivi et arret de travail (6 separate tables now)
       if (suiviRecommandations) completed++;
       if (recoursAuxSoins) completed++;
@@ -1824,7 +1832,7 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
   }
 
   const supabase = await createClient();
-  
+
   // Fetch all visits at once
   const { data: visits, error } = await supabase
     .from('visits')
@@ -1844,21 +1852,21 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
   // Process screening visits - need to separate by pathology
   if (screeningVisits.length > 0) {
     const screeningIds = screeningVisits.map(v => v.id);
-    
+
     // Fetch patient pathology for each screening visit
     const { data: visitPatients } = await supabase
       .from('visits')
       .select('id, patients!inner(pathology_type)')
       .in('id', screeningIds);
-    
+
     const visitPathologyMap = new Map<string, string>();
     visitPatients?.forEach((vp: any) => {
       visitPathologyMap.set(vp.id, vp.patients?.pathology_type || 'bipolar');
     });
-    
+
     const bipolarScreeningIds = screeningIds.filter(id => visitPathologyMap.get(id) !== 'schizophrenia');
     const szScreeningIds = screeningIds.filter(id => visitPathologyMap.get(id) === 'schizophrenia');
-    
+
     // Process bipolar screening visits (5 questionnaires: ASRM, QIDS, MDQ, Diag, Orient)
     if (bipolarScreeningIds.length > 0) {
       const [asrmResults, qidsResults, mdqResults, diagResults, orientResults] = await Promise.all([
@@ -1885,7 +1893,7 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
         });
       }
     }
-    
+
     // Process schizophrenia screening visits (2 questionnaires: Diagnostic, Orientation)
     if (szScreeningIds.length > 0) {
       const [szDiagResults, szOrientResults] = await Promise.all([
@@ -1911,7 +1919,7 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
   // Process initial evaluation visits
   if (initialEvalVisits.length > 0) {
     const evalIds = initialEvalVisits.map(v => v.id);
-    
+
     const [
       eq5d5lResults, priseMResults, staiYaResults, marsResults, mathysResults,
       asrmResults, qidsResults, psqiResults, epworthResults,

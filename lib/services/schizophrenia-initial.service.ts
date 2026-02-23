@@ -78,6 +78,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   BIS_SZ: "schizophrenia_bis",
   EQ5D5L_SZ: "schizophrenia_eq5d5l",
   IPAQ_SZ: "schizophrenia_ipaq",
+  ONAPS_SZ: "schizophrenia_onaps",
   YBOCS_SZ: "schizophrenia_ybocs",
   WURS25_SZ: "schizophrenia_wurs25",
   STORI_SZ: "schizophrenia_stori",
@@ -201,6 +202,8 @@ export async function saveSchizophreniaInitialResponse<
       return (await saveEq5d5lSzResponse(response)) as any as T;
     case "IPAQ_SZ":
       return (await saveIpaqSzResponse(response)) as any as T;
+    case "ONAPS_SZ":
+      return (await saveOnapsSzResponse(response)) as any as T;
     case "YBOCS_SZ":
       return (await saveYbocsResponse(response)) as any as T;
     case "WURS25_SZ":
@@ -440,6 +443,10 @@ export async function saveBilanSocialSzResponse(response: any): Promise<any> {
 // Auto module (patient self-administered)
 export async function getSqolResponse(visitId: string) {
   return getSchizophreniaInitialResponse("SQOL_SZ", visitId);
+}
+
+export async function getOnapsSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse("ONAPS_SZ", visitId);
 }
 
 export async function getCtqResponse(visitId: string) {
