@@ -94,6 +94,7 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   PRESENTEISME_SZ: "schizophrenia_presenteisme",
   FAGERSTROM_SZ: "schizophrenia_fagerstrom",
   BRIEF_A_AUTO_SZ: "schizophrenia_brief_a_auto",
+  ALIMENTAIRE_SZ: "schizophrenia_alimentaire",
   // Entourage module (caregiver-administered)
   EPHP_SZ: "schizophrenia_ephp",
 
@@ -231,6 +232,8 @@ export async function saveSchizophreniaInitialResponse<
       return (await savePresenteismeSzResponse(response)) as any as T;
     case "FAGERSTROM_SZ":
       return (await saveFagerstromSzResponse(response)) as any as T;
+    case "ALIMENTAIRE_SZ":
+      return (await saveAlimentaireSzResponse(response)) as any as T;
     case "BRIEF_A_AUTO_SZ":
       return (await saveBriefAAutoSzResponse(response)) as any as T;
     case "EPHP_SZ":
@@ -6903,3 +6906,59 @@ export async function saveEgfSzResponse(response: any): Promise<any> {
 export async function getTapSzResponse(visitId: string): Promise<any | null> {
   return getSchizophreniaInitialResponse("TAP_SZ", visitId);
 }
+
+// ============================================================================
+// ALIMENTAIRE Functions
+// ============================================================================
+
+/**
+ * Get Alimentaire response by visit ID
+ */
+export async function getAlimentaireSzResponse(visitId: string) {
+  const data = await getSchizophreniaInitialResponse("ALIMENTAIRE_SZ", visitId);
+  if (!data) return data;
+
+  // Convert DB hours/minutes into HH:MM _time field for the form
+  const d = data as any;
+  d.temps_preparation_repas_time = formatHHMM(d.temps_preparation_repas_heures, d.temps_preparation_repas_minutes);
+
+  return d;
+}
+
+/**
+ * Save Alimentaire response with HH:MM conversion
+ */
+export async function saveAlimentaireSzResponse(response: any): Promise<any> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  const dataToSave = { ...response };
+
+  // Handle HH:MM conversion for temps_preparation_repas
+  if (dataToSave.temps_preparation_repas_time) {
+    const [hours, minutes] = dataToSave.temps_preparation_repas_time.split(':').map(Number);
+    dataToSave.temps_preparation_repas_heures = isNaN(hours) ? null : hours;
+    dataToSave.temps_preparation_repas_minutes = isNaN(minutes) ? null : minutes;
+    delete dataToSave.temps_preparation_repas_time;
+  }
+
+  const { data, error } = await supabase
+    .from("schizophrenia_alimentaire")
+    .upsert(
+      {
+        ...dataToSave,
+        completed_by: user.data.user?.id,
+      },
+      { onConflict: "visit_id" }
+    )
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error saving schizophrenia_alimentaire:", error);
+    throw error;
+  }
+  return data;
+}
+
+

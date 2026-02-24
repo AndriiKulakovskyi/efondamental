@@ -171,3 +171,10 @@ export {
   type SchizophreniaOnapsResponseInsert,
   type OnapsSzScoreResult,
 } from './onaps';
+
+export {
+  ALIMENTAIRE_SZ_QUESTIONS,
+  ALIMENTAIRE_SZ_DEFINITION,
+  type SchizophreniaAlimentaireResponse,
+  type SchizophreniaAlimentaireResponseInsert,
+} from './alimentaire';
