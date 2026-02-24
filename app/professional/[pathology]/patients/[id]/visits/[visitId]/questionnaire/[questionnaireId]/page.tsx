@@ -141,7 +141,9 @@ import {
   TROUBLES_PSYCHOTIQUES_ANNUEL_DEFINITION,
   COMPORTEMENTS_VIOLENTS_SZ_DEFINITION,
   ISA_SZ_DEFINITION,
+  ISA_SUIVI_SZ_DEFINITION,
   SUICIDE_HISTORY_SZ_DEFINITION,
+  SUICIDE_HISTORY_SUIVI_SZ_DEFINITION,
   ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION,
   SZ_PERINATALITE_DEFINITION,
   TEA_COFFEE_SZ_DEFINITION,
@@ -312,6 +314,7 @@ import {
   getComportementsViolentsSzResponse,
   getTroublesComorbidesSzResponse,
   getSuicideHistorySzResponse,
+  getSuicideHistorySuiviSzResponse,
   getAntecedentsFamiliauxPsySzResponse,
   getPerinataliteSzResponse,
   getTeaCoffeeSzResponse,
@@ -351,6 +354,7 @@ import {
   getSchizophreniaInitialResponse,
   getOnapsSzResponse,
   getIsaSzResponse,
+  getIsaSuiviSzResponse,
   getTapSzResponse,
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
@@ -744,8 +748,12 @@ export default async function ProfessionalQuestionnairePage({
     questionnaire = TROUBLES_COMORBIDES_SZ_DEFINITION;
   else if (code === ISA_SZ_DEFINITION.code)
     questionnaire = ISA_SZ_DEFINITION;
+  else if (code === ISA_SUIVI_SZ_DEFINITION.code)
+    questionnaire = ISA_SUIVI_SZ_DEFINITION;
   else if (code === SUICIDE_HISTORY_SZ_DEFINITION.code)
     questionnaire = SUICIDE_HISTORY_SZ_DEFINITION;
+  else if (code === SUICIDE_HISTORY_SUIVI_SZ_DEFINITION.code)
+    questionnaire = SUICIDE_HISTORY_SUIVI_SZ_DEFINITION;
   else if (code === ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION.code)
     questionnaire = ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION;
   else if (code === SZ_PERINATALITE_DEFINITION.code)
@@ -1083,8 +1091,12 @@ export default async function ProfessionalQuestionnairePage({
     existingResponse = await getTroublesComorbidesSzResponse(visitId);
   else if (code === ISA_SZ_DEFINITION.code)
     existingResponse = await getIsaSzResponse(visitId);
+  else if (code === ISA_SUIVI_SZ_DEFINITION.code)
+    existingResponse = await getIsaSuiviSzResponse(visitId);
   else if (code === SUICIDE_HISTORY_SZ_DEFINITION.code)
     existingResponse = await getSuicideHistorySzResponse(visitId);
+  else if (code === SUICIDE_HISTORY_SUIVI_SZ_DEFINITION.code)
+    existingResponse = await getSuicideHistorySuiviSzResponse(visitId);
   else if (code === ANTECEDENTS_FAMILIAUX_PSY_SZ_DEFINITION.code)
     existingResponse = await getAntecedentsFamiliauxPsySzResponse(visitId);
   else if (code === SZ_PERINATALITE_DEFINITION.code)

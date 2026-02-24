@@ -146,6 +146,8 @@ import {
   UKU_DEFINITION,
   ECV_DEFINITION,
   ISA_SZ_DEFINITION,
+  ISA_SUIVI_SZ_DEFINITION,
+  SUICIDE_HISTORY_SUIVI_SZ_DEFINITION,
   TROUBLES_PSYCHOTIQUES_INITIAL_DEFINITION,
   TROUBLES_PSYCHOTIQUES_ANNUEL_DEFINITION,
   COMPORTEMENTS_VIOLENTS_SZ_DEFINITION,
@@ -769,8 +771,12 @@ function schizophreniaModules(isAnnual: boolean = false): VirtualModule[] {
           id: 'suicide',
           name: 'Suicide',
           questionnaires: [
-            q(ISA_SZ_DEFINITION, 'healthcare_professional'),
-            q(SUICIDE_HISTORY_SZ_DEFINITION, 'healthcare_professional'),
+            isAnnual
+              ? q(ISA_SUIVI_SZ_DEFINITION, 'healthcare_professional')
+              : q(ISA_SZ_DEFINITION, 'healthcare_professional'),
+            isAnnual
+              ? q(SUICIDE_HISTORY_SUIVI_SZ_DEFINITION, 'healthcare_professional')
+              : q(SUICIDE_HISTORY_SZ_DEFINITION, 'healthcare_professional'),
           ],
         },
         {

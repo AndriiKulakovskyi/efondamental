@@ -64,8 +64,10 @@ export const SCHIZOPHRENIA_INITIAL_TABLES: Record<string, string> = {
   TROUBLES_PSYCHOTIQUES_ANNUEL: "schizophrenia_troubles_psychotiques_annuel",
   COMPORTEMENTS_VIOLENTS_SZ: "schizophrenia_comportements_violents",
   TROUBLES_COMORBIDES_SZ: "schizophrenia_troubles_comorbides",
-  ISA_SZ: "schizophrenia_isa",
-  SUICIDE_HISTORY_SZ: "schizophrenia_suicide_history",
+  ISA_SZ: "schizophrenia_isa_initial",
+  ISA_SUIVI_SZ: "schizophrenia_isa_suivi",
+  SUICIDE_HISTORY_SZ: "schizophrenia_suicide_history_initial",
+  SUICIDE_HISTORY_SUIVI_SZ: "schizophrenia_suicide_history_suivi",
   ANTECEDENTS_FAMILIAUX_PSY_SZ: "schizophrenia_antecedents_familiaux_psy",
   PERINATALITE_SZ: "schizophrenia_perinatalite",
   TEA_COFFEE_SZ: "schizophrenia_tea_coffee",
@@ -393,8 +395,16 @@ export async function getIsaSzResponse(visitId: string) {
   return getSchizophreniaInitialResponse("ISA_SZ", visitId);
 }
 
+export async function getIsaSuiviSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse("ISA_SUIVI_SZ", visitId);
+}
+
 export async function getSuicideHistorySzResponse(visitId: string) {
   return getSchizophreniaInitialResponse("SUICIDE_HISTORY_SZ", visitId);
+}
+
+export async function getSuicideHistorySuiviSzResponse(visitId: string) {
+  return getSchizophreniaInitialResponse("SUICIDE_HISTORY_SUIVI_SZ", visitId);
 }
 
 export async function getAntecedentsFamiliauxPsySzResponse(visitId: string) {

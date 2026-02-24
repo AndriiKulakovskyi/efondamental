@@ -51,6 +51,17 @@ export {
 } from './initial/medical';
 
 export {
+  ISA_SUIVI_SZ_DEFINITION,
+  ISA_SUIVI_SZ_QUESTIONS,
+  type SchizophreniaIsaSuiviResponse,
+  type SchizophreniaIsaSuiviResponseInsert,
+  SUICIDE_HISTORY_SUIVI_SZ_DEFINITION,
+  SUICIDE_HISTORY_SUIVI_SZ_QUESTIONS,
+  type SchizophreniaSuicideHistorySuiviResponse,
+  type SchizophreniaSuicideHistorySuiviResponseInsert,
+} from './annual/suicide';
+
+export {
   TEA_COFFEE_SZ_DEFINITION,
   EVAL_ADDICTOLOGIQUE_SZ_DEFINITION
 } from './initial/addictologie';

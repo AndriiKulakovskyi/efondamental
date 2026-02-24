@@ -1311,8 +1311,8 @@ BEGIN
       'TROUBLES_COMORBIDES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_comorbides WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_comorbides WHERE visit_id = p_visit_id)),
       'TEA_COFFEE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_tea_coffee WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_tea_coffee WHERE visit_id = p_visit_id)),
       'EVAL_ADDICTOLOGIQUE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id)),
-      'ISA_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_isa WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_isa WHERE visit_id = p_visit_id)),
-      'SUICIDE_HISTORY_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_suicide_history WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_suicide_history WHERE visit_id = p_visit_id)),
+      'ISA_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_isa_initial WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_isa_initial WHERE visit_id = p_visit_id)),
+      'SUICIDE_HISTORY_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_suicide_history_initial WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_suicide_history_initial WHERE visit_id = p_visit_id)),
       'ANTECEDENTS_FAMILIAUX_PSY_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_antecedents_familiaux_psy WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_antecedents_familiaux_psy WHERE visit_id = p_visit_id)),
       'PERINATALITE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_perinatalite WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_perinatalite WHERE visit_id = p_visit_id)),
       'ECV', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_ecv WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_ecv WHERE visit_id = p_visit_id))
@@ -1422,14 +1422,14 @@ BEGIN
         'EGF_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_egf WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_egf WHERE visit_id = p_visit_id))
       );
 
-      -- Medical module (ANTECEDENTS_FAMILIAUX_PSY_SZ omitted: immutable baseline)
+      -- Medical module (ANTECEDENTS_FAMILIAUX_PSY_SZ omitted: immutable baseline; ISA_SUIVI_SZ replaces ISA_SZ; SUICIDE_HISTORY_SUIVI_SZ replaces SUICIDE_HISTORY_SZ)
       v_statuses := v_statuses || jsonb_build_object(
         'TROUBLES_PSYCHOTIQUES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_psychotiques WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_psychotiques WHERE visit_id = p_visit_id)),
         'TROUBLES_COMORBIDES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_comorbides WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_comorbides WHERE visit_id = p_visit_id)),
         'TEA_COFFEE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_tea_coffee WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_tea_coffee WHERE visit_id = p_visit_id)),
         'EVAL_ADDICTOLOGIQUE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id)),
-        'ISA_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_isa WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_isa WHERE visit_id = p_visit_id)),
-        'SUICIDE_HISTORY_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_suicide_history WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_suicide_history WHERE visit_id = p_visit_id)),
+        'ISA_SUIVI_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_isa_suivi WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_isa_suivi WHERE visit_id = p_visit_id)),
+        'SUICIDE_HISTORY_SUIVI_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_suicide_history_suivi WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_suicide_history_suivi WHERE visit_id = p_visit_id)),
         'PERINATALITE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_perinatalite WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_perinatalite WHERE visit_id = p_visit_id)),
         'ECV', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_ecv WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_ecv WHERE visit_id = p_visit_id))
       );
@@ -8303,7 +8303,7 @@ COMMENT ON TABLE "public"."schizophrenia_ipaq" IS 'IPAQ (International Physical 
 
 
 
-CREATE TABLE IF NOT EXISTS "public"."schizophrenia_isa" (
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_isa_initial" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "visit_id" "uuid" NOT NULL,
     "patient_id" "uuid" NOT NULL,
@@ -8346,7 +8346,31 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_isa" (
 );
 
 
-ALTER TABLE "public"."schizophrenia_isa" OWNER TO "postgres";
+ALTER TABLE "public"."schizophrenia_isa_initial" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_isa_suivi" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "q1" integer,
+    "q2" integer,
+    "q3" integer,
+    "q4" integer,
+    "q5" integer,
+    "q6" integer,
+    "q7" integer,
+    "q8" integer,
+    "q9" integer,
+    "q10" integer,
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+
+ALTER TABLE "public"."schizophrenia_isa_suivi" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_lis" (
@@ -9171,7 +9195,7 @@ COMMENT ON TABLE "public"."schizophrenia_stori" IS 'STORI (Stages of Recovery In
 
 
 
-CREATE TABLE IF NOT EXISTS "public"."schizophrenia_suicide_history" (
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_suicide_history_initial" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "visit_id" "uuid" NOT NULL,
     "patient_id" "uuid" NOT NULL,
@@ -9188,7 +9212,26 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_suicide_history" (
 );
 
 
-ALTER TABLE "public"."schizophrenia_suicide_history" OWNER TO "postgres";
+ALTER TABLE "public"."schizophrenia_suicide_history_initial" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_suicide_history_suivi" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "q1_attempt_count" integer,
+    "q2_violent_attempts" "text",
+    "q2_1_violent_count" integer,
+    "q3_serious_attempts" "text",
+    "q3_1_serious_count" integer,
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+
+ALTER TABLE "public"."schizophrenia_suicide_history_suivi" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_sumd" (
@@ -12056,13 +12099,13 @@ ALTER TABLE ONLY "public"."schizophrenia_ipaq"
 
 
 
-ALTER TABLE ONLY "public"."schizophrenia_isa"
-    ADD CONSTRAINT "schizophrenia_isa_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "public"."schizophrenia_isa_initial"
+    ADD CONSTRAINT "schizophrenia_isa_initial_pkey" PRIMARY KEY ("id");
 
 
 
-ALTER TABLE ONLY "public"."schizophrenia_isa"
-    ADD CONSTRAINT "schizophrenia_isa_visit_id_key" UNIQUE ("visit_id");
+ALTER TABLE ONLY "public"."schizophrenia_isa_initial"
+    ADD CONSTRAINT "schizophrenia_isa_initial_visit_id_key" UNIQUE ("visit_id");
 
 
 
@@ -12206,13 +12249,23 @@ ALTER TABLE ONLY "public"."schizophrenia_stori"
 
 
 
-ALTER TABLE ONLY "public"."schizophrenia_suicide_history"
-    ADD CONSTRAINT "schizophrenia_suicide_history_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "public"."schizophrenia_suicide_history_initial"
+    ADD CONSTRAINT "schizophrenia_suicide_history_initial_pkey" PRIMARY KEY ("id");
 
 
 
-ALTER TABLE ONLY "public"."schizophrenia_suicide_history"
-    ADD CONSTRAINT "schizophrenia_suicide_history_visit_id_key" UNIQUE ("visit_id");
+ALTER TABLE ONLY "public"."schizophrenia_suicide_history_initial"
+    ADD CONSTRAINT "schizophrenia_suicide_history_initial_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_suicide_history_suivi"
+    ADD CONSTRAINT "schizophrenia_suicide_history_suivi_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_suicide_history_suivi"
+    ADD CONSTRAINT "schizophrenia_suicide_history_suivi_visit_id_key" UNIQUE ("visit_id");
 
 
 
@@ -15724,18 +15777,18 @@ ALTER TABLE ONLY "public"."schizophrenia_ipaq"
 
 
 
-ALTER TABLE ONLY "public"."schizophrenia_isa"
-    ADD CONSTRAINT "schizophrenia_isa_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+ALTER TABLE ONLY "public"."schizophrenia_isa_initial"
+    ADD CONSTRAINT "schizophrenia_isa_initial_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
 
 
 
-ALTER TABLE ONLY "public"."schizophrenia_isa"
-    ADD CONSTRAINT "schizophrenia_isa_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "public"."schizophrenia_isa_initial"
+    ADD CONSTRAINT "schizophrenia_isa_initial_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
 
 
 
-ALTER TABLE ONLY "public"."schizophrenia_isa"
-    ADD CONSTRAINT "schizophrenia_isa_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "public"."schizophrenia_isa_initial"
+    ADD CONSTRAINT "schizophrenia_isa_initial_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
 
 
 
@@ -15944,13 +15997,23 @@ ALTER TABLE ONLY "public"."schizophrenia_stori"
 
 
 
-ALTER TABLE ONLY "public"."schizophrenia_suicide_history"
-    ADD CONSTRAINT "schizophrenia_suicide_history_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "public"."schizophrenia_suicide_history_initial"
+    ADD CONSTRAINT "schizophrenia_suicide_history_initial_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
 
 
 
-ALTER TABLE ONLY "public"."schizophrenia_suicide_history"
-    ADD CONSTRAINT "schizophrenia_suicide_history_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "public"."schizophrenia_suicide_history_initial"
+    ADD CONSTRAINT "schizophrenia_suicide_history_initial_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_suicide_history_suivi"
+    ADD CONSTRAINT "schizophrenia_suicide_history_suivi_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_suicide_history_suivi"
+    ADD CONSTRAINT "schizophrenia_suicide_history_suivi_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
 
 
 
@@ -17070,7 +17133,7 @@ CREATE POLICY "Patients view own schizophrenia_eval_addictologique" ON "public".
 
 
 
-CREATE POLICY "Patients view own schizophrenia_isa" ON "public"."schizophrenia_isa" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+CREATE POLICY "Patients view own schizophrenia_isa_initial" ON "public"."schizophrenia_isa_initial" FOR SELECT USING (("auth"."uid"() = "patient_id"));
 
 
 
@@ -17110,7 +17173,7 @@ CREATE POLICY "Patients view own schizophrenia_sqol" ON "public"."schizophrenia_
 
 
 
-CREATE POLICY "Patients view own schizophrenia_suicide_history" ON "public"."schizophrenia_suicide_history" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+CREATE POLICY "Patients view own schizophrenia_suicide_history_initial" ON "public"."schizophrenia_suicide_history_initial" FOR SELECT USING (("auth"."uid"() = "patient_id"));
 
 
 
@@ -18280,7 +18343,7 @@ CREATE POLICY "Professionals insert schizophrenia_eval_addictologique" ON "publi
 
 
 
-CREATE POLICY "Professionals insert schizophrenia_isa" ON "public"."schizophrenia_isa" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+CREATE POLICY "Professionals insert schizophrenia_isa_initial" ON "public"."schizophrenia_isa_initial" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -18340,7 +18403,7 @@ CREATE POLICY "Professionals insert schizophrenia_sqol" ON "public"."schizophren
 
 
 
-CREATE POLICY "Professionals insert schizophrenia_suicide_history" ON "public"."schizophrenia_suicide_history" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+CREATE POLICY "Professionals insert schizophrenia_suicide_history_initial" ON "public"."schizophrenia_suicide_history_initial" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -18772,7 +18835,7 @@ CREATE POLICY "Professionals update schizophrenia_eval_addictologique" ON "publi
 
 
 
-CREATE POLICY "Professionals update schizophrenia_isa" ON "public"."schizophrenia_isa" FOR UPDATE USING ((EXISTS ( SELECT 1
+CREATE POLICY "Professionals update schizophrenia_isa_initial" ON "public"."schizophrenia_isa_initial" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -18832,7 +18895,7 @@ CREATE POLICY "Professionals update schizophrenia_sqol" ON "public"."schizophren
 
 
 
-CREATE POLICY "Professionals update schizophrenia_suicide_history" ON "public"."schizophrenia_suicide_history" FOR UPDATE USING ((EXISTS ( SELECT 1
+CREATE POLICY "Professionals update schizophrenia_suicide_history_initial" ON "public"."schizophrenia_suicide_history_initial" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -19324,7 +19387,7 @@ CREATE POLICY "Professionals view schizophrenia_eval_addictologique" ON "public"
 
 
 
-CREATE POLICY "Professionals view schizophrenia_isa" ON "public"."schizophrenia_isa" FOR SELECT USING ((EXISTS ( SELECT 1
+CREATE POLICY "Professionals view schizophrenia_isa_initial" ON "public"."schizophrenia_isa_initial" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -19378,7 +19441,7 @@ CREATE POLICY "Professionals view schizophrenia_sqol" ON "public"."schizophrenia
 
 
 
-CREATE POLICY "Professionals view schizophrenia_suicide_history" ON "public"."schizophrenia_suicide_history" FOR SELECT USING ((EXISTS ( SELECT 1
+CREATE POLICY "Professionals view schizophrenia_suicide_history_initial" ON "public"."schizophrenia_suicide_history_initial" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -20214,7 +20277,7 @@ ALTER TABLE "public"."schizophrenia_fagerstrom" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."schizophrenia_ipaq" ENABLE ROW LEVEL SECURITY;
 
 
-ALTER TABLE "public"."schizophrenia_isa" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."schizophrenia_isa_initial" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."schizophrenia_lis" ENABLE ROW LEVEL SECURITY;
@@ -20259,7 +20322,7 @@ ALTER TABLE "public"."schizophrenia_sstics" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."schizophrenia_stori" ENABLE ROW LEVEL SECURITY;
 
 
-ALTER TABLE "public"."schizophrenia_suicide_history" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."schizophrenia_suicide_history_initial" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."schizophrenia_sumd" ENABLE ROW LEVEL SECURITY;
@@ -21514,9 +21577,9 @@ GRANT ALL ON TABLE "public"."schizophrenia_ipaq" TO "service_role";
 
 
 
-GRANT ALL ON TABLE "public"."schizophrenia_isa" TO "anon";
-GRANT ALL ON TABLE "public"."schizophrenia_isa" TO "authenticated";
-GRANT ALL ON TABLE "public"."schizophrenia_isa" TO "service_role";
+GRANT ALL ON TABLE "public"."schizophrenia_isa_initial" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_isa_initial" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_isa_initial" TO "service_role";
 
 
 
@@ -21604,9 +21667,9 @@ GRANT ALL ON TABLE "public"."schizophrenia_stori" TO "service_role";
 
 
 
-GRANT ALL ON TABLE "public"."schizophrenia_suicide_history" TO "anon";
-GRANT ALL ON TABLE "public"."schizophrenia_suicide_history" TO "authenticated";
-GRANT ALL ON TABLE "public"."schizophrenia_suicide_history" TO "service_role";
+GRANT ALL ON TABLE "public"."schizophrenia_suicide_history_initial" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_suicide_history_initial" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_suicide_history_initial" TO "service_role";
 
 
 
