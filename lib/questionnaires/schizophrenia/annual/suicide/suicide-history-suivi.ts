@@ -38,7 +38,6 @@ export const SUICIDE_HISTORY_SUIVI_SZ_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 0,
-    placeholder: '1',
   },
   {
     id: 'q2_violent_attempts',
@@ -57,7 +56,6 @@ export const SUICIDE_HISTORY_SUIVI_SZ_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 0,
-    placeholder: '1',
     display_if: { '==': [{ var: 'q2_violent_attempts' }, 'oui'] },
   },
   {
@@ -77,7 +75,6 @@ export const SUICIDE_HISTORY_SUIVI_SZ_QUESTIONS: Question[] = [
     type: 'number',
     required: false,
     min: 0,
-    placeholder: '2',
     display_if: { '==': [{ var: 'q3_serious_attempts' }, 'oui'] },
   },
 ];
