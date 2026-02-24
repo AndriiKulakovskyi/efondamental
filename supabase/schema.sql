@@ -1307,7 +1307,7 @@ BEGIN
 
     -- Schizophrenia medical module
     v_statuses := v_statuses || jsonb_build_object(
-      'TROUBLES_PSYCHOTIQUES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_psychotiques WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_psychotiques WHERE visit_id = p_visit_id)),
+      'TROUBLES_PSYCHOTIQUES_INITIAL', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_psychotiques_initial WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_psychotiques_initial WHERE visit_id = p_visit_id)),
       'TROUBLES_COMORBIDES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_comorbides WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_comorbides WHERE visit_id = p_visit_id)),
       'TEA_COFFEE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_tea_coffee WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_tea_coffee WHERE visit_id = p_visit_id)),
       'EVAL_ADDICTOLOGIQUE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id)),
@@ -1424,8 +1424,9 @@ BEGIN
 
       -- Medical module (ANTECEDENTS_FAMILIAUX_PSY_SZ omitted: immutable baseline; ISA_SUIVI_SZ replaces ISA_SZ; SUICIDE_HISTORY_SUIVI_SZ replaces SUICIDE_HISTORY_SZ; TROUBLES_COMORBIDES_ANNUEL_SZ replaces TROUBLES_COMORBIDES_SZ)
       v_statuses := v_statuses || jsonb_build_object(
-        'TROUBLES_PSYCHOTIQUES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_psychotiques WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_psychotiques WHERE visit_id = p_visit_id)),
+        'TROUBLES_PSYCHOTIQUES_ANNUEL', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_psychotiques_annuel WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_psychotiques_annuel WHERE visit_id = p_visit_id)),
         'TROUBLES_COMORBIDES_ANNUEL_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_comorbides_annuel WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_comorbides_annuel WHERE visit_id = p_visit_id)),
+        'COMPORTEMENTS_VIOLENTS_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_comportements_violents WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_comportements_violents WHERE visit_id = p_visit_id)),
         'TEA_COFFEE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_tea_coffee WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_tea_coffee WHERE visit_id = p_visit_id)),
         'EVAL_ADDICTOLOGIQUE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id)),
         'ISA_SUIVI_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_isa_suivi WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_isa_suivi WHERE visit_id = p_visit_id)),
