@@ -157,6 +157,7 @@ import {
   SZ_PERINATALITE_DEFINITION,
   EVAL_ADDICTOLOGIQUE_SZ_DEFINITION,
   TROUBLES_COMORBIDES_SZ_DEFINITION,
+  TROUBLES_COMORBIDES_ANNUEL_SZ_DEFINITION,
   BILAN_SOCIAL_SZ_DEFINITION,
   SQOL_SZ_DEFINITION,
   CTQ_SZ_DEFINITION,
@@ -763,7 +764,9 @@ function schizophreniaModules(isAnnual: boolean = false): VirtualModule[] {
           name: 'DSM5',
           questionnaires: [
             q(isAnnual ? TROUBLES_PSYCHOTIQUES_ANNUEL_DEFINITION : TROUBLES_PSYCHOTIQUES_INITIAL_DEFINITION, 'healthcare_professional'),
-            ...(!isAnnual ? [q(TROUBLES_COMORBIDES_SZ_DEFINITION, 'healthcare_professional')] : []),
+            ...(isAnnual
+              ? [q(TROUBLES_COMORBIDES_ANNUEL_SZ_DEFINITION, 'healthcare_professional')]
+              : [q(TROUBLES_COMORBIDES_SZ_DEFINITION, 'healthcare_professional')]),
             ...(isAnnual ? [q(COMPORTEMENTS_VIOLENTS_SZ_DEFINITION, 'healthcare_professional')] : []),
           ],
         },

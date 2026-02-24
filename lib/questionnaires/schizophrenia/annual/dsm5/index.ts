@@ -11,3 +11,10 @@ export {
   type SchizophreniaComportementsViolentsResponse,
   type SchizophreniaComportementsViolentsResponseInsert
 } from './comportements-violents';
+
+export {
+  TROUBLES_COMORBIDES_ANNUEL_SZ_QUESTIONS,
+  TROUBLES_COMORBIDES_ANNUEL_SZ_DEFINITION,
+  type SchizophreniaTroublesComorbidsAnnuelResponse,
+  type SchizophreniaTroublesComorbidsAnnuelResponseInsert
+} from './troubles-comorbides-annuel';

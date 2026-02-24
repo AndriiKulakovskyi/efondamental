@@ -1422,10 +1422,10 @@ BEGIN
         'EGF_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_egf WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_egf WHERE visit_id = p_visit_id))
       );
 
-      -- Medical module (ANTECEDENTS_FAMILIAUX_PSY_SZ omitted: immutable baseline; ISA_SUIVI_SZ replaces ISA_SZ; SUICIDE_HISTORY_SUIVI_SZ replaces SUICIDE_HISTORY_SZ)
+      -- Medical module (ANTECEDENTS_FAMILIAUX_PSY_SZ omitted: immutable baseline; ISA_SUIVI_SZ replaces ISA_SZ; SUICIDE_HISTORY_SUIVI_SZ replaces SUICIDE_HISTORY_SZ; TROUBLES_COMORBIDES_ANNUEL_SZ replaces TROUBLES_COMORBIDES_SZ)
       v_statuses := v_statuses || jsonb_build_object(
         'TROUBLES_PSYCHOTIQUES', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_psychotiques WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_psychotiques WHERE visit_id = p_visit_id)),
-        'TROUBLES_COMORBIDES_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_comorbides WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_comorbides WHERE visit_id = p_visit_id)),
+        'TROUBLES_COMORBIDES_ANNUEL_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_troubles_comorbides_annuel WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_troubles_comorbides_annuel WHERE visit_id = p_visit_id)),
         'TEA_COFFEE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_tea_coffee WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_tea_coffee WHERE visit_id = p_visit_id)),
         'EVAL_ADDICTOLOGIQUE_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_eval_addictologique WHERE visit_id = p_visit_id)),
         'ISA_SUIVI_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_isa_suivi WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_isa_suivi WHERE visit_id = p_visit_id)),
@@ -9502,6 +9502,94 @@ CREATE TABLE IF NOT EXISTS "public"."schizophrenia_troubles_comorbides" (
 ALTER TABLE "public"."schizophrenia_troubles_comorbides" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."schizophrenia_troubles_comorbides_annuel" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "visit_id" "uuid" NOT NULL,
+    "patient_id" "uuid" NOT NULL,
+    "rad_tb_anx" "text",
+    "chk_troubles_anxieux_choix" "text"[],
+    "chk_anxieux_trouble_panique_type" "text"[],
+    "rad_anxieux_trouble_panique_agora_debut" "text",
+    "rad_anxieux_trouble_panique_agora_mois" "text",
+    "rad_anxieux_trouble_panique_sansagora_debut" "text",
+    "rad_anxieux_trouble_panique_sansagora_mois" "text",
+    "rad_anxieux_agoraphobie_age_debut" "text",
+    "rad_anxieux_agoraphobie_symptome_mois_ecoule" "text",
+    "rad_anxieux_phobie_sociale_age_debut" "text",
+    "rad_anxieux_phobie_sociale_symptome_mois_ecoule" "text",
+    "rad_anxieux_phobie_specfique_age_debut" "text",
+    "rad_anxieux_phobie_specfique_symptome_mois_ecoule" "text",
+    "rad_anxieux_toc_age_debut" "text",
+    "rad_anxieux_toc_symptome_mois_ecoule" "text",
+    "rad_anxieux_post_trauma_age_debut" "text",
+    "rad_anxieux_post_trauma_symptome_mois_ecoule" "text",
+    "rad_anxieux_generalise_age_debut" "text",
+    "rad_anxieux_generalise_symptome_mois_ecoule" "text",
+    "anxieux_affection_medicale" character varying(50),
+    "rad_anxieux_affection_medicale_age_debut" "text",
+    "rad_anxieux_affection_medicale_symptome_mois_ecoule" "text",
+    "anxieux_substance" character varying(50),
+    "rad_anxieux_substance_age_debut" "text",
+    "rad_anxieux_substance_symptome_mois_ecoule" "text",
+    "rad_anxieux_non_specifie_age_debut" "text",
+    "rad_anxieux_non_specifie_symptome_mois_ecoule" "text",
+    "rad_tb_subst" "text",
+    "chk_substances_type" "text"[],
+    "rad_alcool_type" "text",
+    "rad_alcool_mois" "text",
+    "rad_alcool_age" "text",
+    "alcool_dur" character varying(50),
+    "rad_sedatif_type" "text",
+    "rad_sedatif_mois" "text",
+    "rad_sedatif_age" "text",
+    "sedatif_dur" character varying(50),
+    "rad_cannabis_type" "text",
+    "rad_cannabis_mois" "text",
+    "rad_cannabis_age" "text",
+    "cannabis_dur" character varying(50),
+    "rad_stimulants_type" "text",
+    "rad_stimulants_mois" "text",
+    "rad_stimulants_age" "text",
+    "stimulants_dur" character varying(50),
+    "rad_opiaces_type" "text",
+    "rad_opiaces_mois" "text",
+    "rad_opiaces_age" "text",
+    "opiaces_dur" character varying(50),
+    "rad_cocaine_type" "text",
+    "rad_cocaine_mois" "text",
+    "rad_cocaine_age" "text",
+    "cocaine_dur" character varying(50),
+    "rad_hallucinogenes_type" "text",
+    "rad_hallucinogenes_mois" "text",
+    "rad_hallucinogenes_age" "text",
+    "hallucinogene_dur" character varying(50),
+    "autresubstance_autre" character varying(50),
+    "rad_autresubstance_type" "text",
+    "rad_autresubstance_mois" "text",
+    "rad_autresubstance_age" "text",
+    "autresubstance_dur" character varying(50),
+    "rad_tb_substind" "text",
+    "chk_tb_substind_sub" "text"[],
+    "chk_tb_substind_typ" "text"[],
+    "rad_tb_substindpres" "text",
+    "rad_tb_somat" "text",
+    "rad_somatoforme_type" "text",
+    "rad_somatoforme_age_debut" "text",
+    "rad_somatoforme_presence_symptomes_mois_ecoule" "text",
+    "rad_tb_alim" "text",
+    "rad_conduites_alimentaires_type" "text",
+    "rad_conduites_alimentaires_age_debut" "text",
+    "rad_conduites_alimentaires_symptomes_mois_ecoule" "text",
+    "completed_by" "uuid",
+    "completed_at" timestamp with time zone DEFAULT "now"(),
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "updated_at" timestamp with time zone DEFAULT "now"()
+);
+
+
+ALTER TABLE "public"."schizophrenia_troubles_comorbides_annuel" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "public"."schizophrenia_troubles_psychotiques" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "visit_id" "uuid" NOT NULL,
@@ -12306,6 +12394,16 @@ ALTER TABLE ONLY "public"."schizophrenia_troubles_comorbides"
 
 ALTER TABLE ONLY "public"."schizophrenia_troubles_comorbides"
     ADD CONSTRAINT "schizophrenia_troubles_comorbides_visit_id_key" UNIQUE ("visit_id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_troubles_comorbides_annuel"
+    ADD CONSTRAINT "schizophrenia_troubles_comorbides_annuel_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_troubles_comorbides_annuel"
+    ADD CONSTRAINT "schizophrenia_troubles_comorbides_annuel_visit_id_key" UNIQUE ("visit_id");
 
 
 
@@ -16077,6 +16175,21 @@ ALTER TABLE ONLY "public"."schizophrenia_troubles_comorbides"
 
 
 
+ALTER TABLE ONLY "public"."schizophrenia_troubles_comorbides_annuel"
+    ADD CONSTRAINT "schizophrenia_troubles_comorbides_annuel_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_troubles_comorbides_annuel"
+    ADD CONSTRAINT "schizophrenia_troubles_comorbides_annuel_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."schizophrenia_troubles_comorbides_annuel"
+    ADD CONSTRAINT "schizophrenia_troubles_comorbides_annuel_visit_id_fkey" FOREIGN KEY ("visit_id") REFERENCES "public"."visits"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."schizophrenia_troubles_psychotiques"
     ADD CONSTRAINT "schizophrenia_troubles_psychotiques_completed_by_fkey" FOREIGN KEY ("completed_by") REFERENCES "public"."user_profiles"("id");
 
@@ -17190,6 +17303,18 @@ CREATE POLICY "Patients view own schizophrenia_tmt responses" ON "public"."schiz
 
 
 CREATE POLICY "Patients view own schizophrenia_troubles_comorbides" ON "public"."schizophrenia_troubles_comorbides" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients view own schizophrenia_troubles_comorbides_annuel" ON "public"."schizophrenia_troubles_comorbides_annuel" FOR SELECT USING (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients insert own schizophrenia_troubles_comorbides_annuel" ON "public"."schizophrenia_troubles_comorbides_annuel" FOR INSERT WITH CHECK (("auth"."uid"() = "patient_id"));
+
+
+
+CREATE POLICY "Patients update own schizophrenia_troubles_comorbides_annuel" ON "public"."schizophrenia_troubles_comorbides_annuel" FOR UPDATE USING (("auth"."uid"() = "patient_id"));
 
 
 
@@ -18433,6 +18558,12 @@ CREATE POLICY "Professionals insert schizophrenia_troubles_comorbides" ON "publi
 
 
 
+CREATE POLICY "Professionals insert schizophrenia_troubles_comorbides_annuel" ON "public"."schizophrenia_troubles_comorbides_annuel" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
 CREATE POLICY "Professionals insert schizophrenia_troubles_psychotiques" ON "public"."schizophrenia_troubles_psychotiques" FOR INSERT WITH CHECK ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
@@ -18920,6 +19051,12 @@ CREATE POLICY "Professionals update schizophrenia_tmt responses" ON "public"."sc
 
 
 CREATE POLICY "Professionals update schizophrenia_troubles_comorbides" ON "public"."schizophrenia_troubles_comorbides" FOR UPDATE USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals update schizophrenia_troubles_comorbides_annuel" ON "public"."schizophrenia_troubles_comorbides_annuel" FOR UPDATE USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -19460,6 +19597,12 @@ CREATE POLICY "Professionals view schizophrenia_tea_coffee" ON "public"."schizop
 
 
 CREATE POLICY "Professionals view schizophrenia_troubles_comorbides" ON "public"."schizophrenia_troubles_comorbides" FOR SELECT USING ((EXISTS ( SELECT 1
+   FROM "public"."user_profiles"
+  WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
+
+
+
+CREATE POLICY "Professionals view schizophrenia_troubles_comorbides_annuel" ON "public"."schizophrenia_troubles_comorbides_annuel" FOR SELECT USING ((EXISTS ( SELECT 1
    FROM "public"."user_profiles"
   WHERE (("user_profiles"."id" = "auth"."uid"()) AND ("user_profiles"."role" = ANY (ARRAY['healthcare_professional'::"public"."user_role", 'manager'::"public"."user_role", 'administrator'::"public"."user_role"]))))));
 
@@ -20335,6 +20478,9 @@ ALTER TABLE "public"."schizophrenia_tmt" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."schizophrenia_troubles_comorbides" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."schizophrenia_troubles_comorbides_annuel" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."schizophrenia_troubles_psychotiques" ENABLE ROW LEVEL SECURITY;
@@ -21694,6 +21840,12 @@ GRANT ALL ON TABLE "public"."schizophrenia_tmt" TO "service_role";
 GRANT ALL ON TABLE "public"."schizophrenia_troubles_comorbides" TO "anon";
 GRANT ALL ON TABLE "public"."schizophrenia_troubles_comorbides" TO "authenticated";
 GRANT ALL ON TABLE "public"."schizophrenia_troubles_comorbides" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."schizophrenia_troubles_comorbides_annuel" TO "anon";
+GRANT ALL ON TABLE "public"."schizophrenia_troubles_comorbides_annuel" TO "authenticated";
+GRANT ALL ON TABLE "public"."schizophrenia_troubles_comorbides_annuel" TO "service_role";
 
 
 

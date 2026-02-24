@@ -39,6 +39,7 @@ export {
   getTroublesPsychotiquesAnnuelResponse,
   getComportementsViolentsSzResponse,
   getTroublesComorbidesSzResponse,
+  getTroublesComorbidsAnnuelSzResponse,
   getIsaSzResponse,
   getIsaSuiviSzResponse,
   getSuicideHistorySzResponse,

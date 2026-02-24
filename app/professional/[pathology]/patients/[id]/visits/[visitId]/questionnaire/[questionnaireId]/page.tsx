@@ -149,6 +149,7 @@ import {
   TEA_COFFEE_SZ_DEFINITION,
   EVAL_ADDICTOLOGIQUE_SZ_DEFINITION,
   TROUBLES_COMORBIDES_SZ_DEFINITION,
+  TROUBLES_COMORBIDES_ANNUEL_SZ_DEFINITION,
   BILAN_SOCIAL_SZ_DEFINITION,
   SQOL_SZ_DEFINITION,
   CTQ_SZ_DEFINITION,
@@ -313,6 +314,7 @@ import {
   getTroublesPsychotiquesAnnuelResponse,
   getComportementsViolentsSzResponse,
   getTroublesComorbidesSzResponse,
+  getTroublesComorbidsAnnuelSzResponse,
   getSuicideHistorySzResponse,
   getSuicideHistorySuiviSzResponse,
   getAntecedentsFamiliauxPsySzResponse,
@@ -746,6 +748,8 @@ export default async function ProfessionalQuestionnairePage({
     questionnaire = COMPORTEMENTS_VIOLENTS_SZ_DEFINITION;
   else if (code === TROUBLES_COMORBIDES_SZ_DEFINITION.code)
     questionnaire = TROUBLES_COMORBIDES_SZ_DEFINITION;
+  else if (code === TROUBLES_COMORBIDES_ANNUEL_SZ_DEFINITION.code)
+    questionnaire = TROUBLES_COMORBIDES_ANNUEL_SZ_DEFINITION;
   else if (code === ISA_SZ_DEFINITION.code)
     questionnaire = ISA_SZ_DEFINITION;
   else if (code === ISA_SUIVI_SZ_DEFINITION.code)
@@ -1089,6 +1093,8 @@ export default async function ProfessionalQuestionnairePage({
     existingResponse = await getComportementsViolentsSzResponse(visitId);
   else if (code === TROUBLES_COMORBIDES_SZ_DEFINITION.code)
     existingResponse = await getTroublesComorbidesSzResponse(visitId);
+  else if (code === TROUBLES_COMORBIDES_ANNUEL_SZ_DEFINITION.code)
+    existingResponse = await getTroublesComorbidsAnnuelSzResponse(visitId);
   else if (code === ISA_SZ_DEFINITION.code)
     existingResponse = await getIsaSzResponse(visitId);
   else if (code === ISA_SUIVI_SZ_DEFINITION.code)
