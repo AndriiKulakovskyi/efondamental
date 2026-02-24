@@ -1,7 +1,7 @@
 -- Migration pour ajouter le questionnaire ONAPS (Activité Physique) pour la Schizophrénie
 
 -- 1. Create the table for ONAPS responses
-CREATE TABLE public.schizophrenia_onaps (
+CREATE TABLE IF NOT EXISTS public.schizophrenia_onaps (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     visit_id UUID NOT NULL REFERENCES public.visits(id) ON DELETE CASCADE,
     patient_id UUID NOT NULL REFERENCES public.patients(id) ON DELETE CASCADE,
@@ -75,72 +75,57 @@ CREATE TABLE public.schizophrenia_onaps (
 -- 2. Add RLS policies
 ALTER TABLE public.schizophrenia_onaps ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Professionals can view ONAPS responses" 
-    ON public.schizophrenia_onaps FOR SELECT 
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.user_profiles up
-            WHERE up.id = auth.uid() 
-            AND up.role IN ('healthcare_professional', 'manager', 'administrator')
-        )
-    );
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Professionals can view ONAPS responses' AND tablename = 'schizophrenia_onaps') THEN
+        CREATE POLICY "Professionals can view ONAPS responses" ON public.schizophrenia_onaps FOR SELECT USING (
+            EXISTS (SELECT 1 FROM public.user_profiles up WHERE up.id = auth.uid() AND up.role IN ('healthcare_professional', 'manager', 'administrator'))
+        );
+    END IF;
 
-CREATE POLICY "Professionals can insert ONAPS responses" 
-    ON public.schizophrenia_onaps FOR INSERT 
-    WITH CHECK (
-        EXISTS (
-            SELECT 1 FROM public.user_profiles up
-            WHERE up.id = auth.uid() 
-            AND up.role IN ('healthcare_professional', 'manager', 'administrator')
-        )
-    );
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Professionals can insert ONAPS responses' AND tablename = 'schizophrenia_onaps') THEN
+        CREATE POLICY "Professionals can insert ONAPS responses" ON public.schizophrenia_onaps FOR INSERT WITH CHECK (
+            EXISTS (SELECT 1 FROM public.user_profiles up WHERE up.id = auth.uid() AND up.role IN ('healthcare_professional', 'manager', 'administrator'))
+        );
+    END IF;
 
-CREATE POLICY "Professionals can update ONAPS responses" 
-    ON public.schizophrenia_onaps FOR UPDATE 
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.user_profiles up
-            WHERE up.id = auth.uid() 
-            AND up.role IN ('healthcare_professional', 'manager', 'administrator')
-        )
-    );
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Professionals can update ONAPS responses' AND tablename = 'schizophrenia_onaps') THEN
+        CREATE POLICY "Professionals can update ONAPS responses" ON public.schizophrenia_onaps FOR UPDATE USING (
+            EXISTS (SELECT 1 FROM public.user_profiles up WHERE up.id = auth.uid() AND up.role IN ('healthcare_professional', 'manager', 'administrator'))
+        );
+    END IF;
 
-CREATE POLICY "Patients can view own ONAPS responses" 
-    ON public.schizophrenia_onaps FOR SELECT 
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.patients p
-            WHERE p.id = patient_id 
-            AND p.user_id = auth.uid()
-        )
-    );
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Patients can view own ONAPS responses' AND tablename = 'schizophrenia_onaps') THEN
+        CREATE POLICY "Patients can view own ONAPS responses" ON public.schizophrenia_onaps FOR SELECT USING (
+            EXISTS (SELECT 1 FROM public.patients p WHERE p.id = patient_id AND p.user_id = auth.uid())
+        );
+    END IF;
 
-CREATE POLICY "Patients can insert own ONAPS responses" 
-    ON public.schizophrenia_onaps FOR INSERT 
-    WITH CHECK (
-        EXISTS (
-            SELECT 1 FROM public.patients p
-            WHERE p.id = patient_id 
-            AND p.user_id = auth.uid()
-        )
-    );
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Patients can insert own ONAPS responses' AND tablename = 'schizophrenia_onaps') THEN
+        CREATE POLICY "Patients can insert own ONAPS responses" ON public.schizophrenia_onaps FOR INSERT WITH CHECK (
+            EXISTS (SELECT 1 FROM public.patients p WHERE p.id = patient_id AND p.user_id = auth.uid())
+        );
+    END IF;
 
-CREATE POLICY "Patients can update own ONAPS responses" 
-    ON public.schizophrenia_onaps FOR UPDATE 
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.patients p
-            WHERE p.id = patient_id 
-            AND p.user_id = auth.uid()
-        )
-    );
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Patients can update own ONAPS responses' AND tablename = 'schizophrenia_onaps') THEN
+        CREATE POLICY "Patients can update own ONAPS responses" ON public.schizophrenia_onaps FOR UPDATE USING (
+            EXISTS (SELECT 1 FROM public.patients p WHERE p.id = patient_id AND p.user_id = auth.uid())
+        );
+    END IF;
+END $$;
 
 -- 3. Create updated_at trigger
-CREATE TRIGGER update_schizophrenia_onaps_updated_at
-    BEFORE UPDATE ON public.schizophrenia_onaps
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'update_schizophrenia_onaps_updated_at') THEN
+        CREATE TRIGGER update_schizophrenia_onaps_updated_at
+            BEFORE UPDATE ON public.schizophrenia_onaps
+            FOR EACH ROW
+            EXECUTE FUNCTION update_updated_at_column();
+    END IF;
+END $$;
 
 -- 4. Grant permissions
 GRANT ALL ON public.schizophrenia_onaps TO authenticated;
 GRANT ALL ON public.schizophrenia_onaps TO service_role;
+

@@ -165,6 +165,7 @@ import {
   FAGERSTROM_SZ_DEFINITION,
   BRIEF_A_AUTO_SZ_DEFINITION,
   ONAPS_SZ_DEFINITION,
+  ALIMENTAIRE_SZ_DEFINITION,
   EPHP_SZ_DEFINITION,
   SZ_CVLT_DEFINITION,
   TMT_SZ_DEFINITION,
@@ -353,6 +354,7 @@ import {
   getBriefASzResponse,
   getSchizophreniaInitialResponse,
   getOnapsSzResponse,
+  getAlimentaireSzResponse,
   getIsaSzResponse,
   getIsaSuiviSzResponse,
   getTapSzResponse,
@@ -789,6 +791,8 @@ export default async function ProfessionalQuestionnairePage({
     questionnaire = BRIEF_A_AUTO_SZ_DEFINITION;
   else if (code === ONAPS_SZ_DEFINITION.code)
     questionnaire = ONAPS_SZ_DEFINITION;
+  else if (code === ALIMENTAIRE_SZ_DEFINITION.code)
+    questionnaire = ALIMENTAIRE_SZ_DEFINITION;
   // Schizophrenia entourage module (caregiver-administered)
   else if (code === EPHP_SZ_DEFINITION.code) questionnaire = EPHP_SZ_DEFINITION;
   // Schizophrenia neuropsy module
@@ -1139,6 +1143,8 @@ export default async function ProfessionalQuestionnairePage({
     existingResponse = await getSchizophreniaInitialResponse("BRIEF_A_AUTO_SZ", visitId);
   else if (code === ONAPS_SZ_DEFINITION.code)
     existingResponse = await getOnapsSzResponse(visitId);
+  else if (code === ALIMENTAIRE_SZ_DEFINITION.code)
+    existingResponse = await getAlimentaireSzResponse(visitId);
   // Schizophrenia entourage module (caregiver-administered)
   else if (code === EPHP_SZ_DEFINITION.code)
     existingResponse = await getEphpSzResponse(visitId);

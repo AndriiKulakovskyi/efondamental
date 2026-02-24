@@ -173,6 +173,7 @@ import {
   FAGERSTROM_SZ_DEFINITION,
   BRIEF_A_AUTO_SZ_DEFINITION,
   ONAPS_SZ_DEFINITION,
+  ALIMENTAIRE_SZ_DEFINITION,
   EPHP_SZ_DEFINITION,
   SZ_CVLT_DEFINITION,
   TMT_SZ_DEFINITION,
@@ -268,7 +269,7 @@ export async function createVisit(visit: VisitInsert): Promise<Visit> {
   // Check for duplicate unique visit types
   const visitType = visit.visit_type as VisitType;
   const isDuplicate = await checkDuplicateVisit(supabase, visit.patient_id, visitType);
-  
+
   if (isDuplicate) {
     const visitTypeName = visitType === VisitType.SCREENING ? 'screening' : 'initial evaluation';
     throw new DuplicateVisitError(visitTypeName);
@@ -281,7 +282,7 @@ export async function createVisit(visit: VisitInsert): Promise<Visit> {
       .select('assigned_to')
       .eq('id', visit.patient_id)
       .single();
-    
+
     if (patient?.assigned_to) {
       visit.conducted_by = patient.assigned_to;
     }
@@ -448,7 +449,7 @@ export async function getUpcomingVisitsByPatient(
     .eq('patient_id', patientId)
     .eq('status', VisitStatus.SCHEDULED)
     .gte('scheduled_date', new Date().toISOString())
-    .order('scheduled_date', { ascending: true});
+    .order('scheduled_date', { ascending: true });
 
   if (error) {
     throw new Error(`Failed to fetch upcoming visits: ${error.message}`);
@@ -716,6 +717,7 @@ function schizophreniaModules(isAnnual: boolean = false): VirtualModule[] {
     q(FAGERSTROM_SZ_DEFINITION, 'patient'),
     q(BRIEF_A_AUTO_SZ_DEFINITION, 'patient'),
     q(ONAPS_SZ_DEFINITION, 'patient'),
+    q(ALIMENTAIRE_SZ_DEFINITION, 'patient'),
   ];
 
   return [
@@ -1173,7 +1175,7 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
   }
 
   const supabase = await createClient();
-  
+
   // Fetch all visits at once
   const { data: visits, error } = await supabase
     .from('visits')
@@ -1193,21 +1195,21 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
   // Process screening visits - need to separate by pathology
   if (screeningVisits.length > 0) {
     const screeningIds = screeningVisits.map(v => v.id);
-    
+
     // Fetch patient pathology for each screening visit
     const { data: visitPatients } = await supabase
       .from('visits')
       .select('id, patients!inner(pathology_type)')
       .in('id', screeningIds);
-    
+
     const visitPathologyMap = new Map<string, string>();
     visitPatients?.forEach((vp: any) => {
       visitPathologyMap.set(vp.id, vp.patients?.pathology_type || 'bipolar');
     });
-    
+
     const bipolarScreeningIds = screeningIds.filter(id => visitPathologyMap.get(id) !== 'schizophrenia');
     const szScreeningIds = screeningIds.filter(id => visitPathologyMap.get(id) === 'schizophrenia');
-    
+
     // Process bipolar screening visits (5 questionnaires: ASRM, QIDS, MDQ, Diag, Orient)
     if (bipolarScreeningIds.length > 0) {
       const [asrmResults, qidsResults, mdqResults, diagResults, orientResults] = await Promise.all([
@@ -1234,7 +1236,7 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
         });
       }
     }
-    
+
     // Process schizophrenia screening visits (2 questionnaires: Diagnostic, Orientation)
     if (szScreeningIds.length > 0) {
       const [szDiagResults, szOrientResults] = await Promise.all([
@@ -1260,7 +1262,7 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
   // Process initial evaluation visits
   if (initialEvalVisits.length > 0) {
     const evalIds = initialEvalVisits.map(v => v.id);
-    
+
     const [
       eq5d5lResults, priseMResults, staiYaResults, marsResults, mathysResults,
       asrmResults, qidsResults, psqiResults, epworthResults,
@@ -1271,7 +1273,11 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
       tobaccoResults, fagerstromResults, physicalParamsResults, bloodPressureResults,
       sleepApneaResults, biologicalAssessmentResults,
       dsm5HumeurResults, dsm5PsychoticResults, dsm5ComorbidResults,
-      divaResults, familyHistoryResults, cssrsResults
+      divaResults, familyHistoryResults, cssrsResults,
+      // Schizophrenia results
+      szCbq, szDacobs, szSqol, szCtq, szMars, szBis, szEq5d5l, szIpaq,
+      szYbocs, szWurs25, szStori, szSogs, szPsqi, szPresenteisme,
+      szFagerstrom, szBriefAAuto, szOnaps, szAlimentaire
     ] = await Promise.all([
       supabase.from('bipolar_eq5d5l').select('visit_id').in('visit_id', evalIds),
       supabase.from('bipolar_prise_m').select('visit_id').in('visit_id', evalIds),
@@ -1310,8 +1316,37 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
       supabase.from('bipolar_dsm5_comorbid').select('visit_id').in('visit_id', evalIds),
       supabase.from('bipolar_diva').select('visit_id').in('visit_id', evalIds),
       supabase.from('bipolar_family_history').select('visit_id').in('visit_id', evalIds),
-      supabase.from('bipolar_cssrs').select('visit_id').in('visit_id', evalIds)
+      supabase.from('bipolar_cssrs').select('visit_id').in('visit_id', evalIds),
+      // Schizophrenia initial evaluation - Autoquestionnaires
+      supabase.from('schizophrenia_cbq').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_dacobs').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_sqol').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_ctq').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_mars').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_bis').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_eq5d5l').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_ipaq').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_ybocs').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_wurs25').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_stori').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_sogs').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_psqi').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_presenteisme').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_fagerstrom').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_brief_a_auto').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_onaps').select('visit_id').in('visit_id', evalIds),
+      supabase.from('schizophrenia_alimentaire').select('visit_id').in('visit_id', evalIds)
     ]);
+
+    const visitPathologyMap = new Map<string, string>();
+    const { data: visitPatients } = await supabase
+      .from('visits')
+      .select('id, patients!inner(pathology_type)')
+      .in('id', evalIds);
+
+    visitPatients?.forEach((vp: any) => {
+      visitPathologyMap.set(vp.id, vp.patients?.pathology_type || 'bipolar');
+    });
 
     const responseSets = [
       new Set(eq5d5lResults.data?.map(r => r.visit_id) || []),
@@ -1354,9 +1389,32 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
       new Set(cssrsResults.data?.map(r => r.visit_id) || [])
     ];
 
+    const szResponseSets = [
+      new Set(szCbq.data?.map(r => r.visit_id) || []),
+      new Set(szDacobs.data?.map(r => r.visit_id) || []),
+      new Set(szSqol.data?.map(r => r.visit_id) || []),
+      new Set(szCtq.data?.map(r => r.visit_id) || []),
+      new Set(szMars.data?.map(r => r.visit_id) || []),
+      new Set(szBis.data?.map(r => r.visit_id) || []),
+      new Set(szEq5d5l.data?.map(r => r.visit_id) || []),
+      new Set(szIpaq.data?.map(r => r.visit_id) || []),
+      new Set(szYbocs.data?.map(r => r.visit_id) || []),
+      new Set(szWurs25.data?.map(r => r.visit_id) || []),
+      new Set(szStori.data?.map(r => r.visit_id) || []),
+      new Set(szSogs.data?.map(r => r.visit_id) || []),
+      new Set(szPsqi.data?.map(r => r.visit_id) || []),
+      new Set(szPresenteisme.data?.map(r => r.visit_id) || []),
+      new Set(szFagerstrom.data?.map(r => r.visit_id) || []),
+      new Set(szBriefAAuto.data?.map(r => r.visit_id) || []),
+      new Set(szOnaps.data?.map(r => r.visit_id) || []),
+      new Set(szAlimentaire.data?.map(r => r.visit_id) || [])
+    ];
+
     for (const visit of initialEvalVisits) {
-      const completed = responseSets.filter(set => set.has(visit.id)).length;
-      const total = 38;
+      const isSz = visitPathologyMap.get(visit.id) === 'schizophrenia';
+      const datasets = isSz ? szResponseSets : responseSets;
+      const completed = datasets.filter(set => set.has(visit.id)).length;
+      const total = isSz ? 18 : 38;
       completionMap.set(visit.id, {
         completedQuestionnaires: completed,
         totalQuestionnaires: total,
