@@ -66,9 +66,9 @@ if [ -n "$VERCEL" ] || [ -n "$NETLIFY" ] || [ -n "$CI" ] || [ -n "$PRODUCTION" ]
     exit 1
 fi
 
-# Vérifier que Supabase local est démarré
-if ! npx supabase status &> /dev/null; then
-    echo "❌ Supabase local n'est pas démarré"
+# Vérifier que Supabase local est démarré (test de connexion direct)
+if ! psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -c "SELECT 1" > /dev/null 2>&1; then
+    echo "❌ Supabase local n'est pas démarré ou la base de données n'est pas accessible"
     echo "   Démarrez-le avec: npx supabase start"
     exit 1
 fi
@@ -115,12 +115,27 @@ EXISTING=$(psql "$DB_URL" -tAc "SELECT COUNT(*) FROM patients WHERE medical_reco
 
 if [[ "$EXISTING" -gt 0 ]]; then
     echo "⚠️  Un patient avec le numéro de dossier $MEDICAL_RECORD_NUMBER existe déjà"
-    read -p "   Voulez-vous le supprimer et en créer un nouveau ? (y/N) " -n 1 -r
+    echo ""
+    echo "   Que voulez-vous faire ?"
+    echo "   1) Supprimer l'ancien et créer un nouveau"
+    echo "   2) Créer un nouveau patient avec un numéro différent"
+    echo "   3) Annuler"
+    echo ""
+    read -p "   Votre choix (1/2/3): " -n 1 -r
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo
+    
+    if [[ $REPLY == "1" ]]; then
         echo "   🗑️  Suppression de l'ancien patient..."
         psql "$DB_URL" -c "DELETE FROM patients WHERE medical_record_number = '$MEDICAL_RECORD_NUMBER';" > /dev/null 2>&1
         echo "   ✅ Ancien patient supprimé"
+    elif [[ $REPLY == "2" ]]; then
+        # Générer un nouveau numéro de dossier unique et modifier le prénom pour éviter les doublons
+        TIMESTAMP=$(date +%s)
+        MEDICAL_RECORD_NUMBER="${PATHOLOGY_PREFIX}${TIMESTAMP: -6}"
+        FIRST_NAME="${FIRST_NAME}_${TIMESTAMP: -4}"
+        echo "   📝 Nouveau numéro de dossier: $MEDICAL_RECORD_NUMBER"
+        echo "   📝 Nouveau prénom: $FIRST_NAME"
     else
         echo "   ❌ Opération annulée"
         exit 1
@@ -132,14 +147,19 @@ echo "   🔧 Configuration de la pathologie pour le médecin..."
 PATHO_EXISTS=$(psql "$DB_URL" -tAc "SELECT COUNT(*) FROM user_pathologies WHERE user_id = '$DOCTOR_ID' AND pathology_id = '$PATHOLOGY_ID';" 2>/dev/null || echo "0")
 
 if [[ "$PATHO_EXISTS" -eq 0 ]]; then
-    psql "$DB_URL" -c "INSERT INTO user_pathologies (user_id, pathology_id) VALUES ('$DOCTOR_ID', '$PATHOLOGY_ID') ON CONFLICT DO NOTHING;" > /dev/null 2>&1
-    echo "   ✅ Pathologie activée pour $DOCTOR_NAME"
+    psql "$DB_URL" -c "INSERT INTO user_pathologies (user_id, pathology_id) VALUES ('$DOCTOR_ID', '$PATHOLOGY_ID');" > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo "   ✅ Pathologie activée pour $DOCTOR_NAME"
+    else
+        echo "   ✅ Pathologie déjà activée pour $DOCTOR_NAME"
+    fi
 else
     echo "   ✅ Pathologie déjà activée pour $DOCTOR_NAME"
 fi
 
 # Créer le patient
-PATIENT_ID=$(psql "$DB_URL" -tAc "
+echo "   📝 Insertion du patient dans la base de données..."
+PATIENT_RESULT=$(psql "$DB_URL" -tA <<EOF
 INSERT INTO patients (
     center_id,
     pathology_id,
@@ -172,7 +192,10 @@ INSERT INTO patients (
     '{}'::jsonb
 )
 RETURNING id;
-" 2>&1 | grep -E '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' | head -1)
+EOF
+)
+
+PATIENT_ID=$(echo "$PATIENT_RESULT" | grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' | head -1)
 
 # Vérifier si la création a réussi
 if [[ $PATIENT_ID =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ ]]; then
@@ -181,7 +204,7 @@ if [[ $PATIENT_ID =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{1
     echo ""
 else
     echo "❌ Erreur lors de la création du patient:"
-    echo "$PATIENT_ID"
+    echo "$PATIENT_RESULT"
     exit 1
 fi
 
