@@ -9,7 +9,9 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
-    "seed:test": "npx tsx scripts/seed-test-data.ts"
+    "seed:test": "npx tsx scripts/seed-test-data.ts",
+    "db:migrate": "supabase migration up && psql postgresql://postgres:postgres@127.0.0.1:54322/postgres -f supabase/rpc_get_visit_detail_data.sql",
+    "db:reset": "supabase db reset && psql postgresql://postgres:postgres@127.0.0.1:54322/postgres -f supabase/rpc_get_visit_detail_data.sql"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.1",
