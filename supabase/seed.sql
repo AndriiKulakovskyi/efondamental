@@ -224,3 +224,10 @@ ON CONFLICT (id) DO UPDATE SET
 --   dr.mercier@efondamental.dev          (Depression Center)
 --   dr.blanc@efondamental.dev            (Depression Center)
 -- ============================================================================
+
+-- ============================================================================
+-- FONCTIONS RPC (source unique - exécuté à chaque db reset)
+-- NOTE: Supabase n'accepte pas \ir dans seed.sql.
+-- Utilisez: npm run db:migrate (applique migrations + RPC)
+-- Ou manuellement: psql <DB_URL> -f supabase/rpc_get_visit_detail_data.sql
+-- ============================================================================
