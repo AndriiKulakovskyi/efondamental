@@ -1,5 +1,10 @@
 // eFondaMental Platform - Questionnaire Service (ETAT Section Continued)
 // PSQI and Epworth functions
+//
+// IMPORTANT - PSQI Scoring Correction (2026-02-27):
+// Les calculs des Components 2 (Sleep Latency) et 7 (Daytime Dysfunction) ont été corrigés
+// pour utiliser l'algorithme officiel PSQI (Buysse et al., 1989) au lieu de Math.floor(sum/2).
+// Référence: lib/questionnaires/bipolar/initial/auto/etat/psqi.ts (version correcte)
 
 import { createClient } from '@/lib/supabase/server';
 import {
@@ -48,16 +53,33 @@ export async function savePsqiResponse(
   // Component 1: Subjective sleep quality
   const c1SubjectiveQuality = response.q6 ?? 0;
 
-  // Component 2: Sleep latency
+  // Component 2: Sleep latency (Q2 + Q5a)
+  // CORRECTION: Utilisation de l'algorithme officiel PSQI (Buysse et al., 1989)
+  // L'ancienne version utilisait Math.floor(sum / 2) ce qui était INCORRECT
+  // La version correcte utilise des seuils sur la somme directe selon le protocole officiel
+  let q2Score = 0;
+  const q2Minutes = response.q2_minutes_to_sleep ?? 0;
+  const q5aScore = response.q5a ?? 0;
+  
+  // Q2 scoring: 0=<=15min, 1=16-30, 2=31-60, 3=>60
+  if (q2Minutes <= 15) q2Score = 0;
+  else if (q2Minutes <= 30) q2Score = 1;
+  else if (q2Minutes <= 60) q2Score = 2;
+  else q2Score = 3;
+  
+  // Somme Q2 + Q5a puis application des seuils officiels PSQI
+  const latencySum = q2Score + q5aScore;
   let c2Latency = 0;
-  if (response.q2_minutes_to_sleep !== undefined && response.q2_minutes_to_sleep !== null) {
-    if (response.q2_minutes_to_sleep <= 15) c2Latency = 0;
-    else if (response.q2_minutes_to_sleep <= 30) c2Latency = 1;
-    else if (response.q2_minutes_to_sleep <= 60) c2Latency = 2;
-    else c2Latency = 3;
-  }
-  c2Latency += (response.q5a ?? 0);
-  c2Latency = Math.min(3, Math.floor(c2Latency / 2));
+  if (latencySum === 0) c2Latency = 0;
+  else if (latencySum <= 2) c2Latency = 1;
+  else if (latencySum <= 4) c2Latency = 2;
+  else c2Latency = 3;
+  
+  // ANCIENNE VERSION INCORRECTE (ne pas utiliser):
+  // c2Latency = Math.min(3, Math.floor(latencySum / 2));
+  // Cette formule donnait des résultats erronés, notamment:
+  // - Pour latencySum=3: donnait 1 au lieu de 2
+  // - Ne respectait pas les seuils officiels du protocole PSQI
 
   // Component 3: Sleep duration
   let c3Duration = 0;
@@ -102,8 +124,19 @@ export async function savePsqiResponse(
   // Component 6: Use of sleep medication
   const c6Medication = response.q7 ?? 0;
 
-  // Component 7: Daytime dysfunction
-  const c7DaytimeDysfunction = Math.min(3, Math.floor(((response.q8 ?? 0) + (response.q9 ?? 0)) / 2));
+  // Component 7: Daytime dysfunction (Q8 + Q9)
+  // CORRECTION: Utilisation de l'algorithme officiel PSQI (Buysse et al., 1989)
+  // L'ancienne version utilisait Math.floor(sum / 2) ce qui était INCORRECT
+  const daySum = (response.q8 ?? 0) + (response.q9 ?? 0);
+  let c7DaytimeDysfunction = 0;
+  if (daySum === 0) c7DaytimeDysfunction = 0;
+  else if (daySum <= 2) c7DaytimeDysfunction = 1;
+  else if (daySum <= 4) c7DaytimeDysfunction = 2;
+  else c7DaytimeDysfunction = 3;
+  
+  // ANCIENNE VERSION INCORRECTE (ne pas utiliser):
+  // c7DaytimeDysfunction = Math.min(3, Math.floor(daySum / 2));
+  // Cette formule donnait des résultats erronés similaires au Component 2
 
   // Total PSQI score
   const totalScore = c1SubjectiveQuality + c2Latency + c3Duration + c4Efficiency +
