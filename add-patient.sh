@@ -66,10 +66,29 @@ if [ -n "$VERCEL" ] || [ -n "$NETLIFY" ] || [ -n "$CI" ] || [ -n "$PRODUCTION" ]
     exit 1
 fi
 
+# Vérifier que psql est installé
+if ! command -v psql &> /dev/null; then
+    echo "❌ psql n'est pas installé"
+    echo "   Pour installer psql:"
+    echo "   - Ubuntu/Debian: sudo apt-get install postgresql-client"
+    echo "   - macOS: brew install postgresql"
+    echo "   - Arch Linux: sudo pacman -S postgresql"
+    exit 1
+fi
+
 # Vérifier que Supabase local est démarré (test de connexion direct)
-if ! psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -c "SELECT 1" > /dev/null 2>&1; then
-    echo "❌ Supabase local n'est pas démarré ou la base de données n'est pas accessible"
-    echo "   Démarrez-le avec: npx supabase start"
+echo "   Test de connexion à PostgreSQL (127.0.0.1:54322)..."
+CONNECTION_TEST=$(psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -c "SELECT 1" 2>&1)
+if [ $? -ne 0 ]; then
+    echo "❌ Impossible de se connecter à la base de données"
+    echo ""
+    echo "   Erreur détaillée:"
+    echo "$CONNECTION_TEST" | head -5 | sed 's/^/   /'
+    echo ""
+    echo "   Solutions possibles:"
+    echo "   1. Vérifiez que Supabase est démarré: npx supabase status"
+    echo "   2. Si non démarré, lancez: npx supabase start"
+    echo "   3. Vérifiez que le port 54322 est le bon (voir supabase status)"
     exit 1
 fi
 

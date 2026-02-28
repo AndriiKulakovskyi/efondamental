@@ -1124,15 +1124,23 @@ export function QuestionnaireRenderer({
         const c1 = isAnswered('q6') ? Number(prev.q6) : undefined;
 
         // C2: Latency (q2_minutes_to_sleep AND q5a)
+        // CORRECTION (2026-02-27): Utilisation de l'algorithme officiel PSQI (Buysse et al., 1989)
+        // L'ancienne version utilisait Math.floor(sum / 2) ce qui était INCORRECT
+        // La version correcte utilise des seuils sur la somme directe selon le protocole officiel
         let c2: number | undefined = undefined;
         if (isAnswered('q2_minutes_to_sleep') && isAnswered('q5a')) {
           const q2min = Number(prev.q2_minutes_to_sleep);
-          let lScore = 0;
-          if (q2min <= 15) lScore = 0;
-          else if (q2min <= 30) lScore = 1;
-          else if (q2min <= 60) lScore = 2;
-          else lScore = 3;
-          c2 = Math.min(3, Math.floor((lScore + Number(prev.q5a)) / 2));
+          let q2Score = 0;
+          if (q2min <= 15) q2Score = 0;
+          else if (q2min <= 30) q2Score = 1;
+          else if (q2min <= 60) q2Score = 2;
+          else q2Score = 3;
+          
+          const latencySum = q2Score + Number(prev.q5a);
+          if (latencySum === 0) c2 = 0;
+          else if (latencySum <= 2) c2 = 1;
+          else if (latencySum <= 4) c2 = 2;
+          else c2 = 3;
         }
 
         // C3: Duration (q4_hours_sleep)
@@ -1177,9 +1185,15 @@ export function QuestionnaireRenderer({
         const c6 = isAnswered('q7') ? Number(prev.q7) : undefined;
 
         // C7: Daytime dysfunction (q8 AND q9)
+        // CORRECTION (2026-02-27): Utilisation de l'algorithme officiel PSQI (Buysse et al., 1989)
+        // L'ancienne version utilisait Math.floor(sum / 2) ce qui était INCORRECT
         let c7: number | undefined = undefined;
         if (isAnswered('q8') && isAnswered('q9')) {
-          c7 = Math.min(3, Math.floor((Number(prev.q8) + Number(prev.q9)) / 2));
+          const daySum = Number(prev.q8) + Number(prev.q9);
+          if (daySum === 0) c7 = 0;
+          else if (daySum <= 2) c7 = 1;
+          else if (daySum <= 4) c7 = 2;
+          else c7 = 3;
         }
 
         const components = [c1, c2, c3, c4, c5, c6, c7];
