@@ -238,6 +238,18 @@ ON CONFLICT (id) DO UPDATE SET
 -- ============================================================================
 
 -- ============================================================================
+-- 7. USER-PATHOLOGY ASSIGNMENTS
+-- ============================================================================
+-- doctor.paris@fondamental.fr -> all 4 pathologies
+INSERT INTO public.user_pathologies (user_id, pathology_id)
+VALUES
+  ('10000000-0000-0000-0000-000000000020', '11111111-1111-1111-1111-111111111111'),  -- Troubles Bipolaires
+  ('10000000-0000-0000-0000-000000000020', '22222222-2222-2222-2222-222222222222'),  -- Schizophrenie
+  ('10000000-0000-0000-0000-000000000020', '33333333-3333-3333-3333-333333333333'),  -- Asperger / TSA
+  ('10000000-0000-0000-0000-000000000020', '44444444-4444-4444-4444-444444444444')   -- Depression Resistante
+ON CONFLICT DO NOTHING;
+
+-- ============================================================================
 -- FONCTIONS RPC (source unique - exécuté à chaque db reset)
 -- NOTE: Supabase n'accepte pas \ir dans seed.sql.
 -- Utilisez: npm run db:migrate (applique migrations + RPC)
