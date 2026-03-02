@@ -24,6 +24,7 @@ import {
   saveDsm5ComorbidResponse
 } from '@/lib/services/questionnaire-dsm5.service';
 import type { Dsm5ComorbidResponseInsert } from '@/lib/types/database.types';
+import { computeAsrsScores, interpretAsrsScore, type BipolarAsrsResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/asrs';
 import { computeCtqScores, type BipolarCtqResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/ctq';
 import { computeBis10Scores, type BipolarBis10Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/bis10';
 import { computeAls18Scores, type BipolarAls18Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/als18';
@@ -301,6 +302,35 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
   // Route through saveDivaResponse which handles the string-to-boolean conversion.
   if (questionnaireCode === 'DIVA') {
     return await saveDivaResponse(response as any as DivaResponseInsert) as any as T;
+  }
+
+  // ASRS needs to calculate part scores, total, and screening status
+  if (questionnaireCode === 'ASRS') {
+    const asrsScores = computeAsrsScores(response as Partial<BipolarAsrsResponse>);
+    const interpretation = interpretAsrsScore(asrsScores.screening_positive, asrsScores.total_score);
+    const asrsResponse = {
+      ...response,
+      part_a_score: asrsScores.part_a_score,
+      part_b_score: asrsScores.part_b_score,
+      total_score: asrsScores.total_score,
+      screening_positive: asrsScores.screening_positive,
+      part_a_positive_items: asrsScores.part_a_positive_items,
+      interpretation
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(asrsResponse, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving ASRS response:', error);
+      throw error;
+    }
+
+    return data as T;
   }
 
   // CTQ needs to calculate subscale scores and severity interpretations

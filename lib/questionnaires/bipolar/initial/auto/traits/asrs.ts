@@ -125,6 +125,7 @@ export function computeAsrsScores(responses: Partial<BipolarAsrsResponse>): {
   part_b_score: number;
   total_score: number;
   screening_positive: boolean;
+  part_a_positive_items: number;
 } {
   let partAScore = 0;
   let partBScore = 0;
@@ -156,7 +157,8 @@ export function computeAsrsScores(responses: Partial<BipolarAsrsResponse>): {
     part_a_score: partAScore,
     part_b_score: partBScore,
     total_score: partAScore + partBScore,
-    screening_positive: screeningCount >= 4 // 4 or more items above threshold
+    screening_positive: screeningCount >= 4, // 4 or more items above threshold
+    part_a_positive_items: screeningCount
   };
 }
 
