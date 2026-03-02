@@ -28,6 +28,7 @@ import { computeCtqScores, type BipolarCtqResponse } from '@/lib/questionnaires/
 import { computeBis10Scores, type BipolarBis10Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/bis10';
 import { computeAls18Scores, type BipolarAls18Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/als18';
 import { computeAimScores, type BipolarAimResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/aim';
+import { computeWurs25Scores, interpretWurs25Score, type BipolarWurs25Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/wurs25';
 import { computeAq12Scores, type BipolarAq12Response } from '@/lib/questionnaires/bipolar/initial/auto/traits/aq12';
 import { computeCsmScores, type BipolarCsmResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/csm';
 import { computeCtiScores, type BipolarCtiResponse } from '@/lib/questionnaires/bipolar/initial/auto/traits/cti';
@@ -739,6 +740,32 @@ export async function saveBipolarInitialResponse<T extends BipolarQuestionnaireR
 
     if (error) {
       console.error('Error saving AIM response:', error);
+      throw error;
+    }
+
+    return data as T;
+  }
+
+  // WURS25 needs to calculate total score, ADHD likelihood, and interpretation
+  if (questionnaireCode === 'WURS25') {
+    const wurs25Scores = computeWurs25Scores(response as Partial<BipolarWurs25Response>);
+    const interpretation = interpretWurs25Score(wurs25Scores.total_score);
+    const wurs25Response = {
+      ...response,
+      total_score: wurs25Scores.total_score,
+      adhd_likely: wurs25Scores.screening_positive,
+      interpretation
+    };
+    
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from(tableName)
+      .upsert(wurs25Response, { onConflict: 'visit_id' })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving WURS25 response:', error);
       throw error;
     }
 
