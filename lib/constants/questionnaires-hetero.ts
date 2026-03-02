@@ -3,6 +3,7 @@
 
 import { Question, QuestionOption } from '@/lib/types/database.types';
 import { QuestionnaireDefinition } from './questionnaires';
+import { SIS_FOLLOWUP_DEFINITION as _SIS_FOLLOWUP_DEFINITION, SIS_FOLLOWUP_QUESTIONS as _SIS_FOLLOWUP_QUESTIONS } from '@/lib/questionnaires/bipolar/followup/suicide/sis-followup';
 
 // ============================================================================
 // MADRS (Montgomery-Åsberg Depression Rating Scale)
@@ -5257,7 +5258,7 @@ export const SIS_QUESTIONS: Question[] = [
 export const SIS_DEFINITION: QuestionnaireDefinition = {
   id: 'sis',
   code: 'SIS',
-  title: 'SIS (Suicide Intent Scale) - Tentative la plus récente',
+  title: 'SIS la plus récente',
   description: 'Évaluation de l\'intentionnalité suicidaire basée sur les circonstances du geste et la conception du sujet lors de la tentative la plus récente (Beck).',
   questions: SIS_QUESTIONS,
   metadata: {
@@ -5266,6 +5267,14 @@ export const SIS_DEFINITION: QuestionnaireDefinition = {
     target_role: 'healthcare_professional'
   }
 };
+
+// ============================================================================
+// SIS Followup (SIS la plus récente - Suivi)
+// Ne s'affiche que si ISA suivi Q5 = Oui
+// ============================================================================
+
+export const SIS_FOLLOWUP_DEFINITION = _SIS_FOLLOWUP_DEFINITION;
+export const SIS_FOLLOWUP_QUESTIONS = _SIS_FOLLOWUP_QUESTIONS;
 
 // ============================================================================
 // Suicide History (Histoire des conduites suicidaires)
@@ -5290,13 +5299,6 @@ export const SUICIDE_HISTORY_QUESTIONS: Question[] = [
   {
     id: 'q2_attempt_count',
     text: 'Q2. Combien de fois avez-vous tenté de vous suicider ?',
-    type: 'number',
-    required: false,
-    min: 0
-  },
-  {
-    id: 'q2_1_attempt_count_12m',
-    text: 'Q2.1. Combien de fois avez-vous tenté de vous suicider au cours des 12 derniers mois ?',
     type: 'number',
     required: false,
     min: 0
@@ -5473,7 +5475,95 @@ export const SUICIDE_HISTORY_DEFINITION: QuestionnaireDefinition = {
 // Suicide Behavior Follow-up (Histoire des conduites suicidaires - Suivi semestriel)
 // ============================================================================
 
+const COUNT_OPTIONS_0_20 = [
+  { code: '0', label: '0', score: 0 },
+  { code: '1', label: '1', score: 1 },
+  { code: '2', label: '2', score: 2 },
+  { code: '3', label: '3', score: 3 },
+  { code: '4', label: '4', score: 4 },
+  { code: '5', label: '5', score: 5 },
+  { code: '6', label: '6', score: 6 },
+  { code: '7', label: '7', score: 7 },
+  { code: '8', label: '8', score: 8 },
+  { code: '9', label: '9', score: 9 },
+  { code: '10', label: '10', score: 10 },
+  { code: '11', label: '11', score: 11 },
+  { code: '12', label: '12', score: 12 },
+  { code: '13', label: '13', score: 13 },
+  { code: '14', label: '14', score: 14 },
+  { code: '15', label: '15', score: 15 },
+  { code: '16', label: '16', score: 16 },
+  { code: '17', label: '17', score: 17 },
+  { code: '18', label: '18', score: 18 },
+  { code: '19', label: '19', score: 19 },
+  { code: '20', label: '20', score: 20 },
+  { code: '>20', label: '>20', score: 21 }
+];
+
+const DISPLAY_IF_TS_FOLLOWUP = { '==': [{ var: 'q0_ts_since_last_visit' }, 'Oui'] };
+
 export const SUICIDE_BEHAVIOR_FOLLOWUP_QUESTIONS: Question[] = [
+  {
+    id: 'q0_ts_since_last_visit',
+    text: 'Le patient a-t-il tenté de se suicider depuis la dernière visite ? (Réponse récupérée automatiquement depuis l\'ISA suivi Q5)',
+    type: 'single_choice',
+    required: false,
+    readonly: true,
+    options: [
+      { code: 'Oui', label: 'Oui', score: 1 },
+      { code: 'Non', label: 'Non', score: 0 }
+    ]
+  },
+  {
+    id: 'q0_attempt_count',
+    text: 'Combien de fois avez-vous tenté de vous suicider depuis la dernière visite ?',
+    type: 'single_choice',
+    required: false,
+    display_if: DISPLAY_IF_TS_FOLLOWUP,
+    options: COUNT_OPTIONS_0_20
+  },
+  {
+    id: 'q0_violent_attempts',
+    text: 'Existe-t-il des TS violentes (arme à feu, immolation, noyade, saut, pendaison, autre) ?',
+    type: 'single_choice',
+    required: false,
+    display_if: DISPLAY_IF_TS_FOLLOWUP,
+    options: [
+      { code: 'yes', label: 'Oui', score: 1 },
+      { code: 'no', label: 'Non', score: 0 },
+      { code: 'unknown', label: 'Ne sais pas', score: 0 }
+    ]
+  },
+  {
+    id: 'q0_violent_count',
+    text: 'Nombre de tentatives de suicide violentes depuis la dernière visite',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [DISPLAY_IF_TS_FOLLOWUP, { '==': [{ var: 'q0_violent_attempts' }, 'yes'] }] },
+    options: COUNT_OPTIONS_0_20
+  },
+  {
+    id: 'q0_serious_attempts',
+    text: 'Existe-t-il des tentatives de suicide graves (passage en réanimation) non violentes (médicamenteuses, phlébotomie) ?',
+    type: 'single_choice',
+    required: false,
+    display_if: DISPLAY_IF_TS_FOLLOWUP,
+    options: [
+      { code: 'yes', label: 'Oui', score: 1 },
+      { code: 'no', label: 'Non', score: 0 },
+      { code: 'unknown', label: 'Ne sais pas', score: 0 }
+    ]
+  },
+  {
+    id: 'q0_serious_count',
+    text: 'Nombre de tentatives de suicide graves depuis la dernière visite',
+    type: 'single_choice',
+    required: false,
+    indentLevel: 1,
+    display_if: { 'and': [DISPLAY_IF_TS_FOLLOWUP, { '==': [{ var: 'q0_serious_attempts' }, 'yes'] }] },
+    options: COUNT_OPTIONS_0_20
+  },
   {
     id: 'q1_self_harm',
     text: 'Le sujet a-t-il eu un comportement auto-agressif non suicidaire ?',
@@ -5539,6 +5629,65 @@ export const SUICIDE_BEHAVIOR_FOLLOWUP_QUESTIONS: Question[] = [
     options: [
       { code: 1, label: 'Oui', score: 1 },
       { code: 0, label: 'Non', score: 0 }
+    ]
+  },
+  // Létalité / lésions médicales observées
+  {
+    id: 'section_lethality',
+    text: 'Létalité / lésions médicales observées',
+    type: 'section',
+    required: false
+  },
+  {
+    id: 'q5_recent_severity',
+    text: 'Tentative la plus récente',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: '0 - Aucune atteinte physique ou atteinte physique très légère (par ex. égratignures)', score: 0 },
+      { code: 1, label: '1 - Atteinte physique légère (par ex. élocution ralentie, brûlures au premier degré, légers saignements, entorses)', score: 1 },
+      { code: 2, label: '2 - Atteinte physique modérée nécessitant une prise en charge médicale (par ex. personne consciente mais somnolente, altération de la réactivité, brûlures au deuxième degré, saignement d\'un vaisseau important)', score: 2 },
+      { code: 3, label: '3 - Atteinte physique grave, hospitalisation nécessaire et soins intensifs probablement nécessaires (par ex. état comateux avec réflexes intacts, brûlures au troisième degré sur moins de 20 % de la surface corporelle, hémorragie importante mais sans risque vital, fractures importantes)', score: 3 },
+      { code: 4, label: '4 - Atteinte physique très grave, hospitalisation et soins intensifs nécessaires (par ex. état comateux avec absence de réflexes, brûlures au troisième degré sur plus de 20 % de la surface corporelle, hémorragie importante associée à une instabilité des signes vitaux, atteinte majeure d\'un organe vital)', score: 4 },
+      { code: 5, label: '5 - Décès', score: 5 }
+    ]
+  },
+  {
+    id: 'q5_recent_date',
+    text: 'Date de la tentative la plus récente',
+    type: 'date',
+    required: false
+  },
+  {
+    id: 'q6_lethal_severity',
+    text: 'Tentative la plus létale',
+    type: 'single_choice',
+    required: false,
+    options: [
+      { code: 0, label: '0 - Aucune atteinte physique ou atteinte physique très légère (par ex. égratignures)', score: 0 },
+      { code: 1, label: '1 - Atteinte physique légère (par ex. élocution ralentie, brûlures au premier degré, légers saignements, entorses)', score: 1 },
+      { code: 2, label: '2 - Atteinte physique modérée nécessitant une prise en charge médicale (par ex. personne consciente mais somnolente, altération de la réactivité, brûlures au deuxième degré, saignement d\'un vaisseau important)', score: 2 },
+      { code: 3, label: '3 - Atteinte physique grave, hospitalisation nécessaire et soins intensifs probablement nécessaires (par ex. état comateux avec réflexes intacts, brûlures au troisième degré sur moins de 20 % de la surface corporelle, hémorragie importante mais sans risque vital, fractures importantes)', score: 3 },
+      { code: 4, label: '4 - Atteinte physique très grave, hospitalisation et soins intensifs nécessaires (par ex. état comateux avec absence de réflexes, brûlures au troisième degré sur plus de 20 % de la surface corporelle, hémorragie importante associée à une instabilité des signes vitaux, atteinte majeure d\'un organe vital)', score: 4 },
+      { code: 5, label: '5 - Décès', score: 5 }
+    ]
+  },
+  {
+    id: 'q6_lethal_date',
+    text: 'Date de la tentative la plus létale',
+    type: 'date',
+    required: false
+  },
+  {
+    id: 'q7_potential_lethality',
+    text: 'Létalité potentielle : ne répondre que si la létalité observée = 0\n\nLétalité probable d\'une tentative avérée en l\'absence de lésions médicales (exemples de tentatives n\'ayant entraîné aucune lésion médicale, mais pouvant potentiellement présenter un degré très élevé de létalité : la personne place le canon d\'une arme à feu dans sa bouche, appuie sur la gâchette, mais le coup ne part pas et aucune lésion médicale n\'est engendrée ; la personne s\'allonge sur les rails à l\'approche d\'un train mais est relevée par quelqu\'un avant d\'être écrasée).',
+    type: 'single_choice',
+    required: false,
+    display_if: { '==': [{ var: 'q5_recent_severity' }, 0] },
+    options: [
+      { code: 0, label: '0 - Comportement peu enclin à engendrer des blessures', score: 0 },
+      { code: 1, label: '1 - Comportement susceptible d\'engendrer des blessures mais ne pouvant causer la mort', score: 1 },
+      { code: 2, label: '2 - Comportement susceptible de causer la mort malgré des soins médicaux disponibles', score: 2 }
     ]
   }
 ];

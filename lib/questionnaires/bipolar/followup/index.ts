@@ -12,8 +12,8 @@
 // Semestrial mood and psychotic disorder evaluations
 export * as dsm5 from './dsm5';
 
-// Suicide module (2 questionnaires)
-// ISA followup and suicide behavior followup
+// Suicide module (3 questionnaires)
+// ISA followup, SIS followup, and suicide behavior followup
 export * as suicide from './suicide';
 
 // Soin Suivi module (6 questionnaires)
@@ -48,6 +48,13 @@ export {
   type BipolarFollowupIsaResponse,
   type BipolarFollowupIsaResponseInsert
 } from './suicide/isa-followup';
+
+export { 
+  SIS_FOLLOWUP_DEFINITION,
+  SIS_FOLLOWUP_QUESTIONS,
+  type BipolarFollowupSisResponse,
+  type BipolarFollowupSisResponseInsert
+} from './suicide/sis-followup';
 
 export { 
   SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
