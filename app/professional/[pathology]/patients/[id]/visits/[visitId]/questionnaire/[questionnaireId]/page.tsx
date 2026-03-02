@@ -47,6 +47,7 @@ import {
   ISA_DEFINITION,
   ISA_FOLLOWUP_DEFINITION,
   SIS_DEFINITION,
+  SIS_FOLLOWUP_DEFINITION,
   SUICIDE_HISTORY_DEFINITION,
   SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
   PERINATALITE_DEFINITION,
@@ -287,6 +288,7 @@ import {
   getDiagPsySemPsychotiquesResponse,
 } from "@/lib/services/questionnaire-dsm5.service";
 import {
+  getSisFollowupResponse,
   getSuiviRecommandationsResponse,
   getRecoursAuxSoinsResponse,
   getTraitementNonPharmaResponse,
@@ -600,6 +602,8 @@ export default async function ProfessionalQuestionnairePage({
   else if (code === ISA_FOLLOWUP_DEFINITION.code)
     questionnaire = ISA_FOLLOWUP_DEFINITION;
   else if (code === SIS_DEFINITION.code) questionnaire = SIS_DEFINITION;
+  else if (code === SIS_FOLLOWUP_DEFINITION.code)
+    questionnaire = SIS_FOLLOWUP_DEFINITION;
   else if (code === SUICIDE_HISTORY_DEFINITION.code)
     questionnaire = SUICIDE_HISTORY_DEFINITION;
   else if (code === SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION.code)
@@ -920,6 +924,8 @@ export default async function ProfessionalQuestionnairePage({
     existingResponse = await getIsaSuiviResponse(visitId);
   else if (code === SIS_DEFINITION.code)
     existingResponse = await getSisResponse(visitId);
+  else if (code === SIS_FOLLOWUP_DEFINITION.code)
+    existingResponse = await getSisFollowupResponse(visitId);
   else if (code === SUICIDE_HISTORY_DEFINITION.code)
     existingResponse = await getSuicideHistoryResponse(visitId);
   else if (code === SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION.code)
@@ -1734,6 +1740,21 @@ export default async function ProfessionalQuestionnairePage({
         ...initialResponses,
         patient_gender: patient.gender === 'M' ? 'm' : 'f',
       };
+    }
+  }
+
+  // Auto-populate gate questions from ISA followup Q5 (q5_attempt) for suicide questionnaires
+  // SUICIDE_BEHAVIOR_FOLLOWUP uses q0_ts_since_last_visit, SIS_FOLLOWUP uses questionnaire_done
+  if (code === "SUICIDE_BEHAVIOR_FOLLOWUP" || code === "SIS_FOLLOWUP") {
+    const isaFollowupResponse = await getIsaSuiviResponse(visitId);
+    if (isaFollowupResponse) {
+      const isaQ5 = isaFollowupResponse.q5_attempt;
+      const gateValue = isaQ5 === 1 ? 'Oui' : 'Non';
+      if (code === "SUICIDE_BEHAVIOR_FOLLOWUP") {
+        initialResponses = { ...initialResponses, q0_ts_since_last_visit: gateValue };
+      } else if (code === "SIS_FOLLOWUP") {
+        initialResponses = { ...initialResponses, questionnaire_done: gateValue };
+      }
     }
   }
 

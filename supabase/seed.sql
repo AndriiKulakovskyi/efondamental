@@ -30,10 +30,10 @@ ON CONFLICT (id) DO NOTHING;
 -- ============================================================================
 INSERT INTO public.centers (id, name, code, city, address, phone, email, active)
 VALUES
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Centre Expert Paris Bipolaire', '01', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 00', 'bipolar@efondamental.dev', true),
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Centre Expert Paris Schizophrenie', '02', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 01', 'schizo@efondamental.dev', true),
-  ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Centre Expert Paris Asperger', '04', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 02', 'asperger@efondamental.dev', true),
-  ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'Centre Expert Paris Depression', '03', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 03', 'depression@efondamental.dev', true)
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Centre Expert Bordeaux', '01', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 00', 'bipolar@efondamental.dev', true),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Centre Expert Creteil', '02', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 01', 'schizo@efondamental.dev', true),
+  ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Centre Expert Montpellier', '03', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 02', 'asperger@efondamental.dev', true),
+  ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'Centre Expert Grenoble', '04', 'Paris', '47 Boulevard de l''Hopital, 75013 Paris', '+33 1 42 16 00 03', 'depression@efondamental.dev', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================================
@@ -41,10 +41,22 @@ ON CONFLICT (id) DO NOTHING;
 -- ============================================================================
 INSERT INTO public.center_pathologies (center_id, pathology_id)
 VALUES
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111'),  -- Paris Bipolaire -> Bipolar
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222'),  -- Paris Schizo -> Schizophrenia
-  ('cccccccc-cccc-cccc-cccc-cccccccccccc', '33333333-3333-3333-3333-333333333333'),  -- Paris Asperger -> ASD
-  ('dddddddd-dddd-dddd-dddd-dddddddddddd', '44444444-4444-4444-4444-444444444444')   -- Paris Depression -> Depression
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111'),  -- Bordeaux Bipolaire -> Bipolar
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '22222222-2222-2222-2222-222222222222'),  -- Bordeaux Schizo -> Bipolar
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '33333333-3333-3333-3333-333333333333'),  -- Bordeaux ASD -> Bipolar
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '44444444-4444-4444-4444-444444444444'),  -- Bordeaux Depression -> Bipolar
+  ('cccccccc-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111'),  -- Montpellier Bipolaire -> Bipolar
+  ('cccccccc-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222'),  -- Montpellier Schizo -> Bipolar
+  ('cccccccc-cccc-cccc-cccc-cccccccccccc', '33333333-3333-3333-3333-333333333333'),  -- Montpellier ASD -> Bipolar
+  ('cccccccc-cccc-cccc-cccc-cccccccccccc', '44444444-4444-4444-4444-444444444444'),  -- Montpellier Depression -> Bipolar
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222'),  -- Creteil Schizo -> Schizophrenia
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '11111111-1111-1111-1111-111111111111'),  -- Creteil Bipolaire -> Schizophrenia
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '33333333-3333-3333-3333-333333333333'),  -- Creteil ASD -> Schizophrenia
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '44444444-4444-4444-4444-444444444444'),  -- Creteil Depression -> Schizophrenia
+  ('dddddddd-dddd-dddd-dddd-dddddddddddd', '11111111-1111-1111-1111-111111111111'),  -- Grenoble Bipolaire -> Depression
+  ('dddddddd-dddd-dddd-dddd-dddddddddddd', '22222222-2222-2222-2222-222222222222'),  -- Grenoble Schizo -> Depression
+  ('dddddddd-dddd-dddd-dddd-dddddddddddd', '33333333-3333-3333-3333-333333333333'),  -- Grenoble ASD -> Depression
+  ('dddddddd-dddd-dddd-dddd-dddddddddddd', '44444444-4444-4444-4444-444444444444')   -- Grenoble Depression -> Depression
 ON CONFLICT DO NOTHING;
 
 -- ============================================================================
@@ -224,6 +236,18 @@ ON CONFLICT (id) DO UPDATE SET
 --   dr.mercier@efondamental.dev          (Depression Center)
 --   dr.blanc@efondamental.dev            (Depression Center)
 -- ============================================================================
+
+-- ============================================================================
+-- 7. USER-PATHOLOGY ASSIGNMENTS
+-- ============================================================================
+-- doctor.paris@fondamental.fr -> all 4 pathologies
+INSERT INTO public.user_pathologies (user_id, pathology_id)
+VALUES
+  ('10000000-0000-0000-0000-000000000020', '11111111-1111-1111-1111-111111111111'),  -- Troubles Bipolaires
+  ('10000000-0000-0000-0000-000000000020', '22222222-2222-2222-2222-222222222222'),  -- Schizophrenie
+  ('10000000-0000-0000-0000-000000000020', '33333333-3333-3333-3333-333333333333'),  -- Asperger / TSA
+  ('10000000-0000-0000-0000-000000000020', '44444444-4444-4444-4444-444444444444')   -- Depression Resistante
+ON CONFLICT DO NOTHING;
 
 -- ============================================================================
 -- FONCTIONS RPC (source unique - exécuté à chaque db reset)

@@ -1,5 +1,6 @@
-// eFondaMental Platform - SIS (Suicide Intent Scale)
-// Bipolar Initial Evaluation - Medical Module
+// eFondaMental Platform - SIS Followup (SIS la plus récente - Suivi)
+// Bipolar Followup Evaluation - Suicide Module
+// Ne s'affiche que si ISA suivi Q5 = Oui (tentative de suicide depuis la dernière visite)
 
 import { Question } from '@/lib/types/database.types';
 
@@ -7,10 +8,11 @@ import { Question } from '@/lib/types/database.types';
 // Types
 // ============================================================================
 
-export interface BipolarSisResponse {
+export interface BipolarFollowupSisResponse {
   id: string;
   visit_id: string;
   patient_id: string;
+  questionnaire_done?: string | null;
   q1: number | null;
   q2: number | null;
   q3: number | null;
@@ -36,8 +38,8 @@ export interface BipolarSisResponse {
   updated_at: string;
 }
 
-export type BipolarSisResponseInsert = Omit<
-  BipolarSisResponse,
+export type BipolarFollowupSisResponseInsert = Omit<
+  BipolarFollowupSisResponse,
   'id' | 'created_at' | 'updated_at' | 'completed_at' | 'objective_score' | 'subjective_score' | 'total_score' | 'interpretation'
 > & {
   completed_by?: string | null;
@@ -47,19 +49,34 @@ export type BipolarSisResponseInsert = Omit<
 // Questions Dictionary
 // ============================================================================
 
-export const SIS_QUESTIONS: Question[] = [
+const DISPLAY_IF_DONE = { '==': [{ var: 'questionnaire_done' }, 'Oui'] };
+
+export const SIS_FOLLOWUP_QUESTIONS: Question[] = [
+  {
+    id: 'questionnaire_done',
+    text: 'Le patient a-t-il tenté de se suicider depuis la dernière visite ? (Réponse récupérée automatiquement depuis l\'ISA suivi Q5)',
+    type: 'single_choice',
+    required: false,
+    readonly: true,
+    options: [
+      { code: 'Oui', label: 'Oui', score: 1 },
+      { code: 'Non', label: 'Non', score: 0 },
+    ],
+  },
   // Part 1: Objective Circumstances
   {
     id: 'section_objective',
     text: 'Partie 1: Circonstances Objectives',
     type: 'section',
-    required: false
+    required: false,
+    display_if: DISPLAY_IF_DONE
   },
   {
     id: 'q1',
     text: '1. Isolement',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - Quelqu\'un etait present', score: 0 },
       { code: 1, label: '1 - Quelqu\'un a proximite ou en contact', score: 1 },
@@ -71,6 +88,7 @@ export const SIS_QUESTIONS: Question[] = [
     text: '2. Timing',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - Une intervention est probable', score: 0 },
       { code: 1, label: '1 - Une intervention est improbable', score: 1 },
@@ -82,6 +100,7 @@ export const SIS_QUESTIONS: Question[] = [
     text: '3. Precautions prises contre la decouverte/intervention',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - Aucune precaution', score: 0 },
       { code: 1, label: '1 - Precautions passives', score: 1 },
@@ -93,6 +112,7 @@ export const SIS_QUESTIONS: Question[] = [
     text: '4. Fait d\'avoir agi pour obtenir de l\'aide pendant ou apres la tentative',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - A averti un tiers qui pourrait apporter de l\'aide', score: 0 },
       { code: 1, label: '1 - A contacte mais n\'a pas specifiquement demande d\'aide', score: 1 },
@@ -104,6 +124,7 @@ export const SIS_QUESTIONS: Question[] = [
     text: '5. Dispositions finales anticipant la mort',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - Aucune', score: 0 },
       { code: 1, label: '1 - A pense a ces dispositions ou pris quelques dispositions', score: 1 },
@@ -115,6 +136,7 @@ export const SIS_QUESTIONS: Question[] = [
     text: '6. Preparation active a la tentative',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - Aucune', score: 0 },
       { code: 1, label: '1 - Minimale a moderee', score: 1 },
@@ -126,6 +148,7 @@ export const SIS_QUESTIONS: Question[] = [
     text: '7. Note de suicide',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - Absence de note', score: 0 },
       { code: 1, label: '1 - Note ecrite mais dechiree ou jetee', score: 1 },
@@ -137,6 +160,7 @@ export const SIS_QUESTIONS: Question[] = [
     text: '8. Communication orale',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - Pas de communication', score: 0 },
       { code: 1, label: '1 - Communication ambigue', score: 1 },
@@ -149,13 +173,15 @@ export const SIS_QUESTIONS: Question[] = [
     id: 'section_subjective',
     text: 'Partie 2: Auto-evaluation',
     type: 'section',
-    required: false
+    required: false,
+    display_if: DISPLAY_IF_DONE
   },
   {
     id: 'q9',
     text: '9. Objectif supposee de la tentative',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - Manipuler l\'environnement, attirer l\'attention, se venger', score: 0 },
       { code: 1, label: '1 - Composantes des precedents avec des composantes de 2', score: 1 },
@@ -167,6 +193,7 @@ export const SIS_QUESTIONS: Question[] = [
     text: '10. Attentes concernant la letalite',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - Pensait que la mort etait improbable', score: 0 },
       { code: 1, label: '1 - Pensait que la mort etait possible mais pas certaine', score: 1 },
@@ -178,6 +205,7 @@ export const SIS_QUESTIONS: Question[] = [
     text: '11. Conception de la letalite de la methode',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - A fait moins que ce qu\'il pensait etre letal', score: 0 },
       { code: 1, label: '1 - N\'etait pas sur que ce serait letal', score: 1 },
@@ -189,6 +217,7 @@ export const SIS_QUESTIONS: Question[] = [
     text: '12. Serieux de la tentative',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - N\'a pas serieusement essaye de mettre fin a ses jours', score: 0 },
       { code: 1, label: '1 - Incertain s\'il a serieusement essaye', score: 1 },
@@ -200,6 +229,7 @@ export const SIS_QUESTIONS: Question[] = [
     text: '13. Attitude concernant le fait de vivre/mourir',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - Ne voulait pas mourir', score: 0 },
       { code: 1, label: '1 - Composantes des deux', score: 1 },
@@ -211,6 +241,7 @@ export const SIS_QUESTIONS: Question[] = [
     text: '14. Conception du sauvetage medical',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - Pensait que la mort serait improbable si des soins medicaux etaient donnes', score: 0 },
       { code: 1, label: '1 - Etait incertain si la mort pouvait etre empechee par des soins medicaux', score: 1 },
@@ -222,6 +253,7 @@ export const SIS_QUESTIONS: Question[] = [
     text: '15. Degre de premeditation',
     type: 'single_choice',
     required: true,
+    display_if: DISPLAY_IF_DONE,
     options: [
       { code: 0, label: '0 - Aucune, impulsif', score: 0 },
       { code: 1, label: '1 - Contemplation moins d\'une heure', score: 1 },
@@ -235,7 +267,7 @@ export const SIS_QUESTIONS: Question[] = [
 // Scoring
 // ============================================================================
 
-export function computeSisScores(responses: Record<string, number>): { objective: number; subjective: number; total: number } {
+export function computeSisFollowupScores(responses: Record<string, number>): { objective: number; subjective: number; total: number } {
   let objective = 0;
   let subjective = 0;
   
@@ -262,7 +294,7 @@ export function computeSisScores(responses: Record<string, number>): { objective
   };
 }
 
-export function interpretSisScore(total: number): string {
+export function interpretSisFollowupScore(total: number): string {
   if (total <= 10) return 'Intention suicidaire faible';
   if (total <= 20) return 'Intention suicidaire moderee';
   return 'Intention suicidaire elevee';
@@ -272,30 +304,15 @@ export function interpretSisScore(total: number): string {
 // Questionnaire Definition
 // ============================================================================
 
-export interface QuestionnaireDefinition {
-  id: string;
-  code: string;
-  title: string;
-  description: string;
-  instructions?: string;
-  questions: Question[];
-  metadata?: {
-    singleColumn?: boolean;
-    pathologies?: string[];
-    target_role?: 'patient' | 'healthcare_professional';
-    [key: string]: any;
-  };
-}
-
-export const SIS_DEFINITION: QuestionnaireDefinition = {
-  id: 'sis',
-  code: 'SIS',
-  title: 'SIS la plus récente',
-  description: 'Echelle d\'intention suicidaire de Beck.',
-  questions: SIS_QUESTIONS,
+export const SIS_FOLLOWUP_DEFINITION = {
+  id: 'sis_followup',
+  code: 'SIS_FOLLOWUP',
+  title: 'SIS la plus récente (suivi)',
+  description: 'Echelle d\'intention suicidaire de Beck - version suivi. Ne s\'affiche que si le patient a tenté de se suicider depuis la dernière visite (ISA suivi Q5 = Oui).',
+  questions: SIS_FOLLOWUP_QUESTIONS,
   metadata: {
     singleColumn: true,
     pathologies: ['bipolar'],
-    target_role: 'healthcare_professional'
+    target_role: 'healthcare_professional' as const
   }
 };

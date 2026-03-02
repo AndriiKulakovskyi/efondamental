@@ -196,7 +196,7 @@ export interface QuestionnaireDefinition {
 export const ISA_DEFINITION: QuestionnaireDefinition = {
   id: 'isa',
   code: 'ISA',
-  title: 'ISA (Ideation Scale for Adults)',
+  title: 'Intentionnalité suicidaire actuelle',
   description: 'Echelle d\'evaluation de l\'ideation suicidaire chez l\'adulte.',
   questions: ISA_QUESTIONS,
   metadata: {

@@ -194,7 +194,7 @@ export interface QuestionnaireDefinition {
 export const SUICIDE_HISTORY_DEFINITION: QuestionnaireDefinition = {
   id: 'suicide_history',
   code: 'SUICIDE_HISTORY',
-  title: 'Antecedents Suicidaires',
+  title: 'Histoire des conduites suicidaires',
   description: 'Recueil des antecedents de tentatives de suicide et des antecedents familiaux de suicide.',
   questions: SUICIDE_HISTORY_QUESTIONS,
   metadata: {
