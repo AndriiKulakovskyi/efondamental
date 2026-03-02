@@ -106,6 +106,7 @@ import {
   saveHumeurDepuisVisiteResponse,
   savePsychotiquesResponse,
   saveIsaFollowupResponse,
+  saveSisFollowupResponse,
   saveSuicideBehaviorFollowupResponse as saveSuicideBehaviorFollowupResponseNew,
   saveSuiviRecommandationsResponse as saveSuiviRecommandationsResponseNew,
   saveRecoursAuxSoinsResponse as saveRecoursAuxSoinsResponseNew,
@@ -119,6 +120,7 @@ import {
   type BipolarFollowupHumeurDepuisVisiteResponseInsert,
   type BipolarFollowupPsychotiquesResponseInsert,
   type BipolarFollowupIsaResponseInsert,
+  type BipolarFollowupSisResponseInsert,
   type BipolarFollowupSuicideBehaviorResponseInsert,
   type BipolarFollowupSuiviRecommandationsResponseInsert,
   type BipolarFollowupRecoursAuxSoinsResponseInsert,
@@ -1136,6 +1138,14 @@ export async function submitProfessionalQuestionnaireAction(
           patient_id: patientId,
           ...(responses as any),
         } as BipolarFollowupIsaResponseInsert);
+        break;
+
+      case "SIS_FOLLOWUP":
+        result = await saveSisFollowupResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          ...(responses as any),
+        } as BipolarFollowupSisResponseInsert);
         break;
 
       case "SIS":

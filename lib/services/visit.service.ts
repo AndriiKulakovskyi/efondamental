@@ -93,6 +93,7 @@ import {
 } from '../questionnaires/bipolar/initial/neuropsy';
 import {
   ISA_FOLLOWUP_DEFINITION,
+  SIS_FOLLOWUP_DEFINITION,
   SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION,
   SUIVI_RECOMMANDATIONS_DEFINITION as SUIVI_RECOMMANDATIONS_DEFINITION_NEW,
   RECOURS_AUX_SOINS_DEFINITION as RECOURS_AUX_SOINS_DEFINITION_NEW,
@@ -1025,6 +1026,7 @@ export function getVisitModules(visitType: string, pathologyType: string): Virtu
             name: 'Suicide',
             questionnaires: [
               q(ISA_FOLLOWUP_DEFINITION, 'healthcare_professional'),
+              q(SIS_FOLLOWUP_DEFINITION, 'healthcare_professional'),
               q(SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION, 'healthcare_professional'),
               q(CSSRS_DEFINITION, 'healthcare_professional'),
             ],
@@ -1096,7 +1098,8 @@ export function getVisitModules(visitType: string, pathologyType: string): Virtu
             questionnaires: [
               q(CSSRS_DEFINITION, 'healthcare_professional'),
               q(ISA_FOLLOWUP_DEFINITION, 'healthcare_professional'),
-              q(SIS_DEFINITION, 'healthcare_professional'),
+              q(SIS_FOLLOWUP_DEFINITION, 'healthcare_professional'),
+              q(SUICIDE_BEHAVIOR_FOLLOWUP_DEFINITION, 'healthcare_professional'),
               q(SUICIDE_HISTORY_DEFINITION, 'healthcare_professional'),
             ],
           },

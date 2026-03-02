@@ -11,6 +11,8 @@ import {
   BipolarFollowupPsychotiquesResponseInsert,
   BipolarFollowupIsaResponse,
   BipolarFollowupIsaResponseInsert,
+  BipolarFollowupSisResponse,
+  BipolarFollowupSisResponseInsert,
   BipolarFollowupSuicideBehaviorResponse,
   BipolarFollowupSuicideBehaviorResponseInsert,
   BipolarFollowupSuiviRecommandationsResponse,
@@ -28,6 +30,7 @@ import {
 } from '@/lib/questionnaires/bipolar/followup';
 
 import { scoreIsaFollowup } from '@/lib/questionnaires/bipolar/followup/suicide/isa-followup';
+import { computeSisFollowupScores, interpretSisFollowupScore } from '@/lib/questionnaires/bipolar/followup/suicide/sis-followup';
 import { scoreSuicideBehaviorFollowup } from '@/lib/questionnaires/bipolar/followup/suicide/suicide-behavior-followup';
 
 // ============================================================================
@@ -198,6 +201,54 @@ export async function saveIsaFollowupResponse(
       total_score: scoring.total_score,
       risk_level: scoring.risk_level_label,
       interpretation: scoring.interpretation,
+      completed_by: user.data.user?.id
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Suicide - SIS Followup
+// ============================================================================
+
+export async function getSisFollowupResponse(
+  visitId: string
+): Promise<BipolarFollowupSisResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('bipolar_followup_sis')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveSisFollowupResponse(
+  response: BipolarFollowupSisResponseInsert
+): Promise<BipolarFollowupSisResponse> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  // Compute scoring
+  const scores = computeSisFollowupScores(response as Record<string, number>);
+  const interpretation = interpretSisFollowupScore(scores.total);
+
+  const { data, error } = await supabase
+    .from('bipolar_followup_sis')
+    .upsert({
+      ...response,
+      objective_score: scores.objective,
+      subjective_score: scores.subjective,
+      total_score: scores.total,
+      interpretation,
       completed_by: user.data.user?.id
     }, { onConflict: 'visit_id' })
     .select()

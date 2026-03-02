@@ -44,7 +44,7 @@ export type BipolarFollowupIsaResponseInsert = Omit<
 export const ISA_FOLLOWUP_QUESTIONS: Question[] = [
   {
     id: 'q1_life_worth',
-    text: '1. Avez-vous deja eu l\'impression que la vie ne vaut pas la peine d\'etre vecue ?',
+    text: '1. Avez-vous deja eu l\'impression que la vie ne vaut pas la peine d\'etre vecue depuis la dernière visite ?',
     type: 'single_choice',
     required: true,
     options: [
@@ -67,7 +67,7 @@ export const ISA_FOLLOWUP_QUESTIONS: Question[] = [
   },
   {
     id: 'q2_wish_death',
-    text: '2. Avez-vous deja souhaite mourir, par exemple, de vous coucher et de ne pas vous reveiller ?',
+    text: '2. Avez-vous deja souhaite mourir, par exemple, de vous coucher et de ne pas vous reveiller depuis la dernière visite ?',
     type: 'single_choice',
     required: true,
     options: [
@@ -90,7 +90,7 @@ export const ISA_FOLLOWUP_QUESTIONS: Question[] = [
   },
   {
     id: 'q3_thoughts',
-    text: '3. Avez-vous deja pense a vous donner la mort, meme si vous ne le feriez jamais ?',
+    text: '3. Avez-vous deja pense a vous donner la mort, meme si vous ne le feriez jamais, depuis la dernière visite ?',
     type: 'single_choice',
     required: true,
     options: [
@@ -113,7 +113,7 @@ export const ISA_FOLLOWUP_QUESTIONS: Question[] = [
   },
   {
     id: 'q4_plan',
-    text: '4. Avez-vous deja serieusement envisage de vous donner la mort ou planifie la facon de vous y prendre ?',
+    text: '4. Avez-vous deja serieusement envisage de vous donner la mort ou planifie la facon de vous y prendre depuis la dernière visite ?',
     type: 'single_choice',
     required: true,
     options: [
@@ -136,7 +136,7 @@ export const ISA_FOLLOWUP_QUESTIONS: Question[] = [
   },
   {
     id: 'q5_attempt',
-    text: '5. Avez-vous deja essaye de vous donner la mort ?',
+    text: '5. Avez-vous deja essaye de vous donner la mort depuis la dernière visite ?',
     type: 'single_choice',
     required: true,
     options: [
