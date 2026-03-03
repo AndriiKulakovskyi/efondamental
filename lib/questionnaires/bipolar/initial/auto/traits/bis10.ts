@@ -118,21 +118,25 @@ export function computeBis10Scores(responses: Partial<BipolarBis10Response>): Bi
   
   const cognitiveScore = COGNITIVE_ITEMS.reduce((sum, item) => sum + getAdjustedValue(item), 0);
   const motorScore = MOTOR_ITEMS.reduce((sum, item) => sum + getAdjustedValue(item), 0);
-  const totalScore = cognitiveScore + motorScore;
   
-  // Calculate means (scores are 1-4, mean ranges 1.0-4.0)
+  // Calculate subscale means (scores are 1-4, mean ranges 1.0-4.0)
   const cognitiveMean = cognitiveScore / COGNITIVE_ITEMS.length;
   const motorMean = motorScore / MOTOR_ITEMS.length;
-  const overallMean = totalScore / (COGNITIVE_ITEMS.length + MOTOR_ITEMS.length);
+  
+  // General Impulsivity = mean of the two subscale means
+  const generalMean = (cognitiveMean + motorMean) / 2;
+  
+  // Total Score = sum of cognitive mean + motor mean + general mean
+  const totalScore = parseFloat(cognitiveMean.toFixed(1)) + parseFloat(motorMean.toFixed(1)) + parseFloat(generalMean.toFixed(1));
   
   return {
     cognitive_score: cognitiveScore,
     motor_score: motorScore,
-    total_score: totalScore,
-    cognitive_impulsivity_mean: cognitiveMean.toFixed(2),
-    behavioral_impulsivity_mean: motorMean.toFixed(2),
-    overall_impulsivity: overallMean.toFixed(2),
-    interpretation: interpretBis10Score(overallMean)
+    total_score: parseFloat(totalScore.toFixed(1)),
+    cognitive_impulsivity_mean: cognitiveMean.toFixed(1),
+    behavioral_impulsivity_mean: motorMean.toFixed(1),
+    overall_impulsivity: generalMean.toFixed(1),
+    interpretation: interpretBis10Score(generalMean)
   };
 }
 
