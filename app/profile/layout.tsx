@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { UserProfileDropdown } from "@/components/user-profile-dropdown";
+import { AppFooter } from "@/components/ui/app-footer";
 
 export default async function ProfileLayout({
   children,
@@ -28,7 +29,7 @@ export default async function ProfileLayout({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       <header className="bg-white border-b border-slate-200">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -46,7 +47,9 @@ export default async function ProfileLayout({
         </div>
       </header>
 
-      <main>{children}</main>
+      <main className="flex-1">{children}</main>
+
+      <AppFooter />
     </div>
   );
 }

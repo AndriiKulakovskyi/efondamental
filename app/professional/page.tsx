@@ -6,6 +6,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { UserProfileDropdown } from "@/components/user-profile-dropdown";
 import { Activity, ArrowRight, UserPlus } from "lucide-react";
+import { AppFooter } from "@/components/ui/app-footer";
 
 export default async function ProfessionalLandingPage() {
   const context = await getUserContext();
@@ -137,7 +138,7 @@ export default async function ProfessionalLandingPage() {
                   <Link
                     key={pathology.id}
                     href={`/professional/${pathology.type}`}
-                  className={`group relative bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-xl ${config.hoverShadow} ${config.hoverBorder} transition-all duration-300 hover:-translate-y-1 overflow-hidden block`}
+                  className={`group relative bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-xl ${config.hoverShadow} ${config.hoverBorder} transition-all duration-300 hover:-translate-y-1 overflow-hidden block`}
                 >
                   {/* Decorative background element */}
                       <div
@@ -146,12 +147,12 @@ export default async function ProfessionalLandingPage() {
                       />
                       
                   {/* Header with Icon and Version */}
-                  <div className="flex items-start justify-between mb-6 relative z-10">
+                  <div className="flex items-start justify-between mb-4 relative z-10">
                               <div
-                      className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}
+                      className={`w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}
                       style={{ backgroundColor: config.lightBg, color: config.color }}
                               >
-                      <Activity className="w-7 h-7" />
+                      <Activity className="w-5 h-5" />
                     </div>
                     <span className={`px-3 py-1 rounded-full bg-slate-50 text-slate-500 text-xs font-medium border border-slate-100 transition`}>
                       v4.0
@@ -160,16 +161,16 @@ export default async function ProfessionalLandingPage() {
 
                   {/* Title and Description */}
                   <div className="relative z-10">
-                    <h3 className={`text-2xl font-bold text-slate-900 mb-2 ${config.hoverText} transition-colors`}>
+                    <h3 className={`text-xl font-bold text-slate-900 mb-2 ${config.hoverText} transition-colors`}>
                                   {PATHOLOGY_NAMES[pathology.type as PathologyType]}
                                 </h3>
-                    <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+                    <p className="text-slate-500 text-sm mb-4 leading-relaxed">
                                   {pathology.description || `Plateforme de suivi ${PATHOLOGY_NAMES[pathology.type as PathologyType].toLowerCase()}`}
                                 </p>
                           </div>
 
                   {/* Stats Footer */}
-                  <div className="flex items-center gap-4 pt-6 border-t border-slate-100 relative z-10">
+                  <div className="flex items-center gap-4 pt-4 border-t border-slate-100 relative z-10">
                     <div className="flex flex-col">
                       <span className="text-xs text-slate-400 font-medium uppercase tracking-wider">
                         Patients actifs
@@ -216,10 +217,7 @@ export default async function ProfessionalLandingPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="py-6 text-center text-xs text-slate-400">
-        <p>&copy; 2026 Fondation FondaMental • Réseau de Centres Experts • v2.1.0</p>
-      </footer>
+      <AppFooter />
     </div>
   );
 }

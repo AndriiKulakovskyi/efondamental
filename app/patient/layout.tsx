@@ -4,6 +4,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { PatientUserMenu } from "./components/patient-user-menu";
 import { MobileBottomNav } from "./components/mobile-bottom-nav";
+import { AppFooter } from "@/components/ui/app-footer";
 
 export default async function PatientLayout({
   children,
@@ -150,6 +151,10 @@ export default async function PatientLayout({
 
         {/* CONTENT AREA */}
         <main className="flex-1 overflow-y-auto p-4 md:p-8">{children}</main>
+      </div>
+
+      <div className="hidden md:block">
+        <AppFooter />
       </div>
 
       {/* MOBILE BOTTOM NAV */}

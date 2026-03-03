@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { UserProfileDropdown } from "@/components/user-profile-dropdown";
 import PathologyNav from "./components/pathology-nav";
 import { Bell } from "lucide-react";
+import { AppFooter } from "@/components/ui/app-footer";
 
 export default async function PathologyLayout({
   children,
@@ -52,6 +53,8 @@ export default async function PathologyLayout({
         <PathologyNav pathology={pathology} pathologyName={pathologyName} />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
+
+      <AppFooter />
     </div>
   );
 }
