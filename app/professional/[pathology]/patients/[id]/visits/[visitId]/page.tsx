@@ -4,6 +4,7 @@ import { enrichModulesWithStatus } from "@/lib/services/visit-modules.service";
 import { getTobaccoResponse } from "@/lib/services/bipolar-nurse.service";
 import { getDsm5ComorbidResponse } from "@/lib/services/questionnaire-dsm5.service";
 import { getWais4CriteriaResponse, getWais3CriteriaResponse } from "@/lib/services/questionnaire-hetero.service";
+import { getDepressionMiniResponse } from "@/lib/services/depression-screening.service";
 import { getUserContext } from "@/lib/rbac/middleware";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDateTime } from "@/lib/utils/date";
@@ -40,12 +41,13 @@ export default async function VisitDetailPage({
   }
 
   // Fetch conditional dependency responses (used by enrichModulesWithStatus)
-  const [tobaccoResponse, dsm5ComorbidResponse, wais4CriteriaResponse, wais3CriteriaResponse] =
+  const [tobaccoResponse, dsm5ComorbidResponse, wais4CriteriaResponse, wais3CriteriaResponse, depressionMiniResponse] =
     await Promise.all([
       getTobaccoResponse(visitId),
       getDsm5ComorbidResponse(visitId),
       getWais4CriteriaResponse(visitId),
       getWais3CriteriaResponse(visitId),
+      pathology === 'depression' ? getDepressionMiniResponse(visitId) : Promise.resolve(null),
     ]);
 
 
@@ -58,6 +60,7 @@ export default async function VisitDetailPage({
   if (dsm5ComorbidResponse) conditionalResponses['DSM5_COMORBID'] = dsm5ComorbidResponse;
   if (wais3CriteriaResponse) conditionalResponses['WAIS3_CRITERIA'] = wais3CriteriaResponse;
   if (wais4CriteriaResponse) conditionalResponses['WAIS4_CRITERIA'] = wais4CriteriaResponse;
+  if (depressionMiniResponse) conditionalResponses['MINI'] = depressionMiniResponse;
 
   // Enrich with completion statuses and conditional logic
   const modulesWithQuestionnaires = enrichModulesWithStatus(

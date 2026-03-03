@@ -367,15 +367,18 @@ import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
 import {
   DEPRESSION_THASE_RUSH_DEFINITION,
+  DEPRESSION_MINI_DEFINITION,
+  collapseColumnsToMultiChoice,
 } from "@/lib/questionnaires/depression/screening/hetero";
+import {
+  DEPRESSION_INCLUSION_DEFINITION,
+} from "@/lib/questionnaires/depression/screening/hetero/inclusion";
 import {
   getDepressionThaseRushResponse,
   getDepressionMiniResponse,
+  getDepressionInclusionResponse,
+  getDepressionMadrsResponse as getDepressionMadrsResponseForPrefill,
 } from "@/lib/services/depression-screening.service";
-import {
-  DEPRESSION_MINI_DEFINITION,
-  collapseColumnsToMultiChoice,
-} from "@/lib/questionnaires/depression/screening/hetero/mini";
 import { QuestionnairePageClient } from "./page-client";
 import { TapQuestionnaireForm } from "@/components/clinical/tap-questionnaire-form";
 import {
@@ -844,6 +847,8 @@ export default async function ProfessionalQuestionnairePage({
     questionnaire = DEPRESSION_THASE_RUSH_DEFINITION;
   else if (code === DEPRESSION_MINI_DEFINITION.code)
     questionnaire = DEPRESSION_MINI_DEFINITION;
+  else if (code === DEPRESSION_INCLUSION_DEFINITION.code)
+    questionnaire = DEPRESSION_INCLUSION_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -1212,6 +1217,8 @@ export default async function ProfessionalQuestionnairePage({
     existingResponse = await getDepressionThaseRushResponse(visitId);
   else if (code === DEPRESSION_MINI_DEFINITION.code)
     existingResponse = await getDepressionMiniResponse(visitId);
+  else if (code === DEPRESSION_INCLUSION_DEFINITION.code)
+    existingResponse = await getDepressionInclusionResponse(visitId);
 
   // Debug logging for PSQI_SZ
   if (code === "PSQI_SZ") {
@@ -1256,6 +1263,35 @@ export default async function ProfessionalQuestionnairePage({
   // For MINI questionnaire, reconstruct multiple_choice arrays from individual DB columns
   if (code === "MINI" && existingResponse) {
     initialResponses = collapseColumnsToMultiChoice(initialResponses);
+  }
+
+  // For INCLUSION questionnaire, auto-populate criteria from other screening questionnaires
+  if (code === "INCLUSION" && !existingResponse) {
+    const [madrsResp, miniResp, thaseRushResp] = await Promise.all([
+      getDepressionMadrsResponseForPrefill(visitId),
+      getDepressionMiniResponse(visitId),
+      getDepressionThaseRushResponse(visitId),
+    ]);
+
+    if (madrsResp?.total_score !== null && madrsResp?.total_score !== undefined) {
+      initialResponses.madrs_score = madrsResp.total_score > 20 ? 1 : 0;
+    }
+    if (miniResp) {
+      initialResponses.epi_depress_caract = miniResp.minia5bis === 1 ? 1 : 0;
+      initialResponses.trou_bipol = (miniResp.minicepmania === 1 || miniResp.minicephmania === 1) ? 1 : 0;
+      initialResponses.trou_compul = miniResp.minigtruobscomact === 1 ? 1 : 0;
+      initialResponses.trou_alim = (miniResp.minilanomenact === 1 || miniResp.minim8 === 1 || miniResp.minim8bis === 1) ? 1 : 0;
+    }
+    if (thaseRushResp?.total_score !== null && thaseRushResp?.total_score !== undefined) {
+      initialResponses.niv_2_thase_rush = thaseRushResp.total_score >= 2 ? 1 : 0;
+    }
+
+    // Auto-compute pat_eligible from the pre-populated criteria
+    const inclusionMet = initialResponses.madrs_score === 1 && initialResponses.epi_depress_caract === 1 && initialResponses.niv_2_thase_rush === 1;
+    const noExclusion = initialResponses.trou_bipol === 0 && initialResponses.trou_compul === 0 && initialResponses.trou_alim === 0;
+    if (inclusionMet !== undefined && noExclusion !== undefined) {
+      initialResponses.pat_eligible = (inclusionMet && noExclusion) ? 1 : 0;
+    }
   }
 
   // Convert boolean fields to 'yes'/'no' strings for SLEEP_APNEA questionnaire

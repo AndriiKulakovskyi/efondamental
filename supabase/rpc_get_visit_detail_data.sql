@@ -76,10 +76,11 @@ BEGIN
           'QIDS_SR16', jsonb_build_object('completed', EXISTS (SELECT 1 FROM depression_qids_sr16 WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM depression_qids_sr16 WHERE visit_id = p_visit_id)),
           'MADRS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM depression_madrs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM depression_madrs WHERE visit_id = p_visit_id)),
           'THASE_RUSH', jsonb_build_object('completed', EXISTS (SELECT 1 FROM depression_thase_rush WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM depression_thase_rush WHERE visit_id = p_visit_id)),
-          'MINI', jsonb_build_object('completed', EXISTS (SELECT 1 FROM depression_mini WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM depression_mini WHERE visit_id = p_visit_id))
+          'MINI', jsonb_build_object('completed', EXISTS (SELECT 1 FROM depression_mini WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM depression_mini WHERE visit_id = p_visit_id)),
+          'INCLUSION', jsonb_build_object('completed', EXISTS (SELECT 1 FROM depression_inclusion WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM depression_inclusion WHERE visit_id = p_visit_id))
         ),
         'completion_status', jsonb_build_object(
-          'total_questionnaires', 4,
+          'total_questionnaires', 5,
           'completed_questionnaires', 0,
           'completion_percentage', 0
         )

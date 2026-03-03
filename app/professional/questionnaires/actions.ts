@@ -205,6 +205,7 @@ import {
   saveDepressionMadrsResponse,
   saveDepressionThaseRushResponse,
   saveDepressionMiniResponse,
+  saveDepressionInclusionResponse,
 } from "@/lib/services/depression-screening.service";
 import {
   type DepressionQidsResponseInsert,
@@ -213,6 +214,7 @@ import {
   type DepressionMadrsResponseInsert,
   type DepressionThaseRushResponseInsert,
   type DepressionMiniResponseInsert,
+  type DepressionInclusionResponseInsert,
 } from "@/lib/questionnaires/depression/screening/hetero";
 
 // Helper to check if a questionnaire should use depression_* tables
@@ -220,7 +222,7 @@ async function shouldUseDepressionTables(
   visitId: string,
   questionnaireCode: string,
 ): Promise<boolean> {
-  const depressionCodes = ['QIDS_SR16', 'MADRS', 'THASE_RUSH', 'MINI'];
+  const depressionCodes = ['QIDS_SR16', 'MADRS', 'THASE_RUSH', 'MINI', 'INCLUSION'];
   if (!depressionCodes.includes(questionnaireCode)) {
     return false;
   }
@@ -593,6 +595,13 @@ export async function submitProfessionalQuestionnaireAction(
           completed_by: completedBy,
           ...(responses as any),
         } as DepressionMiniResponseInsert);
+      } else if (questionnaireCode === 'INCLUSION') {
+        result = await saveDepressionInclusionResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          completed_by: completedBy,
+          ...(responses as any),
+        } as DepressionInclusionResponseInsert);
       } else {
         throw new Error(`Unknown depression questionnaire: ${questionnaireCode}`);
       }

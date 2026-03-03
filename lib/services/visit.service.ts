@@ -21,7 +21,8 @@ import {
   DEPRESSION_QIDS_DEFINITION,
   DEPRESSION_MADRS_DEFINITION,
   DEPRESSION_THASE_RUSH_DEFINITION,
-  DEPRESSION_MINI_DEFINITION
+  DEPRESSION_MINI_DEFINITION,
+  DEPRESSION_INCLUSION_DEFINITION
 } from '../questionnaires/depression';
 import {
   ASRS_DEFINITION,
@@ -590,6 +591,14 @@ const COND_NEUROPSY_ROOT: ConditionalDescriptor = {
   notMetMessage: "Patient non accepté pour l'évaluation neuropsychologique",
 };
 
+const COND_INCLUSION: ConditionalDescriptor = {
+  dependsOn: 'MINI',
+  field: 'id',
+  requiredValue: true,
+  notAnsweredMessage: "Complétez d'abord tous les questionnaires (QIDS, MADRS, Thase et Rush, MINI)",
+  notMetMessage: "Complétez d'abord tous les questionnaires (QIDS, MADRS, Thase et Rush, MINI)",
+};
+
 // Helper: extract only serializable fields from a questionnaire definition
 function q(def: any, targetRole: string, conditional?: ConditionalDescriptor): any {
   return {
@@ -924,6 +933,14 @@ export function getVisitModules(visitType: string, pathologyType: string): Virtu
             q(DEPRESSION_MINI_DEFINITION, 'healthcare_professional'),
           ],
         },
+        {
+          id: 'mod_inclusion',
+          name: 'Inclusion',
+          description: "Critères d'inclusion et de non-inclusion pour la cohorte",
+          questionnaires: [
+            q(DEPRESSION_INCLUSION_DEFINITION, 'healthcare_professional', COND_INCLUSION),
+          ],
+        },
       ];
     }
     return [
@@ -1249,23 +1266,25 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
     const depressionScreeningIds = screeningIds.filter(id => visitPathologyMap.get(id) === 'depression');
     const szScreeningIds = screeningIds.filter(id => visitPathologyMap.get(id) === 'schizophrenia');
 
-    // Process depression screening visits (4 questionnaires: QIDS_SR16, MADRS, THASE_RUSH, MINI)
+    // Process depression screening visits (5 questionnaires: QIDS_SR16, MADRS, THASE_RUSH, MINI, INCLUSION)
     if (depressionScreeningIds.length > 0) {
-      const [depQidsResults, depMadrsResults, depThaseRushResults, depMiniResults] = await Promise.all([
+      const [depQidsResults, depMadrsResults, depThaseRushResults, depMiniResults, depInclusionResults] = await Promise.all([
         supabase.from('depression_qids_sr16').select('visit_id').in('visit_id', depressionScreeningIds),
         supabase.from('depression_madrs').select('visit_id').in('visit_id', depressionScreeningIds),
         supabase.from('depression_thase_rush').select('visit_id').in('visit_id', depressionScreeningIds),
-        supabase.from('depression_mini').select('visit_id').in('visit_id', depressionScreeningIds)
+        supabase.from('depression_mini').select('visit_id').in('visit_id', depressionScreeningIds),
+        supabase.from('depression_inclusion').select('visit_id').in('visit_id', depressionScreeningIds)
       ]);
 
       const depQidsSet = new Set(depQidsResults.data?.map(r => r.visit_id) || []);
       const depMadrsSet = new Set(depMadrsResults.data?.map(r => r.visit_id) || []);
       const depThaseRushSet = new Set(depThaseRushResults.data?.map(r => r.visit_id) || []);
       const depMiniSet = new Set(depMiniResults.data?.map(r => r.visit_id) || []);
+      const depInclusionSet = new Set(depInclusionResults.data?.map(r => r.visit_id) || []);
 
       for (const visitId of depressionScreeningIds) {
-        const completed = [depQidsSet, depMadrsSet, depThaseRushSet, depMiniSet].filter(set => set.has(visitId)).length;
-        const total = 4;
+        const completed = [depQidsSet, depMadrsSet, depThaseRushSet, depMiniSet, depInclusionSet].filter(set => set.has(visitId)).length;
+        const total = 5;
         completionMap.set(visitId, {
           completedQuestionnaires: completed,
           totalQuestionnaires: total,

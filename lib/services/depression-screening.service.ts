@@ -18,6 +18,9 @@ import {
   expandMultiChoiceToColumns,
   type DepressionMiniResponse,
   type DepressionMiniResponseInsert,
+  scoreDepressionInclusion,
+  type DepressionInclusionResponse,
+  type DepressionInclusionResponseInsert,
 } from '@/lib/questionnaires/depression/screening/hetero';
 
 // ============================================================================
@@ -215,6 +218,56 @@ export async function saveDepressionMiniResponse(
       minib_score: scoring.minib_score,
       minib_risque: scoring.minib_risque,
       minib_risque_cot: scoring.minib_risque_cot
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// Inclusion
+// ============================================================================
+
+export async function getDepressionInclusionResponse(
+  visitId: string
+): Promise<DepressionInclusionResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('depression_inclusion')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveDepressionInclusionResponse(
+  response: DepressionInclusionResponseInsert
+): Promise<DepressionInclusionResponse> {
+  const supabase = await createClient();
+
+  const scoring = scoreDepressionInclusion({
+    madrs_score: response.madrs_score,
+    epi_depress_caract: response.epi_depress_caract,
+    niv_2_thase_rush: response.niv_2_thase_rush,
+    trou_bipol: response.trou_bipol,
+    trou_compul: response.trou_compul,
+    trou_alim: response.trou_alim
+  });
+
+  const { data, error } = await supabase
+    .from('depression_inclusion')
+    .upsert({
+      ...response,
+      pat_eligible: scoring.pat_eligible,
+      total_score: scoring.total_score,
+      interpretation: scoring.interpretation
     }, { onConflict: 'visit_id' })
     .select()
     .single();

@@ -42,3 +42,15 @@ export {
   type DepressionMiniScoreInput,
   type DepressionMiniScoringResult
 } from './mini';
+
+export {
+  DEPRESSION_INCLUSION_QUESTIONS,
+  DEPRESSION_INCLUSION_DEFINITION,
+  computeEligibility,
+  interpretEligibility,
+  scoreDepressionInclusion,
+  type DepressionInclusionResponse,
+  type DepressionInclusionResponseInsert,
+  type DepressionInclusionScoreInput,
+  type DepressionInclusionScoringResult
+} from './inclusion';

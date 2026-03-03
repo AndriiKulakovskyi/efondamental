@@ -286,6 +286,12 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return "error";
     }
 
+    if (code === "INCLUSION") {
+      if (data.pat_eligible === 1) return "success";
+      if (data.pat_eligible === 0) return "error";
+      return "info";
+    }
+
     if (code === "YMRS") {
       // YMRS: Total score range 0-60
       // 0-12: minimal, 13-19: mild hypomania, 20-25: moderate mania, ≥26: severe mania
@@ -1088,6 +1094,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {code === "MADRS" && "Résultats MADRS - Échelle de Dépression"}
               {code === "THASE_RUSH" && "Résultats Thase et Rush - Critères de Résistance"}
               {code === "MINI" && "Résultats MINI - Entretien Neuropsychiatrique"}
+              {code === "INCLUSION" && "Résultats - Critères d'inclusion et de non-inclusion"}
               {(code === "YMRS" || code === "YMRS_SZ") &&
                 "Résultats YMRS - Échelle de Manie"}
               {code === "EGF_SZ" &&
@@ -1199,7 +1206,9 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                                               ? (data.total_score !== undefined ? data.total_score : "-")
                                               : code === "MINI"
                                                 ? (data.minib_score !== undefined && data.minib_score !== null ? data.minib_score : "-")
-                                                : (code === "YMRS" || code === "YMRS_SZ")
+                                                : code === "INCLUSION"
+                                                  ? (data.pat_eligible === 1 ? "Éligible" : data.pat_eligible === 0 ? "Non éligible" : "-")
+                                                  : (code === "YMRS" || code === "YMRS_SZ")
                                               ? (data.total_score !== undefined ? data.total_score : "-")
                                               : code === "EGF_SZ"
                                                 ? (data.egf_score !== undefined ? data.egf_score : "-")
@@ -1317,6 +1326,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {code === "MADRS" && "/60"}
               {code === "THASE_RUSH" && "/5"}
               {code === "MINI" && "/52"}
+              {code === "INCLUSION" && ""}
               {(code === "YMRS" || code === "YMRS_SZ") && "/60"}
               {code === "EGF_SZ" && "/100"}
               {code === "WAIS4_MATRICES" && "/19"}
@@ -3411,6 +3421,99 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <p>• 1-8 points : Risque faible</p>
               <p>• 9-16 points : Risque modéré</p>
               <p>• ≥ 17 points : Risque élevé</p>
+            </div>
+          </div>
+        )}
+
+        {/* INCLUSION Details */}
+        {code === "INCLUSION" && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            <div
+              className={`p-3 rounded-lg ${
+                data.pat_eligible === 1
+                  ? "bg-green-50 border border-green-200"
+                  : "bg-red-50 border border-red-200"
+              }`}
+            >
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">
+                    {data.pat_eligible === 1
+                      ? "Patient éligible pour la cohorte"
+                      : "Patient non éligible pour la cohorte"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">
+                Critères d'inclusion
+              </h5>
+              <div className="grid grid-cols-1 gap-1 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Score MADRS &gt; 20 :</span>
+                  <span
+                    className={`font-medium ${data.madrs_score === 1 ? "text-green-700" : "text-red-700"}`}
+                  >
+                    {data.madrs_score === 1 ? "Oui" : "Non"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">
+                    Épisode dépressif caractérisé :
+                  </span>
+                  <span
+                    className={`font-medium ${data.epi_depress_caract === 1 ? "text-green-700" : "text-red-700"}`}
+                  >
+                    {data.epi_depress_caract === 1 ? "Oui" : "Non"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">
+                    Niveau ≥2 Thase et Rush :
+                  </span>
+                  <span
+                    className={`font-medium ${data.niv_2_thase_rush === 1 ? "text-green-700" : "text-red-700"}`}
+                  >
+                    {data.niv_2_thase_rush === 1 ? "Oui" : "Non"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">
+                Critères de non-inclusion
+              </h5>
+              <div className="grid grid-cols-1 gap-1 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Trouble bipolaire :</span>
+                  <span
+                    className={`font-medium ${data.trou_bipol === 0 ? "text-green-700" : "text-red-700"}`}
+                  >
+                    {data.trou_bipol === 1 ? "Oui (exclu)" : "Non"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">TOC :</span>
+                  <span
+                    className={`font-medium ${data.trou_compul === 0 ? "text-green-700" : "text-red-700"}`}
+                  >
+                    {data.trou_compul === 1 ? "Oui (exclu)" : "Non"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">
+                    Trouble alimentaire :
+                  </span>
+                  <span
+                    className={`font-medium ${data.trou_alim === 0 ? "text-green-700" : "text-red-700"}`}
+                  >
+                    {data.trou_alim === 1 ? "Oui (exclu)" : "Non"}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         )}
