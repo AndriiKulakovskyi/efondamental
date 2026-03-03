@@ -21,10 +21,23 @@ export interface TapParseResult {
 }
 
 // ── RTF hex escape → Unicode character ──────────────────────────────────────
+// Windows-1252 bytes 0x80–0x9F map to specific Unicode code points,
+// NOT to U+0080–U+009F (which are C1 control characters).
+const WIN1252_MAP: Record<number, number> = {
+  0x80: 0x20AC, 0x82: 0x201A, 0x83: 0x0192, 0x84: 0x201E, 0x85: 0x2026,
+  0x86: 0x2020, 0x87: 0x2021, 0x88: 0x02C6, 0x89: 0x2030, 0x8A: 0x0160,
+  0x8B: 0x2039, 0x8C: 0x0152, 0x8E: 0x017D, 0x91: 0x2018, 0x92: 0x2019,
+  0x93: 0x201C, 0x94: 0x201D, 0x95: 0x2022, 0x96: 0x2013, 0x97: 0x2014,
+  0x98: 0x02DC, 0x99: 0x2122, 0x9A: 0x0161, 0x9B: 0x203A, 0x9C: 0x0153,
+  0x9E: 0x017E, 0x9F: 0x0178,
+};
+
 function decodeRtfHex(text: string): string {
-  return text.replace(/\\'([0-9a-f]{2})/gi, (_, hex) =>
-    String.fromCharCode(parseInt(hex, 16))
-  );
+  return text.replace(/\\'([0-9a-f]{2})/gi, (_, hex) => {
+    const byte = parseInt(hex, 16);
+    const codePoint = WIN1252_MAP[byte] ?? byte;
+    return String.fromCharCode(codePoint);
+  });
 }
 
 // ── Strip RTF to plain text (for metadata + non-table content) ──────────────
@@ -40,6 +53,15 @@ function stripRtfToPlainText(rtf: string): string {
   text = text.replace(/\\par\b/g, '\n');
   text = text.replace(/\\tab\b/g, '\t');
   text = text.replace(/\\line\b/g, '\n');
+  text = text.replace(/\\~/g, ' ');
+
+  text = text.replace(/\\rquote\b\s?/g, '\u2019');
+  text = text.replace(/\\lquote\b\s?/g, '\u2018');
+  text = text.replace(/\\rdblquote\b\s?/g, '\u201D');
+  text = text.replace(/\\ldblquote\b\s?/g, '\u201C');
+  text = text.replace(/\\emdash\b\s?/g, '\u2014');
+  text = text.replace(/\\endash\b\s?/g, '\u2013');
+  text = text.replace(/\\bullet\b\s?/g, '\u2022');
 
   text = decodeRtfHex(text);
 
@@ -221,7 +243,7 @@ function extractGlobalIndices(plainText: string): FlexibiliteGlobalIndices {
     indices.index_prestation_percentile = parseInteger(prestationMatch[2]);
   }
 
-  const speedAccMatch = plainText.match(/Index de.*speed.accuracy[^:]*:\s*([-\d,\.]+)\s*\(%?\s*=?\s*(\d+)\)/i);
+  const speedAccMatch = plainText.match(/Index de[\s\S]*?speed.accuracy[^:]*:\s*([-\d,\.]+)\s*\(%?\s*=?\s*(\d+)\)/i);
   if (speedAccMatch) {
     indices.index_speed_accuracy_valeur = parseNumber(speedAccMatch[1]);
     indices.index_speed_accuracy_percentile = parseInteger(speedAccMatch[2]);
