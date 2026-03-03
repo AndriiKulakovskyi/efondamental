@@ -238,7 +238,7 @@ export async function saveSisFollowupResponse(
   const user = await supabase.auth.getUser();
 
   // Compute scoring
-  const scores = computeSisFollowupScores(response as Record<string, number>);
+  const scores = computeSisFollowupScores(response);
   const interpretation = interpretSisFollowupScore(scores.total);
 
   const { data, error } = await supabase

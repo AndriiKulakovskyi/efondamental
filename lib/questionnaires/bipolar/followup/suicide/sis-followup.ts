@@ -267,31 +267,25 @@ export const SIS_FOLLOWUP_QUESTIONS: Question[] = [
 // Scoring
 // ============================================================================
 
-export function computeSisFollowupScores(responses: Record<string, number>): { objective: number; subjective: number; total: number } {
+export function computeSisFollowupScores(responses: BipolarFollowupSisResponseInsert): { objective: number; subjective: number; total: number } {
+  const items: (number | null)[] = [
+    responses.q1, responses.q2, responses.q3, responses.q4,
+    responses.q5, responses.q6, responses.q7, responses.q8,
+    responses.q9, responses.q10, responses.q11, responses.q12,
+    responses.q13, responses.q14, responses.q15,
+  ];
+
   let objective = 0;
   let subjective = 0;
-  
-  // Objective items: q1-q8
-  for (let i = 1; i <= 8; i++) {
-    const value = responses[`q${i}`];
-    if (typeof value === 'number') {
-      objective += value;
-    }
+
+  for (let i = 0; i < 8; i++) {
+    objective += items[i] ?? 0;
   }
-  
-  // Subjective items: q9-q15
-  for (let i = 9; i <= 15; i++) {
-    const value = responses[`q${i}`];
-    if (typeof value === 'number') {
-      subjective += value;
-    }
+  for (let i = 8; i < 15; i++) {
+    subjective += items[i] ?? 0;
   }
-  
-  return {
-    objective,
-    subjective,
-    total: objective + subjective
-  };
+
+  return { objective, subjective, total: objective + subjective };
 }
 
 export function interpretSisFollowupScore(total: number): string {
