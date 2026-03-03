@@ -271,6 +271,13 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return "error"; // Severe depression
     }
 
+    if (code === "THASE_RUSH") {
+      const total = data.total_score;
+      if (total === null || total === undefined) return "info";
+      if (total < 2) return "warning";
+      return "error";
+    }
+
     if (code === "YMRS") {
       // YMRS: Total score range 0-60
       // 0-12: minimal, 13-19: mild hypomania, 20-25: moderate mania, ≥26: severe mania
@@ -1071,6 +1078,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {code === "ALDA" && "Score Alda"}
               {(code === "CGI" || code === "CGI_SZ") && "Résultats CGI"}
               {code === "MADRS" && "Résultats MADRS - Échelle de Dépression"}
+              {code === "THASE_RUSH" && "Résultats Thase et Rush - Critères de Résistance"}
               {(code === "YMRS" || code === "YMRS_SZ") &&
                 "Résultats YMRS - Échelle de Manie"}
               {code === "EGF_SZ" &&
@@ -1178,7 +1186,9 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                                           ? (data.therapeutic_index !== undefined && data.therapeutic_index !== null ? data.therapeutic_index : (data.cgi_s !== undefined ? data.cgi_s : "-"))
                                           : code === "MADRS"
                                             ? (data.total_score !== undefined ? data.total_score : "-")
-                                            : (code === "YMRS" || code === "YMRS_SZ")
+                                            : code === "THASE_RUSH"
+                                              ? (data.total_score !== undefined ? data.total_score : "-")
+                                              : (code === "YMRS" || code === "YMRS_SZ")
                                               ? (data.total_score !== undefined ? data.total_score : "-")
                                               : code === "EGF_SZ"
                                                 ? (data.egf_score !== undefined ? data.egf_score : "-")
@@ -1294,6 +1304,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {code === "ALDA" && "/10"}
               {(code === "CGI" || code === "CGI_SZ") && (data.therapeutic_index !== undefined && data.therapeutic_index !== null ? "/16" : "/7")}
               {code === "MADRS" && "/60"}
+              {code === "THASE_RUSH" && "/5"}
               {(code === "YMRS" || code === "YMRS_SZ") && "/60"}
               {code === "EGF_SZ" && "/100"}
               {code === "WAIS4_MATRICES" && "/19"}
@@ -3154,6 +3165,71 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <p>• 7-19 points: Dépression légère</p>
               <p>• 20-34 points: Dépression moyenne</p>
               <p>• {">"} 34 points: Dépression sévère</p>
+            </div>
+          </div>
+        )}
+
+        {/* Thase et Rush Details */}
+        {code === "THASE_RUSH" && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
+              <p className="text-blue-900 text-xs leading-relaxed">
+                Les critères de Thase et Rush permettent d'évaluer le niveau de
+                résistance aux traitements antidépresseurs selon une échelle
+                hiérarchique de 1 à 5. Un niveau ≥ 2 confirme une dépression
+                résistante.
+              </p>
+            </div>
+
+            <div
+              className={`p-3 rounded-lg ${
+                data.total_score !== null && data.total_score >= 2
+                  ? "bg-red-50 border border-red-200"
+                  : "bg-amber-50 border border-amber-200"
+              }`}
+            >
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">
+                    {data.total_score !== null && data.total_score >= 2
+                      ? "Dépression résistante confirmée"
+                      : "Hors critères de cohorte"}
+                  </span>
+                  <span className="text-xs text-gray-600">
+                    Niveau: {data.total_score ?? "-"}/5
+                  </span>
+                </div>
+                {data.total_score !== null && data.total_score < 2 && (
+                  <div className="flex items-center gap-1 text-amber-700 text-xs mt-1">
+                    <AlertTriangle className="h-3 w-3" />
+                    <span>
+                      Sortie de cohorte : Le niveau de résistance est inférieur à
+                      2.
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="text-xs text-gray-500 pt-2 border-t space-y-1">
+              <p>
+                <strong>Niveaux de résistance :</strong>
+              </p>
+              <p>
+                • Niveau 1 : Échec d'un premier antidépresseur à doses et durée
+                adéquates
+              </p>
+              <p>
+                • Niveau 2 : Niveau 1 + échec d'un antidépresseur d'une autre
+                classe
+              </p>
+              <p>
+                • Niveau 3 : Niveau 2 + échec d'un antidépresseur tricyclique
+              </p>
+              <p>• Niveau 4 : Niveau 3 + échec d'un IMAO</p>
+              <p>
+                • Niveau 5 : Niveau 4 + échec de l'ECT bilatérale
+              </p>
             </div>
           </div>
         )}

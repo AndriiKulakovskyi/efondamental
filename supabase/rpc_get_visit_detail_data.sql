@@ -55,31 +55,61 @@ BEGIN
   v_diva_required := v_dsm5_diva_evaluated = 'oui';
 
   IF v_visit_type = 'screening' THEN
-    WITH visit_data AS (
-      SELECT v.*, p.first_name, p.last_name, p.date_of_birth, p.gender, pa.type as pathology_type
-      FROM visits v
-      JOIN patients p ON v.patient_id = p.id
-      LEFT JOIN pathologies pa ON p.pathology_id = pa.id
-      WHERE v.id = p_visit_id
-    )
-    SELECT jsonb_build_object(
-      'visit', (SELECT row_to_json(vd.*) FROM visit_data vd),
-      'questionnaire_statuses', jsonb_build_object(
-        'ASRM', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_asrm WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_asrm WHERE visit_id = p_visit_id)),
-        'QIDS_SR16', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_qids_sr16 WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_qids_sr16 WHERE visit_id = p_visit_id)),
-        'MDQ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_mdq WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_mdq WHERE visit_id = p_visit_id)),
-        'EQ5D5L', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_eq5d5l WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_eq5d5l WHERE visit_id = p_visit_id)),
-        'MEDICAL_DIAGNOSTIC', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_diagnostic WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_diagnostic WHERE visit_id = p_visit_id)),
-        'BIPOLAR_ORIENTATION', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_orientation WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_orientation WHERE visit_id = p_visit_id)),
-        'SCREENING_DIAGNOSTIC_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_screening_diagnostic WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_screening_diagnostic WHERE visit_id = p_visit_id)),
-        'SCREENING_ORIENTATION_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_screening_orientation WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_screening_orientation WHERE visit_id = p_visit_id))
-      ),
-      'completion_status', jsonb_build_object(
-        'total_questionnaires', 8,
-        'completed_questionnaires', 0,
-        'completion_percentage', 0
+    -- Get pathology type for this visit's patient
+    SELECT pa.type INTO v_pathology_type
+    FROM visits v
+    JOIN patients p ON v.patient_id = p.id
+    LEFT JOIN pathologies pa ON p.pathology_id = pa.id
+    WHERE v.id = p_visit_id;
+
+    IF v_pathology_type = 'depression' THEN
+      WITH visit_data AS (
+        SELECT v.*, p.first_name, p.last_name, p.date_of_birth, p.gender, pa.type as pathology_type
+        FROM visits v
+        JOIN patients p ON v.patient_id = p.id
+        LEFT JOIN pathologies pa ON p.pathology_id = pa.id
+        WHERE v.id = p_visit_id
       )
-    ) INTO v_result;
+      SELECT jsonb_build_object(
+        'visit', (SELECT row_to_json(vd.*) FROM visit_data vd),
+        'questionnaire_statuses', jsonb_build_object(
+          'QIDS_SR16', jsonb_build_object('completed', EXISTS (SELECT 1 FROM depression_qids_sr16 WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM depression_qids_sr16 WHERE visit_id = p_visit_id)),
+          'MADRS', jsonb_build_object('completed', EXISTS (SELECT 1 FROM depression_madrs WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM depression_madrs WHERE visit_id = p_visit_id)),
+          'THASE_RUSH', jsonb_build_object('completed', EXISTS (SELECT 1 FROM depression_thase_rush WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM depression_thase_rush WHERE visit_id = p_visit_id))
+        ),
+        'completion_status', jsonb_build_object(
+          'total_questionnaires', 3,
+          'completed_questionnaires', 0,
+          'completion_percentage', 0
+        )
+      ) INTO v_result;
+    ELSE
+      WITH visit_data AS (
+        SELECT v.*, p.first_name, p.last_name, p.date_of_birth, p.gender, pa.type as pathology_type
+        FROM visits v
+        JOIN patients p ON v.patient_id = p.id
+        LEFT JOIN pathologies pa ON p.pathology_id = pa.id
+        WHERE v.id = p_visit_id
+      )
+      SELECT jsonb_build_object(
+        'visit', (SELECT row_to_json(vd.*) FROM visit_data vd),
+        'questionnaire_statuses', jsonb_build_object(
+          'ASRM', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_asrm WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_asrm WHERE visit_id = p_visit_id)),
+          'QIDS_SR16', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_qids_sr16 WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_qids_sr16 WHERE visit_id = p_visit_id)),
+          'MDQ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_mdq WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_mdq WHERE visit_id = p_visit_id)),
+          'EQ5D5L', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_eq5d5l WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_eq5d5l WHERE visit_id = p_visit_id)),
+          'MEDICAL_DIAGNOSTIC', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_diagnostic WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_diagnostic WHERE visit_id = p_visit_id)),
+          'BIPOLAR_ORIENTATION', jsonb_build_object('completed', EXISTS (SELECT 1 FROM bipolar_orientation WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM bipolar_orientation WHERE visit_id = p_visit_id)),
+          'SCREENING_DIAGNOSTIC_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_screening_diagnostic WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_screening_diagnostic WHERE visit_id = p_visit_id)),
+          'SCREENING_ORIENTATION_SZ', jsonb_build_object('completed', EXISTS (SELECT 1 FROM schizophrenia_screening_orientation WHERE visit_id = p_visit_id), 'completed_at', (SELECT completed_at FROM schizophrenia_screening_orientation WHERE visit_id = p_visit_id))
+        ),
+        'completion_status', jsonb_build_object(
+          'total_questionnaires', 8,
+          'completed_questionnaires', 0,
+          'completion_percentage', 0
+        )
+      ) INTO v_result;
+    END IF;
 
   ELSIF v_visit_type = 'initial_evaluation' THEN
     v_statuses := jsonb_build_object(

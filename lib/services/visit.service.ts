@@ -16,6 +16,12 @@ import {
   DIAGNOSTIC_DEFINITION,
   ORIENTATION_DEFINITION
 } from '../questionnaires/bipolar/screening';
+// Depression Screening
+import {
+  DEPRESSION_QIDS_DEFINITION,
+  DEPRESSION_MADRS_DEFINITION,
+  DEPRESSION_THASE_RUSH_DEFINITION
+} from '../questionnaires/depression';
 import {
   ASRS_DEFINITION,
   CTQ_DEFINITION,
@@ -897,6 +903,27 @@ export function getVisitModules(visitType: string, pathologyType: string): Virtu
         },
       ];
     }
+    if (pathologyType === 'depression') {
+      return [
+        {
+          id: 'mod_auto',
+          name: 'Autoquestionnaires',
+          description: 'Questionnaires à remplir par le patient',
+          questionnaires: [
+            q(DEPRESSION_QIDS_DEFINITION, 'patient'),
+          ],
+        },
+        {
+          id: 'mod_hetero',
+          name: 'Hétéroquestionnaires',
+          description: 'Évaluation clinique par le professionnel de santé',
+          questionnaires: [
+            q(DEPRESSION_MADRS_DEFINITION, 'healthcare_professional'),
+            q(DEPRESSION_THASE_RUSH_DEFINITION, 'healthcare_professional'),
+          ],
+        },
+      ];
+    }
     return [
       {
         id: 'mod_auto',
@@ -1213,8 +1240,35 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
       visitPathologyMap.set(vp.id, vp.patients?.pathology_type || 'bipolar');
     });
 
-    const bipolarScreeningIds = screeningIds.filter(id => visitPathologyMap.get(id) !== 'schizophrenia');
+    const bipolarScreeningIds = screeningIds.filter(id => {
+      const p = visitPathologyMap.get(id);
+      return p !== 'schizophrenia' && p !== 'depression';
+    });
+    const depressionScreeningIds = screeningIds.filter(id => visitPathologyMap.get(id) === 'depression');
     const szScreeningIds = screeningIds.filter(id => visitPathologyMap.get(id) === 'schizophrenia');
+
+    // Process depression screening visits (3 questionnaires: QIDS_SR16, MADRS, THASE_RUSH)
+    if (depressionScreeningIds.length > 0) {
+      const [depQidsResults, depMadrsResults, depThaseRushResults] = await Promise.all([
+        supabase.from('depression_qids_sr16').select('visit_id').in('visit_id', depressionScreeningIds),
+        supabase.from('depression_madrs').select('visit_id').in('visit_id', depressionScreeningIds),
+        supabase.from('depression_thase_rush').select('visit_id').in('visit_id', depressionScreeningIds)
+      ]);
+
+      const depQidsSet = new Set(depQidsResults.data?.map(r => r.visit_id) || []);
+      const depMadrsSet = new Set(depMadrsResults.data?.map(r => r.visit_id) || []);
+      const depThaseRushSet = new Set(depThaseRushResults.data?.map(r => r.visit_id) || []);
+
+      for (const visitId of depressionScreeningIds) {
+        const completed = [depQidsSet, depMadrsSet, depThaseRushSet].filter(set => set.has(visitId)).length;
+        const total = 3;
+        completionMap.set(visitId, {
+          completedQuestionnaires: completed,
+          totalQuestionnaires: total,
+          completionPercentage: total > 0 ? Math.round((completed / total) * 100) : 0
+        });
+      }
+    }
 
     // Process bipolar screening visits (5 questionnaires: ASRM, QIDS, MDQ, Diag, Orient)
     if (bipolarScreeningIds.length > 0) {

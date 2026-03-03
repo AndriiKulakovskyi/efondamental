@@ -67,6 +67,12 @@ import {
   FAGERSTROM_SZ_DEFINITION,
   BRIEF_A_AUTO_SZ_DEFINITION
 } from '../questionnaires/schizophrenia';
+import {
+  DEPRESSION_QIDS_DEFINITION,
+} from '../questionnaires/depression';
+import {
+  getDepressionQidsResponse,
+} from './depression-screening.service';
 
 // ============================================================================
 // TYPES
@@ -112,6 +118,10 @@ const SCREENING_AUTO_QUESTIONNAIRES = [
   { definition: ASRM_DEFINITION, estimatedTime: 5, category: 'screening' as const },
   { definition: QIDS_DEFINITION, estimatedTime: 10, category: 'screening' as const },
   { definition: MDQ_DEFINITION, estimatedTime: 5, category: 'screening' as const }
+];
+
+const DEPRESSION_SCREENING_AUTO_QUESTIONNAIRES = [
+  { definition: DEPRESSION_QIDS_DEFINITION, estimatedTime: 10, category: 'screening' as const }
 ];
 
 const INITIAL_EVAL_ETAT_QUESTIONNAIRES = [
@@ -219,6 +229,9 @@ async function checkQuestionnaireCompletionWithRole(
   if (code === 'CTQ' && pathologyType === 'schizophrenia') {
     getter = (vId: string) => getSchizophreniaInitialResponse('CTQ', vId);
   }
+  if (code === 'QIDS_SR16' && pathologyType === 'depression') {
+    getter = getDepressionQidsResponse;
+  }
   if (!getter) {
     console.warn(`[Patient Visit Service] No getter found for questionnaire code: ${code}`);
     return {
@@ -312,6 +325,9 @@ export function getVisitAutoQuestionnaires(
 ): Array<{ definition: QuestionnaireDefinition; estimatedTime: number; category: 'etat' | 'traits' | 'screening' | 'autoquestionnaire' }> {
   switch (visitType) {
     case 'screening':
+      if (pathologyType === 'depression') {
+        return DEPRESSION_SCREENING_AUTO_QUESTIONNAIRES;
+      }
       return SCREENING_AUTO_QUESTIONNAIRES;
     case 'initial_evaluation':
       if (pathologyType === 'schizophrenia') {

@@ -365,6 +365,12 @@ import {
 } from "@/lib/services/schizophrenia-initial.service";
 import { getPatientById } from "@/lib/services/patient.service";
 import { getVisitById } from "@/lib/services/visit.service";
+import {
+  DEPRESSION_THASE_RUSH_DEFINITION,
+} from "@/lib/questionnaires/depression/screening/hetero";
+import {
+  getDepressionThaseRushResponse,
+} from "@/lib/services/depression-screening.service";
 import { QuestionnairePageClient } from "./page-client";
 import { TapQuestionnaireForm } from "@/components/clinical/tap-questionnaire-form";
 import {
@@ -828,6 +834,9 @@ export default async function ProfessionalQuestionnairePage({
     questionnaire = DACOBS_SZ_DEFINITION;
   else if (code === TAP_SZ_DEFINITION.code)
     questionnaire = TAP_SZ_DEFINITION as any;
+  // Depression screening questionnaires
+  else if (code === DEPRESSION_THASE_RUSH_DEFINITION.code)
+    questionnaire = DEPRESSION_THASE_RUSH_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -1191,6 +1200,9 @@ export default async function ProfessionalQuestionnairePage({
     existingResponse = await getDacobsSzResponse(visitId);
   else if (code === TAP_SZ_DEFINITION.code)
     existingResponse = await getTapSzResponse(visitId);
+  // Depression screening questionnaires
+  else if (code === DEPRESSION_THASE_RUSH_DEFINITION.code)
+    existingResponse = await getDepressionThaseRushResponse(visitId);
 
   // Debug logging for PSQI_SZ
   if (code === "PSQI_SZ") {

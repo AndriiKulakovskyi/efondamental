@@ -199,6 +199,38 @@ import {
   getVisitById,
 } from "@/lib/services/visit.service";
 import { getPatientById } from "@/lib/services/patient.service";
+// Depression screening service
+import {
+  saveDepressionQidsResponse,
+  saveDepressionMadrsResponse,
+  saveDepressionThaseRushResponse,
+} from "@/lib/services/depression-screening.service";
+import {
+  type DepressionQidsResponseInsert,
+} from "@/lib/questionnaires/depression/screening/auto";
+import {
+  type DepressionMadrsResponseInsert,
+  type DepressionThaseRushResponseInsert,
+} from "@/lib/questionnaires/depression/screening/hetero";
+
+// Helper to check if a questionnaire should use depression_* tables
+async function shouldUseDepressionTables(
+  visitId: string,
+  questionnaireCode: string,
+): Promise<boolean> {
+  const depressionCodes = ['QIDS_SR16', 'MADRS', 'THASE_RUSH'];
+  if (!depressionCodes.includes(questionnaireCode)) {
+    return false;
+  }
+
+  const visit = await getVisitById(visitId);
+  if (!visit || visit.visit_type !== 'screening') {
+    return false;
+  }
+
+  const patient = await getPatientById(visit.patient_id);
+  return patient?.pathology_type === 'depression';
+}
 
 // Helper to check if a questionnaire should use bipolar_* tables
 async function shouldUseBipolarTables(
@@ -521,6 +553,47 @@ export async function submitProfessionalQuestionnaireAction(
     // Get the current user to track who completed the questionnaire
     const context = await requireUserContext();
     const completedBy = context.user.id;
+
+    // Check if this questionnaire should be routed to depression_* tables
+    // (for depression screening visits)
+    const useDepressionTables = await shouldUseDepressionTables(
+      visitId,
+      questionnaireCode,
+    );
+
+    if (useDepressionTables) {
+      let result;
+      if (questionnaireCode === 'QIDS_SR16' || questionnaireCode === 'QIDS_SR16_FR') {
+        result = await saveDepressionQidsResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          completed_by: completedBy,
+          ...(responses as any),
+        } as DepressionQidsResponseInsert);
+      } else if (questionnaireCode === 'MADRS') {
+        result = await saveDepressionMadrsResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          completed_by: completedBy,
+          ...(responses as any),
+        } as DepressionMadrsResponseInsert);
+      } else if (questionnaireCode === 'THASE_RUSH') {
+        result = await saveDepressionThaseRushResponse({
+          visit_id: visitId,
+          patient_id: patientId,
+          completed_by: completedBy,
+          ...(responses as any),
+        } as DepressionThaseRushResponseInsert);
+      } else {
+        throw new Error(`Unknown depression questionnaire: ${questionnaireCode}`);
+      }
+
+      return {
+        success: true,
+        data: result,
+        message: `Questionnaire ${questionnaireCode} saved (depression screening)`,
+      };
+    }
 
     // Check if this questionnaire should be routed to bipolar_* tables
     // (for bipolar initial evaluation visits)
