@@ -20,7 +20,8 @@ import {
 import {
   DEPRESSION_QIDS_DEFINITION,
   DEPRESSION_MADRS_DEFINITION,
-  DEPRESSION_THASE_RUSH_DEFINITION
+  DEPRESSION_THASE_RUSH_DEFINITION,
+  DEPRESSION_MINI_DEFINITION
 } from '../questionnaires/depression';
 import {
   ASRS_DEFINITION,
@@ -920,6 +921,7 @@ export function getVisitModules(visitType: string, pathologyType: string): Virtu
           questionnaires: [
             q(DEPRESSION_MADRS_DEFINITION, 'healthcare_professional'),
             q(DEPRESSION_THASE_RUSH_DEFINITION, 'healthcare_professional'),
+            q(DEPRESSION_MINI_DEFINITION, 'healthcare_professional'),
           ],
         },
       ];
@@ -1247,21 +1249,23 @@ export async function getBulkVisitCompletionStatus(visitIds: string[]): Promise<
     const depressionScreeningIds = screeningIds.filter(id => visitPathologyMap.get(id) === 'depression');
     const szScreeningIds = screeningIds.filter(id => visitPathologyMap.get(id) === 'schizophrenia');
 
-    // Process depression screening visits (3 questionnaires: QIDS_SR16, MADRS, THASE_RUSH)
+    // Process depression screening visits (4 questionnaires: QIDS_SR16, MADRS, THASE_RUSH, MINI)
     if (depressionScreeningIds.length > 0) {
-      const [depQidsResults, depMadrsResults, depThaseRushResults] = await Promise.all([
+      const [depQidsResults, depMadrsResults, depThaseRushResults, depMiniResults] = await Promise.all([
         supabase.from('depression_qids_sr16').select('visit_id').in('visit_id', depressionScreeningIds),
         supabase.from('depression_madrs').select('visit_id').in('visit_id', depressionScreeningIds),
-        supabase.from('depression_thase_rush').select('visit_id').in('visit_id', depressionScreeningIds)
+        supabase.from('depression_thase_rush').select('visit_id').in('visit_id', depressionScreeningIds),
+        supabase.from('depression_mini').select('visit_id').in('visit_id', depressionScreeningIds)
       ]);
 
       const depQidsSet = new Set(depQidsResults.data?.map(r => r.visit_id) || []);
       const depMadrsSet = new Set(depMadrsResults.data?.map(r => r.visit_id) || []);
       const depThaseRushSet = new Set(depThaseRushResults.data?.map(r => r.visit_id) || []);
+      const depMiniSet = new Set(depMiniResults.data?.map(r => r.visit_id) || []);
 
       for (const visitId of depressionScreeningIds) {
-        const completed = [depQidsSet, depMadrsSet, depThaseRushSet].filter(set => set.has(visitId)).length;
-        const total = 3;
+        const completed = [depQidsSet, depMadrsSet, depThaseRushSet, depMiniSet].filter(set => set.has(visitId)).length;
+        const total = 4;
         completionMap.set(visitId, {
           completedQuestionnaires: completed,
           totalQuestionnaires: total,

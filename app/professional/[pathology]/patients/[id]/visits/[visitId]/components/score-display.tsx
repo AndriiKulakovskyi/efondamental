@@ -278,6 +278,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
       return "error";
     }
 
+    if (code === "MINI") {
+      const riskCot = data.minib_risque_cot;
+      if (riskCot === null || riskCot === undefined || riskCot === 0) return "info";
+      if (riskCot === 1) return "info";
+      if (riskCot === 2) return "warning";
+      return "error";
+    }
+
     if (code === "YMRS") {
       // YMRS: Total score range 0-60
       // 0-12: minimal, 13-19: mild hypomania, 20-25: moderate mania, ≥26: severe mania
@@ -1079,6 +1087,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {(code === "CGI" || code === "CGI_SZ") && "Résultats CGI"}
               {code === "MADRS" && "Résultats MADRS - Échelle de Dépression"}
               {code === "THASE_RUSH" && "Résultats Thase et Rush - Critères de Résistance"}
+              {code === "MINI" && "Résultats MINI - Entretien Neuropsychiatrique"}
               {(code === "YMRS" || code === "YMRS_SZ") &&
                 "Résultats YMRS - Échelle de Manie"}
               {code === "EGF_SZ" &&
@@ -1188,7 +1197,9 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                                             ? (data.total_score !== undefined ? data.total_score : "-")
                                             : code === "THASE_RUSH"
                                               ? (data.total_score !== undefined ? data.total_score : "-")
-                                              : (code === "YMRS" || code === "YMRS_SZ")
+                                              : code === "MINI"
+                                                ? (data.minib_score !== undefined && data.minib_score !== null ? data.minib_score : "-")
+                                                : (code === "YMRS" || code === "YMRS_SZ")
                                               ? (data.total_score !== undefined ? data.total_score : "-")
                                               : code === "EGF_SZ"
                                                 ? (data.egf_score !== undefined ? data.egf_score : "-")
@@ -1305,6 +1316,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {(code === "CGI" || code === "CGI_SZ") && (data.therapeutic_index !== undefined && data.therapeutic_index !== null ? "/16" : "/7")}
               {code === "MADRS" && "/60"}
               {code === "THASE_RUSH" && "/5"}
+              {code === "MINI" && "/52"}
               {(code === "YMRS" || code === "YMRS_SZ") && "/60"}
               {code === "EGF_SZ" && "/100"}
               {code === "WAIS4_MATRICES" && "/19"}
@@ -3230,6 +3242,175 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <p>
                 • Niveau 5 : Niveau 4 + échec de l'ECT bilatérale
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* MINI Details */}
+        {code === "MINI" && (
+          <div className="text-sm space-y-4 mt-2 pt-2 border-t">
+            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
+              <p className="text-blue-900 text-xs leading-relaxed">
+                Le MINI (Mini International Neuropsychiatric Interview) est un
+                entretien diagnostique structuré explorant les principaux
+                troubles de l'Axe I du DSM-IV. Le score affiché correspond au
+                risque suicidaire (Section B).
+              </p>
+            </div>
+
+            <div
+              className={`p-3 rounded-lg ${
+                data.minib_risque_cot >= 3
+                  ? "bg-red-50 border border-red-200"
+                  : data.minib_risque_cot === 2
+                    ? "bg-amber-50 border border-amber-200"
+                    : data.minib_risque_cot === 1
+                      ? "bg-blue-50 border border-blue-200"
+                      : "bg-green-50 border border-green-200"
+              }`}
+            >
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">
+                    {data.minib_risque_cot >= 3 && "Risque suicidaire élevé"}
+                    {data.minib_risque_cot === 2 && "Risque suicidaire modéré"}
+                    {data.minib_risque_cot === 1 && "Risque suicidaire faible"}
+                    {(!data.minib_risque_cot || data.minib_risque_cot === 0) &&
+                      "Pas de risque suicidaire identifié"}
+                  </span>
+                  <span className="text-xs text-gray-600">
+                    Score B: {data.minib_score ?? "-"}/52
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {data.minib_risque_cot >= 3 && (
+              <div className="flex items-center gap-1 text-red-700 text-xs p-2 bg-red-50 rounded border border-red-200">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                <span className="font-medium">
+                  Intervention urgente nécessaire.
+                </span>
+              </div>
+            )}
+
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">
+                Diagnostics identifiés
+              </h5>
+              <div className="grid grid-cols-1 gap-1 text-xs">
+                {data.miniedm_1 === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-red-500" />
+                    Épisode dépressif majeur - Actuel
+                  </div>
+                )}
+                {data.miniedm_2 === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    Épisode dépressif majeur - Passé
+                  </div>
+                )}
+                {data.minicepmania === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-red-500" />
+                    Épisode maniaque
+                  </div>
+                )}
+                {data.minicephmania === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    Épisode hypomaniaque
+                  </div>
+                )}
+                {data.minid4tropanact === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-red-500" />
+                    Trouble panique actuel
+                  </div>
+                )}
+                {data.minifphosoc === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    Phobie sociale actuelle
+                  </div>
+                )}
+                {data.minigtruobscomact === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    TOC actuel
+                  </div>
+                )}
+                {data.minihstress === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    ESPT actuel
+                  </div>
+                )}
+                {data.miniidepalcact === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-red-500" />
+                    Dépendance alcoolique actuelle
+                  </div>
+                )}
+                {data.miniiabalcac === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    Abus d'alcool actuel
+                  </div>
+                )}
+                {data.minijdepsubact === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-red-500" />
+                    Dépendance substance(s) actuelle
+                  </div>
+                )}
+                {data.minijabusubact === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    Abus de substance(s) actuel
+                  </div>
+                )}
+                {data.minik13 === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-red-500" />
+                    Syndrome psychotique actuel
+                  </div>
+                )}
+                {data.minilanomenact === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    Anorexie mentale actuelle
+                  </div>
+                )}
+                {data.minim8 === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    Boulimie actuelle
+                  </div>
+                )}
+                {data.mininanxgenact === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    Anxiété généralisée actuelle
+                  </div>
+                )}
+                {data.miniptroperantisoc === 1 && (
+                  <div className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    Trouble personnalité antisociale
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="text-xs text-gray-500 pt-2 border-t space-y-1">
+              <p>
+                <strong>Risque suicidaire (Section B) :</strong>
+              </p>
+              <p>• 1-8 points : Risque faible</p>
+              <p>• 9-16 points : Risque modéré</p>
+              <p>• ≥ 17 points : Risque élevé</p>
             </div>
           </div>
         )}

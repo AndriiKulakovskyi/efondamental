@@ -14,6 +14,10 @@ import {
   scoreDepressionThaseRush,
   type DepressionThaseRushResponse,
   type DepressionThaseRushResponseInsert,
+  scoreDepressionMini,
+  expandMultiChoiceToColumns,
+  type DepressionMiniResponse,
+  type DepressionMiniResponseInsert,
 } from '@/lib/questionnaires/depression/screening/hetero';
 
 // ============================================================================
@@ -165,6 +169,52 @@ export async function saveDepressionThaseRushResponse(
       ...response,
       total_score: scoring.total_score,
       interpretation: scoring.interpretation
+    }, { onConflict: 'visit_id' })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+// ============================================================================
+// MINI
+// ============================================================================
+
+export async function getDepressionMiniResponse(
+  visitId: string
+): Promise<DepressionMiniResponse | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('depression_mini')
+    .select('*')
+    .eq('visit_id', visitId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function saveDepressionMiniResponse(
+  response: DepressionMiniResponseInsert
+): Promise<DepressionMiniResponse> {
+  const supabase = await createClient();
+
+  const scoring = scoreDepressionMini(response);
+  const expanded = expandMultiChoiceToColumns(response);
+
+  const { data, error } = await supabase
+    .from('depression_mini')
+    .upsert({
+      ...expanded,
+      total_score: scoring.total_score,
+      interpretation: scoring.interpretation,
+      minib_score: scoring.minib_score,
+      minib_risque: scoring.minib_risque,
+      minib_risque_cot: scoring.minib_risque_cot
     }, { onConflict: 'visit_id' })
     .select()
     .single();

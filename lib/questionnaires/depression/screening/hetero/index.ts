@@ -25,3 +25,20 @@ export {
   type DepressionThaseRushScoringResult,
   type DepressionThaseRushInterpretation
 } from './thase-rush';
+
+export {
+  DEPRESSION_MINI_QUESTIONS,
+  DEPRESSION_MINI_DEFINITION,
+  computeMiniSuicideRiskScore,
+  getMiniSuicideRiskFlag,
+  getMiniSuicideRiskLevel,
+  interpretMiniSuicideRisk,
+  scoreDepressionMini,
+  expandMultiChoiceToColumns,
+  collapseColumnsToMultiChoice,
+  MINI_MULTI_CHOICE_FIELDS,
+  type DepressionMiniResponse,
+  type DepressionMiniResponseInsert,
+  type DepressionMiniScoreInput,
+  type DepressionMiniScoringResult
+} from './mini';

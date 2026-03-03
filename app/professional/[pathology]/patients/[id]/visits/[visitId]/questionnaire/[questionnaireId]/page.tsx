@@ -370,7 +370,12 @@ import {
 } from "@/lib/questionnaires/depression/screening/hetero";
 import {
   getDepressionThaseRushResponse,
+  getDepressionMiniResponse,
 } from "@/lib/services/depression-screening.service";
+import {
+  DEPRESSION_MINI_DEFINITION,
+  collapseColumnsToMultiChoice,
+} from "@/lib/questionnaires/depression/screening/hetero/mini";
 import { QuestionnairePageClient } from "./page-client";
 import { TapQuestionnaireForm } from "@/components/clinical/tap-questionnaire-form";
 import {
@@ -837,6 +842,8 @@ export default async function ProfessionalQuestionnairePage({
   // Depression screening questionnaires
   else if (code === DEPRESSION_THASE_RUSH_DEFINITION.code)
     questionnaire = DEPRESSION_THASE_RUSH_DEFINITION;
+  else if (code === DEPRESSION_MINI_DEFINITION.code)
+    questionnaire = DEPRESSION_MINI_DEFINITION;
 
   if (!questionnaire) {
     notFound();
@@ -1203,6 +1210,8 @@ export default async function ProfessionalQuestionnairePage({
   // Depression screening questionnaires
   else if (code === DEPRESSION_THASE_RUSH_DEFINITION.code)
     existingResponse = await getDepressionThaseRushResponse(visitId);
+  else if (code === DEPRESSION_MINI_DEFINITION.code)
+    existingResponse = await getDepressionMiniResponse(visitId);
 
   // Debug logging for PSQI_SZ
   if (code === "PSQI_SZ") {
@@ -1242,6 +1251,11 @@ export default async function ProfessionalQuestionnairePage({
       questionnaire,
       initialResponses,
     ) as Record<string, any>;
+  }
+
+  // For MINI questionnaire, reconstruct multiple_choice arrays from individual DB columns
+  if (code === "MINI" && existingResponse) {
+    initialResponses = collapseColumnsToMultiChoice(initialResponses);
   }
 
   // Convert boolean fields to 'yes'/'no' strings for SLEEP_APNEA questionnaire
