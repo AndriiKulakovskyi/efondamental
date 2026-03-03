@@ -217,6 +217,9 @@ export const QIDS_DEFINITION: QuestionnaireDefinition = {
 };
 
 export const MDQ_QUESTIONS: Question[] = [
+  { id: "collection_date", text: "Date de recueil des informations", type: "date", required: true },
+  { id: "instruction_title", text: "Questionnaire « TROUBLE de l'HUMEUR » (M.D.Q. Mood Disorder Questionnaire, d'après Hirschfeld et col. 2000)", type: "instruction", required: false },
+  { id: "instruction_intro", text: "1. Y a-t-il jamais eu des périodes de temps où vous n'étiez pas comme d'habitude et où …", type: "instruction", required: false },
   { id: "q1_1", text: "1.1 … vous vous sentiez si bien et si remonté que d'autres pensaient que vous n'étiez pas comme d'habitude ou que vous alliez vous attirer des ennuis", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
   { id: "q1_2", text: "1.2 … vous étiez si irritable que vous criiez après les gens ou provoquiez des bagarres ou des disputes", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },
   { id: "q1_3", text: "1.3 … vous vous sentiez beaucoup plus sûr(e) de vous que d'habitude", type: "single_choice", required: true, options: [{ code: 1, label: "Oui", score: 1 }, { code: 0, label: "Non", score: 0 }] },

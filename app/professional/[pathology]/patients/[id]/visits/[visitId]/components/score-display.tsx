@@ -1155,7 +1155,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                   : (code === "CTQ" || code === "CTQ_SZ")
                     ? (data.total_score !== undefined ? data.total_score : "-")
                     : code === "BIS10"
-                      ? (data.overall_impulsivity !== undefined && data.overall_impulsivity !== null ? parseFloat(data.overall_impulsivity).toFixed(2) : "-")
+                      ? (data.total_score !== undefined && data.total_score !== null ? parseFloat(data.total_score).toFixed(1) : "-")
                       : code === "WURS25"
                         ? (data.adhd_likely ? "POSITIF" : "NÉGATIF")
                         : code === "WURS25_SZ"
@@ -1285,7 +1285,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {code === "FAGERSTROM_SZ" && "/10"}
               {code === "EPHP_SZ" && "/78"}
               {(code === "CTQ" || code === "CTQ_SZ") && "/125"}
-              {code === "BIS10" && "/4.0"}
+              {code === "BIS10" && "/12.0"}
               {code === "CSM" && "/55"}
               {code === "CTI" && "/55"}
               {code === "ALS18" && "/54"}
@@ -1805,7 +1805,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <span className="font-semibold">
                   {data.cognitive_impulsivity_mean !== undefined &&
                     data.cognitive_impulsivity_mean !== null
-                    ? parseFloat(data.cognitive_impulsivity_mean).toFixed(2)
+                    ? parseFloat(data.cognitive_impulsivity_mean).toFixed(1)
                     : "-"}
                   /4.0
                 </span>
@@ -1815,7 +1815,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <span className="font-semibold">
                   {data.behavioral_impulsivity_mean !== undefined &&
                     data.behavioral_impulsivity_mean !== null
-                    ? parseFloat(data.behavioral_impulsivity_mean).toFixed(2)
+                    ? parseFloat(data.behavioral_impulsivity_mean).toFixed(1)
                     : "-"}
                   /4.0
                 </span>
@@ -1828,9 +1828,21 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               <span className="font-bold text-lg">
                 {data.overall_impulsivity !== undefined &&
                   data.overall_impulsivity !== null
-                  ? parseFloat(data.overall_impulsivity).toFixed(2)
+                  ? parseFloat(data.overall_impulsivity).toFixed(1)
                   : "-"}
                 /4.0
+              </span>
+            </div>
+            <div className="flex justify-between pt-2 border-t">
+              <span className="text-gray-600 font-medium">
+                Score total:
+              </span>
+              <span className="font-bold text-lg">
+                {data.total_score !== undefined &&
+                  data.total_score !== null
+                  ? parseFloat(data.total_score).toFixed(1)
+                  : "-"}
+                /12.0
               </span>
             </div>
             {data.overall_impulsivity >= 3.0 && (
