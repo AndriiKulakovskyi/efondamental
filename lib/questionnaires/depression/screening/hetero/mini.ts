@@ -1,6 +1,6 @@
 // eFondaMental Platform - MINI (Mini International Neuropsychiatric Interview)
 // Depression Screening - Hetero-questionnaire (clinician-administered)
-// MINI 5.0.0 / DSM-IV - French version
+// MINI 6.0.0 / DSM-IV - French version
 
 import { Question } from '@/lib/types/database.types';
 
@@ -64,6 +64,19 @@ function boolQ(id: string, text: string, opts?: Partial<Question>): Question {
 }
 
 // ============================================================================
+// JSONLogic helpers (used by display_if)
+// ============================================================================
+
+const yes = (field: string) => ({ '==': [{ var: field }, 1] });
+const no = (field: string) => ({ '==': [{ var: field }, 0] });
+const and = (...conds: any[]) => ({ and: conds });
+const or = (...conds: any[]) => ({ or: conds });
+const not = (cond: any) => ({ '!': cond });
+const sum = (fields: string[]) => ({ '+': fields.map((f) => ({ var: f })) });
+const gte = (left: any, right: number) => ({ '>=': [left, right] });
+const gt = (left: any, right: number) => ({ '>': [left, right] });
+
+// ============================================================================
 // Section A: Episode Depressif Majeur
 // ============================================================================
 
@@ -73,79 +86,85 @@ const SECTION_A: Question[] = [
   boolQ('minia1a', "A1 a) Vous est-il déjà arrivé de vous sentir particulièrement triste ou déprimé(e), la plupart du temps au cours de la journée, et ce, presque tous les jours, pendant une période de 2 semaines ?", { required: true }),
 
   boolQ('minia1b', "A1 b) Au cours des deux dernières semaines, vous êtes-vous senti(e) particulièrement triste, cafardeux(se), déprimé(e), la plupart du temps au cours de la journée et ce, presque tous les jours ?", {
-    display_if: { '==': [{ var: 'minia1a' }, 1] }
+    indentLevel: 1,
+    display_if: yes('minia1a')
   }),
 
   boolQ('minia2a', "A2 a) Vous êtes-vous déjà senti(e), pendant une période de deux semaines, nettement moins intéressé(e) par la plupart des choses, ou nettement moins capable de prendre plaisir aux choses auxquelles vous preniez plaisir habituellement ?", { required: true }),
 
   boolQ('minia2b', "A2 b) Au cours des deux dernières semaines, aviez-vous presque tout le temps le sentiment de n'avoir plus goût à rien, d'avoir perdu l'intérêt ou le plaisir pour les choses qui vous plaisent habituellement ?", {
-    display_if: { '==': [{ var: 'minia2a' }, 1] }
+    indentLevel: 1,
+    display_if: yes('minia2a')
   }),
+
+  { id: 'minia_gate_info', text: "Si A1b ou A2b est OUI, explorez l'épisode actuel ET l'épisode passé. Si A1b et A2b sont NON, explorez seulement l'épisode passé.", type: 'instruction', required: false, display_if: or(yes('minia1a'), yes('minia2a')) },
 
   // A3 items: shown if A1a or A2a is Oui
   boolQ('minia3ads', "A3 a) Votre appétit a-t-il notablement changé ? Avez-vous pris ou perdu du poids sans en avoir l'intention ? (2 dernières semaines)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1b'), yes('minia2b'))
   }),
   boolQ('minia3aep', "A3 a) (Episode passé)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1a'), yes('minia2a'))
   }),
   boolQ('minia3bds', "A3 b) Aviez-vous des problèmes de sommeil presque toutes les nuits ? (2 dernières semaines)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1b'), yes('minia2b'))
   }),
   boolQ('minia3bep', "A3 b) (Episode passé)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1a'), yes('minia2a'))
   }),
   boolQ('minia3cds', "A3 c) Parliez-vous ou vous déplaciez-vous plus lentement que d'habitude ou, au contraire, vous sentiez-vous agité(e) ? (2 dernières semaines)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1b'), yes('minia2b'))
   }),
   boolQ('minia3cep', "A3 c) (Episode passé)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1a'), yes('minia2a'))
   }),
   boolQ('minia3dsd', "A3 d) Vous sentiez-vous fatigué(e), sans énergie, et ce presque tous les jours ? (2 dernières semaines)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1b'), yes('minia2b'))
   }),
   boolQ('minia3dep', "A3 d) (Episode passé)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1a'), yes('minia2a'))
   }),
   boolQ('minia3esd', "A3 e) Vous sentiez-vous sans valeur ou coupable, et ce presque tous les jours ? (2 dernières semaines)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1b'), yes('minia2b'))
   }),
   boolQ('minia3eep', "A3 e) (Episode passé)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1a'), yes('minia2a'))
   }),
   boolQ('minia3fsd', "A3 f) Aviez-vous du mal à vous concentrer ou à prendre des décisions ? (2 dernières semaines)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1b'), yes('minia2b'))
   }),
   boolQ('minia3fep', "A3 f) (Episode passé)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1a'), yes('minia2a'))
   }),
   boolQ('minia3gsd', "A3 g) Avez-vous pensé au suicide, à vous faire du mal ou tenté/planifié un suicide ? (2 dernières semaines)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1b'), yes('minia2b'))
   }),
   boolQ('minia3gep', "A3 g) (Episode passé)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1a'), yes('minia2a'))
   }),
   boolQ('minia3eeac', "Les exemples concordent avec une idée délirante (Episode actuel)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] },
+    indentLevel: 1,
+    display_if: or(yes('minia3esd'), yes('minia3eep')),
     help: "DEMANDEZ DES EXEMPLES."
   }),
   boolQ('minia3eepbis', "Les exemples concordent avec une idée délirante (Episode passé)", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    indentLevel: 1,
+    display_if: yes('minia3eep')
   }),
   boolQ('minia4sd', "A4) Les problèmes ont-ils entraîné des difficultés significatives ? (2 dernières semaines)", {
     required: true,
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1b'), yes('minia2b'))
   }),
   boolQ('minia4ep', "A4) (Episode passé)", {
     required: true,
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1a'), yes('minia2a'))
   }),
   boolQ('minia5ep', "A5) Entre 2 épisodes, vous êtes-vous senti(e) bien pendant au moins deux mois ?", {
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1a'), yes('minia2a'))
   }),
-  boolQ('minia5bis', "Y A-T-IL AU MOINS 5 OUI ENTRE A1 ET A3 ET A4 EST-ELLE COTÉE OUI ?", {
+  boolQ('minia5bis', "Évaluation diagnostique A : Y a-t-il au moins 5 OUI entre A1b/A2b et A3, et A4 est-elle cotée OUI pour la période concernée ?", {
     required: true,
-    display_if: { 'or': [{ '==': [{ var: 'minia1a' }, 1] }, { '==': [{ var: 'minia2a' }, 1] }] }
+    display_if: or(yes('minia1a'), yes('minia2a'))
   }),
   {
     id: 'miniedm',
@@ -179,10 +198,12 @@ const SECTION_B: Question[] = [
 
   boolQ('minib1', "B1 Avez-vous eu un accident ? (Au cours du mois écoulé)", { required: true }),
   boolQ('minib1a', "B1 a) Avez-vous prévu ou eu l'intention de vous faire du mal dans cet accident ?", {
-    display_if: { '==': [{ var: 'minib1' }, 1] }
+    indentLevel: 1,
+    display_if: yes('minib1')
   }),
   boolQ('minib1b', "B1 b) Avez-vous eu l'intention de mourir dans cet accident ?", {
-    display_if: { '==': [{ var: 'minib1' }, 1] }
+    indentLevel: 2,
+    display_if: yes('minib1a')
   }),
 
   boolQ('minib2', "B2 Vous est-il arrivé de vous sentir désespéré ?", { required: true }),
@@ -220,7 +241,7 @@ const SECTION_B: Question[] = [
 
   boolQ('minib6', "B6 Vous êtes-vous senti(e) incapable de contrôler ces impulsions ?", {
     required: true,
-    display_if: { '==': [{ var: 'minib5' }, 1] }
+    display_if: yes('minib5')
   }),
   boolQ('minib7', "B7 Avez-vous planifié un suicide ?", { required: true }),
   boolQ('minib8', "B8 Avez-vous commencé à agir pour vous préparer à une tentative de suicide ?", { required: true }),
@@ -239,9 +260,14 @@ const SECTION_B: Question[] = [
     display_if: { '==': [{ var: 'minib10' }, 1] }
   },
 
-  boolQ('minib11', "B11 Avez-vous déjà fait une tentative de suicide ? (Au cours de votre vie)", { required: true }),
+  boolQ('minib11', "B11 Au cours de votre vie : Avez-vous déjà fait une tentative de suicide ?", {
+    required: true,
+    display_if: no('minib10')
+  }),
 
   boolQ('minib_risque', "Risque suicidaire actuel", {
+    readonly: true,
+    metadata: { displayOnly: true },
     help: "Auto-calculé : Oui si au moins un item B2-B11 est Oui"
   }),
   {
@@ -250,6 +276,8 @@ const SECTION_B: Question[] = [
     type: 'number',
     required: false,
     min: 0, max: 52,
+    readonly: true,
+    metadata: { displayOnly: true },
     help: "Score calculé automatiquement"
   },
   {
@@ -257,6 +285,8 @@ const SECTION_B: Question[] = [
     text: 'RISQUE SUICIDAIRE ACTUEL',
     type: 'single_choice',
     required: false,
+    readonly: true,
+    metadata: { displayOnly: true },
     options: [
       { code: 1, label: 'Faible', score: 1 },
       { code: 2, label: 'Modéré', score: 2 },
@@ -286,12 +316,14 @@ const SECTION_C: Question[] = [
 
   boolQ('minic1a', "C1 a Avez-vous déjà eu une période où vous vous sentiez tellement exalté(e) ou plein(e) d'énergie que cela vous a posé des problèmes ?", { required: true }),
   boolQ('minic1b', "C1 b Vous sentez-vous, en ce moment, exalté(e) ou plein(e) d'énergie ?", {
-    display_if: { '==': [{ var: 'minic1a' }, 1] }
+    indentLevel: 1,
+    display_if: yes('minic1a')
   }),
 
   boolQ('minic2a', "C2 a Avez-vous déjà eu une période de plusieurs jours où vous étiez tellement irritable que vous en arriviez à insulter les gens, à hurler, voire à vous battre ?", { required: true }),
   boolQ('minic2b', "C2 b Vous sentez-vous excessivement irritable en ce moment ?", {
-    display_if: { '==': [{ var: 'minic2a' }, 1] }
+    indentLevel: 1,
+    display_if: yes('minic2a')
   }),
 
   // C3 items: shown if C1a or C2a is Oui
@@ -305,45 +337,86 @@ const SECTION_C: Question[] = [
     ['minic3gea', 'minic3gep', "C3 g) Aviez-vous tellement envie de faire des choses agréables que vous aviez tendance à en oublier les risques ?"],
   ].flatMap(([ea, ep, text]) => [
     boolQ(ea, `${text} (Episode actuel)`, {
-      display_if: { 'or': [{ '==': [{ var: 'minic1a' }, 1] }, { '==': [{ var: 'minic2a' }, 1] }] }
+      display_if: or(yes('minic1b'), yes('minic2b'))
     }),
     boolQ(ep, `${text} (Episode passé)`, {
-      display_if: { 'or': [{ '==': [{ var: 'minic1a' }, 1] }, { '==': [{ var: 'minic2a' }, 1] }] }
+      display_if: or(yes('minic1a'), yes('minic2a'))
     }),
   ]),
 
   boolQ('minic3aeac', "Idée délirante concordante ? (Episode actuel)", {
-    display_if: { 'or': [{ '==': [{ var: 'minic1a' }, 1] }, { '==': [{ var: 'minic2a' }, 1] }] }
+    indentLevel: 1,
+    display_if: yes('minic3aea')
   }),
   boolQ('minic3aepbis', "Idée délirante concordante ? (Episode passé)", {
-    display_if: { 'or': [{ '==': [{ var: 'minic1a' }, 1] }, { '==': [{ var: 'minic2a' }, 1] }] }
+    indentLevel: 1,
+    display_if: yes('minic3aep')
   }),
 
-  boolQ('minic3recapea', "RECAPITULATIF C3 : Au moins 3 réponses OUI en C3 (ou 4 si C1a Non) ? (Episode actuel)", {
-    display_if: { 'or': [{ '==': [{ var: 'minic1a' }, 1] }, { '==': [{ var: 'minic2a' }, 1] }] }
-  }),
-  boolQ('minic3recupep', "RECAPITULATIF C3 (Episode passé)", {
-    display_if: { 'or': [{ '==': [{ var: 'minic1a' }, 1] }, { '==': [{ var: 'minic2a' }, 1] }] }
-  }),
+  {
+    id: 'minic3_recap_info',
+    text: 'RECAPITULATIF C3 : Élation = 3 symptômes, Irritable = 4 symptômes (voir comptage automatique ci-dessous).',
+    type: 'instruction',
+    required: false,
+    display_if: or(yes('minic1a'), yes('minic2a')),
+  },
 
   ...[
     ['minic4ea', 'minic4ep', "C4 Durée maximale pendant laquelle ces symptômes ont persisté ?"],
   ].flatMap(([ea, ep, text]) => [
-    { id: ea, text: `${text} (Episode actuel)`, type: 'single_choice' as const, required: false, options: [{ code: 1, label: 'a) 3 jours au moins', score: 1 }, { code: 2, label: 'b) 4 à 6 jours', score: 2 }, { code: 3, label: 'c) 7 jours ou plus', score: 3 }], display_if: { 'or': [{ '==': [{ var: 'minic1a' }, 1] }, { '==': [{ var: 'minic2a' }, 1] }] } },
-    { id: ep, text: `${text} (Episode passé)`, type: 'single_choice' as const, required: false, options: [{ code: 1, label: 'a) 3 jours au moins', score: 1 }, { code: 2, label: 'b) 4 à 6 jours', score: 2 }, { code: 3, label: 'c) 7 jours ou plus', score: 3 }], display_if: { 'or': [{ '==': [{ var: 'minic1a' }, 1] }, { '==': [{ var: 'minic2a' }, 1] }] } },
+    {
+      id: ea,
+      text: `${text} (Episode actuel)`,
+      type: 'single_choice' as const,
+      required: false,
+      options: [{ code: 1, label: 'a) 3 jours au moins', score: 1 }, { code: 2, label: 'b) 4 à 6 jours', score: 2 }, { code: 3, label: 'c) 7 jours ou plus', score: 3 }],
+      display_if: or(
+        and(or(yes('minic1a'), yes('minic1b')), gte(sum(['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea']), 3), or(yes('minic1b'), yes('minic2b'))),
+        and(and(no('minic1a'), no('minic1b')), gte(sum(['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea']), 4), or(yes('minic1b'), yes('minic2b')))
+      ),
+    },
+    {
+      id: ep,
+      text: `${text} (Episode passé)`,
+      type: 'single_choice' as const,
+      required: false,
+      options: [{ code: 1, label: 'a) 3 jours au moins', score: 1 }, { code: 2, label: 'b) 4 à 6 jours', score: 2 }, { code: 3, label: 'c) 7 jours ou plus', score: 3 }],
+      display_if: or(
+        and(yes('minic1a'), gte(sum(['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep']), 3), or(yes('minic1a'), yes('minic2a'))),
+        and(no('minic1a'), gte(sum(['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep']), 4), or(yes('minic1a'), yes('minic2a')))
+      ),
+    },
   ]),
 
   boolQ('minic5ea', "C5 Avez-vous été hospitalisé(e) à cause de ces problèmes ? (Episode actuel)", {
-    display_if: { 'or': [{ '==': [{ var: 'minic1a' }, 1] }, { '==': [{ var: 'minic2a' }, 1] }] }
+    display_if: or(
+      and(or(yes('minic1a'), yes('minic1b')), gte(sum(['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea']), 3), or(yes('minic1b'), yes('minic2b'))),
+      and(and(no('minic1a'), no('minic1b')), gte(sum(['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea']), 4), or(yes('minic1b'), yes('minic2b')))
+    )
   }),
   boolQ('minic5ep', "C5 (Episode passé)", {
-    display_if: { 'or': [{ '==': [{ var: 'minic1a' }, 1] }, { '==': [{ var: 'minic2a' }, 1] }] }
+    display_if: or(
+      and(yes('minic1a'), gte(sum(['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep']), 3), or(yes('minic1a'), yes('minic2a'))),
+      and(no('minic1a'), gte(sum(['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep']), 4), or(yes('minic1a'), yes('minic2a')))
+    )
   }),
   boolQ('minic6ea', "C6 Les problèmes ont-ils entraîné des difficultés significatives ? (Episode actuel)", {
-    display_if: { 'or': [{ '==': [{ var: 'minic1a' }, 1] }, { '==': [{ var: 'minic2a' }, 1] }] }
+    display_if: and(
+      no('minic5ea'),
+      or(
+        and(or(yes('minic1a'), yes('minic1b')), gte(sum(['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea']), 3), or(yes('minic1b'), yes('minic2b'))),
+        and(and(no('minic1a'), no('minic1b')), gte(sum(['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea']), 4), or(yes('minic1b'), yes('minic2b')))
+      )
+    )
   }),
   boolQ('minic6ep', "C6 (Episode passé)", {
-    display_if: { 'or': [{ '==': [{ var: 'minic1a' }, 1] }, { '==': [{ var: 'minic2a' }, 1] }] }
+    display_if: and(
+      no('minic5ep'),
+      or(
+        and(yes('minic1a'), gte(sum(['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep']), 3), or(yes('minic1a'), yes('minic2a'))),
+        and(no('minic1a'), gte(sum(['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep']), 4), or(yes('minic1a'), yes('minic2a')))
+      )
+    )
   }),
 
   boolQ('minicepmania', "ÉPISODE MANIAQUE"),
@@ -368,15 +441,18 @@ const SECTION_D: Question[] = [
   boolQ('minid1a', "D1 a) Avez-vous, à plus d'une occasion, eu des crises durant lesquelles vous vous êtes senti(e) subitement très anxieux(se) ?", { required: true }),
   boolQ('minid1b', "D1 b) Ces crises atteignaient-elles leur intensité maximale en moins de 10 minutes ?", {
     required: true,
-    display_if: { '==': [{ var: 'minid1a' }, 1] }
+    indentLevel: 1,
+    display_if: yes('minid1a')
   }),
   boolQ('minid2', "D2 Certaines de ces crises ont-elles été imprévisibles ?", {
     required: true,
-    display_if: { 'and': [{ '==': [{ var: 'minid1a' }, 1] }, { '==': [{ var: 'minid1b' }, 1] }] }
+    indentLevel: 1,
+    display_if: and(yes('minid1a'), yes('minid1b'))
   }),
   boolQ('minid3', "D3 Avez-vous eu une période d'au moins un mois durant laquelle vous redoutiez d'avoir d'autres crises ?", {
     required: true,
-    display_if: { 'and': [{ '==': [{ var: 'minid1a' }, 1] }, { '==': [{ var: 'minid1b' }, 1] }, { '==': [{ var: 'minid2' }, 1] }] }
+    indentLevel: 1,
+    display_if: and(yes('minid1a'), yes('minid1b'), yes('minid2'))
   }),
 
   ...[
@@ -394,24 +470,53 @@ const SECTION_D: Question[] = [
     ['minid4l', 'Engourdissements/picotements ?'],
     ['minid4m', 'Bouffées de chaleur/frissons ?'],
   ].map(([id, text]) => boolQ(id, `D4 ${text}`, {
-    display_if: { 'and': [{ '==': [{ var: 'minid1a' }, 1] }, { '==': [{ var: 'minid1b' }, 1] }, { '==': [{ var: 'minid2' }, 1] }] }
+    indentLevel: 1,
+    display_if: yes('minid2')
   })),
 
-  boolQ('minid5', "D5 TROUBLE PANIQUE VIE ENTIÈRE", {
-    display_if: { '==': [{ var: 'minid1a' }, 1] },
-    help: "Oui si D3 Oui ET ≥4 symptômes D4 Oui"
-  }),
-  boolQ('minid6', "D6 SYMPTÔMES ANXIEUX PAROXYSTIQUES LIMITÉS VIE ENTIÈRE", {
-    display_if: { '==': [{ var: 'minid1a' }, 1] },
-    help: "Oui si D4 count > 0 mais < 4"
-  }),
   boolQ('minid7', "D7 Au cours du mois écoulé, avez-vous eu de telles crises à plusieurs reprises avec peur constante ?", {
-    display_if: { '==': [{ var: 'minid1a' }, 1] }
+    required: true,
+    indentLevel: 1,
+    display_if: and(
+      yes('minid2'),
+      yes('minid3'),
+      gte(sum(['minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m']), 4)
+    )
   }),
-  boolQ('minid4tropanact', "TROUBLE PANIQUE ACTUEL", {
-    display_if: { '==': [{ var: 'minid1a' }, 1] },
-    help: "Oui si D7 Oui"
-  }),
+  {
+    id: 'minid_diag_lifetime',
+    text: 'Diagnostic (D) : TROUBLE PANIQUE VIE ENTIÈRE (si D3 = OUI et ≥ 4 symptômes D4 = OUI).',
+    type: 'instruction',
+    required: false,
+    display_if: and(
+      yes('minid2'),
+      yes('minid3'),
+      gte(sum(['minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m']), 4)
+    )
+  },
+  {
+    id: 'minid_diag_limited',
+    text: 'Diagnostic (D) : SYMPTÔMES ANXIEUX PAROXYSTIQUES LIMITÉS VIE ENTIÈRE (si ≥ 1 symptôme D4 = OUI mais D5 = NON).',
+    type: 'instruction',
+    required: false,
+    display_if: and(
+      yes('minid2'),
+      not(and(yes('minid3'), gte(sum(['minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m']), 4))),
+      gt(sum(['minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m']), 0)
+    )
+  },
+  {
+    id: 'minid_diag_current',
+    text: 'Diagnostic (D) : TROUBLE PANIQUE ACTUEL (si D7 = OUI).',
+    type: 'instruction',
+    required: false,
+    display_if: and(
+      yes('minid2'),
+      yes('minid3'),
+      gte(sum(['minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m']), 4),
+      yes('minid7')
+    )
+  },
 ];
 
 // ============================================================================
@@ -423,11 +528,48 @@ const SECTION_E: Question[] = [
   boolQ('minie1', "E1 Êtes-vous anxieux(se) dans les endroits ou situations dont il est difficile de s'échapper ?", { required: true }),
   boolQ('minie2', "E2 Redoutez-vous tellement ces situations que vous les évitez ?", {
     required: true,
-    display_if: { '==': [{ var: 'minie1' }, 1] }
+    display_if: yes('minie1')
   }),
-  boolQ('minietrpanagroa', "TROUBLE PANIQUE avec Agoraphobie ACTUEL", { help: "Auto-calculé" }),
-  boolQ('minietrpansaga', "TROUBLE PANIQUE sans Agoraphobie ACTUEL", { help: "Auto-calculé" }),
-  boolQ('minieagasatp', "AGORAPHOBIE ACTUELLE sans antécédents de Trouble panique", { help: "Auto-calculé" }),
+  {
+    id: 'minie_diag_tp_avec_agora',
+    text: 'Diagnostic (E) : TROUBLE PANIQUE avec AGORAPHOBIE ACTUEL (si D7 = OUI et E2 = OUI).',
+    type: 'instruction',
+    required: false,
+    display_if: and(
+      yes('minie2'),
+      yes('minid7'),
+      yes('minid2'),
+      yes('minid3'),
+      gte(sum(['minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m']), 4)
+    ),
+  },
+  {
+    id: 'minie_diag_tp_sans_agora',
+    text: 'Diagnostic (E) : TROUBLE PANIQUE sans AGORAPHOBIE ACTUEL (si D7 = OUI et E2 = NON).',
+    type: 'instruction',
+    required: false,
+    display_if: and(
+      no('minie2'),
+      yes('minid7'),
+      yes('minid2'),
+      yes('minid3'),
+      gte(sum(['minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m']), 4)
+    ),
+  },
+  {
+    id: 'minie_diag_agora_sans_tp',
+    text: "Diagnostic (E) : AGORAPHOBIE ACTUELLE sans antécédents de trouble panique (si E2 = OUI et D5 = NON).",
+    type: 'instruction',
+    required: false,
+    display_if: and(
+      yes('minie2'),
+      not(and(
+        yes('minid2'),
+        yes('minid3'),
+        gte(sum(['minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m']), 4)
+      ))
+    ),
+  },
 ];
 
 // ============================================================================
@@ -439,18 +581,21 @@ const SECTION_F: Question[] = [
   boolQ('minif1', "F1 Avez-vous redouté d'être le centre de l'attention ou d'être humilié(e) dans des situations sociales ? (Au cours du mois écoulé)", { required: true }),
   boolQ('minif2', "F2 Cette peur est-elle excessive ou déraisonnable ?", {
     required: true,
-    display_if: { '==': [{ var: 'minif1' }, 1] }
+    indentLevel: 1,
+    display_if: yes('minif1')
   }),
   boolQ('minif3', "F3 Redoutez-vous tellement ces situations que vous les évitez ?", {
     required: true,
-    display_if: { 'and': [{ '==': [{ var: 'minif1' }, 1] }, { '==': [{ var: 'minif2' }, 1] }] }
+    indentLevel: 1,
+    display_if: and(yes('minif1'), yes('minif2'))
   }),
   boolQ('minif4', "F4 Cette peur entraîne-t-elle une souffrance significative ?", {
     required: true,
-    display_if: { 'and': [{ '==': [{ var: 'minif1' }, 1] }, { '==': [{ var: 'minif2' }, 1] }, { '==': [{ var: 'minif3' }, 1] }] }
+    indentLevel: 1,
+    display_if: and(yes('minif1'), yes('minif2'), yes('minif3'))
   }),
   boolQ('minifphosoc', "PHOBIE SOCIALE (Trouble anxiété sociale) ACTUELLE", {
-    display_if: { 'and': [{ '==': [{ var: 'minif1' }, 1] }, { '==': [{ var: 'minif2' }, 1] }, { '==': [{ var: 'minif3' }, 1] }] }
+    display_if: and(yes('minif1'), yes('minif2'), yes('minif3'))
   }),
   boolQ('minief5', "Craignez-vous ou évitez-vous 4 situations sociales ou plus ?", {
     display_if: { '==': [{ var: 'minifphosoc' }, 1] }
@@ -467,22 +612,30 @@ const SECTION_G: Question[] = [
   boolQ('minig1', "G1 Pensées/pulsions/images déplaisantes récurrentes ? (Au cours du mois écoulé)", { required: true }),
   boolQ('minig2', "G2 Avez-vous essayé de résister à ces idées sans succès ?", {
     required: true,
-    display_if: { '==': [{ var: 'minig1' }, 1] }
+    indentLevel: 1,
+    display_if: yes('minig1')
   }),
   boolQ('minig3', "G3 Pensez-vous que ces idées sont le produit de votre propre pensée ?", {
     required: true,
-    display_if: { 'and': [{ '==': [{ var: 'minig1' }, 1] }, { '==': [{ var: 'minig2' }, 1] }] }
+    indentLevel: 1,
+    display_if: and(yes('minig1'), yes('minig2'))
   }),
   boolQ('minig4', "G4 Besoin de faire certaines choses sans cesse (laver, compter, vérifier) ? (Au cours du mois écoulé)", { required: true }),
-  boolQ('minig5', "G5 Avez-vous réalisé que ces comportements étaient irrationnels ?", { required: true }),
+  boolQ('minig5', "G5 Avez-vous, à un moment donné, réalisé que ces idées envahissantes et/ou ces comportements répétitifs étaient irrationnels ou hors de proportion ?", {
+    required: true,
+    display_if: or(yes('minig3'), yes('minig4')),
+  }),
   boolQ('minig6', "G6 Ces pensées/comportements vous ont-ils gêné(e) ou pris plus d'1h/jour ?", {
     required: true,
-    display_if: { 'or': [
-      { 'and': [{ '==': [{ var: 'minig1' }, 1] }, { '==': [{ var: 'minig2' }, 1] }, { '==': [{ var: 'minig3' }, 1] }] },
-      { '==': [{ var: 'minig4' }, 1] }
-    ] }
+    display_if: yes('minig5')
   }),
-  boolQ('minigtruobscomact', "TROUBLE OBSESSIONNEL COMPULSIF ACTUEL"),
+  {
+    id: 'minig_diag_toc',
+    text: 'Diagnostic (G) : TROUBLE OBSESSIONNEL COMPULSIF ACTUEL (si G6 = OUI).',
+    type: 'instruction',
+    required: false,
+    display_if: yes('minig6'),
+  },
 ];
 
 // ============================================================================
@@ -494,11 +647,13 @@ const SECTION_H: Question[] = [
   boolQ('minih1', "H1 Avez-vous déjà vécu ou été témoin d'un événement extrêmement traumatique ?", { required: true }),
   boolQ('minih2', "H2 Avez-vous réagi avec peur intense, impuissance ou horreur ?", {
     required: true,
-    display_if: { '==': [{ var: 'minih1' }, 1] }
+    indentLevel: 1,
+    display_if: yes('minih1')
   }),
   boolQ('minih3', "H3 Pensées pénibles récurrentes, flashbacks ? (Au cours du mois écoulé)", {
     required: true,
-    display_if: { 'and': [{ '==': [{ var: 'minih1' }, 1] }, { '==': [{ var: 'minih2' }, 1] }] }
+    indentLevel: 1,
+    display_if: and(yes('minih1'), yes('minih2'))
   }),
 
   ...[
@@ -510,8 +665,17 @@ const SECTION_H: Question[] = [
     ['minih4f', "H4 f) Difficultés à ressentir les choses ?"],
     ['minih4g', "H4 g) Impression que votre vie allait se terminer ?"],
   ].map(([id, text]) => boolQ(id, text, {
-    display_if: { 'and': [{ '==': [{ var: 'minih1' }, 1] }, { '==': [{ var: 'minih2' }, 1] }, { '==': [{ var: 'minih3' }, 1] }] }
+    indentLevel: 1,
+    display_if: yes('minih3')
   })),
+
+  {
+    id: 'minih_gate_h4',
+    text: 'Filtre H4 : si moins de 3 réponses OUI en H4, passez au module suivant.',
+    type: 'instruction',
+    required: false,
+    display_if: yes('minih3'),
+  },
 
   ...[
     ['minih5a', "H5 a) Difficultés à dormir ?"],
@@ -520,13 +684,28 @@ const SECTION_H: Question[] = [
     ['minih5d', "H5 d) Nerveux(se)/sur vos gardes ?"],
     ['minih5e', "H5 e) Un rien vous faisait sursauter ?"],
   ].map(([id, text]) => boolQ(id, text, {
-    display_if: { 'and': [{ '==': [{ var: 'minih1' }, 1] }, { '==': [{ var: 'minih2' }, 1] }, { '==': [{ var: 'minih3' }, 1] }] }
+    indentLevel: 1,
+    display_if: and(
+      yes('minih3'),
+      gte(sum(['minih4a', 'minih4b', 'minih4c', 'minih4d', 'minih4e', 'minih4f', 'minih4g']), 3)
+    )
   })),
 
   boolQ('minih6', "H6 Ces problèmes vous ont-ils causé une souffrance ou gêné dans vos activités ?", {
-    display_if: { 'and': [{ '==': [{ var: 'minih1' }, 1] }, { '==': [{ var: 'minih2' }, 1] }, { '==': [{ var: 'minih3' }, 1] }] }
+    indentLevel: 1,
+    display_if: and(
+      yes('minih3'),
+      gte(sum(['minih4a', 'minih4b', 'minih4c', 'minih4d', 'minih4e', 'minih4f', 'minih4g']), 3),
+      gte(sum(['minih5a', 'minih5b', 'minih5c', 'minih5d', 'minih5e']), 2)
+    )
   }),
-  boolQ('minihstress', "ÉTAT DE STRESS POST-TRAUMATIQUE ACTUEL"),
+  {
+    id: 'minih_diag_espt',
+    text: 'Diagnostic (H) : ÉTAT DE STRESS POST-TRAUMATIQUE ACTUEL (si H6 = OUI).',
+    type: 'instruction',
+    required: false,
+    display_if: yes('minih6')
+  },
 ];
 
 // ============================================================================
@@ -545,13 +724,18 @@ const SECTION_I: Question[] = [
     ['minii2e', "I2 e) Beaucoup de temps à vous procurer/boire/récupérer ?"],
     ['minii2f', "I2 f) Réduit vos activités quotidiennes ?"],
     ['minii2g', "I2 g) Continué malgré problèmes de santé ?"],
-  ].map(([id, text]) => boolQ(id, text, {
-    display_if: { '==': [{ var: 'minii1' }, 1] }
-  })),
+  ].map(([id, text]) => boolQ(id, text, { indentLevel: 1, display_if: yes('minii1') })),
 
-  boolQ('miniidepalcact', "DÉPENDANCE ALCOOLIQUE ACTUELLE", {
-    help: "Oui si ≥3 items I2 Oui"
-  }),
+  {
+    id: 'minii_diag_dependance',
+    text: 'Diagnostic (I) : DÉPENDANCE ALCOOLIQUE ACTUELLE (si ≥ 3 réponses OUI en I2).',
+    type: 'instruction',
+    required: false,
+    display_if: and(
+      yes('minii1'),
+      gte(sum(['minii2a', 'minii2b', 'minii2c', 'minii2d', 'minii2e', 'minii2f', 'minii2g']), 3)
+    ),
+  },
 
   ...[
     ['minii3a', "I3 a) Grisé alors que vous aviez des choses à faire ? Problèmes ?"],
@@ -559,12 +743,24 @@ const SECTION_I: Question[] = [
     ['minii3c', "I3 c) Problèmes légaux ?"],
     ['minii3d', "I3 d) Continué malgré problèmes familiaux ?"],
   ].map(([id, text]) => boolQ(id, text, {
-    display_if: { '==': [{ var: 'minii1' }, 1] }
+    indentLevel: 1,
+    display_if: and(
+      yes('minii1'),
+      not(gte(sum(['minii2a', 'minii2b', 'minii2c', 'minii2d', 'minii2e', 'minii2f', 'minii2g']), 3))
+    )
   })),
 
-  boolQ('miniiabalcac', "ABUS D'ALCOOL ACTUEL", {
-    help: "Oui si ≥1 item I3 Oui"
-  }),
+  {
+    id: 'minii_diag_abus',
+    text: "Diagnostic (I) : ABUS D'ALCOOL ACTUEL (si ≥ 1 réponse OUI en I3 et dépendance non retenue).",
+    type: 'instruction',
+    required: false,
+    display_if: and(
+      yes('minii1'),
+      not(gte(sum(['minii2a', 'minii2b', 'minii2c', 'minii2d', 'minii2e', 'minii2f', 'minii2g']), 3)),
+      gt(sum(['minii3a', 'minii3b', 'minii3c', 'minii3d']), 0)
+    )
+  },
 ];
 
 // ============================================================================
@@ -594,14 +790,16 @@ const SECTION_J: Question[] = [
     type: 'multiple_choice',
     required: false,
     options: SUBSTANCE_OPTIONS.map((label, i) => ({ code: i + 1, label, score: i + 1 })),
-    display_if: { '==': [{ var: 'minij1a' }, 1] }
+    indentLevel: 1,
+    display_if: yes('minij1a')
   },
 
   boolQ('minijmedoc', "Prenez-vous des médicaments contre la toux ou d'autres substances ?", {
-    display_if: { '==': [{ var: 'minij1a' }, 1] }
+    indentLevel: 1,
+    display_if: yes('minij1a')
   }),
-  { id: 'minijsubcons', text: 'Spécifier la/les substances les plus consommées', type: 'text', required: false, display_if: { '==': [{ var: 'minij1a' }, 1] } },
-  { id: 'minijsubconprob', text: 'Quelle(s) substance(s) a(ont) occasionné le plus de problèmes ?', type: 'text', required: false, display_if: { '==': [{ var: 'minij1a' }, 1] } },
+  { id: 'minijsubcons', text: 'Spécifier la/les substances les plus consommées', type: 'text', required: false, indentLevel: 1, display_if: yes('minij1a') },
+  { id: 'minijsubconprob', text: 'Quelle(s) substance(s) a(ont) occasionné le plus de problèmes ?', type: 'text', required: false, indentLevel: 1, display_if: yes('minij1a') },
 
   ...[
     ['minij2a', "J2 a) Augmenté les quantités pour même effet ?"],
@@ -611,23 +809,44 @@ const SECTION_J: Question[] = [
     ['minij2e', "J2 e) Beaucoup de temps à procurer/consommer/récupérer ?"],
     ['minij2f', "J2 f) Réduit vos activités ?"],
     ['minij2g', "J2 g) Continué malgré problèmes de santé ?"],
-  ].map(([id, text]) => boolQ(id, text, {
-    display_if: { '==': [{ var: 'minij1a' }, 1] }
-  })),
+  ].map(([id, text]) => boolQ(id, text, { indentLevel: 1, display_if: yes('minij1a') })),
 
-  { id: 'minijspecsub', text: 'Spécifier la(les) substance(s)', type: 'text', required: false, display_if: { '==': [{ var: 'minij1a' }, 1] } },
-  boolQ('minijdepsubact', "DÉPENDANCE à une (des) substance(s) ACTUELLE", { help: "Oui si ≥3 items J2 Oui" }),
+  { id: 'minijspecsub', text: 'Spécifier la(les) substance(s)', type: 'text', required: false, indentLevel: 1, display_if: yes('minij1a') },
+  {
+    id: 'minij_diag_dependance',
+    text: "Diagnostic (J) : DÉPENDANCE À UNE SUBSTANCE ACTUELLE (si ≥ 3 réponses OUI en J2).",
+    type: 'instruction',
+    required: false,
+    display_if: and(
+      yes('minij1a'),
+      gte(sum(['minij2a', 'minij2b', 'minij2c', 'minij2d', 'minij2e', 'minij2f', 'minij2g']), 3)
+    )
+  },
 
   ...[
     ['minij3a', "J3 a) Intoxiqué(e) avec obligations ? Problèmes ?"],
     ['minij3b', "J3 b) Sous l'effet en situation risquée ?"],
-    ['minij3c', "J3 c) Problèmes légaux ?"],
+    ['minij3c', "J3 c) Avez-vous plus d'une fois eu des problèmes légaux parce que vous en aviez pris, par exemple une interpellation ou une condamnation ?"],
     ['minij3d', "J3 d) Continué malgré problèmes familiaux ?"],
   ].map(([id, text]) => boolQ(id, text, {
-    display_if: { '==': [{ var: 'minij1a' }, 1] }
+    indentLevel: 1,
+    display_if: and(
+      yes('minij1a'),
+      not(gte(sum(['minij2a', 'minij2b', 'minij2c', 'minij2d', 'minij2e', 'minij2f', 'minij2g']), 3))
+    )
   })),
 
-  boolQ('minijabusubact', "ABUS DE SUBSTANCE(S) ACTUEL", { help: "Oui si ≥1 item J3 Oui" }),
+  {
+    id: 'minij_diag_abus',
+    text: "Diagnostic (J) : ABUS DE SUBSTANCE(S) ACTUEL (si ≥ 1 réponse OUI en J3 et dépendance non retenue).",
+    type: 'instruction',
+    required: false,
+    display_if: and(
+      yes('minij1a'),
+      not(gte(sum(['minij2a', 'minij2b', 'minij2c', 'minij2d', 'minij2e', 'minij2f', 'minij2g']), 3)),
+      gt(sum(['minij3a', 'minij3b', 'minij3c', 'minij3d']), 0)
+    )
+  },
   { id: 'minijspecsub1', text: 'Spécifier la(les) substance(s)', type: 'text', required: false, display_if: { '==': [{ var: 'minij1a' }, 1] } },
 ];
 
@@ -659,16 +878,61 @@ const SECTION_K: Question[] = [
 
   boolQ('minik8b', "K8 b) Discours incohérent ou désorganisé ? (OBSERVATION DU CLINICIEN)"),
   boolQ('minik9b', "K9 b) Comportement désorganisé ou catatonique ? (OBSERVATION DU CLINICIEN)"),
-  boolQ('minik10b', "K10 b) Symptômes négatifs schizophréniques au premier plan ? (OBSERVATION DU CLINICIEN)"),
+  boolQ('minik10b', "K10 b) DES SYMPTOMES NEGATIFS TYPIQUEMENT SCHIZOPHRENIQUES (AFFECT ABRASÉ, PAUVRETE DU DISCOURS/ALOGIE, MANQUE D'ENERGIE OU D'INTERET POUR DEBUTER OU MENER À BIEN DES ACTIVITES/AVOLITION) SONT-ILS AU PREMIER PLAN AU COURS DE L'ENTRETIEN? (OBSERVATION DU CLINICIEN)"),
 
-  boolQ('minik11a', "K11 b) Les symptômes psychotiques sont-ils survenus uniquement pendant les périodes de dépression/exaltation/irritabilité ?"),
-  boolQ('minik11b', "TROUBLE DE L'HUMEUR AVEC CARACTÉRISTIQUES PSYCHOTIQUES VIE ENTIÈRE"),
-  boolQ('minik12a', "K12 a) TROUBLE DE L'HUMEUR AVEC CARACTÉRISTIQUES PSYCHOTIQUES ACTUEL"),
+  {
+    id: 'minik11a_filter',
+    text: "Filtre K11a : Y a-t-il 1 ou plusieurs questions « a » (K1a à K7a) cotées OUI/OUI BIZARRE ET le patient est-il coté OUI à un trouble thymique (EDM, maniaque ou hypomaniaque) ?",
+    type: 'instruction',
+    required: false,
+  },
+  boolQ('minik12a', "K12a Les idées ou impressions dont nous venons de parler sont-elles survenues uniquement pendant cette (ces) période(s) où vous étiez déprimé(e)/exalté(e)/irritable?", {
+    indentLevel: 1,
+    display_if: and(
+      or(
+        gt({ var: 'minik1a' }, 0),
+        gt({ var: 'minik2a' }, 0),
+        gt({ var: 'minik3a' }, 0),
+        gt({ var: 'minik4a' }, 0),
+        gt({ var: 'minik5a' }, 0),
+        gt({ var: 'minik6a' }, 0),
+        gt({ var: 'minik7a' }, 0),
+      ),
+      or(
+        yes('minia5bis'), // EDM évalué OUI (clinicien)
+        yes('minicepmania'),
+        yes('minicephmania'),
+      )
+    )
+  }),
+  {
+    id: 'minik_diag_humeur_psy',
+    text: "Diagnostic (K) : TROUBLE DE L'HUMEUR AVEC CARACTÉRISTIQUES PSYCHOTIQUES (si K12a = OUI).",
+    type: 'instruction',
+    required: false,
+    display_if: yes('minik12a'),
+  },
 
-  boolQ('minik13b', "K13 ≥1 'b' question Oui bizarre OU ≥2 'b' questions Oui pendant même mois ?"),
-  boolQ('minik13', "SYNDROME PSYCHOTIQUE ACTUEL"),
-  boolQ('minik14b', "K14 K13 Oui OU ≥1 'a' question Oui bizarre OU ≥2 'a' questions Oui ?"),
-  boolQ('minik14', "SYNDROME PSYCHOTIQUE VIE ENTIÈRE"),
+  boolQ('minik13', "K13 Y-A-T-IL 1 OU PLUSIEURS QUESTIONS « b », DE K1b A K6b, COTÉE(S) OUI BIZARRE ? OU Y A T-IL 2 OU PLUSIEURS QUESTIONS « b », DE K1b A K10b, COTÉES OUI ? ET Y A-T-IL AU MOINS 2 SYMPTÔMES PSYCHOTIQUES QUI ONT ÉTÉ PRÉSENTS PENDANT LA MÊME PÉRIODE D'UN MOIS?", {
+    help: "Évaluation clinique (logic gate)."
+  }),
+  {
+    id: 'minik_diag_psy_actuel',
+    text: "Diagnostic (K) : SYNDROME PSYCHOTIQUE ACTUEL (si K13 = OUI).",
+    type: 'instruction',
+    required: false,
+    display_if: yes('minik13')
+  },
+  boolQ('minik14', "K14 K13 EST-ELLE COTÉE OUI OU Y A-T-IL 1 OU PLUSIEURS QUESTIONS « a » COTÉES OUI BIZARRE ? OU 2 OU PLUSIEURS QUESTIONS « a » COTÉES OUI ET AU MOINS 2 SYMPTOMES PENDANT 1 MOIS?", {
+    help: "Évaluation clinique (logic gate)."
+  }),
+  {
+    id: 'minik_diag_psy_vie',
+    text: "Diagnostic (K) : SYNDROME PSYCHOTIQUE VIE ENTIÈRE (si K14 = OUI).",
+    type: 'instruction',
+    required: false,
+    display_if: yes('minik14')
+  },
 ];
 
 // ============================================================================
@@ -680,13 +944,19 @@ const SECTION_L: Question[] = [
   { id: 'minil1a', text: 'Combien mesurez-vous ?', type: 'number', required: false, min: 50, max: 250 },
   { id: 'minil1b', text: 'Au cours des 3 derniers mois, quel a été votre poids le plus faible ?', type: 'number', required: false, min: 20, max: 300 },
   boolQ('minil1c', "Le poids du patient est-il inférieur au seuil critique pour sa taille ?"),
-  boolQ('minil2', "L2 Avez-vous essayé de ne pas prendre de poids malgré un poids faible ?"),
-  boolQ('minil3', "L3 Aviez-vous peur de prendre du poids ?"),
-  boolQ('minil4a', "L4 a) Vous trouviez-vous encore trop gros(se) ?"),
-  boolQ('minil4b', "L4 b) L'estime de vous-même était-elle influencée par votre poids ?"),
-  boolQ('minil4c', "L4 c) Pensiez-vous que ce poids était normal, voire excessif ?"),
-  boolQ('minil6', "L6 (Femmes) Arrêt des règles ces 3 derniers mois ?"),
-  boolQ('minilanomenact', "ANOREXIE MENTALE ACTUELLE"),
+  boolQ('minil2', "L2 Au cours des trois derniers mois : Avez-vous essayé de ne pas prendre de poids malgré le fait que vous pesiez peu ?", { display_if: yes('minil1c'), indentLevel: 1 }),
+  boolQ('minil3', "L3 Aviez-vous peur de prendre du poids ou redoutiez-vous de devenir trop gro(s) bien que votre poids soit inférieur à la moyenne ?", { display_if: yes('minil1c'), indentLevel: 1 }),
+  boolQ('minil4a', "L4 a) Vous trouviez-vous encore trop gro(s), ou pensiez-vous qu'une partie de votre corps était trop grosse ?", { display_if: yes('minil1c'), indentLevel: 1 }),
+  boolQ('minil4b', "L4 b) L'opinion ou l'estime que vous aviez de vous-même étaient-elles largement influencées par votre poids ou vos formes corporelles ?", { display_if: yes('minil1c'), indentLevel: 1 }),
+  boolQ('minil4c', "L4 c) Pensiez-vous que ce poids était normal, voire excessif ?", { display_if: yes('minil1c'), indentLevel: 1 }),
+  { id: 'minil_gate_l5', text: 'Filtre L5 : Y a-t-il au moins 1 OUI en L4 ? Si NON, passez au module suivant.', type: 'instruction', required: false, display_if: yes('minil1c') },
+  boolQ('minil6', "L6 (Femmes) Ces trois derniers mois, avez-vous eu un arrêt de vos règles alors que vous auriez dû les avoir (en l'absence d'une éventuelle grossesse) ?", {
+    display_if: and(yes('minil1c'), gte(sum(['minil4a', 'minil4b', 'minil4c']), 1)),
+    indentLevel: 1
+  }),
+  boolQ('minilanomenact', "ANOREXIE MENTALE ACTUELLE", {
+    display_if: and(yes('minil1c'), gte(sum(['minil4a', 'minil4b', 'minil4c']), 1)),
+  }),
 ];
 
 // ============================================================================
@@ -695,15 +965,27 @@ const SECTION_L: Question[] = [
 
 const SECTION_M: Question[] = [
   { id: 'section_m', text: 'M. BOULIMIE', type: 'section', required: false },
-  boolQ('minim1', "M1 Crises de boulimie (grandes quantités en <2h) ?"),
-  boolQ('minim2', "M2 Au moins 2 fois par semaine ces 3 derniers mois ?"),
-  boolQ('minim3', "M3 Impression de ne pas pouvoir vous arrêter ?"),
-  boolQ('minim4', "M4 Comportements compensatoires (vomissements, laxatifs, exercice) ?"),
-  boolQ('minim5', "M5 L'estime de vous-même influencée par votre poids ?"),
-  boolQ('minim6', "M6 Le patient présente-t-il une anorexie mentale ?"),
-  boolQ('minim7', "M7 Ces crises surviennent-elles toujours sous un certain poids ?"),
-  boolQ('minim8', "M8 BOULIMIE ACTUELLE"),
-  boolQ('minim8bis', "ANOREXIE MENTALE type boulimie/vomissements ACTUELLE"),
+  boolQ('minim1', "M1 Au cours de ces trois derniers mois, vous est-il arrivé d'avoir des crises de boulimie durant lesquelles vous mangiez de très grandes quantités de nourriture en moins de 2 heures ?", { required: true }),
+  boolQ('minim2', "M2 Avez-vous eu de telles crises de boulimie au moins deux fois par semaine au cours de ces 3 derniers mois ?", { required: true, indentLevel: 1, display_if: yes('minim1') }),
+  boolQ('minim3', "M3 Durant ces crises de boulimie, aviez-vous l'impression de ne pas pouvoir vous arrêter de manger ou de ne pas pouvoir contrôler la quantité de nourriture que vous preniez ?", { required: true, indentLevel: 1, display_if: yes('minim2') }),
+  boolQ('minim4', "M4 De façon à éviter une prise de poids après ces crises de boulimie, faisiez-vous certaines choses comme vous faire vomir, vous astreindre à des régimes draconiens, faire de l'exercice, prendre des laxatifs/diurétiques/coupe-faim ou autres ?", { required: true, indentLevel: 1, display_if: yes('minim3') }),
+  boolQ('minim5', "M5 L'opinion ou l'estime que vous avez de vous-même sont-elles largement influencées par votre poids ou vos formes corporelles ?", { required: false, indentLevel: 1, display_if: yes('minim4') }),
+  boolQ('minim6', "M6 LE PATIENT PRÉSENTE-T-IL UNE ANOREXIE MENTALE ?", { required: false, indentLevel: 1, display_if: yes('minim5') }),
+  boolQ('minim7', "M7 Ces crises de boulimie surviennent-elles toujours lorsque votre poids est en dessous du seuil du patient ?", { required: false, indentLevel: 1, display_if: yes('minim6') }),
+  {
+    id: 'minim_diag_bulimie',
+    text: 'Diagnostic (M) : BOULIMIE ACTUELLE (si M5 = OUI et (M6 = NON ou M7 = NON)).',
+    type: 'instruction',
+    required: false,
+    display_if: and(yes('minim5'), or(no('minim6'), and(yes('minim6'), no('minim7'))))
+  },
+  {
+    id: 'minim_diag_anorex_bulimie',
+    text: 'Diagnostic (M) : ANOREXIE MENTALE, type boulimie/vomissements ou prise de purgatifs ACTUELLE (si M7 = OUI).',
+    type: 'instruction',
+    required: false,
+    display_if: yes('minim7')
+  },
 ];
 
 // ============================================================================
@@ -714,13 +996,16 @@ const SECTION_N: Question[] = [
   { id: 'section_n', text: 'N. ANXIÉTÉ GÉNÉRALISÉE', type: 'section', required: false },
   boolQ('minin1a', "N1 a) Excessivement préoccupé(e)/inquiet(e)/anxieux(se) ces 6 derniers mois ?"),
   boolQ('minin1b', "N1 b) Préoccupations presque tous les jours ?", {
-    display_if: { '==': [{ var: 'minin1a' }, 1] }
+    indentLevel: 1,
+    display_if: yes('minin1a')
   }),
-  boolQ('minin1c', "L'anxiété est-elle uniquement liée aux troubles explorés précédemment ?", {
-    display_if: { 'and': [{ '==': [{ var: 'minin1a' }, 1] }, { '==': [{ var: 'minin1b' }, 1] }] }
+  boolQ('minin1c', "N2 EST-CE QUE L'ANXIETE ET LES INQUIETUDES DU PATIENT SONT UNIQUEMENT RESTREINTES A, OU MIEUX EXPLIQUEES PAR, UN DES TROUBLES EXPLORES PRECEDEMMENT?", {
+    indentLevel: 1,
+    display_if: and(yes('minin1a'), yes('minin1b'))
   }),
-  boolQ('minin2', "N2 Difficile de contrôler ces préoccupations ?", {
-    display_if: { 'and': [{ '==': [{ var: 'minin1a' }, 1] }, { '==': [{ var: 'minin1b' }, 1] }] }
+  boolQ('minin2', "N2 bis Vous-est-il difficile de contrôler ces préoccupations?", {
+    indentLevel: 1,
+    display_if: and(yes('minin1a'), yes('minin1b'), no('minin1c'))
   }),
   ...[
     ['minin3a', "N3 a) Agité(e), tendu(e) ?"],
@@ -730,12 +1015,25 @@ const SECTION_N: Question[] = [
     ['minin3e', "N3 e) Particulièrement irritable ?"],
     ['minin3f', "N3 f) Problèmes de sommeil ?"],
   ].map(([id, text]) => boolQ(id, text, {
-    display_if: { 'and': [{ '==': [{ var: 'minin1a' }, 1] }, { '==': [{ var: 'minin1b' }, 1] }] }
+    indentLevel: 1,
+    display_if: and(yes('minin1a'), yes('minin1b'), no('minin1c'))
   })),
   boolQ('minin4', "N4 Cette anxiété entraîne-t-elle une souffrance importante ?", {
-    display_if: { 'and': [{ '==': [{ var: 'minin1a' }, 1] }, { '==': [{ var: 'minin1b' }, 1] }] }
+    indentLevel: 1,
+    display_if: and(
+      yes('minin1a'),
+      yes('minin1b'),
+      no('minin1c'),
+      gte(sum(['minin3a', 'minin3b', 'minin3c', 'minin3d', 'minin3e', 'minin3f']), 3)
+    )
   }),
-  boolQ('mininanxgenact', "ANXIÉTÉ GÉNÉRALISÉE ACTUELLE"),
+  {
+    id: 'minin_diag_tag',
+    text: 'Diagnostic (N) : ANXIÉTÉ GÉNÉRALISÉE ACTUELLE (si N4 = OUI).',
+    type: 'instruction',
+    required: false,
+    display_if: yes('minin4')
+  },
 ];
 
 // ============================================================================
@@ -772,9 +1070,21 @@ const SECTION_P: Question[] = [
     ['minip2d', "P2 d) Souvent menti ou arnaqué les autres ?"],
     ['minip2e', "P2 e) Exposé des gens à des dangers ?"],
     ['minip2f', "P2 f) Aucune culpabilité après avoir blessé/maltraité/volé ?"],
-  ].map(([id, text]) => boolQ(id, `${text} (Depuis l'âge de 15 ans)`)),
+  ].map(([id, text]) => boolQ(id, `${text} (Depuis l'âge de 15 ans)`, {
+    indentLevel: 1,
+    display_if: gte(sum(['minip1a', 'minip1b', 'minip1c', 'minip1d', 'minip1e', 'minip1f']), 2)
+  })),
 
-  boolQ('miniptroperantisoc', "TROUBLE DE LA PERSONNALITÉ ANTISOCIALE VIE ENTIÈRE"),
+  {
+    id: 'minip_diag_antisociale',
+    text: 'Diagnostic (P) : TROUBLE DE LA PERSONNALITÉ ANTISOCIALE VIE ENTIÈRE (si ≥ 2 OUI en P1 et ≥ 3 OUI en P2).',
+    type: 'instruction',
+    required: false,
+    display_if: and(
+      gte(sum(['minip1a', 'minip1b', 'minip1c', 'minip1d', 'minip1e', 'minip1f']), 2),
+      gte(sum(['minip2a', 'minip2b', 'minip2c', 'minip2d', 'minip2e', 'minip2f']), 3)
+    )
+  },
 ];
 
 // ============================================================================
@@ -843,14 +1153,15 @@ export interface QuestionnaireDefinition {
 export const DEPRESSION_MINI_DEFINITION: QuestionnaireDefinition = {
   id: 'depression_mini',
   code: 'MINI',
-  title: 'MINI - Mini International Neuropsychiatric Interview',
-  description: "Entretien neuropsychiatrique structuré (MINI 5.0.0 / DSM-IV) couvrant les principaux troubles de l'Axe I.",
-  instructions: "L'entretien doit être administré par un clinicien formé. Les questions doivent être lues telles quelles au patient.",
+  title: "M.I.N.I. - Mini-Entretien Neuropsychiatrique International",
+  description: "MINI International Neuropsychiatric Interview (version française 6.0.0, compatible DSM-IV). Entretien structuré couvrant les principaux troubles psychiatriques.",
+  instructions: "Entretien hétéro-administré par un clinicien formé. Lire les questions au patient telles quelles et appliquer les règles de filtrage/branching.",
   questions: DEPRESSION_MINI_QUESTIONS,
   metadata: {
     singleColumn: true,
     pathologies: ['depression'],
-    target_role: 'healthcare_professional'
+    target_role: 'healthcare_professional',
+    version: '6.0.0',
   }
 };
 
