@@ -440,7 +440,7 @@ const SECTION_C: Question[] = [
 
   boolQ('minic7a', "C7 a) Au moins 2 épisodes maniaques durant votre vie ?"),
   boolQ('minic7b', "C7 b) Au moins 2 épisodes hypomaniaques durant votre vie ?"),
-  boolQ('minic7c', "C7 c) Au moins 2 SYMPTÔMES hypomaniaques durant votre vie ?"),
+  boolQ('minic7c', "C7 c) Au moins 2 symptômes hypomaniaques durant votre vie ?"),
 ];
 
 // ============================================================================
