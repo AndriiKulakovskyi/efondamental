@@ -43,6 +43,11 @@ import { calculateDigitSpanScores } from "@/lib/services/wais4-digit-span-scorin
 import { Loader2, ChevronDown, Info } from "lucide-react";
 import { calculateCvltScores } from "@/lib/services/cvlt-scoring";
 import { computeOnapsScores } from "@/lib/questionnaires/schizophrenia/initial/auto/onaps";
+import {
+  computeMiniSuicideRiskScore,
+  getMiniSuicideRiskFlag,
+  getMiniSuicideRiskLevel,
+} from "@/lib/questionnaires/depression/screening/hetero/mini";
 
 interface QuestionnaireRendererProps {
   questionnaire: QuestionnaireDefinition;
@@ -205,6 +210,11 @@ export function QuestionnaireRenderer({
       const pastCount = [initialized.minia3aep, initialized.minia3bep, initialized.minia3cep, initialized.minia3dep, initialized.minia3eep, initialized.minia3fep, initialized.minia3gep].filter(oui).length;
       const pastOk = pastCount >= 5 && oui(initialized.minia4ep);
       initialized.minia5bis = (currentOk || pastOk) ? 1 : 0;
+      // Section B : risque suicidaire (B1-B11) → minib_risque, minib_score, minib_risque_cot
+      const minibScore = computeMiniSuicideRiskScore(initialized);
+      initialized.minib_risque = getMiniSuicideRiskFlag(initialized);
+      initialized.minib_score = minibScore;
+      initialized.minib_risque_cot = getMiniSuicideRiskLevel(minibScore);
     }
 
     return initialized;
@@ -2709,6 +2719,14 @@ export function QuestionnaireRenderer({
           const pastCount = [updated.minia3aep, updated.minia3bep, updated.minia3cep, updated.minia3dep, updated.minia3eep, updated.minia3fep, updated.minia3gep].filter(oui).length;
           const pastOk = pastCount >= 5 && oui(updated.minia4ep);
           updated.minia5bis = (currentOk || pastOk) ? 1 : 0;
+        }
+        // Section B : recalcul risque suicidaire (B1-B11)
+        const minibDeps = ['minib1', 'minib2', 'minib3', 'minib4', 'minib5', 'minib6', 'minib7', 'minib8', 'minib9', 'minib10', 'minib11'];
+        if (minibDeps.includes(questionId)) {
+          const minibScore = computeMiniSuicideRiskScore(updated);
+          updated.minib_risque = getMiniSuicideRiskFlag(updated);
+          updated.minib_score = minibScore;
+          updated.minib_risque_cot = getMiniSuicideRiskLevel(minibScore);
         }
       }
 

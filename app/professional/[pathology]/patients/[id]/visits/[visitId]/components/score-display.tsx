@@ -3289,7 +3289,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                       "Pas de risque suicidaire identifié"}
                   </span>
                   <span className="text-xs text-gray-600">
-                    Score B: {data.minib_score ?? "-"}/52
+                    Score B: {data.minib_score ?? "-"}/53
                   </span>
                 </div>
               </div>

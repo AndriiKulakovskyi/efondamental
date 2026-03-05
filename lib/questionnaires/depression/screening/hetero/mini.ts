@@ -190,14 +190,15 @@ const SECTION_A: Question[] = [
 
 const SECTION_B: Question[] = [
   { id: 'section_b', text: 'B. RISQUE SUICIDAIRE', type: 'section', required: false },
+  { id: 'minib_gate_info', text: "Au cours du mois écoulé : ", type: 'instruction', required: false},
 
-  boolQ('minib1', "B1 Avez-vous eu un accident ? (Au cours du mois écoulé)", { required: true }),
+  boolQ('minib1', "B1 Avez-vous eu un accident ?", { required: true }),
   boolQ('minib1a', "B1 a) Avez-vous prévu ou eu l'intention de vous faire du mal dans cet accident ?", {
     indentLevel: 1,
     display_if: yes('minib1')
   }),
   boolQ('minib1b', "B1 b) Avez-vous eu l'intention de mourir dans cet accident ?", {
-    indentLevel: 2,
+    indentLevel: 1,
     display_if: yes('minib1a')
   }),
 
@@ -255,39 +256,42 @@ const SECTION_B: Question[] = [
     display_if: { '==': [{ var: 'minib10' }, 1] }
   },
 
-  boolQ('minib11', "B11 Au cours de votre vie : Avez-vous déjà fait une tentative de suicide ?", {
+  boolQ('minib11', "B11 Avez-vous déjà fait une tentative de suicide ?", {
     required: true,
-    display_if: no('minib10')
   }),
 
-  boolQ('minib_risque', "Risque suicidaire actuel", {
-    readonly: true,
-    metadata: { displayOnly: true },
-    help: "Auto-calculé : Oui si au moins un item B2-B11 est Oui"
-  }),
+  {
+    id: 'minib_risque_instruction',
+    text: "Y a-t-il au moins une des réponses (hormis B1) cotée oui ? Si oui, additionnez le total de points pour les réponses (B1-B11) cochées « oui » et précisez le score de risque suicidaire comme indiqué dans la case diagnostique :",
+    type: 'instruction',
+    required: false,
+  },
+  boolQ('minib_risque', "Risque suicidaire actuel (au moins une réponse OUI parmi B2-B11 ?)",
+    { readonly: true, metadata: { displayOnly: true } }
+  ),
   {
     id: 'minib_score',
-    text: 'SCORE RISQUE SUICIDAIRE ACTUEL',
+    text: 'Score risque suicidaire actuel (auto calculé)',
     type: 'number',
     required: false,
-    min: 0, max: 52,
+    min: 0,
+    max: 53,
     readonly: true,
     metadata: { displayOnly: true },
-    help: "Score calculé automatiquement"
   },
   {
     id: 'minib_risque_cot',
-    text: 'RISQUE SUICIDAIRE ACTUEL',
+    text: 'Risque suicidaire actuel (auto calculé)',
     type: 'single_choice',
     required: false,
     readonly: true,
     metadata: { displayOnly: true },
     options: [
-      { code: 1, label: 'Faible', score: 1 },
-      { code: 2, label: 'Modéré', score: 2 },
-      { code: 3, label: 'Élevé', score: 3 }
+      { code: 1, label: 'Faible (1-8 points)', score: 1 },
+      { code: 2, label: 'Modéré (9-16 points)', score: 2 },
+      { code: 3, label: 'Élevé (≥ 17 points)', score: 3 },
     ],
-    display_if: { '==': [{ var: 'minib_risque' }, 1] }
+    display_if: { '==': [{ var: 'minib_risque' }, 1] },
   },
   {
     id: 'minib_com',
@@ -1165,6 +1169,7 @@ export const DEPRESSION_MINI_DEFINITION: QuestionnaireDefinition = {
 // ============================================================================
 
 export interface DepressionMiniScoreInput {
+  minib1?: number;
   minib2?: number;
   minib3?: number;
   minib4?: number;
@@ -1178,7 +1183,9 @@ export interface DepressionMiniScoreInput {
   [key: string]: any;
 }
 
+// Points pour chaque item B1-B11 coché OUI (hors B1 : au moins un OUI parmi B2-B11 déclenche le calcul)
 const SUICIDE_RISK_WEIGHTS: Record<string, number> = {
+  minib1: 1,
   minib2: 1,
   minib3: 1,
   minib4: 2,
@@ -1191,6 +1198,7 @@ const SUICIDE_RISK_WEIGHTS: Record<string, number> = {
   minib11: 4,
 };
 
+/** Somme des points pour les réponses B1-B11 cochées OUI. */
 export function computeMiniSuicideRiskScore(responses: DepressionMiniScoreInput): number {
   let score = 0;
   for (const [field, weight] of Object.entries(SUICIDE_RISK_WEIGHTS)) {
@@ -1201,23 +1209,25 @@ export function computeMiniSuicideRiskScore(responses: DepressionMiniScoreInput)
   return score;
 }
 
+/** Oui si au moins une des réponses B2-B11 (hormis B1) est cotée OUI. */
 export function getMiniSuicideRiskFlag(responses: DepressionMiniScoreInput): number {
   const riskItems = ['minib2', 'minib3', 'minib4', 'minib5', 'minib6', 'minib7', 'minib8', 'minib9', 'minib10', 'minib11'];
   return riskItems.some(k => responses[k] === 1) ? 1 : 0;
 }
 
+/** 0 = non évalué, 1 = Faible (1-8), 2 = Modéré (9-16), 3 = Élevé (≥17). */
 export function getMiniSuicideRiskLevel(score: number): number {
   if (score <= 0) return 0;
-  if (score < 9) return 1;
-  if (score < 17) return 2;
+  if (score <= 8) return 1;
+  if (score <= 16) return 2;
   return 3;
 }
 
 export function interpretMiniSuicideRisk(score: number): string {
   if (score <= 0) return "Pas de risque suicidaire identifié.";
-  if (score < 9) return `Score ${score}/52. Risque suicidaire faible.`;
-  if (score < 17) return `Score ${score}/52. Risque suicidaire modéré. Surveillance recommandée.`;
-  return `Score ${score}/52. Risque suicidaire élevé. Intervention urgente nécessaire.`;
+  if (score <= 8) return `Score ${score}. Risque suicidaire faible (1-8 points).`;
+  if (score <= 16) return `Score ${score}. Risque suicidaire modéré (9-16 points). Surveillance recommandée.`;
+  return `Score ${score}. Risque suicidaire élevé (≥ 17 points). Intervention urgente nécessaire.`;
 }
 
 export interface DepressionMiniScoringResult {
