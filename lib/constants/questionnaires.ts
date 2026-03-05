@@ -109,97 +109,97 @@ export const ASRM_DEFINITION: QuestionnaireDefinition = {
 };
 
 export const QIDS_QUESTIONS: Question[] = [
-  { id: "q1", text: "Endormissement", type: "single_choice", required: true, options: [
+  { id: "q1", text: "1. Endormissement", type: "single_choice", required: true, options: [
     { code: 0, label: "Je ne mets jamais plus de 30 minutes à m'endormir.", score: 0 },
     { code: 1, label: "Moins d'une fois sur deux, je mets au moins 30 minutes à m'endormir.", score: 1 },
     { code: 2, label: "Plus d'une fois sur deux, je mets au moins 30 minutes à m'endormir.", score: 2 },
     { code: 3, label: "Plus d'une fois sur deux, je mets plus d'une heure à m'endormir.", score: 3 }
   ]},
-  { id: "q2", text: "Sommeil pendant la nuit", type: "single_choice", required: true, options: [
+  { id: "q2", text: "2. Sommeil pendant la nuit", type: "single_choice", required: true, options: [
     { code: 0, label: "Je ne me réveille pas la nuit.", score: 0 },
     { code: 1, label: "J'ai un sommeil agité, léger et quelques réveils brefs chaque nuit.", score: 1 },
     { code: 2, label: "Je me réveille au moins une fois par nuit, mais je me rendors facilement.", score: 2 },
     { code: 3, label: "Plus d'une fois sur deux, je me réveille plus d'une fois par nuit et reste éveillé(e) 20 minutes ou plus.", score: 3 }
   ]},
-  { id: "q3", text: "Réveil avant l'heure prévue", type: "single_choice", required: true, options: [
+  { id: "q3", text: "3. Réveil avant l'heure prévue", type: "single_choice", required: true, options: [
     { code: 0, label: "La plupart du temps, je me réveille 30 minutes ou moins avant le moment où je dois me lever.", score: 0 },
     { code: 1, label: "Plus d'une fois sur deux, je me réveille plus de 30 minutes avant le moment où je dois me lever.", score: 1 },
     { code: 2, label: "Je me réveille presque toujours une heure ou plus avant le moment où je dois me lever, mais je finis par me rendormir.", score: 2 },
     { code: 3, label: "Je me réveille au moins une heure avant le moment où je dois me lever et je n'arrive pas à me rendormir.", score: 3 }
   ]},
-  { id: "q4", text: "Sommeil excessif", type: "single_choice", required: true, options: [
+  { id: "q4", text: "4. Sommeil excessif", type: "single_choice", required: true, options: [
     { code: 0, label: "Je ne dors pas plus de 7 à 8 heures par nuit, et je ne fais pas de sieste dans la journée.", score: 0 },
     { code: 1, label: "Je ne dors pas plus de 10 heures sur un jour entier de 24 heures, siestes comprises.", score: 1 },
     { code: 2, label: "Je ne dors pas plus de 12 heures sur un jour entier de 24 heures, siestes comprises.", score: 2 },
     { code: 3, label: "Je dors plus de 12 heures sur un jour entier de 24 heures, siestes comprises.", score: 3 }
   ]},
-  { id: "q5", text: "Tristesse", type: "single_choice", required: true, options: [
+  { id: "q5", text: "5. Tristesse", type: "single_choice", required: true, options: [
     { code: 0, label: "Je ne me sens pas triste.", score: 0 },
     { code: 1, label: "Je me sens triste moins de la moitié du temps.", score: 1 },
     { code: 2, label: "Je me sens triste plus de la moitié du temps.", score: 2 },
     { code: 3, label: "Je me sens triste presque tout le temps.", score: 3 }
   ]},
-  { id: "q6", text: "Diminution de l'appétit", type: "single_choice", required: true, options: [
+  { id: "q6", text: "6. Diminution de l'appétit", type: "single_choice", required: true, options: [
     { code: 0, label: "J'ai le même appétit que d'habitude.", score: 0 },
     { code: 1, label: "Je mange un peu moins souvent ou en plus petite quantité que d'habitude.", score: 1 },
     { code: 2, label: "Je mange beaucoup moins que d'habitude et seulement en me forçant.", score: 2 },
     { code: 3, label: "Je mange rarement sur un jour entier de 24 heures et seulement en me forçant énormément ou quand on me persuade de manger.", score: 3 }
   ]},
-  { id: "q7", text: "Augmentation de l'appétit", type: "single_choice", required: true, options: [
+  { id: "q7", text: "7. Augmentation de l'appétit", type: "single_choice", required: true, options: [
     { code: 0, label: "J'ai le même appétit que d'habitude.", score: 0 },
     { code: 1, label: "J'éprouve le besoin de manger plus souvent que d'habitude.", score: 1 },
     { code: 2, label: "Je mange régulièrement plus souvent et/ou en plus grosse quantité que d'habitude.", score: 2 },
     { code: 3, label: "J'éprouve un grand besoin de manger plus que d'habitude pendant et entre les repas.", score: 3 }
   ]},
-  { id: "q8", text: "Perte de poids (au cours des 15 derniers jours)", type: "single_choice", required: true, options: [
+  { id: "q8", text: "8. Perte de poids (au cours des 15 derniers jours)", type: "single_choice", required: true, options: [
     { code: 0, label: "Mon poids n'a pas changé.", score: 0 },
     { code: 1, label: "J'ai l'impression d'avoir perdu un peu de poids.", score: 1 },
     { code: 2, label: "J'ai perdu 1 kg ou plus.", score: 2 },
     { code: 3, label: "J'ai perdu plus de 2 kg.", score: 3 }
   ]},
-  { id: "q9", text: "Prise de poids (au cours des 15 derniers jours)", type: "single_choice", required: true, options: [
+  { id: "q9", text: "9. Prise de poids (au cours des 15 derniers jours)", type: "single_choice", required: true, options: [
     { code: 0, label: "Mon poids n'a pas changé.", score: 0 },
     { code: 1, label: "J'ai l'impression d'avoir pris un peu de poids.", score: 1 },
     { code: 2, label: "J'ai pris 1 kg ou plus.", score: 2 },
     { code: 3, label: "J'ai pris plus de 2 kg.", score: 3 }
   ]},
-  { id: "q10", text: "Concentration/Prise de décisions", type: "single_choice", required: true, options: [
+  { id: "q10", text: "10. Concentration/Prise de décisions", type: "single_choice", required: true, options: [
     { code: 0, label: "Il n'y a aucun changement dans ma capacité habituelle à me concentrer ou à prendre des décisions.", score: 0 },
     { code: 1, label: "Je me sens parfois indécis(e) ou je trouve parfois que ma concentration est limitée.", score: 1 },
     { code: 2, label: "La plupart du temps, j'ai du mal à me concentrer ou à prendre des décisions.", score: 2 },
     { code: 3, label: "Je n'arrive pas me concentrer assez pour lire ou je n'arrive pas à prendre des décisions même si elles sont insignifiantes.", score: 3 }
   ]},
-  { id: "q11", text: "Opinion de moi-même", type: "single_choice", required: true, options: [
+  { id: "q11", text: "11. Opinion de moi-même", type: "single_choice", required: true, options: [
     { code: 0, label: "Je considère que j'ai autant de valeur que les autres et que je suis aussi méritant(e) que les autres.", score: 0 },
     { code: 1, label: "Je me critique plus que d'habitude.", score: 1 },
     { code: 2, label: "Je crois fortement que je cause des problèmes aux autres.", score: 2 },
     { code: 3, label: "Je pense presque tout le temps à mes petits et mes gros défauts.", score: 3 }
   ]},
-  { id: "q12", text: "Idées de mort ou de suicide", type: "single_choice", required: true, help: "En cas d'idéation suicidaire, alerter immédiatement le clinicien.", options: [
+  { id: "q12", text: "12. Idées de mort ou de suicide", type: "single_choice", required: true, help: "En cas d'idéation suicidaire, alerter immédiatement le clinicien.", options: [
     { code: 0, label: "Je ne pense pas au suicide ni à la mort.", score: 0 },
     { code: 1, label: "Je pense que la vie est sans intérêt ou je me demande si elle vaut la peine d'être vécue.", score: 1 },
     { code: 2, label: "Je pense au suicide ou à la mort plusieurs fois par semaine pendant plusieurs minutes.", score: 2 },
     { code: 3, label: "Je pense au suicide ou à la mort plusieurs fois par jours en détail, j'ai envisagé le suicide de manière précise ou j'ai réellement tenté de mettre fin à mes jours.", score: 3 }
   ]},
-  { id: "q13", text: "Enthousiasme général", type: "single_choice", required: true, options: [
+  { id: "q13", text: "13. Enthousiasme général", type: "single_choice", required: true, options: [
     { code: 0, label: "Il n'y pas de changement par rapport à d'habitude dans la manière dont je m'intéresse aux gens ou à mes activités.", score: 0 },
     { code: 1, label: "Je me rends compte que je m'intéresse moins aux gens et à mes activités.", score: 1 },
     { code: 2, label: "Je me rends compte que je n'ai d'intérêt que pour une ou deux des activités que j'avais auparavant.", score: 2 },
     { code: 3, label: "Je n'ai pratiquement plus d'intérêt pour les activités que j'avais auparavant.", score: 3 }
   ]},
-  { id: "q14", text: "Énergie", type: "single_choice", required: true, options: [
+  { id: "q14", text: "14. Énergie", type: "single_choice", required: true, options: [
     { code: 0, label: "J'ai autant d'énergie que d'habitude.", score: 0 },
     { code: 1, label: "Je me fatigue plus facilement que d'habitude.", score: 1 },
     { code: 2, label: "Je dois faire un gros effort pour commencer ou terminer mes activités quotidiennes (par exemple, faire les courses, les devoirs, la cuisine ou aller au travail).", score: 2 },
     { code: 3, label: "Je ne peux vraiment pas faire mes activités quotidiennes parce que je n'ai simplement plus d'énergie.", score: 3 }
   ]},
-  { id: "q15", text: "Impression de ralentissement", type: "single_choice", required: true, options: [
+  { id: "q15", text: "15. Impression de ralentissement", type: "single_choice", required: true, options: [
     { code: 0, label: "Je pense, je parle et je bouge aussi vite que d'habitude.", score: 0 },
     { code: 1, label: "Je trouve que je réfléchis plus lentement ou que ma voix est étouffée ou monocorde.", score: 1 },
     { code: 2, label: "Il me faut plusieurs secondes pour répondre à la plupart des questions et je suis sûr(e) que je réfléchis plus lentement.", score: 2 },
     { code: 3, label: "Je suis souvent incapable de répondre aux questions si je ne fais pas de gros efforts.", score: 3 }
   ]},
-  { id: "q16", text: "Impression d'agitation", type: "single_choice", required: true, options: [
+  { id: "q16", text: "16. Impression d'agitation", type: "single_choice", required: true, options: [
     { code: 0, label: "Je ne me sens pas agité(e).", score: 0 },
     { code: 1, label: "Je suis souvent agité(e), je me tords les mains ou j'ai besoin de changer de position quand je suis assis(e).", score: 1 },
     { code: 2, label: "J'éprouve le besoin soudain de bouger et je suis plutôt agité(e).", score: 2 },
