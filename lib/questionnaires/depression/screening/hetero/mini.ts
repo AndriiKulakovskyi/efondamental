@@ -211,6 +211,7 @@ const SECTION_B: Question[] = [
     id: 'minib5bis1',
     text: 'Fréquence',
     type: 'single_choice',
+    indentLevel: 1,
     required: false,
     options: [
       { code: 1, label: 'Occasionnellement', score: 1 },
@@ -223,6 +224,7 @@ const SECTION_B: Question[] = [
     id: 'minib5bis2',
     text: 'Intensité',
     type: 'single_choice',
+    indentLevel: 1,
     required: false,
     options: [
       { code: 1, label: 'Légère', score: 1 },
@@ -248,6 +250,7 @@ const SECTION_B: Question[] = [
     id: 'minib10bis',
     text: 'Précision B10',
     type: 'multiple_choice',
+    indentLevel: 1,
     required: false,
     options: [
       { code: 1, label: 'Espériez-vous être secouru(e)/survivre ?', score: 1 },
@@ -295,7 +298,7 @@ const SECTION_B: Question[] = [
   },
   {
     id: 'minib_com',
-    text: 'COMMENTAIRE SUPPLEMENTAIRE sur le risque suicidaire',
+    text: 'Commentaire supplémentaire sur le risque suicidaire : ',
     type: 'text',
     required: false
   }

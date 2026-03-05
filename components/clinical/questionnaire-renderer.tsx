@@ -2974,11 +2974,10 @@ export function QuestionnaireRenderer({
 
     // Handle instruction type (using markdown parser for bold/newlines)
     if (question.type === 'instruction') {
-      const isMiniaGateInfo = question.id === 'minia_gate_info';
       return (
         <div key={question.id} className="my-6">
-          {isMiniaGateInfo && <hr className="border-t-2 border-slate-300" />}
-          <div className={`text-base text-slate-800 ${isMiniaGateInfo ? 'font-bold italic' : ''}`}>
+          <hr className="border-t-2 border-slate-300" />
+          <div className="text-base text-slate-800 font-bold italic">
             <MarkdownContent content={question.text} />
           </div>
           <hr className="border-t-2 border-slate-300" />
