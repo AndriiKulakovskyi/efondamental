@@ -217,7 +217,8 @@ export async function saveDepressionMiniResponse(
       interpretation: scoring.interpretation,
       minib_score: scoring.minib_score,
       minib_risque: scoring.minib_risque,
-      minib_risque_cot: scoring.minib_risque_cot
+      minib_risque_cot: scoring.minib_risque_cot,
+      minic3_symptomes_ok: scoring.minic3_symptomes_ok
     }, { onConflict: 'visit_id' })
     .select()
     .single();

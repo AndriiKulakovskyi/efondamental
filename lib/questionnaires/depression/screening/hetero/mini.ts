@@ -18,6 +18,7 @@ export interface DepressionMiniResponse {
   minib_score: number | null;
   minib_risque: number | null;
   minib_risque_cot: number | null;
+  minic3_symptomes_ok: number | null;
   completed_by: string | null;
   completed_at: string;
   created_at: string;
@@ -26,7 +27,7 @@ export interface DepressionMiniResponse {
 
 export type DepressionMiniResponseInsert = Omit<
   DepressionMiniResponse,
-  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score' | 'interpretation' | 'minib_score' | 'minib_risque' | 'minib_risque_cot'
+  'id' | 'created_at' | 'updated_at' | 'completed_at' | 'total_score' | 'interpretation' | 'minib_score' | 'minib_risque' | 'minib_risque_cot' | 'minic3_symptomes_ok'
 > & {
   completed_by?: string | null;
 };
@@ -361,11 +362,16 @@ const SECTION_C: Question[] = [
 
   {
     id: 'minic3_recap_info',
-    text: 'RECAPITULATIF C3 : Élation = 3 symptômes, Irritable = 4 symptômes (voir comptage automatique ci-dessous).',
+    text: 'RECAPITULATIF C3 :',
     type: 'instruction',
     required: false,
     display_if: or(yes('minic1a'), yes('minic2a')),
   },
+
+  boolQ('minic3_symptomes_ok', "Est-ce qu'au moins 3 réponses sont cotées « oui » en C3 (ou au moins 4 si C1a est cotée « non » (pour épisode passé) et C1b est cotée Non (pour réponse actuel)) ? Règle : élation/exaltation nécessite seulement trois symptômes C3 tandis que humeur irritable nécessite 4 symptômes C3.", {
+    readonly: true,
+    display_if: or(yes('minic1a'), yes('minic2a')),
+  }),
 
   ...[
     ['minic4ea', 'minic4ep', "C4 Durée maximale pendant laquelle ces symptômes ont persisté ?"],
@@ -1237,12 +1243,36 @@ export function interpretMiniSuicideRisk(score: number): string {
   return `Score ${score}. Risque suicidaire élevé (≥ 17 points). Intervention urgente nécessaire.`;
 }
 
+const C3_ACTUEL_IDS = ['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea'];
+const C3_PASSE_IDS = ['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep'];
+
+/** OUI (1) if at least 3 C3 items are OUI (or 4 when C1a/C1b are NON for the relevant period). */
+export function computeMinic3SymptomesOk(responses: Record<string, any>): 0 | 1 {
+  const oui = (v: any) => v === 1 || v === '1';
+  const countActuel = C3_ACTUEL_IDS.filter((id) => oui(responses[id])).length;
+  const countPasse = C3_PASSE_IDS.filter((id) => oui(responses[id])).length;
+  const c1a = responses.minic1a;
+  const c1b = responses.minic1b;
+  const c2a = responses.minic2a;
+  const c2b = responses.minic2b;
+
+  const actuelOk =
+    (oui(c1b) || oui(c2b)) &&
+    ((oui(c1a) || oui(c1b)) ? countActuel >= 3 : countActuel >= 4);
+  const passeOk =
+    (oui(c1a) || oui(c2a)) &&
+    (oui(c1a) ? countPasse >= 3 : countPasse >= 4);
+
+  return actuelOk || passeOk ? 1 : 0;
+}
+
 export interface DepressionMiniScoringResult {
   total_score: number;
   interpretation: string;
   minib_score: number;
   minib_risque: number;
   minib_risque_cot: number;
+  minic3_symptomes_ok: number;
 }
 
 export function scoreDepressionMini(responses: DepressionMiniScoreInput): DepressionMiniScoringResult {
@@ -1250,13 +1280,15 @@ export function scoreDepressionMini(responses: DepressionMiniScoreInput): Depres
   const minib_risque = getMiniSuicideRiskFlag(responses);
   const minib_risque_cot = getMiniSuicideRiskLevel(minib_score);
   const interpretation = interpretMiniSuicideRisk(minib_score);
+  const minic3_symptomes_ok = computeMinic3SymptomesOk(responses);
 
   return {
     total_score: minib_score,
     interpretation,
     minib_score,
     minib_risque,
-    minib_risque_cot
+    minib_risque_cot,
+    minic3_symptomes_ok
   };
 }
 

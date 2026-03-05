@@ -47,6 +47,7 @@ import {
   computeMiniSuicideRiskScore,
   getMiniSuicideRiskFlag,
   getMiniSuicideRiskLevel,
+  computeMinic3SymptomesOk,
 } from "@/lib/questionnaires/depression/screening/hetero/mini";
 
 interface QuestionnaireRendererProps {
@@ -217,6 +218,8 @@ export function QuestionnaireRenderer({
       initialized.minib_risque = getMiniSuicideRiskFlag(initialized);
       initialized.minib_score = minibScore;
       initialized.minib_risque_cot = getMiniSuicideRiskLevel(minibScore);
+      // C3 : au moins 3 OUI (ou 4 si C1a/C1b NON) → minic3_symptomes_ok
+      initialized.minic3_symptomes_ok = computeMinic3SymptomesOk(initialized);
     }
 
     return initialized;
@@ -2731,6 +2734,11 @@ export function QuestionnaireRenderer({
           updated.minib_risque = getMiniSuicideRiskFlag(updated);
           updated.minib_score = minibScore;
           updated.minib_risque_cot = getMiniSuicideRiskLevel(minibScore);
+        }
+        // C3 : recalcul minic3_symptomes_ok
+        const minic3Deps = ['minic1a', 'minic1b', 'minic2a', 'minic2b', 'minic3aea', 'minic3aep', 'minic3bea', 'minic3bep', 'minic3cea', 'minic3cep', 'minic3dea', 'minic3dep', 'minic3eea', 'minic3eep', 'minic3fea', 'minic3fep', 'minic3gea', 'minic3gep'];
+        if (minic3Deps.includes(questionId)) {
+          updated.minic3_symptomes_ok = computeMinic3SymptomesOk(updated);
         }
       }
 
