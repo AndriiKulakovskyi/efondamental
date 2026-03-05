@@ -374,11 +374,11 @@ const SECTION_C: Question[] = [
   }),
 
   ...[
-    ['minic4ea', 'minic4ep', "C4 Durée maximale pendant laquelle ces symptômes ont persisté ?"],
+    ['minic4ea', 'minic4ep', "C4 Qu’elle a été la durée maximale pendant laquelle ces symptômes ont persisté "],
   ].flatMap(([ea, ep, text]) => [
     {
       id: ea,
-      text: `${text} (Episode actuel)`,
+      text: `${text} - Episode actuel ?`,
       type: 'single_choice' as const,
       required: false,
       options: [{ code: 1, label: 'a) 3 jours au moins', score: 1 }, { code: 2, label: 'b) 4 à 6 jours', score: 2 }, { code: 3, label: 'c) 7 jours ou plus', score: 3 }],
@@ -389,7 +389,7 @@ const SECTION_C: Question[] = [
     },
     {
       id: ep,
-      text: `${text} (Episode passé)`,
+      text: `${text} - Episode passé ?`,
       type: 'single_choice' as const,
       required: false,
       options: [{ code: 1, label: 'a) 3 jours au moins', score: 1 }, { code: 2, label: 'b) 4 à 6 jours', score: 2 }, { code: 3, label: 'c) 7 jours ou plus', score: 3 }],
@@ -400,19 +400,19 @@ const SECTION_C: Question[] = [
     },
   ]),
 
-  boolQ('minic5ea', "C5 Avez-vous été hospitalisé(e) à cause de ces problèmes ? (Episode actuel)", {
+  boolQ('minic5ea', "C5 Avez-vous été hospitalisé(e) à cause de ces problèmes - Episode actuel ?", {
     display_if: or(
       and(or(yes('minic1a'), yes('minic1b')), gte(sum(['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea']), 3), or(yes('minic1b'), yes('minic2b'))),
       and(and(no('minic1a'), no('minic1b')), gte(sum(['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea']), 4), or(yes('minic1b'), yes('minic2b')))
     )
   }),
-  boolQ('minic5ep', "C5 (Episode passé)", {
+  boolQ('minic5ep', "C5 - Episode passé", {
     display_if: or(
       and(yes('minic1a'), gte(sum(['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep']), 3), or(yes('minic1a'), yes('minic2a'))),
       and(no('minic1a'), gte(sum(['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep']), 4), or(yes('minic1a'), yes('minic2a')))
     )
   }),
-  boolQ('minic6ea', "C6 Les problèmes ont-ils entraîné des difficultés significatives ? (Episode actuel)", {
+  boolQ('minic6ea', "C6 Les problèmes dont nous venons de parler ont-ils entraîné des difficultés significatives à la maison, au travail/à l’école, dans vos relations avec les autres ou dans d’autres domaines importants pour vous - Episode actuel ?", {
     display_if: and(
       no('minic5ea'),
       or(
@@ -421,7 +421,7 @@ const SECTION_C: Question[] = [
       )
     )
   }),
-  boolQ('minic6ep', "C6 (Episode passé)", {
+  boolQ('minic6ep', "C6 - Episode passé", {
     display_if: and(
       no('minic5ep'),
       or(
