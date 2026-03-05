@@ -312,17 +312,17 @@ const SECTION_C: Question[] = [
   { id: 'section_c', text: 'C. ÉPISODE (HYPO-)MANIAQUE', type: 'section', required: false },
 
   boolQ('minic0', "Avez-vous dans votre famille des antécédents de maladie maniaco-dépressive ou de trouble bipolaire ?", {
-    help: "CETTE QUESTION N'EST PAS UN CRITÈRE mais accroît la vigilance du clinicien."
+    help: "Cette question n'est pas un critère mais accroît la vigilance du clinicien."
   }),
-  { id: 'minic0prec', text: 'VEUILLEZ PRECISER QUI', type: 'text', required: false, display_if: { '==': [{ var: 'minic0' }, 1] } },
+  { id: 'minic0prec', text: 'Veuillez préciser qui : ', type: 'text', required: false, display_if: { '==': [{ var: 'minic0' }, 1] } },
 
-  boolQ('minic1a', "C1 a Avez-vous déjà eu une période où vous vous sentiez tellement exalté(e) ou plein(e) d'énergie que cela vous a posé des problèmes ?", { required: true }),
+  boolQ('minic1a', "C1 a Avez-vous déjà eu une période où vous vous sentiez tellement exalté(e) ou plein(e) d’énergie que cela vous a posé des problèmes ou que certaines personnes, notamment dans votre entourage,  ont pensé que vous n’étiez pas dans votre état habituel ? (Ne prenez pas en compte les périodes pendant lesquelles vous étiez sous l’effet de drogues ou d’alcool.)", { required: true }),
   boolQ('minic1b', "C1 b Vous sentez-vous, en ce moment, exalté(e) ou plein(e) d'énergie ?", {
     indentLevel: 1,
     display_if: yes('minic1a')
   }),
 
-  boolQ('minic2a', "C2 a Avez-vous déjà eu une période de plusieurs jours où vous étiez tellement irritable que vous en arriviez à insulter les gens, à hurler, voire à vous battre ?", { required: true }),
+  boolQ('minic2a', "C2 a Avez-vous déjà eu une période de plusieurs jours où vous étiez tellement irritable que vous en arriviez à insulter les gens, à hurler, voire à vous battre avec des personnes extérieures à votre famille? Aviez-vous vous-même remarqué ou les autres, avaient-ils remarqué que vous étiez  plus irritable ou que vous réagissiez plus vivement que les autres, même dans des situations  où vous trouviez cela justifié ?", { required: true }),
   boolQ('minic2b', "C2 b Vous sentez-vous excessivement irritable en ce moment ?", {
     indentLevel: 1,
     display_if: yes('minic2a')
