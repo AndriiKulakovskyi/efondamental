@@ -158,7 +158,8 @@ const SECTION_A: Question[] = [
   }),
   boolQ('minia5bis', "Évaluation diagnostique A : Y a-t-il au moins 5 OUI entre A1b/A2b et A3, et A4 est-elle cotée OUI pour la période concernée ?", {
     required: true,
-    display_if: or(yes('minia1a'), yes('minia2a'))
+    readonly: true,
+    display_if: or(yes('minia1a'), yes('minia2a')),
   }),
   {
     id: 'miniedm',
@@ -174,7 +175,7 @@ const SECTION_A: Question[] = [
   },
   {
     id: 'minia6a',
-    text: "A6) a Combien d'épisodes de dépression avez-vous eus dans votre vie ?",
+    text: "A6) a Combien d'épisodes de dépression avez-vous eus dans votre vie (Les épisodes doivent être entrecoupés de périodes d’au moins 2 mois sans dépression significative) ?",
     type: 'number',
     required: false,
     min: 0,

@@ -195,6 +195,16 @@ export function QuestionnaireRenderer({
     if (questionnaire.code === 'MINI') {
       if (initialized.minia1a === 0) initialized.minia1b = 0;
       if (initialized.minia2a === 0) initialized.minia2b = 0;
+      // Évaluation diagnostique A (minia5bis): au moins 5 OUI entre A1b/A2b et A3, et A4 = OUI pour la période
+      const oui = (v: any) => v === 1 || v === '1';
+      let currentOk = false;
+      if (oui(initialized.minia1b) || oui(initialized.minia2b)) {
+        const currentCount = [initialized.minia1b, initialized.minia2b, initialized.minia3ads, initialized.minia3bds, initialized.minia3cds, initialized.minia3dsd, initialized.minia3esd, initialized.minia3fsd, initialized.minia3gsd].filter(oui).length;
+        currentOk = currentCount >= 5 && oui(initialized.minia4sd);
+      }
+      const pastCount = [initialized.minia3aep, initialized.minia3bep, initialized.minia3cep, initialized.minia3dep, initialized.minia3eep, initialized.minia3fep, initialized.minia3gep].filter(oui).length;
+      const pastOk = pastCount >= 5 && oui(initialized.minia4ep);
+      initialized.minia5bis = (currentOk || pastOk) ? 1 : 0;
     }
 
     return initialized;
@@ -2687,6 +2697,19 @@ export function QuestionnaireRenderer({
       if (questionnaire.code === 'MINI') {
         if (questionId === 'minia1a' && value === 0) updated.minia1b = 0;
         if (questionId === 'minia2a' && value === 0) updated.minia2b = 0;
+        // Recompute minia5bis when any Section A dependency changes
+        const minia5bisDeps = ['minia1a', 'minia2a', 'minia1b', 'minia2b', 'minia3ads', 'minia3bds', 'minia3cds', 'minia3dsd', 'minia3esd', 'minia3fsd', 'minia3gsd', 'minia4sd', 'minia3aep', 'minia3bep', 'minia3cep', 'minia3dep', 'minia3eep', 'minia3fep', 'minia3gep', 'minia4ep'];
+        if (minia5bisDeps.includes(questionId)) {
+          const oui = (v: any) => v === 1 || v === '1';
+          let currentOk = false;
+          if (oui(updated.minia1b) || oui(updated.minia2b)) {
+            const currentCount = [updated.minia1b, updated.minia2b, updated.minia3ads, updated.minia3bds, updated.minia3cds, updated.minia3dsd, updated.minia3esd, updated.minia3fsd, updated.minia3gsd].filter(oui).length;
+            currentOk = currentCount >= 5 && oui(updated.minia4sd);
+          }
+          const pastCount = [updated.minia3aep, updated.minia3bep, updated.minia3cep, updated.minia3dep, updated.minia3eep, updated.minia3fep, updated.minia3gep].filter(oui).length;
+          const pastOk = pastCount >= 5 && oui(updated.minia4ep);
+          updated.minia5bis = (currentOk || pastOk) ? 1 : 0;
+        }
       }
 
       // Calculate computed fields when their dependencies change
