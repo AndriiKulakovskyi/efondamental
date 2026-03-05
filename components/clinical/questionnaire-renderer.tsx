@@ -59,7 +59,7 @@ const EMPTY_RESPONSES: Record<string, any> = {};
 /**
  * A very simple markdown-like renderer to handle bold text and tables in questionnaire text/help.
  */
-const MarkdownContent = ({ content, className }: { content: string, className?: string }) => {
+const MarkdownContent = ({ content, className, inline }: { content: string, className?: string, inline?: boolean }) => {
   if (!content) return null;
 
   const lines = content.split('\n');
@@ -141,13 +141,19 @@ const MarkdownContent = ({ content, className }: { content: string, className?: 
       } else if (trimmed.startsWith('### ')) {
         elements.push(<h3 key={`h3-${index}`} className="text-lg font-bold mt-4 mb-2 text-slate-900">{renderText(trimmed.slice(4))}</h3>);
       } else {
-        elements.push(<p key={`p-${index}`} className="leading-relaxed mb-2">{renderText(trimmed)}</p>);
+        elements.push(inline
+          ? <span key={`p-${index}`} className="leading-relaxed">{renderText(trimmed)}</span>
+          : <p key={`p-${index}`} className="leading-relaxed mb-2">{renderText(trimmed)}</p>
+        );
       }
     }
   });
 
   flushTable(lines.length);
 
+  if (inline) {
+    return <span className={`markdown-content ${className || ''}`}>{elements}</span>;
+  }
   return <div className={`markdown-content ${className || ''}`}>{elements}</div>;
 };
 
@@ -2990,6 +2996,7 @@ export function QuestionnaireRenderer({
             <MarkdownContent 
               content={question.text} 
               className={question.text.includes('\n') || question.text.includes('**') ? 'font-normal' : ''}
+              inline
             />
             {isRequired && <span className="text-brand ml-1">*</span>}
             {question.readonly && (
