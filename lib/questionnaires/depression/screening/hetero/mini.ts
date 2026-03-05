@@ -318,42 +318,46 @@ const SECTION_C: Question[] = [
 
   boolQ('minic1a', "C1 a Avez-vous déjà eu une période où vous vous sentiez tellement exalté(e) ou plein(e) d’énergie que cela vous a posé des problèmes ou que certaines personnes, notamment dans votre entourage,  ont pensé que vous n’étiez pas dans votre état habituel ? (Ne prenez pas en compte les périodes pendant lesquelles vous étiez sous l’effet de drogues ou d’alcool.)", { required: true }),
   boolQ('minic1b', "C1 b Vous sentez-vous, en ce moment, exalté(e) ou plein(e) d'énergie ?", {
-    indentLevel: 1,
-    display_if: yes('minic1a')
-  }),
+    required: true }),
 
   boolQ('minic2a', "C2 a Avez-vous déjà eu une période de plusieurs jours où vous étiez tellement irritable que vous en arriviez à insulter les gens, à hurler, voire à vous battre avec des personnes extérieures à votre famille? Aviez-vous vous-même remarqué ou les autres, avaient-ils remarqué que vous étiez  plus irritable ou que vous réagissiez plus vivement que les autres, même dans des situations  où vous trouviez cela justifié ?", { required: true }),
   boolQ('minic2b', "C2 b Vous sentez-vous excessivement irritable en ce moment ?", {
-    indentLevel: 1,
-    display_if: yes('minic2a')
-  }),
+    required: true }),
 
-  // C3 items: shown if C1a or C2a is Oui
+  { id: 'minic_gate_info', text: "Lorsque vous vous sentiez exalté(e), plein(e) d’énergie/irritable :", type: 'instruction', required: false, display_if: or(yes('minic1a'), yes('minic2a')) },
+
+  // C3 — si C1b ou C2b = OUI → épisode actuel + passé ; si C1b et C2b = NON → seulement épisode passé
   ...[
-    ['minic3aea', 'minic3aep', "C3 a) Sentiment de pouvoir faire des choses dont les autres seraient incapables ou d'être quelqu'un de particulièrement important ?"],
-    ['minic3bea', 'minic3bep', "C3 b) Moins besoin de sommeil que d'habitude ?"],
-    ['minic3cea', 'minic3cep', "C3 c) Parliez-vous sans arrêt ou si vite que les gens avaient du mal à vous comprendre ?"],
-    ['minic3dea', 'minic3dep', "C3 d) Vos pensées défilaient-elles si vite que vous ne pouviez pas bien les suivre ?"],
-    ['minic3eea', 'minic3eep', "C3 e) Étiez-vous facilement distrait(e) ?"],
-    ['minic3fea', 'minic3fep', "C3 f) Étiez-vous nettement plus actif(ve) et entreprenant(e) ?"],
-    ['minic3gea', 'minic3gep', "C3 g) Aviez-vous tellement envie de faire des choses agréables que vous aviez tendance à en oublier les risques ?"],
-  ].flatMap(([ea, ep, text]) => [
-    boolQ(ea, `${text} (Episode actuel)`, {
-      display_if: or(yes('minic1b'), yes('minic2b'))
-    }),
-    boolQ(ep, `${text} (Episode passé)`, {
-      display_if: or(yes('minic1a'), yes('minic2a'))
-    }),
-  ]),
-
-  boolQ('minic3aeac', "Idée délirante concordante ? (Episode actuel)", {
-    indentLevel: 1,
-    display_if: yes('minic3aea')
-  }),
-  boolQ('minic3aepbis', "Idée délirante concordante ? (Episode passé)", {
-    indentLevel: 1,
-    display_if: yes('minic3aep')
-  }),
+    ['minic3aea', 'minic3aep', "C3 a) Aviez-vous le sentiment que vous auriez pu faire des choses dont les autres seraient incapables ou que vous étiez quelqu’un de particulièrement important "],
+    ['minic3bea', 'minic3bep', "C3 b) Aviez-vous moins besoin de sommeil que d’habitude (vous sentiez-vous reposé(e) après seulement quelques heures de sommeil) "],
+    ['minic3cea', 'minic3cep', "C3 c) Parliez-vous sans arrêt ou si vite que les gens avaient du mal à vous comprendre "],
+    ['minic3dea', 'minic3dep', "C3 d) Vos pensées défilaient-elles si vite que vous ne pouviez pas bien les suivre "],
+    ['minic3eea', 'minic3eep', "C3 e) Etiez-vous facilement distrait(e) que la moindre interruption vous faisait perdre le fil de ce que vous faisiez ou pensiez "],
+    ['minic3fea', 'minic3fep', "C3 f) Etiez-vous nettement plus actif(e) et entreprenant(e), au travail, à l’école, socialement, sexuellement ou vous sentiez-vous incapable de tenir en place ou particulièrement nerveux(se) en permanence "],
+    ['minic3gea', 'minic3gep', "C3 g) Aviez-vous tellement envie de faire des choses qui vous paraissaient agréables ou tentantes que vous aviez tendance à en oublier les risques ou les difficultés qu’elles auraient pu entraîner (faire des achats inconsidérés, conduire  imprudemment, avoir une activité sexuelle excessive et irréfléchie) "],
+  ].flatMap(([ea, ep, text], idx) => {
+    const actuel = boolQ(ea, `${text} - Episode actuel ?`, {
+      display_if: or(yes('minic1b'), yes('minic2b')),
+    });
+    const passe = boolQ(ep, `${text} - Episode passé ?`, {
+      display_if: or(yes('minic1a'), yes('minic2a')),
+    });
+    if (idx === 0) {
+      return [
+        actuel,
+        boolQ('minic3aeac', "Demandez des examples. Les exemples concordent avec une idée délirante - Episode actuel", {
+          indentLevel: 1,
+          display_if: yes('minic3aea'),
+        }),
+        passe,
+        boolQ('minic3aepbis', "Demandez des examples. Les exemples concordent avec une idée délirante - Episode passé", {
+          indentLevel: 1,
+          display_if: yes('minic3aep'),
+        }),
+      ];
+    }
+    return [actuel, passe];
+  }).flat(),
 
   {
     id: 'minic3_recap_info',

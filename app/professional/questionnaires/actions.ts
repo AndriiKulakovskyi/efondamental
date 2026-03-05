@@ -593,6 +593,8 @@ export async function submitProfessionalQuestionnaireAction(
         const miniResponses = { ...(responses as any) };
         if (miniResponses.minia1a === 0) miniResponses.minia1b = 0;
         if (miniResponses.minia2a === 0) miniResponses.minia2b = 0;
+        if (miniResponses.minic1a === 0) miniResponses.minic1b = 0;
+        if (miniResponses.minic2a === 0) miniResponses.minic2b = 0;
         result = await saveDepressionMiniResponse({
           visit_id: visitId,
           patient_id: patientId,

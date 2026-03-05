@@ -196,10 +196,12 @@ export function QuestionnaireRenderer({
       }
     }
 
-    // MINI: when A1a is NON, A1b must be NON; when A2a is NON, A2b must be NON
+    // MINI: when A1a/A2a/C1a/C2a is NON, corresponding A1b/A2b/C1b/C2b must be NON
     if (questionnaire.code === 'MINI') {
       if (initialized.minia1a === 0) initialized.minia1b = 0;
       if (initialized.minia2a === 0) initialized.minia2b = 0;
+      if (initialized.minic1a === 0) initialized.minic1b = 0;
+      if (initialized.minic2a === 0) initialized.minic2b = 0;
       // Évaluation diagnostique A (minia5bis): au moins 5 OUI entre A1b/A2b et A3, et A4 = OUI pour la période
       const oui = (v: any) => v === 1 || v === '1';
       let currentOk = false;
@@ -2703,10 +2705,12 @@ export function QuestionnaireRenderer({
         [questionId]: value,
       };
 
-      // MINI: when A1a or A2a is set to NON, force A1b or A2b to NON
+      // MINI: when A1a/A2a/C1a/C2a is set to NON, force corresponding *b to NON
       if (questionnaire.code === 'MINI') {
         if (questionId === 'minia1a' && value === 0) updated.minia1b = 0;
         if (questionId === 'minia2a' && value === 0) updated.minia2b = 0;
+        if (questionId === 'minic1a' && value === 0) updated.minic1b = 0;
+        if (questionId === 'minic2a' && value === 0) updated.minic2b = 0;
         // Recompute minia5bis when any Section A dependency changes
         const minia5bisDeps = ['minia1a', 'minia2a', 'minia1b', 'minia2b', 'minia3ads', 'minia3bds', 'minia3cds', 'minia3dsd', 'minia3esd', 'minia3fsd', 'minia3gsd', 'minia4sd', 'minia3aep', 'minia3bep', 'minia3cep', 'minia3dep', 'minia3eep', 'minia3fep', 'minia3gep', 'minia4ep'];
         if (minia5bisDeps.includes(questionId)) {
@@ -2989,7 +2993,9 @@ export function QuestionnaireRenderer({
     // MINI: when A1a or A2a is NON, A1b or A2b is forced to NON and read-only
     const isMiniA1bLocked = questionnaire.code === 'MINI' && question.id === 'minia1b' && responses.minia1a === 0;
     const isMiniA2bLocked = questionnaire.code === 'MINI' && question.id === 'minia2b' && responses.minia2a === 0;
-    const value = (isMiniA1bLocked || isMiniA2bLocked) ? 0 : responses[question.id];
+    const isMiniC1bLocked = questionnaire.code === 'MINI' && question.id === 'minic1b' && responses.minic1a === 0;
+    const isMiniC2bLocked = questionnaire.code === 'MINI' && question.id === 'minic2b' && responses.minic2a === 0;
+    const value = (isMiniA1bLocked || isMiniA2bLocked || isMiniC1bLocked || isMiniC2bLocked) ? 0 : responses[question.id];
 
     // Check if this question belongs to a collapsed section (skip if called from grouped view)
     if (!skipSectionCheck) {
@@ -3223,7 +3229,7 @@ export function QuestionnaireRenderer({
               const finalVal = isNaN(numVal) ? val : numVal;
               handleResponseChange(question.id, finalVal);
             }}
-            disabled={readonly || question.readonly || isMiniA1bLocked || isMiniA2bLocked}
+            disabled={readonly || question.readonly || isMiniA1bLocked || isMiniA2bLocked || isMiniC1bLocked || isMiniC2bLocked}
             required={isRequired}
           >
             <SelectTrigger 
