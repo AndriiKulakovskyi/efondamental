@@ -91,64 +91,61 @@ const SECTION_A: Question[] = [
   boolQ('minia2a', "A2 a) Vous êtes-vous déjà senti(e), pendant une période de deux semaines, nettement moins intéressé(e) par la plupart des choses, ou nettement moins capable de prendre plaisir aux choses auxquelles vous preniez plaisir habituellement ?", { required: true }),
 
   boolQ('minia2b', "A2 b) Au cours des deux dernières semaines, aviez-vous presque tout le temps le sentiment de n'avoir plus goût à rien, d'avoir perdu l'intérêt ou le plaisir pour les choses qui vous plaisent habituellement ?", {
-    indentLevel: 1,
   }),
 
-  { id: 'minia_gate_info', text: "Si A1b ou A2b est OUI, explorez l'épisode actuel ET l'épisode passé. Si A1b et A2b sont NON, explorez seulement l'épisode passé.", type: 'instruction', required: false, display_if: or(yes('minia1a'), yes('minia2a')) },
+  { id: 'minia_gate_info', text: "Au cours de cette période de deux semaines pendant laquelle vous vous sentiez  déprimé(e) et/ou sans intérêt pour la plupart des choses : ", type: 'instruction', required: false, display_if: or(yes('minia1a'), yes('minia2a')) },
 
-  // A3 items: shown if A1a or A2a is Oui
-  boolQ('minia3ads', "A3 a) Votre appétit a-t-il notablement changé ? Avez-vous pris ou perdu du poids sans en avoir l'intention ? (2 dernières semaines)", {
-    display_if: or(yes('minia1b'), yes('minia2b'))
+  // A3 items — affichage : si A1b OU A2b = OUI → épisode actuel (2 dern. sem.) + épisode passé ; si A1b ET A2b = NON → seulement épisode passé
+  boolQ('minia3ads', "A3 a) Votre appétit a-t-il notablement changé ? Avez-vous pris ou perdu du poids sans en avoir l'intention (variation au cours du mois de ±5%, c.à.d. ± 8lbs., pour une personne de 65 kg/120 lbs.) — 2 dernières semaines?", {
+    display_if: or(yes('minia1b'), yes('minia2b')),
   }),
-  boolQ('minia3aep', "A3 a) (Episode passé)", {
-    display_if: or(yes('minia1a'), yes('minia2a'))
+  boolQ('minia3aep', "A3 a) Episode passé", {
+    display_if: or(yes('minia1a'), yes('minia2a')),
   }),
-  boolQ('minia3bds', "A3 b) Aviez-vous des problèmes de sommeil presque toutes les nuits ? (2 dernières semaines)", {
-    display_if: or(yes('minia1b'), yes('minia2b'))
+  boolQ('minia3bds', "A3 b) Aviez-vous des problèmes de sommeil presque toutes les nuits (difficultés d’endormissements, réveils nocturnes ou précoces, dormir trop) — 2 dernières semaines?", {
+    display_if: or(yes('minia1b'), yes('minia2b')),
   }),
-  boolQ('minia3bep', "A3 b) (Episode passé)", {
-    display_if: or(yes('minia1a'), yes('minia2a'))
+  boolQ('minia3bep', "A3 b) Episode passé", {
+    display_if: or(yes('minia1a'), yes('minia2a')),
   }),
-  boolQ('minia3cds', "A3 c) Parliez-vous ou vous déplaciez-vous plus lentement que d'habitude ou, au contraire, vous sentiez-vous agité(e) ? (2 dernières semaines)", {
-    display_if: or(yes('minia1b'), yes('minia2b'))
+  boolQ('minia3cds', "A3 c) Parliez-vous ou vous déplacez-vous plus lentement que d’habitude ou, au contraire, vous sentiez-vous agité(e) et aviez-vous du mal à rester en place, presque tous les jours— 2 dernières semaines?", {
+    display_if: or(yes('minia1b'), yes('minia2b')),
   }),
-  boolQ('minia3cep', "A3 c) (Episode passé)", {
-    display_if: or(yes('minia1a'), yes('minia2a'))
+  boolQ('minia3cep', "A3 c) Episode passé", {
+    display_if: or(yes('minia1a'), yes('minia2a')),
   }),
-  boolQ('minia3dsd', "A3 d) Vous sentiez-vous fatigué(e), sans énergie, et ce presque tous les jours ? (2 dernières semaines)", {
-    display_if: or(yes('minia1b'), yes('minia2b'))
+  boolQ('minia3dsd', "A3 d) Vous sentiez-vous fatigué(e), sans énergie, et ce presque tous les jours — 2 dernières semaines?", {
+    display_if: or(yes('minia1b'), yes('minia2b')),
   }),
-  boolQ('minia3dep', "A3 d) (Episode passé)", {
-    display_if: or(yes('minia1a'), yes('minia2a'))
+  boolQ('minia3dep', "A3 d) Episode passé", {
+    display_if: or(yes('minia1a'), yes('minia2a')),
   }),
-  boolQ('minia3esd', "A3 e) Vous sentiez-vous sans valeur ou coupable, et ce presque tous les jours ? (2 dernières semaines)", {
-    display_if: or(yes('minia1b'), yes('minia2b'))
+  boolQ('minia3esd', "A3 e) Vous sentiez-vous sans valeur ou coupable, et ce presque tous les jours — 2 dernières semaines?", {
+    display_if: or(yes('minia1b'), yes('minia2b')),
   }),
-  boolQ('minia3eep', "A3 e) (Episode passé)", {
-    display_if: or(yes('minia1a'), yes('minia2a'))
+  boolQ('minia3eep', "A3 e) Episode passé", {
+    display_if: or(yes('minia1a'), yes('minia2a')),
   }),
-  boolQ('minia3fsd', "A3 f) Aviez-vous du mal à vous concentrer ou à prendre des décisions ? (2 dernières semaines)", {
-    display_if: or(yes('minia1b'), yes('minia2b'))
+  boolQ('minia3fsd', "A3 f) Aviez-vous du mal à vous concentrer ou à prendre des décisions, et ce presque tous les jours — 2 dernières semaines?", {
+    display_if: or(yes('minia1b'), yes('minia2b')),
   }),
-  boolQ('minia3fep', "A3 f) (Episode passé)", {
-    display_if: or(yes('minia1a'), yes('minia2a'))
+  boolQ('minia3fep', "A3 f) Episode passé", {
+    display_if: or(yes('minia1a'), yes('minia2a')),
   }),
-  boolQ('minia3gsd', "A3 g) Avez-vous pensé au suicide, à vous faire du mal ou tenté/planifié un suicide ? (2 dernières semaines)", {
-    display_if: or(yes('minia1b'), yes('minia2b'))
+  boolQ('minia3gsd', "A3 g) Avez-vous, à plusieurs reprises, pensé qu’il vaudrait mieux que vous soyez mort(e), pensé au suicide ou à vous faire du mal ? Avez-vous tenté ou planifié un suicide ? — 2 dernières semaines?", {
+    display_if: or(yes('minia1b'), yes('minia2b')),
   }),
-  boolQ('minia3gep', "A3 g) (Episode passé)", {
-    display_if: or(yes('minia1a'), yes('minia2a'))
+  boolQ('minia3gep', "A3 g) Episode passé", {
+    display_if: or(yes('minia1a'), yes('minia2a')),
   }),
   boolQ('minia3eeac', "Les exemples concordent avec une idée délirante (Episode actuel)", {
-    indentLevel: 1,
     display_if: or(yes('minia3esd'), yes('minia3eep')),
     help: "DEMANDEZ DES EXEMPLES."
   }),
   boolQ('minia3eepbis', "Les exemples concordent avec une idée délirante (Episode passé)", {
-    indentLevel: 1,
     display_if: yes('minia3eep')
   }),
-  boolQ('minia4sd', "A4) Les problèmes ont-ils entraîné des difficultés significatives ? (2 dernières semaines)", {
+  boolQ('minia4sd', "A4) Les problèmes ont-ils entraîné des difficultés significatives — 2 dernières semaines?", {
     required: true,
     display_if: or(yes('minia1b'), yes('minia2b'))
   }),
