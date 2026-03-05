@@ -589,11 +589,15 @@ export async function submitProfessionalQuestionnaireAction(
           ...(responses as any),
         } as DepressionThaseRushResponseInsert);
       } else if (questionnaireCode === 'MINI') {
+        // When A1a is NON, A1b must be NON; when A2a is NON, A2b must be NON
+        const miniResponses = { ...(responses as any) };
+        if (miniResponses.minia1a === 0) miniResponses.minia1b = 0;
+        if (miniResponses.minia2a === 0) miniResponses.minia2b = 0;
         result = await saveDepressionMiniResponse({
           visit_id: visitId,
           patient_id: patientId,
           completed_by: completedBy,
-          ...(responses as any),
+          ...miniResponses,
         } as DepressionMiniResponseInsert);
       } else if (questionnaireCode === 'INCLUSION') {
         result = await saveDepressionInclusionResponse({

@@ -184,9 +184,15 @@ export function QuestionnaireRenderer({
         console.log('[Male Gender Init] No patient_gender found in initialized responses');
       }
     }
-    
+
+    // MINI: when A1a is NON, A1b must be NON; when A2a is NON, A2b must be NON
+    if (questionnaire.code === 'MINI') {
+      if (initialized.minia1a === 0) initialized.minia1b = 0;
+      if (initialized.minia2a === 0) initialized.minia2b = 0;
+    }
+
     return initialized;
-  }, [stableInitialResponses, questionnaire.questions]);
+  }, [stableInitialResponses, questionnaire.questions, questionnaire.code]);
 
   const [responses, setResponses] = useState<Record<string, any>>(initializeResponses);
   const [errors, setErrors] = useState<string[]>([]);
@@ -2670,7 +2676,13 @@ export function QuestionnaireRenderer({
         ...prev,
         [questionId]: value,
       };
-      
+
+      // MINI: when A1a or A2a is set to NON, force A1b or A2b to NON
+      if (questionnaire.code === 'MINI') {
+        if (questionId === 'minia1a' && value === 0) updated.minia1b = 0;
+        if (questionId === 'minia2a' && value === 0) updated.minia2b = 0;
+      }
+
       // Calculate computed fields when their dependencies change
       questionnaire.questions.forEach((q) => {
         if (q.computed && q.computed.dependencies.includes(questionId)) {
@@ -2926,7 +2938,10 @@ export function QuestionnaireRenderer({
     }
 
     const isRequired = requiredQuestions.includes(question.id);
-    const value = responses[question.id];
+    // MINI: when A1a or A2a is NON, A1b or A2b is forced to NON and read-only
+    const isMiniA1bLocked = questionnaire.code === 'MINI' && question.id === 'minia1b' && responses.minia1a === 0;
+    const isMiniA2bLocked = questionnaire.code === 'MINI' && question.id === 'minia2b' && responses.minia2a === 0;
+    const value = (isMiniA1bLocked || isMiniA2bLocked) ? 0 : responses[question.id];
 
     // Check if this question belongs to a collapsed section (skip if called from grouped view)
     if (!skipSectionCheck) {
@@ -3159,7 +3174,7 @@ export function QuestionnaireRenderer({
               const finalVal = isNaN(numVal) ? val : numVal;
               handleResponseChange(question.id, finalVal);
             }}
-            disabled={readonly || question.readonly}
+            disabled={readonly || question.readonly || isMiniA1bLocked || isMiniA2bLocked}
             required={isRequired}
           >
             <SelectTrigger 

@@ -86,15 +86,12 @@ const SECTION_A: Question[] = [
   boolQ('minia1a', "A1 a) Vous est-il déjà arrivé de vous sentir particulièrement triste ou déprimé(e), la plupart du temps au cours de la journée, et ce, presque tous les jours, pendant une période de 2 semaines ?", { required: true }),
 
   boolQ('minia1b', "A1 b) Au cours des deux dernières semaines, vous êtes-vous senti(e) particulièrement triste, cafardeux(se), déprimé(e), la plupart du temps au cours de la journée et ce, presque tous les jours ?", {
-    indentLevel: 1,
-    display_if: yes('minia1a')
   }),
 
   boolQ('minia2a', "A2 a) Vous êtes-vous déjà senti(e), pendant une période de deux semaines, nettement moins intéressé(e) par la plupart des choses, ou nettement moins capable de prendre plaisir aux choses auxquelles vous preniez plaisir habituellement ?", { required: true }),
 
   boolQ('minia2b', "A2 b) Au cours des deux dernières semaines, aviez-vous presque tout le temps le sentiment de n'avoir plus goût à rien, d'avoir perdu l'intérêt ou le plaisir pour les choses qui vous plaisent habituellement ?", {
     indentLevel: 1,
-    display_if: yes('minia2a')
   }),
 
   { id: 'minia_gate_info', text: "Si A1b ou A2b est OUI, explorez l'épisode actuel ET l'épisode passé. Si A1b et A2b sont NON, explorez seulement l'épisode passé.", type: 'instruction', required: false, display_if: or(yes('minia1a'), yes('minia2a')) },
