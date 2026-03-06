@@ -365,14 +365,17 @@ const SECTION_C: Question[] = [
     if (idx === 0) {
       return [
         actuel,
-        boolQ('minic3aeac', "Demandez des examples. Les exemples concordent avec une idée délirante - Episode actuel", {
+        passe,
+        boolQ('minic3aeac', "Demandez des examples. Les exemples concordent avec une idée délirante - Episode actuel ?", {
           indentLevel: 1,
           display_if: yes('minic3aea'),
+          metadata: { miniEpisodePairKey: 'minic3adelirant', miniEpisodePeriod: 'current' },
+          help: "DEMANDEZ DES EXEMPLES.",
         }),
-        passe,
-        boolQ('minic3aepbis', "Demandez des examples. Les exemples concordent avec une idée délirante - Episode passé", {
+        boolQ('minic3aepbis', "Demandez des examples. Les exemples concordent avec une idée délirante - Episode passé ?", {
           indentLevel: 1,
           display_if: yes('minic3aep'),
+          metadata: { miniEpisodePairKey: 'minic3adelirant', miniEpisodePeriod: 'past' },
         }),
       ];
     }
