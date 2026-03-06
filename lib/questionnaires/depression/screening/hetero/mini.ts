@@ -481,50 +481,59 @@ const SECTION_C: Question[] = [
 const SECTION_D: Question[] = [
   { id: 'section_d', text: 'D. TROUBLE PANIQUE', type: 'section', required: false },
 
-  boolQ('minid1a', "D1 a) Avez-vous, à plus d'une occasion, eu des crises durant lesquelles vous vous êtes senti(e) subitement très anxieux(se) ?", { required: true }),
+  boolQ('minid1a', "D1 a) Avez-vous, à plus d’une occasion, eu des périodes ou des crises durant lesquelles vous vous êtes senti(e) subitement très anxieux(se), très mal à l’aise ou effrayé(e), même dans des situations où la plupart des gens ne le seraient pas ?", { required: true }),
   boolQ('minid1b', "D1 b) Ces crises atteignaient-elles leur intensité maximale en moins de 10 minutes ?", {
     required: true,
-    indentLevel: 1,
-    display_if: yes('minid1a')
+    // indentLevel: 1,
+    // display_if: yes('minid1a')
   }),
-  boolQ('minid2', "D2 Certaines de ces crises ont-elles été imprévisibles ?", {
+  boolQ('minid2', "D2 Certaines de ces crises, même il y a longtemps, ont-elles été imprévisibles, ou sont-elles survenues sans que rien ne les provoque ?", {
     required: true,
-    indentLevel: 1,
-    display_if: and(yes('minid1a'), yes('minid1b'))
+    // indentLevel: 1,
+    // display_if: and(yes('minid1a'), yes('minid1b'))
   }),
-  boolQ('minid3', "D3 Avez-vous eu une période d'au moins un mois durant laquelle vous redoutiez d'avoir d'autres crises ?", {
+  boolQ('minid3', "D3 A la suite de l'une ou plusieurs de ces crises, avez-vous déjà eu une période d'au moins un mois durant laquelle vous redoutiez d'avoir d'autres crises où étiez préoccupé(e) par leurs conséquences éventuelles, ou avez-vous radicalement changé votre comportement du fait de ces crises (par ex. vous ne faites plus vos courses sans être accompagné(e), vous refusez de quitter votre domicile, vous vous rendez très fréquemment aux urgences ou vous allez plus souvent chez le médecin en raison de vos symptômes) ?", {
     required: true,
-    indentLevel: 1,
-    display_if: and(yes('minid1a'), yes('minid1b'), yes('minid2'))
+    // indentLevel: 1,
+    // display_if: and(yes('minid1a'), yes('minid1b'), yes('minid2'))
   }),
+  {
+    id: 'minid_recap_info',
+    text: 'Au cours de la crise où vous êtes vous senti(e) le plus mal :',
+    type: 'instruction',
+    required: false,
+  },
 
   ...[
-    ['minid4a', 'Palpitations ?'],
-    ['minid4b', 'Transpiration/mains moites ?'],
-    ['minid4c', 'Tremblements ?'],
-    ['minid4d', 'Mal à respirer/étouffer ?'],
-    ['minid4e', 'Impression de suffoquer ?'],
-    ['minid4f', 'Douleur thoracique ?'],
-    ['minid4g', 'Nausée/gêne estomac ?'],
-    ['minid4h', 'Vertige/évanouir ?'],
-    ['minid4i', 'Choses étranges/irréelles ?'],
-    ['minid4j', 'Peur de perdre le contrôle ?'],
-    ['minid4k', 'Peur de mourir ?'],
-    ['minid4l', 'Engourdissements/picotements ?'],
-    ['minid4m', 'Bouffées de chaleur/frissons ?'],
+    ['minid4a', 'Aviez-vous des palpitations votre coeur battait-il très fort ou de façon irrégulière ?'],
+    ['minid4b', 'Transpiriez-vous ou aviez-vous les mains moites ?'],
+    ['minid4c', 'Aviez-vous des tremblements ou des secousses musculaires ?'],
+    ['minid4d', "Aviez-vous du mal à respirer ou l'impression d'étouffer ?"],
+    ['minid4e', "Aviez-vous l'impression de suffoquer ou d'avoir une boule dans la gorge ?"],
+    ['minid4f', "Ressentiez-vous une douleur, une pression ou une gêne au niveau du thorax ?"],
+    ['minid4g', "Aviez-vous la nausée, une gêne au niveau de l'estomac ou une diarrhée soudaine ?"],
+    ['minid4h', "Vous sentiez-vous étourdi(e), pris(e) de vertige, ou sur le point de vous évanouir ?"],
+    ['minid4i', "Aviez-vous l'impression que les choses qui vous entouraient étaient étranges ou irréelles où vous sentiez-vous détaché(e) de tout ou d'une partie de votre corps ?"],
+    ['minid4j', "Aviez-vous peur de perdre le contrôle ou de devenir fou (folle) ?"],
+    ['minid4k', "Aviez-vous peur de mourir ?"],
+    ['minid4l', "Aviez-vous des engourdissements des picotements ?"],
+    ['minid4m', "Aviez-vous des bouffées de chaleur ou des frissons ?"],
   ].map(([id, text]) => boolQ(id, `D4 ${text}`, {
-    indentLevel: 1,
-    display_if: yes('minid2')
   })),
+
+  {
+    id: 'minid5',
+    text: 'D5 D3 et au moins 4 des questions ci-dessus (section D4) sont-elles cotées oui ? Trouble panique. Si oui à D5, passez directement à D7.',
+    type: 'single_choice',
+    required: false,
+    readonly: true,
+    options: OUI_NON,
+    display_if: yes('minid2'),
+    metadata: { displayOnly: true },
+  },
 
   boolQ('minid7', "D7 Au cours du mois écoulé, avez-vous eu de telles crises à plusieurs reprises avec peur constante ?", {
     required: true,
-    indentLevel: 1,
-    display_if: and(
-      yes('minid2'),
-      yes('minid3'),
-      gte(sum(['minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m']), 4)
-    )
   }),
   {
     id: 'minid_diag_lifetime',
@@ -1272,6 +1281,16 @@ export function interpretMiniSuicideRisk(score: number): string {
   if (score <= 8) return `Score ${score}. Risque suicidaire faible (1-8 points).`;
   if (score <= 16) return `Score ${score}. Risque suicidaire modéré (9-16 points). Surveillance recommandée.`;
   return `Score ${score}. Risque suicidaire élevé (≥ 17 points). Intervention urgente nécessaire.`;
+}
+
+const D4_IDS = ['minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m'];
+
+/** OUI (1) if D3 = OUI and at least 4 D4 items are OUI. NON (0) otherwise. */
+export function computeMiniD5(responses: Record<string, any>): 0 | 1 {
+  const oui = (v: any) => v === 1 || v === '1';
+  if (!oui(responses.minid3)) return 0;
+  const d4Count = D4_IDS.filter((id) => oui(responses[id])).length;
+  return d4Count >= 4 ? 1 : 0;
 }
 
 const C3_ACTUEL_IDS = ['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea'];
