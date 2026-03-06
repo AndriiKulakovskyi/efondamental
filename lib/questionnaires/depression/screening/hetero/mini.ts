@@ -531,44 +531,30 @@ const SECTION_D: Question[] = [
     display_if: yes('minid2'),
     metadata: { displayOnly: true },
   },
+  
+  boolQ('minid5_tp_vie', "Trouble panique vie entière", {
+    indentLevel: 1,
+    display_if: yes('minid5'),
+  }),
+  boolQ('minid5_sapl_vie', "Symptômes anxieux paroxystiques limités vie entière", {
+    indentLevel: 1,
+    display_if: yes('minid5'),
+  }),
 
-  boolQ('minid7', "D7 Au cours du mois écoulé, avez-vous eu de telles crises à plusieurs reprises avec peur constante ?", {
+  {
+    id: 'minid6',
+    text: 'D6 Si D5 = Non, une ou plusieurs des questions ci-dessus (section D4) est-elle cotée oui ? Si non passez directement à E1.',
+    type: 'single_choice',
+    required: false,
+    readonly: true,
+    options: OUI_NON,
+    display_if: and(yes('minid2'), no('minid5')),
+    metadata: { displayOnly: true },
+  },
+
+  boolQ('minid7', "D7 Au cours du mois écoulé, avez-vous eu de telles crises à plusieurs reprises (au moins 2 fois) en ayant constamment peur d’en avoir une autre, ou vous êtes-vous inquiété(e) des conséquences de ces crises, ou avez-vous changé votre comportement d’une manière ou d’une autre du fait de ces crises ?", {
     required: true,
   }),
-  {
-    id: 'minid_diag_lifetime',
-    text: 'Diagnostic (D) : TROUBLE PANIQUE VIE ENTIÈRE (si D3 = OUI et ≥ 4 symptômes D4 = OUI).',
-    type: 'instruction',
-    required: false,
-    display_if: and(
-      yes('minid2'),
-      yes('minid3'),
-      gte(sum(['minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m']), 4)
-    )
-  },
-  {
-    id: 'minid_diag_limited',
-    text: 'Diagnostic (D) : SYMPTÔMES ANXIEUX PAROXYSTIQUES LIMITÉS VIE ENTIÈRE (si ≥ 1 symptôme D4 = OUI mais D5 = NON).',
-    type: 'instruction',
-    required: false,
-    display_if: and(
-      yes('minid2'),
-      not(and(yes('minid3'), gte(sum(['minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m']), 4))),
-      gt(sum(['minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m']), 0)
-    )
-  },
-  {
-    id: 'minid_diag_current',
-    text: 'Diagnostic (D) : TROUBLE PANIQUE ACTUEL (si D7 = OUI).',
-    type: 'instruction',
-    required: false,
-    display_if: and(
-      yes('minid2'),
-      yes('minid3'),
-      gte(sum(['minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m']), 4),
-      yes('minid7')
-    )
-  },
 ];
 
 // ============================================================================
@@ -1291,6 +1277,13 @@ export function computeMiniD5(responses: Record<string, any>): 0 | 1 {
   if (!oui(responses.minid3)) return 0;
   const d4Count = D4_IDS.filter((id) => oui(responses[id])).length;
   return d4Count >= 4 ? 1 : 0;
+}
+
+/** OUI (1) if D5 = NON and at least 1 D4 item is OUI. NON (0) otherwise. */
+export function computeMiniD6(responses: Record<string, any>): 0 | 1 {
+  const oui = (v: any) => v === 1 || v === '1';
+  if (oui(responses.minid5)) return 0;
+  return D4_IDS.some((id) => oui(responses[id])) ? 1 : 0;
 }
 
 const C3_ACTUEL_IDS = ['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea'];

@@ -49,6 +49,7 @@ import {
   getMiniSuicideRiskLevel,
   computeMinic3SymptomesOk,
   computeMiniD5,
+  computeMiniD6,
 } from "@/lib/questionnaires/depression/screening/hetero/mini";
 
 interface QuestionnaireRendererProps {
@@ -223,6 +224,8 @@ export function QuestionnaireRenderer({
       initialized.minic3_symptomes_ok = computeMinic3SymptomesOk(initialized);
       // D5 : D3 OUI et ≥ 4 D4 OUI → minid5
       initialized.minid5 = computeMiniD5(initialized);
+      // D6 : D5 NON et ≥ 1 D4 OUI → minid6
+      initialized.minid6 = computeMiniD6(initialized);
     }
 
     return initialized;
@@ -2747,6 +2750,11 @@ export function QuestionnaireRenderer({
         const minid5Deps = ['minid3', 'minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m'];
         if (minid5Deps.includes(questionId)) {
           updated.minid5 = computeMiniD5(updated);
+        }
+        // D6 : recalcul D5 NON + ≥1 D4 OUI → minid6
+        const minid6Deps = ['minid5', 'minid4a', 'minid4b', 'minid4c', 'minid4d', 'minid4e', 'minid4f', 'minid4g', 'minid4h', 'minid4i', 'minid4j', 'minid4k', 'minid4l', 'minid4m'];
+        if (minid6Deps.includes(questionId)) {
+          updated.minid6 = computeMiniD6(updated);
         }
       }
 
