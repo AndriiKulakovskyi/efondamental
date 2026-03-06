@@ -3327,6 +3327,182 @@ export function QuestionnaireRenderer({
     );
   };
 
+  type MiniEpisodePeriod = 'current' | 'past';
+
+  const getMiniEpisodeMeta = (question: Question): { pairKey: string | null; period: MiniEpisodePeriod | null } => {
+    const meta = question.metadata as Record<string, unknown> | undefined;
+    const pairKey = typeof meta?.['miniEpisodePairKey'] === 'string' ? (meta['miniEpisodePairKey'] as string) : null;
+    const period = meta?.['miniEpisodePeriod'] === 'current' || meta?.['miniEpisodePeriod'] === 'past'
+      ? (meta['miniEpisodePeriod'] as MiniEpisodePeriod)
+      : null;
+    return { pairKey, period };
+  };
+
+  const getMiniMatrixRowLabel = (stemText: string): string => {
+    return stemText
+      .replace(/\s*[—-]\s*2 dernières semaines\?\s*$/i, '')
+      .replace(/\s*-\s*Episode actuel\s*\?\s*$/i, '')
+      .replace(/\s*-\s*Episode passé\s*\?\s*$/i, '')
+      .trim();
+  };
+
+  const isOuiNonSingleChoice = (question: Question): boolean => {
+    if (question.type !== 'single_choice' || !question.options || question.options.length !== 2) return false;
+    const opts = question.options as any[];
+    const codes = opts.map((o) => (typeof o === 'string' ? o : o?.code));
+    const labels = opts.map((o) => (typeof o === 'string' ? o : o?.label)).filter(Boolean).map((l) => String(l).toLowerCase());
+    const has01 = codes.some((c) => c == 0) && codes.some((c) => c == 1);
+    const hasOuiNon = labels.some((l) => l.includes('oui')) && labels.some((l) => l.includes('non'));
+    return has01 && hasOuiNon;
+  };
+
+  const renderMiniMatrixControl = (question: Question) => {
+    const value = responses[question.id];
+    const isRequired = requiredQuestions.includes(question.id);
+    const disabled = readonly || question.readonly;
+
+    if (question.type === 'single_choice' && question.options) {
+      if (isOuiNonSingleChoice(question)) {
+        const current = value == null ? null : Number(value);
+        return (
+          <div className="flex items-center gap-2">
+            <div className={`inline-flex rounded-lg border p-1 ${disabled ? 'bg-slate-100 border-slate-200' : 'bg-white border-slate-200'}`}>
+              <button
+                type="button"
+                onClick={() => handleResponseChange(question.id, 1)}
+                disabled={disabled}
+                className={`px-3 py-1.5 text-sm rounded-md transition ${
+                  current === 1
+                    ? 'bg-brand text-white shadow-sm'
+                    : disabled
+                      ? 'text-slate-400'
+                      : 'text-slate-700 hover:bg-slate-50'
+                }`}
+                aria-label={`Oui (${question.id})`}
+                aria-pressed={current === 1}
+              >
+                Oui
+              </button>
+              <button
+                type="button"
+                onClick={() => handleResponseChange(question.id, 0)}
+                disabled={disabled}
+                className={`px-3 py-1.5 text-sm rounded-md transition ${
+                  current === 0
+                    ? 'bg-brand text-white shadow-sm'
+                    : disabled
+                      ? 'text-slate-400'
+                      : 'text-slate-700 hover:bg-slate-50'
+                }`}
+                aria-label={`Non (${question.id})`}
+                aria-pressed={current === 0}
+              >
+                Non
+              </button>
+            </div>
+
+            {!disabled && (
+              <button
+                type="button"
+                className="text-xs text-slate-400 hover:text-red-500 transition-colors underline"
+                onClick={() => handleResponseChange(question.id, null)}
+                aria-label={`Effacer (${question.id})`}
+              >
+                Effacer
+              </button>
+            )}
+
+            {isRequired && <span className="sr-only">Champ requis</span>}
+          </div>
+        );
+      }
+
+      return (
+        <Select
+          value={value !== undefined && value !== null ? value.toString() : ""}
+          onValueChange={(val) => {
+            const numVal = Number(val);
+            const finalVal = isNaN(numVal) ? val : numVal;
+            handleResponseChange(question.id, finalVal);
+          }}
+          disabled={disabled}
+          required={isRequired}
+        >
+          <SelectTrigger className="bg-slate-50 border-slate-200 rounded-lg px-3 py-2.5 transition hover:bg-white hover:border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand">
+            <SelectValue placeholder="Sélectionner" />
+          </SelectTrigger>
+          <SelectContent>
+            {question.options.map((option) => {
+              const optionValue = typeof option === 'string' ? option : option.code;
+              const optionLabel = typeof option === 'string' ? option : option.label;
+              return (
+                <SelectItem key={optionValue?.toString() || ''} value={optionValue?.toString() || ''}>
+                  {optionLabel}
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
+      );
+    }
+
+    // Fallback: render full question if an unexpected type is paired
+    return renderQuestion(question, true);
+  };
+
+  const renderMiniEpisodePairRow = (pairKey: string, pair: { current?: Question; past?: Question }) => {
+    const currentQ = pair.current;
+    const pastQ = pair.past;
+
+    const currentVisible = !!currentQ && visibleQuestions.includes(currentQ.id);
+    const pastVisible = !!pastQ && visibleQuestions.includes(pastQ.id);
+
+    const stemSource = currentQ?.text || pastQ?.text || '';
+    const label = getMiniMatrixRowLabel(stemSource);
+
+    return (
+      <div key={`mini-episode-pair-${pairKey}`} className="rounded-2xl border border-slate-200 bg-white">
+        <div className="px-5 py-4 border-b border-slate-100 bg-gradient-to-r from-amber-50 to-white rounded-t-2xl">
+          <div className="text-sm font-semibold text-slate-900 leading-relaxed">
+            <MarkdownContent content={label} inline />
+          </div>
+        </div>
+
+        <div className="p-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-xs font-semibold text-slate-700">Épisode actuel</div>
+                {currentQ && requiredQuestions.includes(currentQ.id) && (
+                  <div className="text-[11px] font-semibold text-red-600">Requis</div>
+                )}
+              </div>
+              {currentQ && currentVisible ? (
+                renderMiniMatrixControl(currentQ)
+              ) : (
+                <div className="text-sm text-slate-400 italic">Non applicable</div>
+              )}
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-xs font-semibold text-slate-700">Épisode passé</div>
+                {pastQ && requiredQuestions.includes(pastQ.id) && (
+                  <div className="text-[11px] font-semibold text-red-600">Requis</div>
+                )}
+              </div>
+              {pastQ && pastVisible ? (
+                renderMiniMatrixControl(pastQ)
+              ) : (
+                <div className="text-sm text-slate-400 italic">Non applicable</div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Group questions by sections for better organization
   const groupedQuestions = useCallback(() => {
     const groups: Array<{ section: Question | null; questions: Question[] }> = [];
@@ -3443,10 +3619,42 @@ export function QuestionnaireRenderer({
               <div className="p-6 pt-2 border-t border-slate-100 space-y-8">
                 {(() => {
                   const rendered = new Set<string>();
+                  const renderedMiniPairs = new Set<string>();
+                  const isMini = questionnaire.code === 'MINI';
+                  const miniPairsByKey = new Map<string, { current?: Question; past?: Question }>();
+
+                  if (isMini) {
+                    for (const q of group.questions) {
+                      const { pairKey, period } = getMiniEpisodeMeta(q);
+                      if (!pairKey || !period) continue;
+                      const existing = miniPairsByKey.get(pairKey) || {};
+                      if (period === 'current') existing.current = q;
+                      if (period === 'past') existing.past = q;
+                      miniPairsByKey.set(pairKey, existing);
+                    }
+                  }
+
                   return visibleGroupQuestions.map((question, qIndex) => {
                     // Skip if already rendered as part of a grouped pair
                     if (rendered.has(question.id)) {
                       return null;
+                    }
+
+                    // MINI: render "Actuel/Passé" paired questions as a 2-column matrix row
+                    if (isMini) {
+                      const { pairKey, period } = getMiniEpisodeMeta(question);
+                      if (pairKey && period) {
+                        if (renderedMiniPairs.has(pairKey)) {
+                          rendered.add(question.id);
+                          return null;
+                        }
+
+                        renderedMiniPairs.add(pairKey);
+                        const pair = miniPairsByKey.get(pairKey) || {};
+                        if (pair.current) rendered.add(pair.current.id);
+                        if (pair.past) rendered.add(pair.past.id);
+                        return renderMiniEpisodePairRow(pairKey, pair);
+                      }
                     }
 
                     const isUnitField = question.id.endsWith('_unit');

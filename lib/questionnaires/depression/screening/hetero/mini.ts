@@ -99,45 +99,59 @@ const SECTION_A: Question[] = [
   // A3 items — affichage : si A1b OU A2b = OUI → épisode actuel (2 dern. sem.) + épisode passé ; si A1b ET A2b = NON → seulement épisode passé
   boolQ('minia3ads', "A3 a) Votre appétit a-t-il notablement changé ? Avez-vous pris ou perdu du poids sans en avoir l'intention (variation au cours du mois de ±5%, c.à.d. ± 8lbs., pour une personne de 65 kg/120 lbs.) — 2 dernières semaines?", {
     display_if: or(yes('minia1b'), yes('minia2b')),
+    metadata: { miniEpisodePairKey: 'minia3a', miniEpisodePeriod: 'current' },
   }),
   boolQ('minia3aep', "A3 a) Episode passé", {
     display_if: or(yes('minia1a'), yes('minia2a')),
+    metadata: { miniEpisodePairKey: 'minia3a', miniEpisodePeriod: 'past' },
   }),
   boolQ('minia3bds', "A3 b) Aviez-vous des problèmes de sommeil presque toutes les nuits (difficultés d’endormissements, réveils nocturnes ou précoces, dormir trop) — 2 dernières semaines?", {
     display_if: or(yes('minia1b'), yes('minia2b')),
+    metadata: { miniEpisodePairKey: 'minia3b', miniEpisodePeriod: 'current' },
   }),
   boolQ('minia3bep', "A3 b) Episode passé", {
     display_if: or(yes('minia1a'), yes('minia2a')),
+    metadata: { miniEpisodePairKey: 'minia3b', miniEpisodePeriod: 'past' },
   }),
   boolQ('minia3cds', "A3 c) Parliez-vous ou vous déplacez-vous plus lentement que d’habitude ou, au contraire, vous sentiez-vous agité(e) et aviez-vous du mal à rester en place, presque tous les jours— 2 dernières semaines?", {
     display_if: or(yes('minia1b'), yes('minia2b')),
+    metadata: { miniEpisodePairKey: 'minia3c', miniEpisodePeriod: 'current' },
   }),
   boolQ('minia3cep', "A3 c) Episode passé", {
     display_if: or(yes('minia1a'), yes('minia2a')),
+    metadata: { miniEpisodePairKey: 'minia3c', miniEpisodePeriod: 'past' },
   }),
   boolQ('minia3dsd', "A3 d) Vous sentiez-vous fatigué(e), sans énergie, et ce presque tous les jours — 2 dernières semaines?", {
     display_if: or(yes('minia1b'), yes('minia2b')),
+    metadata: { miniEpisodePairKey: 'minia3d', miniEpisodePeriod: 'current' },
   }),
   boolQ('minia3dep', "A3 d) Episode passé", {
     display_if: or(yes('minia1a'), yes('minia2a')),
+    metadata: { miniEpisodePairKey: 'minia3d', miniEpisodePeriod: 'past' },
   }),
   boolQ('minia3esd', "A3 e) Vous sentiez-vous sans valeur ou coupable, et ce presque tous les jours — 2 dernières semaines?", {
     display_if: or(yes('minia1b'), yes('minia2b')),
+    metadata: { miniEpisodePairKey: 'minia3e', miniEpisodePeriod: 'current' },
   }),
   boolQ('minia3eep', "A3 e) Episode passé", {
     display_if: or(yes('minia1a'), yes('minia2a')),
+    metadata: { miniEpisodePairKey: 'minia3e', miniEpisodePeriod: 'past' },
   }),
   boolQ('minia3fsd', "A3 f) Aviez-vous du mal à vous concentrer ou à prendre des décisions, et ce presque tous les jours — 2 dernières semaines?", {
     display_if: or(yes('minia1b'), yes('minia2b')),
+    metadata: { miniEpisodePairKey: 'minia3f', miniEpisodePeriod: 'current' },
   }),
   boolQ('minia3fep', "A3 f) Episode passé", {
     display_if: or(yes('minia1a'), yes('minia2a')),
+    metadata: { miniEpisodePairKey: 'minia3f', miniEpisodePeriod: 'past' },
   }),
   boolQ('minia3gsd', "A3 g) Avez-vous, à plusieurs reprises, pensé qu’il vaudrait mieux que vous soyez mort(e), pensé au suicide ou à vous faire du mal ? Avez-vous tenté ou planifié un suicide ? — 2 dernières semaines?", {
     display_if: or(yes('minia1b'), yes('minia2b')),
+    metadata: { miniEpisodePairKey: 'minia3g', miniEpisodePeriod: 'current' },
   }),
   boolQ('minia3gep', "A3 g) Episode passé", {
     display_if: or(yes('minia1a'), yes('minia2a')),
+    metadata: { miniEpisodePairKey: 'minia3g', miniEpisodePeriod: 'past' },
   }),
   boolQ('minia3eeac', "Les exemples concordent avec une idée délirante (Episode actuel)", {
     display_if: or(yes('minia3esd'), yes('minia3eep')),
@@ -148,11 +162,13 @@ const SECTION_A: Question[] = [
   }),
   boolQ('minia4sd', "A4) Les problèmes ont-ils entraîné des difficultés significatives — 2 dernières semaines?", {
     required: true,
-    display_if: or(yes('minia1b'), yes('minia2b'))
+    display_if: or(yes('minia1b'), yes('minia2b')),
+    metadata: { miniEpisodePairKey: 'minia4', miniEpisodePeriod: 'current' },
   }),
   boolQ('minia4ep', "A4) (Episode passé)", {
     required: true,
-    display_if: or(yes('minia1a'), yes('minia2a'))
+    display_if: or(yes('minia1a'), yes('minia2a')),
+    metadata: { miniEpisodePairKey: 'minia4', miniEpisodePeriod: 'past' },
   }),
   boolQ('minia5ep', "A5) Entre 2 épisodes, vous êtes-vous senti(e) bien pendant au moins deux mois ?", {
     display_if: or(yes('minia1a'), yes('minia2a'))
@@ -337,11 +353,14 @@ const SECTION_C: Question[] = [
     ['minic3fea', 'minic3fep', "C3 f) Etiez-vous nettement plus actif(e) et entreprenant(e), au travail, à l’école, socialement, sexuellement ou vous sentiez-vous incapable de tenir en place ou particulièrement nerveux(se) en permanence "],
     ['minic3gea', 'minic3gep', "C3 g) Aviez-vous tellement envie de faire des choses qui vous paraissaient agréables ou tentantes que vous aviez tendance à en oublier les risques ou les difficultés qu’elles auraient pu entraîner (faire des achats inconsidérés, conduire  imprudemment, avoir une activité sexuelle excessive et irréfléchie) "],
   ].flatMap(([ea, ep, text], idx) => {
+    const pairKey = typeof ea === 'string' ? ea.replace(/ea$/, '') : '';
     const actuel = boolQ(ea, `${text} - Episode actuel ?`, {
       display_if: or(yes('minic1b'), yes('minic2b')),
+      metadata: { miniEpisodePairKey: pairKey, miniEpisodePeriod: 'current' },
     });
     const passe = boolQ(ep, `${text} - Episode passé ?`, {
       display_if: or(yes('minic1a'), yes('minic2a')),
+      metadata: { miniEpisodePairKey: pairKey, miniEpisodePeriod: 'past' },
     });
     if (idx === 0) {
       return [
@@ -375,13 +394,16 @@ const SECTION_C: Question[] = [
 
   ...[
     ['minic4ea', 'minic4ep', "C4 Qu’elle a été la durée maximale pendant laquelle ces symptômes ont persisté "],
-  ].flatMap(([ea, ep, text]) => [
+  ].flatMap(([ea, ep, text]) => {
+    const pairKey = typeof ea === 'string' ? ea.replace(/ea$/, '') : '';
+    return [
     {
       id: ea,
       text: `${text} - Episode actuel ?`,
       type: 'single_choice' as const,
       required: false,
       options: [{ code: 1, label: 'a) 3 jours au moins', score: 1 }, { code: 2, label: 'b) 4 à 6 jours', score: 2 }, { code: 3, label: 'c) 7 jours ou plus', score: 3 }],
+      metadata: { miniEpisodePairKey: pairKey, miniEpisodePeriod: 'current' },
       display_if: or(
         and(or(yes('minic1a'), yes('minic1b')), gte(sum(['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea']), 3), or(yes('minic1b'), yes('minic2b'))),
         and(and(no('minic1a'), no('minic1b')), gte(sum(['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea']), 4), or(yes('minic1b'), yes('minic2b')))
@@ -393,24 +415,28 @@ const SECTION_C: Question[] = [
       type: 'single_choice' as const,
       required: false,
       options: [{ code: 1, label: 'a) 3 jours au moins', score: 1 }, { code: 2, label: 'b) 4 à 6 jours', score: 2 }, { code: 3, label: 'c) 7 jours ou plus', score: 3 }],
+      metadata: { miniEpisodePairKey: pairKey, miniEpisodePeriod: 'past' },
       display_if: or(
         and(yes('minic1a'), gte(sum(['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep']), 3), or(yes('minic1a'), yes('minic2a'))),
         and(no('minic1a'), gte(sum(['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep']), 4), or(yes('minic1a'), yes('minic2a')))
       ),
     },
-  ]),
+  ];
+  }),
 
   boolQ('minic5ea', "C5 Avez-vous été hospitalisé(e) à cause de ces problèmes - Episode actuel ?", {
     display_if: or(
       and(or(yes('minic1a'), yes('minic1b')), gte(sum(['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea']), 3), or(yes('minic1b'), yes('minic2b'))),
       and(and(no('minic1a'), no('minic1b')), gte(sum(['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea']), 4), or(yes('minic1b'), yes('minic2b')))
-    )
+    ),
+    metadata: { miniEpisodePairKey: 'minic5', miniEpisodePeriod: 'current' },
   }),
   boolQ('minic5ep', "C5 - Episode passé", {
     display_if: or(
       and(yes('minic1a'), gte(sum(['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep']), 3), or(yes('minic1a'), yes('minic2a'))),
       and(no('minic1a'), gte(sum(['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep']), 4), or(yes('minic1a'), yes('minic2a')))
-    )
+    ),
+    metadata: { miniEpisodePairKey: 'minic5', miniEpisodePeriod: 'past' },
   }),
   boolQ('minic6ea', "C6 Les problèmes dont nous venons de parler ont-ils entraîné des difficultés significatives à la maison, au travail/à l’école, dans vos relations avec les autres ou dans d’autres domaines importants pour vous - Episode actuel ?", {
     display_if: and(
@@ -419,7 +445,8 @@ const SECTION_C: Question[] = [
         and(or(yes('minic1a'), yes('minic1b')), gte(sum(['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea']), 3), or(yes('minic1b'), yes('minic2b'))),
         and(and(no('minic1a'), no('minic1b')), gte(sum(['minic3aea', 'minic3bea', 'minic3cea', 'minic3dea', 'minic3eea', 'minic3fea', 'minic3gea']), 4), or(yes('minic1b'), yes('minic2b')))
       )
-    )
+    ),
+    metadata: { miniEpisodePairKey: 'minic6', miniEpisodePeriod: 'current' },
   }),
   boolQ('minic6ep', "C6 - Episode passé", {
     display_if: and(
@@ -428,7 +455,8 @@ const SECTION_C: Question[] = [
         and(yes('minic1a'), gte(sum(['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep']), 3), or(yes('minic1a'), yes('minic2a'))),
         and(no('minic1a'), gte(sum(['minic3aep', 'minic3bep', 'minic3cep', 'minic3dep', 'minic3eep', 'minic3fep', 'minic3gep']), 4), or(yes('minic1a'), yes('minic2a')))
       )
-    )
+    ),
+    metadata: { miniEpisodePairKey: 'minic6', miniEpisodePeriod: 'past' },
   }),
 
   boolQ('minicepmania', "ÉPISODE MANIAQUE"),
