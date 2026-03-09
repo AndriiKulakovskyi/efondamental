@@ -139,13 +139,13 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
     }
 
     if (code === "ALS18") {
-      // ALS-18: Apathy scale, total 0-54
-      // 0-13: no apathy, 14-25: mild-moderate, >=26: severe
+      // ALS-18: Affective Lability Scale, total 0-3 (mean)
+      // <1.0: low, 1.0-1.99: moderate, >=2.0: high
       const score = data.total_score;
       if (score === null || score === undefined) return "info";
-      if (score >= 26) return "error"; // Marked/severe apathy
-      if (score >= 14) return "warning"; // Mild to moderate apathy
-      return "success"; // No clinically significant apathy
+      if (score >= 2.0) return "error"; // High affective lability
+      if (score >= 1.0) return "warning"; // Moderate affective lability
+      return "success"; // Low affective lability
     }
 
     if (code === "AIM") {
@@ -1065,7 +1065,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 "Résultats STORI - Stades de Rétablissement"}
               {code === "CSM" && "Résultats CSM - Chronotype"}
               {code === "CTI" && "Résultats CTI - Type Circadien"}
-              {code === "ALS18" && "Résultats ALS-18 - Apathie"}
+              {code === "ALS18" && "Résultats ALS-18 - Labilité Affective"}
               {code === "AIM" && "Résultats AIM-20 - Intensité Affective"}
               {code === "AQ12" && "Résultats AQ-12 - Agressivité"}
               {code === "ALDA" && "Score Alda"}
@@ -1288,7 +1288,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
               {code === "BIS10" && "/12.0"}
               {code === "CSM" && "/55"}
               {code === "CTI" && "/55"}
-              {code === "ALS18" && "/54"}
+              {code === "ALS18" && "/3.0"}
               {code === "AIM" && "/120"}
               {code === "AQ12" && "/72"}
               {code === "ALDA" && "/10"}
@@ -2798,14 +2798,14 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
           </div>
         )}
 
-        {/* ALS-18 Apathy Details */}
+        {/* ALS-18 Affective Lability Details */}
         {code === "ALS18" && (
           <div className="text-sm space-y-4 mt-2 pt-2 border-t">
             {/* Score Interpretation */}
             <div
-              className={`p-3 rounded-lg ${data.total_score !== null && data.total_score >= 26
+              className={`p-3 rounded-lg ${data.total_score !== null && data.total_score >= 2.0
                 ? "bg-red-50 border border-red-200"
-                : data.total_score !== null && data.total_score >= 14
+                : data.total_score !== null && data.total_score >= 1.0
                   ? "bg-amber-50 border border-amber-200"
                   : "bg-green-50 border border-green-200"
                 }`}
@@ -2814,29 +2814,29 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 <div className="flex justify-between items-center">
                   <span className="font-medium">
                     {data.total_score !== null &&
-                      data.total_score >= 26 &&
-                      "Apathie marquée / sévère"}
+                      data.total_score >= 2.0 &&
+                      "Labilité affective élevée"}
                     {data.total_score !== null &&
-                      data.total_score >= 14 &&
-                      data.total_score < 26 &&
-                      "Apathie légère à modérée"}
-                    {(data.total_score === null || data.total_score < 14) &&
-                      "Absence d'apathie cliniquement significative"}
+                      data.total_score >= 1.0 &&
+                      data.total_score < 2.0 &&
+                      "Labilité affective modérée"}
+                    {(data.total_score === null || data.total_score < 1.0) &&
+                      "Labilité affective faible"}
                   </span>
                   <span className="text-xs text-gray-600">
-                    Score: {data.total_score ?? "-"}/54
+                    Score: {data.total_score?.toFixed(2) ?? "-"}/3.0
                   </span>
                 </div>
                 <p className="text-xs leading-relaxed mt-2">
                   {data.total_score !== null &&
-                    data.total_score >= 26 &&
-                    "Désengagement important, passivité, émoussement motivationnel net. Retentissement fonctionnel clair (autonomie, relations, activités). Profil compatible avec une apathie cliniquement centrale, souvent indépendante de la symptomatologie thymique aiguë."}
+                    data.total_score >= 2.0 &&
+                    "Labilité affective marquée avec des changements rapides et fréquents d'humeur, d'énergie ou d'émotions. Retentissement fonctionnel significatif sur les relations et les activités quotidiennes."}
                   {data.total_score !== null &&
-                    data.total_score >= 14 &&
-                    data.total_score < 26 &&
-                    "Baisse d'initiative, réduction de l'engagement dans les activités quotidiennes, effort moindre pour démarrer ou maintenir une action. Retentissement fonctionnel possible mais partiel."}
-                  {(data.total_score === null || data.total_score < 14) &&
-                    "Motivation globalement préservée. Les variations observées peuvent relever de la fatigue, du contexte ou de facteurs situationnels."}
+                    data.total_score >= 1.0 &&
+                    data.total_score < 2.0 &&
+                    "Labilité affective modérée avec des fluctuations émotionnelles notables. Peut impacter le fonctionnement quotidien de manière intermittente."}
+                  {(data.total_score === null || data.total_score < 1.0) &&
+                    "Stabilité émotionnelle globalement préservée. Les variations d'humeur restent dans les limites normales."}
                 </p>
               </div>
             </div>
@@ -2852,7 +2852,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     Anxiété-Dépression (5 items):
                   </span>
                   <span className="font-medium">
-                    {data.anxiety_depression_score ?? "-"}/15
+                    {data.anxiety_depression_score?.toFixed(2) ?? "-"}/3.0
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -2860,13 +2860,13 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                     Dépression-Élation (8 items):
                   </span>
                   <span className="font-medium">
-                    {data.depression_elation_score ?? "-"}/24
+                    {data.depression_elation_score?.toFixed(2) ?? "-"}/3.0
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Colère (5 items):</span>
                   <span className="font-medium">
-                    {data.anger_score ?? "-"}/15
+                    {data.anger_score?.toFixed(2) ?? "-"}/3.0
                   </span>
                 </div>
               </div>
@@ -2879,8 +2879,8 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                 pas caractéristique, 3=Très caractéristique)
               </p>
               <p>
-                <strong>Seuils:</strong> 0-13 (absence d'apathie) | 14-25
-                (légère-modérée) | &ge;26 (marquée/sévère)
+                <strong>Seuils:</strong> &lt;1.0 (faible) | 1.0-1.99
+                (modérée) | &ge;2.0 (élevée)
               </p>
             </div>
           </div>
