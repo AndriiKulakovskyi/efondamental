@@ -117,34 +117,43 @@ export function computeAls18Scores(responses: Partial<BipolarAls18Response>): Al
     return value ?? 0;
   };
   
-  const anxietyDepressionScore = SUBSCALES.anxiety_depression.reduce((sum, item) => sum + getValue(item), 0);
-  const depressionElationScore = SUBSCALES.depression_elation.reduce((sum, item) => sum + getValue(item), 0);
-  const angerScore = SUBSCALES.anger.reduce((sum, item) => sum + getValue(item), 0);
-  const totalScore = anxietyDepressionScore + depressionElationScore + angerScore;
+  // Calculate sums for each subscale
+  const anxietyDepressionSum = SUBSCALES.anxiety_depression.reduce((sum, item) => sum + getValue(item), 0);
+  const depressionElationSum = SUBSCALES.depression_elation.reduce((sum, item) => sum + getValue(item), 0);
+  const angerSum = SUBSCALES.anger.reduce((sum, item) => sum + getValue(item), 0);
+  
+  // Calculate means (scores range 0-3)
+  const anxietyDepressionScore = anxietyDepressionSum / SUBSCALES.anxiety_depression.length; // 5 items
+  const depressionElationScore = depressionElationSum / SUBSCALES.depression_elation.length; // 8 items
+  const angerScore = angerSum / SUBSCALES.anger.length; // 5 items
+  
+  // Total score = sum of all items / 18
+  const totalSum = anxietyDepressionSum + depressionElationSum + angerSum;
+  const totalScore = totalSum / 18;
   
   return {
-    anxiety_depression_score: anxietyDepressionScore,
-    depression_elation_score: depressionElationScore,
-    anger_score: angerScore,
-    total_score: totalScore,
+    anxiety_depression_score: parseFloat(anxietyDepressionScore.toFixed(2)),
+    depression_elation_score: parseFloat(depressionElationScore.toFixed(2)),
+    anger_score: parseFloat(angerScore.toFixed(2)),
+    total_score: parseFloat(totalScore.toFixed(2)),
     interpretation: interpretAls18Score(totalScore)
   };
 }
 
 export function interpretAls18Score(totalScore: number): string {
-  // ALS-18 total score ranges from 0-54
-  // Higher scores indicate greater apathy
-  if (totalScore <= 13) return 'Absence d\'apathie';
-  if (totalScore <= 25) return 'Apathie légère à modérée';
-  return 'Apathie marquée/sévère';
+  // ALS-18 total score ranges from 0-3 (mean score)
+  // Higher scores indicate greater affective lability
+  if (totalScore < 1.0) return 'Labilité affective faible';
+  if (totalScore < 2.0) return 'Labilité affective modérée';
+  return 'Labilité affective élevée';
 }
 
 export function getAls18ClinicalGuidance(totalScore: number): string {
-  if (totalScore <= 13) {
-    return 'Motivation globalement préservée. Les variations observées peuvent relever de la fatigue, du contexte ou de facteurs situationnels.';
+  if (totalScore < 1.0) {
+    return 'Stabilité émotionnelle globalement préservée. Les variations d\'humeur restent dans les limites normales.';
   }
-  if (totalScore <= 25) {
-    return 'Baisse d\'initiative, réduction de l\'engagement dans les activités quotidiennes, effort moindre pour démarrer ou maintenir une action. Retentissement fonctionnel possible mais partiel.';
+  if (totalScore < 2.0) {
+    return 'Labilité affective modérée avec des fluctuations émotionnelles notables. Peut impacter le fonctionnement quotidien de manière intermittente.';
   }
-  return 'Désengagement important, passivité, émoussement motivationnel net. Retentissement fonctionnel clair (autonomie, relations, activités). Profil compatible avec une apathie cliniquement centrale, souvent indépendante de la symptomatologie thymique aiguë.';
+  return 'Labilité affective marquée avec des changements rapides et fréquents d\'humeur, d\'énergie ou d\'émotions. Retentissement fonctionnel significatif sur les relations et les activités quotidiennes.';
 }

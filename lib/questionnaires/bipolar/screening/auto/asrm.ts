@@ -1,7 +1,7 @@
 // eFondaMental Platform - ASRM (Altman Self-Rating Mania Scale)
 // Bipolar Screening - Auto-questionnaire
 
-import { Question } from '@/lib/types/database.types';
+import { Question, QuestionnaireDefinition } from '../../types';
 
 // ============================================================================
 // Types
