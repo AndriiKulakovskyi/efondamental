@@ -1241,7 +1241,7 @@ export function ScoreDisplay({ code: rawCode, data }: ScoreDisplayProps) {
                                                                                                         : code === "PSP"
                                                                                                           ? (data.final_score !== undefined && data.final_score !== null ? data.final_score : "-")
                                                                                                           : (code === "EQ5D5L" || code === "EQ5D5L_SZ")
-                                                                                                            ? (data.profile_string || data.health_state || "-")
+                                                                                                            ? (data.index_value || "-")
                                                                                                             : code === "PRISE_M"
                                                                                                               ? (data.total_score !== undefined ? data.total_score : "-")
                                                                                                               : code === "STAI_YA"

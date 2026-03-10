@@ -2,6 +2,7 @@
 // Bipolar Initial Evaluation - Auto ETAT Module
 
 import { Question } from '@/lib/types/database.types';
+import { FRANCE_CROSSWALK } from '@/lib/services/questionnaire.service';
 
 // ============================================================================
 // Types
@@ -151,6 +152,7 @@ export const EQ5D5L_DEFINITION: QuestionnaireDefinition = {
   code: 'EQ5D5L',
   title: 'EQ-5D-5L',
   description: 'Instrument standardise de mesure de l\'etat de sante comprenant 5 dimensions et une echelle visuelle analogique (EVA).',
+  instructions: 'Veuillez indiquer, pour chacune des rubriques suivantes, l\'affirmation qui décrit le mieux votre état de santé aujourd\'hui, en cochant la case appropriée',
   questions: EQ5D5L_QUESTIONS,
   metadata: {
     pathologies: ['bipolar'],
@@ -187,12 +189,14 @@ export function computeHealthState(responses: Eq5d5lScoreInput): string {
 
 export function computeEq5d5lScores(responses: Eq5d5lScoreInput): Eq5d5lScoreResult {
   const profileString = computeHealthState(responses);
-  const sumDimensions = responses.mobility + responses.self_care + responses.usual_activities + 
-                        responses.pain_discomfort + responses.anxiety_depression;
   
-  // Simple index approximation (real calculation requires country-specific value sets)
-  // This is a simplified formula for demonstration
-  const indexValue = (1 - ((sumDimensions - 5) * 0.1)).toFixed(3);
+  // Look up index value from French value set
+  // Reference: Andrade LF, Ludwig K, Goni JMR, Oppe M, de Pouvourville G. 
+  // A French Value Set for the EQ-5D-5L. Pharmacoeconomics. 2020;38(4):413-425.
+  const indexValueNum = FRANCE_CROSSWALK[profileString];
+  
+  // Fallback to 0 if health state not found (should not happen with valid responses)
+  const indexValue = indexValueNum !== undefined ? indexValueNum.toFixed(3) : '0.000';
   
   // Count dimensions with problems
   const problemDimensions = [
