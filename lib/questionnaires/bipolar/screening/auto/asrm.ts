@@ -1,7 +1,8 @@
 // eFondaMental Platform - ASRM (Altman Self-Rating Mania Scale)
 // Bipolar Screening - Auto-questionnaire
 
-import { Question, QuestionnaireDefinition } from '../../types';
+import { Question } from '@/lib/types/database.types';
+import { QuestionnaireDefinition } from '@/lib/questionnaires/definitions';
 
 // ============================================================================
 // Types
@@ -106,21 +107,6 @@ export const ASRM_QUESTIONS: Question[] = [
 // ============================================================================
 // Questionnaire Definition
 // ============================================================================
-
-export interface QuestionnaireDefinition {
-  id: string;
-  code: string;
-  title: string;
-  description: string;
-  instructions?: string;
-  questions: Question[];
-  metadata?: {
-    singleColumn?: boolean;
-    pathologies?: string[];
-    target_role?: 'patient' | 'healthcare_professional';
-    [key: string]: any;
-  };
-}
 
 export const ASRM_DEFINITION: QuestionnaireDefinition = {
   id: 'asrm',

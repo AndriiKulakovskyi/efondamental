@@ -2,7 +2,7 @@
 // New unified architecture for all questionnaires
 
 // Re-export types
-export {
+export type {
   Question,
   QuestionOption,
   QuestionnaireDefinition,

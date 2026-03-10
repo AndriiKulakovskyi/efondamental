@@ -1,36 +1,8 @@
 // eFondaMental Platform - Shared Questionnaire Types
 // Reusable types for auto and hetero questionnaires across pathologies
 
-export interface QuestionOption {
-  code: number;
-  label: string;
-  score?: number;
-}
-
-export interface Question {
-  id: string;
-  section_id: string;
-  text: string;
-  type: 'single_choice' | 'multiple_choice' | 'text' | 'number' | 'scale' | 'boolean' | 'date' | 'instruction';
-  required: boolean;
-  options?: QuestionOption[];
-  constraints?: {
-    value_type?: string;
-    min_value?: number;
-    max_value?: number;
-    allowed_values?: number[];
-  };
-  help?: string;
-  scoring_group_id?: string;
-  scoring_aggregation?: 'max' | 'sum' | 'direct';
-  display_if?: any; // JSONLogic condition
-  required_if?: any; // JSONLogic condition
-  min?: number;
-  max?: number;
-  minLabel?: string;
-  maxLabel?: string;
-  indentLevel?: number; // For visual indentation of branching questions
-}
+export type { Question, QuestionOption } from '@/lib/types/database.types';
+import type { Question } from '@/lib/types/database.types';
 
 export interface Section {
   id: string;

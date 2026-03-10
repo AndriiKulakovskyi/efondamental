@@ -1,6 +1,6 @@
 // eFondaMental Platform - Questionnaire Validation Utilities
 
-import { Question, ValidationResult, QuestionnaireAnswers } from './types';
+import { Question, QuestionOption, ValidationResult, QuestionnaireAnswers } from './types';
 
 export function validateAnswers(
   questions: Question[],
@@ -33,7 +33,9 @@ export function validateAnswers(
     switch (question.type) {
       case 'single_choice':
         if (question.options) {
-          const validCodes = question.options.map(opt => opt.code);
+          const validCodes = question.options
+            .filter((opt): opt is QuestionOption => typeof opt !== 'string')
+            .map(opt => opt.code);
           if (!validCodes.includes(Number(answer))) {
             errors.push(`Réponse invalide pour "${question.text}".`);
           }
@@ -66,23 +68,6 @@ export function validateAnswers(
           errors.push(`La réponse à "${question.text}" doit être oui ou non.`);
         }
         break;
-    }
-
-    // Constraint validation
-    if (question.constraints) {
-      const { allowed_values, min_value, max_value } = question.constraints;
-      
-      if (allowed_values && !allowed_values.includes(Number(answer))) {
-        errors.push(`Valeur non autorisée pour "${question.text}".`);
-      }
-      
-      if (min_value !== undefined && Number(answer) < min_value) {
-        errors.push(`La valeur de "${question.text}" doit être au moins ${min_value}.`);
-      }
-      
-      if (max_value !== undefined && Number(answer) > max_value) {
-        errors.push(`La valeur de "${question.text}" ne peut pas dépasser ${max_value}.`);
-      }
     }
   }
 

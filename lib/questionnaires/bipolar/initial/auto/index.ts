@@ -8,4 +8,4 @@ export * as etat from './etat';
 export * as traits from './traits';
 
 // QuestionnaireDefinition type for new architecture
-export type { QuestionnaireDefinition } from '../../types';
+export type { QuestionnaireDefinition } from '@/lib/questionnaires/definitions';
